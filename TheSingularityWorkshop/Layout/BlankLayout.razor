@@ -1,0 +1,18 @@
+﻿@inherits LayoutComponentBase
+
+<div class="blank-layout-container">
+    @* Renders the content (which is initially Home.razor with minimal content) *@
+    @Body
+</div>
+
+<style>
+    /* Ensure the body is truly blank and fills the screen */
+    .blank-layout-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: white; /* Or black, depending on your theme */
+    }
+</style>
