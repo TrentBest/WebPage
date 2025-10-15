@@ -1,0 +1,50 @@
+﻿@page "/fsmdemo"
+@using TheSingularityWorkshop.Services
+@inject FSMManagerService FSMService
+
+<PageTitle>FSM Demo</PageTitle>
+
+<h1>FSM Service Integration</h1>
+<p>This demonstrates injecting the FSMManagerService, which holds the FSM's running instance and context.</p>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">FSM State and Context</h5>
+        <dl>
+            <dt>Current FSM State:</dt>
+            <dd><strong>@FSMService.CurrentState</strong></dd>
+
+            <dt>Context Message:</dt>
+            <dd>@FSMService.Context.Message</dd>
+
+            <dt>Context Counter:</dt>
+            <dd>@FSMService.Context.ClickCount</dd>
+        </dl>
+    </div>
+</div>
+
+<button class="btn btn-primary mt-3" @onclick="StepFSM">
+    Step FSM (Update Loop)
+</button>
+
+<button class="btn btn-secondary mt-3" @onclick="ForceFSMChange">
+    Force Transition to "Manual"
+</button>
+
+@code {
+    private void StepFSM()
+    {
+        // 1. Call the FSM's Step method, which executes the current state's OnUpdate.
+        FSMService.Step();
+
+        // 2. Notify Blazor to re-render the component with the updated context/state values.
+        StateHasChanged();
+    }
+
+    private void ForceFSMChange()
+    {
+        // Manually force a transition, bypassing normal transition rules.
+        FSMService.ForceTransition("Manual");
+        StateHasChanged();
+    }
+}
