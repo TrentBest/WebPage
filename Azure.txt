@@ -1,0 +1,22 @@
+Subscription
+ad6dcd59-b0d6-4837-9d50-4e8163f92d14
+Resource Group
+TheSingularityWorkshopResourceGroupA
+Name
+the-singularity-workshop
+Region
+centralus
+SKU
+Standard
+Repository
+https://github.com/TrentBest/WebPage
+Branch
+master
+App location
+./TheSingularityWorkshop
+API location
+Api
+Output location
+wwwroot
+Deployment authorization policy
+Deployment token
