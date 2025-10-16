@@ -1,6 +1,10 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">TheSingularityWorkshop</a>
+        <a class="navbar-brand" href="">
+            <!-- Corrected path: /Images/TheSingularityWorkshopLogo.png -->
+            <img src="/Images/TheSingularityWorkshopLogo.png" alt="TSW Logo" style="height: 30px; margin-right: 10px; border-radius: 50%;" />
+            TheSingularityWorkshop
+        </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -17,11 +21,7 @@
 
 
         @* >>> ADMINISTRATIVE TABS <<< *@
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="about-us">
-                <span class="oi oi-people" aria-hidden="true"></span> About Us
-            </NavLink>
-        </div>
+       
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="privacy-policy">
@@ -37,6 +37,11 @@
             <NavLink class="nav-link" href="support">
                 <span class="oi oi-headphones" aria-hidden="true"></span> Support / Contact
             </NavLink>
+        </div> 
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="about-us">
+                <span class="oi oi-people" aria-hidden="true"></span> About Us
+            </NavLink>
         </div>
     </nav>
 </div>
@@ -46,7 +51,7 @@
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    private void ToggleNavMenu()
+    public void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }

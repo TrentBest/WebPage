@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\Images\TheSingularityWorkshopLogo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.20" PrivateAssets="all" />
     <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.11" />
@@ -14,6 +18,10 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\Images\TheSingularityWorkshopLogo.png" />
   </ItemGroup>
 
 </Project>
