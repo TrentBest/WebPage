@@ -1,0 +1,212 @@
+﻿@page "/fsm-editor"
+@using TheSingularityWorkshop.Models
+<PageTitle>FSM Graphical Editor</PageTitle>
+
+@* Link the new CSS for the layout *@
+<link href="TheSingularityWorkshop/Pages/FSMEditor.razor.css" rel="stylesheet" />
+
+@* --- Global Controls (No change, remains minimal) --- *@
+<div class="container-fluid pt-3 pb-2">
+    <h1 class="display-4 fw-bold text-primary mb-2">FSM Graphical Editor</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        @* Edit Mode Toggle *@
+        <div class="d-flex align-items-center">
+            <span class="fw-bold me-3">Editor Mode:</span>
+            <input type="checkbox" id="editModeToggle" @bind="EditMode" />
+            <label for="editModeToggle" class="ms-2">@EditModeText</label>
+        </div>
+
+        @* Action Buttons *@
+        <div>
+            <button class="btn btn-primary me-2" disabled>
+                <span class="oi oi-cloud-upload" aria-hidden="true"></span>
+                Simulate 'Upload Code DLL'
+            </button>
+            @if (EditMode)
+            {
+                <button class="btn btn-success" disabled>Save FSM</button>
+            }
+        </div>
+    </div>
+</div>
+
+@* --- Main Editor Container (3-Column Grid) --- *@
+<div class="editor-page-content">
+    <div class="main-editor-container">
+
+        @* 1. Left Panel (NEW): FSM Records by Group (Tree View) *@
+        <div class="left-panel editor-panel">
+            <h5 class="panel-header text-info">FSM Records</h5>
+
+            @* Search and Exclude Checkbox *@
+            <div class="input-group input-group-sm mb-3">
+                <input type="text" class="form-control" placeholder="Search FSMs/Groups (RegEx)" />
+                <div class="input-group-text p-0">
+                    <input type="checkbox" class="form-check-input ms-1 me-1 mt-0" title="Exclude Matches" />
+                    <span class="small me-1">Exclude</span>
+                </div>
+            </div>
+
+            @* Process Group Tree (Mock Data Implementation) *@
+            <div>
+                @foreach (var group in AvailableFSMsByGroup)
+                {
+                    <div @onclick="() => ToggleGroupExpansion(group.Key)" class="group-header">
+                        <span class="fw-bold text-dark">
+                            @group.Key (@group.Value.Count)
+                        </span>
+                        <span class="oi oi-chevron-@(!ExpandedGroups.Contains(group.Key) ? "right" : "bottom")"></span>
+                    </div>
+
+                    @if (ExpandedGroups.Contains(group.Key))
+                    {
+                        <ul class="list-unstyled mb-2">
+                            @foreach (var fsmName in group.Value)
+                            {
+                                <li class="fsm-list-item text-primary cursor-pointer p-1 border-bottom">@fsmName</li>
+                            }
+                        </ul>
+                    }
+                }
+            </div>
+        </div>
+
+
+        @* 2. Center Panel (NEW): FSM Configuration and Graphical View *@
+        <div class="center-panel">
+            <h5 class="fw-bold text-primary mb-3">FSM: @MyFSM.Name</h5>
+
+            @* FSM Configuration (Details aligned with title) *@
+            <div class="fsm-header-controls">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rate:</span>
+                    <input type="text" class="form-control" @bind="MyFSM.ProcessRate" disabled="@(!EditMode)" />
+                </div>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Group:</span>
+                    <input type="text" class="form-control" @bind="MyFSM.ProcessGroup" disabled="@(!EditMode)" />
+                </div>
+            </div>
+
+            @* Visualization Area *@
+            <div style="height: calc(100% - 70px); border: 1px dashed var(--bs-secondary); background-color: white;">
+                <p class="text-muted text-center mt-5">**FSM Structure Editor / Canvas**</p>
+            </div>
+        </div>
+
+
+        @* 3. Right Panel (NEW): Registered Logic and Filtering *@
+        <div class="right-panel editor-panel">
+            <h5 class="fw-bold text-info panel-header">Registered Logic</h5>
+
+            @* --- Behavior (Action) Filter/List --- *@
+            <h6 class="fw-bold text-success mt-3">Behaviors (Actions)</h6>
+            <div class="input-group input-group-sm mb-2">
+                <input type="text" class="form-control" placeholder="RegEx Search Actions" @bind="BehaviorSearchTerm" />
+                <div class="input-group-text p-0">
+                    <input type="checkbox" class="form-check-input ms-1 me-1 mt-0" @bind="BehaviorSearchInverse" title="Inverse Search (Exclude Matches)" />
+                    <span class="small me-1">Exclude</span>
+                </div>
+            </div>
+
+            <div style="max-height: 250px; overflow-y: auto;">
+                <ul class="list-unstyled small">
+                    @foreach (var method in AvailableActionMethods)
+                    {
+                        <li class="p-1 border-bottom text-truncate" draggable="true">@method</li>
+                    }
+                </ul>
+            </div>
+
+            @* --- Condition (Predicate) Filter/List --- *@
+            <h6 class="fw-bold text-danger mt-4">Conditions (Predicates)</h6>
+            <div class="input-group input-group-sm mb-2">
+                <input type="text" class="form-control" placeholder="RegEx Search Conditions" @bind="ConditionSearchTerm" />
+                <div class="input-group-text p-0">
+                    <input type="checkbox" class="form-check-input ms-1 me-1 mt-0" @bind="ConditionSearchInverse" title="Inverse Search (Exclude Matches)" />
+                    <span class="small me-1">Exclude</span>
+                </div>
+            </div>
+
+            <div style="max-height: 250px; overflow-y: auto;">
+                <ul class="list-unstyled small">
+                    @foreach (var method in AvailableConditionMethods)
+                    {
+                        <li class="p-1 border-bottom text-truncate" draggable="true">@method</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // FSM Core Model (Assuming it exists in Models folder now)
+    public FSMDefinition MyFSM { get; set; } = new FSMDefinition();
+    public bool EditMode { get; set; } = true;
+    private string EditModeText => EditMode ?
+"Editing Enabled (CRUD Active)" : "Read-Only Display (Locked)";
+
+    // Filtering State
+    public string BehaviorSearchTerm { get; set; } = "";
+    public bool BehaviorSearchInverse { get; set; } = false;
+    public string ConditionSearchTerm { get; set; } = "";
+    public bool ConditionSearchInverse { get; set; } = false;
+
+    // UI State for the FSM Group Tree
+    public List<string> ExpandedGroups { get; set; } = new List<string> { "Update" };
+
+    // FSM List (Mock of API.Internal.GetProcessingGroupNames logic)
+    public Dictionary<string, List<string>> AvailableFSMsByGroup { get; set; } = new Dictionary<string, List<string>>()
+    {
+        { "Update", new List<string> { "WebPageFSM (LIVE)", "MainMenuFSM", "LoadingScreenFSM" } },
+        { "Physics", new List<string> { "PlayerMovementFSM", "EnemyAI_Patrol" } },
+        { "Network", new List<string> { "ConnectionManagerFSM" } },
+        { "Unused_Group_A", new List<string> { "Test_FSM_1" } },
+        { "Unused_Group_B", new List<string> { "Test_FSM_2" } }
+    };
+
+    // --- MOCK FUNCTION DISCOVERY ---
+    private List<string> AvailableActionMethods = new List<string>
+    {
+        "NoOp", "SetInitialMessage", "PulseMessage", "ClearMessage",
+        "ReportCompletion", "PerformHeavyTask", "CarStart", "PlaneStart"
+    };
+
+    private List<string> AvailableConditionMethods = new List<string>
+    {
+        "AlwaysTrue", "AlwaysFalse", "CheckClickCount", "IsMessageWaiting",
+        "HasCompletedLoading", "EngineStarted", "LandingGearUp"
+    };
+
+    protected override void OnInitialized()
+    {
+        // Default FSM initialization
+        MyFSM.Name = "UnNamedFSM";
+        MyFSM.ProcessRate = "-1";
+        MyFSM.ProcessGroup = "Update";
+
+        // States (for demonstration)
+        MyFSM.States.Add(new StateModel { Name = "Initializing", OnEnterMethod = "SetInitialMessage" });
+        MyFSM.States.Add(new StateModel { Name = "Idle", OnUpdateMethod = "PulseMessage", OnEnterMethod = "ClearMessage" });
+        MyFSM.States.Add(new StateModel { Name = "Loading", OnExitMethod = "ReportCompletion" });
+
+        // Transitions
+        MyFSM.Transitions.Add(new TransitionModel { FromStateName = "Initializing", ToStateName = "Idle", ConditionMethod = "AlwaysTrue" });
+        MyFSM.Transitions.Add(new TransitionModel { FromStateName = "Idle", ToStateName = "Loading", ConditionMethod = "CheckClickCount" });
+        MyFSM.Transitions.Add(new TransitionModel { FromStateName = "Loading", ToStateName = "Idle", ConditionMethod = "HasCompletedLoading" });
+    }
+
+    private void ToggleGroupExpansion(string groupName)
+    {
+        if (ExpandedGroups.Contains(groupName))
+        {
+            ExpandedGroups.Remove(groupName);
+        }
+        else
+        {
+            ExpandedGroups.Add(groupName);
+        }
+    }
+}

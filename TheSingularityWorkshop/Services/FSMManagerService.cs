@@ -1,80 +1,52 @@
 ﻿using TheSingularityWorkshop.FSM_API;
 using TheSingularityWorkshop.Services;
 
-namespace TheSingularityWorkshop.Services
+
+public class FSMManagerService
 {
-    public class FSMManagerService
+    // FSMHandle is your direct link to the live FSM instance
+    private FSMHandle _fsmHandle;
+
+    public PageStateContext Context { get; }
+
+    // Expose the current FSM state for UI components to bind to
+    public string CurrentState => _fsmHandle?.CurrentState ?? "Uninitialized";
+
+    public FSMManagerService()
     {
-        // FSMHandle is your direct link to the live FSM instance
-        private FSMHandle _fsmHandle;
+        // 1. Initialize the Context/Data Bag
+        Context = new PageStateContext();
 
-        public PageStateContext Context { get; }
+        // 2. Define the FSM blueprint (Initialization, Operation, Shutdown)
+        FSM_API.Create.CreateFiniteStateMachine("WebpageFSM", -1, "Update")
+            // Core States: Defining the three parts of your application state
+            .State("Idle", null, onUpdate: (c) => ((PageStateContext)c).Message = "Awaiting input...", null)
+            .State("Clicked", onEnter: (c) => ((PageStateContext)c).Message = "Button Clicked!",null, null)
+            .State("Processing", onEnter: (c) => ((PageStateContext)c).Message = "Processing...", null, null)
+            .Transition("Idle", "Clicked", (c) => ((PageStateContext)c).ClickCount > 0)
+            .Transition("Clicked", "Processing", (c) => true)
+            .Transition("Processing", "Idle", (c) => ((PageStateContext)c).ClickCount > 10) // Simulates a reset condition         
+            .BuildDefinition(); // Use BuildDefinition for API consistency
 
-        // Expose the current FSM state for UI components to bind to
-        public string CurrentState => _fsmHandle?.CurrentState ?? "Uninitialized";
+        // 3. Create the FSM instance and connect it to the Context
+        // We use the "Update" processing group so the Heartbeat service will tick it.
+        _fsmHandle = FSM_API.Create.CreateInstance("WebpageFSM", Context, "Update");
+    }
 
-        public FSMManagerService()
-        {
-            // 1. Initialize the Context/Data Bag
-            Context = new PageStateContext();
+    /// <summary>
+    /// Tells the FSM instance to take one "step" or "tick" forward.
+    /// </summary>
+    public void Step()
+    {
+        // This is for manual/event-driven updates, which should still use a group update
+        FSM_API.Interaction.Update("Update");
+    }
 
-            // 2. Define the FSM blueprint (To be replaced with your FSM_API.Create logic)
-            // -------------------------------------------------------------------------
-            // TODO: Replace this with your actual FSM Definition and FSMHandle creation.
-            // You will need to build an FSM object using FSM_API.Create.FiniteStateMachine(...)
-            // Example FSM creation setup:
-            /*
-            var myFsmDefinition = FSM_API.Create.FiniteStateMachine("WebpageFSM")
-                .AddState("Idle", onUpdate: (c) => ((PageStateContext)c).Message = "Waiting for click...")
-                .AddState("Clicked", onEnter: (c) => ((PageStateContext)c).Message = "Clicked!")
-                .AddTransition("Idle", "Clicked", (c) => ((PageStateContext)c).ClickCount > 0)
-                .SetInitialState("Idle")
-                .Build();
-            */
-            // Since FSMHandle requires a valid FSM in its constructor, 
-            // you must ensure the FSM object is available or mock it.
-            // -------------------------------------------------------------------------
-
-            // Assuming a valid 'myFsmDefinition' of type FSM exists:
-            // _fsmHandle = FSM_API.Create.Instance(myFsmDefinition, Context);
-
-            // To run without the full API for demonstration, assume _fsmHandle is created/initialized later.
-        }
-
-        /// <summary>
-        /// Tells the FSM instance to take one "step" or "tick" forward.
-        /// </summary>
-        /// <remarks>
-        /// This is the core method for moving your FSM's state forward.
-        /// In a game loop, this would be called automatically; in Blazor, it's called manually.
-        /// </remarks>
-        public void Step()
-        {
-            if (_fsmHandle == null)
-            {
-                // Placeholder logic for the demonstration context
-                Context.ClickCount++;
-                Context.Message = $"FSM Mocked: Click Count: {Context.ClickCount}";
-                return;
-            }
-
-            // In your real implementation, call the handle's update method:
-            // _fsmHandle.Update(); 
-        }
-
-        /// <summary>
-        /// Forces the FSM to transition to a new state, typically triggered by a UI event.
-        /// </summary>
-        public void ForceTransition(string nextStateName)
-        {
-            // The FSMHandle.TransitionTo method bypasses normal transition rules.
-            // _fsmHandle?.TransitionTo(nextStateName);
-
-            // Placeholder logic:
-            if (_fsmHandle == null)
-            {
-                Context.Message = $"Forced transition to '{nextStateName}' (Mocked)";
-            }
-        }
+    /// <summary>
+    /// Forces the FSM to transition to a new state, typically triggered by a UI event.
+    /// </summary>
+    public void ForceTransition(string nextStateName)
+    {
+        _fsmHandle?.TransitionTo(nextStateName);
     }
 }

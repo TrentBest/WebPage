@@ -1,0 +1,79 @@
+﻿@using TheSingularityWorkshop.Models
+
+<div class="card p-3 shadow">
+    <h3 class="card-title text-center text-info">FSM: @FSMData.Name</h3>
+
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        @* FSM Properties (Edit/Display) *@
+        <div class="input-group me-3" style="max-width: 400px;">
+            <span class="input-group-text">Rate (s):</span>
+            <input type="text" class="form-control" @bind="FSMData.ProcessRate" disabled="@(!EditMode)" />
+            <span class="input-group-text">Group:</span>
+            <input type="text" class="form-control" @bind="FSMData.ProcessGroup" disabled="@(!EditMode)" />
+        </div>
+
+        @if (EditMode)
+        {
+            <button class="btn btn-primary" disabled>Save FSM</button>
+        }
+    </div>
+
+    <div class="alert alert-warning small py-2" role="alert">
+        <span class="oi oi-warning" aria-hidden="true"></span>
+        **Technical Note**: Current version is purely GUI. Actual code for behaviors and conditions must be present in compiled DLLs on the server-side for execution.
+    </div>
+
+    <div class="row">
+        @* --- STATES HALF (Full CRUD per State Block) --- *@
+        <div class="col-md-6 border-end" style="height: 600px; overflow-y: auto;">
+            <h5 class="fw-bold text-success">States (@FSMData.States.Count)</h5>
+            @if (EditMode)
+            {
+                <button class="btn btn-sm btn-success mb-2 w-100" disabled>+ Add State</button>
+            }
+
+            @foreach (var state in FSMData.States)
+            {
+                <StateBlock State="state"
+                            EditMode="EditMode"
+                            AvailableMethods="AvailableActionMethods" />
+            }
+        </div>
+
+        @* --- TRANSITIONS HALF (Full CRUD per Transition Block) --- *@
+        <div class="col-md-6" style="height: 600px; overflow-y: auto;">
+            <h5 class="fw-bold text-danger">Transitions (@FSMData.Transitions.Count)</h5>
+            @if (EditMode)
+            {
+                <button class="btn btn-sm btn-danger mb-2 w-100" disabled>+ Add Transition</button>
+            }
+
+            @foreach (var transition in FSMData.Transitions)
+            {
+                <TransitionBlock Transition="transition"
+                                 EditMode="EditMode"
+                                 AvailableStateNames="StateNames"
+                                 AvailableConditionMethods="AvailableConditionMethods" />
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public FSMDefinition FSMData { get; set; } = default!;
+
+    [Parameter]
+    public bool EditMode { get; set; }
+
+    // List of available methods (Actions) for OnEnter/OnUpdate/OnExit.
+    [Parameter]
+    public List<string> AvailableActionMethods { get; set; } = new List<string>();
+
+    // List of available methods (Predicates) for Transition Condition.
+    [Parameter]
+    public List<string> AvailableConditionMethods { get; set; } = new List<string>();
+
+    // Derived list of all State Names for use in Transition dropdowns.
+    private List<string> StateNames => FSMData.States.Select(s => s.Name).ToList();
+}

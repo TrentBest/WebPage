@@ -1,25 +1,47 @@
-﻿# The Singularity Workshop - FSM API
-## Forging Software for the Singularity
+﻿# The Singularity Workshop: Publisher WebPage (Blazor WASM)
+## Project Name: TheSingularityWorkshop
 
-[![Nuget Version](https://img.shields.io/nuget/v/TheSingularityWorkshop.FSM_API.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_API)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.txt)
+This repository hosts the source code for **The Singularity Workshop's official publisher website**, built using **Blazor WebAssembly**.
+
+The primary goals of this project are:
+1. **Publisher Compliance:** Serve as the functional, publicly accessible website required for publishing assets (like the FSM Unity Integration) to external marketplaces.
+2. **Brand Presence:** Establish the official online presence and mission for "Forging Software for the Singularity."
+3. **Technology Showcase:** Provide live demonstrations and documentation for The Singularity Workshop's core FSM technologies.
 
 ---
 
-### 🚀 Mission Statement
-The Singularity Workshop is engineering the foundational logic layer for the next generation of digital experiences. Our core belief is that **explicit state management** is the key to creating scalable, reliable, and testable software. The FSM API defines the **Finite State Machine** as the **Atomic Unit of Work**, providing an engine-agnostic framework for unified logic.
+### 🚀 Quick Start (Local Development)
 
-### ✨ Core Features
-* **Engine-Agnostic Core:** Built on pure C#, the FSM API runs across diverse .NET platforms (WPF, Console, Blazor, and Unity).
-* **Simplified Construction:** Use the fluent **`FSM_API.Create.FiniteStateMachine(...)`** builder to design complex state logic quickly.
-* **Decoupled Architecture:** Logic is separated from data via the `IStateContext`, ensuring clean, context-driven execution.
-* **Focus on Logic:** We provide the framework; you focus on the behavior. Your work is yours—we claim **zero ownership** or revenue from applications you create.
+To run the project locally:
 
-### 📦 Quick Start & Integration
-The FSM API is available as a NuGet package.
+1.  **Clone the Repository:**
+    ```bash
+    git clone [Your Repository URL]
+    cd [Repository Folder]/TheSingularityWorkshop
+    ```
+2.  **Restore Dependencies:**
+    ```bash
+    dotnet restore
+    ```
+3.  **Run the Application:**
+    ```bash
+    dotnet run
+    ```
+    The application will typically launch in your browser at `https://localhost:7001` (or a similar port defined in `launchSettings.json`).
 
-#### 1. NuGet Installation
-```bash
-dotnet add package TheSingularityWorkshop.FSM_API
-# Or use the Package Manager Console in Visual Studio
-# Install-Package TheSingularityWorkshop.FSM_API
+---
+
+### 🏛️ Project Architecture
+
+* **Technology:** Blazor WebAssembly (.NET)
+* **Core Logic:** The site uses the **FSMManagerService** to demonstrate decoupled, state-driven logic, reflecting the architecture of the FSM API itself.
+* **Deployment:** Designed for static hosting environments (e.g., Azure Static Web Apps, GitHub Pages).
+
+### 🔗 Live Site & Compliance
+*(Update this section upon successful deployment to Azure)*
+
+* **Live URL:** `[Your Azure Website URL Here]`
+* **Compliance Links:** The site includes dedicated, public pages for **Privacy Policy**, **Terms of Service**, and **Support/Contact**, as required for asset publishing.
+
+---
+*Built by The Singularity Workshop. Check the FSM API repository for the source code of the core logic layer.*

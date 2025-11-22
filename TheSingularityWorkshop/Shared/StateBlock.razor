@@ -1,0 +1,76 @@
+﻿@using TheSingularityWorkshop.Models
+
+<div class="card card-body mb-2 bg-light shadow-sm">
+    <div class="d-flex justify-content-between align-items-start">
+        @* State Name (Editable in EditMode) *@
+        <div class="d-flex align-items-center">
+            <span class="badge bg-success me-2">STATE</span>
+            <input type="text" class="form-control form-control-sm me-3" @bind="State.Name" disabled="@(!EditMode)" style="width: 150px; font-weight: bold;" />
+        </div>
+
+        @* CRUD Controls *@
+        @if (EditMode)
+        {
+            <div class="d-flex">
+                <button class="btn btn-sm btn-outline-info me-1" title="Clone State" disabled>C</button>
+                <button class="btn btn-sm btn-outline-danger" title="Delete State" disabled>X</button>
+            </div>
+        }
+    </div>
+
+    <hr class="my-2" />
+
+    @* Behavior Dropdowns *@
+    <div class="row g-2">
+        @* On Enter *@
+        <div class="col-12">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-secondary text-white" style="width: 80px;">OnEnter</span>
+                <select class="form-select" @bind="State.OnEnterMethod" disabled="@(!EditMode)">
+                    @foreach (var method in AvailableMethods)
+                    {
+                        <option value="@method">@method</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        @* On Update *@
+        <div class="col-12">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-secondary text-white" style="width: 80px;">OnUpdate</span>
+                <select class="form-select" @bind="State.OnUpdateMethod" disabled="@(!EditMode)">
+                    @foreach (var method in AvailableMethods)
+                    {
+                        <option value="@method">@method</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        @* On Exit *@
+        <div class="col-12">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-secondary text-white" style="width: 80px;">OnExit</span>
+                <select class="form-select" @bind="State.OnExitMethod" disabled="@(!EditMode)">
+                    @foreach (var method in AvailableMethods)
+                    {
+                        <option value="@method">@method</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public StateModel State { get; set; } = default!;
+
+    [Parameter]
+    public bool EditMode { get; set; }
+
+    [Parameter]
+    // Filtered list of methods compatible with Action<IStateContext> (for State Behaviors)
+    public List<string> AvailableMethods { get; set; } = new List<string>();
+}

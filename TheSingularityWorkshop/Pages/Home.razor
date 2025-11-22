@@ -1,44 +1,187 @@
 ﻿@page "/"
+@using TheSingularityWorkshop.Pages
+@inject FSMManagerService FSMService
 
 <PageTitle>The Singularity Workshop</PageTitle>
 
-<div class="text-center py-5 bg-white">
-    <div class="container">
+<link href="TheSingularityWorkshop/Pages/Home.razor.css" rel="stylesheet" />
 
+@* -------------------------------------------------------------
+ * 1. HERO SECTION: Advanced, Minimal, and Focused
+ * ------------------------------------------------------------- *@
+<div class="hero-section">
+    <div class="container text-center">
+
+        @* First Image: The Eye Logo (Logo) *@
         <img src="/images/TheSingularityWorkshopLogo.png"
-             alt="The Singularity Workshop Splash Logo"
-             class="img-fluid mb-4"
-             style="max-width: 400px; height: auto; border-radius: 10px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);" />
+             alt="The Singularity Workshop Logo (The Eye)"
+             class="img-fluid mb-2"
+             style="max-width: 300px; height: auto; filter: drop-shadow(0 0 10px rgba(23, 162, 184, 0.8));" />
 
-        <h1 class="display-4 fw-bold text-dark mt-4 mb-3">
+        <h1 class="display-4 fw-bold text-black mt-4 mb-3">
             Welcome to
         </h1>
+        <br />
+        @* Second Image: The Rainbow Letters (Branding) *@
         <img src="/images/TheSingularityWorkshopSplashSceneWithLetters.png"
-             alt="The Singularity Workshop Splash Logo"
+             alt="The Singularity Workshop Splash Scene With Letters"
              class="img-fluid mb-4"
-             style="max-width: 600px; height: auto; border-radius: 10px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);" />
-        <p class="lead text-muted fst-italic">
-            **Forging Software for the Singularity.** Our core mission is to provide the engine-agnostic logic layer essential for the next generation of digital experiences.
+             style="max-width: 600px; height: auto;" />
+
+        <p class="hero-tagline fst-italic">
+            The Foundational Logic Layer for the Next Digital Experiences.
         </p>
 
-        <a href="about-us" class="btn btn-lg btn-primary mt-3">
-            Explore Our Mission
+        @* The unique call to action button *@
+        <a href="https://www.nuget.org/packages/TheSingularityWorkshop.FSM_API" target="_blank"
+           class="btn btn-advanced mt-3 me-3" style="min-width: 200px;">
+            <span class="oi oi-arrow-circle-right" aria-hidden="true"></span> Integrate FSM API
         </a>
-        <a href="https://www.nuget.org/packages/TheSingularityWorkshop.FSM_API" target="_blank" class="btn btn-lg btn-outline-secondary mt-3 ms-3">
-            FSM API on NuGet
+        <a href="about-us" class="btn btn-outline-light mt-3" style="min-width: 200px;">
+            Read the Full Mission
         </a>
     </div>
 </div>
 
-<div class="container py-5">
-    <div class="row">
-        <div class="col-md-6">
-            <h2 class="h3 fw-bold text-primary">Deterministic Power</h2>
-            <p>The FSM\_API is your foundation for reliable, scalable, and fully testable application logic, proven across console, WPF, and now, Blazor WebAssembly.</p>
+@* -------------------------------------------------------------
+ * 2. PILLARS SECTION: Maximized Information in a Vertical Layout
+ * ------------------------------------------------------------- *@
+<div class="pillars-section container">
+    <div class="text-center mb-5">
+        <h2 class="display-6 fw-bold text-dark">Our Core Pillars of Technology</h2>
+        <p class="lead text-muted">Our Technology Vision spans four primary "Pillars"</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+
+        @* PILLAR 1: FSM_API (The Foundation) *@
+        <div class="col-12 col-md-10">
+            <div class="pillar-card card h-100 shadow-sm bg-light">
+                <div class="card-body">
+                    <span class="card-phase-number">I</span>
+                    <h5 class="card-title card-title-api fw-bold mt-2">FSM_API: The Foundation</h5>
+                    <p class="card-text text-small">
+                        The lightweight, high-performance, and engine-agnostic core technology providing a robust C# framework for defining complex Finite State Machines. It is the starting point for all Singularity Workshop components.
+                    </p>
+                    <a href="fsm-api" class="text-muted small">Learn More...</a>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-            <h2 class="h3 fw-bold text-primary">Compliance First</h2>
-            <p>This site serves as our compliant publisher hub, ensuring our upcoming Unity Asset Store package has the required web presence, documentation, and contact points.</p>
+
+        @* PILLAR 2: FSM Layer (Modular Behaviors) *@
+        <div class="col-12 col-md-10">
+            <div class="pillar-card card h-100 shadow-sm bg-light">
+                <div class="card-body">
+                    <span class="card-phase-number">II</span>
+                    <h5 class="card-title card-title-layer fw-bold mt-2">FSM Layer: Modular Behaviors</h5>
+                    <p class="card-text text-small">
+                        Consists of thousands of pre-built FSM behaviors, packaged as micro-packages for platforms like the Unity Asset Store. These provide near drag-and-drop logic for complex tasks like AI and UI flows.
+                    </p>
+                    <a href="fsm-layer" class="text-muted small">See Product Categories...</a>
+                </div>
+            </div>
+        </div>
+
+        @* PILLAR 3: AnyApp / Experiences (The Host) *@
+        <div class="col-12 col-md-10">
+            <div class="pillar-card card h-100 shadow-sm bg-light">
+                <div class="card-body">
+                    <span class="card-phase-number">III</span>
+                    <h5 class="card-title card-title-app fw-bold mt-2">AnyApp / Experiences: The Host</h5>
+                    <p class="card-text text-small">
+                        The local application (runtime composition layer) that consumes the FSM Layer to host a digital Experience (anything that presents sensory outputs). It provides the necessary runtime and external service integrations.
+                    </p>
+                    <a href="anyapp" class="text-muted small">View Key Role...</a>
+                </div>
+            </div>
+        </div>
+
+        @* PILLAR 4: MyVR (The Metaverse) *@
+        <div class="col-12 col-md-10">
+            <div class="pillar-card card h-100 shadow-sm bg-light">
+                <div class="card-body">
+                    <span class="card-phase-number">IV</span>
+                    <h5 class="card-title card-title-vr fw-bold mt-2">MyVR: The Digital Universe</h5>
+                    <p class="card-text text-small">
+                        The cloud infrastructure that enables hosting AnyApp Experiences within themed Domains to create a persistent, shared, and virtual digital universe. It is the ultimate monetization platform.
+                    </p>
+                    <a href="my-vr" class="text-muted small">Explore Features...</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+@* -------------------------------------------------------------
+ * 3. CURRENT STATUS AREA: Live Project Status
+ * ------------------------------------------------------------- *@
+<div class="status-area">
+    <div class="container">
+        <h2 class="display-6 fw-bold text-center text-white mb-4">Current Status</h2>
+        <p class="lead text-center text-muted">
+            The roadmap is defined by our foundational structure. Development occurs sequentially by pillar.
+        </p>
+
+        <div class="row g-3 justify-content-center">
+            @* Status Card 1: FSM_API *@
+            <div class="col-12 col-md-8">
+                <div class="card status-card">
+                    <div class="card-body p-3">
+                        <h5 class="card-title text-white h6 mb-1">
+                            <span class="status-indicator live"></span> FSM_API (Phase I)
+                        </h5>
+                        <p class="card-text small text-muted">
+                            Status: **LIVE** - Core logic is stable, published on NuGet, and deployed to production environments.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            @* Status Card 2: FSM Layer *@
+            <div class="col-12 col-md-8">
+                <div class="card status-card">
+                    <div class="card-body p-3">
+                        <h5 class="card-title text-white h6 mb-1">
+                            <span class="status-indicator development"></span> FSM Layer (Phase II)
+                        </h5>
+                        <p class="card-text small text-muted">
+                            Status: **In Active Development** - Unity Asset Store package submission is currently in progress.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            @* Status Card 3: AnyApp / Experiences *@
+            <div class="col-12 col-md-8">
+                <div class="card status-card">
+                    <div class="card-body p-3">
+                        <h5 class="card-title text-white h6 mb-1">
+                            <span class="status-indicator planned"></span> AnyApp / Experiences (Phase III)
+                        </h5>
+                        <p class="card-text small text-muted">
+                            Status: **Planned** - Development is scheduled to begin upon successful launch of Phase II.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            @* Status Card 4: MyVR *@
+            <div class="col-12 col-md-8">
+                <div class="card status-card">
+                    <div class="card-body p-3">
+                        <h5 class="card-title text-white h6 mb-1">
+                            <span class="status-indicator planned"></span> MyVR (Phase IV)
+                        </h5>
+                        <p class="card-text small text-muted">
+                            Status: **Conceptual** - The ultimate virtual universe is actively being designed for future implementation.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // The Home.razor file remains minimal for cleaner UI/logic separation.
+}

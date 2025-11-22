@@ -6,6 +6,7 @@ using System;
 using System.Net.Http;
 
 using TheSingularityWorkshop;
+using TheSingularityWorkshop.FSM_API;
 using TheSingularityWorkshop.Services;
 
 internal class Program
@@ -22,3 +23,5 @@ internal class Program
         await builder.Build().RunAsync();
     }
 }
+
+

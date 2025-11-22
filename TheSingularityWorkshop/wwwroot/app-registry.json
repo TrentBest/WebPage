@@ -1,0 +1,22 @@
+{
+  "applicationName": "The Singularity Workshop",
+  "version": "1.0.0",
+  "rootComponents": [
+    {
+      "selector": "#app",
+      "type": "TheSingularityWorkshop.App"
+    },
+    {
+      "selector": "head::after",
+      "type": "Microsoft.AspNetCore.Components.Web.HeadOutlet"
+    }
+  ],
+  "services": [
+    "TheSingularityWorkshop.Services.FSMManagerService",
+    "TheSingularityWorkshop.Services.BlazorFSMIntegration"
+  ],
+  "fsmConfig": {
+    "heartbeatGroup": "Update",
+    "inputGroup": "UserAction"
+  }
+}

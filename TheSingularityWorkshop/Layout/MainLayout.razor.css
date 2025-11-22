@@ -56,6 +56,9 @@ main {
 @media (min-width: 641px) {
     .page {
         flex-direction: row;
+        /* NEW: Lock page to viewport height and hide all scrolling */
+        height: 100vh;
+        overflow: hidden;
     }
 
     .sidebar {
@@ -65,10 +68,22 @@ main {
         top: 0;
     }
 
+    main {
+        flex: 1;
+        /* NEW: Set main as a vertical flex container to occupy available height */
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden; /* Prevents unwanted scroll outside content area */
+    }
+
     .top-row {
         position: sticky;
         top: 0;
         z-index: 1;
+        /* Re-apply padding to the now separated top-row */
+        padding-left: 2rem !important;
+        padding-right: 1.5rem !important;
     }
 
         .top-row.auth ::deep a:first-child {
@@ -77,7 +92,12 @@ main {
             width: 0;
         }
 
-    .top-row, article {
+    article {
+        /* This is the content area containing @Body */
+        /* NEW: Tell content area to take all remaining height and hide its own scrollbar */
+        flex-grow: 1;
+        overflow-y: hidden;
+        /* Re-apply padding to the article content */
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
     }

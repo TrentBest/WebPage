@@ -1,0 +1,60 @@
+﻿.editor-page-content {
+    /* Main wrapper to consume space below the title/controls */
+    flex-grow: 1;
+    height: 100%;
+    /* Reduced vertical padding at top/bottom for a full-screen feel */
+    padding: 0 1rem 1rem 1rem;
+    overflow: hidden;
+}
+
+.main-editor-container {
+    flex-grow: 1;
+    display: grid;
+    /* NEW GRID: FSM Nav (Left) | Main Editor (Center) | Registered Logic (Right) */
+    /* Column 1 (FSM Records): 250px | Column 2 (Main View): 1fr | Column 3 (Registered Logic): 350px */
+    grid-template-columns: 250px 1fr 350px;
+    gap: 15px;
+    height: 100%;
+}
+
+.editor-panel {
+    border: 1px solid var(--bs-gray-300);
+    border-radius: 5px;
+    /* We want the padding *inside* the panel for content, but let it scroll */
+    padding: 15px;
+    overflow-y: auto;
+    background-color: white;
+}
+
+/* Specific styling for panels */
+.left-panel {
+    /* Now holds FSM Records & Process Group Tree */
+    background-color: var(--bs-light);
+}
+
+.center-panel {
+    /* Now holds FSM Configuration and the Graphical View */
+    background-color: var(--bs-light);
+    padding: 15px;
+}
+
+.right-panel {
+    /* Now holds Registered Logic with Search/Filter */
+    background-color: var(--bs-light);
+}
+
+/* Style for the FSMs/Group List inside the Left Panel to handle borders/collapsing */
+.group-header {
+    cursor: pointer;
+    background-color: var(--bs-gray-200);
+    padding: 5px;
+    border-radius: 3px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fsm-list-item {
+    padding-left: 10px;
+}

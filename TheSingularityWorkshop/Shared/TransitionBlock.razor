@@ -1,0 +1,64 @@
+﻿@using TheSingularityWorkshop.Models
+
+<div class="card card-body mb-2 shadow-sm p-3">
+    <div class="d-flex flex-column">
+
+        @* From State Dropdown *@
+        <div class="input-group input-group-sm mb-2">
+            <span class="input-group-text bg-dark text-white" style="width: 75px;">FROM</span>
+            <select class="form-select" @bind="Transition.FromStateName" disabled="@(!EditMode)">
+                @foreach (var stateName in AvailableStateNames)
+                {
+                    <option value="@stateName">@stateName</option>
+                }
+            </select>
+        </div>
+
+        @* To State Dropdown *@
+        <div class="input-group input-group-sm mb-2">
+            <span class="input-group-text bg-primary text-white" style="width: 75px;">TO</span>
+            <select class="form-select" @bind="Transition.ToStateName" disabled="@(!EditMode)">
+                @foreach (var stateName in AvailableStateNames)
+                {
+                    <option value="@stateName">@stateName</option>
+                }
+            </select>
+        </div>
+
+        @* Condition Method Dropdown *@
+        <div class="input-group input-group-sm">
+            <span class="input-group-text bg-danger text-white" style="width: 75px;">CONDITION</span>
+            <select class="form-select" @bind="Transition.ConditionMethod" disabled="@(!EditMode)">
+                @foreach (var method in AvailableConditionMethods)
+                {
+                    <option value="@method">@method</option>
+                }
+            </select>
+        </div>
+
+        @* CRUD Controls *@
+        @if (EditMode)
+        {
+            <div class="d-flex justify-content-end mt-2">
+                <button class="btn btn-sm btn-outline-info me-1" title="Clone Transition" disabled>C</button>
+                <button class="btn btn-sm btn-outline-danger" title="Delete Transition" disabled>X</button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public TransitionModel Transition { get; set; } = default!;
+
+    [Parameter]
+    public bool EditMode { get; set; }
+
+    [Parameter]
+    // Full list of state names (used for both From and To dropdowns)
+    public List<string> AvailableStateNames { get; set; } = new List<string>();
+
+    [Parameter]
+    // Filtered list of methods compatible with Predicate<IStateContext> (for Transition Guards)
+    public List<string> AvailableConditionMethods { get; set; } = new List<string>();
+}
