@@ -1,0 +1,25 @@
+﻿/*
+    Custom styles for the Military Applications page.
+    Note: Most core layout and coloring is handled by Bootstrap classes
+    directly in the Military.razor component.
+*/
+
+/* Example: Customizing the opacity for a section */
+.fsm-military-pitch-lead {
+    /* Targetting the lead paragraph if needed */
+    opacity: 0.9;
+    font-style: italic;
+}
+
+/* Enhancing the hover effect on the Application Cards */
+.card-body:hover {
+    transition: transform 0.3s ease-in-out;
+    transform: translateY(-5px); /* Lift the card slightly on hover */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+/* Custom color for the core vision header if the Bootstrap utility class isn't sufficient */
+.text-primary.fw-bold {
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
