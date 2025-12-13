@@ -19,6 +19,7 @@
     text-align: center;
     padding-top: 5rem;
     padding-bottom: 5rem;
+    /* The 'overflow: scroll;' on the hero-section was removed to restore main page scrolling. */
 }
 
 .hero-title {
@@ -188,5 +189,95 @@
     100% {
         transform: scale(0.8);
         opacity: 0.8;
+    }
+}
+
+/* ------------------------------------------------------------- */
+/* 5. DARK MODE OVERRIDES */
+/* ------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+
+    :root {
+        --tsw-dark-bg: #121212;
+        --tsw-dark-card-bg: #1e1e1e;
+        --tsw-text-on-dark: #e0e0e0;
+        --tsw-text-muted-on-dark: rgba(255, 255, 255, 0.5);
+    }
+
+    /* FIX: Target global body/html to ensure the entire page background changes and scrolling is enabled. */
+    body, html {
+        background-color: var(--tsw-dark-bg) !important;
+        color: var(--tsw-text-on-dark) !important;
+        /* Ensures the scrollbar appears if content overflows vertically */
+        overflow-y: auto !important;
+    }
+
+    /* Hero Section - Fix visibility of hardcoded text-black on dark background */
+    .hero-section h1.text-black {
+        color: var(--tsw-text-on-dark) !important;
+    }
+
+    /* Pillars Section - Change background and general text color */
+    .pillars-section {
+        background-color: var(--tsw-dark-bg);
+    }
+
+        .pillars-section h2.text-dark {
+            color: var(--tsw-text-on-dark) !important;
+        }
+
+        .pillars-section p.lead.text-muted {
+            color: var(--tsw-text-muted-on-dark) !important;
+        }
+
+    /* Pillar Cards - Override bg-light for a dark card color */
+    .pillar-card, .pillar-card.bg-light {
+        background-color: var(--tsw-dark-card-bg) !important;
+        color: var(--tsw-text-on-dark);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    }
+
+        .pillar-card:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        /* Ensure legibility of text and links inside cards */
+        .pillar-card .card-text.text-small {
+            color: var(--tsw-text-muted-on-dark) !important;
+        }
+
+        .pillar-card a.text-muted {
+            color: var(--tsw-primary) !important;
+        }
+
+    /* Status Area Cards - Ensure text contrast remains high */
+    .status-card {
+        background-color: var(--tsw-dark-card-bg) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+
+        .status-card p.text-muted {
+            color: var(--tsw-text-muted-on-dark) !important;
+        }
+
+        .status-card h5.text-white {
+            color: var(--tsw-text-on-dark) !important;
+        }
+
+    /* Keep Bootstrap colors for card titles visible on dark mode */
+    .card-title-api {
+        color: var(--tsw-primary) !important;
+    }
+
+    .card-title-layer {
+        color: #28a745 !important;
+    }
+
+    .card-title-app {
+        color: #17a2b8 !important;
+    }
+
+    .card-title-vr {
+        color: #dc3545 !important;
     }
 }
