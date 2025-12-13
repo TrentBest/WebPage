@@ -1,0 +1,59 @@
+﻿.grid-container {
+    display: grid;
+    /* Define grid dimensions based on C# variables */
+    grid-template-rows: repeat(var(--grid-rows), 1fr);
+    grid-template-columns: repeat(var(--grid-cols), 1fr);
+    width: 600px; /* Max size for readability */
+    height: 600px; /* Max size for readability */
+    border: 1px solid #ccc;
+    background-color: #eee;
+    margin-bottom: 20px;
+}
+
+.grid-cell {
+    /* Base cell style (empty) */
+    background-color: #eee; /* Light gray for empty cell (user requested gray) */
+    border: 1px dotted #ccc;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.5rem;
+}
+
+/* Fox States */
+.fox-normal {
+    background-color: red; /* Red is fox (Walking or Fleeing) */
+    border: 1px solid darkred;
+}
+
+.fox-jumping {
+    background-color: orange; /* Orange is jumping fox */
+    border: 1px solid darkorange;
+}
+
+.fox-mangled {
+    background-color: purple; /* Purple is mangled fox */
+    border: 1px solid darkmagenta;
+}
+
+.fox-success {
+    background-color: lightgray; /* Idle/Success fox (when fox reaches destination and is idle) */
+    border: 1px solid gray;
+}
+
+/* Dog States */
+.dog-normal {
+    background-color: blue; /* Blue is dog (Sleeping/Idle) */
+    border: 1px solid darkblue;
+}
+
+.dog-awake {
+    background-color: green; /* Green is awake dog (Chasing) */
+    border: 1px solid darkgreen;
+}
+
+.dog-mangling {
+    background-color: yellow; /* Yellow is mangling dog */
+    border: 1px solid orange;
+}

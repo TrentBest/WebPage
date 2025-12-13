@@ -13,10 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\images\TheSingularityWorkshopLogo.png">
+    <Content Update="wwwroot\Images\TheSingularityWorkshopLogo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\TheSingularityWorkshopSplashSceneWithLetters.png">
+    <Content Update="wwwroot\Images\TheSingularityWorkshopSplashSceneWithLetters.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

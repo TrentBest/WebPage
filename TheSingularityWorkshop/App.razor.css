@@ -132,7 +132,7 @@ code {
     width: 15rem;
     height: 15rem;
     margin: 15vh auto 1rem auto;
-    background-image: url('/images/TheSingularityWorkshopLogo.png'); /* Your logo! */
+    background-image: url('/Images/TheSingularityWorkshopLogo.png'); /* Your logo! */
     background-size: contain; /* Or 'cover' if you want it to fill more */
     background-repeat: no-repeat;
     background-position: center center;
