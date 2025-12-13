@@ -18,22 +18,27 @@ public class BlazorFSMIntegration : IDisposable
     private PeriodicTimer _gameLoopTimer;
     private CancellationTokenSource _cts;
     private Task _loopTask;
-
+    private bool _isRunning = false;
     public BlazorFSMIntegration()
     {
         // Create groups if they don't exist
         foreach (var group in UpdateGroups) FSM_API.Create.CreateProcessingGroup(group);
 
-        //StartLoop();
+        StartLoop();
     }
 
-    private void StartLoop()
+    public void StartLoop()
     {
         _cts = new CancellationTokenSource();
         _gameLoopTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(UpdateRateMs));
         _loopTask = RunGameLoopAsync(_cts.Token);
+        _isRunning = true;
     }
-
+    public void StopLoop() // <-- Public Stop method
+    {
+        _cts?.Cancel();
+        _isRunning = false;
+    }
     private async Task RunGameLoopAsync(CancellationToken token)
     {
         try
@@ -49,6 +54,11 @@ public class BlazorFSMIntegration : IDisposable
             }
         }
         catch (OperationCanceledException) { /* Graceful shutdown */ }
+        finally
+        {
+            _isRunning = false;
+
+        }
     }
 
     public void Dispose()

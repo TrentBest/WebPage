@@ -1,66 +1,37 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using TheSingularityWorkshop.Shared
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">
-            <!-- Corrected path: /Images/TheSingularityWorkshopLogo.png -->
-            <img src="/Images/TheSingularityWorkshopLogo.png" alt="TSW Logo" style="height: 30px; margin-right: 10px; border-radius: 50%;" />
-            TheSingularityWorkshop
-        </a>
+        <a class="navbar-brand" href="">The Singularity Workshop</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
+        
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="demos">
+                <span class="oi oi-list" aria-hidden="true"></span> Demos
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="privacypolicy">
+                <span class="oi oi-info" aria-hidden="true"></span> Privacy Policy
             </NavLink>
         </div>
 
-
-        @* >>> ADMINISTRATIVE TABS <<< *@
-
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="privacy-policy">
-                <span class="oi oi-lock-locked" aria-hidden="true"></span> Privacy Policy
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="terms-of-service">
-                <span class="oi oi-document" aria-hidden="true"></span> Terms of Service
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="support">
-                <span class="oi oi-headphones" aria-hidden="true"></span> Support / Contact
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="about-us">
-                <span class="oi oi-people" aria-hidden="true"></span> About Us
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fsm-api">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> FSM_API
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fsm-editor">
-                <span class="oi oi-pencil" aria-hidden="true"></span> FSM Editor
-            </NavLink>
-        </div>
-
-        @* >>> MILITARY PITCH TABS - CONSOLIDATED <<< *@
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="military">
-                <span class="oi oi-target" aria-hidden="true"></span> **Military Applications**
-            </NavLink>
-        </div>
-
+        <LoginStatus />
+        
     </nav>
 </div>
 
@@ -69,7 +40,7 @@
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    public void ToggleNavMenu()
+    private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }

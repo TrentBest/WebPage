@@ -1,0 +1,62 @@
+﻿@inject TheSingularityWorkshop.Services.UserService UserService
+@implements IDisposable
+
+<div class="nav-item px-3 bg-dark text-white p-2 border-top border-secondary mt-auto">
+    <p class="mb-1 small"><strong>Current User:</strong></p>
+    <p class="mb-2">
+        <span class="badge @(UserService.CurrentUsername == "Anonymous" ? "bg-secondary" : "bg-info text-dark")">
+            @UserService.CurrentUsername
+        </span>
+    </p>
+
+    @if (UserService.CurrentUsername == "Anonymous")
+    {
+        <button class="btn btn-sm btn-link p-0 text-info" @onclick="HandleLogin">
+            Login / Set Name
+        </button>
+    }
+    else
+    {
+        <button class="btn btn-sm btn-link p-0 text-warning" @onclick="HandleLogout">
+            Logout (Return to Anonymous)
+        </button>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Subscribe to state changes in the UserService so the component automatically
+        // re-renders when the user logs in/out.
+        UserService.OnStateChanged += StateHasChanged;
+    }
+
+    private void HandleLogin()
+    {
+        // Mock login prompt: In a real app, this would use a modal or navigation.
+        // For now, we simulate setting a unique name or defaulting to Anonymous if cancelled.
+        string? name = "Tester" + new Random().Next(100, 999).ToString();
+
+        // This line would normally be a JavaScript prompt or a Blazor modal interaction
+        // For simplicity in this mockup, we just assign a name.
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            UserService.Login(name);
+        }
+        else
+        {
+            UserService.Login("Anonymous");
+        }
+    }
+
+    private void HandleLogout()
+    {
+        UserService.Logout();
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe from the event to prevent memory leaks when the component is removed.
+        UserService.OnStateChanged -= StateHasChanged;
+    }
+}

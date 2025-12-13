@@ -1,0 +1,260 @@
+﻿@page "/advanceddemo-console"
+@using System.Diagnostics
+@using System.Linq
+@using TheSingularityWorkshop.FSM_API
+@using TheSingularityWorkshop.Services
+@using TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs @* Import the simulation context classes *@
+@inject BlazorFSMIntegration FSMIntegration
+
+<PageTitle>Fox/Dog Console Simulation</PageTitle>
+
+<div class="container mt-4">
+    <h3>Fox and Dog Autonomous FSM Simulation (Console Mode)</h3>
+    <p class="lead">
+        A high-speed gauntlet test showcasing concurrent FSM execution and runtime system introspection.
+    </p>
+
+    <div class="d-flex gap-3 mb-4">
+        @if (DemoContext is null || !DemoContext.IsValid)
+        {
+            <button class="btn btn-success" @onclick="StartSimulation">Start Simulation</button>
+        }
+        else
+        {
+            <button class="btn btn-danger" @onclick="StopSimulation">Stop Simulation</button>
+            <button class="btn btn-warning" @onclick="ResetSimulation">Reset (Clear All FSMs)</button>
+        }
+    </div>
+
+    @if (DemoContext?.IsValid == true)
+    {
+        @* --- Runtime Controls Section --- *@
+        <div class="card p-3 mb-4 shadow-sm">
+            <h5>Runtime Controls</h5>
+            <div class="d-flex flex-wrap gap-4 align-items-center">
+
+                <div class="d-flex flex-column align-items-center">
+                    <h6>Add Foxes (Meat Wave)</h6>
+                    <button class="btn btn-sm btn-info w-100" @onclick="() => AddAgent(true, 1)">x1 Fox</button>
+                    <button class="btn btn-sm btn-info w-100 mt-1" @onclick="() => AddAgent(true, 10)">x10 Foxes</button>
+                    <button class="btn btn-sm btn-info w-100 mt-1" @onclick="() => AddAgent(true, 100)">x100 Foxes</button>
+                    <button class="btn btn-sm btn-info w-100 mt-1" @onclick="() => AddAgent(true, 1000)">x1000 Foxes</button>
+                </div>
+
+                <div class="vr"></div>
+
+                <div class="d-flex flex-column align-items-center">
+                    <h6>Add Dogs (Limit @AdvancedDemoContext.MaxDogCount)</h6>
+                    <button class="btn btn-sm btn-info w-100"
+                            @onclick="() => AddAgent(false, 1)"
+                            disabled="@(DemoContext.DogCount >= AdvancedDemoContext.MaxDogCount)">
+                        @* FIX: Static property access *@
+                        +1 Dog (@(DemoContext.DogCount)/@AdvancedDemoContext.MaxDogCount)
+                    </button>
+                </div>
+
+                <div class="vr"></div>
+
+                <div class="d-flex flex-column align-items-center">
+                    <h6>Environment Size</h6>
+                    <button class="btn btn-sm btn-secondary w-100" @onclick="() => AdjustSize(10)">+10 Grid Size</button>
+                    <button class="btn btn-sm btn-secondary w-100 mt-1" @onclick="() => AdjustSize(-10)" disabled="@(DemoContext.EnvironmentWidth <= 20)">-10 Grid Size</button>
+                </div>
+            </div>
+        </div>
+
+        @* --- API STATS SECTION --- *@
+        <h4 class="mt-4">FSM API Engine Statistics</h4>
+        <pre class="console-output api-stats">
+    @GetFSMAPIStats()
+            </pre>
+
+        @* --- SIMULATION METRICS SECTION (unchanged) --- *@
+        <h4 class="mt-4">Simulation Metrics</h4>
+        <pre class="console-output metrics">
+    *** ADVANCED DEMO CONTEXT ***
+    -----------------------------
+    - FSM System Status: RUNNING
+    - Main FSM State:    @DemoContext.State.CurrentState
+    - Simulation Time:   @sw.Elapsed.TotalSeconds.ToString("F3") seconds
+    - Total Ticks/Steps: @tickCount
+    - Environment Size:  @DemoContext.EnvironmentWidth x @DemoContext.EngironmentHeight
+
+    *** SUCCESS & PERFORMANCE ***
+    -----------------------------
+    - Fox Successes (Edge Reached): @DemoContext.SuccessCount
+    - FPM (Foxes Per Minute): @FoxesPerMinute.ToString("F2") 
+
+    *** AGENT POPULATION & STATE ***
+    --------------------------------
+    - Total Foxes:       @DemoContext.FoxCount
+    - Total Dogs:        @DemoContext.DogCount
+
+    - Walking:           @GetFoxCount("Walking")
+    - Jumping:           @GetFoxCount("Jumping")
+    - Fleeing:           @GetFoxCount("Fleeing")
+    - Mangled/Idle (Done): @(GetFoxCount("Mangled") + GetFoxCount("Idle"))
+
+    - Sleeping:          @GetDogCount("Sleeping")
+    - Searching (for spot): @GetDogCount("Searching")
+    - Chasing:           @GetDogCount("Chasing")
+    - Mangling:          @GetDogCount("Mangling")
+    - Active Dogs:       @(GetDogCount("Awake") + GetDogCount("Chasing") + GetDogCount("Mangling"))
+            </pre>
+        @if (DemoContext.State.CurrentState == "Shutdown")
+        {
+            <div class="alert alert-warning mt-3">
+                <strong>SHUTDOWN EVENT:</strong> All foxes are in a terminal state (Idle/Mangled) or the user stopped the simulation.
+            </div>
+        }
+    }
+    else if (DemoContext is not null && DemoContext.State.CurrentState == "Shutdown")
+    {
+        <div class="alert alert-info mt-3">
+            Simulation successfully reached the terminal state and shut down.
+            <p class="mb-0"><strong>Total Steps:</strong> @tickCount</p>
+            <p class="mb-0"><strong>Elapsed Time:</strong> @sw.Elapsed.TotalSeconds.ToString("F3") seconds</p>
+        </div>
+    }
+</div>
+
+@code {
+    private AdvancedDemoContext? DemoContext;
+    private List<IAdvancedAgent> Agents = new();
+    private int tickCount = 0;
+    private readonly Stopwatch sw = new();
+
+    private double FoxesPerMinute => DemoContext?.SuccessCount > 0 && sw.Elapsed.TotalMinutes > 0 ? DemoContext.SuccessCount / sw.Elapsed.TotalMinutes : 0;
+
+    protected override void OnInitialized()
+    {
+        FSMIntegration.OnStateChanged += HandleStateChanged;
+    }
+
+    private void HandleStateChanged()
+    {
+        if (DemoContext?.IsValid == true)
+        {
+            if (DemoContext.State?.CurrentState == "Shutdown")
+            {
+                StopSimulationInternal();
+                return;
+            }
+
+            Agents = DemoContext.environment.GetAgents();
+            tickCount++;
+
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    // --- Core Simulation Controls ---
+    public void StartSimulation()
+    {
+        ResetSimulation();
+        DemoContext = new AdvancedDemoContext();
+        Agents = DemoContext.environment.GetAgents();
+        FSMIntegration.StartLoop();
+        sw.Start();
+        StateHasChanged();
+    }
+
+    public void StopSimulation()
+    {
+        if (DemoContext?.State is FSMHandle state)
+        {
+            state.TransitionTo("Shutdown");
+            TheSingularityWorkshop.FSM_API.FSM_API.Interaction.Update("Update");
+        }
+        StopSimulationInternal();
+    }
+
+    public void ResetSimulation()
+    {
+        StopSimulationInternal();
+        TheSingularityWorkshop.FSM_API.FSM_API.Internal.ResetAPI(true);
+        DemoContext = null;
+        Agents = new();
+        tickCount = 0;
+        StateHasChanged();
+    }
+
+    private void StopSimulationInternal()
+    {
+        FSMIntegration.StopLoop();
+        sw.Stop();
+        sw.Reset();
+    }
+
+    // --- Dynamic Runtime Controls ---
+
+    // FIX: Method now takes the count parameter
+    private void AddAgent(bool isFox, int count)
+    {
+        DemoContext?.AddAgent(isFox, count);
+    }
+
+    private void AdjustSize(int delta)
+    {
+        DemoContext?.AdjustEnvironmentSize(delta);
+    }
+
+    // --- API Stats Logic (FIXED) ---
+
+    private string GetFSMAPIStats()
+    {
+        if (DemoContext is null) return "- API not initialized.";
+
+        var sb = new System.Text.StringBuilder();
+        // Access static classes directly via their full name
+        
+
+        try
+        {
+            // FIX: Direct static member access
+            var allHandles = TheSingularityWorkshop.FSM_API.FSM_API.Internal.GetAllFsmHandles()?.ToArray() ?? Array.Empty<FSMHandle>();
+            var groupNames = TheSingularityWorkshop.FSM_API.FSM_API.Internal.GetProcessingGroupNames()?.ToList() ?? new List<string>();
+
+            sb.AppendLine($"- Total FSM Instances (Handles): {allHandles.Length}");
+            sb.AppendLine($"- Total Processing Groups: {groupNames.Count}");
+
+            foreach (var groupName in groupNames)
+            {
+                // FIX: Corrected method name (GetProcessingGroupTickCount)
+                var tickCount = TheSingularityWorkshop.FSM_API.FSM_API.Internal.GetProcessingGroupTickCount(groupName);
+                sb.AppendLine($"  - Group: {groupName} (Ticks: {tickCount})");
+
+                var definitions = TheSingularityWorkshop.FSM_API.FSM_API.Internal.GetFsmDefinitionNamesInGroup(groupName)?.ToList() ?? new List<string>();
+                foreach (var defName in definitions)
+                {
+                    var handleCount = allHandles.Count(h => h.Definition.Name == defName);
+                    sb.AppendLine($"    - Def: {defName} (Instances: {handleCount})");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            sb.AppendLine($"- ERROR: Could not retrieve detailed API stats. (Exception: {ex.Message.Substring(0, Math.Min(ex.Message.Length, 50))}...)");
+        }
+
+        return sb.ToString();
+    }
+
+    // --- Data Helpers and Dispose (unchanged) ---
+
+    private int GetFoxCount(string state)
+    {
+        return Agents.Count(a => a is AdvancedFoxContext && a.Status.CurrentState == state);
+    }
+
+    private int GetDogCount(string state)
+    {
+        return Agents.Count(a => a is AdvancedDogContext && a.Status.CurrentState == state);
+    }
+
+    public void Dispose()
+    {
+        FSMIntegration.OnStateChanged -= HandleStateChanged;
+        StopSimulation();
+    }
+}

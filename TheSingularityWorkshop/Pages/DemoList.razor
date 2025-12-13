@@ -1,0 +1,83 @@
+﻿@page "/demos"
+@inject NavigationManager NavManager
+@using TheSingularityWorkshop.Models
+
+<PageTitle>FSM Demos</PageTitle>
+
+<div class="container mt-5">
+    <h3>Available FSM Demos and Tools</h3>
+    <p class="lead">Explore the flexibility and performance of the Finite State Machine API using these interactive demonstrations.</p>
+
+    <div class="row g-4 mb-5">
+        @foreach (var demo in Demos)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm demo-card" @onclick="() => NavigateToDemo(demo.Route)">
+                    <div class="card-body">
+                        <i class="@demo.Icon oi-3x mb-3 text-primary" aria-hidden="true"></i>
+                        <h5 class="card-title">@demo.Name</h5>
+                        <p class="card-text">@demo.Description</p>
+                        <button class="btn btn-sm btn-primary mt-2">Launch Demo</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .demo-card {
+        cursor: pointer;
+        /* Custom hover effect for a richer feel */
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .demo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+        }
+
+    .oi-3x {
+        font-size: 2.5em; /* Larger icons for visual appeal */
+    }
+</style>
+
+@code {
+    // Define the list of all available demos and their metadata
+    private List<DemoItem> Demos = new List<DemoItem>
+    {
+        new DemoItem
+        {
+            Name = "Fox & Dog Console Simulation",
+            Description = "Run the 2D multi-agent FSM simulation locally in your browser, focused purely on high-speed metric updates.",
+            Icon = "oi oi-terminal",
+            Route = "/advanceddemo-console"
+        },
+        new DemoItem
+        {
+            Name = "Custom Agent FSM Editor",
+            Description = "Define an FSM blueprint and see it registered in the FSM API for injection into other simulations.",
+            Icon = "oi oi-pencil",
+            Route = "/agenteditor"
+        },
+        new DemoItem
+        {
+            Name = "Simple 1D Gauntlet (WIP)",
+            Description = "A simple one-dimensional proof-of-concept showing collision and state transition on a single axis.",
+            Icon = "oi oi-map-marker",
+            Route = "/simpledemo"
+        },
+        new DemoItem
+        {
+            Name = "Performance Stress Test",
+            Description = "Demonstrates the efficiency of deferred execution by running thousands of concurrent FSM instances (Caution: may spike CPU).",
+            Icon = "oi oi-dashboard",
+            Route = "/stresstest"
+        }
+    };
+
+    private void NavigateToDemo(string route)
+    {
+        NavManager.NavigateTo(route);
+    }
+}
