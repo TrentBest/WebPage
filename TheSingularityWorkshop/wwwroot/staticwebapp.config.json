@@ -5,10 +5,14 @@
   },
   "mimeTypes": {
     ".wasm": "application/wasm",
+    ".dll": "application/octet-stream",
     ".data": "application/octet-stream",
     ".br": "application/brotli",
     ".gz": "application/gzip",
     ".js": "text/javascript",
     ".json": "application/json"
+  },
+  "globalHeaders": {
+    "Cache-Control": "no-cache"
   }
 }
