@@ -4,13 +4,18 @@
     // 2. The Custom Blazor Bootloader (Bypasses Azure's MIME Bug)
     Blazor.start({
         loadBootResource: function (type, name, defaultUri, integrity) {
-            // If it is a WebAssembly file, we intercept it
-            if (type === 'dotnetjs' || type === 'dotnetwasm' || defaultUri.endsWith('.wasm')) {
+
+            // FIX: Let Blazor handle dotnet.js natively using the default URI string
+            if (type === 'dotnetjs') {
+                return defaultUri;
+            }
+
+            // Intercept ONLY WebAssembly binaries to force the correct MIME type
+            if (type === 'dotnetwasm' || defaultUri.endsWith('.wasm')) {
                 return (async function () {
-                    const response = await fetch(defaultUri, { cache: 'no-cache' });
+                    const response = await fetch(defaultUri, { cache: 'no-store' });
                     if (!response.ok) throw new Error("Failed to load: " + name);
 
-                    // Force the raw data into a buffer and manually apply the correct MIME type
                     const buffer = await response.arrayBuffer();
                     return new Response(buffer, { headers: { "content-type": "application/wasm" } });
                 })();
@@ -20,25 +25,22 @@
 
     // 3. The Sovereign Kernel Synapse
     window.interop = {
+        // ... keep your exact initUnity code here ...
         initUnity: function (canvasId) {
             var canvas = document.getElementById(canvasId);
             var buildUrl = "Workshop/Forge/Build";
             var loaderUrl = buildUrl + "/Build001.loader.js";
 
             var config = {
-                // Make sure these match what Unity actually output!
-                // If you disabled compression in Unity, remove the .br extensions.
-                dataUrl: buildUrl + "/Build001.data.br",
-                frameworkUrl: buildUrl + "/Build001.framework.js.br",
-                codeUrl: buildUrl + "/Build001.wasm.br",
+                dataUrl: buildUrl + "/Build001.data",
+                frameworkUrl: buildUrl + "/Build001.framework.js",
+                codeUrl: buildUrl + "/Build001.wasm",
                 streamingAssetsUrl: "StreamingAssets",
                 companyName: "The Singularity Workshop",
                 productName: "Genesis",
                 productVersion: "1.0",
             };
 
-            // We inject the Unity loader dynamically ONLY when C# asks for it.
-            // This guarantees Blazor and Unity don't fight over the Emscripten 'Module' namespace.
             var script = document.createElement("script");
             script.src = loaderUrl;
             script.onload = () => {
@@ -54,6 +56,5 @@
             document.body.appendChild(script);
         }
     };
-</script>
 </body>
 </html>
