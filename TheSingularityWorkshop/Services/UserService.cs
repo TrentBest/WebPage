@@ -1,43 +1,61 @@
-﻿// TheSingularityWorkshop/Services/UserService.cs
-
-using System;
+﻿using System;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace TheSingularityWorkshop.Services
 {
     public class UserService
     {
-        public string CurrentUsername { get; private set; } = "Anonymous";
+        private readonly AuthenticationStateProvider _authProvider;
 
-        // Declared as nullable Action? to prevent non-nullable field warning/error
+        // Backed by Azure, but we keep the property for compatibility
+        public string CurrentUsername { get; private set; } = "Anonymous";
+        public bool IsLoggedIn => !IsAnonymous();
+
+        // FIX 1: Make event nullable (?) to silence the constructor warning
         public event Action? OnStateChanged;
 
-        public UserService()
+        public UserService(AuthenticationStateProvider authProvider)
         {
-            // Initialize as Anonymous by default
-            Login("Anonymous");
+            _authProvider = authProvider;
+            _authProvider.AuthenticationStateChanged += AuthStateChanged;
+
+            // Fire and forget the update
+            _ = UpdateUserAsync();
         }
 
-        public void Login(string username)
+        private async void AuthStateChanged(Task<AuthenticationState> task) => await UpdateUserAsync();
+
+        private async Task UpdateUserAsync()
         {
-            string newUsername = string.IsNullOrWhiteSpace(username) ? "Anonymous" : username;
+            var state = await _authProvider.GetAuthenticationStateAsync();
+            var user = state.User;
 
-            if (CurrentUsername != newUsername)
-            {
-                CurrentUsername = newUsername;
+            CurrentUsername = (user.Identity != null && user.Identity.IsAuthenticated)
+                ? user.Identity.Name ?? "Unknown"
+                : "Anonymous";
 
-                // Notify subscribed UI components to re-render.
-                OnStateChanged?.Invoke();
-            }
-        }
-
-        public void Logout()
-        {
-            Login("Anonymous");
+            OnStateChanged?.Invoke();
         }
 
         public bool IsAnonymous()
         {
             return CurrentUsername.Equals("Anonymous", StringComparison.OrdinalIgnoreCase);
+        }
+
+        // --- COMPATIBILITY STUBS (Fixes the 'Definition not found' errors) ---
+        // These methods are called by your old components. 
+        // We leave them empty because Azure handles the actual login logic now.
+
+        public void Login(string username)
+        {
+            // Optional: Log that this happened
+            Console.WriteLine($"[UserService] Manual Login for '{username}' ignored. Auth is handled by Azure.");
+        }
+
+        public void Logout()
+        {
+            Console.WriteLine("[UserService] Manual Logout ignored. Auth is handled by Azure.");
         }
     }
 }

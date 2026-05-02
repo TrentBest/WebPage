@@ -1,0 +1,213 @@
+﻿@page "/naming-poll"
+@using System.Net.Http.Json
+@inject HttpClient Http
+
+<PageTitle>Naming Poll | The Singularity Workshop</PageTitle>
+
+<div class="container mt-5 mb-5" style="max-width: 800px;">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Project "OneGUI" Needs an Identity</h1>
+        <p class="lead text-muted">
+            I've built the "Inverted" UI framework that unifies Unity, WPF, and Web.
+            Now I need the community to name it.
+        </p>
+    </div>
+
+    @if (hasVoted)
+    {
+        <div class="card shadow-sm border-success text-center animate__animated animate__fadeIn">
+            <div class="card-body p-5">
+                <h2 class="text-success mb-3">🚀 Vote Received!</h2>
+                <p class="fs-5 mb-4">
+                    You chose: <strong>@selectedOption</strong>
+                    @if (!string.IsNullOrEmpty(writeInValue))
+                    {
+                        <span class="text-muted">(@writeInValue)</span>
+                    }
+                </p>
+
+                <hr />
+
+                <h4 class="mt-4 mb-3">Community Results So Far</h4>
+
+                @if (results == null)
+                {
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="results-container text-start mx-auto" style="max-width: 600px;">
+                        @foreach (var item in results.OrderByDescending(x => x.Value))
+                        {
+                            // FIX: Calculate percent here to keep the HTML clean and avoid compiler errors
+                            double percentRaw = totalVotes > 0 ? (double)item.Value / totalVotes * 100 : 0;
+                            int percentInt = (int)percentRaw;
+                            string widthStyle = $"width: {percentInt}%;";
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold">@item.Key</span>
+                                    <span>@item.Value votes</span>
+                                </div>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-primary"
+                                         role="progressbar"
+                                         style="@widthStyle"
+                                         aria-valuenow="@percentInt"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <p class="text-muted mt-5">Thank you for helping define The Singularity Workshop.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-lg">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">Select Your Favorite</h4>
+            </div>
+            <div class="card-body">
+                <EditForm Model="@this" OnValidSubmit="SubmitVote">
+
+                    <InputRadioGroup @bind-Value="selectedOption">
+
+                        <div class="list-group list-group-flush mb-4">
+                            @foreach (var option in options)
+                            {
+                                <label class="list-group-item list-group-item-action p-4 d-flex align-items-center" style="cursor: pointer;">
+                                    <div class="me-4">
+                                        <InputRadio Value="@option.Name" class="form-check-input fs-4" />
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-bold mb-1 text-primary">@option.Name</h5>
+                                        <p class="mb-0 text-muted">@option.Description</p>
+                                    </div>
+                                </label>
+                            }
+
+                            <label class="list-group-item list-group-item-action p-4 d-flex align-items-center">
+                                <div class="me-4">
+                                    <InputRadio Value="@("Other")" class="form-check-input fs-4" />
+                                </div>
+                                <div class="w-100">
+                                    <h5 class="fw-bold mb-1">Other / Write-In</h5>
+                                    <input type="text"
+                                           class="form-control mt-2"
+                                           placeholder="Have a better idea? Let me know..."
+                                           @bind="writeInValue"
+                                           @onfocus="@(() => selectedOption = "Other")" />
+                                </div>
+                            </label>
+                        </div>
+
+                    </InputRadioGroup>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" disabled="@string.IsNullOrEmpty(selectedOption)">
+                            Submit Vote
+                        </button>
+                    </div>
+
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    // --- STATE ---
+    private bool hasVoted = false;
+    private string selectedOption = "";
+    private string writeInValue = "";
+
+    // Stats State
+    private Dictionary<string, int>? results;
+    private int totalVotes = 0;
+
+    // --- DATA MODELS ---
+    private class NamingOption
+    {
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+    }
+
+    private List<NamingOption> options = new List<NamingOption>
+    {
+        new NamingOption
+        {
+            Name = "Manifest",
+            Description = "The Inverted UI. You define the data; the engine manifests the reality. (Navy/Industrial roots)"
+        },
+        new NamingOption
+        {
+            Name = "ARC",
+            Description = "Agnostic Rendering Core. The flash that bridges disparate platforms. (Energy/Structure)"
+        },
+        new NamingOption
+        {
+            Name = "Aegis",
+            Description = "The central shield and command system for your ecosystem. (Defense/Control)"
+        },
+        new NamingOption
+        {
+            Name = "Inversion",
+            Description = "Turning the UI paradigm inside out. Data first, pixels second. (Philosophy)"
+        },
+        new NamingOption
+        {
+            Name = "Centroid",
+            Description = "The precise geometric center of your application stack. (Math/BIM)"
+        }
+    };
+
+    // --- LOGIC ---
+
+    private async Task SubmitVote()
+    {
+        try
+        {
+            var payload = new { SelectedOption = selectedOption, WriteInValue = writeInValue };
+            var response = await Http.PostAsJsonAsync("api/vote", payload);
+
+            if (response.IsSuccessStatusCode)
+            {
+                hasVoted = true;
+                await LoadResults();
+            }
+            else
+            {
+                Console.WriteLine($"Error submitting vote: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception submitting vote: {ex.Message}");
+        }
+    }
+
+    private async Task LoadResults()
+    {
+        try
+        {
+            results = await Http.GetFromJsonAsync<Dictionary<string, int>>("api/results");
+
+            if (results != null)
+            {
+                totalVotes = results.Sum(x => x.Value);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading results: {ex.Message}");
+        }
+    }
+}

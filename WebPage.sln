@@ -5,6 +5,8 @@ VisualStudioVersion = 18.3.11206.111
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheSingularityWorkshop", "TheSingularityWorkshop\TheSingularityWorkshop.csproj", "{CDC12F40-7D72-4884-BC76-A81D00E2B2C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PollingAPI", "PollingAPI\PollingAPI.csproj", "{D60583FE-9885-47FF-B632-4278C1A66942}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{CDC12F40-7D72-4884-BC76-A81D00E2B2C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDC12F40-7D72-4884-BC76-A81D00E2B2C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDC12F40-7D72-4884-BC76-A81D00E2B2C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D60583FE-9885-47FF-B632-4278C1A66942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D60583FE-9885-47FF-B632-4278C1A66942}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D60583FE-9885-47FF-B632-4278C1A66942}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D60583FE-9885-47FF-B632-4278C1A66942}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

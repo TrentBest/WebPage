@@ -29,6 +29,47 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+
+    <script>
+        window.interop = {
+            initUnity: function (canvasId) {
+                var canvas = document.getElementById(canvasId);
+
+                // Match this path to where your PS1 script drops the build
+                var buildUrl = "Workshop/Forge/Build";
+
+                // NOTE: If Unity outputs a different name than "Build001", update these lines!
+                var loaderUrl = buildUrl + "/Build001.loader.js";
+                var config = {
+                    dataUrl: buildUrl + "/Build001.data.br",
+                    frameworkUrl: buildUrl + "/Build001.framework.js.br",
+                    codeUrl: buildUrl + "/Build001.wasm.br",
+                    streamingAssetsUrl: "StreamingAssets",
+                    companyName: "The Singularity Workshop",
+                    productName: "Genesis",
+                    productVersion: "1.0",
+                    matchWebGLToCanvasSize: true, // Ensures it fits your Blazor div
+                };
+
+                // Dynamically inject the Unity loader script
+                var script = document.createElement("script");
+                script.src = loaderUrl;
+                script.onload = () => {
+                    createUnityInstance(canvas, config, (progress) => {
+                        console.log("Kernel Ignition Progress: " + (100 * progress) + "%");
+                    }).then((unityInstance) => {
+                        window.sovereignUnityInstance = unityInstance;
+                        console.log("Sovereign Kernel successfully anchored to Blazor DOM.");
+                    }).catch((message) => {
+                        alert("Engine Error: " + message);
+                    });
+                };
+                document.body.appendChild(script);
+            }
+        };
+    </script>
 </body>
+
 
 </html>
