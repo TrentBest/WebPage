@@ -280,4 +280,42 @@
     .card-title-vr {
         color: #dc3545 !important;
     }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .gateway-btn {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid #444;
+        color: white;
+        padding: 20px 40px;
+        width: 300px;
+        text-align: left;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+    .active-path {
+        border-left: 5px solid #00ffcc;
+    }
+
+        .active-path:hover {
+            background: rgba(0, 255, 204, 0.1);
+            border-color: #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+            transform: translateX(5px);
+        }
+
+    .locked-path {
+        border-left: 5px solid #ff3366;
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 }

@@ -1,187 +1,223 @@
 ﻿@page "/"
-@using TheSingularityWorkshop.Pages
-@inject FSMManagerService FSMService
+@using System.Timers
+@inject IJSRuntime JS
+@implements IDisposable
 
 <PageTitle>The Singularity Workshop</PageTitle>
 
-<link href="TheSingularityWorkshop/Pages/Home.razor.css" rel="stylesheet" />
+<div class="hypervisor-shell" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #050206; font-family: monospace; color: white;">
 
-@* -------------------------------------------------------------
- * 1. HERO SECTION: Advanced, Minimal, and Focused
- * ------------------------------------------------------------- *@
-<div class="hero-section">
-    <div class="container text-center">
-
-        @* First Image: The Eye Logo (Logo) *@
-        <img src="/Images/TheSingularityWorkshopLogo.png"
-             alt="The Singularity Workshop Logo (The Eye)"
-             class="img-fluid mb-2"
-             style="max-width: 300px; height: auto; filter: drop-shadow(0 0 10px rgba(23, 162, 184, 0.8));" />
-
-        <h1 class="display-4 fw-bold text-black mt-4 mb-3">
-            Welcome to
-        </h1>
-        <br />
-        @* Second Image: The Rainbow Letters (Branding) *@
-        <img src="/Images/TheSingularityWorkshopSplashSceneWithLetters.png"
-             alt="The Singularity Workshop Splash Scene With Letters"
-             class="img-fluid mb-4"
-             style="max-width: 600px; height: auto;" />
-
-        <p class="hero-tagline fst-italic">
-            The Foundational Logic Layer for the Next Digital Experiences.
-        </p>
-
-        @* The unique call to action button *@
-        <a href="https://www.nuget.org/packages/TheSingularityWorkshop.FSM_API" target="_blank"
-           class="btn btn-advanced mt-3 me-3" style="min-width: 200px;">
-            <span class="oi oi-arrow-circle-right" aria-hidden="true"></span> Integrate FSM API
-        </a>
-        <a href="about-us" class="btn btn-outline-light mt-3" style="min-width: 200px;">
-            Read the Full Mission
-        </a>
+    @* --- LAYER 1: THE SOVEREIGN KERNEL (Silently Booting) --- *@
+    <div class="unity-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "all" : "none"); opacity: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "1" : "0"); transition: opacity 1.5s ease-in;">
+        <canvas id="unity-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
     </div>
+
+    @* --- LAYER 2: THE CHAOS SWARM & MONOLITH --- *@
+    @if (currentPhase == AppPhase.Monolith || currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
+    {
+        <div class="chaos-container @(currentPhase == AppPhase.Collapsing ? "gravity-failure" : "")" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;">
+            
+            @* The Initial Hook *@
+            @if (currentPhase == AppPhase.Monolith)
+            {
+                <button class="monolith-btn" @onclick="ShatterMonolith" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80vw; height: 80vh; background-image: url('/Images/TheSingularityWorkshopLogo.png'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: rgba(10, 10, 15, 0.9); border: 2px solid #00ffcc; border-radius: 15px; cursor: pointer; box-shadow: 0 0 50px rgba(0, 255, 204, 0.2); transition: all 0.3s ease;">
+                    <div class="monolith-text" style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); font-size: 3rem; font-weight: bold; color: white; text-shadow: 0 0 10px #00ffcc; letter-spacing: 5px;">
+                        ENTER THE WORKSHOP
+                    </div>
+                </button>
+            }
+
+            @* The Living Software (Breeding Buttons) *@
+            @if (currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
+            {
+                @foreach (var node in activeNodes)
+                {
+                    <button class="chaos-node" style="position: absolute; left: @(node.X)px; top: @(node.Y)px; width: @(node.Size)px; height: @(node.Size)px; z-index: @node.Generation; transform: translate(-50%, -50%); transition: width 0.1s linear, height 0.1s linear;">
+                        <div class="node-gen">GEN @node.Generation</div>
+                        <div class="node-lineage">[@node.Lineage]</div>
+                    </button>
+                }
+            }
+        </div>
+    }
+
+    @* --- LAYER 3: THE POST-COLLAPSE GATEWAY --- *@
+    @if (currentPhase == AppPhase.Gateway)
+    {
+        <div class="gateway-interface" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5, 2, 6, 0.85); backdrop-filter: blur(5px); animation: fadeIn 1.5s ease-out;">
+            
+            <div class="kernel-status mb-5 text-center">
+                <span class="oi oi-pulse" style="color: #00ffcc; font-size: 2rem; animation: strobe 1s infinite;"></span>
+                <h2 style="color: #00ffcc; font-weight: bold; letter-spacing: 3px; margin-top: 15px;">SOVEREIGN KERNEL ACTIVE</h2>
+                <p style="color: #aaa; font-size: 1rem; max-width: 500px;">
+                    DOM Authority Terminated. GPU Render Pipeline Online.<br/>
+                    Select your destination trajectory.
+                </p>
+            </div>
+
+            <div class="d-flex gap-4">
+                @* Path 1: The Showcase (Active) *@
+                <button class="btn gateway-btn active-path" @onclick="EnterShowcase">
+                    <h3 class="mb-1">THE SHOWCASE</h3>
+                    <span style="font-size: 0.8rem; opacity: 0.8;">Explore the Architectural Demonstrations</span>
+                </button>
+
+                @* Path 2: The Forge (Locked) *@
+                <button class="btn gateway-btn locked-path" disabled title="Infrastructure actively being built">
+                    <h3 class="mb-1" style="color: #ff3366;">THE FORGE</h3>
+                    <span style="font-size: 0.8rem; opacity: 0.8;">[ UNDER CONSTRUCTION ]</span>
+                </button>
+            </div>
+        </div>
+    }
 </div>
 
-@* -------------------------------------------------------------
- * 2. PILLARS SECTION: Maximized Information in a Vertical Layout
- * ------------------------------------------------------------- *@
-<div class="pillars-section container">
-    <div class="text-center mb-5">
-        <h2 class="display-6 fw-bold text-dark">Our Core Pillars of Technology</h2>
-        <p class="lead text-muted">Our Technology Vision spans four primary "Pillars"</p>
-    </div>
+<style>
+    /* Swarm Node Styles */
+    .chaos-node {
+        border-radius: 8px; border: 1px solid rgba(0, 255, 204, 0.5);
+        color: white; background: rgba(5, 2, 6, 0.8); backdrop-filter: blur(2px);
+        overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); pointer-events: none;
+    }
+    .node-gen { font-size: 0.7rem; color: #00ffcc; font-weight: bold; }
+    .node-lineage { font-size: 0.6rem; opacity: 0.7; }
 
-    <div class="row g-4 justify-content-center">
+    /* The Gravity Drop Animation */
+    .gravity-failure {
+        transform: translateY(150vh) rotate(10deg);
+        opacity: 0;
+        transition: all 1.5s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+        pointer-events: none;
+    }
 
-        @* PILLAR 1: FSM_API (The Foundation) *@
-        <div class="col-12 col-md-10">
-            <div class="pillar-card card h-100 shadow-sm bg-light">
-                <div class="card-body">
-                    <span class="card-phase-number">I</span>
-                    <h5 class="card-title card-title-api fw-bold mt-2">FSM_API: The Foundation</h5>
-                    <p class="card-text text-small">
-                        The lightweight, high-performance, and engine-agnostic core technology providing a robust C# framework for defining complex Finite State Machines. It is the starting point for all Singularity Workshop components.
-                    </p>
-                    <a href="fsm-api" class="text-muted small">Learn More...</a>
-                </div>
-            </div>
-        </div>
-
-        @* PILLAR 2: FSM Layer (Modular Behaviors) *@
-        <div class="col-12 col-md-10">
-            <div class="pillar-card card h-100 shadow-sm bg-light">
-                <div class="card-body">
-                    <span class="card-phase-number">II</span>
-                    <h5 class="card-title card-title-layer fw-bold mt-2">FSM Layer: Modular Behaviors</h5>
-                    <p class="card-text text-small">
-                        Consists of thousands of pre-built FSM behaviors, packaged as micro-packages for platforms like the Unity Asset Store. These provide near drag-and-drop logic for complex tasks like AI and UI flows.
-                    </p>
-                    <a href="fsm-layer" class="text-muted small">See Product Categories...</a>
-                </div>
-            </div>
-        </div>
-
-        @* PILLAR 3: AnyApp / Experiences (The Host) *@
-        <div class="col-12 col-md-10">
-            <div class="pillar-card card h-100 shadow-sm bg-light">
-                <div class="card-body">
-                    <span class="card-phase-number">III</span>
-                    <h5 class="card-title card-title-app fw-bold mt-2">AnyApp / Experiences: The Host</h5>
-                    <p class="card-text text-small">
-                        The local application (runtime composition layer) that consumes the FSM Layer to host a digital Experience (anything that presents sensory outputs). It provides the necessary runtime and external service integrations.
-                    </p>
-                    <a href="anyapp" class="text-muted small">View Key Role...</a>
-                </div>
-            </div>
-        </div>
-
-        @* PILLAR 4: MyVR (The Metaverse) *@
-        <div class="col-12 col-md-10">
-            <div class="pillar-card card h-100 shadow-sm bg-light">
-                <div class="card-body">
-                    <span class="card-phase-number">IV</span>
-                    <h5 class="card-title card-title-vr fw-bold mt-2">MyVR: The Digital Universe</h5>
-                    <p class="card-text text-small">
-                        The cloud infrastructure that enables hosting AnyApp Experiences within themed Domains to create a persistent, shared, and virtual digital universe. It is the ultimate monetization platform.
-                    </p>
-                    <a href="my-vr" class="text-muted small">Explore Features...</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@* -------------------------------------------------------------
- * 3. CURRENT STATUS AREA: Live Project Status
- * ------------------------------------------------------------- *@
-<div class="status-area">
-    <div class="container">
-        <h2 class="display-6 fw-bold text-center text-white mb-4">Current Status</h2>
-        <p class="lead text-center text-muted">
-            The roadmap is defined by our foundational structure. Development occurs sequentially by pillar.
-        </p>
-
-        <div class="row g-3 justify-content-center">
-            @* Status Card 1: FSM_API *@
-            <div class="col-12 col-md-8">
-                <div class="card status-card">
-                    <div class="card-body p-3">
-                        <h5 class="card-title text-white h6 mb-1">
-                            <span class="status-indicator live"></span> FSM_API (Phase I)
-                        </h5>
-                        <p class="card-text small text-muted">
-                            Status: **LIVE** - Core logic is stable, published on NuGet, and deployed to production environments.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            @* Status Card 2: FSM Layer *@
-            <div class="col-12 col-md-8">
-                <div class="card status-card">
-                    <div class="card-body p-3">
-                        <h5 class="card-title text-white h6 mb-1">
-                            <span class="status-indicator development"></span> FSM Layer (Phase II)
-                        </h5>
-                        <p class="card-text small text-muted">
-                            Status: **In Active Development** - Unity Asset Store package submission is currently in progress.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            @* Status Card 3: AnyApp / Experiences *@
-            <div class="col-12 col-md-8">
-                <div class="card status-card">
-                    <div class="card-body p-3">
-                        <h5 class="card-title text-white h6 mb-1">
-                            <span class="status-indicator planned"></span> AnyApp / Experiences (Phase III)
-                        </h5>
-                        <p class="card-text small text-muted">
-                            Status: **Planned** - Development is scheduled to begin upon successful launch of Phase II.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            @* Status Card 4: MyVR *@
-            <div class="col-12 col-md-8">
-                <div class="card status-card">
-                    <div class="card-body p-3">
-                        <h5 class="card-title text-white h6 mb-1">
-                            <span class="status-indicator planned"></span> MyVR (Phase IV)
-                        </h5>
-                        <p class="card-text small text-muted">
-                            Status: **Conceptual** - The ultimate virtual universe is actively being designed for future implementation.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    /* Gateway Styles */
+    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @@keyframes strobe { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+    
+    .gateway-btn {
+        background: rgba(10, 10, 15, 0.9); border: 1px solid #444; color: white;
+        padding: 20px 40px; width: 300px; text-align: left; border-radius: 8px; transition: all 0.3s;
+    }
+    .active-path { border-left: 5px solid #00ffcc; }
+    .active-path:hover { background: rgba(0, 255, 204, 0.1); border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); transform: translateX(5px); color: white; }
+    .locked-path { border-left: 5px solid #ff3366; opacity: 0.6; cursor: not-allowed; }
+</style>
 
 @code {
-    // The Home.razor file remains minimal for cleaner UI/logic separation.
+    private enum AppPhase { Monolith, Chaos, Collapsing, Gateway, Sovereign }
+    private AppPhase currentPhase = AppPhase.Monolith;
+
+    private class ChaosNode
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Size { get; set; }
+        public int Generation { get; set; }
+        public string Lineage { get; set; } = "";
+        public int OffspringCount { get; set; } = 0;
+    }
+
+    private List<ChaosNode> activeNodes = new();
+    private Timer chaosTimer = new();
+    private Random rng = new();
+    
+    private const int CriticalMassThreshold = 100; // Drops when 100 buttons fill the screen
+
+    protected override void OnInitialized()
+    {
+        chaosTimer.Interval = 100; // Fast ticks
+        chaosTimer.Elapsed += TickChaos;
+    }
+
+    private async Task ShatterMonolith()
+    {
+        // 1. Shatter the monolith into the first node
+        currentPhase = AppPhase.Chaos;
+        activeNodes.Add(new ChaosNode { X = 800, Y = 400, Size = 200, Generation = 1, Lineage = "1" });
+        StateHasChanged();
+        
+        // 2. Start the swarm calculation
+        chaosTimer.Start();
+
+        // 3. Silently wake the Sovereign Kernel in the background
+        try {
+            await JS.InvokeVoidAsync("interop.initUnity", "unity-canvas");
+        } catch { /* Suppress */ }
+    }
+
+    private void TickChaos(object? sender, ElapsedEventArgs e)
+    {
+        if (currentPhase != AppPhase.Chaos) return;
+
+        List<ChaosNode> newborns = new();
+
+        foreach (var node in activeNodes)
+        {
+            node.Size += 10; // Rapid growth
+
+            // Reproduce when reaching threshold
+            if (node.Size > 180) 
+            {
+                node.Size = 60; // Reset parent size
+                node.OffspringCount++;
+                
+                newborns.Add(new ChaosNode
+                {
+                    X = node.X + rng.Next(-200, 200),
+                    Y = node.Y + rng.Next(-200, 200),
+                    Generation = node.Generation + 1,
+                    Lineage = $"{node.Lineage}.{node.OffspringCount}",
+                    Size = 60
+                });
+            }
+        }
+
+        if (newborns.Any())
+        {
+            activeNodes.AddRange(newborns);
+            
+            // Constrain to screen
+            foreach(var n in activeNodes)
+            {
+                if (n.X < 100) n.X = 150; if (n.X > 1800) n.X = 1700;
+                if (n.Y < 100) n.Y = 150; if (n.Y > 900) n.Y = 800;
+            }
+        }
+
+        // TRIGGER THE GRAVITY DROP
+        if (activeNodes.Count >= CriticalMassThreshold)
+        {
+            _ = TriggerCollapse();
+        }
+        else
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task TriggerCollapse()
+    {
+        chaosTimer.Stop(); // Freeze calculations
+        
+        currentPhase = AppPhase.Collapsing; // CSS drops the container
+        await InvokeAsync(StateHasChanged);
+        
+        await Task.Delay(1500); // Wait for the drop animation to finish
+
+        currentPhase = AppPhase.Gateway; // Fade in the selection menu
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void EnterShowcase()
+    {
+        // Removes the gateway, leaving the user completely in WebGL
+        currentPhase = AppPhase.Sovereign; 
+    }
+
+    public void Dispose()
+    {
+        chaosTimer.Stop();
+        chaosTimer.Dispose();
+    }
 }

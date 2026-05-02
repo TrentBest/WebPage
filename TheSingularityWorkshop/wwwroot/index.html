@@ -1,60 +1,103 @@
-<script src="_framework/blazor.webassembly.js" autostart="false"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Singularity Workshop</title>
+    <base href="/" />
 
-<script>
-    // 2. The Custom Blazor Bootloader (Bypasses Azure's MIME Bug)
-    Blazor.start({
-        loadBootResource: function (type, name, defaultUri, integrity) {
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="TheSingularityWorkshop.styles.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
 
-            // FIX: Let Blazor handle dotnet.js natively using the default URI string
-            if (type === 'dotnetjs') {
-                return defaultUri;
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+
+    <script>
+        // 2. The Custom Blazor Bootloader (Bypasses Azure's MIME Bug)
+        Blazor.start({
+            loadBootResource: function (type, name, defaultUri, integrity) {
+                // Let Blazor handle dotnet.js natively using the default URI string
+                if (type === 'dotnetjs') {
+                    return defaultUri;
+                }
+
+                // Intercept ONLY WebAssembly binaries to force the correct MIME type
+                if (type === 'dotnetwasm' || defaultUri.endsWith('.wasm')) {
+                    return (async function () {
+                        const response = await fetch(defaultUri, { cache: 'no-store' });
+                        if (!response.ok) throw new Error("Failed to load: " + name);
+
+                        const buffer = await response.arrayBuffer();
+                        return new Response(buffer, { headers: { "content-type": "application/wasm" } });
+                    })();
+                }
             }
+        });
 
-            // Intercept ONLY WebAssembly binaries to force the correct MIME type
-            if (type === 'dotnetwasm' || defaultUri.endsWith('.wasm')) {
-                return (async function () {
-                    const response = await fetch(defaultUri, { cache: 'no-store' });
-                    if (!response.ok) throw new Error("Failed to load: " + name);
+        // 3. The Sovereign Kernel Synapse (Instrumented for Debugging)
+        window.interop = {
+            initUnity: function (canvasId) {
+                console.log("[Interop] 1. initUnity called for canvas:", canvasId);
 
-                    const buffer = await response.arrayBuffer();
-                    return new Response(buffer, { headers: { "content-type": "application/wasm" } });
-                })();
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) {
+                    console.error("[Interop] CRITICAL: Canvas element not found in the DOM!");
+                    return;
+                }
+
+                const buildUrl = "Workshop/Forge/Build";
+                const loaderUrl = buildUrl + "/Build001.loader.js";
+
+                console.log("[Interop] 2. Constructing Engine Configuration...");
+                const config = {
+                    dataUrl: buildUrl + "/Build001.data.br",
+                    frameworkUrl: buildUrl + "/Build001.framework.js.br",
+                    codeUrl: buildUrl + "/Build001.wasm.br",
+                    streamingAssetsUrl: "StreamingAssets",
+                    companyName: "The Singularity Workshop",
+                    productName: "Genesis",
+                };
+                console.table(config); // Prints a clean table of the target URLs
+
+                console.log("[Interop] 3. Injecting Unity loader script: " + loaderUrl);
+                const script = document.createElement("script");
+                script.src = loaderUrl;
+
+                script.onerror = () => {
+                    console.error("[Interop] CRITICAL: Failed to download loader.js! Check the Build folder path.");
+                };
+
+                script.onload = () => {
+                    console.log("[Interop] 4. Loader script executed. Firing createUnityInstance...");
+
+                    createUnityInstance(canvas, config, (progress) => {
+                        console.log("[Unity Engine] Boot Progress: " + (100 * progress).toFixed(1) + "%");
+                    }).then((instance) => {
+                        window.sovereignUnityInstance = instance;
+                        console.log("[Interop] 5. SUCCESS! Sovereign Kernel anchored to Blazor DOM.");
+                    }).catch((message) => {
+                        console.error("[Unity Engine] CRITICAL BOOT FAILURE:", message);
+                    });
+                };
+                document.body.appendChild(script);
             }
-        }
-    });
-
-    // 3. The Sovereign Kernel Synapse
-    window.interop = {
-        // ... keep your exact initUnity code here ...
-        initUnity: function (canvasId) {
-            var canvas = document.getElementById(canvasId);
-            var buildUrl = "Workshop/Forge/Build";
-            var loaderUrl = buildUrl + "/Build001.loader.js";
-
-            var config = {
-                dataUrl: buildUrl + "/Build001.data",
-                frameworkUrl: buildUrl + "/Build001.framework.js",
-                codeUrl: buildUrl + "/Build001.wasm",
-                streamingAssetsUrl: "StreamingAssets",
-                companyName: "The Singularity Workshop",
-                productName: "Genesis",
-                productVersion: "1.0",
-            };
-
-            var script = document.createElement("script");
-            script.src = loaderUrl;
-            script.onload = () => {
-                createUnityInstance(canvas, config, (progress) => {
-                    console.log("Kernel Ignition Progress: " + (100 * progress) + "%");
-                }).then((unityInstance) => {
-                    window.sovereignUnityInstance = unityInstance;
-                    console.log("Sovereign Kernel successfully anchored to Blazor DOM.");
-                }).catch((message) => {
-                    alert("Engine Error: " + message);
-                });
-            };
-            document.body.appendChild(script);
-        }
-    };
+        };
+    </script>
 </body>
 </html>
