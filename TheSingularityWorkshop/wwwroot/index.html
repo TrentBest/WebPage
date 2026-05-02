@@ -1,74 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
+<script src="_framework/blazor.webassembly.js" autostart="false"></script>
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Singularity Workshop</title>
-    <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/app.css" rel="stylesheet" />
-    <link href="TheSingularityWorkshop.styles.css" rel="stylesheet" />
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
-</head>
+<script>
+    // 2. The Custom Blazor Bootloader (Bypasses Azure's MIME Bug)
+    Blazor.start({
+        loadBootResource: function (type, name, defaultUri, integrity) {
+            // If it is a WebAssembly file, we intercept it
+            if (type === 'dotnetjs' || type === 'dotnetwasm' || defaultUri.endsWith('.wasm')) {
+                return (async function () {
+                    const response = await fetch(defaultUri, { cache: 'no-cache' });
+                    if (!response.ok) throw new Error("Failed to load: " + name);
 
-<body>
-    <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
-    </div>
-
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
-
-    <script>
-        window.interop = {
-            initUnity: function (canvasId) {
-                var canvas = document.getElementById(canvasId);
-
-                // Match this path to where your PS1 script drops the build
-                var buildUrl = "Workshop/Forge/Build";
-
-                // NOTE: If Unity outputs a different name than "Build001", update these lines!
-                var loaderUrl = buildUrl + "/Build001.loader.js";
-                var config = {
-                    dataUrl: buildUrl + "/Build001.data.br",
-                    frameworkUrl: buildUrl + "/Build001.framework.js.br",
-                    codeUrl: buildUrl + "/Build001.wasm.br",
-                    streamingAssetsUrl: "StreamingAssets",
-                    companyName: "The Singularity Workshop",
-                    productName: "Genesis",
-                    productVersion: "1.0",
-                    matchWebGLToCanvasSize: true, // Ensures it fits your Blazor div
-                };
-
-                // Dynamically inject the Unity loader script
-                var script = document.createElement("script");
-                script.src = loaderUrl;
-                script.onload = () => {
-                    createUnityInstance(canvas, config, (progress) => {
-                        console.log("Kernel Ignition Progress: " + (100 * progress) + "%");
-                    }).then((unityInstance) => {
-                        window.sovereignUnityInstance = unityInstance;
-                        console.log("Sovereign Kernel successfully anchored to Blazor DOM.");
-                    }).catch((message) => {
-                        alert("Engine Error: " + message);
-                    });
-                };
-                document.body.appendChild(script);
+                    // Force the raw data into a buffer and manually apply the correct MIME type
+                    const buffer = await response.arrayBuffer();
+                    return new Response(buffer, { headers: { "content-type": "application/wasm" } });
+                })();
             }
-        };
-    </script>
+        }
+    });
+
+    // 3. The Sovereign Kernel Synapse
+    window.interop = {
+        initUnity: function (canvasId) {
+            var canvas = document.getElementById(canvasId);
+            var buildUrl = "Workshop/Forge/Build";
+            var loaderUrl = buildUrl + "/Build001.loader.js";
+
+            var config = {
+                // Make sure these match what Unity actually output!
+                // If you disabled compression in Unity, remove the .br extensions.
+                dataUrl: buildUrl + "/Build001.data.br",
+                frameworkUrl: buildUrl + "/Build001.framework.js.br",
+                codeUrl: buildUrl + "/Build001.wasm.br",
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "The Singularity Workshop",
+                productName: "Genesis",
+                productVersion: "1.0",
+            };
+
+            // We inject the Unity loader dynamically ONLY when C# asks for it.
+            // This guarantees Blazor and Unity don't fight over the Emscripten 'Module' namespace.
+            var script = document.createElement("script");
+            script.src = loaderUrl;
+            script.onload = () => {
+                createUnityInstance(canvas, config, (progress) => {
+                    console.log("Kernel Ignition Progress: " + (100 * progress) + "%");
+                }).then((unityInstance) => {
+                    window.sovereignUnityInstance = unityInstance;
+                    console.log("Sovereign Kernel successfully anchored to Blazor DOM.");
+                }).catch((message) => {
+                    alert("Engine Error: " + message);
+                });
+            };
+            document.body.appendChild(script);
+        }
+    };
+</script>
 </body>
-
-
 </html>
