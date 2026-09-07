@@ -1,105 +1,117 @@
-/* Sidebar - Overriding default blue/purple to TSW dark */
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(38, 43, 50) 0%, rgb(25, 30, 35) 70%);
-}
+﻿/* ============================================================================
+   THE SINGULARITY WORKSHOP // IMMERSIVE SHELL
+   The layout must not fight the experience with browser chrome, white gutters,
+   or competing scroll containers.
+   ============================================================================ */
 
-/* Base structural definitions (retained from original) */
 .page {
     position: relative;
     display: flex;
     flex-direction: column;
+    width: 100vw;
+    min-height: 100vh;
+    overflow: hidden;
+    background: #02050b;
+}
+
+.sidebar {
+    background: rgba(3, 8, 16, .94);
+    border-right: 1px solid rgba(0, 234, 255, .25);
+    box-shadow: 8px 0 35px rgba(0, 0, 0, .35);
+    z-index: 100;
 }
 
 main {
     flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #02050b;
+    overflow: hidden;
 }
 
-/* Top Row - Overriding light gray to TSW dark */
 .top-row {
-    background-color: var(--tsw-dark);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Soft white border for depth */
+    background: rgba(2, 5, 11, .96);
+    border-bottom: 1px solid rgba(0, 234, 255, .35);
     justify-content: flex-end;
     height: 3.5rem;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 }
 
-    /* Links in Top Row - Overriding default blue to TSW primary */
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-        color: var(--tsw-primary); /* Electric Cyan */
+.top-row ::deep a,
+.top-row ::deep .btn-link {
+    white-space: nowrap;
+    margin-left: 1.5rem;
+    text-decoration: none;
+    color: #00eaff;
+}
+
+.top-row ::deep a:hover,
+.top-row ::deep .btn-link:hover {
+    color: #ff19d9;
+}
+
+.top-row ::deep a:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+article {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0 !important;
+    background: #02050b;
+}
+
+@media (max-width: 640.98px) {
+    .page {
+        min-height: 100dvh;
+        height: 100dvh;
     }
 
-        .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-            text-decoration: underline;
-            color: var(--tsw-secondary); /* Gold/Yellow on hover */
-        }
-
-        .top-row ::deep a:first-child {
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-/* Media Queries (retained from original for responsiveness) */
-@media (max-width: 640.98px) {
     .top-row {
         justify-content: space-between;
     }
 
-        .top-row ::deep a, .top-row ::deep .btn-link {
-            margin-left: 0;
-        }
+    .top-row ::deep a,
+    .top-row ::deep .btn-link {
+        margin-left: 0;
+    }
 }
 
 @media (min-width: 641px) {
     .page {
         flex-direction: row;
-        
         height: 100vh;
-        overflow: scroll;
+        min-height: 0;
     }
 
     .sidebar {
         width: 200px;
         height: 100vh;
-        position: sticky;
-        top: 0;
+        position: relative;
+        flex: 0 0 200px;
     }
 
     main {
-        flex: 1;
-        
-        display: flex;
-        flex-direction: column;
         height: 100vh;
-        overflow: scroll; 
     }
 
     .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        /* Re-apply padding to the now separated top-row */
+        position: relative;
+        z-index: 101;
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
     }
 
-        .top-row.auth ::deep a:first-child {
-            flex: 1;
-            text-align: right;
-            width: 0;
-        }
-
-    article {
-        /* This is the content area containing @Body */
-        /* NEW: Tell content area to take all remaining height and hide its own scrollbar */
-        flex-grow: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-       padding-top: 1.5rem !important;
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
+    .top-row.auth ::deep a:first-child {
+        flex: 1;
+        text-align: right;
+        width: 0;
     }
 }
