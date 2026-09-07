@@ -5,34 +5,35 @@
 
 <PageTitle>The Singularity Workshop</PageTitle>
 
-<div class="hypervisor-shell" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #050206; font-family: monospace; color: white;">
-
-    @* --- LAYER 1: THE SOVEREIGN KERNEL (Silently Booting) --- *@
-    <div class="unity-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "all" : "none"); opacity: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "1" : "0"); transition: opacity 1.5s ease-in;">
-        <canvas id="unity-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+<div class="hypervisor-shell">
+    <div class="unity-layer" style="pointer-events: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "all" : "none"); opacity: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "1" : "0");">
+        <canvas id="unity-canvas"></canvas>
     </div>
 
-    @* --- LAYER 2: THE CHAOS SWARM & MONOLITH --- *@
     @if (currentPhase == AppPhase.Monolith || currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
     {
-        <div class="chaos-container @(currentPhase == AppPhase.Collapsing ? "gravity-failure" : "")" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;">
-            
-            @* The Initial Hook *@
+        <div class="chaos-container @(currentPhase == AppPhase.Collapsing ? "gravity-failure" : "")">
             @if (currentPhase == AppPhase.Monolith)
             {
-                <button class="monolith-btn" @onclick="ShatterMonolith" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80vw; height: 80vh; background-image: url('/Images/TheSingularityWorkshopLogo.png'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: rgba(10, 10, 15, 0.9); border: 2px solid #00ffcc; border-radius: 15px; cursor: pointer; box-shadow: 0 0 50px rgba(0, 255, 204, 0.2); transition: all 0.3s ease;">
-                    <div class="monolith-text" style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); font-size: 3rem; font-weight: bold; color: white; text-shadow: 0 0 10px #00ffcc; letter-spacing: 5px;">
-                        ENTER THE WORKSHOP
+                <div class="monolith-stage">
+                    <button class="monolith-btn" @onclick="ShatterMonolith" aria-label="Enter The Singularity Workshop">
+                        <img class="monolith-image" src="/Images/TheSingularityWorkshopLogo.png" alt="The Singularity Workshop" />
+                        <span class="monolith-text">ENTER THE WORKSHOP</span>
+                    </button>
+
+                    <div class="workshop-warning" role="note">
+                        <span class="warning-mark">⚠</span>
+                        <span>WARNING // THIS IS AN ACTIVE WORKSHOP</span>
+                        <span class="warning-mark">⚠</span>
                     </div>
-                </button>
+                </div>
             }
 
-            @* The Living Software (Breeding Buttons) *@
             @if (currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
             {
                 @foreach (var node in activeNodes)
                 {
-                    <button class="chaos-node" style="position: absolute; left: @(node.X)px; top: @(node.Y)px; width: @(node.Size)px; height: @(node.Size)px; z-index: @node.Generation; transform: translate(-50%, -50%); transition: width 0.1s linear, height 0.1s linear;">
+                    <button class="chaos-node" style="left: @(node.X)px; top: @(node.Y)px; width: @(node.Size)px; height: @(node.Size)px; z-index: @node.Generation; transform: translate(-50%, -50%);">
                         <div class="node-gen">GEN @node.Generation</div>
                         <div class="node-lineage">[@node.Lineage]</div>
                     </button>
@@ -41,31 +42,22 @@
         </div>
     }
 
-    @* --- LAYER 3: THE POST-COLLAPSE GATEWAY --- *@
     @if (currentPhase == AppPhase.Gateway)
     {
-        <div class="gateway-interface" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5, 2, 6, 0.85); backdrop-filter: blur(5px); animation: fadeIn 1.5s ease-out;">
-            
+        <div class="gateway-interface">
             <div class="kernel-status mb-5 text-center">
-                <span class="oi oi-pulse" style="color: #00ffcc; font-size: 2rem; animation: strobe 1s infinite;"></span>
-                <h2 style="color: #00ffcc; font-weight: bold; letter-spacing: 3px; margin-top: 15px;">SOVEREIGN KERNEL ACTIVE</h2>
-                <p style="color: #aaa; font-size: 1rem; max-width: 500px;">
-                    DOM Authority Terminated. GPU Render Pipeline Online.<br/>
-                    Select your destination trajectory.
-                </p>
+                <span class="oi oi-pulse kernel-pulse"></span>
+                <h2>SOVEREIGN KERNEL ACTIVE</h2>
+                <p>DOM Authority Terminated. GPU Render Pipeline Online.<br />Select your destination trajectory.</p>
             </div>
-
             <div class="d-flex gap-4">
-                @* Path 1: The Showcase (Active) *@
                 <button class="btn gateway-btn active-path" @onclick="EnterShowcase">
                     <h3 class="mb-1">THE SHOWCASE</h3>
-                    <span style="font-size: 0.8rem; opacity: 0.8;">Explore the Architectural Demonstrations</span>
+                    <span>Explore the Architectural Demonstrations</span>
                 </button>
-
-                @* Path 2: The Forge (Locked) *@
                 <button class="btn gateway-btn locked-path" disabled title="Infrastructure actively being built">
-                    <h3 class="mb-1" style="color: #ff3366;">THE FORGE</h3>
-                    <span style="font-size: 0.8rem; opacity: 0.8;">[ UNDER CONSTRUCTION ]</span>
+                    <h3 class="mb-1">THE FORGE</h3>
+                    <span>[ UNDER CONSTRUCTION ]</span>
                 </button>
             </div>
         </div>
@@ -73,35 +65,41 @@
 </div>
 
 <style>
-    /* Swarm Node Styles */
-    .chaos-node {
-        border-radius: 8px; border: 1px solid rgba(0, 255, 204, 0.5);
-        color: white; background: rgba(5, 2, 6, 0.8); backdrop-filter: blur(2px);
-        overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center;
-        box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); pointer-events: none;
-    }
+    .hypervisor-shell { position: relative; width: 100%; height: 100%; min-height: 100%; overflow: hidden; background: #050a14; color: white; font-family: 'Consolas', 'Courier New', monospace; }
+    .unity-layer, .unity-layer canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .unity-layer { z-index: 1; transition: opacity 1.5s ease-in; }
+    .chaos-container { position: absolute; inset: 0; z-index: 10; overflow: hidden; }
+
+    .monolith-stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1.25rem; background: radial-gradient(circle at 50% 50%, rgba(0, 220, 255, 0.06), transparent 42%), #050a14; }
+    .monolith-btn { position: relative; width: 50%; height: 50%; min-width: 280px; min-height: 220px; padding: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(3, 10, 22, 0.88); border: 2px solid #00eaff; border-radius: 14px; cursor: pointer; box-shadow: 0 0 12px rgba(0, 234, 255, 0.45), 0 0 40px rgba(0, 234, 255, 0.12), inset 0 0 25px rgba(0, 234, 255, 0.05); transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease; }
+    .monolith-btn:hover { transform: scale(1.015); border-color: #ff2cff; box-shadow: 0 0 15px rgba(255, 44, 255, 0.6), 0 0 55px rgba(0, 234, 255, 0.18), inset 0 0 35px rgba(255, 44, 255, 0.06); }
+    .monolith-image { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; pointer-events: none; }
+    .monolith-text { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); width: 100%; text-align: center; font-size: clamp(1.1rem, 2.5vw, 2.6rem); font-weight: 700; color: #fff; text-shadow: 0 0 8px #00eaff, 0 0 22px rgba(0, 234, 255, 0.75); letter-spacing: 0.18em; white-space: nowrap; pointer-events: none; }
+    .workshop-warning { display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 0.55rem 1.25rem; border-top: 1px solid #ff2cff; border-bottom: 1px solid #ff2cff; color: #ff55ff; font-size: clamp(0.65rem, 1vw, 0.85rem); letter-spacing: 0.16em; text-shadow: 0 0 8px rgba(255, 44, 255, 0.7); background: rgba(255, 44, 255, 0.035); }
+    .warning-mark { color: #ffd34d; text-shadow: 0 0 8px rgba(255, 211, 77, 0.75); }
+
+    .chaos-node { position: absolute; border-radius: 8px; border: 1px solid rgba(0, 255, 204, 0.5); color: white; background: rgba(5, 2, 6, 0.8); backdrop-filter: blur(2px); overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); pointer-events: none; }
     .node-gen { font-size: 0.7rem; color: #00ffcc; font-weight: bold; }
     .node-lineage { font-size: 0.6rem; opacity: 0.7; }
+    .gravity-failure { transform: translateY(150vh) rotate(10deg); opacity: 0; transition: all 1.5s cubic-bezier(0.55, 0.085, 0.68, 0.53); pointer-events: none; }
 
-    /* The Gravity Drop Animation */
-    .gravity-failure {
-        transform: translateY(150vh) rotate(10deg);
-        opacity: 0;
-        transition: all 1.5s cubic-bezier(0.55, 0.085, 0.68, 0.53);
-        pointer-events: none;
-    }
-
-    /* Gateway Styles */
-    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @@keyframes strobe { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
-    
-    .gateway-btn {
-        background: rgba(10, 10, 15, 0.9); border: 1px solid #444; color: white;
-        padding: 20px 40px; width: 300px; text-align: left; border-radius: 8px; transition: all 0.3s;
-    }
+    .gateway-interface { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5, 10, 20, 0.88); backdrop-filter: blur(5px); animation: fadeIn 1.5s ease-out; }
+    .kernel-pulse { color: #00ffcc; font-size: 2rem; animation: strobe 1s infinite; }
+    .kernel-status h2 { color: #00ffcc; font-weight: bold; letter-spacing: 3px; margin-top: 15px; }
+    .kernel-status p { color: #8fb7c7; font-size: 1rem; max-width: 500px; }
+    .gateway-btn { background: rgba(5, 12, 25, 0.94); border: 1px solid #304b61; color: white; padding: 20px 40px; width: 300px; text-align: left; border-radius: 8px; transition: all 0.3s; }
     .active-path { border-left: 5px solid #00ffcc; }
     .active-path:hover { background: rgba(0, 255, 204, 0.1); border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); transform: translateX(5px); color: white; }
     .locked-path { border-left: 5px solid #ff3366; opacity: 0.6; cursor: not-allowed; }
+    .locked-path h3 { color: #ff3366; }
+    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @@keyframes strobe { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+
+    @media (max-width: 700px) {
+        .monolith-btn { width: 80%; height: 50%; min-width: 0; }
+        .monolith-text { letter-spacing: 0.08em; }
+        .workshop-warning { max-width: 90%; text-align: center; }
+    }
 </style>
 
 @code {
@@ -121,99 +119,67 @@
     private List<ChaosNode> activeNodes = new();
     private Timer chaosTimer = new();
     private Random rng = new();
-    
-    private const int CriticalMassThreshold = 100; // Drops when 100 buttons fill the screen
+    private const int CriticalMassThreshold = 100;
 
     protected override void OnInitialized()
     {
-        chaosTimer.Interval = 100; // Fast ticks
+        chaosTimer.Interval = 100;
         chaosTimer.Elapsed += TickChaos;
     }
 
     private async Task ShatterMonolith()
     {
-        // 1. Shatter the monolith into the first node
         currentPhase = AppPhase.Chaos;
         activeNodes.Add(new ChaosNode { X = 800, Y = 400, Size = 200, Generation = 1, Lineage = "1" });
         StateHasChanged();
-        
-        // 2. Start the swarm calculation
         chaosTimer.Start();
-
-        // 3. Silently wake the Sovereign Kernel in the background
-        try {
-            await JS.InvokeVoidAsync("interop.initUnity", "unity-canvas");
-        } catch { /* Suppress */ }
+        try { await JS.InvokeVoidAsync("interop.initUnity", "unity-canvas"); }
+        catch { /* Suppress optional Unity bootstrap failure. */ }
     }
 
     private void TickChaos(object? sender, ElapsedEventArgs e)
     {
         if (currentPhase != AppPhase.Chaos) return;
-
         List<ChaosNode> newborns = new();
 
         foreach (var node in activeNodes)
         {
-            node.Size += 10; // Rapid growth
-
-            // Reproduce when reaching threshold
-            if (node.Size > 180) 
+            node.Size += 10;
+            if (node.Size > 180)
             {
-                node.Size = 60; // Reset parent size
+                node.Size = 60;
                 node.OffspringCount++;
-                
-                newborns.Add(new ChaosNode
-                {
-                    X = node.X + rng.Next(-200, 200),
-                    Y = node.Y + rng.Next(-200, 200),
-                    Generation = node.Generation + 1,
-                    Lineage = $"{node.Lineage}.{node.OffspringCount}",
-                    Size = 60
-                });
+                newborns.Add(new ChaosNode { X = node.X + rng.Next(-200, 200), Y = node.Y + rng.Next(-200, 200), Generation = node.Generation + 1, Lineage = $"{node.Lineage}.{node.OffspringCount}", Size = 60 });
             }
         }
 
         if (newborns.Any())
         {
             activeNodes.AddRange(newborns);
-            
-            // Constrain to screen
-            foreach(var n in activeNodes)
+            foreach (var n in activeNodes)
             {
-                if (n.X < 100) n.X = 150; if (n.X > 1800) n.X = 1700;
-                if (n.Y < 100) n.Y = 150; if (n.Y > 900) n.Y = 800;
+                if (n.X < 100) n.X = 150;
+                if (n.X > 1800) n.X = 1700;
+                if (n.Y < 100) n.Y = 150;
+                if (n.Y > 900) n.Y = 800;
             }
         }
 
-        // TRIGGER THE GRAVITY DROP
-        if (activeNodes.Count >= CriticalMassThreshold)
-        {
-            _ = TriggerCollapse();
-        }
-        else
-        {
-            InvokeAsync(StateHasChanged);
-        }
+        if (activeNodes.Count >= CriticalMassThreshold) _ = TriggerCollapse();
+        else InvokeAsync(StateHasChanged);
     }
 
     private async Task TriggerCollapse()
     {
-        chaosTimer.Stop(); // Freeze calculations
-        
-        currentPhase = AppPhase.Collapsing; // CSS drops the container
+        chaosTimer.Stop();
+        currentPhase = AppPhase.Collapsing;
         await InvokeAsync(StateHasChanged);
-        
-        await Task.Delay(1500); // Wait for the drop animation to finish
-
-        currentPhase = AppPhase.Gateway; // Fade in the selection menu
+        await Task.Delay(1500);
+        currentPhase = AppPhase.Gateway;
         await InvokeAsync(StateHasChanged);
     }
 
-    private void EnterShowcase()
-    {
-        // Removes the gateway, leaving the user completely in WebGL
-        currentPhase = AppPhase.Sovereign; 
-    }
+    private void EnterShowcase() => currentPhase = AppPhase.Sovereign;
 
     public void Dispose()
     {
