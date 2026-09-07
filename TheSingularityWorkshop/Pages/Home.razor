@@ -5,34 +5,53 @@
 
 <PageTitle>The Singularity Workshop</PageTitle>
 
-<div class="hypervisor-shell" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #050206; font-family: monospace; color: white;">
+<div class="workshop-portal">
+    <div class="circuit-field" aria-hidden="true"></div>
+    <div class="ambient-core" aria-hidden="true"></div>
+    <div class="scanline-field" aria-hidden="true"></div>
 
     @* --- LAYER 1: THE SOVEREIGN KERNEL (Silently Booting) --- *@
-    <div class="unity-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "all" : "none"); opacity: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "1" : "0"); transition: opacity 1.5s ease-in;">
-        <canvas id="unity-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+    <div class="unity-layer" style="pointer-events: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "all" : "none"); opacity: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "1" : "0");">
+        <canvas id="unity-canvas"></canvas>
     </div>
 
     @* --- LAYER 2: THE CHAOS SWARM & MONOLITH --- *@
     @if (currentPhase == AppPhase.Monolith || currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
     {
-        <div class="chaos-container @(currentPhase == AppPhase.Collapsing ? "gravity-failure" : "")" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;">
-            
-            @* The Initial Hook *@
+        <div class="chaos-container @(currentPhase == AppPhase.Collapsing ? "gravity-failure" : "")">
             @if (currentPhase == AppPhase.Monolith)
             {
-                <button class="monolith-btn" @onclick="ShatterMonolith" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80vw; height: 80vh; background-image: url('/Images/TheSingularityWorkshopLogo.png'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: rgba(10, 10, 15, 0.9); border: 2px solid #00ffcc; border-radius: 15px; cursor: pointer; box-shadow: 0 0 50px rgba(0, 255, 204, 0.2); transition: all 0.3s ease;">
-                    <div class="monolith-text" style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); font-size: 3rem; font-weight: bold; color: white; text-shadow: 0 0 10px #00ffcc; letter-spacing: 5px;">
-                        ENTER THE WORKSHOP
+                <div class="portal-stack">
+                    <button class="monolith-btn" @onclick="ShatterMonolith" aria-label="Enter The Singularity Workshop">
+                        <span class="portal-image"></span>
+                        <span class="monolith-text">ENTER THE WORKSHOP</span>
+                        <span class="portal-corner corner-tl"></span>
+                        <span class="portal-corner corner-tr"></span>
+                        <span class="portal-corner corner-bl"></span>
+                        <span class="portal-corner corner-br"></span>
+                    </button>
+
+                    <div class="system-advisory">
+                        <div class="advisory-header">
+                            <span class="advisory-icon">⚠</span>
+                            <span>SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE</span>
+                            <span class="advisory-icon">⚠</span>
+                        </div>
+                        <div class="advisory-copy">
+                            You are transitioning from Blazor WASM UI logic straight into a WebGL Unity engine build.<br />
+                            Both domains are aggressively driven by the same featherweight, pure C# <strong>50kb FSM_API</strong> —<br />
+                            fully agnostic and backwards-compatible down to legacy frameworks.<br />
+                            <span class="advisory-joke">Viewer discretion and spare RAM advised.</span>
+                        </div>
                     </div>
-                </button>
+                </div>
             }
 
-            @* The Living Software (Breeding Buttons) *@
             @if (currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
             {
                 @foreach (var node in activeNodes)
                 {
-                    <button class="chaos-node" style="position: absolute; left: @(node.X)px; top: @(node.Y)px; width: @(node.Size)px; height: @(node.Size)px; z-index: @node.Generation; transform: translate(-50%, -50%); transition: width 0.1s linear, height 0.1s linear;">
+                    <button class="chaos-node" style="left: @(node.X)px; top: @(node.Y)px; width: @(node.Size)px; height: @(node.Size)px; z-index: @node.Generation;">
                         <div class="node-gen">GEN @node.Generation</div>
                         <div class="node-lineage">[@node.Lineage]</div>
                     </button>
@@ -44,106 +63,76 @@
     @* --- LAYER 3: THE POST-COLLAPSE GATEWAY --- *@
     @if (currentPhase == AppPhase.Gateway)
     {
-        <div class="gateway-interface" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5, 2, 6, 0.85); backdrop-filter: blur(5px); animation: fadeIn 1.5s ease-out;">
-            
-            <div class="kernel-status mb-5 text-center">
-                <span class="oi oi-pulse" style="color: #00ffcc; font-size: 2rem; animation: strobe 1s infinite;"></span>
-                <h2 style="color: #00ffcc; font-weight: bold; letter-spacing: 3px; margin-top: 15px;">SOVEREIGN KERNEL ACTIVE</h2>
-                <p style="color: #aaa; font-size: 1rem; max-width: 500px;">
-                    DOM Authority Terminated. GPU Render Pipeline Online.<br/>
+        <div class="gateway-interface">
+            <div class="gateway-glow"></div>
+            <div class="kernel-status">
+                <span class="kernel-pulse">◉</span>
+                <h2>SOVEREIGN KERNEL ACTIVE</h2>
+                <p>
+                    DOM Authority Terminated. GPU Render Pipeline Online.<br />
                     Select your destination trajectory.
                 </p>
             </div>
 
-            <div class="d-flex gap-4">
-                @* Path 1: The Showcase (Active) *@
-                <button class="btn gateway-btn active-path" @onclick="EnterShowcase">
-                    <h3 class="mb-1">THE SHOWCASE</h3>
-                    <span style="font-size: 0.8rem; opacity: 0.8;">Explore the Architectural Demonstrations</span>
+            <div class="gateway-paths">
+                <button class="gateway-btn active-path" @onclick="EnterShowcase">
+                    <span class="gateway-kicker">TRAJECTORY 01</span>
+                    <h3>THE SHOWCASE</h3>
+                    <span>Explore the Architectural Demonstrations</span>
                 </button>
 
-                @* Path 2: The Forge (Locked) *@
-                <button class="btn gateway-btn locked-path" disabled title="Infrastructure actively being built">
-                    <h3 class="mb-1" style="color: #ff3366;">THE FORGE</h3>
-                    <span style="font-size: 0.8rem; opacity: 0.8;">[ UNDER CONSTRUCTION ]</span>
+                <button class="gateway-btn locked-path" disabled title="Infrastructure actively being built">
+                    <span class="gateway-kicker">TRAJECTORY 02</span>
+                    <h3>THE FORGE</h3>
+                    <span>[ UNDER CONSTRUCTION ]</span>
                 </button>
             </div>
         </div>
     }
 </div>
 
-<style>
-    /* Swarm Node Styles */
-    .chaos-node {
-        border-radius: 8px; border: 1px solid rgba(0, 255, 204, 0.5);
-        color: white; background: rgba(5, 2, 6, 0.8); backdrop-filter: blur(2px);
-        overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center;
-        box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); pointer-events: none;
-    }
-    .node-gen { font-size: 0.7rem; color: #00ffcc; font-weight: bold; }
-    .node-lineage { font-size: 0.6rem; opacity: 0.7; }
-
-    /* The Gravity Drop Animation */
-    .gravity-failure {
-        transform: translateY(150vh) rotate(10deg);
-        opacity: 0;
-        transition: all 1.5s cubic-bezier(0.55, 0.085, 0.68, 0.53);
-        pointer-events: none;
-    }
-
-    /* Gateway Styles */
-    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @@keyframes strobe { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
-    
-    .gateway-btn {
-        background: rgba(10, 10, 15, 0.9); border: 1px solid #444; color: white;
-        padding: 20px 40px; width: 300px; text-align: left; border-radius: 8px; transition: all 0.3s;
-    }
-    .active-path { border-left: 5px solid #00ffcc; }
-    .active-path:hover { background: rgba(0, 255, 204, 0.1); border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); transform: translateX(5px); color: white; }
-    .locked-path { border-left: 5px solid #ff3366; opacity: 0.6; cursor: not-allowed; }
-</style>
-
 @code {
     private enum AppPhase { Monolith, Chaos, Collapsing, Gateway, Sovereign }
     private AppPhase currentPhase = AppPhase.Monolith;
 
-    private class ChaosNode
+    private sealed class ChaosNode
     {
         public double X { get; set; }
         public double Y { get; set; }
         public double Size { get; set; }
         public int Generation { get; set; }
         public string Lineage { get; set; } = "";
-        public int OffspringCount { get; set; } = 0;
+        public int OffspringCount { get; set; }
     }
 
-    private List<ChaosNode> activeNodes = new();
-    private Timer chaosTimer = new();
-    private Random rng = new();
-    
-    private const int CriticalMassThreshold = 100; // Drops when 100 buttons fill the screen
+    private readonly List<ChaosNode> activeNodes = new();
+    private readonly Timer chaosTimer = new();
+    private readonly Random rng = new();
+
+    private const int CriticalMassThreshold = 100;
 
     protected override void OnInitialized()
     {
-        chaosTimer.Interval = 100; // Fast ticks
+        chaosTimer.Interval = 100;
         chaosTimer.Elapsed += TickChaos;
     }
 
     private async Task ShatterMonolith()
     {
-        // 1. Shatter the monolith into the first node
         currentPhase = AppPhase.Chaos;
         activeNodes.Add(new ChaosNode { X = 800, Y = 400, Size = 200, Generation = 1, Lineage = "1" });
         StateHasChanged();
-        
-        // 2. Start the swarm calculation
+
         chaosTimer.Start();
 
-        // 3. Silently wake the Sovereign Kernel in the background
-        try {
+        try
+        {
             await JS.InvokeVoidAsync("interop.initUnity", "unity-canvas");
-        } catch { /* Suppress */ }
+        }
+        catch
+        {
+            // The visual transition must remain usable even when Unity is unavailable.
+        }
     }
 
     private void TickChaos(object? sender, ElapsedEventArgs e)
@@ -154,14 +143,13 @@
 
         foreach (var node in activeNodes)
         {
-            node.Size += 10; // Rapid growth
+            node.Size += 10;
 
-            // Reproduce when reaching threshold
-            if (node.Size > 180) 
+            if (node.Size > 180)
             {
-                node.Size = 60; // Reset parent size
+                node.Size = 60;
                 node.OffspringCount++;
-                
+
                 newborns.Add(new ChaosNode
                 {
                     X = node.X + rng.Next(-200, 200),
@@ -173,19 +161,19 @@
             }
         }
 
-        if (newborns.Any())
+        if (newborns.Count > 0)
         {
             activeNodes.AddRange(newborns);
-            
-            // Constrain to screen
-            foreach(var n in activeNodes)
+
+            foreach (var node in activeNodes)
             {
-                if (n.X < 100) n.X = 150; if (n.X > 1800) n.X = 1700;
-                if (n.Y < 100) n.Y = 150; if (n.Y > 900) n.Y = 800;
+                if (node.X < 100) node.X = 150;
+                if (node.X > 1800) node.X = 1700;
+                if (node.Y < 100) node.Y = 150;
+                if (node.Y > 900) node.Y = 800;
             }
         }
 
-        // TRIGGER THE GRAVITY DROP
         if (activeNodes.Count >= CriticalMassThreshold)
         {
             _ = TriggerCollapse();
@@ -198,21 +186,19 @@
 
     private async Task TriggerCollapse()
     {
-        chaosTimer.Stop(); // Freeze calculations
-        
-        currentPhase = AppPhase.Collapsing; // CSS drops the container
+        chaosTimer.Stop();
+        currentPhase = AppPhase.Collapsing;
         await InvokeAsync(StateHasChanged);
-        
-        await Task.Delay(1500); // Wait for the drop animation to finish
 
-        currentPhase = AppPhase.Gateway; // Fade in the selection menu
+        await Task.Delay(1500);
+
+        currentPhase = AppPhase.Gateway;
         await InvokeAsync(StateHasChanged);
     }
 
     private void EnterShowcase()
     {
-        // Removes the gateway, leaving the user completely in WebGL
-        currentPhase = AppPhase.Sovereign; 
+        currentPhase = AppPhase.Sovereign;
     }
 
     public void Dispose()
