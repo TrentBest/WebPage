@@ -1,104 +1,87 @@
-/* Sidebar - Overriding default blue/purple to TSW dark */
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(38, 43, 50) 0%, rgb(25, 30, 35) 70%);
-}
-
-/* Base structural definitions (retained from original) */
-.page {
+﻿.page {
     position: relative;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+    background: #050a14;
+}
+
+.sidebar {
+    background: linear-gradient(180deg, #07111f 0%, #030812 100%);
+    border-right: 1px solid #19384b;
 }
 
 main {
     flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: #050a14;
 }
 
-/* Top Row - Overriding light gray to TSW dark */
 .top-row {
-    background-color: var(--tsw-dark);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Soft white border for depth */
+    background: #050a14;
+    border-bottom: 1px solid #00eaff;
     justify-content: flex-end;
     height: 3.5rem;
+    min-height: 3.5rem;
     display: flex;
     align-items: center;
 }
 
-    /* Links in Top Row - Overriding default blue to TSW primary */
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-        color: var(--tsw-primary); /* Electric Cyan */
-    }
+.top-row ::deep a,
+.top-row ::deep .btn-link {
+    white-space: nowrap;
+    margin-left: 1.5rem;
+    text-decoration: none;
+    color: #00eaff;
+}
 
-        .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-            text-decoration: underline;
-            color: var(--tsw-secondary); /* Gold/Yellow on hover */
-        }
+.top-row ::deep a:hover,
+.top-row ::deep .btn-link:hover { color: #ff2cff; }
 
-        .top-row ::deep a:first-child {
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+.top-row ::deep a:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-/* Media Queries (retained from original for responsiveness) */
+article {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    overflow-x: hidden;
+    padding: 0 !important;
+    background: #050a14;
+}
+
 @media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-        .top-row ::deep a, .top-row ::deep .btn-link {
-            margin-left: 0;
-        }
+    .top-row { justify-content: space-between; }
+    .top-row ::deep a, .top-row ::deep .btn-link { margin-left: 0; }
 }
 
 @media (min-width: 641px) {
-    .page {
-        flex-direction: row;
-        
-        height: 100vh;
-        overflow: scroll;
-    }
+    .page { flex-direction: row; height: 100%; }
 
     .sidebar {
         width: 200px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
+        height: 100%;
+        position: relative;
+        flex: 0 0 200px;
+        overflow: hidden;
     }
 
-    main {
-        flex: 1;
-        
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        overflow: scroll; 
-    }
+    main { flex: 1 1 auto; height: 100%; }
 
     .top-row {
-        position: sticky;
-        top: 0;
+        position: relative;
         z-index: 1;
-        /* Re-apply padding to the now separated top-row */
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
-
-        .top-row.auth ::deep a:first-child {
-            flex: 1;
-            text-align: right;
-            width: 0;
-        }
-
-    article {
-        /* This is the content area containing @Body */
-        /* NEW: Tell content area to take all remaining height and hide its own scrollbar */
-        flex-grow: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-       padding-top: 1.5rem !important;
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
     }
