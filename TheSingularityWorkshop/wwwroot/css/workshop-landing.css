@@ -11,7 +11,6 @@ body,
     background: #020711 !important;
 }
 
-/* Hide the normal site chrome while Home owns the viewport. */
 .page:has(.hypervisor-shell) {
     background: #020711 !important;
 }
@@ -50,8 +49,6 @@ body,
     background: #020711 !important;
 }
 
-/* Once the Gateway exists, the navigation physically unfolds back in.
-   The three-second delay gives the collapsing living boxes time to finish. */
 .page:has(.gateway-interface) .sidebar {
     width: 200px !important;
     flex: 0 0 200px !important;
@@ -71,8 +68,6 @@ body,
     transition-delay: 3s !important;
 }
 
-/* The hero remains the primary object: exactly half the available panel in
-   each dimension, with its square artwork constrained by the shorter side. */
 .hypervisor-shell .monolith-stage {
     width: 100% !important;
     height: 100% !important;
@@ -106,7 +101,6 @@ body,
     object-position: center center !important;
 }
 
-/* White-hot ignition followed by an ember-like cyan/magenta trace. */
 .hypervisor-shell .monolith-btn::after {
     inset: -2px !important;
     padding: 2px;
@@ -134,8 +128,6 @@ body,
     animation: workshopTitleIgnition 3.2s ease-in-out infinite !important;
 }
 
-/* Warning: deliberately obnoxious. It should look alive enough to deserve
-   the warning before anyone discovers what is hiding behind the button. */
 .hypervisor-shell .workshop-warning {
     width: min(680px,72%) !important;
     border: 4px solid #ff6600 !important;
@@ -157,6 +149,65 @@ body,
 .hypervisor-shell .warning-mark {
     color: #ffd34d !important;
     filter: drop-shadow(0 0 7px rgba(255,102,0,1)) !important;
+}
+
+/* Living computation: every node is born from the center of its generation,
+   spins violently while it travels, then settles into an orthogonal shape.
+   The FSM determines when the node exists; CSS only manifests that lifecycle. */
+.hypervisor-shell .chaos-node {
+    transform-origin: center center;
+    animation: workshopNodeEject .78s cubic-bezier(.16,1,.3,1) both;
+    will-change: transform, opacity, filter, box-shadow;
+}
+
+.hypervisor-shell .chaos-node:nth-child(2n) {
+    animation-duration: .68s;
+}
+
+.hypervisor-shell .chaos-node:nth-child(3n) {
+    animation-duration: .92s;
+}
+
+@keyframes workshopNodeEject {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(1080deg) scale(.035);
+        border-radius: 50%;
+        filter: brightness(2.5);
+        box-shadow: 0 0 55px rgba(0,234,255,.95), 0 0 100px rgba(255,44,255,.55);
+    }
+    28% {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(720deg) scale(.18);
+        border-radius: 30%;
+    }
+    72% {
+        transform: translate(-50%, -50%) rotate(105deg) scale(1.08);
+        border-radius: 10px;
+        filter: brightness(1.35);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(0deg) scale(1);
+        border-radius: 8px;
+        filter: brightness(1);
+        box-shadow: 0 0 15px rgba(0,255,204,.3);
+    }
+}
+
+/* Once settled, nodes breathe slowly instead of looking like static cards. */
+.hypervisor-shell .chaos-node {
+    animation-name: workshopNodeEject, workshopNodeLife;
+    animation-duration: .78s, 3.8s;
+    animation-delay: 0s, .78s;
+    animation-timing-function: cubic-bezier(.16,1,.3,1), ease-in-out;
+    animation-iteration-count: 1, infinite;
+    animation-fill-mode: both, both;
+}
+
+@keyframes workshopNodeLife {
+    0%,100% { box-shadow: 0 0 12px rgba(0,255,204,.24), inset 0 0 10px rgba(0,234,255,.025); }
+    50% { box-shadow: 0 0 24px rgba(0,255,204,.48), inset 0 0 16px rgba(0,234,255,.055); }
 }
 
 @keyframes workshopHeroTrace {
@@ -193,5 +244,6 @@ body,
     .hypervisor-shell .monolith-btn::after,
     .hypervisor-shell .monolith-text,
     .hypervisor-shell .workshop-warning,
-    .hypervisor-shell .warning-header { animation:none !important; }
+    .hypervisor-shell .warning-header,
+    .hypervisor-shell .chaos-node { animation:none !important; }
 }
