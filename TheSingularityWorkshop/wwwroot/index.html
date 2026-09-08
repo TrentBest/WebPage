@@ -8,9 +8,9 @@
 
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
-    <link rel="stylesheet" href="css/workshop-landing.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="TheSingularityWorkshop.styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/workshop-landing.css" />
 </head>
 <body>
     <div id="app">
@@ -33,12 +33,10 @@
         // 2. The Custom Blazor Bootloader (Bypasses Azure's MIME Bug)
         Blazor.start({
             loadBootResource: function (type, name, defaultUri, integrity) {
-                // Let Blazor handle dotnet.js natively using the default URI string
                 if (type === 'dotnetjs') {
                     return defaultUri;
                 }
 
-                // Intercept ONLY WebAssembly binaries to force the correct MIME type
                 if (type === 'dotnetwasm' || defaultUri.endsWith('.wasm')) {
                     return (async function () {
                         const response = await fetch(defaultUri, { cache: 'no-store' });
@@ -74,7 +72,7 @@
                     companyName: "The Singularity Workshop",
                     productName: "Genesis",
                 };
-                console.table(config); // Prints a clean table of the target URLs
+                console.table(config);
 
                 console.log("[Interop] 3. Injecting Unity loader script: " + loaderUrl);
                 const script = document.createElement("script");
