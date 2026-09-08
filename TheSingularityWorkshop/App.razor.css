@@ -25,6 +25,12 @@ html, body {
     background: var(--tsw-bg);
 }
 
+/* The landing experience is intentionally a viewport-filling surface.
+   Other pages retain the normal article scroll behavior. */
+main:has(.hypervisor-shell) article {
+    overflow: hidden;
+}
+
 a, .btn-link { color: var(--tsw-cyan); }
 a:hover, .btn-link:hover { color: var(--tsw-magenta); }
 
