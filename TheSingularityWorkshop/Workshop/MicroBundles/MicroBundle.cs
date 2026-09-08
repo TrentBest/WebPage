@@ -1,0 +1,73 @@
+using TheSingularityWorkshop.FSM_API;
+
+namespace TheSingularityWorkshop.Workshop.MicroBundles;
+
+/// <summary>
+/// Minimal runtime shell for a micro-bundle.
+/// The bundle schedules lifecycle through FSM_API and leaves manifestation to
+/// an <see cref="IMicroBundleProvider"/>.
+/// </summary>
+public sealed class MicroBundle : IMicroBundle
+{
+    private readonly FSMHandle _fsm;
+    private readonly IMicroBundleProvider _provider;
+
+    public MicroBundle(int id, string name, IMicroBundleProvider provider, int parentId = -1, int generation = 0)
+    {
+        Id = id;
+        _provider = provider;
+        Context = new MicroBundleContext(id, name)
+        {
+            ParentId = parentId,
+            Generation = generation
+        };
+
+        FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
+            .State("Created", onEnter: EnterCreated)
+            .State("Manifesting", onEnter: EnterManifesting)
+            .State("Active", onEnter: EnterActive)
+            .State("Collapsing", onEnter: EnterCollapsing)
+            .State("Destroyed", onEnter: EnterDestroyed)
+            .Transition("Created", "Manifesting", c => ((MicroBundleContext)c).IsValid)
+            .Transition("Manifesting", "Active", c => ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
+            .Transition("Active", "Collapsing", c => !((MicroBundleContext)c).IsValid)
+            .Transition("Collapsing", "Destroyed", c => !((MicroBundleContext)c).IsValid && ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
+            .BuildDefinition();
+
+        _fsm = FSM_API.Create.CreateInstance(FsmName, Context, ProcessingGroup);
+    }
+
+    private string FsmName => $"MicroBundle_{Id}";
+    private const string ProcessingGroup = "MicroBundles";
+
+    public int Id { get; }
+    public IStateContext Context { get; }
+
+    /// <summary>Latest platform-specific manifestation produced by the provider.</summary>
+    public MicroBundleManifestation? Manifestation { get; private set; }
+
+    public void Update()
+    {
+        if (Context is MicroBundleContext context)
+        {
+            context.ElapsedMilliseconds++;
+        }
+
+        FSM_API.Interaction.Update(ProcessingGroup);
+        Manifestation = _provider.Manifest(Context);
+    }
+
+    public void Invalidate()
+    {
+        if (Context is MicroBundleContext context)
+        {
+            context.IsValid = false;
+        }
+    }
+
+    private void EnterCreated(IStateContext context) => ((MicroBundleContext)context).Phase = "Created";
+    private void EnterManifesting(IStateContext context) => ((MicroBundleContext)context).Phase = "Manifesting";
+    private void EnterActive(IStateContext context) => ((MicroBundleContext)context).Phase = "Active";
+    private void EnterCollapsing(IStateContext context) => ((MicroBundleContext)context).Phase = "Collapsing";
+    private void EnterDestroyed(IStateContext context) => ((MicroBundleContext)context).Phase = "Destroyed";
+}
