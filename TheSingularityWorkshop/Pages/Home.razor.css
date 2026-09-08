@@ -9,7 +9,6 @@
 /* ------------------------------------------------------------- */
 /* 1. HERO SECTION STYLING (The big title and mission) */
 /* ------------------------------------------------------------- */
-
 .hero-section {
     background-color: var(--tsw-dark);
     color: white;
@@ -19,26 +18,13 @@
     text-align: center;
     padding-top: 5rem;
     padding-bottom: 5rem;
-    /* The 'overflow: scroll;' on the hero-section was removed to restore main page scrolling. */
 }
-
-.hero-title {
-    font-size: 4rem;
-    font-weight: 900;
-    line-height: 1.1;
-    color: var(--tsw-primary);
-}
-
-.hero-tagline {
-    font-size: 1.5rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 2rem;
-}
+.hero-title { font-size: 4rem; font-weight: 900; line-height: 1.1; color: var(--tsw-primary); }
+.hero-tagline { font-size: 1.5rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 2rem; }
 
 /* ------------------------------------------------------------- */
 /* 2. THE ADVANCED BUTTON (Custom Glow Effect) */
 /* ------------------------------------------------------------- */
-
 .btn-advanced {
     position: relative;
     overflow: hidden;
@@ -51,271 +37,192 @@
     letter-spacing: 1px;
     z-index: 1;
 }
-
-    .btn-advanced:hover {
-        color: var(--tsw-dark);
-        background-color: white;
-        border-color: white;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-
-    /* Pseudo-element for a subtle, internal glow/shine effect */
-    .btn-advanced::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-        z-index: -1;
-    }
-
-    .btn-advanced:hover::after {
-        opacity: 1;
-    }
+.btn-advanced:hover { color: var(--tsw-dark); background-color: white; border-color: white; box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+.btn-advanced::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%); opacity: 0; transition: opacity 0.3s ease-in-out; z-index: -1; }
+.btn-advanced:hover::after { opacity: 1; }
 
 /* ------------------------------------------------------------- */
 /* 3. CORE PILLARS CARD STYLING (Vertical Layout) */
 /* ------------------------------------------------------------- */
-
-.pillars-section {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-    background-color: #f8f9fa; /* Light background to contrast with dark hero */
-}
-
-.pillar-card {
-    border: none;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    min-height: 100%;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 1.5rem; /* Add spacing between vertical cards */
-}
-
-    .pillar-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    }
-
-.card-phase-title {
-    font-weight: 700;
-    font-size: 1.1rem;
-}
-
-.card-phase-number {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 2rem;
-    font-weight: 900;
-    color: var(--tsw-secondary);
-    opacity: 0.6;
-    line-height: 1;
-}
-
-.card-title-api {
-    color: var(--bs-primary);
-}
-
-.card-title-layer {
-    color: var(--bs-success);
-}
-
-.card-title-app {
-    color: var(--bs-info);
-}
-
-.card-title-vr {
-    color: var(--bs-danger);
-}
+.pillars-section { padding-top: 4rem; padding-bottom: 4rem; background-color: #f8f9fa; }
+.pillar-card { border: none; transition: transform 0.3s ease, box-shadow 0.3s ease; min-height: 100%; position: relative; overflow: hidden; margin-bottom: 1.5rem; }
+.pillar-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); }
+.card-phase-title { font-weight: 700; font-size: 1.1rem; }
+.card-phase-number { position: absolute; top: 10px; right: 10px; font-size: 2rem; font-weight: 900; color: var(--tsw-secondary); opacity: 0.6; line-height: 1; }
+.card-title-api { color: var(--bs-primary); }
+.card-title-layer { color: var(--bs-success); }
+.card-title-app { color: var(--bs-info); }
+.card-title-vr { color: var(--bs-danger); }
 
 /* ------------------------------------------------------------- */
-/* 4. STATUS AREA STYLING (Nested Minimal Cards) */
+/* 4. STATUS AREA STYLING */
 /* ------------------------------------------------------------- */
-.status-area {
-    background-color: var(--tsw-dark);
-    padding: 3rem 1.5rem;
-    color: white;
-}
-
-.status-card {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: rgba(0, 0, 0, 0.2);
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-}
-
-.status-indicator {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: pulse 1.5s infinite;
-}
-
-    .status-indicator.live {
-        background-color: var(--tsw-primary);
-        box-shadow: 0 0 5px var(--tsw-primary);
-    }
-
-    .status-indicator.development {
-        background-color: var(--tsw-secondary);
-        box-shadow: 0 0 5px var(--tsw-secondary);
-        animation-delay: 0.5s;
-    }
-
-    .status-indicator.planned {
-        background-color: rgba(255, 255, 255, 0.4);
-        box-shadow: none;
-        animation: none;
-    }
-
-@keyframes pulse {
-    0% {
-        transform: scale(0.8);
-        opacity: 0.8;
-    }
-
-    50% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(0.8);
-        opacity: 0.8;
-    }
-}
+.status-area { background-color: var(--tsw-dark); padding: 3rem 1.5rem; color: white; }
+.status-card { border: 1px solid rgba(255, 255, 255, 0.1); background-color: rgba(0, 0, 0, 0.2); margin-top: 1rem; margin-bottom: 1rem; }
+.status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; animation: pulse 1.5s infinite; }
+.status-indicator.live { background-color: var(--tsw-primary); box-shadow: 0 0 5px var(--tsw-primary); }
+.status-indicator.development { background-color: var(--tsw-secondary); box-shadow: 0 0 5px var(--tsw-secondary); animation-delay: 0.5s; }
+.status-indicator.planned { background-color: rgba(255, 255, 255, 0.4); box-shadow: none; animation: none; }
+@keyframes pulse { 0% { transform: scale(0.8); opacity: 0.8; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.8; } }
 
 /* ------------------------------------------------------------- */
 /* 5. DARK MODE OVERRIDES */
 /* ------------------------------------------------------------- */
 @media (prefers-color-scheme: dark) {
+    :root { --tsw-dark-bg: #121212; --tsw-dark-card-bg: #1e1e1e; --tsw-text-on-dark: #e0e0e0; --tsw-text-muted-on-dark: rgba(255, 255, 255, 0.5); }
+    body, html { background-color: var(--tsw-dark-bg) !important; color: var(--tsw-text-on-dark) !important; overflow-y: auto !important; }
+    .hero-section h1.text-black { color: var(--tsw-text-on-dark) !important; }
+    .pillars-section { background-color: var(--tsw-dark-bg); }
+    .pillars-section h2.text-dark { color: var(--tsw-text-on-dark) !important; }
+    .pillars-section p.lead.text-muted { color: var(--tsw-text-muted-on-dark) !important; }
+    .pillar-card, .pillar-card.bg-light { background-color: var(--tsw-dark-card-bg) !important; color: var(--tsw-text-on-dark); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important; }
+    .pillar-card:hover { box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5) !important; }
+    .pillar-card .card-text.text-small { color: var(--tsw-text-muted-on-dark) !important; }
+    .pillar-card a.text-muted { color: var(--tsw-primary) !important; }
+    .status-card { background-color: var(--tsw-dark-card-bg) !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; }
+    .status-card p.text-muted { color: var(--tsw-text-muted-on-dark) !important; }
+    .status-card h5.text-white { color: var(--tsw-text-on-dark) !important; }
+    .card-title-api { color: var(--tsw-primary) !important; }
+    .card-title-layer { color: #28a745 !important; }
+    .card-title-app { color: #17a2b8 !important; }
+    .card-title-vr { color: #dc3545 !important; }
+    .gateway-btn { background: rgba(10, 10, 15, 0.9); border: 1px solid #444; color: white; padding: 20px 40px; width: 300px; text-align: left; border-radius: 8px; transition: all 0.3s; }
+    .active-path { border-left: 5px solid #00ffcc; }
+    .active-path:hover { background: rgba(0, 255, 204, 0.1); border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); transform: translateX(5px); }
+    .locked-path { border-left: 5px solid #ff3366; opacity: 0.6; cursor: not-allowed; }
+}
 
-    :root {
-        --tsw-dark-bg: #121212;
-        --tsw-dark-card-bg: #1e1e1e;
-        --tsw-text-on-dark: #e0e0e0;
-        --tsw-text-muted-on-dark: rgba(255, 255, 255, 0.5);
-    }
+/* ========================================================================
+   LIVING LANDING OVERRIDES
+   The landing surface is deliberately theatrical. The surrounding site is
+   still ordinary navigation; the Home surface gets to be the exception.
+   ======================================================================== */
 
-    /* FIX: Target global body/html to ensure the entire page background changes and scrolling is enabled. */
-    body, html {
-        background-color: var(--tsw-dark-bg) !important;
-        color: var(--tsw-text-on-dark) !important;
-        /* Ensures the scrollbar appears if content overflows vertically */
-        overflow-y: auto !important;
-    }
+.hypervisor-shell {
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #020711 !important;
+}
 
-    /* Hero Section - Fix visibility of hardcoded text-black on dark background */
-    .hero-section h1.text-black {
-        color: var(--tsw-text-on-dark) !important;
-    }
+.monolith-stage {
+    width: 100% !important;
+    height: 100% !important;
+    inset: 0 !important;
+    gap: clamp(1rem, 3vh, 2rem) !important;
+    padding: 0 !important;
+}
 
-    /* Pillars Section - Change background and general text color */
-    .pillars-section {
-        background-color: var(--tsw-dark-bg);
-    }
+.monolith-btn {
+    width: 50% !important;
+    height: 50% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 1100px;
+    max-height: 700px;
+    border-width: 2px !important;
+    border-color: rgba(0, 234, 255, 0.85) !important;
+    background: rgba(2, 7, 17, 0.76) !important;
+    box-shadow: 0 0 14px rgba(0,234,255,.45), 0 0 55px rgba(0,234,255,.14), inset 0 0 40px rgba(0,234,255,.045) !important;
+}
 
-        .pillars-section h2.text-dark {
-            color: var(--tsw-text-on-dark) !important;
-        }
+.monolith-btn::before {
+    inset: 0 !important;
+    border: 1px solid rgba(255,255,255,.32) !important;
+    border-radius: 17px !important;
+    box-shadow: inset 0 0 20px rgba(255,255,255,.025);
+}
 
-        .pillars-section p.lead.text-muted {
-            color: var(--tsw-text-muted-on-dark) !important;
-        }
+/* A hot trace travels clockwise around the hero frame. */
+.monolith-btn::after {
+    inset: -2px !important;
+    padding: 2px;
+    border-radius: 19px;
+    background: conic-gradient(from -90deg, transparent 0deg, transparent 245deg, rgba(255,255,255,.9) 285deg, #00eaff 315deg, #ff2cff 340deg, transparent 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: heroTrace 2.8s linear infinite;
+    transform: none !important;
+    opacity: .9;
+}
 
-    /* Pillar Cards - Override bg-light for a dark card color */
-    .pillar-card, .pillar-card.bg-light {
-        background-color: var(--tsw-dark-card-bg) !important;
-        color: var(--tsw-text-on-dark);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
-    }
+.monolith-image {
+    width: auto !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    flex: 0 0 auto;
+}
 
-        .pillar-card:hover {
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5) !important;
-        }
+.monolith-text {
+    bottom: 7% !important;
+    font-size: clamp(1.1rem, 3.25vw, 3.3rem) !important;
+    letter-spacing: .2em !important;
+    text-shadow: 0 0 8px #fff, 0 0 20px rgba(0,234,255,.85), 0 0 42px rgba(255,44,255,.45) !important;
+    animation: titleScorch 3.2s ease-in-out infinite !important;
+}
 
-        /* Ensure legibility of text and links inside cards */
-        .pillar-card .card-text.text-small {
-            color: var(--tsw-text-muted-on-dark) !important;
-        }
+.workshop-warning {
+    width: min(680px, 72%) !important;
+    border: 4px solid #ff6600 !important;
+    border-radius: 4px !important;
+    background: rgba(20,10,2,.94) !important;
+    box-shadow: 0 0 18px rgba(255,102,0,.5), 0 0 45px rgba(255,102,0,.22), inset 0 0 25px rgba(255,102,0,.08) !important;
+    animation: warningBorderBreath 2.8s ease-in-out infinite !important;
+}
 
-        .pillar-card a.text-muted {
-            color: var(--tsw-primary) !important;
-        }
+.warning-header {
+    color: #ff9933 !important;
+    font-size: clamp(.72rem, 1.1vw, .95rem) !important;
+    font-weight: 800 !important;
+    letter-spacing: .16em !important;
+    text-shadow: 0 0 9px rgba(255,153,51,.85) !important;
+    animation: warningTitlePhase 2.8s ease-in-out infinite !important;
+}
+.warning-mark { color: #ffd34d !important; filter: drop-shadow(0 0 7px rgba(255,102,0,.95)) !important; }
+.warning-body { color: #f4eee8 !important; }
+.warning-body strong { color: #fff !important; text-shadow: 0 0 7px rgba(255,255,255,.4); }
+.warning-final { color: #ffb15c !important; }
 
-    /* Status Area Cards - Ensure text contrast remains high */
-    .status-card {
-        background-color: var(--tsw-dark-card-bg) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    }
+@keyframes heroTrace {
+    0% { opacity: .15; transform: rotate(0deg); }
+    8% { opacity: 1; }
+    55% { opacity: 1; }
+    100% { opacity: .15; transform: rotate(360deg); }
+}
 
-        .status-card p.text-muted {
-            color: var(--tsw-text-muted-on-dark) !important;
-        }
+@keyframes titleScorch {
+    0%, 100% { opacity: .78; filter: brightness(.95); text-shadow: 0 0 5px #fff, 0 0 15px rgba(0,234,255,.55); }
+    48% { opacity: 1; filter: brightness(1.25); text-shadow: 0 0 10px #fff, 0 0 28px rgba(0,234,255,1), 0 0 48px rgba(255,44,255,.55); }
+    55% { opacity: .96; }
+}
 
-        .status-card h5.text-white {
-            color: var(--tsw-text-on-dark) !important;
-        }
+@keyframes warningBorderBreath {
+    0%, 100% { border-color: #ff6600; box-shadow: 0 0 10px rgba(255,102,0,.25), 0 0 25px rgba(255,102,0,.12), inset 0 0 16px rgba(255,102,0,.04); }
+    50% { border-color: #ff7a00; box-shadow: 0 0 24px rgba(255,102,0,.65), 0 0 55px rgba(255,102,0,.28), inset 0 0 28px rgba(255,102,0,.1); }
+}
 
-    /* Keep Bootstrap colors for card titles visible on dark mode */
-    .card-title-api {
-        color: var(--tsw-primary) !important;
-    }
+@keyframes warningTitlePhase {
+    0%, 44% { color: #ff9933; text-shadow: 0 0 7px rgba(255,153,51,.75); }
+    50%, 94% { color: #ffd34d; text-shadow: 0 0 11px rgba(255,211,77,1), 0 0 24px rgba(255,153,51,.45); }
+    100% { color: #ff9933; }
+}
 
-    .card-title-layer {
-        color: #28a745 !important;
-    }
+@media (max-width: 900px) {
+    .monolith-btn { width: 76% !important; height: 50% !important; }
+    .monolith-text { font-size: clamp(1rem, 5vw, 2rem) !important; letter-spacing: .09em !important; }
+    .workshop-warning { width: 86% !important; }
+}
 
-    .card-title-app {
-        color: #17a2b8 !important;
-    }
-
-    .card-title-vr {
-        color: #dc3545 !important;
-    }
-
-    @@keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-
-        to {
-            opacity: 1;
-        }
-    }
-
-    .gateway-btn {
-        background: rgba(10, 10, 15, 0.9);
-        border: 1px solid #444;
-        color: white;
-        padding: 20px 40px;
-        width: 300px;
-        text-align: left;
-        border-radius: 8px;
-        transition: all 0.3s;
-    }
-
-    .active-path {
-        border-left: 5px solid #00ffcc;
-    }
-
-        .active-path:hover {
-            background: rgba(0, 255, 204, 0.1);
-            border-color: #00ffcc;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
-            transform: translateX(5px);
-        }
-
-    .locked-path {
-        border-left: 5px solid #ff3366;
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
+@media (prefers-reduced-motion: reduce) {
+    .monolith-btn::after,
+    .monolith-text,
+    .workshop-warning,
+    .warning-header { animation: none !important; }
 }
