@@ -30,7 +30,6 @@
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
 
     <script>
-        // 2. The Custom Blazor Bootloader (Bypasses Azure's MIME Bug)
         Blazor.start({
             loadBootResource: function (type, name, defaultUri, integrity) {
                 if (type === 'dotnetjs') {
@@ -49,52 +48,113 @@
             }
         });
 
-        // 3. The Sovereign Kernel Synapse (Instrumented for Debugging)
+        // Sovereign Kernel Synapse.
+        // Unity initialization may be requested by Blazor before the canvas has
+        // actually been rendered. Keep the request alive until the canvas exists.
         window.interop = {
-            initUnity: function (canvasId) {
-                console.log("[Interop] 1. initUnity called for canvas:", canvasId);
+            _unityInitializing: false,
+            _unityInitialized: false,
+            _canvasObserver: null,
 
-                const canvas = document.getElementById(canvasId);
-                if (!canvas) {
-                    console.error("[Interop] CRITICAL: Canvas element not found in the DOM!");
+            initUnity: function (canvasId) {
+                console.log("[Interop] initUnity requested for canvas:", canvasId);
+
+                if (window.interop._unityInitialized || window.interop._unityInitializing) {
+                    console.log("[Interop] Unity bootstrap already active or complete.");
                     return;
                 }
 
-                const buildUrl = "Workshop/Forge/Build";
-                const loaderUrl = buildUrl + "/Build001.loader.js";
+                const start = () => {
+                    const canvas = document.getElementById(canvasId);
+                    if (!canvas) {
+                        console.log("[Interop] Canvas not rendered yet; waiting for Blazor render.");
+                        return false;
+                    }
 
-                console.log("[Interop] 2. Constructing Engine Configuration...");
-                const config = {
-                    dataUrl: buildUrl + "/Build001.data.br",
-                    frameworkUrl: buildUrl + "/Build001.framework.js.br",
-                    codeUrl: buildUrl + "/Build001.wasm.br",
-                    streamingAssetsUrl: "StreamingAssets",
-                    companyName: "The Singularity Workshop",
-                    productName: "Genesis",
+                    if (window.interop._canvasObserver) {
+                        window.interop._canvasObserver.disconnect();
+                        window.interop._canvasObserver = null;
+                    }
+
+                    window.interop._unityInitializing = true;
+
+                    const buildUrl = "Workshop/Forge/Build";
+                    const loaderUrl = buildUrl + "/Build001.loader.js";
+
+                    const config = {
+                        dataUrl: buildUrl + "/Build001.data.br",
+                        frameworkUrl: buildUrl + "/Build001.framework.js.br",
+                        codeUrl: buildUrl + "/Build001.wasm.br",
+                        streamingAssetsUrl: "StreamingAssets",
+                        companyName: "The Singularity Workshop",
+                        productName: "Genesis",
+                        matchWebGLToCanvasSize: true,
+                        devicePixelRatio: 1
+                    };
+
+                    console.log("[Interop] Loading Unity loader:", loaderUrl);
+
+                    const existingLoader = document.querySelector('script[data-workshop-unity-loader="true"]');
+                    const script = existingLoader || document.createElement("script");
+
+                    const boot = () => {
+                        if (typeof createUnityInstance !== "function") {
+                            console.error("[Interop] Unity loader loaded but createUnityInstance is unavailable.");
+                            window.interop._unityInitializing = false;
+                            return;
+                        }
+
+                        console.log("[Interop] Firing createUnityInstance...");
+                        createUnityInstance(canvas, config, (progress) => {
+                            console.log("[Unity Engine] Boot Progress: " + (100 * progress).toFixed(1) + "%");
+                        }).then((instance) => {
+                            window.sovereignUnityInstance = instance;
+                            window.interop._unityInitialized = true;
+                            window.interop._unityInitializing = false;
+                            console.log("[Interop] SUCCESS: Sovereign Kernel anchored to Blazor DOM.");
+                        }).catch((message) => {
+                            window.interop._unityInitializing = false;
+                            console.error("[Unity Engine] CRITICAL BOOT FAILURE:", message);
+                        });
+                    };
+
+                    if (existingLoader) {
+                        boot();
+                    } else {
+                        script.src = loaderUrl;
+                        script.dataset.workshopUnityLoader = "true";
+                        script.onload = boot;
+                        script.onerror = () => {
+                            window.interop._unityInitializing = false;
+                            console.error("[Interop] CRITICAL: Failed to download Unity loader: " + loaderUrl);
+                        };
+                        document.body.appendChild(script);
+                    }
+
+                    return true;
                 };
-                console.table(config);
 
-                console.log("[Interop] 3. Injecting Unity loader script: " + loaderUrl);
-                const script = document.createElement("script");
-                script.src = loaderUrl;
+                if (start()) {
+                    return;
+                }
 
-                script.onerror = () => {
-                    console.error("[Interop] CRITICAL: Failed to download loader.js! Check the Build folder path.");
-                };
+                if (window.interop._canvasObserver) {
+                    window.interop._canvasObserver.disconnect();
+                }
 
-                script.onload = () => {
-                    console.log("[Interop] 4. Loader script executed. Firing createUnityInstance...");
+                window.interop._canvasObserver = new MutationObserver(() => {
+                    if (start()) {
+                        window.interop._canvasObserver.disconnect();
+                        window.interop._canvasObserver = null;
+                    }
+                });
 
-                    createUnityInstance(canvas, config, (progress) => {
-                        console.log("[Unity Engine] Boot Progress: " + (100 * progress).toFixed(1) + "%");
-                    }).then((instance) => {
-                        window.sovereignUnityInstance = instance;
-                        console.log("[Interop] 5. SUCCESS! Sovereign Kernel anchored to Blazor DOM.");
-                    }).catch((message) => {
-                        console.error("[Unity Engine] CRITICAL BOOT FAILURE:", message);
-                    });
-                };
-                document.body.appendChild(script);
+                window.interop._canvasObserver.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+
+                requestAnimationFrame(() => start());
             }
         };
     </script>
