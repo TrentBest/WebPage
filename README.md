@@ -1,174 +1,448 @@
-# The Singularity Workshop — Publisher WebPage
+# The Singularity Workshop — WebPage
 
-## What this repository is
+## What this repository actually is
 
-This repository is the public-facing web surface for **The Singularity Workshop**.
-It is not intended to be a conventional marketing site.
+This is the **ephemeral WebPage project** for The Singularity Workshop.
 
-The Workshop is a place where the software itself is part of the message:
-state becomes behavior, behavior becomes visible, and the boundary between a
-web application and a native/engine runtime becomes something the visitor can
-actually experience.
+That distinction matters.
 
-The guiding idea is simple:
+The long-term thing being built is **The Singularity Workshop**: a body of software,
+architecture, experiments, tools, runtime infrastructure, and ideas aimed at
+**Forging Software for the Singularity**.
+
+This repository is one manifestation of that larger system — the public-facing web
+surface, publisher presence, demonstration environment, and experimental proving
+ground.
+
+The road to the long-term architecture is deliberately allowed to change.
+The destination is comparatively stable; the implementation path is not.
+
+> **The Workshop is the vision. This WebPage is one of the experiments we use to
+> discover how to get there.**
+
+And because this is software, the experiment is allowed to become part of the
+software it is demonstrating.
+
+---
+
+## The guiding principle
 
 > **Make the mundane magical. Then show the machinery that made it possible.**
 
-The long-term direction is **Forging Software for the Singularity**: deterministic
-software infrastructure, state machines, data/ontology systems, AI-facing command
-boundaries, tooling, and runtime experiments that can cross manifestation domains.
+The Workshop should not merely *tell* a visitor that the underlying technology is
+interesting. The interface should occasionally behave in a way that makes the
+visitor wonder what the hell they are looking at.
+
+A button can be a button.
+
+Or a button can breathe.
+
+It can react to the pointer.
+
+It can reveal a living GUI.
+
+That GUI can reproduce.
+
+The reproduction can become a swarm.
+
+The swarm can overwhelm the screen, freeze, fall away under gravity, and reveal
+that the visitor is crossing from a Blazor/WebAssembly manifestation into a Unity
+WebGL runtime.
+
+That is not decoration around the technology.
+
+**That is the technology becoming the demonstration.**
 
 ---
 
-## Current status — September 2026
+# Current direction — September 2026
 
-### Working
+The current WebPage is intentionally in motion. Do not interpret every current
+implementation detail as permanent architecture.
 
-- Blazor WebAssembly publisher site.
-- FSM_API integration and FSM-oriented infrastructure.
-- Unity WebGL build hosted by the Workshop site.
-- Workshop/Forge assets are present under `wwwroot/Workshop`.
-- MicroBundle infrastructure exists as a small, independently schedulable behavior
-  abstraction.
-- The landing experience has been restored to the intentionally theatrical
-  **living software** direction.
+The durable guideposts are:
 
-### Landing experience
+- deterministic state-driven behavior
+- separation of semantics from manifestation
+- lightweight runtime infrastructure
+- reusable state/identity concepts
+- AI-facing deterministic command boundaries
+- ontology and mapping between human-readable and machine-efficient forms
+- data infrastructure through SingularityWarehouse
+- multiple manifestation domains, including Blazor and Unity/WebGL
+- software that can explain and demonstrate itself
 
-The home page is deliberately unusual.
+The implementation route toward those goals is expected to evolve.
 
-1. A visitor encounters a large **ENTER THE WORKSHOP** control rather than a
-   conventional hero/marketing section.
-2. The control occupies roughly 50% of its containing surface in the desktop
-   experience.
-3. The Workshop environment breathes, scans, glows, and contains small ambient
-   signals rather than sitting motionless on a blank page.
-4. The entry control uses Trent's public GitHub avatar as the initial living
-   identity surface.
-5. Hovering the control increases its energy and scale and drives the animated
-   border treatment.
-6. Entering the Workshop releases the first recognizable GUI-like software node.
-7. Nodes grow, reproduce, carry generation/lineage information, and multiply
-   exponentially until critical mass.
-8. The swarm freezes and falls away, exposing the runtime boundary.
-9. The experience transitions toward the Unity WebGL proof-of-concept gateway.
-10. The gateway leads into the Showcase while the Forge remains explicitly marked
-    as infrastructure under construction.
+## The current landing experience
 
-The point is not decoration. The page is itself a demonstration that ordinary
-software controls can become a living system.
+The home page is intentionally **not a conventional marketing hero**.
 
-### Important visual rule
-
-Do **not** flatten the landing page into a generic hero section.
-
-The cyan/magenta instrumentation, scan lines, orbit traces, warning panel,
-animated border energy, breathing typography, sparks/signals, and recognizable
-GUI nodes are intentional parts of the Workshop's identity.
-
-If a future change makes the page look like a normal SaaS landing page, that is
-probably a regression.
-
----
-
-## Architectural direction
-
-The Workshop is being built around a layered model:
+The intended sequence is:
 
 ```text
-Human intent
+FIRST CONTACT
      |
      v
-AI / command boundary
+[ ENTER THE WORKSHOP ]
+     |
+     |  breathing / reactive / instrumented
+     v
+RECOGNIZABLE GUI
+     |
+     |  grows
+     v
+GEN 0
+     |
+     |  reproduces
+     v
+GEN 1 -> GEN 2 -> GEN 3 -> ...
+     |
+     |  exponential population
+     v
+"oh shit..."
+     |
+     |  simultaneous freeze
+     v
+GRAVITY
+     |
+     |  everything falls away
+     v
+UNITY WEBGL
      |
      v
-Grammar / ontology
-     |
-     v
-Deterministic command representation
-     |
-     v
-FSM_API / runtime state
-     |
-     +--------------------+
-     |                    |
-     v                    v
- Blazor/Web            Unity/WebGL
- manifestation         manifestation
+SHOWCASE / FORGE
 ```
 
-The important architectural distinction is between **what is happening** and
-**how it is manifested**.
+The recognizable GUI is important. The purpose is to take something mundane —
+a button or ordinary application control — and make it behave like software that
+has acquired a life of its own.
 
-That is why MicroBundles do not own UI behavior. They carry lifecycle/state
-information and delegate manifestation to providers. See
-`TheSingularityWorkshop/Workshop/MicroBundles/README.md` for the current model.
+### Visual language is part of the architecture
 
-The next major evolution is integer-backed identity and ontology metadata. Human
-readable strings remain valuable at authoring/documentation boundaries, while
-runtime and AI transport should increasingly operate on compact integer identities.
+The current Workshop language includes:
 
-This repository should remain an experimental proving ground for that architecture.
+- electric cyan and magenta instrumentation
+- gold/orange warning energy
+- breathing borders
+- breathing typography
+- scan-line effects
+- subtle horizontal/vertical environmental distortion
+- orbital traces
+- small signal dots
+- spark-like details
+- glowing controls
+- GUI elements that become the actors in the demonstration
 
----
+These effects are not sacred implementations. They **are** sacred intent.
 
-## Development rules / guideposts
+A future developer may replace the CSS animation with a canvas, a shader, a
+MicroBundle provider, Unity rendering, or something we have not invented yet.
+What must survive is the feeling and the underlying behavior.
 
-### Preserve the behavior before refactoring the implementation
-
-The Workshop has accumulated visual and behavioral experiments through iteration.
-Before replacing a component, inspect its history. A newer-looking implementation
-is not automatically a better implementation if it removes behavior that was
-already demonstrating the intended concept.
-
-### Do not optimize the magic away
-
-The theatrical effects are not disposable polish. They are part of the UX and the
-technical story. Keep them understandable and reasonably cheap, but preserve the
-sense that the interface is alive.
-
-### Prefer deterministic state over animation spaghetti
-
-Animation may be CSS, DOM, Blazor, or Unity, but meaningful lifecycle transitions
-should have explicit states and clear ownership. The eventual goal is to let
-`FSM_API` own those transitions rather than scattering behavioral decisions across
-timers and event handlers.
-
-### Keep manifestation separate from semantics
-
-A behavior should be expressible without assuming that its output is HTML, CSS,
-WPF, Unity, WebGL, audio, or speech.
-
-### Document the strange parts
-
-If something looks unnecessarily weird, assume there is a reason until the history
-and architecture have been checked. Add a comment or README note when introducing
-behavior that future developers could otherwise mistake for accidental complexity.
-
-### Never use a successful build as proof that the architecture is correct
-
-The Workshop exists partly to make architecture observable. A feature should be
-judged by lifecycle clarity, determinism, portability, performance, and whether the
-resulting behavior can be explained.
+If a refactor turns the Workshop into a generic SaaS landing page, it is almost
+certainly a regression.
 
 ---
 
-## Project architecture
+# Architecture: destination stable, road ephemeral
 
-- **Technology:** Blazor WebAssembly / .NET
-- **Core state technology:** `FSM_API`
-- **Web integration:** `FSMManagerService`, `BlazorFSMIntegration`, MicroBundles
-- **Engine boundary:** Unity WebGL
-- **Deployment target:** static hosting such as Azure Static Web Apps
-- **Primary repository:** `TrentBest/WebPage`
-- **Core FSM repository:** `TrentBest/FSM_API`
+There is an important distinction between **the architecture we are trying to
+reach** and **the implementation currently carrying us there**.
 
-The site also contains demonstrations and infrastructure for the Workshop's FSM,
-editor, runtime, and Unity integration work.
+The Workshop is not a single finished application. It is an evolving ecosystem.
+
+A useful conceptual model is:
+
+```text
+                         THE SINGULARITY WORKSHOP
+                                  |
+              +-------------------+-------------------+
+              |                   |                   |
+              v                   v                   v
+       FSM_API / Runtime   SingularityWarehouse   Developer Tools
+              |                   |                   |
+              +-------------------+-------------------+
+                                  |
+                                  v
+                         Deterministic Semantics
+                                  |
+                                  v
+                    AI / Command / Grammar Boundary
+                                  |
+                                  v
+                         Manifestation Domains
+                       +----------+----------+
+                       |                     |
+                       v                     v
+                 Blazor / Web          Unity / WebGL
+```
+
+This is a direction, not a claim that every layer is already complete.
+
+The architecture should become more coherent as the experiments accumulate.
 
 ---
 
-## Local development
+# FSM_API
+
+`FSM_API` is the core state technology behind much of the Workshop.
+
+The goal is not simply to have another finite-state-machine library. The larger
+purpose is to establish a small, deterministic state vocabulary that can be used
+across otherwise unrelated systems.
+
+That makes state a useful boundary between:
+
+- intent
+- behavior
+- runtime
+- UI
+- engines
+- tools
+- AI commands
+
+The current FSM_API work includes both the established string-backed implementation
+and the evolving integer-backed implementation.
+
+The integer-backed direction matters because strings are excellent for humans but
+are not always the representation we want on a hot path or inside an AI command
+stream.
+
+The intended progression is roughly:
+
+```text
+Human-readable authoring
+        |
+        v
+String identity / documentation
+        |
+        v
+Integer identity / compact transport
+        |
+        v
+Deterministic runtime state
+```
+
+The exact API and representation are still evolving. Documentation should describe
+what is currently true rather than pretending the future design is already finished.
+
+---
+
+# SingularityWarehouse
+
+The **SingularityWarehouse** is the larger data/infrastructure experiment behind
+another major part of the Workshop.
+
+The interesting question is not merely:
+
+> "Where do I store this object?"
+
+It is:
+
+> **"How does software know what this thing is, what it relates to, what identity
+> it carries, and how it participates in the runtime?"**
+
+That leads naturally toward:
+
+```text
+DATA
+  |
+  v
+IDENTITY
+  |
+  v
+ONTOLOGY
+  |
+  v
+RELATIONSHIP
+  |
+  v
+STATE
+  |
+  v
+RUNTIME
+```
+
+The Warehouse work is therefore connected to the same larger problem as FSM_API:
+how do we create a deterministic vocabulary that software — and eventually AI — can
+operate on without continuously paying the cost of ambiguous human-readable text?
+
+This is still an evolving body of work. Preserve that distinction in future docs.
+
+---
+
+# AI / Protocol / Grammar / CommandAI direction
+
+Another thread of the Workshop grew out of an earlier C# AI execution environment.
+
+The useful lesson was not "make an AI chatbot."
+
+It was:
+
+> **How do you let probabilistic intelligence operate a deterministic machine
+> without allowing ambiguity to leak through the boundary?**
+
+The evolving conceptual stack is:
+
+```text
+LLM
+ |
+ v
+CommandAI
+ |
+ v
+Grammar
+ |
+ v
+ProtocolAI
+ |
+ v
+Deterministic execution
+```
+
+The names and boundaries may change as the work progresses.
+The problem being attacked is the durable part.
+
+The eventual integer-backed mapping work extends this idea: let the AI understand
+human-readable concepts while giving the runtime compact, deterministic identities.
+
+---
+
+# MicroBundles
+
+MicroBundles are a concrete experiment in separating **behavior** from
+**manifestation**.
+
+The current model is:
+
+```text
+MicroBundle
+    |
+    +-- state / lifecycle
+    |
+    +-- semantic effects
+    |
+    v
+Provider
+    |
+    +-- Blazor
+    +-- WPF
+    +-- Unity
+    +-- WebGL
+    +-- other manifestation
+```
+
+A MicroBundle should describe what is happening without needing to know whether
+that behavior eventually appears as HTML, CSS, a Unity object, sound, speech, or
+something else.
+
+See:
+
+`TheSingularityWorkshop/Workshop/MicroBundles/README.md`
+
+for the current implementation-level notes.
+
+---
+
+# Development guideposts
+
+These are more important than any particular class name.
+
+## 1. Preserve intent before replacing implementation
+
+The Workshop has a long history of experiments. Before replacing something that
+looks strange, inspect its history.
+
+A simpler implementation may be technically cleaner while accidentally destroying
+the behavior that made the experiment valuable.
+
+## 2. The visual behavior is evidence
+
+The living landing page is not just presentation.
+It is an observable experiment.
+
+If something breathes, reproduces, collapses, or crosses a runtime boundary, that
+behavior should eventually have a clear architectural explanation.
+
+## 3. Prefer deterministic state over event spaghetti
+
+Timers, CSS animation, browser events, and rendering loops are implementation
+mechanisms.
+
+Meaningful lifecycle should have explicit state and ownership.
+
+The long-term direction is for FSM_API to carry that meaning wherever practical.
+
+## 4. Keep semantics independent from manifestation
+
+Do not let a behavior become permanently coupled to Blazor simply because Blazor
+was the first place we demonstrated it.
+
+## 5. Performance is part of the design
+
+The Workshop should be able to create the *impression* of overwhelming complexity
+without actually allocating an absurd amount of unnecessary work.
+
+Exponential visual behavior is useful precisely because the system can represent
+many actors while keeping each actor lightweight.
+
+## 6. Document the road, not just the destination
+
+The implementation will change.
+
+That is expected.
+
+README files should therefore record:
+
+- what currently exists
+- what problem it solves
+- why it exists
+- what direction it is moving
+- what is experimental
+- what should not be casually removed
+
+Do not turn temporary implementation details into false architectural promises.
+
+## 7. Use history as engineering memory
+
+Git history is part of the documentation.
+
+When recovering or refactoring Workshop behavior, inspect earlier versions before
+assuming that the current version contains the whole story.
+
+## 8. A successful build is necessary, not sufficient
+
+The Workshop is an architectural proving ground.
+
+A feature is successful when its behavior is understandable, deterministic where it
+needs to be, portable where it should be, performant enough for its purpose, and
+consistent with the larger direction.
+
+---
+
+# Current repository role
+
+This WebPage repository provides:
+
+- the public Workshop presence
+- publisher/compliance pages
+- demonstrations
+- the living landing experiment
+- WebAssembly/Blazor runtime integration
+- Unity WebGL hosting experiments
+- Workshop-facing developer infrastructure
+- a place to make the larger architecture visible
+
+It is **not** the entirety of The Singularity Workshop.
+
+Think of it as the public laboratory door.
+
+Behind that door are the other repositories and experiments.
+
+---
+
+# Local development
 
 ```bash
 git clone https://github.com/TrentBest/WebPage.git
@@ -177,53 +451,59 @@ dotnet restore
 dotnet run
 ```
 
-The application will launch on the HTTPS/HTTP port selected by the project's
-launch settings.
+The HTTPS/HTTP port is determined by the project's launch settings.
 
-For active Workshop development, work from the feature branch being developed and
-keep `master` untouched unless a change is intentionally being promoted.
+For active development, use the feature branch appropriate to the experiment and
+keep `master` untouched unless promotion is intentional.
 
----
-
-## The larger Workshop
-
-The web page is only one manifestation of a much larger body of work:
-
-- FSM_API and deterministic state-driven runtime infrastructure
-- integer-backed state/identity experiments
-- SingularityWarehouse and indexed data infrastructure
-- ontology and string-to-integer mapping
-- MicroBundles and provider-based manifestation
-- AI command/grammar experiments
-- Unity integration and WebGL runtime boundaries
-- developer tooling and visual architecture exploration
-- performance measurement and benchmarking
-- C# systems engineering across unusual runtime boundaries
-
-The website is where these ideas become visible.
+Do not introduce OneDrive-specific assumptions into the project or documentation.
+The repository should remain portable to an ordinary local development workspace
+and CI environment.
 
 ---
 
-## Writing / research direction
+# Documentation and articles
 
-The Workshop should document the journey as it is being built rather than waiting
-for a mythical "finished" version.
+The Workshop should document itself while it is being built.
 
-Future technical writing should cover subjects such as:
+The intended writing style is technical, honest, playful, and occasionally absurd.
 
-- SingularityWarehouse architecture and why it exists
-- integer-backed ontology and mapping
+Or, more simply:
+
+> **Dr. Seuss for software developers.**
+
+The writing should be capable of explaining a difficult architecture without
+pretending software is less weird than it actually is.
+
+Future articles should explore:
+
+- SingularityWarehouse
+- ontology and identity
+- integer-backed mappings
+- FSM_API design and performance
+- MicroBundles
 - deterministic AI command boundaries
-- Grammar / ProtocolAI / CommandAI evolution
-- MicroBundles and manifestation domains
-- FSM_API performance and design decisions
-- Unity/WebGL hosting experiments
-- rebuilding lost systems better than the originals
-- the engineering lessons hiding inside seemingly ridiculous experiments
+- ProtocolAI / Grammar / CommandAI
+- Unity/WebGL runtime boundaries
+- rebuilding lost systems better than their originals
+- the strange engineering lessons discovered along the way
 
-The goal is technical writing that is rigorous without becoming sterile —
-**Dr. Seuss for software developers**: playful enough to invite people in, precise
-enough that the machinery underneath can survive inspection.
+The articles are not merely marketing.
+They are the public engineering log of the Workshop becoming itself.
+
+---
+
+# The larger idea
+
+We are not claiming to have reached the Singularity.
+
+We're building the machinery that might make the journey interesting.
+
+The destination remains recognizable even when the road changes.
+
+And the road **will** change.
+
+That's the point of a workshop.
 
 ---
 
