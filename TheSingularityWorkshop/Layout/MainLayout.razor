@@ -63,15 +63,24 @@
         }
 
         /*
-           The landing no longer asks the visitor to choose between Showcase and Forge.
-           Once the existing landing FSM reaches Gateway, the gateway itself becomes
-           the hand-off: the creator moniker appears for three seconds while the
-           ordinary browser chrome wakes back up underneath it.
+           The landing layers are mutually exclusive.
 
-           The next layer now performs the actual escape: after the hand-off, the
-           browser-native runtime takes ownership and reproduces the portable
-           processing-group execution model without invoking Unity lifecycle callbacks.
+           The browser-native runtime is mounted with the normal layout so it can
+           exist for the entire lifetime of the landing page, but it MUST NOT paint
+           until the Gateway hand-off. Previously it was visible during Monolith /
+           Chaos / Collapse, which put the new runtime above the actual entry button
+           and warning because the runtime owns z-index 9990 while the landing owns
+           z-index 9000.
+
+           This is a visibility gate, not a stacking-order hack: the old landing gets
+           the screen first; the browser runtime gets the screen only at Gateway.
         */
+        .page:has(.browser-runtime) main > .browser-runtime {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .workshop-content:has(.gateway-interface) {
             pointer-events: none;
         }
@@ -109,12 +118,11 @@
             animation: landingChromeAppear 3s ease-in-out both;
         }
 
-        /* The browser runtime is mounted from the normal Blazor layout, but stays
-           completely absent during Monolith / Chaos / Collapse. It arrives exactly
-           as the three-second creator hand-off finishes. */
+        /* The runtime is released only after the creator hand-off has completed. */
         .page:has(.gateway-interface) main > .browser-runtime {
             visibility: hidden;
             opacity: 0;
+            pointer-events: none;
             animation: browserRuntimeRelease .9s ease-out 3s forwards;
         }
 
@@ -135,7 +143,7 @@
 
         @@keyframes browserRuntimeRelease {
             from { visibility: hidden; opacity: 0; transform: scale(1.015); }
-            to { visibility: visible; opacity: 1; transform: scale(1); }
+            to { visibility: visible; opacity: 1; transform: scale(1); pointer-events: auto; }
         }
     </style>
 }
