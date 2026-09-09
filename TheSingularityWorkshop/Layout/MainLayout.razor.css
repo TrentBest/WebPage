@@ -29,11 +29,32 @@ main {
     flex: 0 0 3.5rem;
     background: #050a14;
     border-bottom: 1px solid #00eaff;
-    justify-content: flex-end;
     height: 3.5rem;
     min-height: 3.5rem;
     display: flex;
     align-items: center;
+}
+
+.workshop-tab-header {
+    justify-content: center;
+    text-align: center;
+}
+
+.workshop-tab-title {
+    display: inline-block;
+    color: #dcefff;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: clamp(.8rem, 1.2vw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(0, 234, 255, .35);
+    animation: workshopTabBreath 4s ease-in-out infinite;
+}
+
+@keyframes workshopTabBreath {
+    0%, 100% { opacity: .72; letter-spacing: .19em; }
+    50% { opacity: 1; letter-spacing: .24em; }
 }
 
 .top-row ::deep a,
@@ -63,17 +84,14 @@ article {
     background: #050a14;
 }
 
-/*
-   The Workshop landing surface owns the remaining content viewport.
-   It must not create a second browser scrollbar around its animation.
-*/
+/* The living Workshop is a viewport surface, not a scrolling article. */
 article:has(.hypervisor-shell) {
     overflow: hidden !important;
 }
 
 @media (max-width: 640.98px) {
-    .top-row { justify-content: space-between; }
-    .top-row ::deep a, .top-row ::deep .btn-link { margin-left: 0; }
+    .top-row { justify-content: center; }
+    .workshop-tab-title { max-width: 85vw; overflow: hidden; text-overflow: ellipsis; }
 }
 
 @media (min-width: 641px) {
