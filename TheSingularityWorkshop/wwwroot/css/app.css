@@ -34,6 +34,127 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+/*
+   WORKSHOP SPLASH CONTRACT
+   ------------------------
+   On the landing route the Workshop owns the entire browser surface until its
+   first-contact sequence releases navigation. This is deliberately expressed
+   as a host-level state rather than by teaching the living GUI about the page
+   layout.
+*/
+html.workshop-splash-locked,
+html.workshop-splash-locked body,
+html.workshop-splash-locked #app {
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+html.workshop-splash-locked .page {
+    display: block !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+}
+
+html.workshop-splash-locked .page > .sidebar,
+html.workshop-splash-locked .page > main > .top-row {
+    display: none !important;
+}
+
+html.workshop-splash-locked .page > main {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+html.workshop-splash-locked .page > main > article.workshop-content {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* The shell returned after the splash. */
+html.workshop-splash-released .page > main > article.workshop-content {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/*
+   The first-contact moniker is intentionally a GUI manifestation. It exists
+   only for the release transition; the normal navbar owns the permanent brand.
+*/
+.workshop-moniker-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, rgba(2, 7, 17, 0.08), rgba(2, 7, 17, 0.78));
+    opacity: 0;
+    animation: workshopMonikerArrival 3s ease forwards;
+}
+
+.workshop-moniker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.08em;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: clamp(1.5rem, 4vw, 4.5rem);
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    line-height: 0.94;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(255,255,255,.65), 0 0 36px rgba(0,234,255,.25);
+}
+
+.workshop-moniker-line {
+    display: flex;
+    justify-content: center;
+}
+
+.workshop-moniker-line span {
+    display: inline-block;
+    animation: workshopLetterBreath 2.2s ease-in-out infinite;
+}
+
+.workshop-moniker-line span:nth-child(6n + 1) { color: #00a8ff; }
+.workshop-moniker-line span:nth-child(6n + 2) { color: #ff2cff; }
+.workshop-moniker-line span:nth-child(6n + 3) { color: #ff7a00; }
+.workshop-moniker-line span:nth-child(6n + 4) { color: #ff3030; }
+.workshop-moniker-line span:nth-child(6n + 5) { color: #ffd34d; }
+.workshop-moniker-line span:nth-child(6n + 6) { color: #52e05a; }
+
+.workshop-moniker-line span:nth-child(2) { animation-delay: -0.16s; }
+.workshop-moniker-line span:nth-child(3) { animation-delay: -0.32s; }
+.workshop-moniker-line span:nth-child(4) { animation-delay: -0.48s; }
+.workshop-moniker-line span:nth-child(5) { animation-delay: -0.64s; }
+.workshop-moniker-line span:nth-child(6) { animation-delay: -0.80s; }
+
+@keyframes workshopMonikerArrival {
+    0% { opacity: 0; transform: scale(.92); }
+    18% { opacity: 1; transform: scale(1); }
+    78% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.04); }
+}
+
+@keyframes workshopLetterBreath {
+    0%, 100% { filter: brightness(.82); transform: translateY(0); }
+    50% { filter: brightness(1.35); transform: translateY(-.035em); }
+}
+
 h1:focus {
     outline: none;
 }
