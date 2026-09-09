@@ -83,6 +83,7 @@
 
         .workshop-content:has(.gateway-interface) {
             pointer-events: none;
+            z-index: 1;
         }
 
         .workshop-content:has(.gateway-interface) .gateway-interface {
@@ -118,7 +119,11 @@
             animation: landingChromeAppear 3s ease-in-out both;
         }
 
-        /* The runtime is released only after the creator hand-off has completed. */
+        /*
+           Gateway hands the content surface back to the normal page layout.
+           The sidebar and top row remain outside this surface; the runtime fills
+           the remaining main flex region beneath the top row.
+        */
         .page:has(.gateway-interface) main > .browser-runtime {
             visibility: hidden;
             opacity: 0;
