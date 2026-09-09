@@ -9,8 +9,8 @@
             <span>DRAG THE PADDLE</span>
         </div>
 
-        <button class="pong-paddle pong-player-one" style="top: @GetPaddleTop(true)%" aria-label="Paddle" @onpointerdown="BeginDrag" @onpointermove="DragPaddle" @onpointerup="EndDrag" @onpointercancel="EndDrag">PADDLE</button>
-        <button class="pong-paddle pong-player-two" style="top: @GetPaddleTop(false)%" aria-label="Paddle">PADDLE</button>
+        <button class="pong-paddle pong-player-one" style="top: @GetPaddleTop(true)px" aria-label="Paddle" @onpointerdown="BeginDrag" @onpointermove="DragPaddle" @onpointerup="EndDrag" @onpointercancel="EndDrag">PADDLE</button>
+        <button class="pong-paddle pong-player-two" style="top: @GetPaddleTop(false)px" aria-label="Paddle">PADDLE</button>
         <button class="pong-ball" style="left: @_context.BallX%; top: @_context.BallY%;" aria-label="Ball"></button>
 
         <div class="pong-status">
@@ -39,6 +39,7 @@
 @code {
     private const string ProcessingGroup = "WorkshopPong";
     private const string DefinitionName = "WorkshopPongFSM";
+    private const double InitialPaddleY = 450;
 
     private sealed class PongContext : IStateContext
     {
@@ -47,7 +48,7 @@
         public bool ManifestRequested { get; set; }
         public bool StopRequested { get; set; }
         public bool PaddleDragging { get; set; }
-        public double PaddleY { get; set; } = 50;
+        public double PaddleY { get; set; } = InitialPaddleY;
         public double BallX { get; set; } = 50;
         public double BallY { get; set; } = 50;
         public double BallVX { get; set; } = .72;
@@ -124,7 +125,7 @@
 
     private void OnEnterStopped(IStateContext context) { _visible = false; _state = "STOPPED"; }
 
-    private double GetPaddleTop(bool left) => left ? Math.Clamp(_context.PaddleY, 14, 86) : Math.Clamp(100 - _context.BallY, 14, 86);
+    private double GetPaddleTop(bool left) => left ? _context.PaddleY : 900 - _context.BallY * 9;
 
     private void BeginDrag(PointerEventArgs e)
     {
@@ -141,13 +142,7 @@
 
     private void EndDrag(PointerEventArgs e) => _context.PaddleDragging = false;
 
-    private void UpdatePaddleFromPointer(double clientY)
-    {
-        var viewportHeight = Math.Max(1, BrowserViewportHeight);
-        _context.PaddleY = Math.Clamp(clientY / viewportHeight * 100.0, 14, 86);
-    }
-
-    private double BrowserViewportHeight { get; set; } = 900;
+    private void UpdatePaddleFromPointer(double clientY) => _context.PaddleY = Math.Clamp(clientY, 70, 830);
 
     public void Dispose()
     {
