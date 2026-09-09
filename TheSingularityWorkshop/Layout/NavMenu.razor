@@ -27,6 +27,12 @@
             </NavLink>
         </div>
 
+        <div class="nav-item px-3 ai-nav-item">
+            <NavLink class="nav-link" href="ai">
+                <span class="oi oi-lightbulb" aria-hidden="true"></span> AI
+            </NavLink>
+        </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="demos">
                 <span class="oi oi-list" aria-hidden="true"></span> Demos
@@ -129,13 +135,28 @@
     .workshop-brand .brand-letter:nth-child(10) { animation-delay: -1.53s; }
     .workshop-brand .brand-letter:nth-child(11) { animation-delay: -1.70s; }
 
-    /* Razor requires the escaped form below so the emitted stylesheet contains the CSS animation rule. */
     @@keyframes workshopBrandBreath {
         0%, 100% { filter: brightness(.82); text-shadow: 0 0 4px currentColor; transform: translateY(0) scale(1); }
         50% { filter: brightness(1.35); text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; transform: translateY(-1px) scale(1.05); }
     }
 
-    /* Living Workshop entrance refinements. These styles are intentionally global while this shell is present. */
+    .ai-nav-item .nav-link {
+        color: #00eaff;
+        text-shadow: 0 0 8px rgba(0,234,255,.45);
+        animation: aiNavBreath 2.8s ease-in-out infinite;
+    }
+
+    .ai-nav-item .nav-link.active,
+    .ai-nav-item .nav-link:hover {
+        color: #ff2cff;
+        text-shadow: 0 0 10px rgba(255,44,255,.65);
+    }
+
+    @@keyframes aiNavBreath {
+        0%, 100% { opacity: .78; }
+        50% { opacity: 1; }
+    }
+
     .monolith-text {
         width: calc(100% - 2.5rem) !important;
         max-width: calc(100% - 2.5rem) !important;
@@ -150,9 +171,7 @@
         animation: workshopEnterBreath 2.8s ease-in-out infinite !important;
     }
 
-    .monolith-btn:hover .monolith-text {
-        animation-duration: 1.8s !important;
-    }
+    .monolith-btn:hover .monolith-text { animation-duration: 1.8s !important; }
 
     .ambient-signal::before,
     .ambient-signal::after {
