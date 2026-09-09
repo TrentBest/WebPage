@@ -189,7 +189,7 @@
     {
         if (nodeDefinitionBuilt) return;
 
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(NodeDefinitionName, -1, NodeGroup)
+        TheSingularityWorkshop.FSM_API.FSM_API.Create.CreateFiniteStateMachine(NodeDefinitionName, -1, NodeGroup)
             .State("Seed", NodeEnter, NodeSeedUpdate, NodeExit)
             .State("Living", NodeEnter, NodeLivingUpdate, NodeExit)
             .State("Reproducing", NodeReproduceEnter, NodeReproduceUpdate, NodeExit)
@@ -211,7 +211,7 @@
         {
             Lineage = generation == 0 ? "0" : $"{generation}"
         };
-        var handle = FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
+        var handle = TheSingularityWorkshop.FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
         Nodes.Add(new LivingNode(handle, context));
     }
 
@@ -229,7 +229,7 @@
         {
             Lineage = $"{parent.Context.Lineage}.{random.Next(10, 99)}"
         };
-        var handle = FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
+        var handle = TheSingularityWorkshop.FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
         Nodes.Add(new LivingNode(handle, context));
     }
 
