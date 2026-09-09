@@ -17,7 +17,7 @@
         </div>
 
         <button class="pong-paddle pong-player-one"
-                style="top: calc(50% + @_context.PlayerPaddleOffsetYpx);"
+                style="top: calc(50% + @_context.PlayerPaddleOffsetPercent%);"
                 aria-label="Player paddle"
                 @onclick:stopPropagation="true"
                 @onpointerdown="BeginDrag"
@@ -28,7 +28,7 @@
         </button>
 
         <button class="pong-paddle pong-player-two"
-                style="top: calc(50% + @_context.AiPaddleOffsetYpx);"
+                style="top: calc(50% + @_context.AiPaddleOffsetPercent%);"
                 aria-label="AI paddle"
                 @onclick:stopPropagation="true">
             PADDLE
@@ -210,7 +210,8 @@
     private const double PlayerPaddleX = 10;
     private const double AiPaddleX = 90;
     private const double PaddleHalfHeight = 9;
-    private const double MaxPaddleOffsetY = 38;
+    private const double MaxPaddleOffsetPercent = 38;
+    private const double PointerPixelsPerPercent = 10;
     private const double AiTrackingSpeed = 1.15;
     private const double InitialBallVX = .72;
     private const double InitialBallVY = .24;
@@ -224,8 +225,8 @@
         public bool StopRequested { get; set; }
         public bool PaddleDragging { get; set; }
 
-        public double PlayerPaddleOffsetYpx { get; set; }
-        public double AiPaddleOffsetYpx { get; set; }
+        public double PlayerPaddleOffsetPercent { get; set; }
+        public double AiPaddleOffsetPercent { get; set; }
 
         public double BallX { get; set; } = 50;
         public double BallY { get; set; } = 50;
@@ -316,8 +317,8 @@
         c.BallY = 50;
         c.BallVX = InitialBallVX;
         c.BallVY = InitialBallVY;
-        c.PlayerPaddleOffsetYpx = 0;
-        c.AiPaddleOffsetYpx = 0;
+        c.PlayerPaddleOffsetPercent = 0;
+        c.AiPaddleOffsetPercent = 0;
         c.ServeToAi = true;
         _visible = true;
         _ending = false;
@@ -341,8 +342,8 @@
     private static void UpdateAiPaddle(PongContext c)
     {
         var target = c.BallY - 50;
-        var delta = Math.Clamp(target - c.AiPaddleOffsetYpx, -AiTrackingSpeed, AiTrackingSpeed);
-        c.AiPaddleOffsetYpx = Math.Clamp(c.AiPaddleOffsetYpx + delta, -MaxPaddleOffsetY, MaxPaddleOffsetY);
+        var delta = Math.Clamp(target - c.AiPaddleOffsetPercent, -AiTrackingSpeed, AiTrackingSpeed);
+        c.AiPaddleOffsetPercent = Math.Clamp(c.AiPaddleOffsetPercent + delta, -MaxPaddleOffsetPercent, MaxPaddleOffsetPercent);
     }
 
     private static void AdvanceBall(PongContext c)
@@ -371,7 +372,7 @@
         if (!player && c.BallVX <= 0) return;
 
         var paddleX = player ? PlayerPaddleX : AiPaddleX;
-        var paddleY = 50 + (player ? c.PlayerPaddleOffsetYpx : c.AiPaddleOffsetYpx);
+        var paddleY = 50 + (player ? c.PlayerPaddleOffsetPercent : c.AiPaddleOffsetPercent);
         var withinPaddle = Math.Abs(c.BallY - paddleY) <= PaddleHalfHeight;
         var reachedPaddle = player ? c.BallX <= paddleX : c.BallX >= paddleX;
 
@@ -443,10 +444,10 @@
     {
         if (_disposed || !_context.PaddleDragging || _ending) return;
 
-        _context.PlayerPaddleOffsetYpx = Math.Clamp(
-            _context.PlayerPaddleOffsetYpx + e.MovementY,
-            -MaxPaddleOffsetY,
-            MaxPaddleOffsetY);
+        _context.PlayerPaddleOffsetPercent = Math.Clamp(
+            _context.PlayerPaddleOffsetPercent + (e.MovementY / PointerPixelsPerPercent),
+            -MaxPaddleOffsetPercent,
+            MaxPaddleOffsetPercent);
     }
 
     private void EndDrag(PointerEventArgs e) => _context.PaddleDragging = false;
