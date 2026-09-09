@@ -26,18 +26,25 @@
         <a class="dismiss">🗙</a>
     </div>
 
+    <script>
+        // The Workshop owns the landing surface until the first-contact sequence
+        // presents the moniker and releases the application chrome.
+        const workshopLanding = window.location.pathname === "/" || window.location.pathname === "";
+        if (workshopLanding) {
+            document.documentElement.classList.add("workshop-splash-locked");
+        }
+    </script>
+
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
 
     <script>
         // 2. The Custom Blazor Bootloader (Bypasses Azure's MIME Bug)
         Blazor.start({
             loadBootResource: function (type, name, defaultUri, integrity) {
-                // Let Blazor handle dotnet.js natively using the default URI string
                 if (type === 'dotnetjs') {
                     return defaultUri;
                 }
 
-                // Intercept ONLY WebAssembly binaries to force the correct MIME type
                 if (type === 'dotnetwasm' || defaultUri.endsWith('.wasm')) {
                     return (async function () {
                         const response = await fetch(defaultUri, { cache: 'no-store' });
@@ -50,7 +57,6 @@
             }
         });
 
-        // 3. The Sovereign Kernel Synapse (Instrumented for Debugging)
         window.interop = {
             initUnity: function (canvasId) {
                 console.log("[Interop] 1. initUnity called for canvas:", canvasId);
@@ -64,7 +70,6 @@
                 const buildUrl = "Workshop/Forge/Build";
                 const loaderUrl = buildUrl + "/Build001.loader.js";
 
-                console.log("[Interop] 2. Constructing Engine Configuration...");
                 const config = {
                     dataUrl: buildUrl + "/Build001.data.br",
                     frameworkUrl: buildUrl + "/Build001.framework.js.br",
@@ -73,9 +78,9 @@
                     companyName: "The Singularity Workshop",
                     productName: "Genesis",
                 };
-                console.table(config); // Prints a clean table of the target URLs
 
-                console.log("[Interop] 3. Injecting Unity loader script: " + loaderUrl);
+                console.table(config);
+
                 const script = document.createElement("script");
                 script.src = loaderUrl;
 
@@ -98,6 +103,100 @@
                 document.body.appendChild(script);
             }
         };
+
+        // Transitional shell adapter. The visual sequence remains inside the
+        // Workshop; this adapter only knows when the final gateway has appeared.
+        // The eventual GUI builder will own this transition semantically.
+        (function watchWorkshopRelease() {
+            if (!workshopLanding) return;
+
+            let released = false;
+            let presentationStarted = false;
+
+            function releaseWorkshop() {
+                if (released) return;
+                released = true;
+                document.documentElement.classList.remove("workshop-splash-locked");
+                document.documentElement.classList.add("workshop-splash-released");
+            }
+
+            function presentMoniker() {
+                if (presentationStarted) return;
+                presentationStarted = true;
+
+                const overlay = document.createElement("div");
+                overlay.className = "workshop-moniker-overlay";
+                overlay.setAttribute("aria-label", "The Singularity Workshop");
+
+                const moniker = document.createElement("div");
+                moniker.className = "workshop-moniker";
+
+                ["THE", "SINGULARITY", "WORKSHOP"].forEach((word) => {
+                    const line = document.createElement("div");
+                    line.className = "workshop-moniker-line";
+                    [...word].forEach((letter) => {
+                        const span = document.createElement("span");
+                        span.textContent = letter;
+                        line.appendChild(span);
+                    });
+                    moniker.appendChild(line);
+                });
+
+                overlay.appendChild(moniker);
+                document.body.appendChild(overlay);
+
+                window.setTimeout(() => {
+                    releaseWorkshop();
+                    overlay.remove();
+                }, 3000);
+            }
+
+            function inspectWorkshop() {
+                if (document.querySelector(".gateway-interface")) {
+                    presentMoniker();
+                }
+
+                // Normalize the living GUI's legacy pixel coordinates against the
+                // actual Workshop surface. This keeps the existing behavior while
+                // making it independent of monitor resolution and browser scaling.
+                const container = document.querySelector(".chaos-container");
+                if (!container) return;
+
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                if (!width || !height) return;
+
+                container.querySelectorAll(".chaos-node").forEach((node) => {
+                    const element = /** @type {HTMLElement} */ (node);
+                    if (element.dataset.workshopNormalized === "true") return;
+
+                    const matchX = element.style.left.match(/^(-?[0-9.]+)px$/);
+                    const matchY = element.style.top.match(/^(-?[0-9.]+)px$/);
+                    if (!matchX || !matchY) return;
+
+                    let x = parseFloat(matchX[1]);
+                    let y = parseFloat(matchY[1]);
+
+                    if (element.querySelector(".node-gen")?.textContent?.trim() === "GEN 1") {
+                        x = width * 0.5;
+                        y = height * 0.5;
+                    }
+
+                    element.style.left = `${Math.max(2, Math.min(98, (x / width) * 100))}%`;
+                    element.style.top = `${Math.max(3, Math.min(97, (y / height) * 100))}%`;
+                    element.dataset.workshopNormalized = "true";
+                });
+            }
+
+            const observer = new MutationObserver(inspectWorkshop);
+            observer.observe(document.body, { childList: true, subtree: true });
+            window.addEventListener("resize", () => {
+                document.querySelectorAll(".chaos-node").forEach((node) => {
+                    node.removeAttribute("data-workshop-normalized");
+                });
+                inspectWorkshop();
+            });
+        })();
     </script>
 </body>
 </html>
