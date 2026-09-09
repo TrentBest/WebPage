@@ -60,6 +60,68 @@
             height: 100vh !important;
             min-height: 100vh !important;
         }
+
+        /*
+           The landing no longer asks the visitor to choose between Showcase and Forge.
+           Once the existing landing FSM reaches Gateway, the gateway itself becomes
+           the hand-off: the creator moniker appears for three seconds while the
+           ordinary browser chrome wakes back up underneath it.
+
+           This is deliberately CSS-driven for this visual transition. The underlying
+           landing state is still supplied by Home.razor; the next pass can move this
+           presentation state into the Workshop/FSM machinery once that boundary exists.
+        */
+        .workshop-content:has(.gateway-interface) {
+            pointer-events: none;
+        }
+
+        .workshop-content:has(.gateway-interface) .gateway-interface {
+            background: rgba(2, 7, 17, 0.96);
+            backdrop-filter: blur(8px);
+            animation: landingMonikerFade 3s ease-in-out forwards;
+        }
+
+        .workshop-content:has(.gateway-interface) .gateway-interface > * {
+            display: none !important;
+        }
+
+        .workshop-content:has(.gateway-interface) .gateway-interface::before {
+            content: "TRENT BEST";
+            display: block;
+            color: #ffffff;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: clamp(2rem, 6vw, 6rem);
+            font-weight: 800;
+            letter-spacing: clamp(.16em, .5vw, .28em);
+            text-align: center;
+            text-shadow:
+                0 0 10px #00eaff,
+                0 0 30px rgba(0, 234, 255, .75),
+                0 0 65px rgba(255, 44, 255, .45);
+            animation: landingMonikerBreath 1.5s ease-in-out infinite;
+        }
+
+        .page:has(.gateway-interface) .sidebar,
+        .page:has(.gateway-interface) main > .top-row {
+            position: relative;
+            z-index: 10001;
+            animation: landingChromeAppear 3s ease-in-out both;
+        }
+
+        @@keyframes landingMonikerFade {
+            0%, 72% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        @@keyframes landingMonikerBreath {
+            0%, 100% { transform: scale(.985); opacity: .82; }
+            50% { transform: scale(1.025); opacity: 1; }
+        }
+
+        @@keyframes landingChromeAppear {
+            0%, 72% { opacity: 0; }
+            100% { opacity: 1; }
+        }
     </style>
 }
 
