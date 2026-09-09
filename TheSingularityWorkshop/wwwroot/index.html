@@ -15,11 +15,11 @@
         /* The avatar is intentionally allowed to escape the entry button on hover. */
         .monolith-btn {
             overflow: visible !important;
-            transition: transform 0.55s cubic-bezier(.2,.75,.25,1), box-shadow 0.55s ease, border-color 0.55s ease !important;
+            transition: transform 0.72s cubic-bezier(.22,.72,.25,1), box-shadow 0.72s ease, border-color 0.72s ease !important;
         }
 
         .monolith-btn:hover {
-            transform: scale(1.025) !important;
+            transform: scale(1.06) !important;
         }
 
         .monolith-image {
@@ -29,17 +29,19 @@
             z-index: 20 !important;
             transform: scale(1) !important;
             transform-origin: center center !important;
-            transition: transform 0.20s cubic-bezier(.16,1.42,.30,1), filter 0.20s ease, box-shadow 0.20s ease !important;
+            border: 3px solid rgba(0, 234, 255, 0.9) !important;
+            outline: 1px solid rgba(255, 255, 255, 0.28) !important;
+            outline-offset: -4px !important;
+            box-shadow: 0 0 12px rgba(0,234,255,.78), 0 0 34px rgba(0,234,255,.25), 0 0 58px rgba(255,44,255,.10) !important;
+            transition: transform 0.72s cubic-bezier(.18,.86,.22,1), filter 0.72s ease, box-shadow 0.72s ease, border-color 0.72s ease !important;
         }
 
         .monolith-btn:hover .monolith-image {
-            transform: scale(1.72) !important;
-            filter: saturate(1.35) contrast(1.12) brightness(1.16) !important;
-            box-shadow:
-                0 0 22px rgba(0,234,255,.95),
-                0 0 65px rgba(0,234,255,.55),
-                0 0 120px rgba(255,44,255,.35),
-                0 0 190px rgba(255,211,77,.16) !important;
+            /* The button starts growing first; the avatar then overtakes it. */
+            transform: scale(1.50) !important;
+            filter: saturate(1.28) contrast(1.08) brightness(1.10) !important;
+            border-color: rgba(0, 234, 255, 1) !important;
+            box-shadow: 0 0 18px rgba(0,234,255,.95), 0 0 48px rgba(0,234,255,.48), 0 0 88px rgba(255,44,255,.24), 0 0 120px rgba(255,211,77,.10) !important;
         }
 
         /* Keep the title readable while the avatar breaches the frame. */
@@ -64,8 +66,6 @@
     </div>
 
     <script>
-        // The Workshop owns the landing surface until the first-contact sequence
-        // presents the moniker and releases the application chrome.
         const workshopLanding = window.location.pathname === "/" || window.location.pathname === "";
         if (workshopLanding) {
             document.documentElement.classList.add("workshop-splash-locked");
@@ -75,7 +75,6 @@
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
 
     <script>
-        // 2. The Custom Blazor Bootloader (Bypasses Azure's MIME Bug)
         Blazor.start({
             loadBootResource: function (type, name, defaultUri, integrity) {
                 if (type === 'dotnetjs') {
@@ -141,9 +140,6 @@
             }
         };
 
-        // Transitional shell adapter. The visual sequence remains inside the
-        // Workshop; this adapter only knows when the final gateway has appeared.
-        // The eventual GUI builder will own this transition semantically.
         (function watchWorkshopRelease() {
             if (!workshopLanding) return;
 
@@ -193,9 +189,6 @@
                     presentMoniker();
                 }
 
-                // Normalize the living GUI's legacy pixel coordinates against the
-                // actual Workshop surface. This keeps the existing behavior while
-                // making it independent of monitor resolution and browser scaling.
                 const container = document.querySelector(".chaos-container");
                 if (!container) return;
 
