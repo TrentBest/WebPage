@@ -26,11 +26,6 @@
             }
         </article>
 
-        @if (IsWorkshopLanding)
-        {
-            <WorkshopExperienceFeed />
-        }
-
         @if (IsWorkshopLanding && _pongActive)
         {
             <PongField @ref="_pongField" />
@@ -99,6 +94,43 @@
                 0 0 30px rgba(0, 234, 255, .75),
                 0 0 65px rgba(255, 44, 255, .45);
             animation: landingMonikerBreath 1.5s ease-in-out infinite;
+        }
+
+        /*
+           The experience feed was originally a stock-style overlay. Its observations
+           belong with the warning label, not floating across the living interface.
+           Present the useful facts as the first layer of that warning instead.
+        */
+        .workshop-content:has(.workshop-warning) .workshop-warning::before {
+            content: "OBSERVATIONS BEFORE ENTRY\\A\\A• PONG STARTS AFTER 200 HEARTBEATS.\\A• EACH HEARTBEAT IS 50 MILLISECONDS.\\A• PONG IS DRIVEN BY FSM_API.\\A• CYAN IS THE VISITOR. MAGENTA IS THE MACHINE.\\A• THE FIRST SERVE GOES TOWARD THE MACHINE.\\A• THE MACHINE KEEPS SCORE.\\A";
+            display: block;
+            margin: 0 0 .65rem;
+            padding: .45rem .6rem .6rem;
+            border-bottom: 1px solid rgba(255, 102, 0, .42);
+            color: rgba(255, 226, 196, .88);
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: clamp(.52rem, .72vw, .66rem);
+            font-weight: 600;
+            letter-spacing: .06em;
+            line-height: 1.45;
+            text-align: left;
+            white-space: pre-line;
+        }
+
+        /* Guarantee the paddle label is physically stacked, regardless of inherited button styles. */
+        .pong-paddle {
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .pong-paddle > span {
+            display: block !important;
+            width: 100% !important;
+            height: auto !important;
+            text-align: center !important;
+            writing-mode: horizontal-tb !important;
+            white-space: nowrap !important;
         }
 
         .page:has(.gateway-interface) .sidebar,
