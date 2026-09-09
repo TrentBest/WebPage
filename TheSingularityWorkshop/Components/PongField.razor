@@ -1,4 +1,5 @@
 @using System.Timers
+@using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.FSM_API
 
 @if (_visible)
@@ -39,7 +40,6 @@
 @code {
     private const string ProcessingGroup = "WorkshopPong";
     private const string DefinitionName = "WorkshopPongFSM";
-    private const double InitialPaddleY = 450;
 
     private sealed class PongContext : IStateContext
     {
@@ -48,7 +48,7 @@
         public bool ManifestRequested { get; set; }
         public bool StopRequested { get; set; }
         public bool PaddleDragging { get; set; }
-        public double PaddleY { get; set; } = InitialPaddleY;
+        public double PaddleY { get; set; } = 50;
         public double BallX { get; set; } = 50;
         public double BallY { get; set; } = 50;
         public double BallVX { get; set; } = .72;
@@ -125,24 +125,24 @@
 
     private void OnEnterStopped(IStateContext context) { _visible = false; _state = "STOPPED"; }
 
-    private double GetPaddleTop(bool left) => left ? _context.PaddleY : 900 - _context.BallY * 9;
+    private double GetPaddleTop(bool left) => left ? _context.PaddleY : 50;
 
     private void BeginDrag(PointerEventArgs e)
     {
         if (_disposed || !_visible) return;
         _context.PaddleDragging = true;
-        UpdatePaddleFromPointer(e.ClientY);
+        _context.PaddleY = Math.Clamp(e.ClientY, 50, 850);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private void DragPaddle(PointerEventArgs e)
     {
         if (_disposed || !_context.PaddleDragging) return;
-        UpdatePaddleFromPointer(e.ClientY);
+        _context.PaddleY = Math.Clamp(e.ClientY, 50, 850);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private void EndDrag(PointerEventArgs e) => _context.PaddleDragging = false;
-
-    private void UpdatePaddleFromPointer(double clientY) => _context.PaddleY = Math.Clamp(clientY, 70, 830);
 
     public void Dispose()
     {
