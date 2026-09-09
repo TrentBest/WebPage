@@ -62,19 +62,6 @@
             min-height: 100vh !important;
         }
 
-        /*
-           The landing layers are mutually exclusive.
-
-           The browser-native runtime is mounted with the normal layout so it can
-           exist for the entire lifetime of the landing page, but it MUST NOT paint
-           until the Gateway hand-off. Previously it was visible during Monolith /
-           Chaos / Collapse, which put the new runtime above the actual entry button
-           and warning because the runtime owns z-index 9990 while the landing owns
-           z-index 9000.
-
-           This is a visibility gate, not a stacking-order hack: the old landing gets
-           the screen first; the browser runtime gets the screen only at Gateway.
-        */
         .page:has(.browser-runtime) main > .browser-runtime {
             visibility: hidden;
             opacity: 0;
@@ -97,13 +84,13 @@
         }
 
         .workshop-content:has(.gateway-interface) .gateway-interface::before {
-            content: "TRENT BEST";
+            content: "THE SINGULARITY WORKSHOP";
             display: block;
             color: #ffffff;
             font-family: Consolas, 'Courier New', monospace;
-            font-size: clamp(2rem, 6vw, 6rem);
+            font-size: clamp(1.4rem, 4.5vw, 5rem);
             font-weight: 800;
-            letter-spacing: clamp(.16em, .5vw, .28em);
+            letter-spacing: clamp(.08em, .35vw, .2em);
             text-align: center;
             text-shadow:
                 0 0 10px #00eaff,
@@ -119,11 +106,6 @@
             animation: landingChromeAppear 3s ease-in-out both;
         }
 
-        /*
-           Gateway hands the content surface back to the normal page layout.
-           The sidebar and top row remain outside this surface; the runtime fills
-           the remaining main flex region beneath the top row.
-        */
         .page:has(.gateway-interface) main > .browser-runtime {
             visibility: hidden;
             opacity: 0;
