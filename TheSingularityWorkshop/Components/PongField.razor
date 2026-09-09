@@ -7,7 +7,7 @@
     <div class="pong-field" role="application" aria-label="FSM powered Pong simulation">
         <div class="pong-header">
             <span>FSM_API // PONG SIMULATION</span>
-            <span>PLAYER: DRAG LEFT PADDLE</span>
+            <span>PLAYER: DRAG OR USE ↑ ↓</span>
         </div>
 
         <div class="pong-score" aria-label="Pong score">
@@ -24,22 +24,49 @@
                  @onpointercancel="EndDrag"></div>
         }
 
-        <button class="pong-paddle pong-player-one"
-                style="top: calc(50% + @_context.PlayerPaddleOffsetPercent%);"
-                aria-label="Player paddle"
-                @onclick:stopPropagation="true"
-                @onpointerdown="BeginDrag">
-            PADDLE
-        </button>
+        <div class="pong-player-controls" aria-label="Player paddle controls">
+            <button class="pong-arrow pong-arrow-up"
+                    type="button"
+                    aria-label="Move paddle up"
+                    @onclick:stopPropagation="true"
+                    @onclick="MovePaddleUp">↑</button>
+
+            <button class="pong-paddle pong-player-one"
+                    type="button"
+                    style="top: calc(50% + @_context.PlayerPaddleOffsetPercent%);"
+                    aria-label="Player paddle"
+                    @onclick:stopPropagation="true"
+                    @onpointerdown="BeginDrag">
+                <span>P</span>
+                <span>A</span>
+                <span>D</span>
+                <span>D</span>
+                <span>L</span>
+                <span>E</span>
+            </button>
+
+            <button class="pong-arrow pong-arrow-down"
+                    type="button"
+                    aria-label="Move paddle down"
+                    @onclick:stopPropagation="true"
+                    @onclick="MovePaddleDown">↓</button>
+        </div>
 
         <button class="pong-paddle pong-player-two"
+                type="button"
                 style="top: calc(50% + @_context.AiPaddleOffsetPercent%);"
                 aria-label="AI paddle"
                 @onclick:stopPropagation="true">
-            PADDLE
+            <span>P</span>
+            <span>A</span>
+            <span>D</span>
+            <span>D</span>
+            <span>L</span>
+            <span>E</span>
         </button>
 
         <button class="pong-ball"
+                type="button"
                 style="left: @_context.BallX%; top: @_context.BallY%;"
                 aria-label="Ball"></button>
 
@@ -129,7 +156,8 @@
     .pong-score-divider { color: rgba(223,252,255,.5); }
 
     .pong-paddle,
-    .pong-ball {
+    .pong-ball,
+    .pong-arrow {
         position: absolute;
         z-index: 3;
         padding: 0;
@@ -138,25 +166,32 @@
     }
 
     .pong-paddle {
-        width: clamp(3rem,4vw,4.25rem);
-        height: clamp(9rem,22vh,13rem);
+        width: clamp(3rem,3.5vw,3.75rem);
+        height: clamp(11rem,28vh,17rem);
         transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .02em;
         background: rgba(0,234,255,.035);
         border: 2px solid #00eaff;
         box-shadow: 0 0 14px rgba(0,234,255,.35), inset 0 0 14px rgba(0,234,255,.04);
         color: #00eaff;
         font-weight: 700;
-        letter-spacing: .08em;
-        writing-mode: vertical-rl;
-        text-orientation: mixed;
+        font-size: clamp(.72rem,1vw,.95rem);
+        line-height: .95;
+        letter-spacing: .04em;
         cursor: grab;
         touch-action: none;
         user-select: none;
         pointer-events: auto;
     }
 
+    .pong-paddle span { display: block; }
     .pong-paddle:active { cursor: grabbing; }
     .pong-player-one { left: 6%; }
+
     .pong-player-two {
         right: 6%;
         border-color: #ff2cff;
@@ -164,6 +199,47 @@
         box-shadow: 0 0 14px rgba(255,44,255,.35), inset 0 0 14px rgba(255,44,255,.04);
         cursor: default;
     }
+
+    .pong-player-controls {
+        position: absolute;
+        left: 6%;
+        top: 50%;
+        z-index: 4;
+        width: clamp(3rem,3.5vw,3.75rem);
+        height: clamp(11rem,28vh,17rem);
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+
+    .pong-player-controls .pong-player-one { inset: 0 auto auto 0; }
+
+    .pong-arrow {
+        left: 50%;
+        width: 2rem;
+        height: 1.7rem;
+        transform: translateX(-50%);
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(0,234,255,.7);
+        background: rgba(2,7,17,.88);
+        color: #00eaff;
+        font-size: 1rem;
+        line-height: 1;
+        cursor: pointer;
+        pointer-events: auto;
+        box-shadow: 0 0 10px rgba(0,234,255,.18);
+    }
+
+    .pong-arrow:hover,
+    .pong-arrow:focus-visible {
+        border-color: #ff2cff;
+        color: #ff2cff;
+        outline: none;
+        box-shadow: 0 0 14px rgba(255,44,255,.3);
+    }
+
+    .pong-arrow-up { top: -2.35rem; }
+    .pong-arrow-down { bottom: -2.35rem; }
 
     .pong-drag-surface {
         position: absolute;
@@ -214,7 +290,8 @@
         .pong-header { top:.75rem; }
         .pong-status { bottom:.75rem; }
         .pong-score { top: 3.5rem; }
-        .pong-paddle { width:3rem; height:8rem; font-size:.65rem; }
+        .pong-paddle { width:3rem; height:10rem; font-size:.72rem; }
+        .pong-player-controls { width:3rem; height:10rem; }
     }
 </style>
 
@@ -225,10 +302,11 @@
     private const double FieldBottom = 95;
     private const double PlayerPaddleX = 10;
     private const double AiPaddleX = 90;
-    private const double PaddleHalfHeight = 11;
+    private const double PaddleHalfHeight = 14;
     private const double PaddleHalfWidthPercent = 2.5;
     private const double MaxPaddleOffsetPercent = 38;
     private const double PointerPixelsPerPercent = 10;
+    private const double ArrowStepPercent = 4;
     private const double AiTrackingSpeed = 1.15;
     private const double InitialBallVX = .72;
     private const double InitialBallVY = .24;
@@ -237,19 +315,15 @@
     {
         public string Name { get; set; } = ProcessingGroup;
         public bool IsValid { get; set; } = true;
-
         public bool ManifestRequested { get; set; }
         public bool StopRequested { get; set; }
         public bool PaddleDragging { get; set; }
-
         public double PlayerPaddleOffsetPercent { get; set; }
         public double AiPaddleOffsetPercent { get; set; }
-
         public double BallX { get; set; } = 50;
         public double BallY { get; set; } = 50;
         public double BallVX { get; set; } = InitialBallVX;
         public double BallVY { get; set; } = InitialBallVY;
-
         public int PlayerScore { get; set; }
         public int AiScore { get; set; }
         public bool ServeToAi { get; set; } = true;
@@ -271,7 +345,6 @@
     protected override void OnAfterRender(bool firstRender)
     {
         if (!firstRender) return;
-
         _timer = new Timer(50) { AutoReset = true };
         _timer.Elapsed += Tick;
         _timer.Start();
@@ -300,13 +373,9 @@
     private void Tick(object? sender, ElapsedEventArgs e)
     {
         if (_disposed || !_started) return;
-
         _context.Ticks++;
-
         if (!_visible && !_ending && _context.Ticks >= 200)
-        {
             _context.ManifestRequested = true;
-        }
 
         FSM_API.Interaction.Update(ProcessingGroup);
         _ticks = _context.Ticks;
@@ -343,14 +412,12 @@
     private void OnPlaying(IStateContext context)
     {
         var c = (PongContext)context;
-
         UpdateAiPaddle(c);
         AdvanceBall(c);
         ResolveWallCollision(c);
         ResolvePaddleCollision(c, true);
         ResolvePaddleCollision(c, false);
         ResolveScore(c);
-
         _state = "PLAYING";
     }
 
@@ -398,7 +465,6 @@
 
         c.BallX = player ? paddleEdgeX + 0.5 : paddleEdgeX - 0.5;
         c.BallVX *= -1;
-
         var deflection = (c.BallY - paddleY) * .035;
         c.BallVY = Math.Clamp(c.BallVY + deflection, -1.15, 1.15);
     }
@@ -427,54 +493,60 @@
         c.BallVY = c.ServeToAi ? InitialBallVY : -InitialBallVY;
     }
 
-    private void OnEnterStopped(IStateContext context)
-    {
-        _visible = true;
-        _ending = true;
-        _state = "STOPPED";
-        _ = FinishGoodGameAsync();
-    }
+    private void MovePaddleUp() => MovePaddle(-ArrowStepPercent);
+    private void MovePaddleDown() => MovePaddle(ArrowStepPercent);
 
-    private async Task FinishGoodGameAsync()
+    private void MovePaddle(double delta)
     {
-        await Task.Delay(1200);
-        if (_disposed) return;
-        _visible = false;
-        _ending = false;
-        await InvokeAsync(StateHasChanged);
-    }
-
-    public void StopFromLandingInteraction()
-    {
-        if (_disposed || !_visible || _ending) return;
-        _context.PaddleDragging = false;
-        _context.StopRequested = true;
+        if (_ending) return;
+        _context.PlayerPaddleOffsetPercent = Math.Clamp(
+            _context.PlayerPaddleOffsetPercent + delta,
+            -MaxPaddleOffsetPercent,
+            MaxPaddleOffsetPercent);
         _ = InvokeAsync(StateHasChanged);
     }
 
     private void BeginDrag(PointerEventArgs e)
     {
-        if (_disposed || !_visible || _ending) return;
+        if (_ending) return;
         _context.PaddleDragging = true;
     }
 
     private void DragPaddle(PointerEventArgs e)
     {
-        if (_disposed || !_context.PaddleDragging || _ending) return;
-
-        _context.PlayerPaddleOffsetPercent = Math.Clamp(
-            _context.PlayerPaddleOffsetPercent + (e.MovementY / PointerPixelsPerPercent),
-            -MaxPaddleOffsetPercent,
-            MaxPaddleOffsetPercent);
+        if (!_context.PaddleDragging || _ending) return;
+        var deltaPercent = e.MovementY / PointerPixelsPerPercent;
+        MovePaddle(deltaPercent);
     }
 
     private void EndDrag(PointerEventArgs e) => _context.PaddleDragging = false;
 
+    private void OnEnterStopped(IStateContext context)
+    {
+        _visible = true;
+        _ending = true;
+        _state = "STOPPED";
+        _context.PaddleDragging = false;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void StopFromLandingInteraction()
+    {
+        if (_disposed || _ending) return;
+        _context.StopRequested = true;
+    }
+
     public void Dispose()
     {
+        if (_disposed) return;
         _disposed = true;
-        _context.IsValid = false;
         _timer?.Stop();
         _timer?.Dispose();
+        _timer = null;
+        if (_fsm is FSMHandle handle)
+        {
+            try { FSM_API.Interaction.DestroyInstance(handle); } catch { }
+        }
+        _fsm = null;
     }
 }
