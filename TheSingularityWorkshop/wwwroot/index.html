@@ -56,6 +56,14 @@
             _unityInitialized: false,
             _canvasObserver: null,
 
+            workshopVisited: function () {
+                return window.localStorage.getItem("tsw-workshop-introduced") === "true";
+            },
+
+            markWorkshopVisited: function () {
+                window.localStorage.setItem("tsw-workshop-introduced", "true");
+            },
+
             initUnity: function (canvasId) {
                 console.log("[Interop] initUnity requested for canvas:", canvasId);
 
