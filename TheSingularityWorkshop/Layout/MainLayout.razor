@@ -7,13 +7,22 @@
         <NavMenu />
     </div>
 
-    <main @onclick="HandleLandingClick">
+    <main>
         <div class="top-row px-4 workshop-tab-header">
             <span class="workshop-tab-title">@CurrentTabTitle</span>
         </div>
 
         <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">
-            @Body
+            @if (IsWorkshopLanding)
+            {
+                <CascadingValue Value="(Action)StopPong">
+                    @Body
+                </CascadingValue>
+            }
+            else
+            {
+                @Body
+            }
         </article>
 
         @if (IsWorkshopLanding)
@@ -45,11 +54,8 @@
         }
     }
 
-    private void HandleLandingClick()
+    private void StopPong()
     {
-        if (IsWorkshopLanding)
-        {
-            _pongField?.StopFromLandingInteraction();
-        }
+        _pongField?.StopFromLandingInteraction();
     }
 }
