@@ -61,6 +61,14 @@ article {
     background: #050a14;
 }
 
+/*
+   The Workshop landing surface owns the remaining content viewport.
+   It must not create a second browser scrollbar around its animation.
+*/
+article:has(.hypervisor-shell) {
+    overflow: hidden !important;
+}
+
 @media (max-width: 640.98px) {
     .top-row { justify-content: space-between; }
     .top-row ::deep a, .top-row ::deep .btn-link { margin-left: 0; }
