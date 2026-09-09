@@ -138,8 +138,8 @@
     }
 
     .pong-paddle {
-        width: clamp(4.5rem,7vw,7rem);
-        height: clamp(7rem,18vh,10rem);
+        width: clamp(3rem,4vw,4.25rem);
+        height: clamp(9rem,22vh,13rem);
         transform: translateY(-50%);
         background: rgba(0,234,255,.035);
         border: 2px solid #00eaff;
@@ -147,6 +147,8 @@
         color: #00eaff;
         font-weight: 700;
         letter-spacing: .08em;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
         cursor: grab;
         touch-action: none;
         user-select: none;
@@ -212,7 +214,7 @@
         .pong-header { top:.75rem; }
         .pong-status { bottom:.75rem; }
         .pong-score { top: 3.5rem; }
-        .pong-paddle { width:3.5rem; height:6rem; font-size:.65rem; }
+        .pong-paddle { width:3rem; height:8rem; font-size:.65rem; }
     }
 </style>
 
@@ -223,7 +225,8 @@
     private const double FieldBottom = 95;
     private const double PlayerPaddleX = 10;
     private const double AiPaddleX = 90;
-    private const double PaddleHalfHeight = 9;
+    private const double PaddleHalfHeight = 11;
+    private const double PaddleHalfWidthPercent = 2.5;
     private const double MaxPaddleOffsetPercent = 38;
     private const double PointerPixelsPerPercent = 10;
     private const double AiTrackingSpeed = 1.15;
@@ -383,14 +386,17 @@
         if (player && c.BallVX >= 0) return;
         if (!player && c.BallVX <= 0) return;
 
-        var paddleX = player ? PlayerPaddleX : AiPaddleX;
+        var paddleCenterX = player ? PlayerPaddleX : AiPaddleX;
+        var paddleEdgeX = player
+            ? paddleCenterX + PaddleHalfWidthPercent
+            : paddleCenterX - PaddleHalfWidthPercent;
         var paddleY = 50 + (player ? c.PlayerPaddleOffsetPercent : c.AiPaddleOffsetPercent);
         var withinPaddle = Math.Abs(c.BallY - paddleY) <= PaddleHalfHeight;
-        var reachedPaddle = player ? c.BallX <= paddleX : c.BallX >= paddleX;
+        var reachedPaddleEdge = player ? c.BallX <= paddleEdgeX : c.BallX >= paddleEdgeX;
 
-        if (!withinPaddle || !reachedPaddle) return;
+        if (!withinPaddle || !reachedPaddleEdge) return;
 
-        c.BallX = player ? paddleX + 1 : paddleX - 1;
+        c.BallX = player ? paddleEdgeX + 0.5 : paddleEdgeX - 0.5;
         c.BallVX *= -1;
 
         var deflection = (c.BallY - paddleY) * .035;
