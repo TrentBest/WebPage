@@ -16,14 +16,19 @@
             <span class="pong-score-ai">@_context.AiScore</span>
         </div>
 
+        @if (_context.PaddleDragging)
+        {
+            <div class="pong-drag-surface"
+                 @onpointermove="DragPaddle"
+                 @onpointerup="EndDrag"
+                 @onpointercancel="EndDrag"></div>
+        }
+
         <button class="pong-paddle pong-player-one"
                 style="top: calc(50% + @_context.PlayerPaddleOffsetPercent%);"
                 aria-label="Player paddle"
                 @onclick:stopPropagation="true"
-                @onpointerdown="BeginDrag"
-                @onpointermove="DragPaddle"
-                @onpointerup="EndDrag"
-                @onpointercancel="EndDrag">
+                @onpointerdown="BeginDrag">
             PADDLE
         </button>
 
@@ -158,6 +163,15 @@
         cursor: default;
     }
 
+    .pong-drag-surface {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        pointer-events: auto;
+        cursor: grabbing;
+        touch-action: none;
+    }
+
     .pong-ball {
         width: clamp(12px,1vw,18px);
         height: clamp(12px,1vw,18px);
@@ -284,13 +298,11 @@
     {
         if (_disposed || !_started) return;
 
-        if (!_visible && !_ending)
+        _context.Ticks++;
+
+        if (!_visible && !_ending && _context.Ticks >= 200)
         {
-            _context.Ticks++;
-            if (_context.Ticks >= 200)
-            {
-                _context.ManifestRequested = true;
-            }
+            _context.ManifestRequested = true;
         }
 
         FSM_API.Interaction.Update(ProcessingGroup);
