@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @using TheSingularityWorkshop.Components
 
@@ -64,7 +64,7 @@
         /*
            The landing no longer asks the visitor to choose between Showcase and Forge.
            Once the existing landing FSM reaches Gateway, the gateway itself becomes
-           the hand-off: the creator moniker appears for three seconds while the
+           the hand-off: The Singularity Workshop appears for three seconds while the
            ordinary browser chrome wakes back up underneath it.
 
            This is deliberately CSS-driven for this visual transition. The underlying
@@ -86,13 +86,13 @@
         }
 
         .workshop-content:has(.gateway-interface) .gateway-interface::before {
-            content: "TRENT BEST";
+            content: "THE SINGULARITY WORKSHOP";
             display: block;
             color: #ffffff;
             font-family: Consolas, 'Courier New', monospace;
-            font-size: clamp(2rem, 6vw, 6rem);
+            font-size: clamp(1.4rem, 4.5vw, 5rem);
             font-weight: 800;
-            letter-spacing: clamp(.16em, .5vw, .28em);
+            letter-spacing: clamp(.08em, .35vw, .2em);
             text-align: center;
             text-shadow:
                 0 0 10px #00eaff,
