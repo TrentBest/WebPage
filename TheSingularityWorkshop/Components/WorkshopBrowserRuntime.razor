@@ -26,7 +26,7 @@
                 {
                     var active = group == _activeGroup;
                     <div class="pipeline-node @(active ? "active" : "")">
-                        <span class="pipeline-index">@(_processingOrder.IndexOf(group) + 1).ToString("00")</span>
+                        <span class="pipeline-index">@((_processingOrder.IndexOf(group) + 1).ToString("00"))</span>
                         <strong>@group</strong>
                         <span>@GetTickCount(group) ticks</span>
                     </div>
@@ -80,8 +80,15 @@
 </div>
 
 <style>
-    .browser-runtime { position: fixed; inset: 0; z-index: 9990; overflow: auto; padding: clamp(5rem, 9vh, 7rem) clamp(1rem, 5vw, 5rem) 3rem; box-sizing: border-box; color: #eaf8ff; background: radial-gradient(circle at 75% 15%, rgba(0,234,255,.10), transparent 30%), radial-gradient(circle at 18% 72%, rgba(255,44,255,.08), transparent 32%), #020711; font-family: Consolas,'Courier New',monospace; animation: runtimeBoot .9s ease-out both; }
-    .runtime-scanline { position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0, rgba(255,255,255,.012) 1px, transparent 1px, transparent 5px); mix-blend-mode: screen; }
+    /*
+       This component is a child of MainLayout/main, not a second viewport.
+       The layout owns the browser chrome; this runtime owns only the content
+       surface below it. Keeping it in normal flex flow means the sidebar and
+       top-row remain visible and the runtime receives the exact space left by
+       the main content region.
+    */
+    .browser-runtime { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; width: 100%; height: auto; z-index: 2; overflow: auto; padding: clamp(1.5rem, 4vh, 3.5rem) clamp(1rem, 4vw, 4rem) 3rem; box-sizing: border-box; color: #eaf8ff; background: radial-gradient(circle at 75% 15%, rgba(0,234,255,.10), transparent 30%), radial-gradient(circle at 18% 72%, rgba(255,44,255,.08), transparent 32%), #020711; font-family: Consolas,'Courier New',monospace; animation: runtimeBoot .9s ease-out both; }
+    .runtime-scanline { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0, rgba(255,255,255,.012) 1px, transparent 1px, transparent 5px); mix-blend-mode: screen; }
     .runtime-header { position: relative; max-width: 1280px; margin: 0 auto 1.5rem; display: flex; justify-content: space-between; gap: 2rem; align-items: flex-end; border-bottom: 1px solid rgba(0,234,255,.24); padding-bottom: 1.2rem; }
     .runtime-eyebrow { color: #ff2cff; font-size: .72rem; letter-spacing: .18em; margin-bottom: .5rem; }
     .runtime-header h1 { margin: 0; font-size: clamp(1.7rem,4vw,3.8rem); letter-spacing: .06em; text-shadow: 0 0 22px rgba(0,234,255,.4); }
