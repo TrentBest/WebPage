@@ -1,53 +1,79 @@
-﻿@using TheSingularityWorkshop.Shared
+@using TheSingularityWorkshop.Shared
+@using TheSingularityWorkshop.Services
+@inject NavigationManager Navigation
+@inject WorkshopExperienceService Experience
+@implements IDisposable
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">The Singularity Workshop</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+@if (ShouldShowNavigation)
+{
+    <div class="top-row ps-3 navbar navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="">The Singularity Workshop</a>
+            <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
     </div>
-</div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="demos">
-                <span class="oi oi-list" aria-hidden="true"></span> Demos
-            </NavLink>
-        </div>
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="privacypolicy">
-                <span class="oi oi-info" aria-hidden="true"></span> Privacy Policy
-            </NavLink>
-        </div>
+    <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="naming-poll">
-                <span class="oi oi-graph" aria-hidden="true"></span> Vote on Name
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="demos">
+                    <span class="oi oi-list" aria-hidden="true"></span> Demos
+                </NavLink>
+            </div>
 
-        <LoginStatus />
-        
-    </nav>
-</div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="privacypolicy">
+                    <span class="oi oi-info" aria-hidden="true"></span> Privacy Policy
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="naming-poll">
+                    <span class="oi oi-graph" aria-hidden="true"></span> Vote on Name
+                </NavLink>
+            </div>
+
+            <LoginStatus />
+        </nav>
+    </div>
+}
 
 @code {
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    private bool ShouldShowNavigation =>
+        !IsHomeRoute || Experience.ShowNavigation;
+
+    private bool IsHomeRoute =>
+        Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Length == 0;
+
+    protected override void OnInitialized()
+    {
+        Experience.StateChanged += OnExperienceStateChanged;
+    }
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void OnExperienceStateChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Experience.StateChanged -= OnExperienceStateChanged;
     }
 }
