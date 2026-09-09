@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @using TheSingularityWorkshop.Components
 
@@ -29,6 +29,7 @@
         @if (IsWorkshopLanding)
         {
             <WorkshopExperienceFeed />
+            <WorkshopBrowserRuntime />
         }
 
         @if (IsWorkshopLanding && _pongActive)
@@ -67,9 +68,9 @@
            the hand-off: the creator moniker appears for three seconds while the
            ordinary browser chrome wakes back up underneath it.
 
-           This is deliberately CSS-driven for this visual transition. The underlying
-           landing state is still supplied by Home.razor; the next pass can move this
-           presentation state into the Workshop/FSM machinery once that boundary exists.
+           The next layer now performs the actual escape: after the hand-off, the
+           browser-native runtime takes ownership and reproduces the portable
+           processing-group execution model without invoking Unity lifecycle callbacks.
         */
         .workshop-content:has(.gateway-interface) {
             pointer-events: none;
@@ -108,6 +109,15 @@
             animation: landingChromeAppear 3s ease-in-out both;
         }
 
+        /* The browser runtime is mounted from the normal Blazor layout, but stays
+           completely absent during Monolith / Chaos / Collapse. It arrives exactly
+           as the three-second creator hand-off finishes. */
+        .page:has(.gateway-interface) main > .browser-runtime {
+            visibility: hidden;
+            opacity: 0;
+            animation: browserRuntimeRelease .9s ease-out 3s forwards;
+        }
+
         @@keyframes landingMonikerFade {
             0%, 72% { opacity: 1; }
             100% { opacity: 0; visibility: hidden; }
@@ -121,6 +131,11 @@
         @@keyframes landingChromeAppear {
             0%, 72% { opacity: 0; }
             100% { opacity: 1; }
+        }
+
+        @@keyframes browserRuntimeRelease {
+            from { visibility: hidden; opacity: 0; transform: scale(1.015); }
+            to { visibility: visible; opacity: 1; transform: scale(1); }
         }
     </style>
 }
