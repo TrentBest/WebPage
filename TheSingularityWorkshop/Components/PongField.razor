@@ -408,7 +408,7 @@
     {
         if (_disposed || !_started) return;
         _context.Ticks++;
-        if (!_visible && !_ending && _context.Ticks >= 200)
+        if (!_visible && !_ending && _context.Ticks >= 140)
             _context.ManifestRequested = true;
 
         FSM_API.Interaction.Update(ProcessingGroup);
@@ -596,7 +596,7 @@
         try
         {
             if (_fsm is not null)
-                FSM_API.Interaction.Destroy(_fsm);
+                FSM_API.Interaction.DestroyInstance(_fsm);
         }
         catch { }
     }
