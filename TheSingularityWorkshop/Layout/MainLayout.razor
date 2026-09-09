@@ -7,7 +7,7 @@
         <NavMenu />
     </div>
 
-    <main>
+    <main @onclick="HandleLandingClick">
         <div class="top-row px-4 workshop-tab-header">
             <span class="workshop-tab-title">@CurrentTabTitle</span>
         </div>
@@ -15,15 +15,17 @@
         <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">
             @Body
         </article>
+
+        @if (IsWorkshopLanding)
+        {
+            <PongField @ref="_pongField" />
+        }
     </main>
 </div>
 
-@if (IsWorkshopLanding)
-{
-    <PongField />
-}
-
 @code {
+    private PongField? _pongField;
+
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
 
     private string CurrentTabTitle
@@ -40,6 +42,14 @@
                 "naming-poll" => "VOTE ON NAME",
                 _ => path.Replace('-', ' ').ToUpperInvariant()
             };
+        }
+    }
+
+    private void HandleLandingClick()
+    {
+        if (IsWorkshopLanding)
+        {
+            _pongField?.StopFromLandingInteraction();
         }
     }
 }
