@@ -12,7 +12,7 @@
 
     @if (currentPhase == AppPhase.Monolith || currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
     {
-        <div class="chaos-container @(currentPhase == AppPhase.Collapsing ? "gravity-failure" : "")">
+        <div class="chaos-container @(currentPhase == AppPhase.Collapsing ? "gravity-failure" : "")" style="display: block !important; position: absolute !important; inset: 0 !important;">
             @if (currentPhase == AppPhase.Monolith)
             {
                 <div class="monolith-stage">
@@ -54,7 +54,7 @@
             {
                 @foreach (var node in activeNodes)
                 {
-                    <button class="chaos-node" style="left: @(node.X)px; top: @(node.Y)px; width: @(node.Size)px; height: @(node.Size)px; z-index: @node.Generation; transform: translate(-50%, -50%);">
+                    <button class="chaos-node" style="left: @(node.X.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture))%; top: @(node.Y.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture))%; width: @(node.Size)px; height: @(node.Size)px; z-index: @node.Generation; transform: translate(-50%, -50%);">
                         <div class="node-gen">GEN @node.Generation</div>
                         <div class="node-lineage">[@node.Lineage]</div>
                     </button>
@@ -162,7 +162,7 @@
         mix-blend-mode: screen;
     }
 
-    .ambient-grid { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, transparent 0 9%, rgba(0, 234, 255, 0.08) 9.1%, transparent 9.2% 90.8%, rgba(0, 234, 255, 0.08) 90.9%, transparent 91%), linear-gradient(0deg, transparent 0 14%, rgba(255, 44, 255, 0.055) 14.1%, transparent 14.2% 85.8%, rgba(255, 44, 255, 0.055) 85.9%, transparent 86%); opacity: 0.7; }
+    .ambient-grid { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, transparent 0 9%, rgba(0, 234, 255, 0.08) 9.1%, transparent 9.2% 90.8%, rgba(0, 234, 255, 0.08) 90.9%, transparent 91%), linear-gradient(0deg, transparent 0 14%, rgba(255, 44, 255, 0.055) 14.1%, transparent 14.2% 85.8%, rgba(255, 44, 255, 0.055) 85.9%, transparent 85.8%, rgba(255, 44, 255, 0.055) 85.9%, transparent 86%); opacity: 0.7; }
     .ambient-scan { position: absolute; left: 0; right: 0; top: -15%; height: 18%; z-index: 0; pointer-events: none; background: linear-gradient(180deg, transparent, rgba(0, 234, 255, 0.055), transparent); filter: blur(3px); animation: scanSweep 8s ease-in-out infinite; }
     .ambient-orbit { position: absolute; width: min(70vw, 900px); height: min(70vw, 900px); border: 1px solid rgba(0, 234, 255, 0.09); border-radius: 50%; pointer-events: none; z-index: -1; animation: orbitPulse 7s ease-in-out infinite; }
     .ambient-orbit-one { transform: rotateX(66deg) rotateZ(-16deg); }
@@ -267,6 +267,13 @@
     private Random rng = new();
     private const int CriticalMassThreshold = 100;
 
+    // The living GUI owns a local 0..100 coordinate space. CSS maps that space to
+    // the actual Workshop surface, so the simulation never needs viewport pixels.
+    private const double LocalCoordinateMax = 100.0;
+    private const double QuadrantBoundary = 50.0;
+    private const double PlacementPadding = 14.0;
+    private const double MinimumPlacementSpan = 8.0;
+
     protected override void OnInitialized()
     {
         chaosTimer.Interval = 100;
@@ -276,7 +283,7 @@
     private async Task ShatterMonolith()
     {
         currentPhase = AppPhase.Chaos;
-        activeNodes.Add(new ChaosNode { X = 800, Y = 400, Size = 200, Generation = 1, Lineage = "1" });
+        activeNodes.Add(new ChaosNode { X = 50, Y = 50, Size = 200, Generation = 1, Lineage = "1" });
         StateHasChanged();
         chaosTimer.Start();
         try { await JS.InvokeVoidAsync("interop.initUnity", "unity-canvas"); }
@@ -295,25 +302,100 @@
             {
                 node.Size = 60;
                 node.OffspringCount++;
-                newborns.Add(new ChaosNode { X = node.X + rng.Next(-200, 200), Y = node.Y + rng.Next(-200, 200), Generation = node.Generation + 1, Lineage = $"{node.Lineage}.{node.OffspringCount}", Size = 60 });
+
+                var quadrant = FindLeastPopulatedQuadrant();
+                var bounds = GetQuadrantPlacementBounds(quadrant);
+
+                newborns.Add(new ChaosNode
+                {
+                    X = NextWithin(bounds.MinX, bounds.MaxX),
+                    Y = NextWithin(bounds.MinY, bounds.MaxY),
+                    Generation = node.Generation + 1,
+                    Lineage = $"{node.Lineage}.{node.OffspringCount}",
+                    Size = 60
+                });
             }
         }
 
         if (newborns.Any())
-        {
             activeNodes.AddRange(newborns);
-            foreach (var n in activeNodes)
-            {
-                if (n.X < 100) n.X = 150;
-                if (n.X > 1800) n.X = 1700;
-                if (n.Y < 100) n.Y = 150;
-                if (n.Y > 900) n.Y = 800;
-            }
-        }
 
         if (activeNodes.Count >= CriticalMassThreshold) _ = TriggerCollapse();
         else InvokeAsync(StateHasChanged);
     }
+
+    private int FindLeastPopulatedQuadrant()
+    {
+        var counts = new int[4];
+
+        foreach (var node in activeNodes)
+            counts[GetQuadrant(node.X, node.Y)]++;
+
+        var minimum = counts.Min();
+        var candidates = Enumerable.Range(0, 4)
+            .Where(index => counts[index] == minimum)
+            .ToList();
+
+        // Equal-density quadrants remain stochastic, so the swarm does not acquire
+        // a mechanical left-to-right or top-to-bottom construction pattern.
+        return candidates[rng.Next(candidates.Count)];
+    }
+
+    private static int GetQuadrant(double x, double y)
+    {
+        var right = x >= QuadrantBoundary;
+        var bottom = y >= QuadrantBoundary;
+
+        return (bottom ? 2 : 0) + (right ? 1 : 0);
+    }
+
+    private (double MinX, double MaxX, double MinY, double MaxY) GetQuadrantPlacementBounds(int quadrant)
+    {
+        var quadrantMinX = quadrant % 2 == 0 ? 0.0 : QuadrantBoundary;
+        var quadrantMaxX = quadrant % 2 == 0 ? QuadrantBoundary : LocalCoordinateMax;
+        var quadrantMinY = quadrant < 2 ? 0.0 : QuadrantBoundary;
+        var quadrantMaxY = quadrant < 2 ? QuadrantBoundary : LocalCoordinateMax;
+
+        var occupied = activeNodes
+            .Where(node => GetQuadrant(node.X, node.Y) == quadrant)
+            .ToList();
+
+        if (occupied.Count == 0)
+            return (quadrantMinX + PlacementPadding, quadrantMaxX - PlacementPadding,
+                    quadrantMinY + PlacementPadding, quadrantMaxY - PlacementPadding);
+
+        // The occupied min/max values become the local constraints for the next
+        // arrival. Padding keeps the range alive when a quadrant contains only one
+        // node, while the quadrant itself remains the hard boundary.
+        var minX = Math.Max(quadrantMinX, occupied.Min(node => node.X) - PlacementPadding);
+        var maxX = Math.Min(quadrantMaxX, occupied.Max(node => node.X) + PlacementPadding);
+        var minY = Math.Max(quadrantMinY, occupied.Min(node => node.Y) - PlacementPadding);
+        var maxY = Math.Min(quadrantMaxY, occupied.Max(node => node.Y) + PlacementPadding);
+
+        EnsureMinimumSpan(ref minX, ref maxX, quadrantMinX, quadrantMaxX);
+        EnsureMinimumSpan(ref minY, ref maxY, quadrantMinY, quadrantMaxY);
+
+        return (minX, maxX, minY, maxY);
+    }
+
+    private static void EnsureMinimumSpan(ref double min, ref double max, double hardMin, double hardMax)
+    {
+        if (max - min >= MinimumPlacementSpan) return;
+
+        var center = (min + max) * 0.5;
+        var halfSpan = MinimumPlacementSpan * 0.5;
+        min = Math.Max(hardMin, center - halfSpan);
+        max = Math.Min(hardMax, center + halfSpan);
+
+        if (max - min < MinimumPlacementSpan)
+        {
+            min = hardMin;
+            max = hardMax;
+        }
+    }
+
+    private double NextWithin(double min, double max)
+        => min + (rng.NextDouble() * (max - min));
 
     private async Task TriggerCollapse()
     {
