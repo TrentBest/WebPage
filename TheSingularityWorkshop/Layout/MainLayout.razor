@@ -26,15 +26,41 @@
             }
         </article>
 
-        @if (IsWorkshopLanding)
+        @if (IsWorkshopLanding && _pongActive)
         {
             <PongField @ref="_pongField" />
         }
     </main>
 </div>
 
+@if (IsWorkshopLanding)
+{
+    <style>
+        .workshop-content {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            z-index: 9000;
+        }
+
+        .workshop-content .hypervisor-shell {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            min-height: 100vh !important;
+        }
+    </style>
+}
+
 @code {
     private PongField? _pongField;
+    private bool _pongActive = true;
 
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
 
@@ -48,6 +74,7 @@
             {
                 "" => "THE WORKSHOP",
                 "demos" => "DEMOS",
+                "ai" => "AI",
                 "privacypolicy" => "PRIVACY POLICY",
                 "naming-poll" => "VOTE ON NAME",
                 _ => path.Replace('-', ' ').ToUpperInvariant()
@@ -62,6 +89,10 @@
 
     private void StopPong()
     {
+        if (!_pongActive) return;
+
+        _pongActive = false;
         _pongField?.StopFromLandingInteraction();
+        StateHasChanged();
     }
 }
