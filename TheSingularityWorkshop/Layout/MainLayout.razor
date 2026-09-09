@@ -12,7 +12,8 @@
             <span class="workshop-tab-title">@CurrentTabTitle</span>
         </div>
 
-        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">
+        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")"
+                 @onclick="HandleLandingClick">
             @if (IsWorkshopLanding)
             {
                 <CascadingValue Value="(Action)StopPong">
@@ -52,6 +53,11 @@
                 _ => path.Replace('-', ' ').ToUpperInvariant()
             };
         }
+    }
+
+    private void HandleLandingClick()
+    {
+        StopPong();
     }
 
     private void StopPong()
