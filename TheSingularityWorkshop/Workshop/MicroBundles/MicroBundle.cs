@@ -22,19 +22,19 @@ public sealed class MicroBundle : IMicroBundle
             Generation = generation
         };
 
-        FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
-            .State("Created", onEnter: EnterCreated)
-            .State("Manifesting", onEnter: EnterManifesting)
-            .State("Active", onEnter: EnterActive)
-            .State("Collapsing", onEnter: EnterCollapsing)
-            .State("Destroyed", onEnter: EnterDestroyed)
+        FSM_API.FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
+            .State("Created", onEnter: EnterCreated, onUpdate: _ => { }, onExit: _ => { })
+            .State("Manifesting", onEnter: EnterManifesting, onUpdate: _ => { }, onExit: _ => { })
+            .State("Active", onEnter: EnterActive, onUpdate: _ => { }, onExit: _ => { })
+            .State("Collapsing", onEnter: EnterCollapsing, onUpdate: _ => { }, onExit: _ => { })
+            .State("Destroyed", onEnter: EnterDestroyed, onUpdate: _ => { }, onExit: _ => { })
             .Transition("Created", "Manifesting", c => ((MicroBundleContext)c).IsValid)
             .Transition("Manifesting", "Active", c => ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
             .Transition("Active", "Collapsing", c => !((MicroBundleContext)c).IsValid)
             .Transition("Collapsing", "Destroyed", c => !((MicroBundleContext)c).IsValid && ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
             .BuildDefinition();
 
-        _fsm = FSM_API.Create.CreateInstance(FsmName, Context, ProcessingGroup);
+        _fsm = FSM_API.FSM_API.Create.CreateInstance(FsmName, Context, ProcessingGroup);
     }
 
     private string FsmName => $"MicroBundle_{Id}";
@@ -53,7 +53,7 @@ public sealed class MicroBundle : IMicroBundle
             context.ElapsedMilliseconds++;
         }
 
-        FSM_API.Interaction.Update(ProcessingGroup);
+        FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
         Manifestation = _provider.Manifest(Context);
     }
 
