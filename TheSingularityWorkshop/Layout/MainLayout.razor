@@ -26,6 +26,11 @@
             }
         </article>
 
+        @if (IsWorkshopLanding)
+        {
+            <WorkshopExperienceFeed />
+        }
+
         @if (IsWorkshopLanding && _pongActive)
         {
             <PongField @ref="_pongField" />
