@@ -7,8 +7,8 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <div class="top-row px-4 workshop-tab-header">
+            <span class="workshop-tab-title">@CurrentTabTitle</span>
         </div>
 
         <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">
@@ -19,4 +19,21 @@
 
 @code {
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
+
+    private string CurrentTabTitle
+    {
+        get
+        {
+            var path = Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
+
+            return path.ToLowerInvariant() switch
+            {
+                "" => "THE WORKSHOP",
+                "demos" => "DEMOS",
+                "privacypolicy" => "PRIVACY POLICY",
+                "naming-poll" => "VOTE ON NAME",
+                _ => path.Replace('-', ' ').ToUpperInvariant()
+            };
+        }
+    }
 }
