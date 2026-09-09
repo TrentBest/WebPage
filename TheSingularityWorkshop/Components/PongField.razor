@@ -1,0 +1,296 @@
+@using System.Timers
+@using TheSingularityWorkshop.FSM_API
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+@if (_visible)
+{
+    <div class="pong-field" role="application" aria-label="FSM powered Pong simulation">
+        <div class="pong-header">
+            <span>FSM_API // PONG SIMULATION</span>
+            <span>PLAYER 1: W / S &nbsp;&nbsp; PLAYER 2: ↑ / ↓</span>
+        </div>
+
+        <button class="pong-paddle pong-player-one" aria-label="Paddle">PADDLE</button>
+        <button class="pong-paddle pong-player-two" aria-label="Paddle">PADDLE</button>
+        <button class="pong-ball" aria-label="Ball">@if (_ballLegible) { <span>Ball</span> }</button>
+
+        <div class="pong-status">
+            <span>STATE: @_state</span>
+            <span>FSM TICKS: @_ticks</span>
+        </div>
+    </div>
+}
+
+<style>
+    .pong-field {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 50% 50%, rgba(0, 234, 255, 0.035), transparent 35%),
+            #020711;
+        color: #dffcff;
+        font-family: Consolas, 'Courier New', monospace;
+        border: 1px solid rgba(0, 234, 255, 0.18);
+        box-sizing: border-box;
+    }
+
+    .pong-field::before {
+        content: "";
+        position: absolute;
+        inset: 4%;
+        border: 1px dashed rgba(0, 234, 255, 0.13);
+        pointer-events: none;
+    }
+
+    .pong-field::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        border-left: 1px dashed rgba(255, 44, 255, 0.22);
+        pointer-events: none;
+    }
+
+    .pong-header,
+    .pong-status {
+        position: absolute;
+        left: 2rem;
+        right: 2rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        z-index: 2;
+        font-size: clamp(.62rem, .9vw, .82rem);
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: rgba(223, 252, 255, .72);
+    }
+
+    .pong-header { top: 1.25rem; color: #00eaff; }
+    .pong-status { bottom: 1.25rem; color: rgba(255, 44, 255, .72); }
+
+    .pong-paddle,
+    .pong-ball {
+        position: absolute;
+        z-index: 3;
+        padding: 0;
+        color: inherit;
+        font: inherit;
+        cursor: default;
+    }
+
+    .pong-paddle {
+        top: 50%;
+        width: clamp(4.5rem, 7vw, 7rem);
+        height: clamp(7rem, 18vh, 10rem);
+        transform: translateY(-50%);
+        background: rgba(0, 234, 255, .025);
+        border: 2px solid #00eaff;
+        box-shadow: 0 0 14px rgba(0, 234, 255, .35), inset 0 0 14px rgba(0, 234, 255, .04);
+        color: #00eaff;
+        font-weight: 700;
+        letter-spacing: .08em;
+    }
+
+    .pong-player-one { left: 6%; }
+    .pong-player-two { right: 6%; border-color: #ff2cff; color: #ff2cff; box-shadow: 0 0 14px rgba(255, 44, 255, .35), inset 0 0 14px rgba(255, 44, 255, .04); }
+
+    .pong-ball {
+        width: clamp(12px, 1vw, 18px);
+        height: clamp(12px, 1vw, 18px);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border: 1px solid #fff;
+        background: #fff;
+        color: transparent;
+        box-shadow: 0 0 10px #00eaff, 0 0 18px rgba(255, 44, 255, .55);
+    }
+
+    .pong-ball span { display: none; }
+
+    @@media (max-width: 700px) {
+        .pong-header,
+        .pong-status { left: .75rem; right: .75rem; flex-direction: column; gap: .2rem; }
+        .pong-header { top: .75rem; }
+        .pong-status { bottom: .75rem; }
+        .pong-paddle { width: 3.5rem; height: 6rem; font-size: .65rem; }
+    }
+</style>
+
+@code {
+    private const string ProcessingGroup = "WorkshopPong";
+    private const string DefinitionName = "WorkshopPongFSM";
+
+    private sealed class PongContext
+    {
+        public bool ManifestRequested { get; set; }
+        public bool StopRequested { get; set; }
+        public double BallX { get; set; } = 50;
+        public double BallY { get; set; } = 50;
+        public double BallVX { get; set; } = .72;
+        public double BallVY { get; set; } = .48;
+        public int Ticks { get; set; }
+    }
+
+    private PongContext _context = new();
+    private FSMHandle? _fsm;
+    private Timer? _timer;
+    private DotNetObjectReference<PongField>? _self;
+    private bool _visible;
+    private bool _cancelled;
+    private bool _disposed;
+    private string _state = "DORMANT";
+    private int _ticks;
+    private bool _ballLegible;
+
+    protected override async Task OnInitializedAsync()
+    {
+        BuildFsm();
+        _self = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("workshopPong.install", _self);
+
+        _timer = new Timer(50);
+        _timer.Elapsed += Tick;
+        _timer.AutoReset = true;
+        _timer.Start();
+    }
+
+    private void BuildFsm()
+    {
+        if (!FSM_API.Interaction.Exists(DefinitionName, ProcessingGroup))
+        {
+            FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
+            FSM_API.Create.CreateFiniteStateMachine(DefinitionName, -1, ProcessingGroup)
+                .State("Dormant", null, OnDormant, null)
+                .State("Manifesting", OnManifesting, OnManifestingUpdate, null)
+                .State("Playing", OnEnterPlaying, OnPlaying, null)
+                .State("Stopped", OnEnterStopped, null, null)
+                .Transition("Dormant", "Manifesting", c => ((PongContext)c).ManifestRequested)
+                .Transition("Manifesting", "Playing", c => true)
+                .Transition("Playing", "Stopped", c => ((PongContext)c).StopRequested)
+                .BuildDefinition();
+        }
+
+        _fsm = FSM_API.Create.CreateInstance(DefinitionName, _context, ProcessingGroup);
+    }
+
+    private void Tick(object? sender, ElapsedEventArgs e)
+    {
+        if (_disposed) return;
+
+        if (!_cancelled && !_visible)
+        {
+            _context.Ticks++;
+            if (_context.Ticks >= 200)
+                _context.ManifestRequested = true;
+        }
+
+        FSM_API.Interaction.Update(ProcessingGroup);
+        _ticks = _context.Ticks;
+        _state = _fsm?.CurrentState ?? "DORMANT";
+
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void OnDormant(object context)
+    {
+        _state = "DORMANT";
+    }
+
+    private void OnManifesting(object context)
+    {
+        _visible = true;
+        _ballLegible = false;
+        _state = "MANIFESTING";
+    }
+
+    private void OnManifestingUpdate(object context)
+    {
+        _visible = true;
+    }
+
+    private void OnEnterPlaying(object context)
+    {
+        _visible = true;
+        _state = "PLAYING";
+    }
+
+    private void OnPlaying(object context)
+    {
+        var c = (PongContext)context;
+        c.BallX += c.BallVX;
+        c.BallY += c.BallVY;
+
+        if (c.BallY <= 5 || c.BallY >= 95) c.BallVY *= -1;
+        if (c.BallX <= 9 || c.BallX >= 91) c.BallVX *= -1;
+
+        _state = "PLAYING";
+    }
+
+    private void OnEnterStopped(object context)
+    {
+        _visible = false;
+        _state = "STOPPED";
+    }
+
+    [JSInvokable]
+    public void CancelFromInteraction()
+    {
+        if (_disposed) return;
+        _cancelled = true;
+        _context.StopRequested = true;
+        _timer?.Stop();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public void ResumeAfterDisclosure()
+    {
+        if (_disposed || _visible) return;
+        _cancelled = false;
+        _context.StopRequested = false;
+        _context.ManifestRequested = false;
+        _context.Ticks = 0;
+        _timer?.Start();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _disposed = true;
+        _timer?.Stop();
+        _timer?.Dispose();
+        try { await JS.InvokeVoidAsync("workshopPong.uninstall"); } catch { }
+        _self?.Dispose();
+    }
+}
+
+<script>
+    window.workshopPong = window.workshopPong || {
+        install: function (dotnet) {
+            window.workshopPong.dotnet = dotnet;
+            window.workshopPong.clickHandler = function (event) {
+                if (event.target.closest('.monolith-btn, .workshop-warning')) {
+                    window.workshopPong.dotnet.invokeMethodAsync('CancelFromInteraction');
+                }
+            };
+            window.workshopPong.keyHandler = function (event) {
+                if (event.key === 'Escape' && document.querySelector('.workshop-disclosure')) {
+                    window.workshopPong.dotnet.invokeMethodAsync('ResumeAfterDisclosure');
+                }
+            };
+            document.addEventListener('click', window.workshopPong.clickHandler, true);
+            document.addEventListener('keydown', window.workshopPong.keyHandler, true);
+        },
+        uninstall: function () {
+            if (!window.workshopPong.dotnet) return;
+            document.removeEventListener('click', window.workshopPong.clickHandler, true);
+            document.removeEventListener('keydown', window.workshopPong.keyHandler, true);
+            window.workshopPong.dotnet = null;
+        }
+    };
+</script>
