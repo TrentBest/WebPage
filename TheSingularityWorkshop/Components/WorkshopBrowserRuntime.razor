@@ -1,0 +1,212 @@
+@using System.Timers
+@using TheSingularityWorkshop.FSM_API
+@implements IDisposable
+
+<div class="browser-runtime" aria-label="Workshop browser runtime">
+    <div class="runtime-scanline" aria-hidden="true"></div>
+
+    <header class="runtime-header">
+        <div>
+            <div class="runtime-eyebrow">THE SINGULARITY WORKSHOP / BROWSER RUNTIME</div>
+            <h1>THE MACHINE DIDN'T NEED UNITY.</h1>
+            <p>Unity supplied the lifecycle. The execution model was always the portable part.</p>
+        </div>
+        <div class="runtime-heartbeat">
+            <span class="heartbeat-dot"></span>
+            <span>@_heartbeat.ToString("D6")</span>
+            <small>HEARTBEAT</small>
+        </div>
+    </header>
+
+    <section class="runtime-grid">
+        <div class="runtime-panel pipeline-panel">
+            <div class="panel-title">PROCESS GROUP EXECUTION</div>
+            <div class="pipeline">
+                @foreach (var group in _processingOrder)
+                {
+                    var active = group == _activeGroup;
+                    <div class="pipeline-node @(active ? "active" : "")">
+                        <span class="pipeline-index">@(_processingOrder.IndexOf(group) + 1).ToString("00")</span>
+                        <strong>@group</strong>
+                        <span>@GetTickCount(group) ticks</span>
+                    </div>
+                    @if (group != _processingOrder[^1])
+                    {
+                        <div class="pipeline-arrow">→</div>
+                    }
+                }
+            </div>
+            <div class="runtime-note">
+                <b>NO UNITY CALLBACKS.</b>
+                The browser is executing the same idea directly: an ordered collection of named processing groups, each dispatched through <code>FSM_API.Interaction.Update(group)</code>.
+            </div>
+        </div>
+
+        <div class="runtime-panel state-panel">
+            <div class="panel-title">LIVE EXECUTION</div>
+            <div class="state-readout">
+                <span class="state-label">CURRENT GROUP</span>
+                <strong>@_activeGroup</strong>
+            </div>
+            <div class="state-readout">
+                <span class="state-label">FSM STATE</span>
+                <strong>@_fsmState</strong>
+            </div>
+            <div class="state-readout">
+                <span class="state-label">TOTAL DISPATCHES</span>
+                <strong>@_dispatches.ToString("N0")</strong>
+            </div>
+            <div class="state-readout">
+                <span class="state-label">RUNTIME</span>
+                <strong>@ElapsedText</strong>
+            </div>
+        </div>
+
+        <div class="runtime-panel architecture-panel">
+            <div class="panel-title">THE ESCAPE ROUTE</div>
+            <div class="architecture-row"><span>01</span><b>Unity lifecycle</b><em>optional host</em></div>
+            <div class="architecture-row"><span>02</span><b>Processing groups</b><em>portable boundary</em></div>
+            <div class="architecture-row"><span>03</span><b>FSM instances</b><em>deterministic execution</em></div>
+            <div class="architecture-row"><span>04</span><b>Blazor render</b><em>browser-native</em></div>
+            <div class="architecture-footer">THE GROUP ORDER IS DATA.</div>
+        </div>
+    </section>
+
+    <footer class="runtime-footer">
+        <span>EXECUTION STREAM</span>
+        <span class="footer-line"></span>
+        <span>@_lastEvent</span>
+    </footer>
+</div>
+
+<style>
+    .browser-runtime { position: fixed; inset: 0; z-index: 9990; overflow: auto; padding: clamp(5rem, 9vh, 7rem) clamp(1rem, 5vw, 5rem) 3rem; box-sizing: border-box; color: #eaf8ff; background: radial-gradient(circle at 75% 15%, rgba(0,234,255,.10), transparent 30%), radial-gradient(circle at 18% 72%, rgba(255,44,255,.08), transparent 32%), #020711; font-family: Consolas,'Courier New',monospace; animation: runtimeBoot .9s ease-out both; }
+    .runtime-scanline { position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0, rgba(255,255,255,.012) 1px, transparent 1px, transparent 5px); mix-blend-mode: screen; }
+    .runtime-header { position: relative; max-width: 1280px; margin: 0 auto 1.5rem; display: flex; justify-content: space-between; gap: 2rem; align-items: flex-end; border-bottom: 1px solid rgba(0,234,255,.24); padding-bottom: 1.2rem; }
+    .runtime-eyebrow { color: #ff2cff; font-size: .72rem; letter-spacing: .18em; margin-bottom: .5rem; }
+    .runtime-header h1 { margin: 0; font-size: clamp(1.7rem,4vw,3.8rem); letter-spacing: .06em; text-shadow: 0 0 22px rgba(0,234,255,.4); }
+    .runtime-header p { margin: .65rem 0 0; color: #8fa9b8; max-width: 760px; }
+    .runtime-heartbeat { min-width: 115px; text-align: right; color: #00eaff; font-size: 1.2rem; }
+    .runtime-heartbeat small { display: block; color: #557080; font-size: .55rem; letter-spacing: .16em; }
+    .heartbeat-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #00eaff; box-shadow: 0 0 12px #00eaff; animation: heartbeat 1s ease-in-out infinite; }
+    .runtime-grid { position: relative; max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0,2fr) minmax(240px,.8fr); gap: 1rem; }
+    .runtime-panel { border: 1px solid rgba(0,234,255,.18); background: rgba(4,13,26,.76); box-shadow: inset 0 0 28px rgba(0,234,255,.025); padding: 1rem; backdrop-filter: blur(5px); }
+    .pipeline-panel { grid-column: 1 / -1; }
+    .panel-title { color: #6f8d9d; font-size: .65rem; letter-spacing: .2em; margin-bottom: 1rem; }
+    .pipeline { display: flex; align-items: stretch; gap: .5rem; overflow-x: auto; padding-bottom: .25rem; }
+    .pipeline-node { min-width: 145px; flex: 1; display: flex; flex-direction: column; gap: .3rem; padding: .85rem; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.015); transition: .15s ease; }
+    .pipeline-node.active { border-color: #00eaff; box-shadow: 0 0 20px rgba(0,234,255,.12); transform: translateY(-2px); }
+    .pipeline-index { color: #ff2cff; font-size: .62rem; }
+    .pipeline-node strong { font-size: .8rem; letter-spacing: .05em; }
+    .pipeline-node span:last-child { color: #557080; font-size: .62rem; }
+    .pipeline-arrow { align-self: center; color: #00eaff; opacity: .55; }
+    .runtime-note { margin-top: 1rem; color: #7e96a4; font-size: .72rem; line-height: 1.55; }
+    .runtime-note b { color: #ff2cff; }
+    code { color: #b7efff; }
+    .state-panel,.architecture-panel { min-height: 245px; }
+    .state-readout { padding: .8rem 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .state-label { display:block; color:#526b78; font-size:.55rem; letter-spacing:.14em; margin-bottom:.2rem; }
+    .state-readout strong { font-size:.9rem; color:#dffaff; }
+    .architecture-row { display:grid; grid-template-columns:2rem 1fr auto; gap:.5rem; padding:.62rem 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:.68rem; }
+    .architecture-row span { color:#ff2cff; }
+    .architecture-row em { color:#526b78; font-style:normal; }
+    .architecture-footer { margin-top:1rem; color:#00eaff; font-size:.68rem; letter-spacing:.12em; }
+    .runtime-footer { position:relative; max-width:1280px; margin:1rem auto 0; display:flex; gap:.75rem; align-items:center; color:#526b78; font-size:.58rem; letter-spacing:.12em; }
+    .footer-line { flex:1; height:1px; background:rgba(0,234,255,.12); }
+    .runtime-footer span:last-child { color:#7695a4; letter-spacing:0; }
+    @@keyframes runtimeBoot { from { opacity:0; transform:scale(1.015); } to { opacity:1; transform:none; } }
+    @@keyframes heartbeat { 0%,100% { transform:scale(.7); opacity:.5; } 50% { transform:scale(1.2); opacity:1; } }
+    @@media (max-width: 800px) { .runtime-header { align-items:flex-start; } .runtime-heartbeat { min-width:auto; } .runtime-grid { grid-template-columns:1fr; } .pipeline-panel { grid-column:auto; } .architecture-row { grid-template-columns:2rem 1fr; } .architecture-row em { grid-column:2; } }
+</style>
+
+@code {
+    private sealed class RuntimeContext : IStateContext
+    {
+        public string Name { get; set; } = "WorkshopBrowserRuntime";
+        public bool IsValid { get; set; } = true;
+        public string CurrentGroup { get; set; } = "BOOT";
+        public long Dispatches { get; set; }
+    }
+
+    private static readonly string[] Groups = { "Browser.Input", "Browser.Simulation", "Browser.AI", "Browser.Render" };
+    private readonly List<string> _processingOrder = Groups.ToList();
+    private readonly Dictionary<string, long> _ticks = new();
+    private readonly List<FSMHandle> _handles = new();
+    private readonly RuntimeContext _context = new();
+    private Timer? _timer;
+    private DateTime _started;
+    private int _heartbeat;
+    private string _activeGroup = "BOOT";
+    private string _fsmState = "Not initialized";
+    private long _dispatches;
+    private string _lastEvent = "Awaiting browser-native execution...";
+
+    private string ElapsedText => (DateTime.UtcNow - _started).TotalSeconds.ToString("0.0") + "s";
+
+    protected override void OnInitialized()
+    {
+        foreach (var group in _processingOrder)
+        {
+            _ticks[group] = 0;
+            FSM_API.Create.CreateProcessingGroup(group);
+        }
+
+        foreach (var group in _processingOrder)
+        {
+            var definitionName = "WorkshopBrowser_" + group.Replace('.', '_');
+            if (!FSM_API.Interaction.Exists(definitionName, group))
+            {
+                FSM_API.Create.CreateFiniteStateMachine(definitionName, -1, group)
+                    .State("Executing", ExecuteGroup, null, null)
+                    .WithInitialState("Executing")
+                    .BuildDefinition();
+            }
+
+            _handles.Add(FSM_API.Create.CreateInstance(definitionName, _context, group));
+        }
+
+        _started = DateTime.UtcNow;
+        _timer = new Timer(100);
+        _timer.Elapsed += Tick;
+        _timer.AutoReset = true;
+        _timer.Start();
+        _fsmState = "Executing";
+        _lastEvent = "FSM definitions built. Processing groups online.";
+    }
+
+    private void Tick(object? sender, ElapsedEventArgs e)
+    {
+        _heartbeat++;
+
+        foreach (var group in _processingOrder)
+        {
+            _activeGroup = group;
+            _context.CurrentGroup = group;
+            FSM_API.Interaction.Update(group);
+            _dispatches++;
+        }
+
+        _lastEvent = $"Dispatch {_dispatches:N0}: {_activeGroup} completed.";
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ExecuteGroup(IStateContext context)
+    {
+        if (context is not RuntimeContext runtime) return;
+        if (_ticks.TryGetValue(runtime.CurrentGroup, out var count))
+            _ticks[runtime.CurrentGroup] = count + 1;
+    }
+
+    private long GetTickCount(string group) => _ticks.TryGetValue(group, out var count) ? count : 0;
+
+    public void Dispose()
+    {
+        _timer?.Stop();
+        _timer?.Dispose();
+        foreach (var handle in _handles)
+        {
+            try { FSM_API.Interaction.DestroyInstance(handle); } catch { }
+        }
+        _handles.Clear();
+    }
+}
