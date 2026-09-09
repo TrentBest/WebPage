@@ -87,9 +87,52 @@ Freeze
 Collapse / Gravity
 ```
 
+The current landing experiment now introduces another deterministic behavior before
+that living GUI appears:
+
+```text
+Wait ~10 seconds
+      |
+      v
+Pong
+      |
+      | FSM_API
+      | cyan = visitor
+      | magenta = machine
+      v
+Living GUI
+```
+
+The Pong phase is implemented in `Components/PongField.razor`. It is intentionally
+part of the Workshop's architecture demonstration rather than a standalone game.
+
 The current WebPage implementation is still experimental. Do not assume that the
 landing page's timer or rendering code represents the final MicroBundle architecture.
 The behavior is the important artifact; the implementation is still being forged.
+
+## Observable behavior
+
+The next landing enhancement is a scrolling feed of facts derived from the actual
+runtime/codebase. The purpose is to let the interface explain itself without turning
+into a conventional instruction panel.
+
+Examples include:
+
+- waiting ten seconds starts Pong
+- FSM_API drives Pong state
+- the visitor controls the cyan paddle
+- the magenta paddle is autonomous
+- the first serve goes toward the AI
+- the machine maintains score
+- clicking the warning or Workshop button dismisses Pong
+- the GUI reproduces
+- nodes carry generation and lineage
+- critical mass eventually occurs
+- the system freezes and collapses
+
+The long-term direction is a real observable experience/data model rather than
+hard-coded marketing text. The GUI should be able to observe the machine it is
+demonstrating.
 
 ## Integer-backed identity direction
 
@@ -129,20 +172,27 @@ The broader experimental stack currently looks conceptually like:
 LLM
  |
  v
-CommandAI
+Protocol AI
  |
  v
-Grammar
+Grammar AI
  |
  v
-ProtocolAI
+Command AI
  |
  v
 FSM_API / deterministic execution
  |
  v
 MicroBundle / provider / manifestation
+ |
+ v
+App AI
 ```
+
+The `/ai` page currently presents these concepts as an architectural model. App AI
+is an emerging construct: the idea that an AI receives a goal, derives the application
+needed to accomplish it, and assembles that application from deterministic constructs.
 
 Names and boundaries may change as the work evolves. The durable problem is how to
 let probabilistic intelligence interact with deterministic machinery without
@@ -163,6 +213,11 @@ a collection of unrelated timer callbacks, stop and reconsider the boundary.
 
 The current implementation is allowed to be temporary. The behavior and lessons
 learned from it are not disposable.
+
+### Keep manifestation portable
+
+Blazor is the current web manifestation. Unity/WebGL is another. Do not make a
+behavior permanently dependent on whichever host happened to demonstrate it first.
 
 ### Document changes in direction
 
