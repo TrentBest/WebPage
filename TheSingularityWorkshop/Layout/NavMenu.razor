@@ -115,7 +115,10 @@
     .workshop-brand span:nth-child(5) { animation-delay: -0.68s; }
     .workshop-brand span:nth-child(6) { animation-delay: -0.85s; }
 
-    @keyframes workshopBrandBreath {
+    /* Razor treats a single @ as C# syntax inside .razor markup.
+       CSS therefore requires @@keyframes here so the emitted stylesheet
+       contains the normal CSS @keyframes rule. */
+    @@keyframes workshopBrandBreath {
         0%, 100% { filter: brightness(.82); text-shadow: 0 0 4px currentColor; transform: translateY(0); }
         50% { filter: brightness(1.35); text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; transform: translateY(-1px); }
     }
