@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Navigation
+@using TheSingularityWorkshop.Components
 
 <div class="page">
     <div class="sidebar">
@@ -16,6 +17,11 @@
         </article>
     </main>
 </div>
+
+@if (IsWorkshopLanding)
+{
+    <PongField />
+}
 
 @code {
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
