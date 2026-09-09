@@ -87,7 +87,7 @@
     .card-title-vr { color: #dc3545 !important; }
     .gateway-btn { background: rgba(10, 10, 15, 0.9); border: 1px solid #444; color: white; padding: 20px 40px; width: 300px; text-align: left; border-radius: 8px; transition: all 0.3s; }
     .active-path { border-left: 5px solid #00ffcc; }
-    .active-path:hover { background: rgba(0, 255, 204, 0.1); border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); transform: translateX(5px); }
+    .active-path:hover { background: rgba(0, 255, 204, 0.1); border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); transform: translateX(5px); color: white; }
     .locked-path { border-left: 5px solid #ff3366; opacity: 0.6; cursor: not-allowed; }
 }
 
@@ -199,6 +199,29 @@
 .warning-body { color: #f4eee8 !important; }
 .warning-body strong { color: #fff !important; text-shadow: 0 0 7px rgba(255,255,255,.4); }
 .warning-final { color: #ffb15c !important; }
+
+/* Keep the living GUI distributed as a centered field instead of allowing
+   independently generated pixel positions to bunch up or drift off-center. */
+.chaos-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: clamp(.75rem, 1.5vw, 1.5rem) !important;
+    padding: 8vh 8vw !important;
+    box-sizing: border-box !important;
+}
+
+.chaos-container .chaos-node {
+    position: relative !important;
+    inset: auto !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+}
 
 @keyframes heroTrace {
     0% { opacity: .15; transform: rotate(0deg); }
