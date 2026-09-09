@@ -29,6 +29,7 @@ internal class Program
         builder.Services.AddScoped<FSMManagerService>();
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<BlazorFSMIntegration>();
+        builder.Services.AddScoped<WorkshopExperienceService>();
 
         await builder.Build().RunAsync();
     }
