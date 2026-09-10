@@ -97,21 +97,22 @@
         FSM.StateChanged += HandleFSMStateChanged;
         RandomizePositions();
 
-        // The visual has completed its materialization; the FSM decides the next state.
         await Task.Delay(2900);
         FSM.SignalLivingGuiPopulated();
 
-        // Moniker is deliberately a distinct FSM state BEFORE gravity.
         await Task.Delay(1000);
         FSM.SignalMonikerReady();
 
-        // Gravity is a separate state and therefore cannot reveal the moniker early.
         await Task.Delay(650);
         FSM.SignalGravityReleased();
 
-        // Match the 1.7s fall animation before telling the FSM that the field is gone.
         await Task.Delay(1750);
         FSM.SignalLivingGuiFallen();
+
+        // The Workshop chrome is deliberately gated by the FSM for three seconds
+        // after the final Living GUI element has fallen away.
+        await Task.Delay(3000);
+        FSM.SignalNavigationReady();
     }
 
     private void HandleFSMStateChanged(string _) => InvokeAsync(StateHasChanged);
