@@ -239,7 +239,7 @@
         FSM.StateChanged += HandleFSMStateChanged;
     }
 
-    private void HandleFSMStateChanged(string _)
+    private void HandleFSMStateChanged(string stateName)
     {
         _ = InvokeAsync(StateHasChanged);
     }
