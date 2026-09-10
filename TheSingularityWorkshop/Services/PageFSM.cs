@@ -54,7 +54,11 @@ namespace TheSingularityWorkshop.Services
                 .State(Initializing, Enter(behavior?.OnInitialization), Tick, null)
                 .State(Gateway, Enter(behavior?.OnGateway), Tick, null)
                 .State(GatewayExit, Enter(behavior?.OnGatewayExit), Tick, null)
-                .State(LivingGuiIgnition, Enter(behavior?.OnLivingGuiIgnition), Tick, null)
+                .State(LivingGuiIgnition, Enter(c =>
+                {
+                    c.BeginLivingGui();
+                    behavior?.OnLivingGuiIgnition?.Invoke(c);
+                }), Tick, null)
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
                 .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
                 .State(Gravity, Enter(behavior?.OnGravity), Tick, null)
@@ -68,10 +72,8 @@ namespace TheSingularityWorkshop.Services
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiPopulating, MonikerReveal, c => ((PageStateContext)c).LivingGuiPopulated)
-                .Transition(MonikerReveal, Gravity, c => ((PageStateContext)c).MonikerReady)
-                .Transition(Gravity, LivingGuiDissipating, c => ((PageStateContext)c).GravityReleased)
-                .Transition(LivingGuiDissipating, NavigationArrival, c => ((PageStateContext)c).NavigationReady)
-                .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
+                // MonikerReveal is intentionally terminal for this landing sequence.
+                // The moniker must remain visible until navigation leaves the page.
                 .BuildDefinition();
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
@@ -92,6 +94,10 @@ namespace TheSingularityWorkshop.Services
             var context = (PageStateContext)stateContext;
             context.TotalTicks++;
             context.StateTicks++;
+
+            if (CurrentState == LivingGuiPopulating)
+                context.AdvanceLivingGui();
+
             StateChanged?.Invoke(CurrentState);
         }
 
