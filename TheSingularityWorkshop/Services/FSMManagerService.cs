@@ -35,6 +35,8 @@ namespace TheSingularityWorkshop.Services
 
         public void SignalLivingGuiFallen() => Page.SignalLivingGuiFallen();
 
+        public void SignalNavigationReady() => Page.SignalNavigationReady();
+
         public void Step() => Page.Update();
 
         public void Shutdown() => Page.Shutdown();
