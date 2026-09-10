@@ -5,7 +5,7 @@
 <PageTitle>FSM Demo</PageTitle>
 
 <h1>FSM Service Integration</h1>
-<p>This demonstrates injecting the FSMManagerService, which holds the FSM's running instance and context.</p>
+<p>This demonstrates injecting the FSMManagerService and driving the real PageFSM through its context signals.</p>
 
 <div class="card">
     <div class="card-body">
@@ -14,11 +14,23 @@
             <dt>Current FSM State:</dt>
             <dd><strong>@FSMService.CurrentState</strong></dd>
 
-            <dt>Context Message:</dt>
-            <dd>@FSMService.Context.Message</dd>
+            <dt>Enter Requested:</dt>
+            <dd>@FSMService.Context.EnterRequested</dd>
 
-            <dt>Context Counter:</dt>
-            <dd>@FSMService.Context.ClickCount</dd>
+            <dt>Living GUI Populated:</dt>
+            <dd>@FSMService.Context.LivingGuiPopulated</dd>
+
+            <dt>Moniker Ready:</dt>
+            <dd>@FSMService.Context.MonikerReady</dd>
+
+            <dt>Gravity Released:</dt>
+            <dd>@FSMService.Context.GravityReleased</dd>
+
+            <dt>Navigation Ready:</dt>
+            <dd>@FSMService.Context.NavigationReady</dd>
+
+            <dt>Total Ticks:</dt>
+            <dd>@FSMService.Context.TotalTicks</dd>
         </dl>
     </div>
 </div>
@@ -27,24 +39,30 @@
     Step FSM (Update Loop)
 </button>
 
-<button class="btn btn-secondary mt-3" @onclick="ForceFSMChange">
-    Force Transition to "Manual"
+<button class="btn btn-secondary mt-3" @onclick="RequestEnter">
+    Request Enter
+</button>
+
+<button class="btn btn-outline-danger mt-3" @onclick="Shutdown">
+    Shutdown
 </button>
 
 @code {
     private void StepFSM()
     {
-        // 1. Call the FSM's Step method, which executes the current state's OnUpdate.
         FSMService.Step();
-
-        // 2. Notify Blazor to re-render the component with the updated context/state values.
         StateHasChanged();
     }
 
-    private void ForceFSMChange()
+    private void RequestEnter()
     {
-        // Manually force a transition, bypassing normal transition rules.
-        FSMService.ForceTransition("Manual");
+        FSMService.RequestEnter();
+        StateHasChanged();
+    }
+
+    private void Shutdown()
+    {
+        FSMService.Shutdown();
         StateHasChanged();
     }
 }
