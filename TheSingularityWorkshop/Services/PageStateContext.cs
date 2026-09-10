@@ -112,8 +112,8 @@ namespace TheSingularityWorkshop.Services
 
             foreach (var node in _livingNodes)
             {
-                var quadrant = (node.X >= 50 ? 1 : 0) + (node.Y >= 50 ? 2 : 0);
-                counts[quadrant]++;
+                var nodeQuadrant = (node.X >= 50 ? 1 : 0) + (node.Y >= 50 ? 2 : 0);
+                counts[nodeQuadrant]++;
             }
 
             var least = counts[0];
@@ -127,12 +127,12 @@ namespace TheSingularityWorkshop.Services
                     candidates.Add(i);
             }
 
-            var quadrant = candidates[_random.Next(candidates.Count)];
+            var selectedQuadrant = candidates[_random.Next(candidates.Count)];
 
-            var xMin = quadrant is 0 or 2 ? MinX : 50;
-            var xMax = quadrant is 0 or 2 ? 50 : MaxX;
-            var yMin = quadrant is 0 or 1 ? MinY : 50;
-            var yMax = quadrant is 0 or 1 ? 50 : MaxY;
+            var xMin = selectedQuadrant is 0 or 2 ? MinX : 50;
+            var xMax = selectedQuadrant is 0 or 2 ? 50 : MaxX;
+            var yMin = selectedQuadrant is 0 or 1 ? MinY : 50;
+            var yMax = selectedQuadrant is 0 or 1 ? 50 : MaxY;
 
             return (
                 xMin + _random.NextDouble() * (xMax - xMin),
