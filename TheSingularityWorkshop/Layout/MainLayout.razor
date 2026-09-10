@@ -1,16 +1,24 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Navigation
+@inject TheSingularityWorkshop.Services.FSMManagerService FSM
 @using TheSingularityWorkshop.Components
+@implements IDisposable
 
-<div class="page @(IsLivingGui ? "living-gui-sequence" : "")">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "")">
+    @if (!IsWorkshopLanding || ShowWorkshopChrome)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
 
     <main>
-        <div class="top-row px-4 workshop-tab-header">
-            <span class="workshop-tab-title">@CurrentTabTitle</span>
-        </div>
+        @if (!IsWorkshopLanding || ShowWorkshopChrome)
+        {
+            <div class="top-row px-4 workshop-tab-header">
+                <span class="workshop-tab-title">@CurrentTabTitle</span>
+            </div>
+        }
 
         <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")"
                  @onclick="HandleLandingClick">
@@ -44,13 +52,17 @@
         .workshop-content {
             position: relative !important;
             width: 100% !important;
-            height: calc(100vh - 4rem) !important;
+            height: 100% !important;
             min-height: 0 !important;
             max-width: none !important;
             margin: 0 !important;
             padding: 0 !important;
             overflow: hidden !important;
             z-index: 9000;
+        }
+
+        .workshop-page.workshop-chrome-visible .workshop-content {
+            height: calc(100vh - 4rem) !important;
         }
 
         .workshop-content .hypervisor-shell,
@@ -70,9 +82,7 @@
 
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
 
-    private bool IsLivingGui => Navigation.ToBaseRelativePath(Navigation.Uri)
-        .Trim('/')
-        .Equals("living-gui", StringComparison.OrdinalIgnoreCase);
+    private bool ShowWorkshopChrome => !IsWorkshopLanding || FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running;
 
     private string CurrentTabTitle
     {
@@ -95,6 +105,13 @@
         }
     }
 
+    protected override void OnInitialized()
+    {
+        FSM.StateChanged += HandleFSMStateChanged;
+    }
+
+    private void HandleFSMStateChanged(string _) => InvokeAsync(StateHasChanged);
+
     private void HandleLandingClick()
     {
         StopPong();
@@ -107,5 +124,10 @@
         _pongActive = false;
         _pongField?.StopFromLandingInteraction();
         StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        FSM.StateChanged -= HandleFSMStateChanged;
     }
 }
