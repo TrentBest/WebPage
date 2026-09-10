@@ -3,27 +3,141 @@
 <PageTitle>About — The Singularity Workshop</PageTitle>
 
 <div class="about-page">
-    <h1>The Singularity Workshop</h1>
-    <p>Software is being forged here.</p>
-    <p>The destination is comparatively stable. The road is deliberately experimental.</p>
+    <section class="about-hero">
+        <div class="about-kicker">THE SINGULARITY WORKSHOP // ABOUT</div>
+        <h1>Software is being forged here.</h1>
+        <p class="about-lead">
+            The Singularity Workshop is an independent software laboratory built around a simple
+            idea: complicated systems should become more understandable as they become more capable.
+        </p>
+        <p class="about-lead muted">
+            The destination is comparatively stable. The road is deliberately experimental.
+        </p>
+    </section>
+
+    <section class="about-grid">
+        <article class="about-panel person-panel">
+            <div class="panel-kicker">PEOPLE // 001</div>
+            <div class="person-name">Trent Best</div>
+            <div class="person-role">FOUNDER · ARCHITECT · BUILDER</div>
+            <p>
+                One person currently occupies the Workshop. That is not a disclaimer. It is the
+                reason this place is interesting: the architecture, experiments, failures, tools,
+                documentation, and software are being built in the same laboratory.
+            </p>
+            <p>
+                The work crosses software architecture, automation, fabrication, BIM/AEC workflows,
+                deterministic state systems, AI interfaces, and the problem of making complex
+                technology inspectable by other people.
+            </p>
+            <div class="person-links">
+                <a href="/about#resume">RESUME</a>
+                <a href="/library">LIBRARY</a>
+            </div>
+        </article>
+
+        <article class="about-panel system-panel">
+            <div class="panel-kicker">WORKSHOP // CURRENT SYSTEM</div>
+            <div class="system-stack">
+                <span>FSM_API</span><b>→</b><span>CONTEXT</span><b>→</b><span>HUB</span><b>→</b><span>EXPERIENCE</span>
+            </div>
+            <p>
+                The Workshop is not one application. It is a growing collection of reusable
+                machinery for constructing applications, experiences, tools, and knowledge.
+            </p>
+            <div class="system-status"><i></i> ACTIVE DEVELOPMENT</div>
+        </article>
+    </section>
+
+    <section class="about-panel philosophy-panel">
+        <div class="panel-kicker">PHILOSOPHY // OWNERSHIP OF COMPLEXITY</div>
+        <div class="philosophy-grid">
+            <div>
+                <h2>AI chooses.</h2>
+                <p>Machines execute. The boundary matters.</p>
+            </div>
+            <div>
+                <h2>Context selects.</h2>
+                <p>Relevant capabilities and representations should be addressable rather than guessed.</p>
+            </div>
+            <div>
+                <h2>Actors own behavior.</h2>
+                <p>Behavior has a home. Execution has an owner. State changes are deliberate.</p>
+            </div>
+            <div>
+                <h2>Knowledge stays alive.</h2>
+                <p>The Library is intended to become a living corpus instead of a graveyard of old posts.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="resume" class="about-panel resume-panel">
+        <div>
+            <div class="panel-kicker">PERSON // TRENT BEST // RESUME</div>
+            <h2>The human behind the machinery.</h2>
+            <p>
+                The resume belongs here as the authoritative career record. The Workshop around it
+                is the evidence: software, experiments, architecture, and the systems being built.
+            </p>
+        </div>
+        <div class="resume-slot">
+            <div class="resume-icon">PDF</div>
+            <div>
+                <strong>TRENTBEST_RESUME.pdf</strong>
+                <small>ARTIFACT SLOT READY</small>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-panel invitation-panel">
+        <div class="panel-kicker">NEXT ENTRY POINT</div>
+        <h2>Don't take the description. Enter the machinery.</h2>
+        <p>
+            The Library contains the ideas. The demonstrations expose the technology. The living GUI
+            is where the boundary between webpage and software starts to disappear.
+        </p>
+        <div class="entry-links">
+            <a href="/library">OPEN THE LIBRARY ↗</a>
+            <a href="/demos">ENTER THE DEMOS ↗</a>
+            <a href="/ai">MEET THE AI ↗</a>
+        </div>
+    </section>
 </div>
 
 <style>
-    .about-page {
-        min-height: 100%;
-        padding: clamp(2rem, 6vw, 6rem);
-        color: #dcefff;
-        background: #020711;
-        font-family: Consolas, 'Courier New', monospace;
-    }
-
-    .about-page h1 {
-        color: #00eaff;
-        text-shadow: 0 0 14px rgba(0, 234, 255, .45);
-    }
-
-    .about-page p {
-        max-width: 60rem;
-        color: rgba(220, 239, 255, .82);
-    }
+    .about-page { min-height: 100vh; padding: clamp(2rem, 5vw, 5rem); color: #e8f7ff; background: radial-gradient(circle at 80% 10%, rgba(255,44,255,.12), transparent 28rem), radial-gradient(circle at 15% 50%, rgba(0,234,255,.08), transparent 30rem), #020711; font-family: Consolas, 'Courier New', monospace; }
+    .about-hero, .about-grid, .about-panel { max-width: 75rem; margin-left: auto; margin-right: auto; }
+    .about-hero { margin-bottom: 3rem; }
+    .about-kicker, .panel-kicker { color: #ff2cff; font-size: .72rem; font-weight: 800; letter-spacing: .16em; }
+    .about-hero h1 { max-width: 65rem; margin: .6rem 0 1rem; color: #00eaff; font-size: clamp(2.8rem, 7vw, 6.5rem); line-height: .92; text-shadow: 0 0 18px rgba(0,234,255,.38); }
+    .about-lead { max-width: 58rem; color: rgba(232,247,255,.82); font-size: clamp(1.05rem, 1.8vw, 1.35rem); line-height: 1.55; }
+    .about-lead.muted { color: rgba(232,247,255,.5); }
+    .about-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(18rem, .7fr); gap: 1rem; }
+    .about-panel { margin-top: 1rem; padding: clamp(1.4rem, 3vw, 2.5rem); border: 1px solid rgba(0,234,255,.18); background: linear-gradient(145deg, rgba(8,18,35,.94), rgba(4,8,20,.94)); box-shadow: inset 0 0 0 1px rgba(255,44,255,.025); }
+    .about-grid .about-panel { margin-top: 0; max-width: none; }
+    .person-name { margin-top: .6rem; color: #fff; font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 900; }
+    .person-role { color: #ffd34d; font-size: .72rem; letter-spacing: .12em; font-weight: 800; }
+    .about-panel p { max-width: 55rem; color: rgba(232,247,255,.68); line-height: 1.6; font-family: system-ui, sans-serif; }
+    .person-links, .entry-links { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1.5rem; }
+    .person-links a, .entry-links a { padding: .65rem .8rem; color: #00eaff; border: 1px solid rgba(0,234,255,.3); text-decoration: none; font-size: .68rem; font-weight: 800; letter-spacing: .08em; }
+    .person-links a:hover, .entry-links a:hover { color: #020711; background: #00eaff; }
+    .system-stack { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: 1.3rem 0; font-size: .68rem; }
+    .system-stack span { padding: .55rem .5rem; border: 1px solid rgba(0,234,255,.2); color: #00eaff; }
+    .system-stack b { color: #ff2cff; }
+    .system-status { margin-top: 1.5rem; color: #52e05a; font-size: .68rem; letter-spacing: .1em; }
+    .system-status i { display: inline-block; width: .5rem; height: .5rem; margin-right: .4rem; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; animation: aboutPulse 1.8s ease-in-out infinite; }
+    .philosophy-panel { border-color: rgba(255,44,255,.2); }
+    .philosophy-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .philosophy-grid h2 { color: #fff; font-size: 1.15rem; }
+    .philosophy-grid p { font-size: .9rem; }
+    .resume-panel { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2rem; }
+    .resume-panel h2, .invitation-panel h2 { margin: .5rem 0; color: #fff; font-size: clamp(1.5rem, 3vw, 2.4rem); }
+    .resume-slot { display: flex; align-items: center; gap: .8rem; min-width: 18rem; padding: 1rem; border: 1px dashed rgba(255,211,77,.35); background: rgba(255,211,77,.035); }
+    .resume-icon { display: grid; place-items: center; width: 3rem; height: 3.4rem; color: #020711; background: #ffd34d; font-size: .65rem; font-weight: 900; }
+    .resume-slot strong, .resume-slot small { display: block; }
+    .resume-slot strong { color: #ffd34d; font-size: .72rem; }
+    .resume-slot small { margin-top: .3rem; color: rgba(232,247,255,.48); font-size: .6rem; letter-spacing: .08em; }
+    .invitation-panel { border-color: rgba(0,234,255,.25); }
+    @@keyframes aboutPulse { 0%,100% { opacity:.45; transform:scale(.75); } 50% { opacity:1; transform:scale(1.2); } }
+    @media (max-width: 800px) { .about-grid, .philosophy-grid, .resume-panel { grid-template-columns: 1fr; } .resume-slot { min-width: 0; } }
 </style>
