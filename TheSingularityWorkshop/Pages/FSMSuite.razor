@@ -1,0 +1,114 @@
+﻿@page "/fsm-suite"
+@using TheSingularityWorkshop.Services
+@inject FSMManagerService FSM
+@implements IDisposable
+
+<PageTitle>FSM Suite — The Singularity Workshop</PageTitle>
+
+<div class="fsm-suite-shell">
+    <header class="suite-header">
+        <div>
+            <span class="eyebrow">FSM_API / LIVE OBSERVABILITY</span>
+            <h1>FSM SUITE</h1>
+            <p>Real state, real transitions, real processing groups. No mock diagram.</p>
+        </div>
+        <div class="live-indicator"><span></span> LIVE</div>
+    </header>
+
+    <section class="suite-grid">
+        <article class="state-card">
+            <div class="card-label">PAGE FSM / CURRENT STATE</div>
+            <div class="current-state">@FSM.CurrentState</div>
+            <div class="state-meta">
+                <span>GROUP <strong>@PageFSM.ProcessingGroup</strong></span>
+                <span>TICKS <strong>@FSM.Context.TotalTicks</strong></span>
+                <span>STATE TICKS <strong>@FSM.Context.StateTicks</strong></span>
+            </div>
+        </article>
+
+        <article class="context-card">
+            <div class="card-label">CONTEXT SIGNALS</div>
+            <div class="signal-grid">
+                <Signal Name="ENTER_REQUESTED" Active="@FSM.Context.EnterRequested" />
+                <Signal Name="GUI_POPULATED" Active="@FSM.Context.LivingGuiPopulated" />
+                <Signal Name="MONIKER_READY" Active="@FSM.Context.MonikerReady" />
+                <Signal Name="GRAVITY_RELEASED" Active="@FSM.Context.GravityReleased" />
+                <Signal Name="GUI_FALLEN" Active="@FSM.Context.LivingGuiFallen" />
+                <Signal Name="NAVIGATION_READY" Active="@FSM.Context.NavigationReady" />
+            </div>
+        </article>
+    </section>
+
+    <section class="sequence-card">
+        <div class="card-label">PAGE LIFECYCLE</div>
+        <div class="sequence-track">
+            @foreach (var state in States)
+            {
+                <div class="sequence-node @(state == FSM.CurrentState ? "active" : "") @(Reached(state) ? "reached" : "")">
+                    <span class="node-dot"></span>
+                    <span class="node-name">@state</span>
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="architecture-card">
+        <div class="card-label">FSM ARCHITECTURE</div>
+        <div class="architecture-lines">
+            <div><span>HOST</span><b>Blazor presentation</b></div>
+            <div><span>ENGINE</span><b>FSM_API</b></div>
+            <div><span>PROCESS GROUP</span><b>PageFSM</b></div>
+            <div><span>CONTEXT</span><b>PageStateContext</b></div>
+            <div><span>BEHAVIOR</span><b>Host-supplied delegates</b></div>
+            <div><span>HUB</span><b>@(FSM.Context.SingularityHub is null ? "READY FOR HOST REFERENCE" : "CONNECTED")</b></div>
+        </div>
+    </section>
+</div>
+
+<style>
+.fsm-suite-shell{min-height:100%;padding:2.5rem;box-sizing:border-box;background:radial-gradient(circle at 50% 0%,rgba(0,234,255,.07),transparent 38%),#050a14;color:#eaf7ff;font-family:Consolas,"Courier New",monospace}
+.suite-header{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;margin-bottom:2rem}.eyebrow,.card-label{color:#00eaff;font-size:.65rem;letter-spacing:.18em;font-weight:800}.suite-header h1{margin:.35rem 0;font-size:clamp(2rem,5vw,4.2rem);letter-spacing:.12em;color:#fff;text-shadow:0 0 18px rgba(0,234,255,.45)}.suite-header p{margin:0;color:#8298a5}.live-indicator{border:1px solid #52e05a;padding:.55rem .8rem;color:#52e05a;letter-spacing:.14em;font-size:.7rem}.live-indicator span{display:inline-block;width:7px;height:7px;border-radius:50%;background:#52e05a;box-shadow:0 0 10px #52e05a;margin-right:.5rem;animation:livePulse 1.4s ease-in-out infinite}
+.suite-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:1rem}.state-card,.context-card,.sequence-card,.architecture-card{border:1px solid rgba(0,234,255,.2);background:rgba(2,7,17,.8);box-shadow:inset 0 0 30px rgba(0,234,255,.025),0 18px 45px rgba(0,0,0,.2);padding:1.35rem}.current-state{margin:1rem 0;font-size:clamp(1.4rem,3vw,2.7rem);font-weight:800;color:#ff2cff;text-shadow:0 0 16px rgba(255,44,255,.45)}.state-meta{display:flex;flex-wrap:wrap;gap:1.2rem;color:#718895;font-size:.62rem;letter-spacing:.1em}.state-meta strong{color:#dcefff;margin-left:.3rem}.signal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-top:1rem}.signal{display:flex;justify-content:space-between;gap:.7rem;border:1px solid rgba(255,255,255,.08);padding:.55rem .65rem;font-size:.56rem;letter-spacing:.08em;color:#718895}.signal.active{border-color:rgba(82,224,90,.5);color:#52e05a;box-shadow:inset 0 0 14px rgba(82,224,90,.04)}.signal-dot{width:6px;height:6px;border-radius:50%;background:#29343a}.signal.active .signal-dot{background:#52e05a;box-shadow:0 0 8px #52e05a}
+.sequence-card,.architecture-card{margin-top:1rem}.sequence-track{display:flex;align-items:flex-start;gap:0;margin-top:1.5rem;overflow-x:auto;padding-bottom:.7rem}.sequence-node{position:relative;min-width:118px;color:#4e626e;font-size:.52rem;letter-spacing:.07em}.sequence-node:not(:last-child)::after{content:"";position:absolute;top:5px;left:13px;width:calc(100% - 13px);height:1px;background:#1b2d36}.node-dot{position:relative;z-index:1;display:block;width:9px;height:9px;border:1px solid #34505d;border-radius:50%;background:#07101a;margin-bottom:.6rem}.sequence-node.reached .node-dot{background:#00a8ff;border-color:#00a8ff;box-shadow:0 0 8px #00a8ff}.sequence-node.active{color:#ff2cff}.sequence-node.active .node-dot{background:#ff2cff;border-color:#ff2cff;box-shadow:0 0 14px #ff2cff}.node-name{display:block;max-width:110px}.architecture-lines{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-top:1rem}.architecture-lines div{display:flex;flex-direction:column;border-left:2px solid rgba(0,234,255,.3);padding:.45rem .65rem;background:rgba(0,234,255,.02)}.architecture-lines span{font-size:.5rem;color:#617784;letter-spacing:.13em}.architecture-lines b{margin-top:.25rem;font-size:.68rem;color:#e6f7ff}
+@@keyframes livePulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.25)}}
+@@media(max-width:850px){.suite-grid,.architecture-lines{grid-template-columns:1fr}.fsm-suite-shell{padding:1.2rem}.suite-header{flex-direction:column}.signal-grid{grid-template-columns:1fr}}
+</style>
+
+@code {
+    private static readonly string[] States =
+    {
+        PageFSM.Initializing,
+        PageFSM.Gateway,
+        PageFSM.GatewayExit,
+        PageFSM.LivingGuiIgnition,
+        PageFSM.LivingGuiPopulating,
+        PageFSM.MonikerReveal,
+        PageFSM.Gravity,
+        PageFSM.LivingGuiDissipating,
+        PageFSM.NavigationArrival,
+        PageFSM.Running,
+        PageFSM.Shutdown
+    };
+
+    private void HandleStateChanged(string _) => InvokeAsync(StateHasChanged);
+
+    private bool Reached(string state)
+    {
+        var current = Array.IndexOf(States, FSM.CurrentState);
+        var target = Array.IndexOf(States, state);
+        return current >= 0 && target >= 0 && current > target;
+    }
+
+    protected override void OnInitialized()
+    {
+        FSM.StateChanged += HandleStateChanged;
+    }
+
+    public void Dispose() => FSM.StateChanged -= HandleStateChanged;
+
+    private sealed class Signal
+    {
+        public string Name { get; set; } = "";
+        public bool Active { get; set; }
+    }
+}
