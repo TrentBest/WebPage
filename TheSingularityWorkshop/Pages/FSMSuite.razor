@@ -40,7 +40,7 @@
 </style>
 
 @code {
-    private static readonly string[] States = { PageFSM.Initializing, PageFSM.Gateway, PageFSM.GatewayExit, PageFSM.LivingGuiIgnition, PageFSM.LivingGuiPopulating, PageFSM.MonikerReveal, PageFSM.Gravity, PageFSM.LivingGuiDissipating, PageFSM.NavigationArrival, PageFSM.Running, PageFSM.Shutdown };
+    private static readonly string[] States = { PageFSM.Initializing, PageFSM.Gateway, PageFSM.GatewayExit, PageFSM.LivingGuiIgnition, PageFSM.LivingGuiPopulating, PageFSM.MonikerReveal, PageFSM.Gravity, PageFSM.LivingGuiDissipating, PageFSM.NavigationArrival, PageFSM.Running, PageFSM.ShutdownState };
     private void HandleStateChanged(string _) => InvokeAsync(StateHasChanged);
     private bool Reached(string state){var current=Array.IndexOf(States,FSM.CurrentState);var target=Array.IndexOf(States,state);return current>=0&&target>=0&&current>target;}
     protected override void OnInitialized(){FSM.StateChanged+=HandleStateChanged;}
