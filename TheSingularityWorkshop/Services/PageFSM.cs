@@ -29,7 +29,6 @@ namespace TheSingularityWorkshop.Services
         public string CurrentState => _handle.CurrentState;
         public event Action<string>? StateChanged;
 
-        /// <summary>Behavior hooks supplied by the host instead of being hardwired into the FSM.</summary>
         public sealed class Behavior
         {
             public Action<PageStateContext>? OnInitialization { get; init; }
@@ -51,17 +50,17 @@ namespace TheSingularityWorkshop.Services
             FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
 
             FSM_API.Create.CreateFiniteStateMachine("PageFSM", -1, ProcessingGroup)
-                .State(Initializing, c => behavior?.OnInitialization?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(Gateway, c => behavior?.OnGateway?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(GatewayExit, c => behavior?.OnGatewayExit?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(LivingGuiIgnition, c => behavior?.OnLivingGuiIgnition?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(LivingGuiPopulating, c => behavior?.OnLivingGuiPopulating?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(MonikerReveal, c => behavior?.OnMonikerReveal?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(Gravity, c => behavior?.OnGravity?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(LivingGuiDissipating, c => behavior?.OnLivingGuiDissipating?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(NavigationArrival, c => behavior?.OnNavigationArrival?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(Running, c => behavior?.OnRunning?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
-                .State(Shutdown, c => behavior?.OnShutdown?.Invoke((PageStateContext)c), c => Tick((PageStateContext)c), null)
+                .State(Initializing, Enter(behavior?.OnInitialization), Tick, null)
+                .State(Gateway, Enter(behavior?.OnGateway), Tick, null)
+                .State(GatewayExit, Enter(behavior?.OnGatewayExit), Tick, null)
+                .State(LivingGuiIgnition, Enter(behavior?.OnLivingGuiIgnition), Tick, null)
+                .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
+                .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
+                .State(Gravity, Enter(behavior?.OnGravity), Tick, null)
+                .State(LivingGuiDissipating, Enter(behavior?.OnLivingGuiDissipating), Tick, null)
+                .State(NavigationArrival, Enter(behavior?.OnNavigationArrival), Tick, null)
+                .State(Running, Enter(behavior?.OnRunning), Tick, null)
+                .State(Shutdown, Enter(behavior?.OnShutdown), Tick, null)
                 .WithInitialState(Initializing)
                 .Transition(Initializing, Gateway, c => true)
                 .Transition(Gateway, GatewayExit, c => ((PageStateContext)c).EnterRequested)
@@ -70,15 +69,26 @@ namespace TheSingularityWorkshop.Services
                 .Transition(LivingGuiPopulating, MonikerReveal, c => ((PageStateContext)c).LivingGuiPopulated)
                 .Transition(MonikerReveal, Gravity, c => ((PageStateContext)c).MonikerReady)
                 .Transition(Gravity, LivingGuiDissipating, c => ((PageStateContext)c).GravityReleased)
-                .Transition(LivingGuiDissipating, NavigationArrival, c => ((PageStateContext)c).LivingGuiFallen)
+                .Transition(LivingGuiDissipating, NavigationArrival, c => ((PageStateContext)c).NavigationReady)
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
 
             _handle = FSM_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
         }
 
-        private void Tick(PageStateContext context)
+        private Action<IStateContext> Enter(Action<PageStateContext>? behavior)
         {
+            return c =>
+            {
+                var context = (PageStateContext)c;
+                context.ResetStateClock();
+                behavior?.Invoke(context);
+            };
+        }
+
+        private void Tick(IStateContext stateContext)
+        {
+            var context = (PageStateContext)stateContext;
             context.TotalTicks++;
             context.StateTicks++;
             StateChanged?.Invoke(CurrentState);
@@ -94,6 +104,7 @@ namespace TheSingularityWorkshop.Services
         public void SignalMonikerReady() => Context.MonikerReady = true;
         public void SignalGravityReleased() => Context.GravityReleased = true;
         public void SignalLivingGuiFallen() => Context.LivingGuiFallen = true;
+        public void SignalNavigationReady() => Context.NavigationReady = true;
 
         public void Shutdown()
         {
@@ -102,8 +113,7 @@ namespace TheSingularityWorkshop.Services
 
         public void Update()
         {
-            if (_disposed) return;
-            FSM_API.Interaction.Update(ProcessingGroup);
+            if (!_disposed) FSM_API.Interaction.Update(ProcessingGroup);
         }
 
         public void Dispose()
