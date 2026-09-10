@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using TheSingularityWorkshop.FSM_API;
+using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 
 namespace TheSingularityWorkshop.Services
 {
@@ -20,7 +21,7 @@ namespace TheSingularityWorkshop.Services
         public const string LivingGuiDissipating = "LIVING_GUI_DISSIPATING";
         public const string NavigationArrival = "NAVIGATION_ARRIVAL";
         public const string Running = "RUNNING";
-        public const string Shutdown = "SHUTDOWN";
+        public const string ShutdownState = "SHUTDOWN";
 
         private readonly FSMHandle _handle;
         private bool _disposed;
@@ -47,9 +48,9 @@ namespace TheSingularityWorkshop.Services
         public PageFSM(object? singularityHub = null, Behavior? behavior = null)
         {
             Context = new PageStateContext(singularityHub);
-            FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
+            fsm_API.Create.CreateProcessingGroup(ProcessingGroup);
 
-            FSM_API.Create.CreateFiniteStateMachine("PageFSM", -1, ProcessingGroup)
+            fsm_API.Create.CreateFiniteStateMachine("PageFSM", -1, ProcessingGroup)
                 .State(Initializing, Enter(behavior?.OnInitialization), Tick, null)
                 .State(Gateway, Enter(behavior?.OnGateway), Tick, null)
                 .State(GatewayExit, Enter(behavior?.OnGatewayExit), Tick, null)
@@ -60,7 +61,7 @@ namespace TheSingularityWorkshop.Services
                 .State(LivingGuiDissipating, Enter(behavior?.OnLivingGuiDissipating), Tick, null)
                 .State(NavigationArrival, Enter(behavior?.OnNavigationArrival), Tick, null)
                 .State(Running, Enter(behavior?.OnRunning), Tick, null)
-                .State(Shutdown, Enter(behavior?.OnShutdown), Tick, null)
+                .State(ShutdownState, Enter(behavior?.OnShutdown), Tick, null)
                 .WithInitialState(Initializing)
                 .Transition(Initializing, Gateway, c => true)
                 .Transition(Gateway, GatewayExit, c => ((PageStateContext)c).EnterRequested)
@@ -73,7 +74,7 @@ namespace TheSingularityWorkshop.Services
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
 
-            _handle = FSM_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
+            _handle = fsm_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
         }
 
         private Action<IStateContext> Enter(Action<PageStateContext>? behavior)
@@ -108,12 +109,12 @@ namespace TheSingularityWorkshop.Services
 
         public void Shutdown()
         {
-            if (!_disposed) _handle.TransitionTo(Shutdown);
+            if (!_disposed) _handle.TransitionTo(ShutdownState);
         }
 
         public void Update()
         {
-            if (!_disposed) FSM_API.Interaction.Update(ProcessingGroup);
+            if (!_disposed) fsm_API.Interaction.Update(ProcessingGroup);
         }
 
         public void Dispose()
