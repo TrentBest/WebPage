@@ -5,14 +5,14 @@
 
 <PageTitle>The Living GUI — The Singularity Workshop</PageTitle>
 
-<div class="living-sequence-shell @(MonikerVisible ? "critical-mass" : "")">
+<div class="living-sequence-shell @(MonikerVisible ? "critical-mass" : "") @(GravityActive ? "gravity-active" : "")">
     @* The identity exists from the beginning, but is physically behind the swarm and
-       remains invisible until the FSM reaches the 100-button critical mass state. *@
+       remains invisible until the FSM transitions into MONIKER_REVEAL. *@
     <div class="moniker-layer @(MonikerVisible ? "moniker-visible" : "")" aria-hidden="true">
         <div class="moniker-title">
             <div><span class="blue">T</span><span class="magenta">h</span><span class="orange">e</span></div>
             <div><span class="red">S</span><span class="yellow">i</span><span class="green">n</span><span class="blue">g</span><span class="magenta">u</span><span class="orange">l</span><span class="red">a</span><span class="yellow">r</span><span class="green">i</span><span class="blue">t</span><span class="magenta">y</span></div>
-            <div><span class="orange">W</span><span class="red">o</span><span class="yellow">r</span><span class="green">k</span><span class="blue">s</span><span class="magenta">h</span><span class="orange">o</span><span class="red">p</span></div>
+            <div><span class="orange">W</span><span class="red">o</span><span class="yellow">r</span><span class="green">k</span><span class="blue">s</span><span class="magenta">h</span><span class="orange">o</span><span class="red">o</span><span class="orange">p</span></div>
         </div>
     </div>
 
@@ -23,7 +23,7 @@
 
         @foreach (var node in FSM.Context.LivingNodes)
         {
-            <button class="architecture-node"
+            <button class="architecture-node @(GravityActive ? "gravity-node" : "")"
                     style="left:@node.X%;top:@node.Y%;width:@node.Size}px;height:@node.Size}px;"
                     @onclick="() => SelectNode(node.Lineage)"
                     aria-label="GUI @node.Lineage, generation @node.Generation">
@@ -151,6 +151,11 @@
         box-shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 0 18px rgba(255,48,48,.045);
     }
 
+    .gravity-node {
+        animation: gravityFall .7s cubic-bezier(.55,.04,.98,.34) forwards;
+        pointer-events: none;
+    }
+
     .architecture-node:hover,
     .architecture-node:focus-visible {
         border-color: #52e05a;
@@ -197,6 +202,11 @@
         text-shadow: 0 0 10px rgba(255,211,77,.5);
     }
 
+    @@keyframes gravityFall {
+        0% { transform: translate(-50%,-50%) rotate(0deg); opacity: 1; }
+        100% { transform: translate(-50%,calc(120vh - 50%)) rotate(18deg); opacity: .04; }
+    }
+
     @@keyframes kelpSway {
         0%,100% { transform: rotate(-1.2deg) skewX(-.6deg); }
         25% { transform: rotate(1deg) skewX(.9deg) translateY(-3px); }
@@ -232,6 +242,7 @@
 
 @code {
     private bool MonikerVisible => FSM.CurrentState == PageFSM.MonikerReveal;
+    private bool GravityActive => FSM.CurrentState == PageFSM.Gravity || MonikerVisible;
     private string? selectedNode;
 
     protected override void OnInitialized()
