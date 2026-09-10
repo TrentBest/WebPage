@@ -23,11 +23,8 @@ public class BlazorFSMIntegration : IDisposable
 
     public BlazorFSMIntegration()
     {
-        foreach (var group in UpdateGroups)
-        {
-            _FSM_API.Create.CreateProcessingGroup(group);
-        }
-
+        // PageFSM owns creation of its own processing group.
+        _FSM_API.Create.CreateProcessingGroup("Update");
         StartLoop();
     }
 
@@ -38,10 +35,7 @@ public class BlazorFSMIntegration : IDisposable
         _loopTask = RunGameLoopAsync(_cts.Token);
     }
 
-    public void StopLoop()
-    {
-        _cts?.Cancel();
-    }
+    public void StopLoop() => _cts?.Cancel();
 
     private async Task RunGameLoopAsync(CancellationToken token)
     {
@@ -52,9 +46,7 @@ public class BlazorFSMIntegration : IDisposable
             while (await _gameLoopTimer.WaitForNextTickAsync(token))
             {
                 foreach (var group in UpdateGroups)
-                {
                     _FSM_API.Interaction.Update(group);
-                }
 
                 OnStateChanged?.Invoke();
             }
