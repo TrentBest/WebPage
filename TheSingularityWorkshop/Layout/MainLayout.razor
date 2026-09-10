@@ -2,7 +2,7 @@
 @inject NavigationManager Navigation
 @using TheSingularityWorkshop.Components
 
-<div class="page">
+<div class="page @(IsLivingGui ? "living-gui-sequence" : "")">
     <div class="sidebar">
         <NavMenu />
     </div>
@@ -56,11 +56,6 @@
             min-height: 100vh !important;
         }
 
-        /*
-           The landing is no longer a routing kiosk.
-           The navigation owns movement through the Workshop.
-           The gateway remains as a living title/status surface.
-        */
         .workshop-content .gateway-interface .d-flex {
             display: none !important;
         }
@@ -87,6 +82,10 @@
 
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
 
+    private bool IsLivingGui => Navigation.ToBaseRelativePath(Navigation.Uri)
+        .Trim('/')
+        .Equals("living-gui", StringComparison.OrdinalIgnoreCase);
+
     private string CurrentTabTitle
     {
         get
@@ -100,6 +99,7 @@
                 "ai" => "AI",
                 "library" => "LIBRARY",
                 "about" => "ABOUT",
+                "living-gui" => "THE LIVING GUI",
                 "privacypolicy" => "PRIVACY POLICY",
                 "naming-poll" => "VOTE ON NAME",
                 _ => path.Replace('-', ' ').ToUpperInvariant()
