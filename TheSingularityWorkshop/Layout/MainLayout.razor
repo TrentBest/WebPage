@@ -48,7 +48,8 @@
             z-index: 9000;
         }
 
-        .workshop-content .hypervisor-shell {
+        .workshop-content .hypervisor-shell,
+        .workshop-content .living-sequence-shell {
             position: fixed !important;
             inset: 0 !important;
             width: 100vw !important;
@@ -82,9 +83,15 @@
 
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
 
-    private bool IsLivingGui => Navigation.ToBaseRelativePath(Navigation.Uri)
-        .Trim('/')
-        .Equals("living-gui", StringComparison.OrdinalIgnoreCase);
+    private bool IsLivingGui
+    {
+        get
+        {
+            var path = Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
+            return string.IsNullOrWhiteSpace(path)
+                || path.Equals("living-gui", StringComparison.OrdinalIgnoreCase);
+        }
+    }
 
     private string CurrentTabTitle
     {
