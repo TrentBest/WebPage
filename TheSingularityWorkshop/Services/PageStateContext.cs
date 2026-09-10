@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TheSingularityWorkshop.FSM_API;
 
@@ -26,7 +26,7 @@ namespace TheSingularityWorkshop.Services
         public object? SingularityHub { get; }
 
         public bool EnterRequested { get; set; }
-        public bool LivingGuiPopulated { get; private set; }
+        public bool LivingGuiPopulated { get; internal set; }
         public bool MonikerReady { get; set; }
         public bool GravityReleased { get; set; }
         public bool LivingGuiFallen { get; set; }
