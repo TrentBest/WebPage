@@ -51,14 +51,15 @@
 </div>
 
 <style>
-    .living-sequence-shell { position:fixed; inset:0; z-index:10000; overflow:hidden; isolation:isolate; background:#020407; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; opacity:1; transition:opacity 1.1s ease; }
-    .living-sequence-shell.sequence-complete { opacity:0; pointer-events:none; }
+    .living-sequence-shell { position:fixed; inset:0; z-index:10000; overflow:hidden; isolation:isolate; background:#020407; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; opacity:1; }
+    .living-sequence-shell.sequence-complete { background:transparent; opacity:1; pointer-events:none; }
     .living-canvas { position:absolute; inset:0; overflow:hidden; perspective:1200px; }
     .architecture-atmosphere { position:absolute; inset:-20%; background:radial-gradient(circle at 50% 50%,rgba(255,48,48,.09),transparent 24%),radial-gradient(circle at 18% 28%,rgba(255,211,77,.045),transparent 22%),radial-gradient(circle at 82% 72%,rgba(82,224,90,.035),transparent 24%),repeating-linear-gradient(118deg,transparent 0 120px,rgba(255,48,48,.035) 121px 132px,rgba(255,211,77,.028) 133px 145px,transparent 146px 260px); animation:atmosphereDrift 12s ease-in-out infinite; }
     .venom-field { position:absolute; inset:0; z-index:-1; background:repeating-linear-gradient(115deg,transparent 0 150px,rgba(255,48,48,.035) 151px 166px,rgba(255,211,77,.025) 167px 181px,transparent 182px 330px); mask-image:radial-gradient(circle at center,black 0,transparent 78%); opacity:.8; }
-    .moniker-layer { position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; pointer-events:none; opacity:0; transform:scale(.82); filter:blur(10px); transition:opacity .35s ease,transform 1s cubic-bezier(.16,1,.3,1),filter 1s ease; }
-    .density-reached .moniker-layer { opacity:.74; transform:scale(1); filter:blur(1.2px); }
-    .gravity-released .moniker-layer { opacity:.92; filter:blur(0); transform:scale(1.025); }
+    .moniker-layer { position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; pointer-events:none; opacity:0; transform:scale(.98); filter:blur(10px); }
+    .density-reached .moniker-layer { opacity:0; transform:scale(.98); filter:blur(10px); }
+    .gravity-released .moniker-layer { opacity:.94; transform:scale(1.025); filter:blur(0); transition:none; }
+    .sequence-complete .moniker-layer { opacity:.94; transform:scale(1.025); filter:blur(0); }
     .moniker-title { display:flex; flex-wrap:wrap; justify-content:center; max-width:94vw; font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.88; letter-spacing:.075em; text-transform:uppercase; text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%; }
     .moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }
     .moniker-title .space { width:.24em; }
@@ -110,6 +111,7 @@
         densityReached = true;
         await InvokeAsync(StateHasChanged);
 
+        // Density is the trigger. The moniker is not revealed before gravity.
         await Task.Delay(450);
         gravityReleased = true;
         await InvokeAsync(StateHasChanged);
