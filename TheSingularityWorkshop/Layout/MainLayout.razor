@@ -26,11 +26,6 @@
             }
         </article>
 
-        @if (IsWorkshopLanding)
-        {
-            <WorkshopExperienceFeed />
-        }
-
         @if (IsWorkshopLanding && _pongActive)
         {
             <PongField @ref="_pongField" />
@@ -60,6 +55,29 @@
             height: 100vh !important;
             min-height: 100vh !important;
         }
+
+        /*
+           The landing is no longer a routing kiosk.
+           The navigation owns movement through the Workshop.
+           The gateway remains as a living title/status surface.
+        */
+        .workshop-content .gateway-interface .d-flex {
+            display: none !important;
+        }
+
+        .workshop-content .gateway-interface .kernel-status {
+            margin-bottom: 0 !important;
+            transform: translateY(-3vh);
+        }
+
+        .workshop-content .gateway-interface .kernel-status p {
+            display: none !important;
+        }
+
+        .workshop-content .gateway-interface .kernel-pulse {
+            display: inline-block;
+            margin-bottom: .35rem;
+        }
     </style>
 }
 
@@ -80,6 +98,8 @@
                 "" => "THE WORKSHOP",
                 "demos" => "DEMOS",
                 "ai" => "AI",
+                "library" => "LIBRARY",
+                "about" => "ABOUT",
                 "privacypolicy" => "PRIVACY POLICY",
                 "naming-poll" => "VOTE ON NAME",
                 _ => path.Replace('-', ' ').ToUpperInvariant()
