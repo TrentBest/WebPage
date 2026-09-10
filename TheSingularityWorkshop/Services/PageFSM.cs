@@ -23,6 +23,8 @@ namespace TheSingularityWorkshop.Services
         public const string Running = "RUNNING";
         public const string ShutdownState = "SHUTDOWN";
 
+        private const long GravityRevealTicks = 20;
+
         private readonly FSMHandle _handle;
         private bool _disposed;
 
@@ -60,8 +62,8 @@ namespace TheSingularityWorkshop.Services
                     behavior?.OnLivingGuiIgnition?.Invoke(c);
                 }), Tick, null)
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
-                .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
                 .State(Gravity, Enter(behavior?.OnGravity), Tick, null)
+                .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
                 .State(LivingGuiDissipating, Enter(behavior?.OnLivingGuiDissipating), Tick, null)
                 .State(NavigationArrival, Enter(behavior?.OnNavigationArrival), Tick, null)
                 .State(Running, Enter(behavior?.OnRunning), Tick, null)
@@ -71,9 +73,13 @@ namespace TheSingularityWorkshop.Services
                 .Transition(Gateway, GatewayExit, c => ((PageStateContext)c).EnterRequested)
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
-                .Transition(LivingGuiPopulating, MonikerReveal, c => ((PageStateContext)c).LivingGuiPopulated)
+                // Critical mass is the trigger. Once the swarm freezes, gravity begins.
+                .Transition(LivingGuiPopulating, Gravity, c => ((PageStateContext)c).LivingGuiPopulated)
+                // Gravity gets a short, deterministic FSM-owned reveal window.
+                // Only after gravity has begun do we transition into the persistent moniker.
+                .Transition(Gravity, MonikerReveal, c => ((PageStateContext)c).StateTicks >= GravityRevealTicks)
                 // MonikerReveal is intentionally terminal for this landing sequence.
-                // The moniker must remain visible until navigation leaves the page.
+                // The moniker remains visible until navigation leaves the page.
                 .BuildDefinition();
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
