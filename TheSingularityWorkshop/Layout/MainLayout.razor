@@ -36,11 +36,16 @@
 @if (IsWorkshopLanding)
 {
     <style>
+        main {
+            position: relative;
+            min-width: 0;
+        }
+
         .workshop-content {
-            position: fixed !important;
-            inset: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
+            position: relative !important;
+            width: 100% !important;
+            height: calc(100vh - 4rem) !important;
+            min-height: 0 !important;
             max-width: none !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -50,29 +55,11 @@
 
         .workshop-content .hypervisor-shell,
         .workshop-content .living-sequence-shell {
-            position: fixed !important;
+            position: absolute !important;
             inset: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            min-height: 100vh !important;
-        }
-
-        .workshop-content .gateway-interface .d-flex {
-            display: none !important;
-        }
-
-        .workshop-content .gateway-interface .kernel-status {
-            margin-bottom: 0 !important;
-            transform: translateY(-3vh);
-        }
-
-        .workshop-content .gateway-interface .kernel-status p {
-            display: none !important;
-        }
-
-        .workshop-content .gateway-interface .kernel-pulse {
-            display: inline-block;
-            margin-bottom: .35rem;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 0 !important;
         }
     </style>
 }
@@ -83,15 +70,9 @@
 
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
 
-    private bool IsLivingGui
-    {
-        get
-        {
-            var path = Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
-            return string.IsNullOrWhiteSpace(path)
-                || path.Equals("living-gui", StringComparison.OrdinalIgnoreCase);
-        }
-    }
+    private bool IsLivingGui => Navigation.ToBaseRelativePath(Navigation.Uri)
+        .Trim('/')
+        .Equals("living-gui", StringComparison.OrdinalIgnoreCase);
 
     private string CurrentTabTitle
     {
