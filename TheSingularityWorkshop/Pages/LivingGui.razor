@@ -1,0 +1,584 @@
+@page "/living-gui"
+@using System.Threading
+
+<PageTitle>The Living GUI — The Singularity Workshop</PageTitle>
+
+<div class="living-gui-shell @(gravityEngaged ? "gravity-engaged" : "")">
+    <div class="moniker-layer" aria-hidden="true">
+        <div class="moniker-kicker">THE MACHINE HAS AN IDENTITY</div>
+        <div class="moniker-title">
+            <span class="m-blue">T</span><span class="m-magenta">H</span><span class="m-orange">E</span>
+            <span class="m-space"></span>
+            <span class="m-red">S</span><span class="m-yellow">I</span><span class="m-green">N</span><span class="m-blue">G</span><span class="m-magenta">U</span><span class="m-orange">L</span><span class="m-red">A</span><span class="m-yellow">R</span><span class="m-green">I</span><span class="m-blue">T</span><span class="m-magenta">Y</span>
+            <span class="m-space"></span>
+            <span class="m-orange">W</span><span class="m-red">O</span><span class="m-yellow">R</span><span class="m-green">K</span><span class="m-blue">S</span><span class="m-magenta">H</span><span class="m-orange">O</span><span class="m-red">P</span>
+        </div>
+        <div class="moniker-subtitle">THE SINGULARITY WORKSHOP</div>
+    </div>
+
+    <div class="venom-aura" aria-hidden="true"></div>
+    <div class="venom-grid" aria-hidden="true"></div>
+
+    <header class="living-header">
+        <div>
+            <span class="eyebrow">LIVING GUI // EXECUTABLE ARCHITECTURE</span>
+            <h1>THE INTERFACE IS THE EXPERIMENT.</h1>
+            <p>Nothing here is a screenshot. The machine is responding to you.</p>
+        </div>
+        <div class="kernel-readout">
+            <span class="readout-label">KERNEL</span>
+            <strong>@(gravityEngaged ? "GRAVITY / ACTIVE" : "SUSPENDED")</strong>
+            <span class="readout-pulse"></span>
+        </div>
+    </header>
+
+    <main class="living-stage">
+        <section class="architecture-field" aria-label="Living architecture demonstration">
+            <div class="field-ring ring-one"></div>
+            <div class="field-ring ring-two"></div>
+            <div class="field-ring ring-three"></div>
+
+            <div class="connection connection-a"></div>
+            <div class="connection connection-b"></div>
+            <div class="connection connection-c"></div>
+            <div class="connection connection-d"></div>
+
+            <button class="architecture-node node-bootstrap" @onclick="() => SelectNode("BOOTSTRAP")">
+                <span class="node-index">01</span>
+                <strong>BOOTSTRAP</strong>
+                <small>WAKE THE MACHINE</small>
+            </button>
+
+            <button class="architecture-node node-ontology" @onclick="() => SelectNode("ONTOLOGY")">
+                <span class="node-index">02</span>
+                <strong>ONTOLOGY</strong>
+                <small>NAME REALITY</small>
+            </button>
+
+            <button class="architecture-node node-warehouse" @onclick="() => SelectNode("WAREHOUSE")">
+                <span class="node-index">03</span>
+                <strong>WAREHOUSE</strong>
+                <small>HOLD STATE</small>
+            </button>
+
+            <button class="architecture-node node-context" @onclick="() => SelectNode("CONTEXT")">
+                <span class="node-index">04</span>
+                <strong>CONTEXT</strong>
+                <small>SELECT RELEVANCE</small>
+            </button>
+
+            <button class="architecture-node node-fsm" @onclick="() => SelectNode("FSM")">
+                <span class="node-index">05</span>
+                <strong>FSM_API</strong>
+                <small>EXECUTE</small>
+            </button>
+
+            <div class="core-node">
+                <span class="core-halo"></span>
+                <span class="core-caption">DETERMINISTIC CORE</span>
+                <strong>FSM</strong>
+                <span class="core-state">@(selectedNode ?? "AWAITING INPUT")</span>
+            </div>
+
+            <div class="architecture-caption">
+                <span>AI CHOOSES</span>
+                <i></i>
+                <span>CONTEXT SELECTS</span>
+                <i></i>
+                <span>ACTOR OWNS BEHAVIOR</span>
+                <i></i>
+                <span>FSM EXECUTES</span>
+            </div>
+        </section>
+
+        <aside class="living-console">
+            <div class="console-header">
+                <span>LIVE TRACE</span>
+                <span class="trace-status">@(gravityEngaged ? "EVENT CASCADE" : "LISTENING")</span>
+            </div>
+
+            <div class="trace-lines">
+                @foreach (var line in traceLines)
+                {
+                    <div class="trace-line @(line.StartsWith(">") ? "trace-command" : "")">@line</div>
+                }
+            </div>
+
+            <div class="node-inspector">
+                <span class="inspector-label">ACTIVE ADDRESS</span>
+                <strong>@(selectedNode ?? "NONE")</strong>
+                <p>@GetNodeDescription()</p>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="gravity-deck">
+        <div class="deck-copy">
+            <span class="deck-label">PHYSICAL SIMULATION</span>
+            <strong>@(gravityEngaged ? "GRAVITY EVENT IN PROGRESS" : "ARCHITECTURE SUSPENDED")</strong>
+            <small>@(gravityEngaged ? "The interface has relinquished its position. The identity remains." : "The architecture is deliberately held above its identity. Engage gravity when you are ready.")</small>
+        </div>
+        <button class="gravity-button" @onclick="EngageGravity" disabled="@gravityEngaged">
+            <span class="gravity-icon">↓</span>
+            <span>@(gravityEngaged ? "GRAVITY ENGAGED" : "ENGAGE GRAVITY")</span>
+        </button>
+    </footer>
+</div>
+
+<style>
+    .living-gui-shell {
+        position: relative;
+        min-height: calc(100vh - 7.5rem);
+        overflow: hidden;
+        background: #030508;
+        color: #f4f7f8;
+        font-family: Consolas, 'Courier New', monospace;
+        isolation: isolate;
+    }
+
+    .moniker-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        transform: translateY(0) scale(1);
+        transition: transform 1.2s cubic-bezier(.16,1,.3,1), filter 1.2s ease;
+    }
+
+    .moniker-kicker {
+        margin-bottom: 1rem;
+        color: rgba(244,247,248,.36);
+        font-size: .72rem;
+        letter-spacing: .32em;
+        text-transform: uppercase;
+    }
+
+    .moniker-title {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: min(94vw, 1100px);
+        font-size: clamp(2.1rem, 6.2vw, 6.5rem);
+        font-weight: 900;
+        line-height: .92;
+        letter-spacing: .075em;
+        text-transform: uppercase;
+        filter: blur(.7px) drop-shadow(0 0 20px rgba(255,48,48,.08));
+    }
+
+    .moniker-title span { display: inline-block; animation: monikerBreath 4.6s ease-in-out infinite; }
+    .moniker-title .m-space { width: .25em; }
+    .m-blue { color: #00a8ff; }
+    .m-magenta { color: #ff2cff; }
+    .m-orange { color: #ff7a00; }
+    .m-red { color: #ff3030; }
+    .m-yellow { color: #ffd34d; }
+    .m-green { color: #52e05a; }
+
+    .moniker-subtitle {
+        margin-top: 1.3rem;
+        color: rgba(244,247,248,.26);
+        font-size: clamp(.58rem, 1vw, .82rem);
+        letter-spacing: .5em;
+    }
+
+    .venom-aura {
+        position: absolute;
+        z-index: -1;
+        width: 62vw;
+        height: 62vw;
+        max-width: 900px;
+        max-height: 900px;
+        left: 50%;
+        top: 51%;
+        transform: translate(-50%,-50%);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,48,48,.11), rgba(255,211,77,.035) 35%, transparent 67%);
+        filter: blur(8px);
+        animation: venomBreath 5s ease-in-out infinite;
+    }
+
+    .venom-grid {
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+        opacity: .24;
+        background-image:
+            linear-gradient(rgba(255,211,77,.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,48,48,.045) 1px, transparent 1px);
+        background-size: 44px 44px;
+        mask-image: radial-gradient(circle at center, black, transparent 76%);
+    }
+
+    .living-header {
+        position: relative;
+        z-index: 30;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 2rem;
+        padding: clamp(1.5rem, 4vw, 3.2rem) clamp(1rem, 4vw, 4rem) 1rem;
+    }
+
+    .eyebrow, .deck-label, .inspector-label {
+        color: #ffd34d;
+        font-size: .68rem;
+        letter-spacing: .22em;
+        text-transform: uppercase;
+    }
+
+    .living-header h1 {
+        margin: .65rem 0 .45rem;
+        max-width: 760px;
+        font-size: clamp(1.45rem, 3.4vw, 3.25rem);
+        line-height: 1;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        text-shadow: 0 0 18px rgba(255,48,48,.22);
+    }
+
+    .living-header p {
+        margin: 0;
+        color: #aebdc2;
+        font-size: clamp(.75rem, 1.25vw, 1rem);
+    }
+
+    .kernel-readout {
+        min-width: 190px;
+        padding: .8rem 1rem;
+        border: 1px solid rgba(255,211,77,.38);
+        border-left: 4px solid #ff3030;
+        background: rgba(8,7,7,.78);
+        box-shadow: 0 0 22px rgba(255,48,48,.09), inset 0 0 20px rgba(255,211,77,.025);
+    }
+
+    .kernel-readout span:not(.readout-pulse) { display: block; }
+    .readout-label { color: #89969b; font-size: .62rem; letter-spacing: .2em; }
+    .kernel-readout strong { display: block; margin-top: .35rem; color: #f4f7f8; font-size: .78rem; letter-spacing: .08em; }
+    .readout-pulse { display: block; width: 7px; height: 7px; margin-top: .55rem; border-radius: 50%; background: #ff3030; box-shadow: 0 0 8px #ff3030, 0 0 18px rgba(255,48,48,.65); animation: pulse 1.25s ease-in-out infinite; }
+
+    .living-stage {
+        position: relative;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 1rem;
+        min-height: 600px;
+        padding: 0 clamp(1rem, 3vw, 3rem) 1rem;
+    }
+
+    .architecture-field {
+        position: relative;
+        min-height: 600px;
+        overflow: hidden;
+        border: 1px solid rgba(255,211,77,.18);
+        background: rgba(3,5,8,.52);
+        box-shadow: inset 0 0 80px rgba(255,48,48,.035), 0 0 30px rgba(0,0,0,.35);
+    }
+
+    .architecture-field::before {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        border: 1px solid rgba(255,48,48,.08);
+        pointer-events: none;
+    }
+
+    .field-ring {
+        position: absolute;
+        left: 50%;
+        top: 48%;
+        border: 1px solid rgba(255,211,77,.14);
+        border-radius: 50%;
+        transform: translate(-50%,-50%) rotateX(66deg);
+        pointer-events: none;
+    }
+
+    .ring-one { width: 470px; height: 470px; animation: ringPulse 6s ease-in-out infinite; }
+    .ring-two { width: 330px; height: 330px; border-color: rgba(255,48,48,.18); transform: translate(-50%,-50%) rotateX(66deg) rotateZ(19deg); animation: ringSpin 18s linear infinite; }
+    .ring-three { width: 190px; height: 190px; border-color: rgba(255,211,77,.22); transform: translate(-50%,-50%) rotateX(66deg) rotateZ(-27deg); animation: ringSpinReverse 12s linear infinite; }
+
+    .connection {
+        position: absolute;
+        height: 1px;
+        transform-origin: left center;
+        background: linear-gradient(90deg, rgba(255,48,48,.05), rgba(255,211,77,.45), rgba(255,48,48,.05));
+        box-shadow: 0 0 7px rgba(255,48,48,.28);
+        opacity: .7;
+        pointer-events: none;
+        animation: connectionBreath 3.2s ease-in-out infinite;
+    }
+
+    .connection-a { width: 270px; left: 25%; top: 31%; transform: rotate(28deg); }
+    .connection-b { width: 260px; left: 56%; top: 32%; transform: rotate(143deg); animation-delay: -.8s; }
+    .connection-c { width: 300px; left: 27%; top: 66%; transform: rotate(-25deg); animation-delay: -1.5s; }
+    .connection-d { width: 290px; left: 56%; top: 67%; transform: rotate(-155deg); animation-delay: -2.2s; }
+
+    .architecture-node {
+        position: absolute;
+        z-index: 8;
+        width: 154px;
+        min-height: 82px;
+        padding: .75rem .85rem;
+        border: 1px solid rgba(255,211,77,.35);
+        border-left: 5px solid #ff3030;
+        border-radius: 2px;
+        background: rgba(8,7,7,.91);
+        color: #f4f7f8;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        box-shadow: 0 8px 25px rgba(0,0,0,.38), inset 0 0 20px rgba(255,48,48,.035);
+        transition: transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+        animation: nodeFloat 4.8s ease-in-out infinite;
+    }
+
+    .architecture-node:hover, .architecture-node:focus-visible {
+        border-color: #ffd34d;
+        box-shadow: 0 0 22px rgba(255,48,48,.2), inset 0 0 22px rgba(255,211,77,.06);
+        outline: none;
+    }
+
+    .architecture-node .node-index { display: block; color: #ff3030; font-size: .58rem; letter-spacing: .16em; }
+    .architecture-node strong { display: block; margin-top: .22rem; color: #fff; font-size: .86rem; letter-spacing: .08em; }
+    .architecture-node small { display: block; margin-top: .32rem; color: #9eaaae; font-size: .54rem; letter-spacing: .1em; }
+
+    .node-bootstrap { left: 7%; top: 17%; animation-delay: -.3s; }
+    .node-ontology { right: 8%; top: 17%; border-left-color: #ffd34d; animation-delay: -1.1s; }
+    .node-warehouse { left: 4%; bottom: 17%; border-left-color: #52e05a; animation-delay: -1.9s; }
+    .node-context { right: 5%; bottom: 17%; border-left-color: #00a8ff; animation-delay: -2.7s; }
+    .node-fsm { left: 50%; top: 8%; transform: translateX(-50%); border-left-color: #ff2cff; animation-delay: -3.5s; }
+    .node-fsm:hover, .node-fsm:focus-visible { transform: translateX(-50%) translateY(-3px); }
+
+    .core-node {
+        position: absolute;
+        z-index: 10;
+        left: 50%;
+        top: 48%;
+        display: flex;
+        width: 150px;
+        height: 150px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        transform: translate(-50%,-50%);
+        border: 1px solid #ff3030;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(48,9,9,.92), rgba(5,5,6,.96) 64%);
+        box-shadow: 0 0 18px rgba(255,48,48,.32), 0 0 55px rgba(255,211,77,.08), inset 0 0 25px rgba(255,48,48,.11);
+        animation: coreBreath 3s ease-in-out infinite;
+    }
+
+    .core-halo { position: absolute; inset: -12px; border: 1px solid rgba(255,211,77,.12); border-radius: 50%; animation: coreHalo 3s ease-in-out infinite; }
+    .core-caption { color: #aebdc2; font-size: .49rem; letter-spacing: .12em; }
+    .core-node strong { margin: .3rem 0; color: #ffd34d; font-size: 1.65rem; letter-spacing: .12em; text-shadow: 0 0 12px rgba(255,211,77,.35); }
+    .core-state { max-width: 115px; overflow: hidden; color: #ff3030; font-size: .48rem; letter-spacing: .08em; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+
+    .architecture-caption {
+        position: absolute;
+        left: 50%;
+        bottom: 5%;
+        z-index: 9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .7rem;
+        width: 92%;
+        transform: translateX(-50%);
+        color: #7f8b8f;
+        font-size: .55rem;
+        letter-spacing: .11em;
+        text-align: center;
+    }
+
+    .architecture-caption i { width: 4px; height: 4px; flex: 0 0 auto; border-radius: 50%; background: #ff3030; box-shadow: 0 0 7px #ff3030; }
+
+    .living-console {
+        display: flex;
+        min-height: 600px;
+        flex-direction: column;
+        border: 1px solid rgba(255,48,48,.28);
+        background: rgba(5,5,6,.86);
+        box-shadow: inset 0 0 35px rgba(255,48,48,.035);
+    }
+
+    .console-header {
+        display: flex;
+        justify-content: space-between;
+        padding: .9rem;
+        border-bottom: 1px solid rgba(255,211,77,.15);
+        color: #ffd34d;
+        font-size: .63rem;
+        letter-spacing: .14em;
+    }
+
+    .trace-status { color: #ff3030; }
+    .trace-lines { flex: 1; padding: .85rem; overflow: hidden; }
+    .trace-line { margin-bottom: .62rem; color: #69767b; font-size: .59rem; line-height: 1.4; }
+    .trace-command { color: #d9e1e3; }
+    .trace-command::first-letter { color: #ff3030; }
+
+    .node-inspector {
+        margin: .75rem;
+        padding: .9rem;
+        border: 1px solid rgba(255,211,77,.2);
+        border-top: 3px solid #ff3030;
+        background: rgba(18,8,8,.66);
+    }
+
+    .node-inspector strong { display: block; margin-top: .35rem; color: #ffd34d; font-size: 1rem; letter-spacing: .1em; }
+    .node-inspector p { margin: .55rem 0 0; color: #9eaaae; font-size: .62rem; line-height: 1.6; }
+
+    .gravity-deck {
+        position: relative;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        padding: 1rem clamp(1rem, 4vw, 4rem) 1.5rem;
+        border-top: 1px solid rgba(255,48,48,.18);
+        background: rgba(3,5,8,.88);
+    }
+
+    .deck-copy strong { display: block; margin-top: .3rem; color: #f4f7f8; font-size: .78rem; letter-spacing: .1em; }
+    .deck-copy small { display: block; max-width: 720px; margin-top: .35rem; color: #7f8b8f; font-size: .61rem; line-height: 1.5; }
+
+    .gravity-button {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        min-width: 190px;
+        padding: .85rem 1.1rem;
+        border: 1px solid #ffd34d;
+        border-left: 5px solid #ff3030;
+        background: #0a0707;
+        color: #fff;
+        font: inherit;
+        font-size: .67rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        cursor: pointer;
+        box-shadow: 0 0 18px rgba(255,48,48,.1);
+        transition: .3s ease;
+    }
+
+    .gravity-button:hover:not(:disabled) { background: #180b0b; box-shadow: 0 0 28px rgba(255,48,48,.25); transform: translateY(-2px); }
+    .gravity-button:disabled { color: #747d80; border-color: #4a4141; cursor: default; }
+    .gravity-icon { color: #ff3030; font-size: 1.3rem; line-height: 1; }
+
+    .gravity-engaged .architecture-node,
+    .gravity-engaged .living-console,
+    .gravity-engaged .architecture-caption,
+    .gravity-engaged .connection,
+    .gravity-engaged .field-ring,
+    .gravity-engaged .core-node {
+        animation: gravityFall 1.65s cubic-bezier(.55,.06,.68,.19) forwards;
+    }
+
+    .gravity-engaged .living-console { animation-delay: .12s; }
+    .gravity-engaged .architecture-caption { animation-delay: .06s; }
+    .gravity-engaged .moniker-layer { transform: scale(1.035); filter: brightness(1.22); }
+    .gravity-engaged .moniker-title { filter: blur(0) drop-shadow(0 0 30px rgba(255,48,48,.18)); }
+
+    @@keyframes gravityFall {
+        0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+        100% { opacity: 0; transform: translateY(120vh) rotate(9deg); }
+    }
+
+    @@keyframes monikerBreath {
+        0%, 100% { opacity: .68; transform: translateY(0); }
+        50% { opacity: .98; transform: translateY(-2px); }
+    }
+
+    @@keyframes venomBreath {
+        0%, 100% { opacity: .65; transform: translate(-50%,-50%) scale(.96); }
+        50% { opacity: 1; transform: translate(-50%,-50%) scale(1.04); }
+    }
+
+    @@keyframes pulse {
+        0%, 100% { opacity: .55; transform: scale(.8); }
+        50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    @@keyframes ringPulse {
+        0%, 100% { opacity: .45; transform: translate(-50%,-50%) rotateX(66deg) scale(.98); }
+        50% { opacity: 1; transform: translate(-50%,-50%) rotateX(66deg) scale(1.03); }
+    }
+
+    @@keyframes ringSpin { from { transform: translate(-50%,-50%) rotateX(66deg) rotateZ(0); } to { transform: translate(-50%,-50%) rotateX(66deg) rotateZ(360deg); } }
+    @@keyframes ringSpinReverse { from { transform: translate(-50%,-50%) rotateX(66deg) rotateZ(360deg); } to { transform: translate(-50%,-50%) rotateX(66deg) rotateZ(0); } }
+    @@keyframes connectionBreath { 0%, 100% { opacity: .3; } 50% { opacity: .9; } }
+    @@keyframes nodeFloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+    @@keyframes coreBreath { 0%, 100% { box-shadow: 0 0 18px rgba(255,48,48,.24), 0 0 55px rgba(255,211,77,.06), inset 0 0 25px rgba(255,48,48,.08); } 50% { box-shadow: 0 0 30px rgba(255,48,48,.46), 0 0 70px rgba(255,211,77,.1), inset 0 0 32px rgba(255,48,48,.16); } }
+    @@keyframes coreHalo { 0%, 100% { opacity: .25; transform: scale(.97); } 50% { opacity: .8; transform: scale(1.04); } }
+
+    @@media (max-width: 950px) {
+        .living-stage { grid-template-columns: 1fr; }
+        .living-console { min-height: 260px; }
+        .trace-lines { max-height: 130px; }
+    }
+
+    @@media (max-width: 700px) {
+        .living-header { flex-direction: column; }
+        .kernel-readout { width: 100%; box-sizing: border-box; }
+        .architecture-field { min-height: 560px; }
+        .node-bootstrap { left: 3%; }
+        .node-ontology { right: 3%; }
+        .node-warehouse { left: 2%; bottom: 19%; }
+        .node-context { right: 2%; bottom: 19%; }
+        .architecture-caption { gap: .4rem; font-size: .45rem; }
+        .gravity-deck { align-items: stretch; flex-direction: column; }
+        .gravity-button { width: 100%; justify-content: center; }
+        .moniker-title { max-width: 98vw; font-size: clamp(1.65rem, 7vw, 3rem); }
+        .moniker-subtitle { letter-spacing: .24em; }
+    }
+</style>
+
+@code {
+    private bool gravityEngaged;
+    private string? selectedNode;
+
+    private readonly List<string> traceLines = new()
+    {
+        "> SYSTEM / LIVING_GUI INITIALIZED",
+        "  address space: workshop://architecture",
+        "  render authority: LOCAL",
+        "  state authority: FSM",
+        "> CONTEXT / AWAITING SELECTION",
+        "  deterministic execution armed"
+    };
+
+    private void SelectNode(string node)
+    {
+        selectedNode = node;
+        traceLines.Insert(0, $"> INPUT / {node} SELECTED");
+        if (traceLines.Count > 7)
+            traceLines.RemoveAt(traceLines.Count - 1);
+    }
+
+    private string GetNodeDescription() => selectedNode switch
+    {
+        "BOOTSTRAP" => "The entry boundary. Establishes the environment in which the rest of the machine can become addressable.",
+        "ONTOLOGY" => "The machine-readable vocabulary. Human meaning becomes deterministic address space without requiring runtime string dependence.",
+        "WAREHOUSE" => "The single-source-of-truth layer. State and assets become addressable through structured signatures rather than scattered ownership.",
+        "CONTEXT" => "The relevance boundary. Context determines what representation, capability, relationship, and behavior is addressable now.",
+        "FSM" => "The execution boundary. State transitions remain explicit, deterministic, and owned by the machine that actually performs them.",
+        _ => "Select an architectural node. The interface will tell you what it is doing."
+    };
+
+    private void EngageGravity()
+    {
+        if (gravityEngaged)
+            return;
+
+        gravityEngaged = true;
+        traceLines.Insert(0, "> GRAVITY / RELEASE ALL SUSPENDED SURFACES");
+        if (traceLines.Count > 7)
+            traceLines.RemoveAt(traceLines.Count - 1);
+    }
+}
