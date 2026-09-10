@@ -84,9 +84,34 @@ article {
     background: #050a14;
 }
 
-/* The living Workshop is a viewport surface, not a scrolling article. */
 article:has(.hypervisor-shell) {
     overflow: hidden !important;
+}
+
+/*
+   Living GUI arrival sequence.
+   The page chrome exists from the beginning, but the Living GUI owns the
+   viewport until its final surface has fallen away. Three seconds later,
+   the ordinary Workshop chrome arrives as the next layer of the experience.
+*/
+.living-gui-sequence .sidebar,
+.living-gui-sequence .top-row {
+    opacity: 0;
+    transform: translateY(-18px);
+    animation: browserInterfaceArrival 1s 8.05s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+.living-gui-sequence .sidebar {
+    transform: translateX(-18px);
+}
+
+.living-gui-sequence .top-row {
+    transform: translateY(-18px);
+}
+
+@keyframes browserInterfaceArrival {
+    0% { opacity: 0; }
+    100% { opacity: 1; transform: translate(0, 0); }
 }
 
 @media (max-width: 640.98px) {
@@ -120,5 +145,14 @@ article:has(.hypervisor-shell) {
         z-index: 1;
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .living-gui-sequence .sidebar,
+    .living-gui-sequence .top-row {
+        opacity: 1;
+        transform: none;
+        animation: none;
     }
 }
