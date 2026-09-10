@@ -1,9 +1,12 @@
-@page "/living-gui"
+﻿@page "/living-gui"
+@using TheSingularityWorkshop.Services
+@inject FSMManagerService FSM
+@implements IDisposable
 
 <PageTitle>The Living GUI — The Singularity Workshop</PageTitle>
 
-<div class="living-sequence-shell @(gravityReleased ? "gravity-released" : "") @(sequenceComplete ? "sequence-complete" : "")">
-    <div class="moniker-layer" aria-hidden="true">
+<div class="living-sequence-shell @StateClass">
+    <div class="moniker-layer @(MonikerVisible ? "moniker-visible" : "")" aria-hidden="true">
         <div class="moniker-title">
             <div><span class="blue">T</span><span class="magenta">h</span><span class="orange">e</span></div>
             <div><span class="red">S</span><span class="yellow">i</span><span class="green">n</span><span class="blue">g</span><span class="magenta">u</span><span class="orange">l</span><span class="red">a</span><span class="yellow">r</span><span class="green">i</span><span class="blue">t</span><span class="magenta">y</span></div>
@@ -35,12 +38,11 @@
 
 <style>
 .living-sequence-shell{position:absolute;inset:0;z-index:10000;overflow:hidden;isolation:isolate;background:#020407;color:#f4f7f8;font-family:Consolas,"Courier New",monospace}
-.living-sequence-shell.sequence-complete{background:transparent;pointer-events:none}
+.living-sequence-shell .moniker-layer{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;filter:blur(12px);transform:scale(.78)}
+.living-sequence-shell .moniker-layer.moniker-visible{opacity:.94;filter:blur(0);transform:scale(1);transition:opacity .7s ease,filter .7s ease,transform .9s cubic-bezier(.16,1,.3,1)}
 .living-canvas{position:absolute;inset:0;overflow:hidden;perspective:1200px}
 .architecture-atmosphere{position:absolute;inset:-20%;background:radial-gradient(circle at 50% 50%,rgba(255,48,48,.09),transparent 24%),radial-gradient(circle at 18% 28%,rgba(255,211,77,.045),transparent 22%),radial-gradient(circle at 82% 72%,rgba(82,224,90,.035),transparent 24%),repeating-linear-gradient(118deg,transparent 0 120px,rgba(255,48,48,.035) 121px 132px,rgba(255,211,77,.028) 133px 145px,transparent 146px 260px);animation:atmosphereDrift 12s ease-in-out infinite}
 .venom-field{position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(115deg,transparent 0 150px,rgba(255,48,48,.035) 151px 166px,rgba(255,211,77,.025) 167px 181px,transparent 182px 330px);mask-image:radial-gradient(circle at center,black 0,transparent 78%);opacity:.8}
-.moniker-layer{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;filter:blur(10px)}
-.gravity-released .moniker-layer,.sequence-complete .moniker-layer{opacity:.94;filter:blur(0)}
 .moniker-title{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:clamp(2.2rem,8vw,8rem);font-weight:900;line-height:.82;letter-spacing:.075em;text-shadow:0 0 26px rgba(255,48,48,.12);animation:kelpSway 6.5s ease-in-out infinite;transform-origin:50% 62%}
 .moniker-title>div{white-space:nowrap}.moniker-title span{display:inline-block;animation:letterDrift 4.8s ease-in-out infinite}.moniker-title>div:nth-child(2) span{animation-delay:-.4s}.moniker-title>div:nth-child(3) span{animation-delay:-.8s}
 .blue{color:#00a8ff}.magenta{color:#ff2cff}.orange{color:#ff7a00}.red{color:#ff3030}.yellow{color:#ffd34d}.green{color:#52e05a}
@@ -49,7 +51,7 @@
 .node-index{display:block;color:#ff3030;font-size:.56rem;letter-spacing:.16em}.architecture-node strong{display:block;margin-top:.22rem;color:#fff;font-size:clamp(.72rem,1vw,.9rem);letter-spacing:.08em}.architecture-node small{display:block;margin-top:.35rem;color:#8b999d;font-size:.51rem;letter-spacing:.1em}
 .execution-core{position:absolute;z-index:30;left:50%;top:50%;width:clamp(150px,15vw,220px);aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;transform:translate(-50%,-50%) scale(.55);border:1px solid #ff3030;border-radius:50%;background:radial-gradient(circle,rgba(52,8,8,.95),rgba(3,4,6,.98) 65%);box-shadow:0 0 34px rgba(255,48,48,.34),inset 0 0 35px rgba(255,48,48,.13);animation:coreAwaken 1.2s 1.8s cubic-bezier(.16,1,.3,1) forwards,corePulse 3s 3s ease-in-out infinite}
 .execution-core span{color:#9eaaae;font-size:.5rem;letter-spacing:.13em}.execution-core strong{margin:.35rem 0;color:#ffd34d;font-size:clamp(1.5rem,3vw,2.6rem);letter-spacing:.14em}.execution-core small{max-width:120px;overflow:hidden;color:#ff3030;font-size:.48rem;letter-spacing:.08em;text-overflow:ellipsis;white-space:nowrap}.core-ring{position:absolute;border:1px solid rgba(255,211,77,.18);border-radius:50%;pointer-events:none}.ring-a{inset:-14px;animation:ringSpin 15s linear infinite}.ring-b{inset:-30px;border-color:rgba(255,48,48,.12);animation:ringSpinReverse 21s linear infinite}
-.gravity-released .architecture-node,.gravity-released .execution-core{animation:fallAway 1.7s cubic-bezier(.55,.06,.68,.19) forwards}
+.gravity .architecture-node,.gravity .execution-core,.living-gui-dissipating .architecture-node,.living-gui-dissipating .execution-core{animation:fallAway 1.7s cubic-bezier(.55,.06,.68,.19) forwards}
 @@keyframes materialize{0%{opacity:0;transform:translate(-50%,-50%) translateY(-32px) scale(.82)}70%{opacity:1;transform:translate(-50%,-50%) translateY(5px) scale(1.02)}100%{opacity:1;transform:translate(-50%,-50%) translateY(0) scale(1)}}
 @@keyframes coreAwaken{0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}70%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @@keyframes fallAway{0%{opacity:1;transform:translate(-50%,-50%) translateY(0) rotate(0deg) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) translateY(125vh) rotate(11deg) scale(.92)}}
@@ -62,27 +64,57 @@
 </style>
 
 @code {
-    private bool gravityReleased;
-    private bool sequenceComplete;
+    private string StateClass => FSM.CurrentState switch
+    {
+        PageFSM.GatewayExit => "gateway-exit",
+        PageFSM.LivingGuiIgnition => "living-gui-ignition",
+        PageFSM.LivingGuiPopulating => "living-gui-populating",
+        PageFSM.MonikerReveal => "moniker-reveal",
+        PageFSM.Gravity => "gravity",
+        PageFSM.LivingGuiDissipating => "living-gui-dissipating",
+        PageFSM.NavigationArrival => "navigation-arrival",
+        PageFSM.Running => "running",
+        _ => ""
+    };
+
+    private bool MonikerVisible => FSM.CurrentState is
+        PageFSM.MonikerReveal or
+        PageFSM.Gravity or
+        PageFSM.LivingGuiDissipating or
+        PageFSM.NavigationArrival or
+        PageFSM.Running;
+
     private string? selectedNode;
     private readonly Random random = new();
 
     private readonly List<LivingNode> nodes = new()
     {
-        new("01","BOOTSTRAP","WAKE THE MACHINE","0.20s"),new("02","ONTOLOGY","NAME REALITY","0.42s"),new("03","WAREHOUSE","HOLD STATE","0.64s"),new("04","CONTEXT","SELECT RELEVANCE","0.86s"),new("05","HUB","DISCOVER / ROUTE","1.08s"),new("06","ACTOR","OWN BEHAVIOR","1.30s"),new("07","SIGNATURE","ADDRESS MEANING","1.52s"),new("08","COMMAND","EXECUTABLE INTENT","1.74s"),new("09","GRAMMAR","VALID COMPOSITION","1.96s"),new("10","REPRESENTATION","DENSITY NEGOTIATED","2.18s")
+        new("01","BOOTSTRAP","WAKE THE MACHINE"),new("02","ONTOLOGY","NAME REALITY"),new("03","WAREHOUSE","HOLD STATE"),new("04","CONTEXT","SELECT RELEVANCE"),new("05","HUB","DISCOVER / ROUTE"),new("06","ACTOR","OWN BEHAVIOR"),new("07","SIGNATURE","ADDRESS MEANING"),new("08","COMMAND","EXECUTABLE INTENT"),new("09","GRAMMAR","VALID COMPOSITION"),new("10","REPRESENTATION","DENSITY NEGOTIATED")
     };
 
     protected override async Task OnInitializedAsync()
     {
+        FSM.StateChanged += HandleFSMStateChanged;
         RandomizePositions();
+
+        // The visual has completed its materialization; the FSM decides the next state.
         await Task.Delay(2900);
-        await Task.Delay(450);
-        gravityReleased = true;
-        await InvokeAsync(StateHasChanged);
-        await Task.Delay(4700);
-        sequenceComplete = true;
-        await InvokeAsync(StateHasChanged);
+        FSM.SignalLivingGuiPopulated();
+
+        // Moniker is deliberately a distinct FSM state BEFORE gravity.
+        await Task.Delay(1000);
+        FSM.SignalMonikerReady();
+
+        // Gravity is a separate state and therefore cannot reveal the moniker early.
+        await Task.Delay(650);
+        FSM.SignalGravityReleased();
+
+        // Match the 1.7s fall animation before telling the FSM that the field is gone.
+        await Task.Delay(1750);
+        FSM.SignalLivingGuiFallen();
     }
+
+    private void HandleFSMStateChanged(string _) => InvokeAsync(StateHasChanged);
 
     private void RandomizePositions()
     {
@@ -93,13 +125,14 @@
 
     private void SelectNode(string node) => selectedNode = node;
 
+    public void Dispose() => FSM.StateChanged -= HandleFSMStateChanged;
+
     private sealed class LivingNode
     {
-        public LivingNode(string index, string name, string role, string delay) { Index = index; Name = name; Role = role; Delay = delay; }
+        public LivingNode(string index, string name, string role) { Index = index; Name = name; Role = role; }
         public string Index { get; }
         public string Name { get; }
         public string Role { get; }
-        public string Delay { get; }
         public double X { get; private set; }
         public double Y { get; private set; }
         public void SetPosition(double x, double y) { X = x; Y = y; }
