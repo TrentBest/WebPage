@@ -91,4 +91,11 @@ public sealed class IncrementalVersionTests
     {
         Assert.True(true);
     }
+
+    [ArchitectureTest(0, 0, 12)]
+    [Fact(DisplayName = "0.00.012 — Incremental_Change_Heartbeat")]
+    public void Incremental_Change_Heartbeat_012()
+    {
+        Assert.True(true);
+    }
 }
