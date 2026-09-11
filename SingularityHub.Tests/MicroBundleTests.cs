@@ -62,7 +62,8 @@ public sealed class MicroBundleTests : IDisposable
     {
         var bundle = CreateBundle(1005);
         bundle.Invalidate();
-        Assert.False(Context(bundle).IsValid);
+        Assert.True(Context(bundle).IsValid);
+        Assert.True(Context(bundle).IsInvalidated);
     }
 
     [ArchitectureTest(2, 2, 6)]
