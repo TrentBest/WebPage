@@ -6,15 +6,18 @@
 <PageTitle>The Living GUI — The Singularity Workshop</PageTitle>
 
 <div class="living-sequence-shell @(MonikerVisible ? "critical-mass" : "") @(GravityActive ? "gravity-active" : "")">
-    @* The identity exists from the beginning, but is physically behind the swarm and
-       remains invisible until the FSM transitions into MONIKER_REVEAL. *@
-    <div class="moniker-layer @(MonikerVisible ? "moniker-visible" : "")" aria-hidden="true">
-        <div class="moniker-title">
-            <div><span class="blue">T</span><span class="magenta">h</span><span class="orange">e</span></div>
-            <div><span class="red">S</span><span class="yellow">i</span><span class="green">n</span><span class="blue">g</span><span class="magenta">u</span><span class="orange">l</span><span class="red">a</span><span class="yellow">r</span><span class="green">i</span><span class="blue">t</span><span class="magenta">y</span></div>
-            <div><span class="orange">W</span><span class="red">o</span><span class="yellow">r</span><span class="green">k</span><span class="blue">s</span><span class="magenta">h</span><span class="orange">o</span><span class="red">o</span><span class="orange">p</span></div>
+    @if (MonikerVisible)
+    {
+        @* The moniker is created at critical mass, before gravity begins, and lives
+           at z-index 1 so every living GUI node remains physically above it. *@
+        <div class="moniker-layer moniker-visible" aria-hidden="true">
+            <div class="moniker-title">
+                <div><span class="blue">T</span><span class="magenta">h</span><span class="orange">e</span></div>
+                <div><span class="red">S</span><span class="yellow">i</span><span class="green">n</span><span class="blue">g</span><span class="magenta">u</span><span class="orange">l</span><span class="red">a</span><span class="yellow">r</span><span class="green">i</span><span class="blue">t</span><span class="magenta">y</span></div>
+                <div><span class="orange">W</span><span class="red">o</span><span class="yellow">r</span><span class="green">k</span><span class="blue">s</span><span class="magenta">h</span><span class="orange">o</span><span class="red">o</span><span class="orange">p</span></div>
+            </div>
         </div>
-    </div>
+    }
 
     <div class="venom-field" aria-hidden="true"></div>
 
@@ -152,7 +155,7 @@
     }
 
     .gravity-node {
-        animation: gravityFall .7s cubic-bezier(.55,.04,.98,.34) forwards;
+        animation: gravityFall .7s cubic-bezier(.18,.82,.1,1) forwards;
         pointer-events: none;
     }
 
@@ -203,8 +206,9 @@
     }
 
     @@keyframes gravityFall {
-        0% { transform: translate(-50%,-50%) rotate(0deg); opacity: 1; }
-        100% { transform: translate(-50%,calc(120vh - 50%)) rotate(18deg); opacity: .04; }
+        0% { transform: translate(-50%,-50%) rotate(0deg) scale(1); opacity: 1; }
+        65% { transform: translate(-50%,70vh) rotate(13deg) scale(.92); opacity: .85; }
+        100% { transform: translate(-50%,125vh) rotate(25deg) scale(.72); opacity: 0; }
     }
 
     @@keyframes kelpSway {
@@ -241,8 +245,18 @@
 </style>
 
 @code {
-    private bool MonikerVisible => FSM.CurrentState == PageFSM.MonikerReveal;
-    private bool GravityActive => FSM.CurrentState == PageFSM.Gravity || MonikerVisible;
+    private bool MonikerVisible => FSM.CurrentState is
+        PageFSM.Gravity or
+        PageFSM.MonikerReveal or
+        PageFSM.LivingGuiDissipating or
+        PageFSM.NavigationArrival or
+        PageFSM.Running;
+
+    private bool GravityActive => FSM.CurrentState is
+        PageFSM.Gravity or
+        PageFSM.MonikerReveal or
+        PageFSM.LivingGuiDissipating;
+
     private string? selectedNode;
 
     protected override void OnInitialized()
