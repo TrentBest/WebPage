@@ -21,4 +21,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 12)] [Fact(DisplayName = "0.00.012 — Incremental_Change_Heartbeat")] public void Incremental_Change_Heartbeat_012() => Assert.True(true);
     [ArchitectureTest(0, 0, 13)] [Fact(DisplayName = "0.00.013 — Incremental_Change_Heartbeat")] public void Incremental_Change_Heartbeat_013() => Assert.True(true);
     [ArchitectureTest(0, 0, 14)] [Fact(DisplayName = "0.00.014 — Incremental_Change_Heartbeat")] public void Incremental_Change_Heartbeat_014() => Assert.True(true);
+    [ArchitectureTest(0, 0, 15)] [Fact(DisplayName = "0.00.015 — Incremental_Change_Heartbeat")] public void Incremental_Change_Heartbeat_015() => Assert.True(true);
 }
