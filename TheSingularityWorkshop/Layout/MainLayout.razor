@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
+@inject TheSingularityWorkshop.Services.BlazorFSMIntegration Heartbeat
 @using TheSingularityWorkshop.Components
 @implements IDisposable
 
@@ -107,6 +108,9 @@
 
     protected override void OnInitialized()
     {
+        // Resolving Heartbeat starts the single browser heartbeat that steps the
+        // PageFSM. PageFSM itself controls its child process-group handoffs.
+        _ = Heartbeat;
         FSM.StateChanged += HandleFSMStateChanged;
     }
 
