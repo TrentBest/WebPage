@@ -22,6 +22,10 @@ public sealed class MicroBundle : IMicroBundle
             Generation = generation
         };
 
+        // FSM_API owns the lifecycle clock. The processing group must exist
+        // before the definition/instance can participate in its update pass.
+        FSM_API.FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
+
         FSM_API.FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
             .State("Created", onEnter: EnterCreated, onUpdate: _ => { }, onExit: _ => { })
             .State("Manifesting", onEnter: EnterManifesting, onUpdate: _ => { }, onExit: _ => { })
@@ -32,6 +36,7 @@ public sealed class MicroBundle : IMicroBundle
             .Transition("Manifesting", "Active", c => ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
             .Transition("Active", "Collapsing", c => !((MicroBundleContext)c).IsValid)
             .Transition("Collapsing", "Destroyed", c => !((MicroBundleContext)c).IsValid && ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
+            .WithInitialState("Created")
             .BuildDefinition();
 
         _fsm = FSM_API.FSM_API.Create.CreateInstance(FsmName, Context, ProcessingGroup);
