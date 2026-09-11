@@ -1,3 +1,4 @@
+using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 using TheSingularityWorkshop.SingularityHub;
 using Xunit;
 
@@ -18,7 +19,7 @@ public sealed class SingularityHubTests
     [Fact]
     public void Hub_RejectsDuplicateBundle_AndArbitratesToHomeostasis()
     {
-        var hub = new SingularityHub();
+        var hub = new HubKernel();
         var bundle = new TestBundle();
         Assert.True(hub.LoadBundle(bundle));
         Assert.False(hub.LoadBundle(bundle));
@@ -30,7 +31,7 @@ public sealed class SingularityHubTests
     [Fact]
     public void ProcessGroupLifecycle_IsTrackedWithoutExecutionMechanics()
     {
-        var hub = new SingularityHub();
+        var hub = new HubKernel();
         Assert.True(hub.Register(42));
         Assert.True(hub.Activate(42));
         Assert.Contains(hub.ActiveGroups, g => g.Id == 42 && g.State == ProcessGroupState.Active);
