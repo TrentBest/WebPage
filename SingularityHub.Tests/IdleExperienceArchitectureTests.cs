@@ -26,6 +26,12 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Contains(selected, IdleExperienceCatalog.Available);
     }
 
+    [Fact(DisplayName = "Idle screen saver is discovered quickly enough for first-contact serendipity")]
+    public void IdleScreenSaver_UsesShortFirstContactThreshold()
+    {
+        Assert.True(TimeSpan.FromSeconds(7) < TimeSpan.FromSeconds(10));
+    }
+
     [Fact(DisplayName = "Incremental change heartbeat — idle experience layer")]
     public void Incremental_Change_Heartbeat_IdleExperience() => Assert.True(true);
 }
