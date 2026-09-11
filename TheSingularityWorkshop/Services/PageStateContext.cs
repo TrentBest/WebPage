@@ -27,15 +27,17 @@ namespace TheSingularityWorkshop.Services
 
         public bool EnterRequested { get; set; }
         public bool LivingGuiPopulated { get; internal set; }
-        public bool MonikerReady { get; set; }
-        public bool GravityReleased { get; set; }
-        public bool LivingGuiFallen { get; set; }
-        public bool NavigationReady { get; set; }
+        public bool MonikerReady { get; internal set; }
+        public bool GravityReleased { get; internal set; }
+        public bool LivingGuiFallen { get; internal set; }
+        public bool NavigationReady { get; internal set; }
 
         public long StateTicks { get; set; }
         public long TotalTicks { get; set; }
+        public long GravityTicks { get; private set; }
 
         public bool LivingGuiFrozen { get; private set; }
+        public bool GravityActive { get; private set; }
         public IReadOnlyList<LivingNodeState> LivingNodes => _livingNodes;
 
         private readonly List<LivingNodeState> _livingNodes = new();
@@ -54,13 +56,18 @@ namespace TheSingularityWorkshop.Services
             _livingNodes.Add(CreateNode("1", 1));
             LivingGuiFrozen = false;
             LivingGuiPopulated = false;
+            MonikerReady = false;
+            GravityReleased = false;
+            LivingGuiFallen = false;
+            NavigationReady = false;
+            GravityActive = false;
+            GravityTicks = 0;
         }
 
         /// <summary>
-        /// Advances the living GUI swarm by one FSM heartbeat.
-        /// Every live node grows. A full node reproduces, remains alive,
-        /// and resets to its seed size. The FSM therefore owns the clock
-        /// and the recursive swarm progression.
+        /// Advances the living GUI swarm by one heartbeat while its dedicated
+        /// process group is active. At exactly 100 nodes the swarm freezes.
+        /// No further living-GUI process-group work is required after this point.
         /// </summary>
         public void AdvanceLivingGui()
         {
@@ -84,15 +91,53 @@ namespace TheSingularityWorkshop.Services
                 }
             }
 
+            var remaining = CriticalMass - _livingNodes.Count;
+            if (newborns.Count > remaining)
+                newborns.RemoveRange(remaining, newborns.Count - remaining);
+
             _livingNodes.AddRange(newborns);
 
-            if (_livingNodes.Count >= CriticalMass)
+            if (_livingNodes.Count == CriticalMass)
             {
-                if (_livingNodes.Count > CriticalMass)
-                    _livingNodes.RemoveRange(CriticalMass, _livingNodes.Count - CriticalMass);
-
                 LivingGuiFrozen = true;
                 LivingGuiPopulated = true;
+            }
+        }
+
+        /// <summary>
+        /// Creates the visual moniker's runtime phase and resets the independent
+        /// gravity clock. The parent FSM enters this state only after critical mass.
+        /// </summary>
+        public void BeginGravity()
+        {
+            if (!LivingGuiPopulated)
+                return;
+
+            LivingGuiFrozen = true;
+            GravityActive = true;
+            GravityReleased = true;
+            MonikerReady = true;
+            GravityTicks = 0;
+            NavigationReady = false;
+        }
+
+        /// <summary>
+        /// Advances the independent gravity process group. The visual acceleration
+        /// is rendered by the LivingGui CSS animation; this heartbeat owns the
+        /// deterministic three-second handoff to the navigation chrome.
+        /// </summary>
+        public void AdvanceGravity()
+        {
+            if (!GravityActive)
+                return;
+
+            GravityTicks++;
+
+            // PageFSM runs at 33 ms. 91 ticks is just over three seconds.
+            if (GravityTicks >= 91)
+            {
+                LivingGuiFallen = true;
+                NavigationReady = true;
             }
         }
 
