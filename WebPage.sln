@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheSingularityWorkshop", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PollingAPI", "PollingAPI\PollingAPI.csproj", "{D60583FE-9885-47FF-B632-4278C1A66942}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingularityHub.Abstractions", "SingularityHub.Abstractions\SingularityHub.Abstractions.csproj", "{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingularityHub", "SingularityHub\SingularityHub.csproj", "{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{D60583FE-9885-47FF-B632-4278C1A66942}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D60583FE-9885-47FF-B632-4278C1A66942}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D60583FE-9885-47FF-B632-4278C1A66942}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
