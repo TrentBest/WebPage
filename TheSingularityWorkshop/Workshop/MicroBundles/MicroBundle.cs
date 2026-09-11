@@ -60,10 +60,24 @@ public sealed class MicroBundle : IMicroBundle
             context.ElapsedMilliseconds++;
         }
 
-        // FSM_API's processing-group update owns initial state entry and normal
-        // lifecycle sequencing. Context validity remains true through collapse;
-        // IsInvalidated is the lifecycle signal consumed by the FSM.
+        // FSM_API's processing-group update owns the initial state entry and
+        // regular transition evaluation. A regular transition changes the
+        // handle's CurrentState and deliberately leaves HasEnteredCurrentState
+        // false until the next tick. MicroBundle completes that transition's
+        // entry in the same explicit update, but only after the initial state
+        // has already had its first entry opportunity.
+        var hadEnteredState = _fsm.HasEnteredCurrentState;
+        var stateBeforeTick = _fsm.CurrentState;
+
         FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
+
+        if (hadEnteredState &&
+            stateBeforeTick != _fsm.CurrentState &&
+            !_fsm.HasEnteredCurrentState)
+        {
+            _fsm.TransitionTo(_fsm.CurrentState);
+        }
+
         Manifestation = _provider.Manifest(Context);
     }
 
