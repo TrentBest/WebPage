@@ -66,14 +66,11 @@ public sealed class MicroBundle : IMicroBundle
         // false until the next tick. MicroBundle completes that transition's
         // entry in the same explicit update, but only after the initial state
         // has already had its first entry opportunity.
-        var hadEnteredState = _fsm.HasEnteredCurrentState;
         var stateBeforeTick = _fsm.CurrentState;
 
         FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
 
-        if (hadEnteredState &&
-            stateBeforeTick != _fsm.CurrentState &&
-            !_fsm.HasEnteredCurrentState)
+        if (stateBeforeTick != _fsm.CurrentState && !_fsm.HasEnteredCurrentState)
         {
             _fsm.TransitionTo(_fsm.CurrentState);
         }
