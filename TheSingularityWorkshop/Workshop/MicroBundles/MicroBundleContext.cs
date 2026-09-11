@@ -16,7 +16,18 @@ public sealed class MicroBundleContext : IStateContext
 
     public int Id { get; }
     public string Name { get; set; }
-    public bool IsValid { get; set; } = true;
+
+    /// <summary>
+    /// FSM_API validity gate. A context is not runnable until its owning object
+    /// has completed initialization and explicitly marks it valid.
+    /// </summary>
+    public bool IsValid { get; set; }
+
+    /// <summary>
+    /// Lifecycle invalidation is deliberately separate from FSM_API validity.
+    /// It is a state-machine input, not a request to stop the FSM scheduler.
+    /// </summary>
+    public bool IsInvalidated { get; set; }
 
     /// <summary>Current lifecycle state as exposed to the manifestation provider.</summary>
     public string Phase { get; set; } = "Created";
@@ -27,6 +38,6 @@ public sealed class MicroBundleContext : IStateContext
     /// <summary>Optional parent bundle identity used for generative effects.</summary>
     public int ParentId { get; set; } = -1;
 
-    /// <summary>Generation/lineage value used by reproductive manifestations.</summary>
+    /// <summary>Generation/lineage value used for generative manifestations.</summary>
     public int Generation { get; set; }
 }
