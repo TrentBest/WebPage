@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingularityHub.Abstractions
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingularityHub", "SingularityHub\SingularityHub.csproj", "{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingularityHub.Tests", "SingularityHub.Tests\SingularityHub.Tests.csproj", "{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,8 +33,11 @@ Global
 		{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
