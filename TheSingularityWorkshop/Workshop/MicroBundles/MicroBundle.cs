@@ -22,14 +22,10 @@ public sealed class MicroBundle : IMicroBundle
             Generation = generation
         };
 
-        // FSM_API owns the lifecycle clock. The processing group must exist
-        // before the definition/instance can participate in its update pass.
         FSM_API.FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
 
-        // Construction establishes the bundle's conceptual Created phase.
-        // FSM_API's first update enters its configured initial state; therefore
-        // Manifesting is the first FSM state so one MicroBundle.Update() maps
-        // to one externally observable lifecycle advance.
+        // Construction establishes Created conceptually. FSM_API enters the
+        // configured initial state on the first explicit step.
         FSM_API.FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
             .State("Manifesting", onEnter: EnterManifesting, onUpdate: _ => { }, onExit: _ => { })
             .State("Active", onEnter: EnterActive, onUpdate: _ => { }, onExit: _ => { })
@@ -60,12 +56,10 @@ public sealed class MicroBundle : IMicroBundle
             context.ElapsedMilliseconds++;
         }
 
-        // Drive this specific handle directly. The bundle's context remains the
-        // FSM lifecycle authority even after invalidation: invalidity is itself
-        // a transition condition leading to Collapsing and Destroyed. Routing
-        // through the group ticker would allow the API's validity filtering to
-        // suppress the very FSM tick that must consume that condition.
-        _fsm.Update(ProcessingGroup);
+        // FSMHandle.Update performs exactly one FSM step. Do not route this
+        // lifecycle clock through group validity filtering: invalidity is itself
+        // a lifecycle condition that must be consumed by the bundle FSM.
+        _fsm.Update();
         Manifestation = _provider.Manifest(Context);
     }
 
