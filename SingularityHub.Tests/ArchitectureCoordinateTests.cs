@@ -42,7 +42,9 @@ public sealed class ArchitectureCoordinateTests
     [Fact(DisplayName = "0.02.005 — Missing_Metadata_Is_Detectable")]
     public void Missing_Metadata_Is_Detectable()
     {
-        var method = typeof(ArchitectureCoordinateTests).GetMethod(nameof(Coordinate_Without_Metadata));
+        var method = typeof(ArchitectureCoordinateTests).GetMethod(
+            nameof(Coordinate_Without_Metadata),
+            BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(method);
         Assert.Throws<InvalidOperationException>(() => ArchitectureTestAttribute.GetAddress(method!));
     }
