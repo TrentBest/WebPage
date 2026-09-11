@@ -75,10 +75,8 @@ public sealed class HubDomainTests
     public void Arbitration_Orders_By_Identity()
     {
         var hub = new HubKernel();
-        var high = new TestBundle(6010);
-        var low = new TestBundle(6009);
-        Assert.True(hub.LoadBundle(high));
-        Assert.True(hub.LoadBundle(low));
+        Assert.True(hub.LoadBundle(new TestBundle(6010)));
+        Assert.True(hub.LoadBundle(new TestBundle(6009)));
         Assert.Equal(2, hub.ExecuteArbitrationPipeline());
         Assert.Equal(new ulong[] { 6009, 6010 }, hub.Audit.Events.Select(e => e.ActorId));
     }
@@ -157,7 +155,7 @@ public sealed class HubDomainTests
         public OntologySignature Ontology => new((int)Id, 0, 0, 0, 0, 0, 0, 0, 0);
         public BundleVersion Version => new(1, 0, 0);
         public IReadOnlyList<ulong> Dependencies { get; }
-        public bool Arbitrate(IArbitrator arbitrator, int roundIndex) => !_changed && MarkChanged();
+        public virtual bool Arbitrate(IArbitrator arbitrator, int roundIndex) => !_changed && MarkChanged();
         private bool MarkChanged() { _changed = true; return true; }
     }
 
@@ -165,7 +163,7 @@ public sealed class HubDomainTests
     {
         private int _round;
         public TenRoundBundle(ulong id) : base(id) { }
-        public new bool Arbitrate(IArbitrator arbitrator, int roundIndex)
+        public override bool Arbitrate(IArbitrator arbitrator, int roundIndex)
         {
             _round++;
             return _round <= 10;
