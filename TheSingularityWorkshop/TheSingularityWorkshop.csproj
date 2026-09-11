@@ -4,8 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-
-	  <BlazorEnableCompression>false</BlazorEnableCompression>
+    <BlazorEnableCompression>false</BlazorEnableCompression>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.11" PrivateAssets="all" />
     <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" />
+    <ProjectReference Include="..\SingularityHub\SingularityHub.csproj" />
   </ItemGroup>
 
   <ItemGroup>
