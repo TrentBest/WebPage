@@ -41,6 +41,8 @@
     private int _generation;
     private static readonly TimeSpan GenerationInterval = TimeSpan.FromMilliseconds(625);
 
+    public event Action? Completed;
+
     public void Start()
     {
         if (_active) return;
@@ -73,6 +75,9 @@
                 AddGeneration(children);
                 await InvokeAsync(StateHasChanged);
             }
+
+            if (!cancellationToken.IsCancellationRequested)
+                await InvokeAsync(() => Completed?.Invoke());
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
