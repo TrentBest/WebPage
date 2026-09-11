@@ -55,13 +55,13 @@ namespace TheSingularityWorkshop.Services
         {
             Context = new PageStateContext(singularityHub);
 
-            if (!fsm_API.Interaction.Exists(ProcessingGroup, "PageFSM"))
+            if (!fsm_API.Interaction.Exists("PageFSM", ProcessingGroup))
                 fsm_API.Create.CreateProcessingGroup(ProcessingGroup);
 
-            if (!fsm_API.Interaction.Exists(LivingGuiProcessingGroup, "LivingGuiFSM"))
+            if (!fsm_API.Interaction.Exists("LivingGuiFSM", LivingGuiProcessingGroup))
                 fsm_API.Create.CreateProcessingGroup(LivingGuiProcessingGroup);
 
-            if (!fsm_API.Interaction.Exists(GravityProcessingGroup, "GravityFSM"))
+            if (!fsm_API.Interaction.Exists("GravityFSM", GravityProcessingGroup))
                 fsm_API.Create.CreateProcessingGroup(GravityProcessingGroup);
 
             fsm_API.Create.CreateFiniteStateMachine("LivingGuiFSM", -1, LivingGuiProcessingGroup)
@@ -133,13 +133,13 @@ namespace TheSingularityWorkshop.Services
             if (CurrentState == LivingGuiPopulating)
             {
                 // The living-GUI group is stepped only during population.
-                // At critical mass this branch is never entered again.
                 fsm_API.Interaction.Update(LivingGuiProcessingGroup);
 
                 if (context.LivingGuiPopulated)
                 {
-                    // Critical-mass handoff: stop stepping LivingGui and begin
-                    // the Gravity group in this same outer heartbeat.
+                    // Critical mass: the living group stops here. The moniker is
+                    // created by the new Gravity state, and Gravity is stepped in
+                    // this same outer heartbeat.
                     _handle.TransitionTo(Gravity);
                     fsm_API.Interaction.Update(GravityProcessingGroup);
                 }
