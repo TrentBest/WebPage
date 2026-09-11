@@ -6,7 +6,8 @@ namespace SingularityHub.Tests;
 
 public sealed class SingularityHubTests
 {
-    [Fact]
+    [ArchitectureTest(6, 2, 1)]
+    [Fact(DisplayName = "6.02.001 — OntologySignature_IsFixedNineLayers_AndDeterministic")]
     public void OntologySignature_IsFixedNineLayers_AndDeterministic()
     {
         var a = new OntologySignature(1,2,3,4,5,6,7,8,9);
@@ -16,7 +17,8 @@ public sealed class SingularityHubTests
         Assert.Equal(a.StructuralId, b.StructuralId);
     }
 
-    [Fact]
+    [ArchitectureTest(6, 2, 2)]
+    [Fact(DisplayName = "6.02.002 — Hub_RejectsDuplicateBundle_AndArbitratesToHomeostasis")]
     public void Hub_RejectsDuplicateBundle_AndArbitratesToHomeostasis()
     {
         var hub = new HubKernel();
@@ -28,7 +30,8 @@ public sealed class SingularityHubTests
         Assert.Equal(0, hub.ExecuteArbitrationPipeline());
     }
 
-    [Fact]
+    [ArchitectureTest(7, 2, 1)]
+    [Fact(DisplayName = "7.02.001 — ProcessGroupLifecycle_IsTrackedWithoutExecutionMechanics")]
     public void ProcessGroupLifecycle_IsTrackedWithoutExecutionMechanics()
     {
         var hub = new HubKernel();
