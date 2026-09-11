@@ -30,11 +30,9 @@ public sealed class SingularityHub : ISingularityHub
             var roundMutations = 0;
             foreach (var bundle in _bundles.Values.OrderBy(b => b.Id))
             {
-                if (bundle.Arbitrate(this, round))
-                {
-                    roundMutations++;
-                    Audit.Record(new ArbitrationEvent(round, bundle.Id, bundle.Ontology.StructuralId, MutationType.StructuralMutation, 0));
-                }
+                if (!bundle.Arbitrate(this, round)) continue;
+                roundMutations++;
+                Audit.Record(new ArbitrationEvent(round, bundle.Id, bundle.Ontology.StructuralId, MutationType.StructuralMutation, 0));
             }
             mutations += roundMutations;
             if (roundMutations == 0) break;
@@ -44,7 +42,6 @@ public sealed class SingularityHub : ISingularityHub
 
     public bool TryResolve(ulong identity, out WarehouseAddress address) => _warehouse.TryGetValue(identity, out address);
     public void MapWarehouseIdentity(ulong identity, WarehouseAddress address) => _warehouse[identity] = address;
-
     public bool Register(ulong id) => _groups.TryAdd(id, ProcessGroupState.Registered);
     public bool Activate(ulong id) => _groups.TryGetValue(id, out var state) && state == ProcessGroupState.Registered && SetState(id, ProcessGroupState.Active);
     public bool Complete(ulong id) => _groups.TryGetValue(id, out var state) && state == ProcessGroupState.Active && SetState(id, ProcessGroupState.Completed);
@@ -57,5 +54,3 @@ public sealed class ArbitrationAudit : IArbitrationAudit
     public IReadOnlyList<ArbitrationEvent> Events => _events;
     public void Record(ArbitrationEvent arbitrationEvent) => _events.Add(arbitrationEvent);
 }
-
-public enum MutationType { StructuralMutation, PropertyInjection, DependencyResolution }
