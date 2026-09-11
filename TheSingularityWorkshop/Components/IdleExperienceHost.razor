@@ -1,0 +1,161 @@
+@using TheSingularityWorkshop.Services
+@implements IAsyncDisposable
+
+@if (_idleActive)
+{
+    <section class="idle-screen-saver" aria-label="Workshop idle experience">
+        <div class="idle-frame">
+            <header class="idle-header">
+                <span>WORKSHOP // IDLE</span>
+                <span>@_selectedExperience?.DisplayName</span>
+            </header>
+
+            @if (_selectedExperience?.Id == "pong")
+            {
+                <div class="pong-board" aria-label="Pong idle experience">
+                    <div class="pong-center-line"></div>
+                    <div class="pong-score pong-score-left">@_leftScore</div>
+                    <div class="pong-score pong-score-right">@_rightScore</div>
+                    <div class="pong-paddle pong-paddle-left" style="top:@($"{_leftPaddle}%")"></div>
+                    <div class="pong-paddle pong-paddle-right" style="top:@($"{_rightPaddle}%")"></div>
+                    <div class="pong-ball" style="left:@($"{_ballX}%");top:@($"{_ballY}%")"></div>
+                </div>
+            }
+
+            <footer class="idle-footer">
+                <span>THE USER HAS GONE AWAY.</span>
+                <span>THE WORKSHOP HAS NOT.</span>
+            </footer>
+        </div>
+    </section>
+}
+
+<style>
+    .idle-screen-saver { position:fixed; inset:0; z-index:90000; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 45%,rgba(0,234,255,.09),transparent 38%),rgba(1,3,8,.97); color:#dffaff; font-family:Consolas,'Courier New',monospace; animation:idleArrival .8s ease-out; }
+    .idle-frame { width:min(1100px,92vw); height:min(760px,88vh); display:flex; flex-direction:column; overflow:hidden; border:1px solid rgba(0,234,255,.65); box-shadow:0 0 22px rgba(0,234,255,.28),0 0 90px rgba(255,44,255,.12),inset 0 0 40px rgba(0,234,255,.035); background:rgba(2,7,17,.96); }
+    .idle-header,.idle-footer { display:flex; justify-content:space-between; gap:1rem; padding:.7rem 1rem; font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; border-bottom:1px solid rgba(0,234,255,.28); color:#8eefff; }
+    .idle-footer { border-top:1px solid rgba(0,234,255,.28); border-bottom:0; color:#ffb15c; }
+    .pong-board { position:relative; flex:1; min-height:0; margin:2rem; overflow:hidden; border:1px solid rgba(0,234,255,.38); background:radial-gradient(circle,rgba(0,234,255,.035),transparent 60%); }
+    .pong-center-line { position:absolute; top:0; bottom:0; left:50%; border-left:1px dashed rgba(255,255,255,.18); }
+    .pong-score { position:absolute; top:4%; font-size:clamp(3rem,8vw,6rem); color:rgba(0,234,255,.18); user-select:none; }
+    .pong-score-left { left:43%; }.pong-score-right { left:53%; }
+    .pong-paddle { position:absolute; width:10px; height:18%; transform:translateY(-50%); background:#00eaff; box-shadow:0 0 12px #00eaff,0 0 30px rgba(0,234,255,.55); }
+    .pong-paddle-left { left:2%; }.pong-paddle-right { right:2%; background:#ff2cff; box-shadow:0 0 12px #ff2cff,0 0 30px rgba(255,44,255,.55); }
+    .pong-ball { position:absolute; width:14px; height:14px; transform:translate(-50%,-50%); border-radius:50%; background:#ffd34d; box-shadow:0 0 12px #ffd34d,0 0 30px rgba(255,211,77,.65); }
+    @@keyframes idleArrival { from { opacity:0; transform:scale(1.03); } to { opacity:1; transform:scale(1); } }
+    @@media(max-width:700px) { .idle-frame{width:96vw;height:90vh}.pong-board{margin:1rem}.idle-header,.idle-footer{font-size:.55rem;letter-spacing:.08em}.pong-paddle{width:7px}.pong-ball{width:10px;height:10px} }
+</style>
+
+@code {
+    private readonly Random _random = new();
+    private CancellationTokenSource? _shutdown;
+    private Task? _loop;
+    private DateTime _lastActivityUtc = DateTime.UtcNow;
+    private bool _idleActive;
+    private IdleExperienceDefinition? _selectedExperience;
+    private double _ballX = 50;
+    private double _ballY = 50;
+    private double _ballVelocityX = .65;
+    private double _ballVelocityY = .42;
+    private double _leftPaddle = 50;
+    private double _rightPaddle = 50;
+    private int _leftScore;
+    private int _rightScore;
+
+    private static readonly TimeSpan IdleThreshold = TimeSpan.FromSeconds(15);
+
+    protected override void OnInitialized()
+    {
+        _shutdown = new CancellationTokenSource();
+        _loop = RunAsync(_shutdown.Token);
+    }
+
+    /// <summary>Records meaningful page activity and exits screen-saver mode.</summary>
+    public void RegisterActivity()
+    {
+        _lastActivityUtc = DateTime.UtcNow;
+        if (_idleActive)
+        {
+            _idleActive = false;
+            _selectedExperience = null;
+            _leftScore = 0;
+            _rightScore = 0;
+        }
+    }
+
+    private async Task RunAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(33));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                var idle = DateTime.UtcNow - _lastActivityUtc >= IdleThreshold;
+                if (idle && !_idleActive)
+                {
+                    _idleActive = true;
+                    _selectedExperience = IdleExperienceCatalog.Select(_random);
+                    ResetPong();
+                }
+
+                if (_idleActive && _selectedExperience?.Id == "pong")
+                {
+                    TickPong();
+                }
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
+    private void ResetPong()
+    {
+        _ballX = 50;
+        _ballY = 50;
+        _ballVelocityX = _random.Next(0, 2) == 0 ? .65 : -.65;
+        _ballVelocityY = _random.Next(0, 2) == 0 ? .42 : -.42;
+        _leftPaddle = 50;
+        _rightPaddle = 50;
+    }
+
+    private void TickPong()
+    {
+        _ballX += _ballVelocityX;
+        _ballY += _ballVelocityY;
+
+        if (_ballY <= 2 || _ballY >= 98)
+            _ballVelocityY *= -1;
+
+        _leftPaddle += Math.Clamp((_ballY - _leftPaddle) * .08, -1.6, 1.6);
+        _rightPaddle += Math.Clamp((_ballY - _rightPaddle) * .07, -1.45, 1.45);
+
+        if (_ballX <= 5 && Math.Abs(_ballY - _leftPaddle) <= 11)
+            _ballVelocityX = Math.Abs(_ballVelocityX) + .015;
+        else if (_ballX >= 95 && Math.Abs(_ballY - _rightPaddle) <= 11)
+            _ballVelocityX = -Math.Abs(_ballVelocityX) - .015;
+        else if (_ballX < -2)
+        {
+            _rightScore++;
+            ResetPong();
+        }
+        else if (_ballX > 102)
+        {
+            _leftScore++;
+            ResetPong();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_shutdown is null) return;
+        await _shutdown.CancelAsync();
+        if (_loop is not null)
+        {
+            try { await _loop; } catch (OperationCanceledException) { }
+        }
+        _shutdown.Dispose();
+    }
+}
