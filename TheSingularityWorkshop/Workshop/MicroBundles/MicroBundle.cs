@@ -26,17 +26,19 @@ public sealed class MicroBundle : IMicroBundle
         // before the definition/instance can participate in its update pass.
         FSM_API.FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
 
+        // Construction establishes the bundle's conceptual Created phase.
+        // FSM_API's first update enters its configured initial state; therefore
+        // Manifesting is the first FSM state so one MicroBundle.Update() maps
+        // to one externally observable lifecycle advance.
         FSM_API.FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
-            .State("Created", onEnter: EnterCreated, onUpdate: _ => { }, onExit: _ => { })
             .State("Manifesting", onEnter: EnterManifesting, onUpdate: _ => { }, onExit: _ => { })
             .State("Active", onEnter: EnterActive, onUpdate: _ => { }, onExit: _ => { })
             .State("Collapsing", onEnter: EnterCollapsing, onUpdate: _ => { }, onExit: _ => { })
             .State("Destroyed", onEnter: EnterDestroyed, onUpdate: _ => { }, onExit: _ => { })
-            .Transition("Created", "Manifesting", c => ((MicroBundleContext)c).IsValid)
             .Transition("Manifesting", "Active", c => ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
             .Transition("Active", "Collapsing", c => !((MicroBundleContext)c).IsValid)
             .Transition("Collapsing", "Destroyed", c => !((MicroBundleContext)c).IsValid && ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
-            .WithInitialState("Created")
+            .WithInitialState("Manifesting")
             .BuildDefinition();
 
         _fsm = FSM_API.FSM_API.Create.CreateInstance(FsmName, Context, ProcessingGroup);
@@ -70,7 +72,6 @@ public sealed class MicroBundle : IMicroBundle
         }
     }
 
-    private void EnterCreated(IStateContext context) => ((MicroBundleContext)context).Phase = "Created";
     private void EnterManifesting(IStateContext context) => ((MicroBundleContext)context).Phase = "Manifesting";
     private void EnterActive(IStateContext context) => ((MicroBundleContext)context).Phase = "Active";
     private void EnterCollapsing(IStateContext context) => ((MicroBundleContext)context).Phase = "Collapsing";
