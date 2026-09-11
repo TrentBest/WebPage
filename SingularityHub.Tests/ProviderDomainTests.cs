@@ -73,7 +73,7 @@ public sealed class ProviderDomainTests
         var context = new MicroBundleContext(3008, "Identity") { Phase = "Active", ParentId = 41, Generation = 9 };
         var manifestation = _provider.Manifest(context);
         Assert.Equal(3008, manifestation.Id);
-        Assert.Equal("Identity", manifestation.Name);
+        Assert.Equal("Identity", manifestation.Target);
         Assert.Equal(41, manifestation.Parameters["ParentId"]);
         Assert.Equal(9, manifestation.Parameters["Generation"]);
     }
