@@ -1,0 +1,30 @@
+name: .NET Tests
+
+on:
+  push:
+    branches:
+      - feature/living-workshop-landing
+  pull_request:
+    branches:
+      - feature/living-workshop-landing
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore SingularityHub.Tests/SingularityHub.Tests.csproj
+
+      - name: Build
+        run: dotnet build SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"

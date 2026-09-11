@@ -1,53 +1,43 @@
 ﻿@using TheSingularityWorkshop.Shared
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">The Singularity Workshop</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<div class="top-row ps-3 navbar navbar-dark workshop-navbar-brand">
+    <div class="container-fluid workshop-brand-stack" aria-label="The Singularity Workshop">
+        <a class="navbar-brand workshop-brand" href="">
+            <span class="brand-word"><span class="brand-letter blue">T</span><span class="brand-letter magenta">H</span><span class="brand-letter orange">E</span></span>
+            <span class="brand-word"><span class="brand-letter red">S</span><span class="brand-letter yellow">I</span><span class="brand-letter green">N</span><span class="brand-letter blue">G</span><span class="brand-letter magenta">U</span><span class="brand-letter orange">L</span><span class="brand-letter red">A</span><span class="brand-letter yellow">R</span><span class="brand-letter green">I</span><span class="brand-letter blue">T</span><span class="brand-letter magenta">Y</span></span>
+            <span class="brand-word"><span class="brand-letter orange">W</span><span class="brand-letter red">O</span><span class="brand-letter yellow">R</span><span class="brand-letter green">K</span><span class="brand-letter blue">S</span><span class="brand-letter magenta">H</span><span class="brand-letter orange">O</span><span class="brand-letter red">P</span></span>
+        </a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu"><span class="navbar-toggler-icon"></span></button>
     </div>
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="demos">
-                <span class="oi oi-list" aria-hidden="true"></span> Demos
-            </NavLink>
-        </div>
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="privacypolicy">
-                <span class="oi oi-info" aria-hidden="true"></span> Privacy Policy
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="naming-poll">
-                <span class="oi oi-graph" aria-hidden="true"></span> Vote on Name
-            </NavLink>
-        </div>
-
+        <div class="nav-item px-3"><NavLink class="nav-link" href="" Match="NavLinkMatch.All"><span class="oi oi-home" aria-hidden="true"></span> Home</NavLink></div>
+        <div class="nav-item px-3 ai-nav-item"><NavLink class="nav-link" href="ai"><span class="oi oi-lightbulb" aria-hidden="true"></span> AI</NavLink></div>
+        <div class="nav-item px-3"><NavLink class="nav-link" href="living-gui"><span class="oi oi-pulse" aria-hidden="true"></span> Living GUI</NavLink></div>
+        <div class="nav-item px-3"><NavLink class="nav-link" href="fsm-suite"><span class="oi oi-list-rich" aria-hidden="true"></span> FSM Suite</NavLink></div>
+        <div class="nav-item px-3"><NavLink class="nav-link" href="hub"><span class="oi oi-cog" aria-hidden="true"></span> Singularity Hub</NavLink></div>
+        <div class="nav-item px-3"><NavLink class="nav-link" href="demos"><span class="oi oi-list" aria-hidden="true"></span> Demos</NavLink></div>
+        <div class="nav-item px-3"><NavLink class="nav-link" href="library"><span class="oi oi-book" aria-hidden="true"></span> Library</NavLink></div>
+        <div class="nav-item px-3"><NavLink class="nav-link" href="about"><span class="oi oi-info" aria-hidden="true"></span> About</NavLink></div>
+        <div class="nav-item px-3"><NavLink class="nav-link" href="privacypolicy"><span class="oi oi-info" aria-hidden="true"></span> Privacy Policy</NavLink></div>
+        <div class="nav-item px-3"><NavLink class="nav-link" href="naming-poll"><span class="oi oi-graph" aria-hidden="true"></span> Vote on Name</NavLink></div>
         <LoginStatus />
-        
     </nav>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
-
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 }
+
+<style>
+    .workshop-navbar-brand{min-height:7.5rem;padding:.75rem .5rem}.workshop-brand-stack{display:flex;align-items:center;justify-content:center;gap:.35rem}.workshop-brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.18rem;width:100%;margin:0;padding:0;font-family:Consolas,'Courier New',monospace;font-size:clamp(.7rem,1.25vw,1.05rem);font-weight:800;line-height:1;text-decoration:none;text-align:center;white-space:nowrap}.workshop-brand .brand-word{display:block;width:max-content;max-width:100%;white-space:nowrap;line-height:1}.workshop-brand .brand-letter{display:inline-block;animation:workshopBrandBreath 3.4s ease-in-out infinite;transform-origin:center}.workshop-brand .blue{color:#00a8ff}.workshop-brand .magenta{color:#ff2cff}.workshop-brand .orange{color:#ff7a00}.workshop-brand .red{color:#ff3030}.workshop-brand .yellow{color:#ffd34d}.workshop-brand .green{color:#52e05a}.workshop-brand .brand-letter:nth-child(2){animation-delay:-.17s}.workshop-brand .brand-letter:nth-child(3){animation-delay:-.34s}.workshop-brand .brand-letter:nth-child(4){animation-delay:-.51s}.workshop-brand .brand-letter:nth-child(5){animation-delay:-.68s}.workshop-brand .brand-letter:nth-child(6){animation-delay:-.85s}.workshop-brand .brand-letter:nth-child(7){animation-delay:-1.02s}.workshop-brand .brand-letter:nth-child(8){animation-delay:-1.19s}.workshop-brand .brand-letter:nth-child(9){animation-delay:-1.36s}.workshop-brand .brand-letter:nth-child(10){animation-delay:-1.53s}.workshop-brand .brand-letter:nth-child(11){animation-delay:-1.70s}
+    @@keyframes workshopBrandBreath{0%,100%{filter:brightness(.82);text-shadow:0 0 4px currentColor;transform:translateY(0) scale(1)}50%{filter:brightness(1.35);text-shadow:0 0 10px currentColor,0 0 20px currentColor;transform:translateY(-1px) scale(1.05)}}
+    .ai-nav-item .nav-link{color:#00eaff;text-shadow:0 0 8px rgba(0,234,255,.45);animation:aiNavBreath 2.8s ease-in-out infinite}.ai-nav-item .nav-link.active,.ai-nav-item .nav-link:hover{color:#ff2cff;text-shadow:0 0 10px rgba(255,44,255,.65)}@@keyframes aiNavBreath{0%,100%{opacity:.78}50%{opacity:1}}
+    .monolith-text{width:calc(100% - 2.5rem)!important;max-width:calc(100% - 2.5rem)!important;padding-inline:.4rem!important;box-sizing:border-box!important;font-size:clamp(.62rem,1.7vw,1.95rem)!important;letter-spacing:clamp(.035em,.09em,.11em)!important;line-height:1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;animation:workshopEnterBreath 2.8s ease-in-out infinite!important}.monolith-btn:hover .monolith-text{animation-duration:1.8s!important}
+    .ambient-signal::before,.ambient-signal::after{content:"";position:absolute;width:3px;height:3px;border-radius:50%;background:currentColor;box-shadow:0 0 7px currentColor,0 0 15px currentColor;opacity:0;animation:workshopSparkCrescendo 8s ease-in-out infinite}.ambient-signal::before{left:22px;top:-14px;animation-delay:-1.7s}.ambient-signal::after{left:-31px;top:17px;animation-delay:-4.1s}.signal-two::before{left:28px;top:25px;animation-delay:-2.6s}.signal-three::after{left:19px;top:-28px;animation-delay:-5.4s}
+    @@keyframes workshopEnterBreath{0%,100%{transform:translateX(-50%) scale(1);filter:brightness(.9);opacity:.9}50%{transform:translateX(-50%) scale(1.035);filter:brightness(1.22);opacity:1}}@@keyframes workshopSparkCrescendo{0%,12%{opacity:0;transform:scale(.2) translateY(8px)}25%{opacity:.35}48%{opacity:.85;transform:scale(1.4) translateY(0)}72%{opacity:1;transform:scale(.75) translateY(-5px)}100%{opacity:0;transform:scale(.1) translateY(-18px)}}
+</style>

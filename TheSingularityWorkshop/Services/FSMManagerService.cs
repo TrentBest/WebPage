@@ -1,52 +1,46 @@
-﻿using TheSingularityWorkshop.FSM_API;
-using TheSingularityWorkshop.Services;
+﻿using System;
 
-
-public class FSMManagerService
+namespace TheSingularityWorkshop.Services
 {
-    // FSMHandle is your direct link to the live FSM instance
-    private FSMHandle _fsmHandle;
-
-    public PageStateContext Context { get; }
-
-    // Expose the current FSM state for UI components to bind to
-    public string CurrentState => _fsmHandle?.CurrentState ?? "Uninitialized";
-
-    public FSMManagerService()
-    {
-        // 1. Initialize the Context/Data Bag
-        Context = new PageStateContext();
-
-        // 2. Define the FSM blueprint (Initialization, Operation, Shutdown)
-        FSM_API.Create.CreateFiniteStateMachine("WebpageFSM", -1, "Update")
-            // Core States: Defining the three parts of your application state
-            .State("Idle", null, onUpdate: (c) => ((PageStateContext)c).Message = "Awaiting input...", null)
-            .State("Clicked", onEnter: (c) => ((PageStateContext)c).Message = "Button Clicked!",null, null)
-            .State("Processing", onEnter: (c) => ((PageStateContext)c).Message = "Processing...", null, null)
-            .Transition("Idle", "Clicked", (c) => ((PageStateContext)c).ClickCount > 0)
-            .Transition("Clicked", "Processing", (c) => true)
-            .Transition("Processing", "Idle", (c) => ((PageStateContext)c).ClickCount > 10) // Simulates a reset condition         
-            .BuildDefinition(); // Use BuildDefinition for API consistency
-
-        // 3. Create the FSM instance and connect it to the Context
-        // We use the "Update" processing group so the Heartbeat service will tick it.
-        _fsmHandle = FSM_API.Create.CreateInstance("WebpageFSM", Context, "Update");
-    }
-
     /// <summary>
-    /// Tells the FSM instance to take one "step" or "tick" forward.
+    /// Compatibility facade over the real page-level FSM.
+    /// The FSM_API owns progression; this service only exposes the live PageFSM to UI consumers.
     /// </summary>
-    public void Step()
+    public sealed class FSMManagerService : IDisposable
     {
-        // This is for manual/event-driven updates, which should still use a group update
-        FSM_API.Interaction.Update("Update");
-    }
+        public PageFSM Page { get; }
 
-    /// <summary>
-    /// Forces the FSM to transition to a new state, typically triggered by a UI event.
-    /// </summary>
-    public void ForceTransition(string nextStateName)
-    {
-        _fsmHandle?.TransitionTo(nextStateName);
+        public PageStateContext Context => Page.Context;
+
+        public string CurrentState => Page.CurrentState;
+
+        public event Action<string>? StateChanged
+        {
+            add => Page.StateChanged += value;
+            remove => Page.StateChanged -= value;
+        }
+
+        public FSMManagerService()
+        {
+            Page = new PageFSM();
+        }
+
+        public void RequestEnter() => Page.RequestEnter();
+
+        public void SignalLivingGuiPopulated() => Page.SignalLivingGuiPopulated();
+
+        public void SignalMonikerReady() => Page.SignalMonikerReady();
+
+        public void SignalGravityReleased() => Page.SignalGravityReleased();
+
+        public void SignalLivingGuiFallen() => Page.SignalLivingGuiFallen();
+
+        public void SignalNavigationReady() => Page.SignalNavigationReady();
+
+        public void Step() => Page.Update();
+
+        public void Shutdown() => Page.Shutdown();
+
+        public void Dispose() => Page.Dispose();
     }
 }

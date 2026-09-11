@@ -8,7 +8,12 @@ using _FSM_API = TheSingularityWorkshop.FSM_API.FSM_API;
 public class BlazorFSMIntegration : IDisposable
 {
     private const int UpdateRateMs = 33;
-    public List<string> UpdateGroups { get; private set; } = new() { "Update" };
+
+    public List<string> UpdateGroups { get; private set; } = new()
+    {
+        "Update",
+        "PageFSM"
+    };
 
     public event Action? OnStateChanged;
 
@@ -16,11 +21,10 @@ public class BlazorFSMIntegration : IDisposable
     private CancellationTokenSource? _cts;
     private Task? _loopTask;
 
-    // Removed unused '_isRunning' field to fix warning
-
     public BlazorFSMIntegration()
     {
-        foreach (var group in UpdateGroups) _FSM_API.Create.CreateProcessingGroup(group);
+        // PageFSM owns creation of its own processing group.
+        _FSM_API.Create.CreateProcessingGroup("Update");
         StartLoop();
     }
 
@@ -31,10 +35,7 @@ public class BlazorFSMIntegration : IDisposable
         _loopTask = RunGameLoopAsync(_cts.Token);
     }
 
-    public void StopLoop()
-    {
-        _cts?.Cancel();
-    }
+    public void StopLoop() => _cts?.Cancel();
 
     private async Task RunGameLoopAsync(CancellationToken token)
     {
@@ -45,13 +46,15 @@ public class BlazorFSMIntegration : IDisposable
             while (await _gameLoopTimer.WaitForNextTickAsync(token))
             {
                 foreach (var group in UpdateGroups)
-                {
                     _FSM_API.Interaction.Update(group);
-                }
+
                 OnStateChanged?.Invoke();
             }
         }
-        catch (OperationCanceledException) { /* Graceful shutdown */ }
+        catch (OperationCanceledException)
+        {
+            // Graceful shutdown.
+        }
     }
 
     public void Dispose()
