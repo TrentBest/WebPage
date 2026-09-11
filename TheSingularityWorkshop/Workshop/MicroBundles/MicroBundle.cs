@@ -60,7 +60,12 @@ public sealed class MicroBundle : IMicroBundle
             context.ElapsedMilliseconds++;
         }
 
-        FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
+        // Drive this specific handle directly. The bundle's context remains the
+        // FSM lifecycle authority even after invalidation: invalidity is itself
+        // a transition condition leading to Collapsing and Destroyed. Routing
+        // through the group ticker would allow the API's validity filtering to
+        // suppress the very FSM tick that must consume that condition.
+        _fsm.Update(ProcessingGroup);
         Manifestation = _provider.Manifest(Context);
     }
 

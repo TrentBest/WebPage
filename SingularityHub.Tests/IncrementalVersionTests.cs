@@ -13,7 +13,7 @@ namespace SingularityHub.Tests;
 public sealed class IncrementalVersionTests
 {
     /// <summary>Current architectural test-suite milestone.</summary>
-    public const string CurrentVersion = "0.0.2";
+    public const string CurrentVersion = "0.0.3";
 
     [ArchitectureTest(0, 0, 1)]
     [Fact(DisplayName = "0.00.001 — Incremental_Version_Heartbeat")]
@@ -32,6 +32,13 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 3)]
     [Fact(DisplayName = "0.00.003 — Incremental_Change_Heartbeat")]
     public void Incremental_Change_Heartbeat()
+    {
+        Assert.True(true);
+    }
+
+    [ArchitectureTest(0, 0, 4)]
+    [Fact(DisplayName = "0.00.004 — Incremental_Change_Heartbeat")]
+    public void Incremental_Change_Heartbeat_004()
     {
         Assert.True(true);
     }
