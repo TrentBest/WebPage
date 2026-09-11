@@ -24,7 +24,7 @@ public sealed class SingularityHubTests
         Assert.False(hub.LoadBundle(bundle));
         Assert.Equal(1, hub.ExecuteArbitrationPipeline());
         Assert.Single(hub.Audit.Events);
-        Assert.Equal(1, hub.ExecuteArbitrationPipeline());
+        Assert.Equal(0, hub.ExecuteArbitrationPipeline());
     }
 
     [Fact]
