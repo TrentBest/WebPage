@@ -48,8 +48,8 @@ public sealed class ContractSurfaceTests
         {
             foreach (var method in type.GetMethods())
             {
-                Assert.DoesNotContain(method.ReturnType, forbidden);
-                Assert.DoesNotContain(method.GetParameters().Select(p => p.ParameterType), forbidden);
+                Assert.False(forbidden.Contains(method.ReturnType));
+                Assert.All(method.GetParameters(), parameter => Assert.False(forbidden.Contains(parameter.ParameterType)));
             }
         }
     }
