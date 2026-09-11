@@ -55,17 +55,11 @@ public sealed class MicroBundle : IMicroBundle
 
     public void Update()
     {
-        if (Context is MicroBundleContext context)
-        {
-            context.ElapsedMilliseconds++;
-        }
-
         // FSM_API's processing-group update owns the initial state entry and
-        // regular transition evaluation. A regular transition changes the
-        // handle's CurrentState and deliberately leaves HasEnteredCurrentState
-        // false until the next tick. MicroBundle completes that transition's
-        // entry in the same explicit update, but only after the initial state
-        // has already had its first entry opportunity.
+        // regular transition evaluation. The lifecycle clock advances only
+        // after the FSM has evaluated the current tick. This preserves the
+        // contract that the first explicit update enters Manifesting without
+        // immediately satisfying its one-tick transition to Active.
         var stateBeforeTick = _fsm.CurrentState;
 
         FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
@@ -73,6 +67,11 @@ public sealed class MicroBundle : IMicroBundle
         if (stateBeforeTick != _fsm.CurrentState && !_fsm.HasEnteredCurrentState)
         {
             _fsm.TransitionTo(_fsm.CurrentState);
+        }
+
+        if (Context is MicroBundleContext context)
+        {
+            context.ElapsedMilliseconds++;
         }
 
         Manifestation = _provider.Manifest(Context);
