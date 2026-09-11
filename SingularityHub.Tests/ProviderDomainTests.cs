@@ -56,14 +56,23 @@ public sealed class ProviderDomainTests
     }
 
     [ArchitectureTest(3, 1, 7)]
-    [Fact(DisplayName = "3.01.007 — Provider_Does_Not_Mutate_Context")]
-    public void Provider_Does_Not_Mutate_Context()
+    [Fact(DisplayName = "3.01.007 — Provider_Preserves_Context_State")]
+    public void Provider_Preserves_Context_State()
     {
-        var context = new MicroBundleContext(3007, "Provider") { Phase = "Active", ElapsedMilliseconds = 17 };
+        var context = new MicroBundleContext(3007, "Provider")
+        {
+            Phase = "Active",
+            ElapsedMilliseconds = 17,
+            IsValid = false,
+            IsInvalidated = false
+        };
+
         _ = _provider.Manifest(context);
+
         Assert.Equal("Active", context.Phase);
         Assert.Equal(17, context.ElapsedMilliseconds);
-        Assert.True(context.IsValid);
+        Assert.False(context.IsValid);
+        Assert.False(context.IsInvalidated);
     }
 
     [ArchitectureTest(3, 1, 8)]
