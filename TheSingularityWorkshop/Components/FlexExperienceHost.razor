@@ -5,7 +5,7 @@
     <div class="flex-experience" aria-label="Living GUI flex experience">
         @foreach (var node in _nodes)
         {
-            <div class="flex-node" style="left:@$"{node.X}%";top:@$"{node.Y}%";--node-delay:@$"{node.DelayMs}ms";" title="Lineage @node.Lineage">
+            <div class="flex-node" style="@($"left:{node.X}%;top:{node.Y}%;--node-delay:{node.DelayMs}ms;")" title="Lineage @node.Lineage">
                 <span class="flex-node-label">@node.Lineage</span>
             </div>
         }
