@@ -19,7 +19,7 @@
                     <div class="pong-score pong-score-left">@_leftScore</div>
                     <div class="pong-score pong-score-right">@_rightScore</div>
                     <div class="pong-paddle pong-paddle-left"
-                         style="--paddle-position:@$"{_leftPaddle}%""
+                         style="@($"--paddle-position:{_leftPaddle}%")"
                          @onpointerdown="BeginLeftDrag"
                          @onpointermove="DragLeftPaddle"
                          @onpointerup="EndLeftDrag"
@@ -32,11 +32,11 @@
                         <span>P</span><span>A</span><span>D</span><span>D</span><span>L</span><span>E</span>
                     </div>
                     <div class="pong-paddle pong-paddle-right"
-                         style="--paddle-position:@$"{_rightPaddle}%""
+                         style="@($"--paddle-position:{_rightPaddle}%")"
                          aria-label="AI paddle">
                         <span>P</span><span>A</span><span>D</span><span>D</span><span>L</span><span>E</span>
                     </div>
-                    <div class="pong-ball" style="left:@($"{_ballX}%");top:@($"{_ballY}%")"></div>
+                    <div class="pong-ball" style="@($"left:{_ballX}%;top:{_ballY}%")"></div>
                 </div>
             }
 
@@ -96,8 +96,6 @@
 
     protected override void OnInitialized()
     {
-        // The experience exists independently of idle mode. Idle merely decides
-        // when this already-registered experience should be manifested.
         _pongBundle = MicroBundleCatalog.CreatePong();
         _shutdown = new CancellationTokenSource();
         _loop = RunAsync(_shutdown.Token);
