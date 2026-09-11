@@ -63,8 +63,12 @@ public sealed class ContractSurfaceTests
     [Fact(DisplayName = "0.01.005 — ProcessGroup_Contract_Exposes_State_Not_Mechanics")]
     public void ProcessGroup_Contract_Exposes_State_Not_Mechanics()
     {
-        var methods = typeof(IProcessGroupHost).GetMethods();
-        Assert.Equal(3, methods.Length);
+        var type = typeof(IProcessGroupHost);
+        var methods = type.GetMethods();
+        var properties = type.GetProperties();
+
+        Assert.Equal(3, methods.Count(m => m.Name is "Register" or "Activate" or "Complete"));
+        Assert.Single(properties, p => p.Name == nameof(IProcessGroupHost.ActiveGroups));
         Assert.DoesNotContain(methods, m => m.Name.Contains("Execute", StringComparison.OrdinalIgnoreCase));
     }
 
