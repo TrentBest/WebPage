@@ -1,7 +1,6 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
-@using TheSingularityWorkshop.Components
 @implements IDisposable
 
 <div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "")">
@@ -20,24 +19,9 @@
             </div>
         }
 
-        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")"
-                 @onclick="HandleLandingClick">
-            @if (IsWorkshopLanding)
-            {
-                <CascadingValue Value="(Action)StopPong">
-                    @Body
-                </CascadingValue>
-            }
-            else
-            {
-                @Body
-            }
+        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">
+            @Body
         </article>
-
-        @if (IsWorkshopLanding && _pongActive)
-        {
-            <PongField @ref="_pongField" />
-        }
     </main>
 </div>
 
@@ -77,9 +61,6 @@
 }
 
 @code {
-    private PongField? _pongField;
-    private bool _pongActive = true;
-
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
 
     private bool ShowWorkshopChrome => !IsWorkshopLanding || FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running;
@@ -111,20 +92,6 @@
     }
 
     private void HandleFSMStateChanged(string _) => InvokeAsync(StateHasChanged);
-
-    private void HandleLandingClick()
-    {
-        StopPong();
-    }
-
-    private void StopPong()
-    {
-        if (!_pongActive) return;
-
-        _pongActive = false;
-        _pongField?.StopFromLandingInteraction();
-        StateHasChanged();
-    }
 
     public void Dispose()
     {
