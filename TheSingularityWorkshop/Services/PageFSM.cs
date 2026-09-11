@@ -7,10 +7,14 @@ namespace TheSingularityWorkshop.Services
     /// <summary>
     /// The outermost FSM for the Workshop web experience.
     /// Blazor is the presentation surface; FSM_API owns progression.
+    /// The living GUI and gravity simulations have separate processing groups.
     /// </summary>
     public sealed class PageFSM : IDisposable
     {
         public const string ProcessingGroup = "PageFSM";
+        public const string LivingGuiProcessingGroup = "LivingGui";
+        public const string GravityProcessingGroup = "Gravity";
+
         public const string Initializing = "PAGE_INITIALIZING";
         public const string Gateway = "GATEWAY";
         public const string GatewayExit = "GATEWAY_EXIT";
@@ -23,9 +27,9 @@ namespace TheSingularityWorkshop.Services
         public const string Running = "RUNNING";
         public const string ShutdownState = "SHUTDOWN";
 
-        private const long GravityRevealTicks = 20;
-
         private readonly FSMHandle _handle;
+        private readonly FSMHandle _livingGuiHandle;
+        private readonly FSMHandle _gravityHandle;
         private bool _disposed;
 
         public PageStateContext Context { get; }
@@ -50,7 +54,32 @@ namespace TheSingularityWorkshop.Services
         public PageFSM(object? singularityHub = null, Behavior? behavior = null)
         {
             Context = new PageStateContext(singularityHub);
-            fsm_API.Create.CreateProcessingGroup(ProcessingGroup);
+
+            if (!fsm_API.Interaction.Exists(ProcessingGroup, "PageFSM"))
+                fsm_API.Create.CreateProcessingGroup(ProcessingGroup);
+
+            if (!fsm_API.Interaction.Exists(LivingGuiProcessingGroup, "LivingGuiFSM"))
+                fsm_API.Create.CreateProcessingGroup(LivingGuiProcessingGroup);
+
+            if (!fsm_API.Interaction.Exists(GravityProcessingGroup, "GravityFSM"))
+                fsm_API.Create.CreateProcessingGroup(GravityProcessingGroup);
+
+            fsm_API.Create.CreateFiniteStateMachine("LivingGuiFSM", -1, LivingGuiProcessingGroup)
+                .State("RUNNING", null,
+                    c => ((PageStateContext)c).AdvanceLivingGui(), null)
+                .WithInitialState("RUNNING")
+                .BuildDefinition();
+
+            _livingGuiHandle = fsm_API.Create.CreateInstance("LivingGuiFSM", Context, LivingGuiProcessingGroup);
+
+            fsm_API.Create.CreateFiniteStateMachine("GravityFSM", -1, GravityProcessingGroup)
+                .State("RUNNING",
+                    c => ((PageStateContext)c).BeginGravity(),
+                    c => ((PageStateContext)c).AdvanceGravity(), null)
+                .WithInitialState("RUNNING")
+                .BuildDefinition();
+
+            _gravityHandle = fsm_API.Create.CreateInstance("GravityFSM", Context, GravityProcessingGroup);
 
             fsm_API.Create.CreateFiniteStateMachine("PageFSM", -1, ProcessingGroup)
                 .State(Initializing, Enter(behavior?.OnInitialization), Tick, null)
@@ -62,8 +91,12 @@ namespace TheSingularityWorkshop.Services
                     behavior?.OnLivingGuiIgnition?.Invoke(c);
                 }), Tick, null)
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
-                .State(Gravity, Enter(behavior?.OnGravity), Tick, null)
                 .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
+                .State(Gravity, Enter(c =>
+                {
+                    c.BeginGravity();
+                    behavior?.OnGravity?.Invoke(c);
+                }), Tick, null)
                 .State(LivingGuiDissipating, Enter(behavior?.OnLivingGuiDissipating), Tick, null)
                 .State(NavigationArrival, Enter(behavior?.OnNavigationArrival), Tick, null)
                 .State(Running, Enter(behavior?.OnRunning), Tick, null)
@@ -73,13 +106,9 @@ namespace TheSingularityWorkshop.Services
                 .Transition(Gateway, GatewayExit, c => ((PageStateContext)c).EnterRequested)
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
-                // Critical mass is the trigger. Once the swarm freezes, gravity begins.
                 .Transition(LivingGuiPopulating, Gravity, c => ((PageStateContext)c).LivingGuiPopulated)
-                // Gravity gets a short, deterministic FSM-owned reveal window.
-                // Only after gravity has begun do we transition into the persistent moniker.
-                .Transition(Gravity, MonikerReveal, c => ((PageStateContext)c).StateTicks >= GravityRevealTicks)
-                // MonikerReveal is intentionally terminal for this landing sequence.
-                // The moniker remains visible until navigation leaves the page.
+                .Transition(Gravity, NavigationArrival, c => ((PageStateContext)c).NavigationReady)
+                .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
@@ -102,7 +131,26 @@ namespace TheSingularityWorkshop.Services
             context.StateTicks++;
 
             if (CurrentState == LivingGuiPopulating)
-                context.AdvanceLivingGui();
+            {
+                // The living-GUI group is stepped only during population.
+                // At critical mass this branch is never entered again.
+                fsm_API.Interaction.Update(LivingGuiProcessingGroup);
+
+                if (context.LivingGuiPopulated)
+                {
+                    // Critical-mass handoff: stop stepping LivingGui and begin
+                    // the Gravity group in this same outer heartbeat.
+                    _handle.TransitionTo(Gravity);
+                    fsm_API.Interaction.Update(GravityProcessingGroup);
+                }
+            }
+            else if (CurrentState == Gravity)
+            {
+                fsm_API.Interaction.Update(GravityProcessingGroup);
+
+                if (context.NavigationReady)
+                    _handle.TransitionTo(NavigationArrival);
+            }
 
             StateChanged?.Invoke(CurrentState);
         }
@@ -126,7 +174,8 @@ namespace TheSingularityWorkshop.Services
 
         public void Update()
         {
-            if (!_disposed) fsm_API.Interaction.Update(ProcessingGroup);
+            if (!_disposed)
+                fsm_API.Interaction.Update(ProcessingGroup);
         }
 
         public void Dispose()
