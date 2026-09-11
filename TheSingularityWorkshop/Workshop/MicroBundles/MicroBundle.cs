@@ -45,7 +45,7 @@ public sealed class MicroBundle : IMicroBundle
     }
 
     private string FsmName => $"MicroBundle_{Id}";
-    private const string ProcessingGroup = "MicroBundles";
+    private string ProcessingGroup => $"MicroBundle_{Id}";
 
     public int Id { get; }
     public IStateContext Context { get; }
