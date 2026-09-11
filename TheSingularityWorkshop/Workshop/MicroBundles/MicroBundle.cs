@@ -1,4 +1,6 @@
 using TheSingularityWorkshop.FSM_API;
+using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
+using TheSingularityWorkshop.SingularityHub;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
@@ -6,8 +8,10 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// Minimal runtime shell for a micro-bundle.
 /// The bundle schedules lifecycle through FSM_API and leaves manifestation to
 /// an <see cref="IMicroBundleProvider"/>.
+/// It also projects itself through the Hub-level micro-bundle contract so the
+/// runtime Element can participate in Hub arbitration without exposing its FSM mechanics.
 /// </summary>
-public sealed class MicroBundle : IMicroBundle
+public sealed class MicroBundle : IMicroBundle, HubBundle
 {
     private readonly FSMHandle _fsm;
     private readonly IMicroBundleProvider _provider;
@@ -52,6 +56,25 @@ public sealed class MicroBundle : IMicroBundle
 
     /// <summary>Latest platform-specific manifestation produced by the provider.</summary>
     public MicroBundleManifestation? Manifestation { get; private set; }
+
+    /// <summary>Hub-facing identity. It is the same stable identity represented by the Workshop integer id.</summary>
+    ulong HubBundle.Id => checked((ulong)Id);
+
+    /// <summary>Hub-facing ontology projection. Runtime Element identity is the first coordinate until richer ontology data is supplied.</summary>
+    OntologySignature HubBundle.Ontology => new(0, 0, 0, 0, 0, 0, 0, 0, Id);
+
+    /// <summary>Hub-facing bundle version.</summary>
+    BundleVersion HubBundle.Version => new(1, 0, 0);
+
+    /// <summary>Workshop Elements currently declare no Hub-level dependencies.</summary>
+    IReadOnlyList<ulong> HubBundle.Dependencies => Array.Empty<ulong>();
+
+    /// <summary>Lifecycle participation is represented as a successful Hub arbitration pass.</summary>
+    bool HubBundle.Arbitrate(IArbitrator arbitrator, int roundIndex)
+    {
+        ArgumentNullException.ThrowIfNull(arbitrator);
+        return roundIndex >= 0;
+    }
 
     public void Update()
     {
