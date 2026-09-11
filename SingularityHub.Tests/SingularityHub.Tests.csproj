@@ -13,5 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SingularityHub.Abstractions\SingularityHub.Abstractions.csproj" />
     <ProjectReference Include="..\SingularityHub\SingularityHub.csproj" />
+    <ProjectReference Include="..\TheSingularityWorkshop\TheSingularityWorkshop.csproj" />
   </ItemGroup>
 </Project>
