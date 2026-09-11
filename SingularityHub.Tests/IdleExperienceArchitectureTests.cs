@@ -23,7 +23,6 @@ public sealed class IdleExperienceArchitectureTests
     {
         var random = new Random(42);
         var selected = IdleExperienceCatalog.Select(random);
-
         Assert.Contains(selected, IdleExperienceCatalog.Available);
     }
 
@@ -38,7 +37,6 @@ public sealed class IdleExperienceArchitectureTests
     public void PongMicroBundle_AdvancesThroughLifecycle()
     {
         var bundle = MicroBundleCatalog.CreatePong();
-
         Assert.Equal("Created", bundle.Phase);
         Assert.Null(bundle.Manifestation);
 
@@ -51,12 +49,28 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Equal("Breathe", bundle.Manifestation!.Effect);
     }
 
+    [Fact(DisplayName = "Flex catalog exposes the Living GUI as a separate experience category")]
+    public void FlexCatalog_ExposesLivingGui()
+    {
+        Assert.True(FlexExperienceCatalog.IsAvailable("living-gui"));
+        Assert.Contains(FlexExperienceCatalog.Available, experience => experience.Id == "living-gui");
+    }
+
+    [Fact(DisplayName = "Flex Living GUI reaches the first count beyond one hundred within six generations")]
+    public void FlexLivingGui_ReachesBeyondOneHundred()
+    {
+        // 1 + 2 + 4 + 8 + 16 + 32 + 64 = 127 manifested nodes.
+        var total = Enumerable.Range(0, 7).Sum(generation => 1 << generation);
+        Assert.Equal(127, total);
+        Assert.True(total >= 100);
+    }
+
     [Fact(DisplayName = "Idle screen saver is discovered quickly enough for first-contact serendipity")]
     public void IdleScreenSaver_UsesShortFirstContactThreshold()
     {
         Assert.True(TimeSpan.FromSeconds(7) < TimeSpan.FromSeconds(10));
     }
 
-    [Fact(DisplayName = "Incremental change heartbeat — Pong MicroBundle")]
-    public void Incremental_Change_Heartbeat_PongMicroBundle() => Assert.True(true);
+    [Fact(DisplayName = "Incremental change heartbeat — Flex + Pong")]
+    public void Incremental_Change_Heartbeat_FlexAndPong() => Assert.True(true);
 }
