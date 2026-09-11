@@ -25,19 +25,23 @@ public sealed class MicroBundle : IMicroBundle
         FSM_API.FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
 
         // Construction establishes Created conceptually. FSM_API enters the
-        // configured initial state on the first explicit step.
+        // configured initial state on the first explicit group update.
         FSM_API.FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
             .State("Manifesting", onEnter: EnterManifesting, onUpdate: _ => { }, onExit: _ => { })
             .State("Active", onEnter: EnterActive, onUpdate: _ => { }, onExit: _ => { })
             .State("Collapsing", onEnter: EnterCollapsing, onUpdate: _ => { }, onExit: _ => { })
             .State("Destroyed", onEnter: EnterDestroyed, onUpdate: _ => { }, onExit: _ => { })
             .Transition("Manifesting", "Active", c => ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
-            .Transition("Active", "Collapsing", c => !((MicroBundleContext)c).IsValid)
-            .Transition("Collapsing", "Destroyed", c => !((MicroBundleContext)c).IsValid && ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
+            .Transition("Active", "Collapsing", c => ((MicroBundleContext)c).IsInvalidated)
+            .Transition("Collapsing", "Destroyed", c => ((MicroBundleContext)c).IsInvalidated && ((MicroBundleContext)c).ElapsedMilliseconds >= 1)
             .WithInitialState("Manifesting")
             .BuildDefinition();
 
         _fsm = FSM_API.FSM_API.Create.CreateInstance(FsmName, Context, ProcessingGroup);
+
+        // The context is deliberately invalid while this constructor is wiring
+        // the bundle. Only the completed object becomes runnable by FSM_API.
+        ((MicroBundleContext)Context).IsValid = true;
     }
 
     private string FsmName => $"MicroBundle_{Id}";
@@ -56,10 +60,10 @@ public sealed class MicroBundle : IMicroBundle
             context.ElapsedMilliseconds++;
         }
 
-        // FSMHandle.Update performs exactly one FSM step. Do not route this
-        // lifecycle clock through group validity filtering: invalidity is itself
-        // a lifecycle condition that must be consumed by the bundle FSM.
-        _fsm.Update();
+        // FSM_API's processing-group update owns initial state entry and normal
+        // lifecycle sequencing. Context validity remains true through collapse;
+        // IsInvalidated is the lifecycle signal consumed by the FSM.
+        FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
         Manifestation = _provider.Manifest(Context);
     }
 
@@ -67,7 +71,7 @@ public sealed class MicroBundle : IMicroBundle
     {
         if (Context is MicroBundleContext context)
         {
-            context.IsValid = false;
+            context.IsInvalidated = true;
         }
     }
 
