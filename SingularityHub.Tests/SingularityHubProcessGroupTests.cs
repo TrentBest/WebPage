@@ -38,6 +38,20 @@ public sealed class SingularityHubProcessGroupTests
             stepped);
     }
 
+    [Fact(DisplayName = "Hub_UpdateProcessGroup_Steps_Only_Selected_Group")]
+    public void Hub_UpdateProcessGroup_Steps_Only_Selected_Group()
+    {
+        var stepped = new List<string>();
+        var hub = new HubKernel(stepped.Add)
+            .RegisterProcessGroup("Page")
+            .RegisterProcessGroup("Page.Living", "Page")
+            .RegisterProcessGroup("Page.Gravity", "Page");
+
+        hub.UpdateProcessGroup("Page.Living");
+
+        Assert.Equal(new[] { "Page.Living" }, stepped);
+    }
+
     [Fact(DisplayName = "Hub_Rejects_Nested_Group_When_Parent_Is_Not_Registered")]
     public void Hub_Rejects_Nested_Group_When_Parent_Is_Not_Registered()
     {
