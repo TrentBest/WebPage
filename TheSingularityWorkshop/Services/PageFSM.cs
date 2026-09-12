@@ -10,7 +10,14 @@ namespace TheSingularityWorkshop.Services
     /// </summary>
     public sealed class PageFSM : IDisposable
     {
+        /// <summary>
+        /// Stable prefix used to identify PageFSM-owned processing groups.
+        /// Each PageFSM instance receives its own scheduler group so its public
+        /// Update operation can use FSM_API's real scheduler lifecycle without
+        /// ticking unrelated PageFSM instances.
+        /// </summary>
         public const string ProcessingGroup = "PageFSM";
+
         public const string Initializing = "PAGE_INITIALIZING";
         public const string Gateway = "GATEWAY";
         public const string GatewayExit = "GATEWAY_EXIT";
@@ -26,11 +33,12 @@ namespace TheSingularityWorkshop.Services
         private const long MonikerPresentationTicks = 91;
 
         private readonly FSMHandle _handle;
-        private string? _enteredState;
+        private readonly string _processingGroup;
         private bool _disposed;
 
         public PageStateContext Context { get; }
         public string CurrentState => _handle.CurrentState;
+        public string InstanceProcessingGroup => _processingGroup;
         public event Action<string>? StateChanged;
 
         public sealed class Behavior
@@ -51,9 +59,10 @@ namespace TheSingularityWorkshop.Services
         public PageFSM(object? singularityHub = null, Behavior? behavior = null)
         {
             Context = new PageStateContext(singularityHub);
-            fsm_API.Create.CreateProcessingGroup(ProcessingGroup);
+            _processingGroup = $"{ProcessingGroup}:{Guid.NewGuid():N}";
+            fsm_API.Create.CreateProcessingGroup(_processingGroup);
 
-            fsm_API.Create.CreateFiniteStateMachine("PageFSM", -1, ProcessingGroup)
+            fsm_API.Create.CreateFiniteStateMachine("PageFSM", -1, _processingGroup)
                 .State(Initializing, Enter(behavior?.OnInitialization), Tick, null)
                 .State(Gateway, Enter(behavior?.OnGateway), Tick, null)
                 .State(GatewayExit, Enter(behavior?.OnGatewayExit), Tick, null)
@@ -83,7 +92,7 @@ namespace TheSingularityWorkshop.Services
                 .Transition(Gravity, NavigationArrival, c => ((PageStateContext)c).StateTicks >= MonikerPresentationTicks)
                 .BuildDefinition();
 
-            _handle = fsm_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
+            _handle = fsm_API.Create.CreateInstance("PageFSM", Context, _processingGroup);
             Update();
         }
 
@@ -133,24 +142,17 @@ namespace TheSingularityWorkshop.Services
             if (_disposed)
                 return;
 
-            // FSMHandle.Update() does not perform the scheduler's state-entry step.
-            // FSMHandle.HasEnteredCurrentState is read-only through the referenced
-            // API contract, so PageFSM tracks the last entered state itself. A state
-            // is entered exactly once per visit, immediately before its handle step.
-            if (!string.Equals(_enteredState, _handle.CurrentState, StringComparison.Ordinal))
-            {
-                _handle.Definition.GetState(_handle.CurrentState)?.Enter(_handle.Context);
-                _enteredState = _handle.CurrentState;
-            }
-
-            _handle.Update(ProcessingGroup);
+            // Use FSM_API's scheduler for this one owned processing group. This is
+            // deliberate: 1.0.13 owns the HasEnteredCurrentState/OnEnter lifecycle
+            // inside the scheduler, while PageFSM owns only its private group.
+            fsm_API.Interaction.Update(_processingGroup);
         }
 
         public void Dispose()
         {
             if (_disposed) return;
 
-            fsm_API.Interaction.DestroyInstance(_handle);
+            fsm_API.Interaction.DestroyFiniteStateMachine("PageFSM", _processingGroup);
             _disposed = true;
         }
     }
