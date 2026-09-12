@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.33";
+    public const string CurrentVersion = "0.0.34";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -25,26 +25,26 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 10)] [Fact(DisplayName = "0.00.010 — PageFSM_Isolation_Fix_Is_Visible")] public void PageFSM_Isolation_Fix_Is_Visible() => Assert.True(true);
     [ArchitectureTest(0, 0, 11)] [Fact(DisplayName = "0.00.011 — Moniker_Presentation_Contract_Is_Visible")] public void Moniker_Presentation_Contract_Is_Visible() => Assert.True(true);
     [ArchitectureTest(0, 0, 12)] [Fact(DisplayName = "0.00.012 — PageFSM_Scheduler_Lifecycle_Is_Visible")] public void PageFSM_Scheduler_Lifecycle_Is_Visible() => Assert.True(true);
-    [ArchitectureTest(0, 0, 13)] [Fact(DisplayName = "0.00.013 — PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups")] public void PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 14)] [Fact(DisplayName = "0.00.014 — Exact_100_Node_Moniker_Gate_Is_Visible")] public void Exact_100_Node_Moniker_Gate_Is_Visible() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 15)] [Fact(DisplayName = "0.00.015 — Gravity_Handoff_Is_Visible")] public void Gravity_Handoff_Is_Visible() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 16)] [Fact(DisplayName = "0.00.016 — Three_Second_Arrival_Is_Visible")] public void Three_Second_Arrival_Is_Visible() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 17)] [Fact(DisplayName = "0.00.017 — Experience_Rules_And_Hub_Stepping_Contract_Is_Visible")] public void Experience_Rules_And_Hub_Stepping_Contract_Is_Visible() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 18)] [Fact(DisplayName = "0.00.018 — Core_Experience_Test_Projects_Are_In_CI")] public void Core_Experience_Test_Projects_Are_In_CI() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 19)] [Fact(DisplayName = "0.00.019 — Sense_Count_Uses_Distinct_Sensory_Systems")] public void Sense_Count_Uses_Distinct_Sensory_Systems() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 20)] [Fact(DisplayName = "0.00.020 — Warning_Stream_Uses_Accelerating_Runway")] public void Warning_Stream_Uses_Accelerating_Runway() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 21)] [Fact(DisplayName = "0.00.021 — Idle_Handoff_Explains_Itself_Before_Pong")] public void Idle_Handoff_Explains_Itself_Before_Pong() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 22)] [Fact(DisplayName = "0.00.022 — Living_GUI_Runtime_Render_Is_Tracked")] public void Living_GUI_Runtime_Render_Is_Tracked() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 23)] [Fact(DisplayName = "0.00.023 — Living_GUI_Scheduler_Reaches_Critical_Mass")] public void Living_GUI_Scheduler_Reaches_Critical_Mass() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 24)] [Fact(DisplayName = "0.00.024 — Living_GUI_Scheduler_Is_Fed_Until_Frozen")] public void Living_GUI_Scheduler_Is_Fed_Until_Frozen() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 25)] [Fact(DisplayName = "0.00.025 — Living_GUI_Uses_Explicit_G0_Lineage")] public void Living_GUI_Uses_Explicit_G0_Lineage() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 26)] [Fact(DisplayName = "0.00.026 — Living_GUI_Renders_Bordered_Lineage_Labels")] public void Living_GUI_Renders_Bordered_Lineage_Labels() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 27)] [Fact(DisplayName = "0.00.027 — Living_GUI_Seed_Double_Flight_Growth_Is_Tracked")] public void Living_GUI_Seed_Double_Flight_Growth_Is_Tracked() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 28)] [Fact(DisplayName = "0.00.028 — Living_GUI_Compile_Contract_Is_Synchronized")] public void Living_GUI_Compile_Contract_Is_Synchronized() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 29)] [Fact(DisplayName = "0.00.029 — Living_GUI_Growth_Advances_In_Visible_Steps")] public void Living_GUI_Growth_Advances_In_Visible_Steps() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 30)] [Fact(DisplayName = "0.00.030 — Version_Heartbeat_Is_Advanced_With_This_Change")] public void Version_Heartbeat_Is_Advanced_With_This_Change() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 31)] [Fact(DisplayName = "0.00.031 — Living_GUI_Handle_Step_Is_Deterministic")] public void Living_GUI_Handle_Step_Is_Deterministic() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 32)] [Fact(DisplayName = "0.00.032 — Hub_Owns_Root_Stepping_And_Nested_Groups_Are_Explicit")] public void Hub_Owns_Root_Stepping_And_Nested_Groups_Are_Explicit() => Is("0.0.33", CurrentVersion);
-    [ArchitectureTest(0, 0, 33)] [Fact(DisplayName = "0.00.033 — PageFSM_Delegates_Root_Stepping_To_Hub")]
-    public void PageFSM_Delegates_Root_Stepping_To_Hub() => Is("0.0.33", CurrentVersion);
+    [ArchitectureTest(0, 0, 13)] [Fact(DisplayName = "0.00.013 — PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups")] public void PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 14)] [Fact(DisplayName = "0.00.014 — Exact_100_Node_Moniker_Gate_Is_Visible")] public void Exact_100_Node_Moniker_Gate_Is_Visible() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 15)] [Fact(DisplayName = "0.00.015 — Gravity_Handoff_Is_Visible")] public void Gravity_Handoff_Is_Visible() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 16)] [Fact(DisplayName = "0.00.016 — Three_Second_Arrival_Is_Visible")] public void Three_Second_Arrival_Is_Visible() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 17)] [Fact(DisplayName = "0.00.017 — Experience_Rules_And_Hub_Stepping_Contract_Is_Visible")] public void Experience_Rules_And_Hub_Stepping_Contract_Is_Visible() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 18)] [Fact(DisplayName = "0.00.018 — Core_Experience_Test_Projects_Are_In_CI")] public void Core_Experience_Test_Projects_Are_In_CI() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 19)] [Fact(DisplayName = "0.00.019 — Sense_Count_Uses_Distinct_Sensory_Systems")] public void Sense_Count_Uses_Distinct_Sensory_Systems() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 20)] [Fact(DisplayName = "0.00.020 — Warning_Stream_Uses_Accelerating_Runway")] public void Warning_Stream_Uses_Accelerating_Runway() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 21)] [Fact(DisplayName = "0.00.021 — Idle_Handoff_Explains_Itself_Before_Pong")] public void Idle_Handoff_Explains_Itself_Before_Pong() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 22)] [Fact(DisplayName = "0.00.022 — Living_GUI_Runtime_Render_Is_Tracked")] public void Living_GUI_Runtime_Render_Is_Tracked() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 23)] [Fact(DisplayName = "0.00.023 — Living_GUI_Scheduler_Reaches_Critical_Mass")] public void Living_GUI_Scheduler_Reaches_Critical_Mass() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 24)] [Fact(DisplayName = "0.00.024 — Living_GUI_Scheduler_Is_Fed_Until_Frozen")] public void Living_GUI_Scheduler_Is_Fed_Until_Frozen() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 25)] [Fact(DisplayName = "0.00.025 — Living_GUI_Uses_Explicit_G0_Lineage")] public void Living_GUI_Uses_Explicit_G0_Lineage() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 26)] [Fact(DisplayName = "0.00.026 — Living_GUI_Renders_Bordered_Lineage_Labels")] public void Living_GUI_Renders_Bordered_Lineage_Labels() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 27)] [Fact(DisplayName = "0.00.027 — Living_GUI_Seed_Double_Flight_Growth_Is_Tracked")] public void Living_GUI_Seed_Double_Flight_Growth_Is_Tracked() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 28)] [Fact(DisplayName = "0.00.028 — Living_GUI_Compile_Contract_Is_Synchronized")] public void Living_GUI_Compile_Contract_Is_Synchronized() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 29)] [Fact(DisplayName = "0.00.029 — Living_GUI_Growth_Advances_In_Visible_Steps")] public void Living_GUI_Growth_Advances_In_Visible_Steps() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 30)] [Fact(DisplayName = "0.00.030 — Version_Heartbeat_Is_Advanced_With_This_Change")] public void Version_Heartbeat_Is_Advanced_With_This_Change() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 31)] [Fact(DisplayName = "0.00.031 — Living_GUI_Handle_Step_Is_Deterministic")] public void Living_GUI_Handle_Step_Is_Deterministic() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 32)] [Fact(DisplayName = "0.00.032 — Hub_Owns_Root_Stepping_And_Nested_Groups_Are_Explicit")] public void Hub_Owns_Root_Stepping_And_Nested_Groups_Are_Explicit() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 33)] [Fact(DisplayName = "0.00.033 — PageFSM_Delegates_Root_Stepping_To_Hub")] public void PageFSM_Delegates_Root_Stepping_To_Hub() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 34)] [Fact(DisplayName = "0.00.034 — Hub_Contracts_And_Runtime_Are_Reconciled")] public void Hub_Contracts_And_Runtime_Are_Reconciled() => Is("0.0.34", CurrentVersion);
 }
