@@ -96,9 +96,6 @@ namespace TheSingularityWorkshop.Services
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
 
-            // These are intentionally separate process groups. Reaching critical
-            // mass stops the living GUI group; gravity has already been allocated
-            // and simply remains dormant until PageFSM enters GRAVITY.
             fsm_API.Create.CreateFiniteStateMachine("LivingGuiFSM", -1, _livingGuiProcessingGroup)
                 .State("Populating", onEnter: null, onUpdate: _ => Context.AdvanceLivingGui(), onExit: null)
                 .WithInitialState("Populating")
@@ -116,7 +113,7 @@ namespace TheSingularityWorkshop.Services
             Update();
         }
 
-        private Action<IStateContext> Enter(Action<PageStateContext>? behavior)
+        private static Action<IStateContext> Enter(Action<PageStateContext>? behavior)
         {
             return c =>
             {
@@ -156,15 +153,8 @@ namespace TheSingularityWorkshop.Services
             if (_disposed)
                 return;
 
-            // FSM_API owns state-entry lifecycle for the page FSM. The two visual
-            // work groups are stepped only while their owning phase is active.
             fsm_API.Interaction.Update(_processingGroup);
 
-            // Population is data-driven rather than transition-clock-driven: once
-            // the gateway has been accepted, the dedicated living-GUI scheduler owns
-            // advancement until the exact critical-mass mutation freezes it. This
-            // prevents a state-transition timing window from starving the visual
-            // experience before Blazor gets its first meaningful render.
             if (Context.EnterRequested && !Context.LivingGuiFrozen && !Context.LivingGuiPopulated)
                 fsm_API.Interaction.Update(_livingGuiProcessingGroup);
             else if (CurrentState == Gravity && !Context.LivingGuiFallen)
