@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Singularity Workshop</title>
+    <title>Workshop Gateway</title>
     <base href="/" />
 
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
@@ -12,12 +12,8 @@
     <link href="TheSingularityWorkshop.styles.css" rel="stylesheet" />
 
     <style>
-        .monolith-btn { overflow: visible !important; transition: transform 0.72s cubic-bezier(.22,.72,.25,1), box-shadow 0.72s ease, border-color 0.72s ease !important; }
-        .monolith-btn:hover { transform: scale(1.06) !important; }
-        .monolith-image { width: min(52%, 420px) !important; height: min(62%, 420px) !important; position: relative !important; z-index: 20 !important; transform: scale(1) !important; transform-origin: center center !important; border: 3px solid rgba(0, 234, 255, 0.9) !important; outline: 1px solid rgba(255, 255, 255, 0.28) !important; outline-offset: -4px !important; box-shadow: 0 0 12px rgba(0,234,255,.78), 0 0 34px rgba(0,234,255,.25), 0 0 58px rgba(255,44,255,.10) !important; transition: transform 0.72s cubic-bezier(.18,.86,.22,1), filter 0.72s ease, box-shadow 0.72s ease, border-color 0.72s ease !important; }
-        .monolith-btn:hover .monolith-image { transform: scale(1.50) !important; filter: saturate(1.28) contrast(1.08) brightness(1.10) !important; border-color: rgba(0, 234, 255, 1) !important; box-shadow: 0 0 18px rgba(0,234,255,.95), 0 0 48px rgba(0,234,255,.48), 0 0 88px rgba(255,44,255,.24), 0 0 120px rgba(255,211,77,.10) !important; }
-        .monolith-text { z-index: 30 !important; width: calc(100% - 2rem) !important; max-width: calc(100% - 2rem) !important; overflow: hidden !important; text-overflow: clip !important; font-size: clamp(.78rem, 2.1vw, 2.2rem) !important; letter-spacing: clamp(.05em, .14em, .18em) !important; }
-
+        /* Gateway presentation belongs to Home.razor. Do not put competing
+           monolith/image rules here: the landing page must have one visual authority. */
         .workshop-warning { cursor: pointer !important; transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease !important; }
         .workshop-warning:hover { transform: scale(1.012) !important; border-color: #ffb000 !important; box-shadow: 0 0 22px rgba(255,102,0,.65), 0 0 55px rgba(255,102,0,.28), inset 0 0 28px rgba(255,102,0,.1) !important; }
         .workshop-warning::after { content: "CLICK AT YOUR OWN RISK"; display: block; margin-top: .35rem; font-size: .52rem; letter-spacing: .18em; color: rgba(255,177,92,.58); opacity: .7; }
@@ -92,28 +88,10 @@
             }
         };
 
-        (function watchWorkshopRelease() {
-            if (!workshopLanding) return;
-            let released = false, presentationStarted = false;
-            function releaseWorkshop() { if (released) return; released = true; document.documentElement.classList.remove("workshop-splash-locked"); document.documentElement.classList.add("workshop-splash-released"); }
-            function presentMoniker() {
-                if (presentationStarted) return;
-                presentationStarted = true;
-                const overlay = document.createElement("div"); overlay.className = "workshop-moniker-overlay"; overlay.setAttribute("aria-label", "The Singularity Workshop");
-                const moniker = document.createElement("div"); moniker.className = "workshop-moniker";
-                ["THE", "SINGULARITY", "WORKSHOP"].forEach((word) => { const line = document.createElement("div"); line.className = "workshop-moniker-line"; [...word].forEach((letter) => { const span = document.createElement("span"); span.textContent = letter; line.appendChild(span); }); moniker.appendChild(line); });
-                overlay.appendChild(moniker); document.body.appendChild(overlay);
-                window.setTimeout(() => { releaseWorkshop(); overlay.remove(); }, 3000);
-            }
-            function inspectWorkshop() {
-                if (document.querySelector(".gateway-interface")) presentMoniker();
-                const container = document.querySelector(".chaos-container"); if (!container) return;
-                const width = container.clientWidth, height = container.clientHeight; if (!width || !height) return;
-                container.querySelectorAll(".chaos-node").forEach((node) => { const element = /** @type {HTMLElement} */ (node); if (element.dataset.workshopNormalized === "true") return; const matchX = element.style.left.match(/^(-?[0-9.]+)px$/), matchY = element.style.top.match(/^(-?[0-9.]+)px$/); if (!matchX || !matchY) return; let x = parseFloat(matchX[1]), y = parseFloat(matchY[1]); if (element.querySelector(".node-gen")?.textContent?.trim() === "GEN 1") { x = width * .5; y = height * .5; } element.style.left = `${Math.max(2, Math.min(98, (x / width) * 100))}%`; element.style.top = `${Math.max(3, Math.min(97, (y / height) * 100))}%`; element.dataset.workshopNormalized = "true"; });
-            }
-            const observer = new MutationObserver(inspectWorkshop); observer.observe(document.body, { childList: true, subtree: true });
-            window.addEventListener("resize", () => { document.querySelectorAll(".chaos-node").forEach((node) => node.removeAttribute("data-workshop-normalized")); inspectWorkshop(); });
-        })();
+        /* IMPORTANT: no JavaScript moniker presentation lives here anymore.
+           The FSM/API is the sole authority for the reveal. The old MutationObserver
+           injected a three-second moniker whenever .gateway-interface appeared, which
+           was exactly the premature flash the landing contract forbids. */
 
         (function installWarningExperience() {
             let activeOverlay = null, animationFrame = 0, pauseUntil = 0, tinyHeader = null;
