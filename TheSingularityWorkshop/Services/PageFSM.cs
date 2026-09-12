@@ -23,7 +23,9 @@ namespace TheSingularityWorkshop.Services
         public const string Running = "RUNNING";
         public const string ShutdownState = "SHUTDOWN";
 
-        private const long GravityTicksBeforeArrival = 20;
+        // The WebPage integration updates the PageFSM at 33 ms. Ninety-one
+        // heartbeats is approximately three seconds of moniker presentation.
+        private const long MonikerPresentationTicks = 91;
 
         private readonly FSMHandle _handle;
         private bool _disposed;
@@ -62,14 +64,11 @@ namespace TheSingularityWorkshop.Services
                     behavior?.OnLivingGuiIgnition?.Invoke(c);
                 }), Tick, null)
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
-                // Critical mass creates the moniker state. The moniker is instantiated
-                // here but remains hidden for one FSM heartbeat.
                 .State(MonikerReveal, Enter(c =>
                 {
                     c.MonikerReady = true;
                     behavior?.OnMonikerReveal?.Invoke(c);
                 }), Tick, null)
-                // Physics does not begin until the moniker has existed for a heartbeat.
                 .State(Gravity, Enter(behavior?.OnGravity), Tick, null)
                 .State(LivingGuiDissipating, Enter(behavior?.OnLivingGuiDissipating), Tick, null)
                 .State(NavigationArrival, Enter(behavior?.OnNavigationArrival), Tick, null)
@@ -78,22 +77,24 @@ namespace TheSingularityWorkshop.Services
                 .WithInitialState(Initializing)
                 .Transition(Initializing, Gateway, c => true)
                 .Transition(Gateway, GatewayExit, c => ((PageStateContext)c).EnterRequested)
-                // GatewayExit is deliberately one FSM heartbeat. The Razor gateway
-                // is not rendered in this state, so the button/warning/sparkles vanish
-                // as soon as the click is accepted.
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiPopulating, MonikerReveal, c => ((PageStateContext)c).LivingGuiPopulated)
+                // Critical mass is complete before this state is entered. The
+                // moniker is created here; the presentation surface does not
+                // render it until GRAVITY begins.
                 .Transition(MonikerReveal, Gravity, c =>
                     ((PageStateContext)c).StateTicks >= 1 && ((PageStateContext)c).MonikerReady)
-                .Transition(Gravity, NavigationArrival, c => ((PageStateContext)c).StateTicks >= GravityTicksBeforeArrival)
+                // Gravity owns the three-second presentation window. The frozen
+                // GUI swarm falls away underneath the moniker during this state.
+                .Transition(Gravity, NavigationArrival, c =>
+                    ((PageStateContext)c).StateTicks >= MonikerPresentationTicks)
                 .BuildDefinition();
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
 
-            // FSM_API instances begin in their declared initial state. Advance the
-            // page's initialization transition once so a newly created PageFSM is
-            // externally observable as the Gateway, not PAGE_INITIALIZING.
+            // Settle initialization once so a newly created page is externally
+            // observable as GATEWAY rather than PAGE_INITIALIZING.
             Update();
         }
 
