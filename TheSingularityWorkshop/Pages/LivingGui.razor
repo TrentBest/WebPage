@@ -16,6 +16,8 @@ else
 <div class="living-sequence-shell @(MonikerInstantiated ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
     @if (MonikerInstantiated)
     {
+        <!-- Branding deliberately sits behind the living GUI. It is revealed at exactly
+             100 nodes, then remains while the frozen field is handed to gravity. -->
         <div class="moniker-layer" aria-hidden="true">
             <div class="moniker-title">
                 <div><span class="blue">T</span><span class="magenta">h</span><span class="orange">e</span></div>
@@ -25,21 +27,16 @@ else
         </div>
     }
 
-    <div class="venom-field" aria-hidden="true"></div>
-
     <main class="living-canvas" aria-label="Living GUI swarm">
         <div class="architecture-atmosphere" aria-hidden="true"></div>
 
         @foreach (var node in FSM.Context.LivingNodes)
         {
-            <button class="architecture-node @(GravityActive ? "gravity-node" : "")"
-                    style="left:@node.X%;top:@node.Y%;width:@node.Size}px;height:@node.Size}px;transform:translate(-50%,-50%) rotate(@node.Rotation)deg;opacity:@NodeOpacity(node);"
-                    @onclick="() => SelectNode(node.Lineage)"
-                    aria-label="GUI @node.Lineage, generation @node.Generation">
-                <span class="node-index">GUI @node.Lineage</span>
-                <strong>WORKSHOP</strong>
-                <small>GEN @node.Generation // @node.Size.ToString("0")</small>
-            </button>
+            <div class="architecture-node @(GravityActive ? "gravity-node" : "")"
+                 style="left:@node.X%;top:@node.Y%;width:@node.Size}px;height:@node.Size}px;transform:translate(-50%,-50%) rotate(@node.Rotation)deg;opacity:@NodeOpacity(node);"
+                 aria-label="@node.Lineage">
+                <span class="node-label">@node.Lineage</span>
+            </div>
         }
 
         @if (FSM.Context.LivingGuiFrozen)
@@ -54,45 +51,44 @@ else
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
     .living-canvas { position:absolute; inset:0; z-index:10; overflow:hidden; perspective:1200px; }
     .architecture-atmosphere { position:absolute; inset:-20%; z-index:0; pointer-events:none; background:radial-gradient(circle at 50% 50%,rgba(255,48,48,.09),transparent 24%),radial-gradient(circle at 18% 28%,rgba(255,211,77,.045),transparent 22%),radial-gradient(circle at 82% 72%,rgba(82,224,90,.035),transparent 24%),repeating-linear-gradient(118deg,transparent 0 120px,rgba(255,48,48,.035) 121px 132px,rgba(255,211,77,.028) 133px 145px,transparent 146px 260px); animation:atmosphereDrift 12s ease-in-out infinite; }
-    .venom-field { position:absolute; inset:0; z-index:2; pointer-events:none; background:repeating-linear-gradient(115deg,transparent 0 150px,rgba(255,48,48,.035) 151px 166px,rgba(255,211,77,.025) 167px 181px,transparent 182px 330px); mask-image:radial-gradient(circle at center,black 0,transparent 78%); opacity:.8; }
+
+    /* Every living object is intentionally just a bordered label. The content is
+       lineage, not a fabricated mini-application. */
+    .architecture-node { position:absolute; z-index:20; box-sizing:border-box; min-width:18px; min-height:18px; padding:3px 5px; display:flex; align-items:center; justify-content:center; border:2px solid #ff7a00; border-radius:5px; background:rgba(5,6,8,.92); color:#fff; font:700 .72rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 12px rgba(255,122,0,.28),inset 0 0 12px rgba(255,122,0,.06); transition:opacity .08s linear; }
+    .node-label { display:block; pointer-events:none; text-shadow:0 0 7px rgba(255,211,77,.75); }
+    .gravity-node { pointer-events:none; }
+
+    .critical-mass-marker { position:absolute; left:50%; bottom:3%; z-index:31; transform:translateX(-50%); color:rgba(255,211,77,.72); font-size:.58rem; letter-spacing:.22em; pointer-events:none; text-shadow:0 0 10px rgba(255,211,77,.5); }
     .moniker-title { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.82; letter-spacing:.075em; text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%; }
     .moniker-title>div { white-space:nowrap; }.moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }.moniker-title>div:nth-child(2) span { animation-delay:-.4s; }.moniker-title>div:nth-child(3) span { animation-delay:-.8s; }
     .blue{color:#00a8ff}.magenta{color:#ff2cff}.orange{color:#ff7a00}.red{color:#ff3030}.yellow{color:#ffd34d}.green{color:#52e05a}
-    .architecture-node { position:absolute; z-index:20; box-sizing:border-box; min-width:6px; min-height:6px; padding:.55rem; border:1px solid rgba(255,211,77,.5); border-left:4px solid #ff3030; border-radius:4px; background:rgba(5,6,8,.94); color:#f4f7f8; font:inherit; text-align:left; cursor:pointer; overflow:hidden; transform-origin:center; transition:width .08s linear,height .08s linear,border-color .15s ease,box-shadow .15s ease,opacity .08s linear; box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 0 18px rgba(255,48,48,.045); }
-    .gravity-node { pointer-events:none; cursor:default; }.architecture-node:hover,.architecture-node:focus-visible { border-color:#52e05a; box-shadow:0 0 25px rgba(82,224,90,.18),inset 0 0 20px rgba(255,211,77,.06); outline:none; }
-    .node-index{display:block;color:#ff3030;font-size:.5rem;letter-spacing:.08em;white-space:nowrap}.architecture-node strong{display:block;margin-top:.18rem;color:#ffd34d;font-size:clamp(.52rem,.8vw,.72rem);letter-spacing:.08em;white-space:nowrap}.architecture-node small{display:block;margin-top:.22rem;color:#52e05a;font-size:.42rem;letter-spacing:.05em;white-space:nowrap}
-    .critical-mass-marker { position:absolute;left:50%;bottom:3%;z-index:31;transform:translateX(-50%);color:rgba(255,211,77,.72);font-size:.58rem;letter-spacing:.22em;pointer-events:none;text-shadow:0 0 10px rgba(255,211,77,.5); }
-    @@keyframes kelpSway{0%,100%{transform:rotate(-1.2deg) skewX(-.6deg)}25%{transform:rotate(1deg) skewX(.9deg) translateY(-3px)}50%{transform:rotate(-.6deg) skewX(-1deg) translateY(2px)}75%{transform:rotate(1.4deg) skewX(.7deg) translateY(-2px)}}@@keyframes letterDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}@@keyframes atmosphereDrift{0%,100%{transform:translate3d(-1%,0,0) scale(1)}50%{transform:translate3d(1%,1%,0) scale(1.03)}}
-    @@media(max-width:800px){.architecture-node{padding:.4rem}.moniker-title{font-size:clamp(1.65rem,8vw,3.5rem)}}@@media(prefers-reduced-motion:reduce){.living-sequence-shell *, .living-sequence-shell *::before, .living-sequence-shell *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+    @@keyframes kelpSway{0%,100%{transform:rotate(-1.2deg) skewX(-.6deg)}25%{transform:rotate(1deg) skewX(.9deg) translateY(-3px)}50%{transform:rotate(-.6deg) skewX(-1deg) translateY(2px)}75%{transform:rotate(1.4deg) skewX(.7deg) translateY(-2px)}}
+    @@keyframes letterDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+    @@keyframes atmosphereDrift{0%,100%{transform:translate3d(-1%,0,0) scale(1)}50%{transform:translate3d(1%,1%,0) scale(1.03)}}
+    @@media(max-width:800px){.architecture-node{font-size:.62rem;padding:2px 4px}.moniker-title{font-size:clamp(1.65rem,8vw,3.5rem)}}
+    @@media(prefers-reduced-motion:reduce){.living-sequence-shell *, .living-sequence-shell *::before, .living-sequence-shell *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 
 @code {
-    // The UI does not count toward the reveal. The FSM context opens this gate only
-    // when the population reaches the shared 100-node critical mass.
     private bool MonikerInstantiated =>
         FSM.Context.MonikerReady &&
         FSM.Context.LivingNodes.Count == PageStateContext.CriticalMass;
 
-    private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.NavigationArrival or PageFSM.Running;
-    private string? selectedNode;
+    private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
 
     protected override void OnInitialized()
     {
         FSM.StateChanged += HandleFSMStateChanged;
     }
 
-    private void HandleFSMStateChanged(string stateName)
-    {
-        _ = InvokeAsync(StateHasChanged);
-    }
+    private void HandleFSMStateChanged(string _) => _ = InvokeAsync(StateHasChanged);
 
     private static double NodeOpacity(PageStateContext.LivingNodeState node)
     {
         if (node.Y <= 100) return 1;
         return Math.Clamp(1 - ((node.Y - 100) / 30), 0, 1);
     }
-
-    private void SelectNode(string lineage) => selectedNode = lineage;
 
     public void Dispose() => FSM.StateChanged -= HandleFSMStateChanged;
 }
