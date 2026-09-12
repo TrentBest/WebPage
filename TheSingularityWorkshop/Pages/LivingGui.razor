@@ -4,7 +4,14 @@
 @inject FSMManagerService FSM
 @implements IDisposable
 
-<PageTitle>The Living GUI — The Singularity Workshop</PageTitle>
+@if (MonikerInstantiated)
+{
+    <PageTitle>The Singularity Workshop</PageTitle>
+}
+else
+{
+    <PageTitle>Living GUI</PageTitle>
+}
 
 <div class="living-sequence-shell @(MonikerInstantiated ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
     @if (MonikerInstantiated)
@@ -60,11 +67,12 @@
 </style>
 
 @code {
-    // CriticalMass is intentionally private inside PageStateContext. Keep the
-    // presentation gate local and explicit: exactly 100 living nodes is the
-    // narrative trigger for first moniker instantiation.
-    private const int CriticalMass = 100;
-    private bool MonikerInstantiated => FSM.Context.LivingNodes.Count >= CriticalMass;
+    // The UI does not count toward the reveal. The FSM context opens this gate only
+    // when the population reaches the shared 100-node critical mass.
+    private bool MonikerInstantiated =>
+        FSM.Context.MonikerReady &&
+        FSM.Context.LivingNodes.Count == PageStateContext.CriticalMass;
+
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.NavigationArrival or PageFSM.Running;
     private string? selectedNode;
 
