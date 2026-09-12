@@ -84,6 +84,22 @@ public sealed class PongExperienceTests
         Assert.Contains("Experience.Pong.Presentation", experience.ProcessingGroups);
     }
 
+    [Fact(DisplayName = "Pong_Experience_Is_Explicitly_Admitted_To_Idle")]
+    public void Pong_Experience_Is_Explicitly_Admitted_To_Idle()
+    {
+        Assert.IsAssignableFrom<IIdleExperience>(new PongExperience());
+    }
+
+    [Fact(DisplayName = "Pong_Experience_Bundles_Inherit_Experience_Ontology")]
+    public void Pong_Experience_Bundles_Inherit_Experience_Ontology()
+    {
+        var experience = new PongExperience();
+
+        foreach (var bundle in PongMicroBundleCatalog.All)
+            for (var layer = 0; layer < 8; layer++)
+                Assert.Equal(experience.Ontology[layer], bundle.Ontology[layer]);
+    }
+
     [Fact(DisplayName = "Pong_Runtime_Executes_Physics")]
     public void Pong_Runtime_Executes_Physics()
     {
@@ -122,5 +138,55 @@ public sealed class PongExperienceTests
 
         Assert.NotEmpty(sounds);
         Assert.Contains(sounds, sound => sound is PongSoundEvent.Wall or PongSoundEvent.Paddle or PongSoundEvent.Score);
+    }
+
+    [Fact(DisplayName = "Pong_Experience_Loads_From_Integer_Identity_And_Retains_All_Bundles")]
+    public void Pong_Experience_Loads_From_Integer_Identity_And_Retains_All_Bundles()
+    {
+        var experiences = new ExperienceRegistry();
+        var bundles = new MicroBundleRegistry();
+        var experience = new PongExperience();
+        experiences.Register(experience);
+        foreach (var bundle in PongMicroBundleCatalog.All)
+            bundles.Register(bundle);
+
+        var host = new ExperienceRuntimeHost(new ExperienceLoader(experiences, bundles));
+        var loaded = host.Activate(PongExperience.ExperienceId, requireIdle: true);
+
+        Assert.True(loaded.IsReady);
+        Assert.Equal(experience.MicroBundleIds.Count, loaded.Bundles.Count);
+        Assert.Equal(experience.MicroBundleIds.Count, loaded.DependencyOrder.Count);
+        Assert.True(host.IsActive(PongExperience.ExperienceId));
+    }
+
+    [Fact(DisplayName = "Pong_Experience_Resolves_Deep_Dependencies_Before_Consumers")]
+    public void Pong_Experience_Resolves_Deep_Dependencies_Before_Consumers()
+    {
+        var experiences = new ExperienceRegistry();
+        var bundles = new MicroBundleRegistry();
+        experiences.Register(new PongExperience());
+        foreach (var bundle in PongMicroBundleCatalog.All)
+            bundles.Register(bundle);
+
+        var result = new ExperienceLoader(experiences, bundles).Load(PongExperience.ExperienceId);
+
+        Assert.True(result.IsLoadable);
+        Assert.True(result.DependencyOrder.IndexOf(PongMicroBundleIds.BallPhysicsBehavior) <
+                    result.DependencyOrder.IndexOf(PongMicroBundleIds.ScoreBehavior));
+        Assert.True(result.DependencyOrder.IndexOf(PongMicroBundleIds.ScoreAsset) <
+                    result.DependencyOrder.IndexOf(PongMicroBundleIds.ScoreBehavior));
+    }
+
+    [Fact(DisplayName = "Pong_MicroBundles_Are_Queryable_Through_The_Ontology_Index")]
+    public void Pong_MicroBundles_Are_Queryable_Through_The_Ontology_Index()
+    {
+        var registry = new MicroBundleRegistry();
+        foreach (var bundle in PongMicroBundleCatalog.All)
+            registry.Register(bundle);
+
+        var matches = registry.FindByOntologyLayer(0, 7);
+
+        Assert.Equal(PongMicroBundleCatalog.All.Count, matches.Count);
+        Assert.Contains(matches, bundle => bundle.Id == PongMicroBundleIds.BallAsset);
     }
 }
