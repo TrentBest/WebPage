@@ -78,8 +78,46 @@ public sealed class IdleExperienceArchitectureTests
             context.AdvanceLivingGui();
 
         Assert.True(context.LivingNodes.Count > 1);
-        Assert.Contains(context.LivingNodes, node => node.Size == 6);
-        Assert.Contains(context.LivingNodes, node => node.X != 50 || node.Y != 50);
+
+        var newborn = context.LivingNodes[^1];
+
+        // The newborn is thrown from the parent's current position, but it has
+        // an independent destination and remains at absolute seed size until
+        // the flight completes.
+        Assert.Equal(6, newborn.Size);
+        Assert.Equal(newborn.SeedX, newborn.X);
+        Assert.Equal(newborn.SeedY, newborn.Y);
+        Assert.True(newborn.TargetX != newborn.SeedX || newborn.TargetY != newborn.SeedY);
+
+        context.AdvanceLivingGui();
+
+        Assert.Equal(6, newborn.Size);
+        Assert.True(newborn.X != newborn.SeedX || newborn.Y != newborn.SeedY);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 01 — newborn seed flight precedes growth")]
+    public void IncrementalUnitTest01_NewbornSeedFlightPrecedesGrowth()
+    {
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+
+        while (context.LivingNodes.Count == 1)
+            context.AdvanceLivingGui();
+
+        var newborn = context.LivingNodes[^1];
+        var initialSize = newborn.Size;
+        var initialX = newborn.X;
+        var initialY = newborn.Y;
+
+        Assert.Equal(6, initialSize);
+        Assert.Equal(0, newborn.SeedTicks);
+        Assert.True(newborn.SeedFlightDuration >= 2);
+
+        context.AdvanceLivingGui();
+
+        Assert.Equal(6, newborn.Size);
+        Assert.True(newborn.SeedTicks > 0);
+        Assert.True(newborn.X != initialX || newborn.Y != initialY);
     }
 
     [Fact(DisplayName = "Living GUI freezes exactly at critical mass and stops updating")]
