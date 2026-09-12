@@ -97,7 +97,15 @@ namespace TheSingularityWorkshop.Services
                 .Transition(Gateway, GatewayExit, c => ((PageStateContext)c).EnterRequested)
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
-                .Transition(LivingGuiPopulating, MonikerReveal, c => ((PageStateContext)c).LivingGuiPopulated)
+                // Population completion is an observable state boundary. Do not
+                // consume it in the same heartbeat that reaches critical mass;
+                // leave the FSM in POPULATING for one full heartbeat so the exact
+                // 100-node/moniker gate is externally observable.
+                .Transition(LivingGuiPopulating, MonikerReveal, c =>
+                {
+                    var context = (PageStateContext)c;
+                    return context.LivingGuiPopulated && context.StateTicks >= 2;
+                })
                 .Transition(MonikerReveal, Gravity, c => ((PageStateContext)c).StateTicks >= GravityReleaseTicks)
                 .Transition(Gravity, LivingGuiDissipating, c => ((PageStateContext)c).LivingGuiFallen)
                 .Transition(LivingGuiDissipating, NavigationArrival, c => ((PageStateContext)c).StateTicks >= NavigationDelayTicks)
