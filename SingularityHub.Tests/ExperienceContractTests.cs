@@ -49,6 +49,25 @@ public sealed class ExperienceContractTests
         Assert.Equal(new ulong[] { 7, 19 }, experience.Capabilities);
     }
 
+    [ArchitectureTest(4, 3, 5)]
+    [Fact(DisplayName = "4.03.005 — Experience_Is_Quantified_By_Distinct_Sensory_Systems")]
+    public void Experience_Is_Quantified_By_Distinct_Sensory_Systems()
+    {
+        IExperience experience = new TestExperience();
+
+        Assert.Equal(new ulong[] { 1, 2, 3 }, experience.SensorySystems);
+        Assert.Equal(3, experience.SenseCount);
+    }
+
+    [ArchitectureTest(4, 3, 6)]
+    [Fact(DisplayName = "4.03.006 — Experience_Exposes_Process_Groups_For_Hub_Stepping")]
+    public void Experience_Exposes_Process_Groups_For_Hub_Stepping()
+    {
+        IExperience experience = new TestExperience();
+
+        Assert.Equal(new[] { "Experience.Page", "Experience.Living" }, experience.ProcessingGroups);
+    }
+
     private sealed class TestExperience : IExperience
     {
         public ulong Id => 42;
@@ -57,5 +76,7 @@ public sealed class ExperienceContractTests
         public OntologySignature Ontology => new(7, 1, 2, 3, 4, 5, 6, 8, 42);
         public IReadOnlyList<ulong> MicroBundleIds { get; } = new ulong[] { 1001, 1002 };
         public IReadOnlyList<ulong> Capabilities { get; } = new ulong[] { 7, 19 };
+        public IReadOnlyList<ulong> SensorySystems { get; } = new ulong[] { 1, 2, 3 };
+        public IReadOnlyList<string> ProcessingGroups { get; } = new[] { "Experience.Page", "Experience.Living" };
     }
 }
