@@ -116,7 +116,7 @@ namespace TheSingularityWorkshop.Services
             Update();
         }
 
-        private Action<IStateContext> Enter(Action<PageStateContext>? behavior)
+        private static Action<IStateContext> Enter(Action<PageStateContext>? behavior)
         {
             return c =>
             {
