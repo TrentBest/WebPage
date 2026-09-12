@@ -147,6 +147,14 @@ namespace TheSingularityWorkshop.Services
         public void Dispose()
         {
             if (_disposed) return;
+
+            // PageFSM definitions are process-global in FSM_API. Leaving this
+            // instance registered means every later PageFSM update also executes
+            // this dead instance. Because the definition's Tick delegate is bound
+            // to the most recently built PageFSM, those stale handles can observe
+            // the wrong CurrentState and silently prevent population from advancing.
+            // Dispose must therefore unregister the live handle, not merely mark it.
+            fsm_API.Interaction.DestroyInstance(_handle);
             _disposed = true;
         }
     }
