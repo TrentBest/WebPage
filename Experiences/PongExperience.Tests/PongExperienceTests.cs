@@ -1,7 +1,7 @@
 using TheSingularityWorkshop.Workshop.Experiences;
 using Xunit;
 
-namespace PongExperience.Tests;
+namespace TheSingularityWorkshop.Experiences.Pong.Tests;
 
 /// <summary>Executable contract for the first concrete Workshop Experience.</summary>
 public sealed class PongExperienceTests
