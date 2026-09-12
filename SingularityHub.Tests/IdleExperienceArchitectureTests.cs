@@ -1,5 +1,6 @@
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Workshop.MicroBundles;
+using TheSingularityWorkshop.FSM_API;
 using Xunit;
 
 namespace SingularityHub.Tests;
@@ -211,6 +212,17 @@ public sealed class IdleExperienceArchitectureTests
         fsm.Update();
         Assert.Equal(PageFSM.NavigationArrival, fsm.CurrentState);
         Assert.Equal(91, fsm.Context.StateTicks);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 07 — disposing PageFSM unregisters its runtime handle")]
+    public void IncrementalUnitTest07_DisposingPageFSMUnregistersRuntimeHandle()
+    {
+        using (var fsm = new PageFSM())
+        {
+            Assert.Equal(1, FSM_API.Internal.GetFSMHandleCountInGroup(PageFSM.ProcessingGroup));
+        }
+
+        Assert.Equal(0, FSM_API.Internal.GetFSMHandleCountInGroup(PageFSM.ProcessingGroup));
     }
 
     [Fact(DisplayName = "Living GUI freezes exactly at critical mass and stops updating")]
