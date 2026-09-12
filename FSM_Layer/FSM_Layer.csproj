@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TheSingularityWorkshop.FSMLayer</RootNamespace>
+    <AssemblyName>FSM_Layer</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SingularityHub.Abstractions\SingularityHub.Abstractions.csproj" />
+  </ItemGroup>
+</Project>
