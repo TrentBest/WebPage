@@ -247,6 +247,32 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Empty(second.Context.LivingNodes);
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 09 — the moniker remains hidden until gravity")]
+    public void IncrementalUnitTest09_MonikerRemainsHiddenUntilGravity()
+    {
+        using var fsm = new PageFSM();
+
+        fsm.RequestEnter();
+        fsm.Update();
+        fsm.Update();
+
+        var guard = 0;
+        while (fsm.CurrentState == PageFSM.LivingGuiPopulating && guard++ < 5000)
+        {
+            Assert.False(fsm.Context.MonikerReady);
+            fsm.Update();
+        }
+
+        Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
+        Assert.False(fsm.Context.MonikerReady);
+        Assert.Equal(100, fsm.Context.LivingNodes.Count);
+
+        fsm.Update();
+
+        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+        Assert.True(fsm.Context.MonikerReady);
+    }
+
     [Fact(DisplayName = "Living GUI freezes exactly at critical mass and stops updating")]
     public void LivingGui_FreezesAtOneHundred()
     {
