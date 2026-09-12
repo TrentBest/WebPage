@@ -23,11 +23,10 @@ namespace TheSingularityWorkshop.Services
         public const string Running = "RUNNING";
         public const string ShutdownState = "SHUTDOWN";
 
-        // The WebPage integration updates the PageFSM at 33 ms. Ninety-one
-        // heartbeats is approximately three seconds of moniker presentation.
         private const long MonikerPresentationTicks = 91;
 
         private readonly FSMHandle _handle;
+        private string? _enteredState;
         private bool _disposed;
 
         public PageStateContext Context { get; }
@@ -64,8 +63,6 @@ namespace TheSingularityWorkshop.Services
                     behavior?.OnLivingGuiIgnition?.Invoke(c);
                 }), Tick, null)
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
-                // MONIKER_REVEAL is deliberately a sequencing boundary. The visible
-                // moniker does not become ready here; GRAVITY owns presentation.
                 .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
                 .State(Gravity, Enter(c =>
                 {
@@ -82,20 +79,11 @@ namespace TheSingularityWorkshop.Services
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiPopulating, MonikerReveal, c => ((PageStateContext)c).LivingGuiPopulated)
-                // Critical mass is complete before this state is entered. The
-                // moniker remains hidden for this boundary state.
-                .Transition(MonikerReveal, Gravity, c =>
-                    ((PageStateContext)c).StateTicks >= 1)
-                // Gravity owns the three-second presentation window. The frozen
-                // GUI swarm falls away underneath the moniker during this state.
-                .Transition(Gravity, NavigationArrival, c =>
-                    ((PageStateContext)c).StateTicks >= MonikerPresentationTicks)
+                .Transition(MonikerReveal, Gravity, c => ((PageStateContext)c).StateTicks >= 1)
+                .Transition(Gravity, NavigationArrival, c => ((PageStateContext)c).StateTicks >= MonikerPresentationTicks)
                 .BuildDefinition();
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
-
-            // Settle initialization once so a newly created page is externally
-            // observable as GATEWAY rather than PAGE_INITIALIZING.
             Update();
         }
 
@@ -145,15 +133,14 @@ namespace TheSingularityWorkshop.Services
             if (_disposed)
                 return;
 
-            // FSMHandle.Update() drives FSM.Step(), while FSM_API's scheduler also
-            // owns the HasEnteredCurrentState/OnEnter lifecycle. A direct handle
-            // update therefore needs to reproduce that one missing scheduler step.
-            // This preserves per-handle ownership without falling back to the global
-            // processing-group tick that can advance unrelated PageFSM instances.
-            if (!_handle.HasEnteredCurrentState)
+            // FSMHandle.Update() does not perform the scheduler's state-entry step.
+            // FSMHandle.HasEnteredCurrentState is read-only through the referenced
+            // API contract, so PageFSM tracks the last entered state itself. A state
+            // is entered exactly once per visit, immediately before its handle step.
+            if (!string.Equals(_enteredState, _handle.CurrentState, StringComparison.Ordinal))
             {
                 _handle.Definition.GetState(_handle.CurrentState)?.Enter(_handle.Context);
-                _handle.HasEnteredCurrentState = true;
+                _enteredState = _handle.CurrentState;
             }
 
             _handle.Update(ProcessingGroup);
@@ -163,9 +150,6 @@ namespace TheSingularityWorkshop.Services
         {
             if (_disposed) return;
 
-            // PageFSM definitions are process-global in FSM_API. Leaving this
-            // instance registered means every later PageFSM update also executes
-            // this dead instance. Dispose must therefore unregister the live handle.
             fsm_API.Interaction.DestroyInstance(_handle);
             _disposed = true;
         }
