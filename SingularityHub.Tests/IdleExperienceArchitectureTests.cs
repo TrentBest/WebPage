@@ -56,6 +56,58 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Contains(FlexExperienceCatalog.Available, experience => experience.Id == "living-gui");
     }
 
+    [Fact(DisplayName = "The first Living GUI is born exactly in the center")]
+    public void LivingGui_FirstNodeStartsCentered()
+    {
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+
+        var first = Assert.Single(context.LivingNodes);
+        Assert.Equal(50, first.X);
+        Assert.Equal(50, first.Y);
+        Assert.Equal(6, first.Size);
+    }
+
+    [Fact(DisplayName = "Living GUI newborns are tiny independent seeds")]
+    public void LivingGui_NewbornsStartAsIndependentSeeds()
+    {
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+
+        for (var i = 0; i < 5 && context.LivingNodes.Count == 1; i++)
+            context.AdvanceLivingGui();
+
+        Assert.True(context.LivingNodes.Count > 1);
+        Assert.Contains(context.LivingNodes, node => node.Size == 6);
+        Assert.Contains(context.LivingNodes, node => node.X != 50 || node.Y != 50);
+    }
+
+    [Fact(DisplayName = "Living GUI freezes exactly at critical mass and stops updating")]
+    public void LivingGui_FreezesAtOneHundred()
+    {
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+
+        for (var i = 0; i < 2000 && !context.LivingGuiFrozen; i++)
+            context.AdvanceLivingGui();
+
+        Assert.True(context.LivingGuiFrozen);
+        Assert.Equal(100, context.LivingNodes.Count);
+        Assert.True(context.LivingGuiPopulated);
+
+        var frozenSnapshot = context.LivingNodes
+            .Select(node => (node.Lineage, node.X, node.Y, node.Size))
+            .ToArray();
+
+        context.AdvanceLivingGui();
+
+        var afterFreeze = context.LivingNodes
+            .Select(node => (node.Lineage, node.X, node.Y, node.Size))
+            .ToArray();
+
+        Assert.Equal(frozenSnapshot, afterFreeze);
+    }
+
     [Fact(DisplayName = "Flex Living GUI reaches the first count beyond one hundred within six generations")]
     public void FlexLivingGui_ReachesBeyondOneHundred()
     {
