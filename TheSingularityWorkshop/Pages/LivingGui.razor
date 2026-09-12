@@ -1,4 +1,5 @@
 @page "/living-gui"
+@using System
 @using TheSingularityWorkshop.Services
 @inject FSMManagerService FSM
 @implements IDisposable
@@ -6,9 +7,6 @@
 <PageTitle>The Living GUI — The Singularity Workshop</PageTitle>
 
 <div class="living-sequence-shell @(MonikerInstantiated ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
-    @* The moniker is deliberately absent from the DOM until the living GUI itself
-       reaches the exact 100-node critical mass. Once instantiated it remains part
-       of this page until the user leaves the tab/page. *@
     @if (MonikerInstantiated)
     {
         <div class="moniker-layer" aria-hidden="true">
@@ -45,68 +43,28 @@
 </div>
 
 <style>
-    .living-sequence-shell {
-        position:absolute; inset:0; z-index:10000; overflow:hidden; isolation:isolate;
-        background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace;
-    }
-    .moniker-layer {
-        position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center;
-        pointer-events:none;
-    }
+    .living-sequence-shell { position:absolute; inset:0; z-index:10000; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
+    .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
     .living-canvas { position:absolute; inset:0; z-index:10; overflow:hidden; perspective:1200px; }
-    .architecture-atmosphere {
-        position:absolute; inset:-20%; z-index:0; pointer-events:none;
-        background:radial-gradient(circle at 50% 50%,rgba(255,48,48,.09),transparent 24%),
-                   radial-gradient(circle at 18% 28%,rgba(255,211,77,.045),transparent 22%),
-                   radial-gradient(circle at 82% 72%,rgba(82,224,90,.035),transparent 24%),
-                   repeating-linear-gradient(118deg,transparent 0 120px,rgba(255,48,48,.035) 121px 132px,rgba(255,211,77,.028) 133px 145px,transparent 146px 260px);
-        animation:atmosphereDrift 12s ease-in-out infinite;
-    }
-    .venom-field {
-        position:absolute; inset:0; z-index:2; pointer-events:none;
-        background:repeating-linear-gradient(115deg,transparent 0 150px,rgba(255,48,48,.035) 151px 166px,rgba(255,211,77,.025) 167px 181px,transparent 182px 330px);
-        mask-image:radial-gradient(circle at center,black 0,transparent 78%); opacity:.8;
-    }
-    .moniker-title {
-        display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
-        font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.82; letter-spacing:.075em;
-        text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%;
-    }
-    .moniker-title>div { white-space:nowrap; }
-    .moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }
-    .moniker-title>div:nth-child(2) span { animation-delay:-.4s; }
-    .moniker-title>div:nth-child(3) span { animation-delay:-.8s; }
+    .architecture-atmosphere { position:absolute; inset:-20%; z-index:0; pointer-events:none; background:radial-gradient(circle at 50% 50%,rgba(255,48,48,.09),transparent 24%),radial-gradient(circle at 18% 28%,rgba(255,211,77,.045),transparent 22%),radial-gradient(circle at 82% 72%,rgba(82,224,90,.035),transparent 24%),repeating-linear-gradient(118deg,transparent 0 120px,rgba(255,48,48,.035) 121px 132px,rgba(255,211,77,.028) 133px 145px,transparent 146px 260px); animation:atmosphereDrift 12s ease-in-out infinite; }
+    .venom-field { position:absolute; inset:0; z-index:2; pointer-events:none; background:repeating-linear-gradient(115deg,transparent 0 150px,rgba(255,48,48,.035) 151px 166px,rgba(255,211,77,.025) 167px 181px,transparent 182px 330px); mask-image:radial-gradient(circle at center,black 0,transparent 78%); opacity:.8; }
+    .moniker-title { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.82; letter-spacing:.075em; text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%; }
+    .moniker-title>div { white-space:nowrap; }.moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }.moniker-title>div:nth-child(2) span { animation-delay:-.4s; }.moniker-title>div:nth-child(3) span { animation-delay:-.8s; }
     .blue{color:#00a8ff}.magenta{color:#ff2cff}.orange{color:#ff7a00}.red{color:#ff3030}.yellow{color:#ffd34d}.green{color:#52e05a}
-    .architecture-node {
-        position:absolute; z-index:20; box-sizing:border-box; min-width:6px; min-height:6px; padding:.55rem;
-        border:1px solid rgba(255,211,77,.5); border-left:4px solid #ff3030; border-radius:4px;
-        background:rgba(5,6,8,.94); color:#f4f7f8; font:inherit; text-align:left; cursor:pointer;
-        overflow:hidden; transform-origin:center; transition:width .08s linear,height .08s linear,border-color .15s ease,box-shadow .15s ease,opacity .08s linear;
-        box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 0 18px rgba(255,48,48,.045);
-    }
-    .gravity-node { pointer-events:none; cursor:default; }
-    .architecture-node:hover,.architecture-node:focus-visible {
-        border-color:#52e05a; box-shadow:0 0 25px rgba(82,224,90,.18),inset 0 0 20px rgba(255,211,77,.06); outline:none;
-    }
-    .node-index{display:block;color:#ff3030;font-size:.5rem;letter-spacing:.08em;white-space:nowrap}
-    .architecture-node strong{display:block;margin-top:.18rem;color:#ffd34d;font-size:clamp(.52rem,.8vw,.72rem);letter-spacing:.08em;white-space:nowrap}
-    .architecture-node small{display:block;margin-top:.22rem;color:#52e05a;font-size:.42rem;letter-spacing:.05em;white-space:nowrap}
-    .critical-mass-marker {
-        position:absolute;left:50%;bottom:3%;z-index:31;transform:translateX(-50%);color:rgba(255,211,77,.72);
-        font-size:.58rem;letter-spacing:.22em;pointer-events:none;text-shadow:0 0 10px rgba(255,211,77,.5);
-    }
-    @@keyframes kelpSway{0%,100%{transform:rotate(-1.2deg) skewX(-.6deg)}25%{transform:rotate(1deg) skewX(.9deg) translateY(-3px)}50%{transform:rotate(-.6deg) skewX(-1deg) translateY(2px)}75%{transform:rotate(1.4deg) skewX(.7deg) translateY(-2px)}}
-    @@keyframes letterDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-    @@keyframes atmosphereDrift{0%,100%{transform:translate3d(-1%,0,0) scale(1)}50%{transform:translate3d(1%,1%,0) scale(1.03)}}
-    @@media(max-width:800px){.architecture-node{padding:.4rem}.moniker-title{font-size:clamp(1.65rem,8vw,3.5rem)}}
-    @@media(prefers-reduced-motion:reduce){.living-sequence-shell *, .living-sequence-shell *::before, .living-sequence-shell *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+    .architecture-node { position:absolute; z-index:20; box-sizing:border-box; min-width:6px; min-height:6px; padding:.55rem; border:1px solid rgba(255,211,77,.5); border-left:4px solid #ff3030; border-radius:4px; background:rgba(5,6,8,.94); color:#f4f7f8; font:inherit; text-align:left; cursor:pointer; overflow:hidden; transform-origin:center; transition:width .08s linear,height .08s linear,border-color .15s ease,box-shadow .15s ease,opacity .08s linear; box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 0 18px rgba(255,48,48,.045); }
+    .gravity-node { pointer-events:none; cursor:default; }.architecture-node:hover,.architecture-node:focus-visible { border-color:#52e05a; box-shadow:0 0 25px rgba(82,224,90,.18),inset 0 0 20px rgba(255,211,77,.06); outline:none; }
+    .node-index{display:block;color:#ff3030;font-size:.5rem;letter-spacing:.08em;white-space:nowrap}.architecture-node strong{display:block;margin-top:.18rem;color:#ffd34d;font-size:clamp(.52rem,.8vw,.72rem);letter-spacing:.08em;white-space:nowrap}.architecture-node small{display:block;margin-top:.22rem;color:#52e05a;font-size:.42rem;letter-spacing:.05em;white-space:nowrap}
+    .critical-mass-marker { position:absolute;left:50%;bottom:3%;z-index:31;transform:translateX(-50%);color:rgba(255,211,77,.72);font-size:.58rem;letter-spacing:.22em;pointer-events:none;text-shadow:0 0 10px rgba(255,211,77,.5); }
+    @@keyframes kelpSway{0%,100%{transform:rotate(-1.2deg) skewX(-.6deg)}25%{transform:rotate(1deg) skewX(.9deg) translateY(-3px)}50%{transform:rotate(-.6deg) skewX(-1deg) translateY(2px)}75%{transform:rotate(1.4deg) skewX(.7deg) translateY(-2px)}}@@keyframes letterDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}@@keyframes atmosphereDrift{0%,100%{transform:translate3d(-1%,0,0) scale(1)}50%{transform:translate3d(1%,1%,0) scale(1.03)}}
+    @@media(max-width:800px){.architecture-node{padding:.4rem}.moniker-title{font-size:clamp(1.65rem,8vw,3.5rem)}}@@media(prefers-reduced-motion:reduce){.living-sequence-shell *, .living-sequence-shell *::before, .living-sequence-shell *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 
 @code {
-    // Critical mass is the sole gate for first moniker instantiation.
-    // LivingNodes is frozen at exactly PageStateContext.CriticalMass (100), so
-    // the moniker remains instantiated for the remainder of this page lifetime.
-    private bool MonikerInstantiated => FSM.Context.LivingNodes.Count >= PageStateContext.CriticalMass;
+    // CriticalMass is intentionally private inside PageStateContext. Keep the
+    // presentation gate local and explicit: exactly 100 living nodes is the
+    // narrative trigger for first moniker instantiation.
+    private const int CriticalMass = 100;
+    private bool MonikerInstantiated => FSM.Context.LivingNodes.Count >= CriticalMass;
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.NavigationArrival or PageFSM.Running;
     private string? selectedNode;
 
@@ -126,13 +84,7 @@
         return Math.Clamp(1 - ((node.Y - 100) / 30), 0, 1);
     }
 
-    private void SelectNode(string lineage)
-    {
-        selectedNode = lineage;
-    }
+    private void SelectNode(string lineage) => selectedNode = lineage;
 
-    public void Dispose()
-    {
-        FSM.StateChanged -= HandleFSMStateChanged;
-    }
+    public void Dispose() => FSM.StateChanged -= HandleFSMStateChanged;
 }
