@@ -225,6 +225,28 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Equal(0, FSM_API.Internal.GetFSMHandleCountInGroup(PageFSM.ProcessingGroup));
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 08 — PageFSM Update advances only its owning handle")]
+    public void IncrementalUnitTest08_PageFSMUpdateAdvancesOnlyItsOwningHandle()
+    {
+        using var first = new PageFSM();
+        using var second = new PageFSM();
+
+        Assert.Equal(PageFSM.Gateway, first.CurrentState);
+        Assert.Equal(PageFSM.Gateway, second.CurrentState);
+
+        first.RequestEnter();
+
+        Assert.Equal(PageFSM.GatewayExit, first.CurrentState);
+        Assert.Equal(PageFSM.Gateway, second.CurrentState);
+        Assert.False(second.Context.EnterRequested);
+
+        first.Update();
+
+        Assert.Equal(PageFSM.LivingGuiIgnition, first.CurrentState);
+        Assert.Equal(PageFSM.Gateway, second.CurrentState);
+        Assert.Empty(second.Context.LivingNodes);
+    }
+
     [Fact(DisplayName = "Living GUI freezes exactly at critical mass and stops updating")]
     public void LivingGui_FreezesAtOneHundred()
     {
