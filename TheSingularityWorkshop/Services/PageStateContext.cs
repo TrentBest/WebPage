@@ -12,7 +12,7 @@ namespace TheSingularityWorkshop.Services
     {
         public const int CriticalMass = 100;
 
-        private const double SeedSize = 6;
+        private const double SeedSize = 18;
         private const double DefaultNodeSize = 48;
         private const double MaximumNodeSize = 96;
         private const double MinX = 8;
@@ -54,8 +54,7 @@ namespace TheSingularityWorkshop.Services
         {
             if (_livingNodes.Count != 0) return;
 
-            // The first object is deliberately a literal G:0 seed. It is the root
-            // from which every later lineage can be read without an external index.
+            // One visible label starts the whole sequence.
             _livingNodes.Add(new LivingNodeState(
                 "G:0", 0, 50, 50, SeedSize, 50, 50, 0, 0, 50, 50,
                 growthReady: false, seedDoubled: false));
@@ -81,7 +80,6 @@ namespace TheSingularityWorkshop.Services
 
             foreach (var node in _livingNodes)
             {
-                // A new seed first visibly doubles before it is launched.
                 if (!node.SeedDoubled)
                 {
                     node.Size = SeedSize * 2;
@@ -89,7 +87,6 @@ namespace TheSingularityWorkshop.Services
                     continue;
                 }
 
-                // The doubled seed then travels like the Pong ball to its chosen point.
                 if (node.SeedTicks < node.SeedFlightDuration)
                 {
                     node.SeedTicks++;
@@ -99,7 +96,6 @@ namespace TheSingularityWorkshop.Services
                     continue;
                 }
 
-                // On arrival it expands to its normal/default GUI size.
                 if (!node.GrowthReady)
                 {
                     node.Size = DefaultNodeSize;
@@ -107,8 +103,6 @@ namespace TheSingularityWorkshop.Services
                     continue;
                 }
 
-                // Then it grows. A completed node produces another seed carrying
-                // its own readable lineage: G:1 -> G:1-0, G:1-1; G:0 -> G:1, G:2...
                 node.Size *= 2;
 
                 if (node.Size >= MaximumNodeSize)
