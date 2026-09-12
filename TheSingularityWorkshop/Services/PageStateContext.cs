@@ -11,15 +11,17 @@ namespace TheSingularityWorkshop.Services
     public sealed class PageStateContext : IStateContext
     {
         private const int CriticalMass = 100;
-        private const double MinimumNodeSize = 60;
-        private const double MaximumNodeSize = 120;
-        private const double GrowthPerTick = 2;
+        private const double SeedSize = 6;
+        private const double MaximumNodeSize = 96;
         private const double MinX = 8;
         private const double MaxX = 92;
         private const double MinY = 10;
         private const double MaxY = 88;
+        private const int SeedFlightTicks = 3;
+        private const double GravityAcceleration = 1.15;
 
         private readonly Random _random = new();
+        private readonly List<LivingNodeState> _livingNodes = new();
 
         public string Name { get; set; } = "PageFSMContext";
         public bool IsValid { get; set; } = true;
@@ -27,18 +29,16 @@ namespace TheSingularityWorkshop.Services
 
         public bool EnterRequested { get; set; }
         public bool LivingGuiPopulated { get; internal set; }
-        public bool MonikerReady { get; set; }
-        public bool GravityReleased { get; set; }
-        public bool LivingGuiFallen { get; set; }
-        public bool NavigationReady { get; set; }
+        public bool MonikerReady { get; internal set; }
+        public bool GravityReleased { get; internal set; }
+        public bool LivingGuiFallen { get; internal set; }
+        public bool NavigationReady { get; internal set; }
 
         public long StateTicks { get; set; }
         public long TotalTicks { get; set; }
 
         public bool LivingGuiFrozen { get; private set; }
         public IReadOnlyList<LivingNodeState> LivingNodes => _livingNodes;
-
-        private readonly List<LivingNodeState> _livingNodes = new();
 
         public PageStateContext(object? singularityHub = null)
         {
@@ -51,16 +51,22 @@ namespace TheSingularityWorkshop.Services
         {
             if (_livingNodes.Count != 0) return;
 
-            _livingNodes.Add(CreateNode("1", 1));
+            // The first living GUI is deliberately dead-center. Chaos begins only
+            // after the user has entered the experience and the first seed exists.
+            _livingNodes.Add(new LivingNodeState("1", 1, 50, 50, SeedSize, 50, 50, 0));
             LivingGuiFrozen = false;
             LivingGuiPopulated = false;
+            MonikerReady = false;
+            GravityReleased = false;
+            LivingGuiFallen = false;
         }
 
         /// <summary>
-        /// Advances the living GUI swarm by one FSM heartbeat.
-        /// Every live node grows. A full node reproduces, remains alive,
-        /// and resets to its seed size. The FSM therefore owns the clock
-        /// and the recursive swarm progression.
+        /// Advances the swarm by one FSM heartbeat.
+        /// Newborn GUIs are thrown from their parent's location toward an independent
+        /// destination while remaining at seed size. Only after the throw completes
+        /// does the GUI enter its growth cycle. At maximum size it resets to seed size
+        /// and launches a new child. This deliberately avoids synchronized growth.
         /// </summary>
         public void AdvanceLivingGui()
         {
@@ -71,16 +77,22 @@ namespace TheSingularityWorkshop.Services
 
             foreach (var node in _livingNodes)
             {
-                node.Size += GrowthPerTick;
+                if (node.SeedTicks < SeedFlightTicks)
+                {
+                    node.SeedTicks++;
+                    var progress = (double)node.SeedTicks / SeedFlightTicks;
+                    node.X = node.SeedX + ((node.TargetX - node.SeedX) * progress);
+                    node.Y = node.SeedY + ((node.TargetY - node.SeedY) * progress);
+                    continue;
+                }
+
+                node.Size *= 2;
 
                 if (node.Size >= MaximumNodeSize)
                 {
-                    node.Size = MinimumNodeSize;
+                    node.Size = SeedSize;
                     node.OffspringCount++;
-
-                    newborns.Add(CreateNode(
-                        $"{node.Lineage}.{node.OffspringCount}",
-                        node.Generation + 1));
+                    newborns.Add(CreateSeed(node));
                 }
             }
 
@@ -96,66 +108,89 @@ namespace TheSingularityWorkshop.Services
             }
         }
 
-        private LivingNodeState CreateNode(string lineage, int generation)
+        private LivingNodeState CreateSeed(LivingNodeState parent)
         {
-            var (x, y) = NextBalancedPosition();
-            return new LivingNodeState(lineage, generation, x, y, MinimumNodeSize);
+            var (targetX, targetY) = NextChaoticPosition();
+            return new LivingNodeState(
+                $"{parent.Lineage}.{parent.OffspringCount}",
+                parent.Generation + 1,
+                parent.X,
+                parent.Y,
+                SeedSize,
+                parent.X,
+                parent.Y,
+                0,
+                targetX,
+                targetY);
+        }
+
+        private (double X, double Y) NextChaoticPosition()
+        {
+            // Randomized, bounded destinations deliberately replace quadrant balancing.
+            // The result should feel alive rather than like a tree being laid out.
+            return (
+                MinX + _random.NextDouble() * (MaxX - MinX),
+                MinY + _random.NextDouble() * (MaxY - MinY));
         }
 
         /// <summary>
-        /// Prefer the least-populated quadrant, then choose a random point inside it.
-        /// Coordinates are local 0-100 percentages of the living panel.
+        /// Starts physics only after the moniker has been instantiated by the FSM.
         /// </summary>
-        private (double X, double Y) NextBalancedPosition()
+        public void AdvanceGravity()
         {
-            var counts = new int[4];
+            if (!LivingGuiFrozen)
+                return;
 
             foreach (var node in _livingNodes)
             {
-                var nodeQuadrant = (node.X >= 50 ? 1 : 0) + (node.Y >= 50 ? 2 : 0);
-                counts[nodeQuadrant]++;
+                node.GravityVelocity += GravityAcceleration;
+                node.Y += node.GravityVelocity;
+                node.Rotation += 2.4;
             }
 
-            var least = counts[0];
-            for (var i = 1; i < counts.Length; i++)
-                least = Math.Min(least, counts[i]);
-
-            var candidates = new List<int>(4);
-            for (var i = 0; i < counts.Length; i++)
-            {
-                if (counts[i] == least)
-                    candidates.Add(i);
-            }
-
-            var selectedQuadrant = candidates[_random.Next(candidates.Count)];
-
-            var xMin = selectedQuadrant is 0 or 2 ? MinX : 50;
-            var xMax = selectedQuadrant is 0 or 2 ? 50 : MaxX;
-            var yMin = selectedQuadrant is 0 or 1 ? MinY : 50;
-            var yMax = selectedQuadrant is 0 or 1 ? 50 : MaxY;
-
-            return (
-                xMin + _random.NextDouble() * (xMax - xMin),
-                yMin + _random.NextDouble() * (yMax - yMin));
+            GravityReleased = true;
+            LivingGuiFallen = _livingNodes.TrueForAll(node => node.Y > 125);
         }
 
         public sealed class LivingNodeState
         {
-            internal LivingNodeState(string lineage, int generation, double x, double y, double size)
+            internal LivingNodeState(
+                string lineage,
+                int generation,
+                double x,
+                double y,
+                double size,
+                double seedX,
+                double seedY,
+                int seedTicks,
+                double? targetX = null,
+                double? targetY = null)
             {
                 Lineage = lineage;
                 Generation = generation;
                 X = x;
                 Y = y;
                 Size = size;
+                SeedX = seedX;
+                SeedY = seedY;
+                SeedTicks = seedTicks;
+                TargetX = targetX ?? x;
+                TargetY = targetY ?? y;
             }
 
             public string Lineage { get; }
             public int Generation { get; }
-            public double X { get; }
-            public double Y { get; }
+            public double X { get; internal set; }
+            public double Y { get; internal set; }
             public double Size { get; internal set; }
             public int OffspringCount { get; internal set; }
+            public double SeedX { get; }
+            public double SeedY { get; }
+            public int SeedTicks { get; internal set; }
+            public double TargetX { get; }
+            public double TargetY { get; }
+            public double GravityVelocity { get; internal set; }
+            public double Rotation { get; internal set; }
         }
     }
 }
