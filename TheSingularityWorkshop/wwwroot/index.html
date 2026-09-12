@@ -39,9 +39,16 @@
         .fine-rushing .fine-tiny { font-size: .22rem; line-height: 1.03; }
         .fine-rushing .fine-tiny h3 { font-size: 1.6rem; }
         .fine-print-disclaimer { margin-top: 3rem; padding: 1rem; border-top: 1px dashed rgba(255,102,0,.55); color: rgba(255,177,92,.7); text-align: center; font-size: .55rem; letter-spacing: .08em; }
+
+        /* The idle handoff now explains itself before Pong appears. */
+        .idle-screen-saver::before { content:"IDLE"; position:absolute; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; pointer-events:none; color:#fff; font:900 clamp(4rem,18vw,16rem)/.8 Consolas,'Courier New',monospace; letter-spacing:.08em; text-shadow:0 0 18px #00eaff,0 0 55px rgba(0,234,255,.9),0 0 100px rgba(255,44,255,.75); animation:idleImpact 1.5s cubic-bezier(.12,.92,.18,1) forwards; }
+        .idle-screen-saver .pong-board { opacity:0; animation:pongAfterIdle .9s ease-out 1.15s forwards; }
+
         @@keyframes finePrintArrival { from { opacity: 0; transform: scale(.985); } to { opacity: 1; transform: scale(1); } }
         @@keyframes fineHeaderBreath { 0%,100% { text-shadow: 0 0 5px rgba(255,102,0,.35); } 50% { text-shadow: 0 0 12px rgba(255,211,77,.85), 0 0 25px rgba(255,102,0,.45); } }
         @@keyframes topButtonPulse { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        @@keyframes idleImpact { 0% { opacity:0; transform:scale(.015); } 12% { opacity:1; } 72% { opacity:1; transform:scale(1.08); } 100% { opacity:0; transform:scale(18); } }
+        @@keyframes pongAfterIdle { from { opacity:0; transform:scale(1.025); } to { opacity:1; transform:scale(1); } }
         @@media (max-width: 700px) { .workshop-fineprint-shell { width: 95vw; height: 88vh; } .workshop-fineprint-scroll { padding: 1rem .8rem 10rem; font-size: .78rem; } .fine-tiny { font-size: .27rem; } .fine-rushing .fine-tiny { font-size: .19rem; } }
     </style>
 </head>
@@ -165,6 +172,7 @@
             ];
             function addLines(parent, lines, count, prefix) { for (let i = 0; i < count; i++) { const p = document.createElement("div"); p.className = "fine-line"; p.textContent = prefix + lines[i % lines.length] + (i >= lines.length ? " [iteration " + (i + 1) + "]" : ""); parent.appendChild(p); } }
             function closeExperience() { if (animationFrame) cancelAnimationFrame(animationFrame); animationFrame = 0; if (activeOverlay) activeOverlay.remove(); activeOverlay = null; pauseUntil = 0; tinyHeader = null; }
+            let runAutoScroll = () => {};
             function returnToTop(scroll, topButton) {
                 pauseUntil = 0;
                 scroll.classList.remove("fine-rushing");
@@ -175,7 +183,6 @@
                     if (activeOverlay) animationFrame = requestAnimationFrame(() => runAutoScroll());
                 }, 650);
             }
-            let runAutoScroll = () => {};
             function openExperience() {
                 if (activeOverlay) return;
                 const overlay = document.createElement("div"); overlay.className = "workshop-fineprint-overlay";
@@ -199,19 +206,19 @@
                     if (!activeOverlay || finished) return;
                     const now = performance.now();
                     const dt = Math.min(.05, (now - last) / 1000); last = now;
+                    const maxScroll = Math.max(1, scroll.scrollHeight - scroll.clientHeight);
                     if (pauseUntil && now < pauseUntil) {
                         scroll.scrollTop = Math.max(scroll.scrollTop, 0);
                     } else {
                         pauseUntil = 0;
-                        const maxScroll = Math.max(1, scroll.scrollHeight - scroll.clientHeight);
                         const progress = Math.min(1, Math.max(0, scroll.scrollTop / maxScroll));
                         if (progress > .34) scroll.classList.add("fine-rushing");
                         const elapsed = Math.max(0, (now - started) / 1000);
                         if (elapsed >= 2 && progress < 1) {
-                            const runway = Math.min(1, (progress - .34) / .66);
                             const normalized = Math.min(1, progress / .5);
+                            const runway = Math.min(1, Math.max(0, (progress - .34) / .66));
                             const earlySpeed = 7 + 68 * Math.pow(normalized, 1.55);
-                            const lateSpeed = 75 + 825 * Math.pow(Math.max(0, runway), 2.05);
+                            const lateSpeed = 75 + 825 * Math.pow(runway, 2.05);
                             const speed = progress < .5 ? earlySpeed : lateSpeed;
                             scroll.scrollTop += speed * dt;
                         }
