@@ -18,7 +18,6 @@ public sealed class MicroBundleRegistry
         ArgumentNullException.ThrowIfNull(bundle);
         if (_byId.ContainsKey(bundle.Id))
             throw new InvalidOperationException($"MicroBundle {bundle.Id} is already registered.");
-
         _byId.Add(bundle.Id, bundle);
         var ontologyId = bundle.Ontology.StructuralId;
         if (!_byOntology.TryGetValue(ontologyId, out var matches))
@@ -26,24 +25,18 @@ public sealed class MicroBundleRegistry
             matches = new List<IMicroBundle>();
             _byOntology.Add(ontologyId, matches);
         }
-
         matches.Add(bundle);
     }
 
     public bool TryGet(ulong id, out IMicroBundle? bundle) => _byId.TryGetValue(id, out bundle);
 
-    /// <summary>Returns every bundle occupying an exact nine-layer ontology coordinate.</summary>
     public IReadOnlyList<IMicroBundle> FindByOntology(OntologySignature ontology)
-        => _byOntology.TryGetValue(ontology.StructuralId, out var matches)
-            ? matches
-            : Array.Empty<IMicroBundle>();
+        => _byOntology.TryGetValue(ontology.StructuralId, out var matches) ? matches : Array.Empty<IMicroBundle>();
 
-    /// <summary>Queries the ontology index at any one of its nine ordered layers.</summary>
     public IReadOnlyList<IMicroBundle> FindByOntologyLayer(int layer, int token)
     {
         if (layer is < 0 or >= OntologySignature.LayerCount)
             throw new ArgumentOutOfRangeException(nameof(layer));
-
         return _byId.Values.Where(bundle => bundle.Ontology[layer] == token).ToArray();
     }
 }
@@ -52,7 +45,6 @@ public sealed class MicroBundleRegistry
 public sealed class ExperienceRegistry
 {
     private readonly Dictionary<ulong, IExperience> _experiences = new();
-
     public int Count => _experiences.Count;
 
     public void Register(IExperience experience)
@@ -60,7 +52,6 @@ public sealed class ExperienceRegistry
         ArgumentNullException.ThrowIfNull(experience);
         if (_experiences.ContainsKey(experience.Id))
             throw new InvalidOperationException($"Experience {experience.Id} is already registered.");
-
         _experiences.Add(experience.Id, experience);
     }
 
@@ -76,13 +67,10 @@ public sealed record ExperienceLoadResult(
     IReadOnlyList<ulong> DependencyOrder,
     IReadOnlyList<string> Errors)
 {
-    public bool IsReady => IsLoadable && (!IsIdleCompatible || Experience is IIdleExperience);
+    public bool IsReady => IsLoadable && IsIdleCompatible;
 }
 
-/// <summary>
-/// Resolves, validates, arbitrates and retains an Experience's MicroBundle closure.
-/// The registry is the global knowledge base; the loaded result is the small active set.
-/// </summary>
+/// <summary>Resolves, validates, arbitrates and returns the compact active MicroBundle closure.</summary>
 public sealed class ExperienceLoader
 {
     private const int MaxArbitrationRounds = 10;
@@ -98,16 +86,17 @@ public sealed class ExperienceLoader
     public ExperienceLoadResult Load(ulong experienceId, bool requireIdle = false)
     {
         if (!_experiences.TryGet(experienceId, out var experience) || experience is null)
-            return Failure(null, requireIdle, "Experience is not registered.");
+            return Failure(null, false, "Experience is not registered.");
 
+        var idleCompatible = experience is IIdleExperience;
         if (experience.MicroBundleIds.Count == 0)
-            return Failure(experience, requireIdle, "Experience has no MicroBundles.");
+            return Failure(experience, idleCompatible, "Experience has no MicroBundles.");
         if (experience.SensorySystems.Distinct().Count() != experience.SenseCount)
-            return Failure(experience, requireIdle, "Experience SenseCount does not match its distinct sensory systems.");
+            return Failure(experience, idleCompatible, "Experience SenseCount does not match its distinct sensory systems.");
         if (experience.ProcessingGroups.Count == 0)
-            return Failure(experience, requireIdle, "Experience exposes no processing groups.");
-        if (requireIdle && experience is not IIdleExperience)
-            return Failure(experience, true, "Experience is not admitted to Idle mode.");
+            return Failure(experience, idleCompatible, "Experience exposes no processing groups.");
+        if (requireIdle && !idleCompatible)
+            return Failure(experience, false, "Experience is not admitted to Idle mode.");
 
         var errors = new List<string>();
         var resolved = new Dictionary<ulong, IMicroBundle>();
@@ -118,17 +107,8 @@ public sealed class ExperienceLoader
                 errors.Add($"MicroBundle {id} is not registered.");
                 continue;
             }
-
-            if (bundle.Ontology[0] != experience.Ontology[0] ||
-                bundle.Ontology[1] != experience.Ontology[1] ||
-                bundle.Ontology[2] != experience.Ontology[2] ||
-                bundle.Ontology[3] != experience.Ontology[3] ||
-                bundle.Ontology[4] != experience.Ontology[4] ||
-                bundle.Ontology[5] != experience.Ontology[5] ||
-                bundle.Ontology[6] != experience.Ontology[6] ||
-                bundle.Ontology[7] != experience.Ontology[7])
+            if (!SharesParentOntology(experience.Ontology, bundle.Ontology))
                 errors.Add($"MicroBundle {id} does not inherit the Experience ontology through layer 8.");
-
             resolved[id] = bundle;
         }
 
@@ -139,43 +119,37 @@ public sealed class ExperienceLoader
             Visit(id, resolved, visiting, visited, order, errors);
 
         if (errors.Count > 0)
-            return new ExperienceLoadResult(false, requireIdle, experience, resolved.Values.ToArray(), order, errors);
+            return new ExperienceLoadResult(false, idleCompatible, experience, resolved.Values.ToArray(), order, errors);
 
         var arbitrator = new RuntimeArbitrator();
         foreach (var id in order)
             arbitrator.LoadBundle(resolved[id]);
+        for (var round = 0; round < MaxArbitrationRounds; round++)
+            if (arbitrator.ExecuteArbitrationPipeline() == 0)
+                break;
 
-        for (var round = 0; round < MaxArbitrationRounds && arbitrator.ExecuteArbitrationPipeline() > 0; round++)
-        {
-        }
-
-        return new ExperienceLoadResult(
-            true,
-            requireIdle,
-            experience,
-            order.Select(id => resolved[id]).ToArray(),
-            order,
-            Array.Empty<string>());
+        return new ExperienceLoadResult(true, idleCompatible, experience,
+            order.Select(id => resolved[id]).ToArray(), order, Array.Empty<string>());
     }
 
-    private static void Visit(
-        ulong id,
-        IReadOnlyDictionary<ulong, IMicroBundle> resolved,
-        HashSet<ulong> visiting,
-        HashSet<ulong> visited,
-        List<ulong> order,
-        List<string> errors)
+    private static bool SharesParentOntology(OntologySignature experience, OntologySignature bundle)
     {
-        if (visited.Contains(id))
-            return;
-        if (!resolved.TryGetValue(id, out var bundle))
+        for (var layer = 0; layer < OntologySignature.LayerCount - 1; layer++)
+            if (experience[layer] != bundle[layer])
+                return false;
+        return true;
+    }
+
+    private static void Visit(ulong id, IReadOnlyDictionary<ulong, IMicroBundle> resolved,
+        HashSet<ulong> visiting, HashSet<ulong> visited, List<ulong> order, List<string> errors)
+    {
+        if (visited.Contains(id) || !resolved.TryGetValue(id, out var bundle))
             return;
         if (!visiting.Add(id))
         {
             errors.Add($"MicroBundle dependency cycle detected at {id}.");
             return;
         }
-
         foreach (var dependency in bundle.Dependencies)
         {
             if (!resolved.ContainsKey(dependency))
@@ -183,14 +157,13 @@ public sealed class ExperienceLoader
             else
                 Visit(dependency, resolved, visiting, visited, order, errors);
         }
-
         visiting.Remove(id);
         visited.Add(id);
         order.Add(id);
     }
 
-    private static ExperienceLoadResult Failure(IExperience? experience, bool idle, string error)
-        => new(false, idle, experience, Array.Empty<IMicroBundle>(), Array.Empty<ulong>(), [error]);
+    private static ExperienceLoadResult Failure(IExperience? experience, bool idleCompatible, string error)
+        => new(false, idleCompatible, experience, Array.Empty<IMicroBundle>(), Array.Empty<ulong>(), [error]);
 
     private sealed class RuntimeArbitrator : IArbitrator
     {
@@ -203,7 +176,6 @@ public sealed class ExperienceLoader
             _loaded.Add(bundle);
             return true;
         }
-
         public int ExecuteArbitrationPipeline()
         {
             var changed = 0;
