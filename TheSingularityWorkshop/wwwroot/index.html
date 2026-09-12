@@ -12,17 +12,17 @@
     <link href="TheSingularityWorkshop.styles.css" rel="stylesheet" />
 
     <style>
-        /* Gateway presentation belongs to Home.razor. Do not put competing
-           monolith/image rules here: the landing page must have one visual authority. */
         .workshop-warning { cursor: pointer !important; transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease !important; }
         .workshop-warning:hover { transform: scale(1.012) !important; border-color: #ffb000 !important; box-shadow: 0 0 22px rgba(255,102,0,.65), 0 0 55px rgba(255,102,0,.28), inset 0 0 28px rgba(255,102,0,.1) !important; }
-        .workshop-warning::after { content: "CLICK AT YOUR OWN RISK"; display: block; margin-top: .35rem; font-size: .52rem; letter-spacing: .18em; color: rgba(255,177,92,.58); opacity: .7; }
+        .workshop-warning::after { content: "CLICK TO READ THE WHOLE RUNWAY"; display: block; margin-top: .35rem; font-size: .52rem; letter-spacing: .18em; color: rgba(255,177,92,.58); opacity: .7; }
 
         .workshop-fineprint-overlay { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 3vh 3vw; background: rgba(1, 3, 8, .92); backdrop-filter: blur(7px); animation: finePrintArrival .55s ease-out; }
         .workshop-fineprint-shell { position: relative; width: min(1100px, 92vw); height: min(82vh, 820px); display: flex; flex-direction: column; overflow: hidden; border: 3px solid #ff6600; border-radius: 5px; background: rgba(12, 7, 3, .97); box-shadow: 0 0 18px rgba(255,102,0,.55), 0 0 65px rgba(255,102,0,.22), inset 0 0 35px rgba(255,102,0,.07); }
         .workshop-fineprint-header { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .8rem 1rem; color: #ffd34d; border-bottom: 2px solid #ff6600; background: rgba(30, 13, 2, .98); text-transform: uppercase; letter-spacing: .14em; font: 700 clamp(.68rem, 1vw, .9rem) Consolas, 'Courier New', monospace; animation: fineHeaderBreath 2.6s ease-in-out infinite; }
-        .workshop-fineprint-close { border: 1px solid #ff6600; background: rgba(40, 12, 2, .8); color: #ffb15c; padding: .25rem .55rem; cursor: pointer; font: 700 .72rem Consolas, 'Courier New', monospace; }
-        .workshop-fineprint-close:hover { color: #fff; box-shadow: 0 0 12px rgba(255,102,0,.5); }
+        .workshop-fineprint-close,.workshop-fineprint-top { border: 1px solid #ff6600; background: rgba(40, 12, 2, .8); color: #ffb15c; padding: .25rem .55rem; cursor: pointer; font: 700 .72rem Consolas, 'Courier New', monospace; }
+        .workshop-fineprint-close:hover,.workshop-fineprint-top:hover { color: #fff; box-shadow: 0 0 12px rgba(255,102,0,.5); }
+        .workshop-fineprint-top { position: absolute; right: 1rem; bottom: 1rem; z-index: 4; display: none; padding: .5rem .8rem; box-shadow: 0 0 14px rgba(255,102,0,.4); }
+        .workshop-fineprint-top.visible { display: block; animation: topButtonPulse 1.2s ease-in-out infinite; }
         .workshop-fineprint-scroll { position: relative; flex: 1 1 auto; min-height: 0; overflow-y: scroll; overflow-x: hidden; padding: 1.2rem 1.5rem 12rem; color: #e9ded3; scrollbar-color: #ff6600 #1a0b03; scrollbar-width: auto; font: 400 .92rem/1.62 Consolas, 'Courier New', monospace; }
         .workshop-fineprint-scroll::-webkit-scrollbar { width: 14px; }
         .workshop-fineprint-scroll::-webkit-scrollbar-track { background: #1a0b03; border-left: 1px solid rgba(255,102,0,.3); }
@@ -41,6 +41,7 @@
         .fine-print-disclaimer { margin-top: 3rem; padding: 1rem; border-top: 1px dashed rgba(255,102,0,.55); color: rgba(255,177,92,.7); text-align: center; font-size: .55rem; letter-spacing: .08em; }
         @@keyframes finePrintArrival { from { opacity: 0; transform: scale(.985); } to { opacity: 1; transform: scale(1); } }
         @@keyframes fineHeaderBreath { 0%,100% { text-shadow: 0 0 5px rgba(255,102,0,.35); } 50% { text-shadow: 0 0 12px rgba(255,211,77,.85), 0 0 25px rgba(255,102,0,.45); } }
+        @@keyframes topButtonPulse { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
         @@media (max-width: 700px) { .workshop-fineprint-shell { width: 95vw; height: 88vh; } .workshop-fineprint-scroll { padding: 1rem .8rem 10rem; font-size: .78rem; } .fine-tiny { font-size: .27rem; } .fine-rushing .fine-tiny { font-size: .19rem; } }
     </style>
 </head>
@@ -89,9 +90,7 @@
         };
 
         /* IMPORTANT: no JavaScript moniker presentation lives here anymore.
-           The FSM/API is the sole authority for the reveal. The old MutationObserver
-           injected a three-second moniker whenever .gateway-interface appeared, which
-           was exactly the premature flash the landing contract forbids. */
+           The FSM/API is the sole authority for the reveal. */
 
         (function installWarningExperience() {
             let activeOverlay = null, animationFrame = 0, pauseUntil = 0, tinyHeader = null;
@@ -109,8 +108,9 @@
                 "The Forge is not a metaphor for a folder. It is a metaphor for a process: ingest, normalize, compose, execute, observe, refine.",
                 "The Workshop is being built with the technology it is intended to demonstrate.",
                 "This page is therefore both product surface and laboratory specimen.",
-                "Congratulations. You have clicked the warning.",
-                "That was probably the correct decision for science."
+                "The gateway is deliberately quiet. The sequence beyond it is not.",
+                "You are being given the explanation before the machinery takes over.",
+                "The orange warning is not a trap. It is a runway."
             ];
             const humor = [
                 "Please remain calm. The software has been informed that you are curious.",
@@ -165,6 +165,17 @@
             ];
             function addLines(parent, lines, count, prefix) { for (let i = 0; i < count; i++) { const p = document.createElement("div"); p.className = "fine-line"; p.textContent = prefix + lines[i % lines.length] + (i >= lines.length ? " [iteration " + (i + 1) + "]" : ""); parent.appendChild(p); } }
             function closeExperience() { if (animationFrame) cancelAnimationFrame(animationFrame); animationFrame = 0; if (activeOverlay) activeOverlay.remove(); activeOverlay = null; pauseUntil = 0; tinyHeader = null; }
+            function returnToTop(scroll, topButton) {
+                pauseUntil = 0;
+                scroll.classList.remove("fine-rushing");
+                scroll.scrollTo({ top: 0, behavior: "smooth" });
+                topButton.classList.remove("visible");
+                scroll.focus({ preventScroll: true });
+                window.setTimeout(() => {
+                    if (activeOverlay) animationFrame = requestAnimationFrame(() => runAutoScroll());
+                }, 650);
+            }
+            let runAutoScroll = () => {};
             function openExperience() {
                 if (activeOverlay) return;
                 const overlay = document.createElement("div"); overlay.className = "workshop-fineprint-overlay";
@@ -176,28 +187,45 @@
                 const comedy = document.createElement("section"); comedy.className = "fine-section fine-humor"; const comedyTitle = document.createElement("h3"); comedyTitle.textContent = "The situation deteriorates"; comedy.appendChild(comedyTitle); addLines(comedy, humor, 180, "// ");
                 const tinySection = document.createElement("section"); tinySection.className = "fine-section fine-tiny"; tinyHeader = document.createElement("h3"); tinyHeader.textContent = "TINY PRINT"; tinySection.appendChild(tinyHeader); addLines(tinySection, tiny, 2200, "· ");
                 const disclaimer = document.createElement("div"); disclaimer.className = "fine-print-disclaimer"; disclaimer.textContent = "END OF EXTENDED DISCLOSURE // YOU MADE IT THIS FAR // PLEASE GO OUTSIDE // THE WORKSHOP WILL STILL BE HERE"; tinySection.appendChild(disclaimer);
-                scroll.appendChild(tech); scroll.appendChild(comedy); scroll.appendChild(tinySection); shell.appendChild(header); shell.appendChild(scroll); overlay.appendChild(shell); document.body.appendChild(overlay); activeOverlay = overlay;
+                scroll.appendChild(tech); scroll.appendChild(comedy); scroll.appendChild(tinySection); shell.appendChild(header); shell.appendChild(scroll);
+                const topButton = document.createElement("button"); topButton.className = "workshop-fineprint-top"; topButton.type = "button"; topButton.textContent = "↟ RETURN TO TOP"; topButton.setAttribute("aria-label", "Return the advisory to the top"); topButton.addEventListener("click", () => returnToTop(scroll, topButton)); shell.appendChild(topButton);
+                overlay.appendChild(shell); document.body.appendChild(overlay); activeOverlay = overlay;
                 overlay.addEventListener("click", (event) => { if (event.target === overlay) closeExperience(); });
-                let last = performance.now(), started = last, tinyPauseDone = false;
-                function tick(now) {
-                    if (!activeOverlay) return;
+
+                let last = performance.now();
+                let started = last;
+                let finished = false;
+                runAutoScroll = () => {
+                    if (!activeOverlay || finished) return;
+                    const now = performance.now();
                     const dt = Math.min(.05, (now - last) / 1000); last = now;
-                    const tinyTop = tinyHeader ? tinyHeader.offsetTop : Number.MAX_SAFE_INTEGER;
-                    const distanceToTiny = tinyTop - scroll.scrollTop;
-                    if (!tinyPauseDone && distanceToTiny <= 55) { tinyPauseDone = true; pauseUntil = now + 4200; scroll.classList.add("fine-tiny-paused"); }
-                    if (pauseUntil && now < pauseUntil) { scroll.scrollTop = Math.max(scroll.scrollTop, tinyTop - 48); }
-                    else {
-                        scroll.classList.remove("fine-tiny-paused");
-                        if (tinyPauseDone) scroll.classList.add("fine-rushing");
-                        const elapsed = (now - started) / 1000;
-                        let speed;
-                        if (!tinyPauseDone) { speed = elapsed < 10 ? 9 : elapsed < 18 ? 18 : 32; if (scroll.scrollTop > comedy.offsetTop - scroll.clientHeight * .35) speed = 55; }
-                        else { const progress = Math.min(1, Math.max(0, (scroll.scrollTop - tinyTop) / Math.max(1, scroll.scrollHeight - tinyTop - scroll.clientHeight))); speed = 70 + progress * 260; }
-                        scroll.scrollTop += speed * dt;
+                    if (pauseUntil && now < pauseUntil) {
+                        scroll.scrollTop = Math.max(scroll.scrollTop, 0);
+                    } else {
+                        pauseUntil = 0;
+                        const maxScroll = Math.max(1, scroll.scrollHeight - scroll.clientHeight);
+                        const progress = Math.min(1, Math.max(0, scroll.scrollTop / maxScroll));
+                        if (progress > .34) scroll.classList.add("fine-rushing");
+                        const elapsed = Math.max(0, (now - started) / 1000);
+                        if (elapsed >= 2 && progress < 1) {
+                            const runway = Math.min(1, (progress - .34) / .66);
+                            const normalized = Math.min(1, progress / .5);
+                            const earlySpeed = 7 + 68 * Math.pow(normalized, 1.55);
+                            const lateSpeed = 75 + 825 * Math.pow(Math.max(0, runway), 2.05);
+                            const speed = progress < .5 ? earlySpeed : lateSpeed;
+                            scroll.scrollTop += speed * dt;
+                        }
                     }
-                    if (scroll.scrollTop + scroll.clientHeight < scroll.scrollHeight - 4) animationFrame = requestAnimationFrame(tick); else animationFrame = 0;
-                }
-                animationFrame = requestAnimationFrame(tick);
+                    if (scroll.scrollTop + scroll.clientHeight >= scroll.scrollHeight - 3) {
+                        finished = true;
+                        scroll.scrollTop = maxScroll;
+                        topButton.classList.add("visible");
+                        animationFrame = 0;
+                        return;
+                    }
+                    animationFrame = requestAnimationFrame(runAutoScroll);
+                };
+                animationFrame = requestAnimationFrame(runAutoScroll);
             }
             document.addEventListener("click", (event) => { const target = event.target instanceof Element ? event.target : null; const warning = target?.closest(".workshop-warning"); if (warning) { event.preventDefault(); openExperience(); } });
             document.addEventListener("keydown", (event) => { if (event.key === "Escape" && activeOverlay) closeExperience(); });
