@@ -156,9 +156,18 @@ namespace TheSingularityWorkshop.Services
             fsm_API.Interaction.Update(_processingGroup);
 
             if (Context.EnterRequested && !Context.LivingGuiFrozen && !Context.LivingGuiPopulated)
-                fsm_API.Interaction.Update(_livingGuiProcessingGroup);
+            {
+                // The landing Experience has one living-GUI FSM instance in its
+                // dedicated process group. Step that exact handle here instead of
+                // asking the global group walker to rediscover it. This guarantees
+                // one logical living-GUI step per PageFSM.Update() call while still
+                // preserving the FSM_API process-group boundary for Hub migration.
+                _livingGuiHandle.Update(_livingGuiProcessingGroup);
+            }
             else if (CurrentState == Gravity && !Context.LivingGuiFallen)
-                fsm_API.Interaction.Update(_gravityProcessingGroup);
+            {
+                _gravityHandle.Update(_gravityProcessingGroup);
+            }
 
             StateChanged?.Invoke(CurrentState);
         }
