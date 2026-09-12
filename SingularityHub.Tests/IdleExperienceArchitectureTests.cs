@@ -40,15 +40,11 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.MonikerReady);
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
 
-        // One page heartbeat consumes the exact-100 gate and enters the moniker
-        // reveal state. The living GUI group is no longer stepped after freezing.
         fsm.Update();
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
         Assert.True(fsm.Context.LivingGuiFrozen);
 
-        // The next heartbeat transitions into GRAVITY. The moniker remains behind
-        // the frozen GUI while the preallocated gravity group begins falling it.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
@@ -67,7 +63,6 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.LivingGuiFallen);
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
 
-        // The three-second timer starts only after the last living GUI has fallen.
         fsm.Update();
         Assert.Equal(PageFSM.LivingGuiDissipating, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
@@ -152,5 +147,32 @@ public sealed class IdleExperienceArchitectureTests
         fsm.Update();
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 20 — gravity executes through its isolated scheduler group")]
+    public void IncrementalUnitTest20_GravityExecutesThroughItsIsolatedSchedulerGroup()
+    {
+        using var fsm = new PageFSM();
+
+        fsm.RequestEnter();
+        fsm.Update();
+        fsm.Update();
+
+        const int populationGuard = 10000;
+        var populationTicks = 0;
+        while (!fsm.Context.LivingGuiPopulated && populationTicks++ < populationGuard)
+            fsm.Update();
+
+        Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
+        fsm.Update();
+        Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
+        fsm.Update();
+        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+
+        var initialY = fsm.Context.LivingNodes[0].Y;
+        fsm.Update();
+
+        Assert.True(fsm.Context.LivingNodes[0].Y > initialY);
+        Assert.True(fsm.Context.GravityReleased);
     }
 }
