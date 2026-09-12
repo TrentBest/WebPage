@@ -6,11 +6,12 @@
 <PageTitle>The Living GUI — The Singularity Workshop</PageTitle>
 
 <div class="living-sequence-shell @(MonikerVisible ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
-    @* The moniker does not exist in the DOM before critical mass. MONIKER_REVEAL
-       creates it hidden; GRAVITY is the first state that makes it visible. *@
+    @* The moniker is deliberately absent from the DOM until GRAVITY begins.
+       Critical mass freezes first; MONIKER_REVEAL creates the FSM milestone;
+       the next heartbeat enters GRAVITY and only then is the moniker rendered. *@
     @if (MonikerInstantiated)
     {
-        <div class="moniker-layer @(MonikerVisible ? "moniker-visible" : "")" aria-hidden="true">
+        <div class="moniker-layer" aria-hidden="true">
             <div class="moniker-title">
                 <div><span class="blue">T</span><span class="magenta">h</span><span class="orange">e</span></div>
                 <div><span class="red">S</span><span class="yellow">i</span><span class="green">n</span><span class="blue">g</span><span class="magenta">u</span><span class="orange">l</span><span class="red">a</span><span class="yellow">r</span><span class="green">i</span><span class="blue">t</span><span class="magenta">y</span></div>
@@ -50,11 +51,7 @@
     }
     .moniker-layer {
         position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center;
-        pointer-events:none; opacity:0; filter:blur(12px); transform:scale(.78);
-    }
-    .moniker-layer.moniker-visible {
-        opacity:.96; filter:blur(0); transform:scale(1);
-        transition:opacity .7s ease,filter .7s ease,transform .9s cubic-bezier(.16,1,.3,1);
+        pointer-events:none;
     }
     .living-canvas { position:absolute; inset:0; z-index:10; overflow:hidden; perspective:1200px; }
     .architecture-atmosphere {
@@ -106,8 +103,8 @@
 </style>
 
 @code {
-    private bool MonikerInstantiated => FSM.CurrentState is PageFSM.MonikerReveal or PageFSM.Gravity or PageFSM.NavigationArrival or PageFSM.Running;
-    private bool MonikerVisible => FSM.CurrentState is PageFSM.Gravity or PageFSM.NavigationArrival or PageFSM.Running;
+    private bool MonikerInstantiated => FSM.CurrentState is PageFSM.Gravity or PageFSM.NavigationArrival or PageFSM.Running;
+    private bool MonikerVisible => MonikerInstantiated;
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.NavigationArrival or PageFSM.Running;
     private string? selectedNode;
 
