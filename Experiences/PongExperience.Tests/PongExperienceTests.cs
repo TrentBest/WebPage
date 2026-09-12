@@ -2,8 +2,6 @@ using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Experiences;
 using Xunit;
 
-using ExperienceMicroBundleRegistry = TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry;
-
 namespace TheSingularityWorkshop.Experiences.Pong.Tests;
 
 public sealed class PongExperienceTests
@@ -129,7 +127,7 @@ public sealed class PongExperienceTests
     public void Pong_Experience_Loads_From_Integer_Identity_And_Retains_All_Bundles()
     {
         var experiences = new ExperienceRegistry();
-        var bundles = new ExperienceMicroBundleRegistry();
+        var bundles = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
         experiences.Register(new PongExperience());
         foreach (var bundle in PongMicroBundleCatalog.All)
             bundles.Register(bundle);
@@ -147,7 +145,7 @@ public sealed class PongExperienceTests
     public void Pong_Experience_Resolves_Deep_Dependencies_Before_Consumers()
     {
         var experiences = new ExperienceRegistry();
-        var bundles = new ExperienceMicroBundleRegistry();
+        var bundles = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
         experiences.Register(new PongExperience());
         foreach (var bundle in PongMicroBundleCatalog.All)
             bundles.Register(bundle);
@@ -163,7 +161,7 @@ public sealed class PongExperienceTests
     [Fact(DisplayName = "Pong_MicroBundles_Are_Queryable_Through_The_Ontology_Index")]
     public void Pong_MicroBundles_Are_Queryable_Through_The_Ontology_Index()
     {
-        var registry = new ExperienceMicroBundleRegistry();
+        var registry = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
         foreach (var bundle in PongMicroBundleCatalog.All)
             registry.Register(bundle);
         var matches = registry.FindByOntologyLayer(0, 7);
@@ -175,7 +173,7 @@ public sealed class PongExperienceTests
     public void Pong_Experience_Fails_Load_When_A_Required_Bundle_Is_Missing()
     {
         var experiences = new ExperienceRegistry();
-        var bundles = new ExperienceMicroBundleRegistry();
+        var bundles = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
         experiences.Register(new PongExperience());
         foreach (var bundle in PongMicroBundleCatalog.All.Where(bundle => bundle.Id != PongMicroBundleIds.BallAsset))
             bundles.Register(bundle);
