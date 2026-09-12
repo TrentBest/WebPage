@@ -16,8 +16,6 @@ else
 <div class="living-sequence-shell @(MonikerInstantiated ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
     @if (MonikerInstantiated)
     {
-        <!-- Branding deliberately sits behind the living GUI. It is revealed at exactly
-             100 nodes, then remains while the frozen field is handed to gravity. -->
         <div class="moniker-layer" aria-hidden="true">
             <div class="moniker-title">
                 <div><span class="blue">T</span><span class="magenta">h</span><span class="orange">e</span></div>
@@ -28,8 +26,6 @@ else
     }
 
     <main class="living-canvas" aria-label="Living GUI swarm">
-        <div class="architecture-atmosphere" aria-hidden="true"></div>
-
         @foreach (var node in FSM.Context.LivingNodes)
         {
             <div class="architecture-node @(GravityActive ? "gravity-node" : "")"
@@ -38,11 +34,6 @@ else
                 <span class="node-label">@node.Lineage</span>
             </div>
         }
-
-        @if (FSM.Context.LivingGuiFrozen)
-        {
-            <div class="critical-mass-marker" aria-hidden="true">100 // CRITICAL MASS // FROZEN</div>
-        }
     </main>
 </div>
 
@@ -50,22 +41,14 @@ else
     .living-sequence-shell { position:absolute; inset:0; z-index:10000; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
     .living-canvas { position:absolute; inset:0; z-index:10; overflow:hidden; perspective:1200px; }
-    .architecture-atmosphere { position:absolute; inset:-20%; z-index:0; pointer-events:none; background:radial-gradient(circle at 50% 50%,rgba(255,48,48,.09),transparent 24%),radial-gradient(circle at 18% 28%,rgba(255,211,77,.045),transparent 22%),radial-gradient(circle at 82% 72%,rgba(82,224,90,.035),transparent 24%),repeating-linear-gradient(118deg,transparent 0 120px,rgba(255,48,48,.035) 121px 132px,rgba(255,211,77,.028) 133px 145px,transparent 146px 260px); animation:atmosphereDrift 12s ease-in-out infinite; }
-
-    /* Every living object is intentionally just a bordered label. The content is
-       lineage, not a fabricated mini-application. */
-    .architecture-node { position:absolute; z-index:20; box-sizing:border-box; min-width:18px; min-height:18px; padding:3px 5px; display:flex; align-items:center; justify-content:center; border:2px solid #ff7a00; border-radius:5px; background:rgba(5,6,8,.92); color:#fff; font:700 .72rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 12px rgba(255,122,0,.28),inset 0 0 12px rgba(255,122,0,.06); transition:opacity .08s linear; }
+    .architecture-node { position:absolute; z-index:20; box-sizing:border-box; min-width:18px; min-height:18px; padding:3px 5px; display:flex; align-items:center; justify-content:center; border:2px solid #ff7a00; border-radius:5px; background:rgba(5,6,8,.92); color:#fff; font:700 .72rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 12px rgba(255,122,0,.28),inset 0 0 12px rgba(255,122,0,.06); }
     .node-label { display:block; pointer-events:none; text-shadow:0 0 7px rgba(255,211,77,.75); }
     .gravity-node { pointer-events:none; }
-
-    .critical-mass-marker { position:absolute; left:50%; bottom:3%; z-index:31; transform:translateX(-50%); color:rgba(255,211,77,.72); font-size:.58rem; letter-spacing:.22em; pointer-events:none; text-shadow:0 0 10px rgba(255,211,77,.5); }
     .moniker-title { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.82; letter-spacing:.075em; text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%; }
     .moniker-title>div { white-space:nowrap; }.moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }.moniker-title>div:nth-child(2) span { animation-delay:-.4s; }.moniker-title>div:nth-child(3) span { animation-delay:-.8s; }
     .blue{color:#00a8ff}.magenta{color:#ff2cff}.orange{color:#ff7a00}.red{color:#ff3030}.yellow{color:#ffd34d}.green{color:#52e05a}
-
     @@keyframes kelpSway{0%,100%{transform:rotate(-1.2deg) skewX(-.6deg)}25%{transform:rotate(1deg) skewX(.9deg) translateY(-3px)}50%{transform:rotate(-.6deg) skewX(-1deg) translateY(2px)}75%{transform:rotate(1.4deg) skewX(.7deg) translateY(-2px)}}
     @@keyframes letterDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-    @@keyframes atmosphereDrift{0%,100%{transform:translate3d(-1%,0,0) scale(1)}50%{transform:translate3d(1%,1%,0) scale(1.03)}}
     @@media(max-width:800px){.architecture-node{font-size:.62rem;padding:2px 4px}.moniker-title{font-size:clamp(1.65rem,8vw,3.5rem)}}
     @@media(prefers-reduced-motion:reduce){.living-sequence-shell *, .living-sequence-shell *::before, .living-sequence-shell *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
@@ -82,7 +65,10 @@ else
         FSM.StateChanged += HandleFSMStateChanged;
     }
 
-    private void HandleFSMStateChanged(string _) => _ = InvokeAsync(StateHasChanged);
+    private void HandleFSMStateChanged(string state)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
 
     private static double NodeOpacity(PageStateContext.LivingNodeState node)
     {
