@@ -38,12 +38,7 @@ namespace TheSingularityWorkshop.Services
         public bool LivingGuiFallen { get; internal set; }
         public bool NavigationReady { get; internal set; }
 
-        /// <summary>
-        /// Total heartbeat on which critical mass was reached. The moniker transition
-        /// cannot consume the population boundary on that same heartbeat.
-        /// </summary>
         public long PopulationCompletedTick { get; internal set; } = -1;
-
         public long StateTicks { get; set; }
         public long TotalTicks { get; set; }
 
@@ -91,10 +86,6 @@ namespace TheSingularityWorkshop.Services
                     node.Size = SeedSize * 2;
                     node.SeedDoubled = true;
 
-                    // Doubling is also the launch event. Advance the seed into
-                    // flight on this same scheduler tick so the lifecycle is
-                    // visibly "double, then travel" rather than requiring an
-                    // invisible extra heartbeat before movement begins.
                     if (node.SeedFlightDuration > 0)
                     {
                         node.SeedTicks = 1;
@@ -119,12 +110,8 @@ namespace TheSingularityWorkshop.Services
                 {
                     node.Size = DefaultNodeSize;
                     node.GrowthReady = true;
-                    node.GrowthStepPending = true;
                     continue;
                 }
-
-                if (node.GrowthStepPending)
-                    node.GrowthStepPending = false;
 
                 node.Size += GrowthStep;
 
@@ -220,7 +207,6 @@ namespace TheSingularityWorkshop.Services
             public double TargetY { get; }
             public bool GrowthReady { get; internal set; }
             public bool SeedDoubled { get; internal set; }
-            public bool GrowthStepPending { get; internal set; }
             public double GravityVelocity { get; internal set; }
             public double Rotation { get; internal set; }
         }
