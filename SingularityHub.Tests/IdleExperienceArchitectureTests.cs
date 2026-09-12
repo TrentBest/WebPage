@@ -161,17 +161,14 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Empty(fsm.Context.LivingNodes);
 
         // 3. One heartbeat exits the gateway into Living GUI ignition.
-        // FSM_API transitions to the target state on this tick; the target state's
-        // OnEnter executes on the following heartbeat. Therefore ignition is
-        // intentionally observable with an empty GUI tree for this one tick.
+        // The target state is not entered until its next heartbeat.
         fsm.Update();
         Assert.Equal(PageFSM.LivingGuiIgnition, fsm.CurrentState);
         Assert.Empty(fsm.Context.LivingNodes);
         Assert.False(fsm.Context.MonikerReady);
 
-        // 4. The next heartbeat executes ignition and enters population. The seed
-        // must exist before population can continue, and nothing may reveal the
-        // moniker yet.
+        // 4. The next heartbeat enters ignition, creates exactly one centered seed,
+        // and then transitions into population. Nothing may reveal the moniker yet.
         fsm.Update();
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
         Assert.Single(fsm.Context.LivingNodes);
@@ -190,8 +187,8 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.LivingGuiPopulated);
         Assert.False(fsm.Context.MonikerReady);
 
-        // 6. MONIKER_REVEAL is a sequencing boundary, not a visible presentation frame.
-        // Its OnEnter occurs on the next heartbeat, which then starts GRAVITY.
+        // 6. MONIKER_REVEAL is a sequencing boundary only. Its heartbeat enters
+        // GRAVITY, where the moniker becomes visibly ready.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
@@ -263,6 +260,7 @@ public sealed class IdleExperienceArchitectureTests
             fsm.Update();
         }
 
+        Assert.True(guard < 5000, "Living GUI population did not reach critical mass within the test guard.");
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
         Assert.False(fsm.Context.MonikerReady);
         Assert.Equal(100, fsm.Context.LivingNodes.Count);
