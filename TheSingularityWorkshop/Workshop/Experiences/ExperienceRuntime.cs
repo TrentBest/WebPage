@@ -67,7 +67,7 @@ public sealed record ExperienceLoadResult(
     IReadOnlyList<ulong> DependencyOrder,
     IReadOnlyList<string> Errors)
 {
-    public bool IsReady => IsLoadable && IsIdleCompatible;
+    public bool IsReady => IsLoadable;
 }
 
 /// <summary>Resolves, validates, arbitrates and returns the compact active MicroBundle closure.</summary>
