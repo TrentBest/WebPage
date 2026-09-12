@@ -134,6 +134,16 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Equal(PageFSM.GatewayExit, fsm.CurrentState);
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 03 — a new PageFSM settles initialization into the gateway")]
+    public void IncrementalUnitTest03_NewPageFSMSettlesIntoGateway()
+    {
+        using var fsm = new PageFSM();
+
+        Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
+        Assert.Equal(0, fsm.Context.StateTicks);
+        Assert.False(fsm.Context.EnterRequested);
+    }
+
     [Fact(DisplayName = "Living GUI freezes exactly at critical mass and stops updating")]
     public void LivingGui_FreezesAtOneHundred()
     {
