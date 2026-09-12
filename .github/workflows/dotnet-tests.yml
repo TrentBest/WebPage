@@ -7,12 +7,14 @@ on:
       - feature/pong-microbundle-vertical-slice
       - feature/experience-core-architecture
       - feature/pong-experience
+      - feature/experience-loading-and-microbundle-registry
       - feature/ontology-microbundle-library
   pull_request:
     branches:
       - feature/living-workshop-landing
       - feature/experience-core-architecture
       - feature/pong-experience
+      - feature/experience-loading-and-microbundle-registry
       - feature/ontology-microbundle-library
 
 jobs:
