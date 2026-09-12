@@ -1,13 +1,18 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
-@using TheSingularityWorkshop.Components
 @implements IDisposable
 
-<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "")">
-    @if (!IsWorkshopLanding || ShowWorkshopChrome)
+<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden")">
+    @if (!IsWorkshopLanding)
     {
         <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
+    else
+    {
+        <div class="sidebar workshop-sidebar" aria-hidden="true">
             <NavMenu />
         </div>
     }
@@ -19,67 +24,18 @@
                 <span class="workshop-tab-title">@CurrentTabTitle</span>
             </div>
         }
-
-        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")"
-                 @onclick="HandleLandingClick">
-            @if (IsWorkshopLanding)
-            {
-                <CascadingValue Value="(Action)StopPong">
-                    @Body
-                </CascadingValue>
-            }
-            else
-            {
-                @Body
-            }
-        </article>
-
-        @if (IsWorkshopLanding && _pongActive)
+        else
         {
-            <PongField @ref="_pongField" />
+            <div class="top-row workshop-tab-header workshop-top-row-placeholder" aria-hidden="true"></div>
         }
+
+        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">
+            @Body
+        </article>
     </main>
 </div>
 
-@if (IsWorkshopLanding)
-{
-    <style>
-        main {
-            position: relative;
-            min-width: 0;
-        }
-
-        .workshop-content {
-            position: relative !important;
-            width: 100% !important;
-            height: 100% !important;
-            min-height: 0 !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-            z-index: 9000;
-        }
-
-        .workshop-page.workshop-chrome-visible .workshop-content {
-            height: calc(100vh - 4rem) !important;
-        }
-
-        .workshop-content .hypervisor-shell,
-        .workshop-content .living-sequence-shell {
-            position: absolute !important;
-            inset: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            min-height: 0 !important;
-        }
-    </style>
-}
-
 @code {
-    private PongField? _pongField;
-    private bool _pongActive = true;
-
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
 
     private bool ShowWorkshopChrome => !IsWorkshopLanding || FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running;
@@ -111,20 +67,6 @@
     }
 
     private void HandleFSMStateChanged(string _) => InvokeAsync(StateHasChanged);
-
-    private void HandleLandingClick()
-    {
-        StopPong();
-    }
-
-    private void StopPong()
-    {
-        if (!_pongActive) return;
-
-        _pongActive = false;
-        _pongField?.StopFromLandingInteraction();
-        StateHasChanged();
-    }
 
     public void Dispose()
     {

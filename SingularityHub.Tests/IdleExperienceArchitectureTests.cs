@@ -1,31 +1,156 @@
-using TheSingularityWorkshop.Services;
+using System;
 using Xunit;
+using TheSingularityWorkshop.Services;
+using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 
 namespace SingularityHub.Tests;
 
 public sealed class IdleExperienceArchitectureTests
 {
-    [Fact(DisplayName = "Idle experience catalog is non-empty and GUI-native")]
-    public void IdleExperienceCatalog_HasAvailableExperience()
+    [Fact(DisplayName = "Unit 04 — PageFSM follows exact presentation sequence")]
+    public void PageFSM_FollowsExactPresentationSequence()
     {
-        Assert.NotEmpty(IdleExperienceCatalog.Available);
-        Assert.All(IdleExperienceCatalog.Available, experience =>
+        using var fsm = new PageFSM();
+
+        Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
+        Assert.False(fsm.Context.MonikerReady);
+
+        fsm.RequestEnter();
+        Assert.Equal(PageFSM.GatewayExit, fsm.CurrentState);
+        Assert.False(fsm.Context.MonikerReady);
+
+        fsm.Update();
+        Assert.Equal(PageFSM.LivingGuiIgnition, fsm.CurrentState);
+
+        fsm.Update();
+        Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
+
+        const int populationGuard = 10000;
+        var populationTicks = 0;
+        while (!fsm.Context.LivingGuiPopulated && populationTicks++ < populationGuard)
         {
-            Assert.False(string.IsNullOrWhiteSpace(experience.Id));
-            Assert.False(string.IsNullOrWhiteSpace(experience.DisplayName));
-            Assert.False(string.IsNullOrWhiteSpace(experience.Description));
-        });
+            Assert.False(fsm.Context.MonikerReady);
+            fsm.Update();
+        }
+
+        Assert.True(fsm.Context.LivingGuiPopulated);
+        Assert.True(populationTicks < populationGuard, "Living GUI population did not reach critical mass within the test guard.");
+        Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
+        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.True(fsm.Context.MonikerReady);
+        Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
+
+        // One page heartbeat consumes the exact-100 gate and enters the moniker
+        // reveal state. The living GUI group is no longer stepped after freezing.
+        fsm.Update();
+        Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
+        Assert.True(fsm.Context.MonikerReady);
+        Assert.True(fsm.Context.LivingGuiFrozen);
+
+        // The next heartbeat transitions into GRAVITY. The moniker remains behind
+        // the frozen GUI while the preallocated gravity group begins falling it.
+        fsm.Update();
+        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+        Assert.True(fsm.Context.MonikerReady);
+        Assert.False(fsm.Context.LivingGuiFallen);
+
+        const int gravityGuard = 1000;
+        var gravityTicks = 0;
+        while (!fsm.Context.LivingGuiFallen && gravityTicks++ < gravityGuard)
+        {
+            Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+            Assert.True(fsm.Context.MonikerReady);
+            fsm.Update();
+        }
+
+        Assert.True(gravityTicks < gravityGuard, "Living GUI did not fall away within the test guard.");
+        Assert.True(fsm.Context.LivingGuiFallen);
+        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+
+        // The three-second timer starts only after the last living GUI has fallen.
+        fsm.Update();
+        Assert.Equal(PageFSM.LivingGuiDissipating, fsm.CurrentState);
+        Assert.True(fsm.Context.MonikerReady);
+
+        for (var tick = 1; tick < 91; tick++)
+        {
+            fsm.Update();
+            Assert.Equal(PageFSM.LivingGuiDissipating, fsm.CurrentState);
+            Assert.True(fsm.Context.MonikerReady);
+        }
+
+        fsm.Update();
+        Assert.Equal(PageFSM.NavigationArrival, fsm.CurrentState);
+        Assert.True(fsm.Context.MonikerReady);
     }
 
-    [Fact(DisplayName = "Idle experience selection is contained by the catalog")]
-    public void IdleExperienceCatalog_SelectsOnlyRegisteredExperience()
+    [Fact(DisplayName = "Incremental Unit Test 07 — disposing PageFSM unregisters all runtime handles")]
+    public void IncrementalUnitTest07_DisposingPageFSMUnregistersRuntimeHandles()
     {
-        var random = new Random(42);
-        var selected = IdleExperienceCatalog.Select(random);
+        string pageGroup;
+        string livingGuiGroup;
+        string gravityGroup;
 
-        Assert.Contains(selected, IdleExperienceCatalog.Available);
+        using (var fsm = new PageFSM())
+        {
+            pageGroup = fsm.InstanceProcessingGroup;
+            livingGuiGroup = fsm.LivingGuiProcessingGroup;
+            gravityGroup = fsm.GravityProcessingGroup;
+
+            Assert.Equal(1, fsm_API.Internal.GetFSMHandleCountInGroup(pageGroup));
+            Assert.Equal(1, fsm_API.Internal.GetFSMHandleCountInGroup(livingGuiGroup));
+            Assert.Equal(1, fsm_API.Internal.GetFSMHandleCountInGroup(gravityGroup));
+        }
+
+        Assert.Equal(0, fsm_API.Internal.GetFSMHandleCountInGroup(pageGroup));
+        Assert.Equal(0, fsm_API.Internal.GetFSMHandleCountInGroup(livingGuiGroup));
+        Assert.Equal(0, fsm_API.Internal.GetFSMHandleCountInGroup(gravityGroup));
     }
 
-    [Fact(DisplayName = "Incremental change heartbeat — idle experience layer")]
-    public void Incremental_Change_Heartbeat_IdleExperience() => Assert.True(true);
+    [Fact(DisplayName = "Incremental Unit Test 08 — PageFSM Update advances only its owning handle")]
+    public void IncrementalUnitTest08_PageFSMUpdateAdvancesOnlyItsOwningHandle()
+    {
+        using var first = new PageFSM();
+        using var second = new PageFSM();
+
+        Assert.Equal(PageFSM.Gateway, first.CurrentState);
+        Assert.Equal(PageFSM.Gateway, second.CurrentState);
+
+        first.RequestEnter();
+        Assert.Equal(PageFSM.GatewayExit, first.CurrentState);
+        Assert.Equal(PageFSM.Gateway, second.CurrentState);
+
+        first.Update();
+        Assert.Equal(PageFSM.LivingGuiIgnition, first.CurrentState);
+        Assert.Equal(PageFSM.Gateway, second.CurrentState);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 09 — moniker remains hidden until exactly 100 nodes")]
+    public void IncrementalUnitTest09_MonikerRemainsHiddenUntilExactly100Nodes()
+    {
+        using var fsm = new PageFSM();
+
+        fsm.RequestEnter();
+        fsm.Update();
+        fsm.Update();
+
+        const int guard = 10000;
+        var ticks = 0;
+        while (!fsm.Context.LivingGuiPopulated && ticks++ < guard)
+        {
+            Assert.True(fsm.Context.LivingNodes.Count < PageStateContext.CriticalMass);
+            Assert.False(fsm.Context.MonikerReady);
+            fsm.Update();
+        }
+
+        Assert.True(ticks < guard, "Living GUI population did not reach critical mass within the test guard.");
+        Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
+        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.True(fsm.Context.MonikerReady);
+        Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
+
+        fsm.Update();
+        Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
+        Assert.True(fsm.Context.MonikerReady);
+    }
 }

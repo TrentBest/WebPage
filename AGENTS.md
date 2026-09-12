@@ -4,7 +4,7 @@ This repository is an active engineering experiment, not a conventional marketin
 
 ## Branch safety
 
-- The active landing-page work is on `feature/living-workshop-landing`.
+- The active vertical-slice landing work is on `feature/pong-microbundle-vertical-slice`.
 - **Do not modify `master`.**
 - Keep changes narrowly scoped to the current experiment.
 - Before replacing an existing behavior, inspect its Git history. Strange code may be carrying intentional behavior from an earlier experiment.
@@ -48,42 +48,83 @@ The landing page is deliberately an experience rather than a static hero.
 Current intended sequence:
 
 ```text
-LANDING
+GATEWAY
   |
-  | wait ~10 seconds without clicking
+  | visitor clicks Enter Workshop
   v
-PONG
-  |
-  | FSM_API-driven game state
-  | cyan player paddle / magenta AI paddle
-  | initial serve toward AI
-  | drag player paddle with pointer
-  |
-  | click Warning or Enter Workshop
-  v
-PONG COMPONENT IS REMOVED
+GATEWAY_EXIT
   |
   v
-LIVING GUI / CHAOS
+LIVING_GUI_IGNITION
   |
-  | GUI actors reproduce
-  | generations and lineage exist
-  | population reaches critical mass
-  | system freezes / collapses
+  | create one centered seed
   v
-UNITY WEBGL / NEXT MANIFESTATION
+LIVING_GUI_POPULATING
+  |
+  | reproduce / fly / grow
+  | NO MONIKER
+  v
+100 GUI NODES / CRITICAL MASS
+  |
+  | freeze
+  v
+MONIKER_REVEAL
+  |
+  | sequencing boundary only
+  | NO VISIBLE MONIKER FRAME
+  v
+GRAVITY
+  |
+  | visible "The Singularity Workshop"
+  | 91 FSM heartbeats ~= 3 seconds
+  v
+NAVIGATION_ARRIVAL
   |
   v
-WORKSHOP
+RUNNING
 ```
 
-Important UX facts:
+The detailed executable-vision contract lives in `WORKSHOP_PRESENTATION_CONTRACT.md`.
+
+### Moniker timing is a hard UX contract
+
+The phrase **The Singularity Workshop** must not dominate first contact.
+
+The gateway presents the visitor with the large avatar-backed `Enter Workshop` control. The living GUI then earns the reveal by reaching exactly 100 nodes and freezing. `MONIKER_REVEAL` is an FSM sequencing boundary; the visual moniker is rendered only once `GRAVITY` begins. Gravity owns the approximately three-second presentation window.
+
+Do not add the moniker to the initial gateway simply because it appears in a page title, accessibility label, source filename, or browser metadata. Those are not the visual presentation contract.
+
+## Important UX facts
 
 - Hovering/mouse movement must not reset or pause the landing timer.
 - Clicking the warning or Workshop button is an explicit interaction that dismisses the Pong experience.
 - Pong must disappear **before** the living GUI is presented. The current `MainLayout.razor` therefore removes the `<PongField>` component instead of relying only on its internal FSM stop state.
 - The landing surface is intended to use the **entire browser viewport**, not the old content column. The point of the chaos is to rapidly overflow the visitor's visual field with living GUI.
 - Do not replace the existing chaos/living GUI with a generic animation. Preserve the behavior and improve its architecture.
+
+## PageFSM / FSM_API ownership
+
+`PageFSM` is a wrapper around one FSM_API live handle. FSM_API stores definitions and instances in process-global processing groups.
+
+Therefore:
+
+- `PageFSM.Update()` advances **its own handle**.
+- It must not call `Interaction.Update(PageFSM.ProcessingGroup)` merely to advance one page instance.
+- `PageFSM.Dispose()` must unregister its live handle.
+- Do not rebuild a process-global definition with instance-bound delegates and assume unrelated handles are isolated.
+
+This is an important architectural distinction: **group-wide ticking belongs to the host/integration loop; an object wrapper's `Update()` belongs to its owned handle.**
+
+## Tests as breadcrumbs
+
+`SingularityHub.Tests/IdleExperienceArchitectureTests.cs` contains the executable landing breadcrumbs.
+
+- Incremental Unit Test 04 is the canonical exact presentation sequence.
+- Incremental Unit Test 07 proves disposal unregisters the runtime handle.
+- Incremental Unit Test 08 proves one PageFSM's update does not advance another PageFSM instance.
+- `SingularityHub.Tests/IncrementalVersionTests.cs` provides the visible incremental proof marker.
+
+**Do not weaken Unit Test 04 to make an implementation pass. Fix the machine/lifecycle that violates the sequence.**
 
 ## Pong
 
@@ -92,7 +133,7 @@ Important UX facts:
 Current behavior includes:
 
 - `Dormant`, `Manifesting`, `Playing`, and `Stopped` lifecycle states.
-- A 50 ms heartbeat driving the FSM.
+- A 50 ms heartbeat.
 - Cyan player paddle.
 - Magenta autonomous AI paddle.
 - Initial serve toward the AI so the visitor has time to understand the scene.
@@ -105,48 +146,46 @@ The important architectural lesson is that Pong is not merely a game bolted onto
 
 ## Living GUI / chaos
 
-`TheSingularityWorkshop/Pages/Home.razor` contains the living landing experiment.
+`TheSingularityWorkshop/Pages/LivingGui.razor` is the dedicated living GUI presentation surface used by the landing sequence.
 
-The existing model includes node lifecycle states such as:
+The model includes nodes carrying:
 
-```text
-Seed -> Living -> Reproducing -> Falling -> Dead
-```
+- identity
+- generation
+- lineage
+- position
+- scale
+- opacity
+- rotation
+- seed-flight state
 
-and experience phases including the introductory/critical-mass/collapse progression.
-
-Nodes carry identity, generation, parent/lineage information, position, scale, opacity, and rotation.
+The runtime behavior includes reproduction, exact critical mass at 100 nodes, freeze, and gravity/collapse.
 
 The visual intent is deliberately excessive:
 
-> **ordinary GUI -> GUI with a pulse -> GUI that reproduces -> swarm -> critical mass -> collapse**
+> **ordinary GUI -> GUI with a pulse -> GUI that reproduces -> swarm -> critical mass -> freeze -> gravity**
 
-The current layout has been moved toward full viewport use. If positioning still appears confined to the old panel/content column, fix the coordinate system rather than shrinking the experiment back into the panel.
+Do not replace this with a generic animation.
 
 ## Scrolling experience feed
 
-The next immediate landing enhancement is a scrolling list/feed whose text is derived from actual code behavior rather than generic marketing copy.
+The landing should eventually expose a scrolling list/feed whose text is derived from actual code behavior rather than generic marketing copy.
 
-The feed should indirectly/directly teach the visitor what is about to happen. Examples of truthful observations include:
+Truthful observations include:
 
-- Wait 10 seconds without clicking a button: Pong starts.
 - Pong is powered by FSM_API.
-- The cyan paddle is controlled by the visitor.
-- The magenta paddle is autonomous.
-- The first serve is toward the AI.
-- The machine maintains a score.
-- Clicking the warning or Workshop button ends the Pong phase.
+- The visitor can interact with the Pong paddle.
 - The living interface can reproduce.
 - Nodes carry generation and lineage.
 - The population reaches critical mass.
-- The machine freezes and collapses.
-- Another manifestation can take over.
+- The machine freezes and then enters gravity.
+- The Workshop moniker appears only after the critical-mass boundary.
 
 Long-term, prefer a real observable/data model over a pile of hard-coded marketing strings. The GUI should be able to observe the machine it is demonstrating.
 
 ## AI tab
 
-`TheSingularityWorkshop/Pages/AI.razor` is now the `/ai` route.
+`TheSingularityWorkshop/Pages/AI.razor` is the `/ai` route.
 
 The conceptual pipeline presented there is:
 
@@ -211,6 +250,7 @@ A useful progression is:
 ```text
 Field
  -> Pong
+ -> Living GUI
  -> Unity
  -> Workshop
  -> FSM telemetry
