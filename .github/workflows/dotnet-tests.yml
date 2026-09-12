@@ -35,6 +35,7 @@ jobs:
           dotnet restore Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj
           dotnet restore Experiences/PongExperience.Tests/PongExperience.Tests.csproj
           dotnet restore Experiences/OntologyMicroBundle.Tests/OntologyMicroBundle.Tests.csproj
+          dotnet restore FSM_Layer.Tests/FSM_Layer.Tests.csproj
 
       - name: Build
         run: |
@@ -42,6 +43,7 @@ jobs:
           dotnet build Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/OntologyMicroBundle.Tests/OntologyMicroBundle.Tests.csproj --configuration Release --no-restore
+          dotnet build FSM_Layer.Tests/FSM_Layer.Tests.csproj --configuration Release --no-restore
 
       - name: Test
         run: |
@@ -49,3 +51,4 @@ jobs:
           dotnet test Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
           dotnet test Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
           dotnet test Experiences/OntologyMicroBundle.Tests/OntologyMicroBundle.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
+          dotnet test FSM_Layer.Tests/FSM_Layer.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
