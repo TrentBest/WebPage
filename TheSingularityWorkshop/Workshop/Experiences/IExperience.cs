@@ -33,7 +33,7 @@ public interface IExperience
     IReadOnlyList<ulong> SensorySystems { get; }
 
     /// <summary>Gets the number of distinct sensory systems provided by the experience.</summary>
-    int SenseCount => SensorySystems.Count;
+    int SenseCount => SensorySystems.Distinct().Count();
 
     /// <summary>
     /// Scheduler process-group identifiers used by the experience.

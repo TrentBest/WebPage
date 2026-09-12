@@ -55,7 +55,7 @@ public sealed class ExperienceContractTests
     {
         IExperience experience = new TestExperience();
 
-        Assert.Equal(new ulong[] { 1, 2, 3 }, experience.SensorySystems);
+        Assert.Equal(new ulong[] { 1, 2, 2, 3 }, experience.SensorySystems);
         Assert.Equal(3, experience.SenseCount);
     }
 
@@ -76,7 +76,7 @@ public sealed class ExperienceContractTests
         public OntologySignature Ontology => new(7, 1, 2, 3, 4, 5, 6, 8, 42);
         public IReadOnlyList<ulong> MicroBundleIds { get; } = new ulong[] { 1001, 1002 };
         public IReadOnlyList<ulong> Capabilities { get; } = new ulong[] { 7, 19 };
-        public IReadOnlyList<ulong> SensorySystems { get; } = new ulong[] { 1, 2, 3 };
+        public IReadOnlyList<ulong> SensorySystems { get; } = new ulong[] { 1, 2, 2, 3 };
         public IReadOnlyList<string> ProcessingGroups { get; } = new[] { "Experience.Page", "Experience.Living" };
     }
 }

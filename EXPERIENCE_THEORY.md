@@ -22,7 +22,7 @@ The composition is identified by the MicroBundles that participate in it. MicroB
 
 The model is intentionally open to sensory systems beyond today's screen/audio stack. A future Experience may provide visual, auditory, touch, smell, taste, or other sensory systems, including forms of touch beyond today's haptics.
 
-`SenseCount` is the number of distinct sensory systems provided by the Experience. Sensory systems are represented by integer identifiers at runtime.
+`SenseCount` is the number of **distinct** sensory systems provided by the Experience. Sensory systems are represented by integer identifiers at runtime.
 
 The Experience also respects the nine-layer ontology. Its MicroBundles carry ontological coordinates, and the ontological values at each level are semantically active rather than decorative metadata. A MicroBundle automatically participates in rules, composition, and behavior associated with every ontological level represented by its `OntologySignature`.
 
@@ -115,6 +115,8 @@ This is the intended direction for escaping page-specific orchestration. `PageFS
 
 Repository progress continues to use the incremental version heartbeat in `SingularityHub.Tests/IncrementalVersionTests.cs`.
 
-Version comparisons should use an explicit `Is(expected, actual)` assertion helper rather than an assertion whose intent is hidden in a generic `true` heartbeat. The current heartbeat for this Experience-rule pass is **0.0.16**.
+Version comparisons should use an explicit `Is(expected, actual)` assertion helper rather than an assertion whose intent is hidden in a generic `true` heartbeat. The current heartbeat for this Experience-rule pass is **0.0.17**.
 
-The architecture test coordinate added for this rule pass is **0.00.017**.
+The architecture test coordinate added for the current CI/core-project pass is **0.00.018**.
+
+The next refinement of the sensory rule is explicitly proved by the contract test using duplicate sensory IDs and asserting a distinct count.
