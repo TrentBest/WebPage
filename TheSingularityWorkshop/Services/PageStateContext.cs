@@ -17,7 +17,8 @@ namespace TheSingularityWorkshop.Services
         private const double MaxX = 92;
         private const double MinY = 10;
         private const double MaxY = 88;
-        private const int SeedFlightTicks = 3;
+        private const int MinimumSeedFlightTicks = 2;
+        private const int MaximumSeedFlightTicks = 6;
         private const double GravityAcceleration = 1.15;
 
         private readonly Random _random = new();
@@ -53,7 +54,9 @@ namespace TheSingularityWorkshop.Services
 
             // The first living GUI is deliberately dead-center. Chaos begins only
             // after the user has entered the experience and the first seed exists.
-            _livingNodes.Add(new LivingNodeState("1", 1, 50, 50, SeedSize, 50, 50, 0));
+            _livingNodes.Add(new LivingNodeState(
+                "1", 1, 50, 50, SeedSize, 50, 50, 0, 4, 50, 50));
+
             LivingGuiFrozen = false;
             LivingGuiPopulated = false;
             MonikerReady = false;
@@ -63,10 +66,11 @@ namespace TheSingularityWorkshop.Services
 
         /// <summary>
         /// Advances the swarm by one FSM heartbeat.
-        /// Newborn GUIs are thrown from their parent's location toward an independent
-        /// destination while remaining at seed size. Only after the throw completes
-        /// does the GUI enter its growth cycle. At maximum size it resets to seed size
-        /// and launches a new child. This deliberately avoids synchronized growth.
+        /// Newborn GUIs are thrown from their parent's location toward independent
+        /// destinations while remaining at seed size. Their throw duration is varied,
+        /// so the swarm never becomes a synchronized tree layout. Only after the throw
+        /// completes does the GUI enter its growth cycle. At maximum size it resets to
+        /// seed size and launches a new child. At 100 nodes, all living-GUI updates stop.
         /// </summary>
         public void AdvanceLivingGui()
         {
@@ -77,15 +81,18 @@ namespace TheSingularityWorkshop.Services
 
             foreach (var node in _livingNodes)
             {
-                if (node.SeedTicks < SeedFlightTicks)
+                if (node.SeedTicks < node.SeedFlightDuration)
                 {
                     node.SeedTicks++;
-                    var progress = (double)node.SeedTicks / SeedFlightTicks;
+                    var progress = (double)node.SeedTicks / node.SeedFlightDuration;
                     node.X = node.SeedX + ((node.TargetX - node.SeedX) * progress);
                     node.Y = node.SeedY + ((node.TargetY - node.SeedY) * progress);
                     continue;
                 }
 
+                // A living GUI doubles before it reproduces. The newborn is tiny and
+                // independent, so parent growth and child growth are intentionally out
+                // of phase with one another.
                 node.Size *= 2;
 
                 if (node.Size >= MaximumNodeSize)
@@ -111,6 +118,8 @@ namespace TheSingularityWorkshop.Services
         private LivingNodeState CreateSeed(LivingNodeState parent)
         {
             var (targetX, targetY) = NextChaoticPosition();
+            var flightDuration = _random.Next(MinimumSeedFlightTicks, MaximumSeedFlightTicks + 1);
+
             return new LivingNodeState(
                 $"{parent.Lineage}.{parent.OffspringCount}",
                 parent.Generation + 1,
@@ -120,6 +129,7 @@ namespace TheSingularityWorkshop.Services
                 parent.X,
                 parent.Y,
                 0,
+                flightDuration,
                 targetX,
                 targetY);
         }
@@ -163,8 +173,9 @@ namespace TheSingularityWorkshop.Services
                 double seedX,
                 double seedY,
                 int seedTicks,
-                double? targetX = null,
-                double? targetY = null)
+                int seedFlightDuration,
+                double targetX,
+                double targetY)
             {
                 Lineage = lineage;
                 Generation = generation;
@@ -174,8 +185,9 @@ namespace TheSingularityWorkshop.Services
                 SeedX = seedX;
                 SeedY = seedY;
                 SeedTicks = seedTicks;
-                TargetX = targetX ?? x;
-                TargetY = targetY ?? y;
+                SeedFlightDuration = seedFlightDuration;
+                TargetX = targetX;
+                TargetY = targetY;
             }
 
             public string Lineage { get; }
@@ -187,6 +199,7 @@ namespace TheSingularityWorkshop.Services
             public double SeedX { get; }
             public double SeedY { get; }
             public int SeedTicks { get; internal set; }
+            public int SeedFlightDuration { get; }
             public double TargetX { get; }
             public double TargetY { get; }
             public double GravityVelocity { get; internal set; }
