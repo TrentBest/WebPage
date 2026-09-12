@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Experiences;
 using Xunit;
 
@@ -46,5 +47,17 @@ public sealed class PhysicsKnowledgeLutTests
         Assert.Equal(
             PhysicsKnowledgeLut.Entries.Select(entry => (entry.MicroBundleId, entry.Level)).Distinct().Count(),
             PhysicsKnowledgeLut.Entries.Count);
+    }
+
+    [Fact(DisplayName = "Physics_Knowledge_Is_Carried_By_Independently_Addressable_MicroBundles")]
+    public void Physics_Knowledge_Is_Carried_By_Independently_Addressable_MicroBundles()
+    {
+        Assert.Equal(10, PhysicsKnowledgeMicroBundleCatalog.All.Count);
+        Assert.All(PhysicsKnowledgeMicroBundleCatalog.All,
+            bundle => Assert.IsType<PhysicsKnowledgeMicroBundle>(bundle));
+        Assert.All(PhysicsKnowledgeMicroBundleCatalog.All,
+            bundle => Assert.Equal(4, ((PhysicsKnowledgeMicroBundle)bundle).Knowledge.Count));
+        Assert.All(PhysicsKnowledgeMicroBundleCatalog.All,
+            bundle => Assert.Equal(9, bundle.Ontology[0]));
     }
 }
