@@ -97,14 +97,16 @@ namespace TheSingularityWorkshop.Services
                 .Transition(Gateway, GatewayExit, c => ((PageStateContext)c).EnterRequested)
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
-                // Population completion is an observable state boundary. Do not
-                // consume it in the same heartbeat that reaches critical mass;
-                // leave the FSM in POPULATING for one full heartbeat so the exact
-                // 100-node/moniker gate is externally observable.
+                // Critical mass records the heartbeat on which population completed.
+                // The transition requires a strictly later heartbeat, making the
+                // exact-100 population boundary observable instead of consuming it
+                // during the same FSM update that freezes the living GUI.
                 .Transition(LivingGuiPopulating, MonikerReveal, c =>
                 {
                     var context = (PageStateContext)c;
-                    return context.LivingGuiPopulated && context.StateTicks >= 2;
+                    return context.LivingGuiPopulated &&
+                           context.PopulationCompletedTick >= 0 &&
+                           context.TotalTicks > context.PopulationCompletedTick;
                 })
                 .Transition(MonikerReveal, Gravity, c => ((PageStateContext)c).StateTicks >= GravityReleaseTicks)
                 .Transition(Gravity, LivingGuiDissipating, c => ((PageStateContext)c).LivingGuiFallen)
@@ -145,12 +147,6 @@ namespace TheSingularityWorkshop.Services
             context.TotalTicks++;
             context.StateTicks++;
 
-            // Nested groups are owned by the state that needs them. In particular,
-            // do not run LivingGui during GATEWAY_EXIT or LIVING_GUI_IGNITION:
-            // those states must establish the exact presentation boundary before
-            // the first population tick occurs. This also prevents the population
-            // group from being stepped early and making the moniker gate appear
-            // one heartbeat too soon.
             if (CurrentState == LivingGuiPopulating &&
                 !context.LivingGuiFrozen &&
                 !context.LivingGuiPopulated)
