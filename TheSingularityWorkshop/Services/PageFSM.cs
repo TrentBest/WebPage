@@ -9,7 +9,7 @@ namespace TheSingularityWorkshop.Services
     /// The outermost FSM for the Workshop web experience.
     /// Blazor is the presentation surface; FSM_API owns progression while the
     /// Hub owns root process-group scheduling and this FSM explicitly invokes
-    /// its nested process groups when its own update requires them.
+    /// the selected nested process group when its own update requires it.
     /// </summary>
     public sealed class PageFSM : IDisposable
     {
@@ -97,10 +97,6 @@ namespace TheSingularityWorkshop.Services
                 .Transition(Gateway, GatewayExit, c => ((PageStateContext)c).EnterRequested)
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
-                // Critical mass records the heartbeat on which population completed.
-                // The transition requires a strictly later heartbeat, making the
-                // exact-100 population boundary observable instead of consuming it
-                // during the same FSM update that freezes the living GUI.
                 .Transition(LivingGuiPopulating, MonikerReveal, c =>
                 {
                     var context = (PageStateContext)c;
@@ -151,11 +147,11 @@ namespace TheSingularityWorkshop.Services
                 !context.LivingGuiFrozen &&
                 !context.LivingGuiPopulated)
             {
-                _hub.UpdateNestedProcessGroups(_processingGroup);
+                _hub.UpdateProcessGroup(_livingGuiProcessingGroup);
             }
             else if (CurrentState == Gravity && !context.LivingGuiFallen)
             {
-                _hub.UpdateNestedProcessGroups(_processingGroup);
+                _hub.UpdateProcessGroup(_gravityProcessingGroup);
             }
 
             StateChanged?.Invoke(CurrentState);
@@ -178,12 +174,11 @@ namespace TheSingularityWorkshop.Services
             if (!_disposed) _handle.TransitionTo(ShutdownState);
         }
 
-        /// <summary>Steps the Hub. The Hub steps PageFSM; PageFSM steps its nested groups.</summary>
+        /// <summary>Steps the Hub. The Hub steps PageFSM; PageFSM selects its nested group.</summary>
         public void Update()
         {
             if (_disposed)
                 return;
-
             _hub.Update();
             StateChanged?.Invoke(CurrentState);
         }
@@ -191,7 +186,6 @@ namespace TheSingularityWorkshop.Services
         public void Dispose()
         {
             if (_disposed) return;
-
             fsm_API.Interaction.DestroyFiniteStateMachine("PageFSM", _processingGroup);
             fsm_API.Interaction.DestroyFiniteStateMachine("LivingGuiFSM", _livingGuiProcessingGroup);
             fsm_API.Interaction.DestroyFiniteStateMachine("GravityFSM", _gravityProcessingGroup);
