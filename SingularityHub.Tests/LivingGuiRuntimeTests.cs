@@ -20,20 +20,65 @@ public sealed class LivingGuiRuntimeTests
 
         fsm.RequestEnter();
 
-        // GatewayExit is a real lifecycle phase. The living GUI seed is created
-        // by the LivingGuiIgnition state entry, so the contract must drive the
-        // page FSM through that boundary rather than assuming it happens in the
-        // same heartbeat as the gateway request.
         for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
             fsm.Update();
 
         Assert.NotEqual(PageFSM.Gateway, fsm.CurrentState);
         Assert.NotEmpty(fsm.Context.LivingNodes);
+        Assert.Equal("G:0", fsm.Context.LivingNodes[0].Lineage);
         Assert.Contains(fsm.CurrentState, new[]
         {
             PageFSM.LivingGuiIgnition,
             PageFSM.LivingGuiPopulating
         });
+    }
+
+    [Fact(DisplayName = "Living GUI seed doubles, travels, reaches default size, then grows")]
+    public void LivingGui_SeedLifecycle()
+    {
+        using var fsm = new PageFSM();
+        fsm.RequestEnter();
+
+        for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
+            fsm.Update();
+
+        var root = fsm.Context.LivingNodes[0];
+        var startX = root.X;
+        var startY = root.Y;
+        var startSize = root.Size;
+
+        fsm.Update();
+        Assert.Equal(startSize * 2, root.Size);
+        Assert.True(root.SeedDoubled);
+
+        var flightGuard = root.SeedFlightDuration + 2;
+        for (var ticks = 0; ticks < flightGuard && !root.GrowthReady; ticks++)
+            fsm.Update();
+
+        Assert.True(root.GrowthReady);
+        Assert.Equal(48, root.Size);
+        Assert.NotEqual((startX, startY), (root.X, root.Y));
+
+        fsm.Update();
+        Assert.Equal(96, root.Size);
+    }
+
+    [Fact(DisplayName = "Living GUI lineage names root children and descendants deterministically")]
+    public void LivingGui_LineageNaming()
+    {
+        using var fsm = new PageFSM();
+        fsm.RequestEnter();
+
+        const int guard = 10_000;
+        var ticks = 0;
+        while (fsm.Context.LivingNodes.Count < 100 && ticks++ < guard)
+            fsm.Update();
+
+        Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
+        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:0");
+        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:1");
+        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:2");
+        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage.StartsWith("G:1-", StringComparison.Ordinal));
     }
 
     [Fact(DisplayName = "Living GUI reaches exact critical mass through its isolated scheduler")]
