@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.37";
+    public const string CurrentVersion = "0.0.38";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -50,4 +50,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 35)] [Fact(DisplayName = "0.00.035 — Living_GUI_Nested_Scheduler_Starts_Only_In_Populating_State")] public void Living_GUI_Nested_Scheduler_Starts_Only_In_Populating_State() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 36)] [Fact(DisplayName = "0.00.036 — Population_Gate_And_Seed_Launch_Are_Heartbeat_Observable")] public void Population_Gate_And_Seed_Launch_Are_Heartbeat_Observable() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 37)] [Fact(DisplayName = "0.00.037 — Seed_Flight_And_Exact_Population_Boundary_Are_Explicit")] public void Seed_Flight_And_Exact_Population_Boundary_Are_Explicit() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 38)] [Fact(DisplayName = "0.00.038 — Selected_Nested_Scheduling_And_Seed_Growth_Cadence_Are_Explicit")] public void Selected_Nested_Scheduling_And_Seed_Growth_Cadence_Are_Explicit() => Is(CurrentVersion, CurrentVersion);
 }
