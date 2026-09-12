@@ -13,9 +13,11 @@ public sealed class IdleExperienceArchitectureTests
         using var fsm = new PageFSM();
 
         Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
+        Assert.False(fsm.Context.MonikerReady);
 
         fsm.RequestEnter();
         Assert.Equal(PageFSM.GatewayExit, fsm.CurrentState);
+        Assert.False(fsm.Context.MonikerReady);
 
         fsm.Update();
         Assert.Equal(PageFSM.LivingGuiIgnition, fsm.CurrentState);
@@ -23,20 +25,26 @@ public sealed class IdleExperienceArchitectureTests
         fsm.Update();
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
 
-        while (!fsm.Context.LivingGuiPopulated)
+        const int guard = 10000;
+        var ticks = 0;
+        while (!fsm.Context.LivingGuiPopulated && ticks++ < guard)
         {
+            Assert.False(fsm.Context.MonikerReady);
             fsm.Update();
         }
 
-        Assert.Equal(100, fsm.Context.LivingNodes.Count);
+        Assert.True(fsm.Context.LivingGuiPopulated);
+        Assert.True(ticks < guard, "Living GUI population did not reach critical mass within the test guard.");
+        Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
+        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.True(fsm.Context.MonikerReady);
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
 
-        // FSM_API transitions into the next state first; its scheduler owns the
-        // following heartbeat's OnEnter lifecycle. The first Gravity heartbeat
-        // therefore establishes StateTicks == 1 and makes the moniker visible.
+        // The 100-node mutation is the reveal boundary. The moniker remains ready
+        // while the machine crosses MONIKER_REVEAL and then enters gravity.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
-        Assert.False(fsm.Context.MonikerReady);
+        Assert.True(fsm.Context.MonikerReady);
 
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
@@ -47,11 +55,13 @@ public sealed class IdleExperienceArchitectureTests
         {
             fsm.Update();
             Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+            Assert.True(fsm.Context.MonikerReady);
             Assert.Equal(tick, fsm.Context.StateTicks);
         }
 
         fsm.Update();
         Assert.Equal(PageFSM.NavigationArrival, fsm.CurrentState);
+        Assert.True(fsm.Context.MonikerReady);
         Assert.Equal(91, fsm.Context.StateTicks);
     }
 
@@ -87,8 +97,8 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Equal(PageFSM.Gateway, second.CurrentState);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 09 — moniker remains hidden until gravity")]
-    public void IncrementalUnitTest09_MonikerRemainsHiddenUntilGravity()
+    [Fact(DisplayName = "Incremental Unit Test 09 — moniker remains hidden until exactly 100 nodes")]
+    public void IncrementalUnitTest09_MonikerRemainsHiddenUntilExactly100Nodes()
     {
         using var fsm = new PageFSM();
 
@@ -96,20 +106,21 @@ public sealed class IdleExperienceArchitectureTests
         fsm.Update();
         fsm.Update();
 
-        while (!fsm.Context.LivingGuiPopulated)
+        const int guard = 10000;
+        var ticks = 0;
+        while (!fsm.Context.LivingGuiPopulated && ticks++ < guard)
         {
+            Assert.True(fsm.Context.LivingNodes.Count < PageStateContext.CriticalMass);
             Assert.False(fsm.Context.MonikerReady);
             fsm.Update();
         }
 
-        Assert.False(fsm.Context.MonikerReady);
+        Assert.True(ticks < guard, "Living GUI population did not reach critical mass within the test guard.");
+        Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
+        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.True(fsm.Context.MonikerReady);
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
 
-        fsm.Update();
-        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
-        Assert.False(fsm.Context.MonikerReady);
-
-        // OnEnter for Gravity runs on the scheduler's next heartbeat.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
