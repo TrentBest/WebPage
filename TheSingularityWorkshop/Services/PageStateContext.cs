@@ -38,6 +38,12 @@ namespace TheSingularityWorkshop.Services
         public bool LivingGuiFallen { get; internal set; }
         public bool NavigationReady { get; internal set; }
 
+        /// <summary>
+        /// Total heartbeat on which critical mass was reached. The moniker transition
+        /// cannot consume the population boundary on that same heartbeat.
+        /// </summary>
+        public long PopulationCompletedTick { get; internal set; } = -1;
+
         public long StateTicks { get; set; }
         public long TotalTicks { get; set; }
 
@@ -52,12 +58,16 @@ namespace TheSingularityWorkshop.Services
         {
             if (_livingNodes.Count != 0) return;
 
+            var (targetX, targetY) = NextChaoticPosition();
+            var flightDuration = _random.Next(MinimumSeedFlightTicks, MaximumSeedFlightTicks + 1);
+
             _livingNodes.Add(new LivingNodeState(
-                "G:0", 0, 50, 50, SeedSize, 50, 50, 0, 0, 50, 50,
+                "G:0", 0, 50, 50, SeedSize, 50, 50, 0, flightDuration, targetX, targetY,
                 growthReady: false, seedDoubled: false));
 
             LivingGuiFrozen = false;
             LivingGuiPopulated = false;
+            PopulationCompletedTick = -1;
             MonikerReady = false;
             GravityReleased = false;
             LivingGuiFallen = false;
@@ -113,9 +123,6 @@ namespace TheSingularityWorkshop.Services
                     continue;
                 }
 
-                // Growth is deliberately discrete. The pending flag makes the
-                // first 48 -> 72 step a distinct scheduler tick rather than an
-                // accidental continuation of the arrival transition.
                 if (node.GrowthStepPending)
                     node.GrowthStepPending = false;
 
@@ -139,6 +146,7 @@ namespace TheSingularityWorkshop.Services
                 LivingGuiFrozen = true;
                 LivingGuiPopulated = true;
                 MonikerReady = true;
+                PopulationCompletedTick = TotalTicks;
             }
         }
 
