@@ -64,12 +64,14 @@ namespace TheSingularityWorkshop.Services
                     behavior?.OnLivingGuiIgnition?.Invoke(c);
                 }), Tick, null)
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
-                .State(MonikerReveal, Enter(c =>
+                // MONIKER_REVEAL is deliberately a sequencing boundary. The visible
+                // moniker does not become ready here; GRAVITY owns presentation.
+                .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
+                .State(Gravity, Enter(c =>
                 {
                     c.MonikerReady = true;
-                    behavior?.OnMonikerReveal?.Invoke(c);
+                    behavior?.OnGravity?.Invoke(c);
                 }), Tick, null)
-                .State(Gravity, Enter(behavior?.OnGravity), Tick, null)
                 .State(LivingGuiDissipating, Enter(behavior?.OnLivingGuiDissipating), Tick, null)
                 .State(NavigationArrival, Enter(behavior?.OnNavigationArrival), Tick, null)
                 .State(Running, Enter(behavior?.OnRunning), Tick, null)
@@ -81,10 +83,9 @@ namespace TheSingularityWorkshop.Services
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiPopulating, MonikerReveal, c => ((PageStateContext)c).LivingGuiPopulated)
                 // Critical mass is complete before this state is entered. The
-                // moniker is created here; the presentation surface does not
-                // render it until GRAVITY begins.
+                // moniker remains hidden for this boundary state.
                 .Transition(MonikerReveal, Gravity, c =>
-                    ((PageStateContext)c).StateTicks >= 1 && ((PageStateContext)c).MonikerReady)
+                    ((PageStateContext)c).StateTicks >= 1)
                 // Gravity owns the three-second presentation window. The frozen
                 // GUI swarm falls away underneath the moniker during this state.
                 .Transition(Gravity, NavigationArrival, c =>
@@ -141,10 +142,21 @@ namespace TheSingularityWorkshop.Services
 
         public void Update()
         {
-            if (!_disposed)
-                // PageFSM owns one live handle. Updating the whole processing group
-                // would tick every PageFSM in the process and couple unrelated handles.
-                _handle.Update(ProcessingGroup);
+            if (_disposed)
+                return;
+
+            // FSMHandle.Update() drives FSM.Step(), while FSM_API's scheduler also
+            // owns the HasEnteredCurrentState/OnEnter lifecycle. A direct handle
+            // update therefore needs to reproduce that one missing scheduler step.
+            // This preserves per-handle ownership without falling back to the global
+            // processing-group tick that can advance unrelated PageFSM instances.
+            if (!_handle.HasEnteredCurrentState)
+            {
+                _handle.Definition.GetState(_handle.CurrentState)?.Enter(_handle.Context);
+                _handle.HasEnteredCurrentState = true;
+            }
+
+            _handle.Update(ProcessingGroup);
         }
 
         public void Dispose()
