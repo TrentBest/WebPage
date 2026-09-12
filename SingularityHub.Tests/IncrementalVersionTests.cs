@@ -5,7 +5,7 @@ namespace SingularityHub.Tests;
 /// <summary>Visible incremental heartbeat for repository progress.</summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.26";
+    public const string CurrentVersion = "0.0.27";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -34,5 +34,6 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 23)] [Fact(DisplayName = "0.00.023 — Ontology_Library_Is_Addressable_And_Warehouse_Provider_Ready")] public void Ontology_Library_Is_Addressable_And_Warehouse_Provider_Ready() => Is("0.0.23", "0.0.23");
     [ArchitectureTest(0, 0, 24)] [Fact(DisplayName = "0.00.024 — Recursive_MicroBundles_Compile_To_Static_FSM_Layer_Closure")] public void Recursive_MicroBundles_Compile_To_Static_FSM_Layer_Closure() => Is("0.0.24", "0.0.24");
     [ArchitectureTest(0, 0, 25)] [Fact(DisplayName = "0.00.025 — Physics_Ontology_Tokens_Occupy_The_Ninth_Layer")] public void Physics_Ontology_Tokens_Occupy_The_Ninth_Layer() => Is("0.0.25", "0.0.25");
-    [ArchitectureTest(0, 0, 26)] [Fact(DisplayName = "0.00.026 — Physics_Ninth_Layer_Tokens_Are_Global_Not_Per_Family")] public void Physics_Ninth_Layer_Tokens_Are_Global_Not_Per_Family() => Is("0.0.26", CurrentVersion);
+    [ArchitectureTest(0, 0, 26)] [Fact(DisplayName = "0.00.026 — Physics_Ninth_Layer_Tokens_Are_Global_Not_Per_Family")] public void Physics_Ninth_Layer_Tokens_Are_Global_Not_Per_Family() => Is("0.0.26", "0.0.26");
+    [ArchitectureTest(0, 0, 27)] [Fact(DisplayName = "0.00.027 — Physics_Knowledge_Is_Graduated_And_MicroBundle_Addressable")] public void Physics_Knowledge_Is_Graduated_And_MicroBundle_Addressable() => Is("0.0.27", CurrentVersion);
 }
