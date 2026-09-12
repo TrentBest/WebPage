@@ -144,6 +144,69 @@ public sealed class IdleExperienceArchitectureTests
         Assert.False(fsm.Context.EnterRequested);
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 04 — Workshop entry follows the exact presentation sequence")]
+    public void IncrementalUnitTest04_WorkshopEntryFollowsExactPresentationSequence()
+    {
+        using var fsm = new PageFSM();
+
+        // 1. Gateway exists before user input.
+        Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
+        Assert.False(fsm.Context.LivingGuiPopulated);
+        Assert.False(fsm.Context.MonikerReady);
+
+        // 2. Click immediately leaves the gateway, but does not skip its exit state.
+        fsm.RequestEnter();
+        Assert.Equal(PageFSM.GatewayExit, fsm.CurrentState);
+        Assert.Empty(fsm.Context.LivingNodes);
+
+        // 3. One heartbeat exits the gateway into Living GUI ignition.
+        fsm.Update();
+        Assert.Equal(PageFSM.LivingGuiIgnition, fsm.CurrentState);
+        Assert.Single(fsm.Context.LivingNodes);
+        Assert.False(fsm.Context.MonikerReady);
+
+        // 4. The next heartbeat enters population. Nothing may reveal the moniker yet.
+        fsm.Update();
+        Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
+        Assert.False(fsm.Context.MonikerReady);
+        Assert.False(fsm.Context.LivingGuiFrozen);
+
+        // 5. Population must reach exactly 100 before the moniker state can exist.
+        var guard = 0;
+        while (fsm.CurrentState == PageFSM.LivingGuiPopulating && guard++ < 5000)
+            fsm.Update();
+
+        Assert.True(guard < 5000, "Living GUI population did not reach critical mass within the test guard.");
+        Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
+        Assert.Equal(100, fsm.Context.LivingNodes.Count);
+        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.True(fsm.Context.LivingGuiPopulated);
+        Assert.False(fsm.Context.MonikerReady);
+
+        // 6. MONIKER_REVEAL is a sequencing boundary, not a visible presentation frame.
+        //    Its OnEnter occurs on the next heartbeat, which then starts GRAVITY.
+        fsm.Update();
+        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+        Assert.True(fsm.Context.MonikerReady);
+        Assert.True(fsm.Context.GravityReleased);
+        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.Equal(1, fsm.Context.StateTicks);
+
+        // 7. Gravity owns the moniker presentation window. It must not arrive at the
+        //    navigation state early. 91 ticks at the 33 ms page update rate ~= 3 seconds.
+        for (var tick = 2; tick <= 90; tick++)
+        {
+            fsm.Update();
+            Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+            Assert.Equal(tick, fsm.Context.StateTicks);
+        }
+
+        // 8. The 91st gravity heartbeat ends the three-second presentation window.
+        fsm.Update();
+        Assert.Equal(PageFSM.NavigationArrival, fsm.CurrentState);
+        Assert.Equal(91, fsm.Context.StateTicks);
+    }
+
     [Fact(DisplayName = "Living GUI freezes exactly at critical mass and stops updating")]
     public void LivingGui_FreezesAtOneHundred()
     {
