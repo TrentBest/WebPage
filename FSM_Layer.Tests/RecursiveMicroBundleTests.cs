@@ -1,5 +1,6 @@
 using TheSingularityWorkshop.FSMLayer;
 using TheSingularityWorkshop.SingularityHub;
+using Xunit;
 
 namespace FSM_Layer.Tests;
 
