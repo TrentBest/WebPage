@@ -1,5 +1,7 @@
 using System;
 using Xunit;
+using TheSingularityWorkshop.Services;
+using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 
 namespace SingularityHub.Tests;
 
@@ -52,10 +54,10 @@ public sealed class IdleExperienceArchitectureTests
         using (var fsm = new PageFSM())
         {
             processingGroup = fsm.InstanceProcessingGroup;
-            Assert.Equal(1, FSM_API.Internal.GetFSMHandleCountInGroup(processingGroup));
+            Assert.Equal(1, fsm_API.Internal.GetFSMHandleCountInGroup(processingGroup));
         }
 
-        Assert.Equal(0, FSM_API.Internal.GetFSMHandleCountInGroup(processingGroup));
+        Assert.Equal(0, fsm_API.Internal.GetFSMHandleCountInGroup(processingGroup));
     }
 
     [Fact(DisplayName = "Incremental Unit Test 08 — PageFSM Update advances only its owning handle")]
