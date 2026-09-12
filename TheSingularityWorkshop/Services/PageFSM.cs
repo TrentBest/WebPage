@@ -160,7 +160,12 @@ namespace TheSingularityWorkshop.Services
             // work groups are stepped only while their owning phase is active.
             fsm_API.Interaction.Update(_processingGroup);
 
-            if (CurrentState == LivingGuiPopulating && !Context.LivingGuiFrozen)
+            // Population is data-driven rather than transition-clock-driven: once
+            // the gateway has been accepted, the dedicated living-GUI scheduler owns
+            // advancement until the exact critical-mass mutation freezes it. This
+            // prevents a state-transition timing window from starving the visual
+            // experience before Blazor gets its first meaningful render.
+            if (Context.EnterRequested && !Context.LivingGuiFrozen && !Context.LivingGuiPopulated)
                 fsm_API.Interaction.Update(_livingGuiProcessingGroup);
             else if (CurrentState == Gravity && !Context.LivingGuiFallen)
                 fsm_API.Interaction.Update(_gravityProcessingGroup);
