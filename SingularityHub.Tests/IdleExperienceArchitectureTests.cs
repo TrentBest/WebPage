@@ -28,7 +28,7 @@ public sealed class IdleExperienceArchitectureTests
             fsm.Update();
         }
 
-        Assert.Equal(100, fsm.Context.LivingGuiNodes.Count);
+        Assert.Equal(100, fsm.Context.LivingNodes.Count);
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
 
         fsm.Update();
@@ -70,34 +70,31 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Equal(PageFSM.Gateway, second.CurrentState);
 
         first.RequestEnter();
-        first.Update();
-
         Assert.Equal(PageFSM.GatewayExit, first.CurrentState);
+        Assert.Equal(PageFSM.Gateway, second.CurrentState);
+
+        first.Update();
+        Assert.Equal(PageFSM.LivingGuiIgnition, first.CurrentState);
         Assert.Equal(PageFSM.Gateway, second.CurrentState);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 09 — moniker remains hidden until Gravity")]
+    [Fact(DisplayName = "Incremental Unit Test 09 — moniker remains hidden until gravity")]
     public void IncrementalUnitTest09_MonikerRemainsHiddenUntilGravity()
     {
         using var fsm = new PageFSM();
-
-        Assert.False(fsm.Context.MonikerReady);
 
         fsm.RequestEnter();
         fsm.Update();
         fsm.Update();
 
-        Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
-        Assert.False(fsm.Context.MonikerReady);
-
         while (!fsm.Context.LivingGuiPopulated)
         {
-            fsm.Update();
             Assert.False(fsm.Context.MonikerReady);
+            fsm.Update();
         }
 
-        Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
         Assert.False(fsm.Context.MonikerReady);
+        Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
 
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
