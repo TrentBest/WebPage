@@ -96,9 +96,9 @@ namespace TheSingularityWorkshop.Services
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
 
-            // These are intentionally separate process groups. Reaching critical
-            // mass stops the living GUI group; gravity has already been allocated
-            // and simply remains dormant until PageFSM enters GRAVITY.
+            // The living GUI and gravity FSMs each own a distinct scheduler group.
+            // The handles must be created in the same group as their definitions so
+            // a PageFSM heartbeat can deterministically drive the correct work.
             fsm_API.Create.CreateFiniteStateMachine("LivingGuiFSM", -1, _livingGuiProcessingGroup)
                 .State("Populating", onEnter: null, onUpdate: _ => Context.AdvanceLivingGui(), onExit: null)
                 .WithInitialState("Populating")
