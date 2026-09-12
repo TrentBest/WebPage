@@ -6,7 +6,7 @@ namespace TheSingularityWorkshop.Workshop.Experiences;
 /// The canonical Pong experience. The experience is assembled from independently
 /// identifiable MicroBundles; presentation is supplied by the active host.
 /// </summary>
-public sealed class PongExperience : IExperience
+public sealed class PongExperience : IIdleExperience
 {
     public const ulong ExperienceId = 0x504F4E47UL;
 
