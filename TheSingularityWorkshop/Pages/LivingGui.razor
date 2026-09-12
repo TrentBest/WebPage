@@ -5,10 +5,10 @@
 
 <PageTitle>The Living GUI — The Singularity Workshop</PageTitle>
 
-<div class="living-sequence-shell @(MonikerVisible ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
-    @* The moniker is deliberately absent from the DOM until GRAVITY begins.
-       Critical mass freezes first; MONIKER_REVEAL creates the FSM milestone;
-       the next heartbeat enters GRAVITY and only then is the moniker rendered. *@
+<div class="living-sequence-shell @(MonikerInstantiated ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
+    @* The moniker is deliberately absent from the DOM until the living GUI itself
+       reaches the exact 100-node critical mass. Once instantiated it remains part
+       of this page until the user leaves the tab/page. *@
     @if (MonikerInstantiated)
     {
         <div class="moniker-layer" aria-hidden="true">
@@ -103,8 +103,10 @@
 </style>
 
 @code {
-    private bool MonikerInstantiated => FSM.CurrentState is PageFSM.Gravity or PageFSM.NavigationArrival or PageFSM.Running;
-    private bool MonikerVisible => MonikerInstantiated;
+    // Critical mass is the sole gate for first moniker instantiation.
+    // LivingNodes is frozen at exactly PageStateContext.CriticalMass (100), so
+    // the moniker remains instantiated for the remainder of this page lifetime.
+    private bool MonikerInstantiated => FSM.Context.LivingNodes.Count >= PageStateContext.CriticalMass;
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.NavigationArrival or PageFSM.Running;
     private string? selectedNode;
 
