@@ -5,11 +5,14 @@ namespace TheSingularityWorkshop.Workshop.Experiences;
 /// <summary>Marks an Experience that is explicitly admitted to the Idle host.</summary>
 public interface IIdleExperience : IExperience;
 
-/// <summary>Global authored MicroBundle definitions indexed by integer identity and ontology.</summary>
+/// <summary>Global authored MicroBundle definitions indexed by integer identity and every ontology layer.</summary>
 public sealed class MicroBundleRegistry
 {
     private readonly Dictionary<ulong, IMicroBundle> _byId = new();
     private readonly Dictionary<ulong, List<IMicroBundle>> _byOntology = new();
+    private readonly Dictionary<int, Dictionary<int, List<IMicroBundle>>> _byLayer =
+        Enumerable.Range(0, OntologySignature.LayerCount)
+            .ToDictionary(layer => layer, _ => new Dictionary<int, List<IMicroBundle>>());
 
     public int Count => _byId.Count;
 
@@ -18,14 +21,27 @@ public sealed class MicroBundleRegistry
         ArgumentNullException.ThrowIfNull(bundle);
         if (_byId.ContainsKey(bundle.Id))
             throw new InvalidOperationException($"MicroBundle {bundle.Id} is already registered.");
+
         _byId.Add(bundle.Id, bundle);
         var ontologyId = bundle.Ontology.StructuralId;
-        if (!_byOntology.TryGetValue(ontologyId, out var matches))
+        if (!_byOntology.TryGetValue(ontologyId, out var exactMatches))
         {
-            matches = new List<IMicroBundle>();
-            _byOntology.Add(ontologyId, matches);
+            exactMatches = new List<IMicroBundle>();
+            _byOntology.Add(ontologyId, exactMatches);
         }
-        matches.Add(bundle);
+        exactMatches.Add(bundle);
+
+        for (var layer = 0; layer < OntologySignature.LayerCount; layer++)
+        {
+            var token = bundle.Ontology[layer];
+            var index = _byLayer[layer];
+            if (!index.TryGetValue(token, out var matches))
+            {
+                matches = new List<IMicroBundle>();
+                index.Add(token, matches);
+            }
+            matches.Add(bundle);
+        }
     }
 
     public bool TryGet(ulong id, out IMicroBundle? bundle) => _byId.TryGetValue(id, out bundle);
@@ -37,7 +53,9 @@ public sealed class MicroBundleRegistry
     {
         if (layer is < 0 or >= OntologySignature.LayerCount)
             throw new ArgumentOutOfRangeException(nameof(layer));
-        return _byId.Values.Where(bundle => bundle.Ontology[layer] == token).ToArray();
+        return _byLayer[layer].TryGetValue(token, out var matches)
+            ? matches
+            : Array.Empty<IMicroBundle>();
     }
 }
 
