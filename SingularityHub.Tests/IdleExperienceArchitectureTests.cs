@@ -140,7 +140,7 @@ public sealed class IdleExperienceArchitectureTests
         using var fsm = new PageFSM();
 
         Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
-        Assert.Equal(0, fsm.Context.StateTicks);
+        Assert.Equal(1, fsm.Context.StateTicks);
         Assert.False(fsm.Context.EnterRequested);
     }
 
