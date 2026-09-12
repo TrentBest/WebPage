@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/living-workshop-landing
+      - feature/pong-microbundle-vertical-slice
   pull_request:
     branches:
       - feature/living-workshop-landing
