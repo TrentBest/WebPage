@@ -14,8 +14,8 @@ namespace TheSingularityWorkshop.Services
 
         private const double SeedSize = 18;
         private const double DefaultNodeSize = 48;
-        private const double MaximumNodeSize = 96;
         private const double GrowthStep = 24;
+        private const double MaximumNodeSize = 96;
         private const double MinX = 8;
         private const double MaxX = 92;
         private const double MinY = 10;
@@ -44,10 +44,7 @@ namespace TheSingularityWorkshop.Services
         public bool LivingGuiFrozen { get; private set; }
         public IReadOnlyList<LivingNodeState> LivingNodes => _livingNodes;
 
-        public PageStateContext(object? singularityHub = null)
-        {
-            SingularityHub = singularityHub;
-        }
+        public PageStateContext(object? singularityHub = null) => SingularityHub = singularityHub;
 
         public void ResetStateClock() => StateTicks = 0;
 
@@ -67,10 +64,8 @@ namespace TheSingularityWorkshop.Services
         }
 
         /// <summary>
-        /// Advances one living seed at a time through the visual lifecycle:
-        /// seed -> double -> fly to a random point -> expand to default size -> grow
-        /// -> reproduce. Growth advances in visible steps from 48 to 72 to 96.
-        /// The exact 100-node boundary freezes the field.
+        /// Advances one living seed through the visible lifecycle:
+        /// 18 -> 36 -> flight -> 48 -> 72 -> 96 -> reproduce.
         /// </summary>
         public void AdvanceLivingGui()
         {
@@ -101,8 +96,15 @@ namespace TheSingularityWorkshop.Services
                 {
                     node.Size = DefaultNodeSize;
                     node.GrowthReady = true;
+                    node.GrowthStepPending = true;
                     continue;
                 }
+
+                // Growth is deliberately discrete. The pending flag makes the
+                // first 48 -> 72 step a distinct scheduler tick rather than an
+                // accidental continuation of the arrival transition.
+                if (node.GrowthStepPending)
+                    node.GrowthStepPending = false;
 
                 node.Size += GrowthStep;
 
@@ -137,32 +139,18 @@ namespace TheSingularityWorkshop.Services
                 : $"{parent.Lineage}-{parent.OffspringCount - 1}";
 
             return new LivingNodeState(
-                lineage,
-                parent.Generation + 1,
-                parent.X,
-                parent.Y,
-                SeedSize,
-                parent.X,
-                parent.Y,
-                0,
-                flightDuration,
-                targetX,
-                targetY,
-                growthReady: false,
-                seedDoubled: false);
+                lineage, parent.Generation + 1, parent.X, parent.Y, SeedSize,
+                parent.X, parent.Y, 0, flightDuration, targetX, targetY,
+                growthReady: false, seedDoubled: false);
         }
 
-        private (double X, double Y) NextChaoticPosition()
-        {
-            return (
-                MinX + _random.NextDouble() * (MaxX - MinX),
-                MinY + _random.NextDouble() * (MaxY - MinY));
-        }
+        private (double X, double Y) NextChaoticPosition() =>
+            (MinX + _random.NextDouble() * (MaxX - MinX),
+             MinY + _random.NextDouble() * (MaxY - MinY));
 
         public void AdvanceGravity()
         {
-            if (!LivingGuiFrozen)
-                return;
+            if (!LivingGuiFrozen) return;
 
             foreach (var node in _livingNodes)
             {
@@ -178,19 +166,9 @@ namespace TheSingularityWorkshop.Services
         public sealed class LivingNodeState
         {
             internal LivingNodeState(
-                string lineage,
-                int generation,
-                double x,
-                double y,
-                double size,
-                double seedX,
-                double seedY,
-                int seedTicks,
-                int seedFlightDuration,
-                double targetX,
-                double targetY,
-                bool growthReady,
-                bool seedDoubled)
+                string lineage, int generation, double x, double y, double size,
+                double seedX, double seedY, int seedTicks, int seedFlightDuration,
+                double targetX, double targetY, bool growthReady, bool seedDoubled)
             {
                 Lineage = lineage;
                 Generation = generation;
@@ -221,6 +199,7 @@ namespace TheSingularityWorkshop.Services
             public double TargetY { get; }
             public bool GrowthReady { get; internal set; }
             public bool SeedDoubled { get; internal set; }
+            public bool GrowthStepPending { get; internal set; }
             public double GravityVelocity { get; internal set; }
             public double Rotation { get; internal set; }
         }
