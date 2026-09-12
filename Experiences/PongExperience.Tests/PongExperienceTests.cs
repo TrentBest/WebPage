@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Experiences;
 using Xunit;
 
@@ -39,7 +40,7 @@ public sealed class PongExperienceTests
     public void Pong_Experience_Composes_Assets_Presentation_And_Behavior()
     {
         var experience = new PongExperience();
-        var bundles = PongExperience.MicroBundles;
+        var bundles = PongMicroBundleCatalog.All;
 
         Assert.Equal(experience.MicroBundleIds.Count, bundles.Count);
         Assert.Contains(bundles, bundle => bundle.Kind == PongMicroBundleKind.Asset);
