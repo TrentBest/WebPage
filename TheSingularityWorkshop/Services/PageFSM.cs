@@ -1,13 +1,15 @@
 using System;
 using TheSingularityWorkshop.FSM_API;
+using TheSingularityWorkshop.SingularityHub;
 using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 
 namespace TheSingularityWorkshop.Services
 {
     /// <summary>
     /// The outermost FSM for the Workshop web experience.
-    /// Blazor is the presentation surface; FSM_API owns progression and the
-    /// living-GUI/gravity work is isolated into dedicated scheduler groups.
+    /// Blazor is the presentation surface; FSM_API owns progression while the
+    /// Hub owns root process-group scheduling and this FSM explicitly invokes
+    /// its nested process groups when its own update requires them.
     /// </summary>
     public sealed class PageFSM : IDisposable
     {
@@ -28,14 +30,14 @@ namespace TheSingularityWorkshop.Services
         private const long NavigationDelayTicks = 91;
 
         private readonly FSMHandle _handle;
-        private readonly FSMHandle _livingGuiHandle;
-        private readonly FSMHandle _gravityHandle;
+        private readonly SingularityHub _hub;
         private readonly string _processingGroup;
         private readonly string _livingGuiProcessingGroup;
         private readonly string _gravityProcessingGroup;
         private bool _disposed;
 
         public PageStateContext Context { get; }
+        public SingularityHub Hub => _hub;
         public string CurrentState => _handle.CurrentState;
         public string InstanceProcessingGroup => _processingGroup;
         public string LivingGuiProcessingGroup => _livingGuiProcessingGroup;
@@ -60,6 +62,7 @@ namespace TheSingularityWorkshop.Services
         public PageFSM(object? singularityHub = null, Behavior? behavior = null)
         {
             Context = new PageStateContext(singularityHub);
+            _hub = singularityHub as SingularityHub ?? new SingularityHub();
             _processingGroup = $"{ProcessingGroup}:{Guid.NewGuid():N}";
             _livingGuiProcessingGroup = $"LivingGui:{Guid.NewGuid():N}";
             _gravityProcessingGroup = $"Gravity:{Guid.NewGuid():N}";
@@ -67,6 +70,11 @@ namespace TheSingularityWorkshop.Services
             fsm_API.Create.CreateProcessingGroup(_processingGroup);
             fsm_API.Create.CreateProcessingGroup(_livingGuiProcessingGroup);
             fsm_API.Create.CreateProcessingGroup(_gravityProcessingGroup);
+
+            _hub
+                .RegisterProcessGroup(_processingGroup)
+                .RegisterProcessGroup(_livingGuiProcessingGroup, _processingGroup)
+                .RegisterProcessGroup(_gravityProcessingGroup, _processingGroup);
 
             fsm_API.Create.CreateFiniteStateMachine("PageFSM", -1, _processingGroup)
                 .State(Initializing, Enter(behavior?.OnInitialization), Tick, null)
@@ -107,8 +115,8 @@ namespace TheSingularityWorkshop.Services
                 .BuildDefinition();
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, _processingGroup);
-            _livingGuiHandle = fsm_API.Create.CreateInstance("LivingGuiFSM", Context, _livingGuiProcessingGroup);
-            _gravityHandle = fsm_API.Create.CreateInstance("GravityFSM", Context, _gravityProcessingGroup);
+            fsm_API.Create.CreateInstance("LivingGuiFSM", Context, _livingGuiProcessingGroup);
+            fsm_API.Create.CreateInstance("GravityFSM", Context, _gravityProcessingGroup);
 
             Update();
         }
@@ -128,6 +136,19 @@ namespace TheSingularityWorkshop.Services
             var context = (PageStateContext)stateContext;
             context.TotalTicks++;
             context.StateTicks++;
+
+            // PageFSM is a Hub-owned root. Its dependent FSMs are nested groups:
+            // step them here, inside the owning FSM update, and return to the FSM
+            // before the Hub proceeds to the next root process group.
+            if (context.EnterRequested && !context.LivingGuiFrozen && !context.LivingGuiPopulated)
+            {
+                _hub.UpdateNestedProcessGroups(_processingGroup);
+            }
+            else if (CurrentState == Gravity && !context.LivingGuiFallen)
+            {
+                _hub.UpdateNestedProcessGroups(_processingGroup);
+            }
+
             StateChanged?.Invoke(CurrentState);
         }
 
@@ -148,27 +169,13 @@ namespace TheSingularityWorkshop.Services
             if (!_disposed) _handle.TransitionTo(ShutdownState);
         }
 
+        /// <summary>Steps the Hub. The Hub steps PageFSM; PageFSM steps its nested groups.</summary>
         public void Update()
         {
             if (_disposed)
                 return;
 
-            fsm_API.Interaction.Update(_processingGroup);
-
-            if (Context.EnterRequested && !Context.LivingGuiFrozen && !Context.LivingGuiPopulated)
-            {
-                // The landing Experience has one living-GUI FSM instance in its
-                // dedicated process group. Step that exact handle here instead of
-                // asking the global group walker to rediscover it. This guarantees
-                // one logical living-GUI step per PageFSM.Update() call while still
-                // preserving the FSM_API process-group boundary for Hub migration.
-                _livingGuiHandle.Update(_livingGuiProcessingGroup);
-            }
-            else if (CurrentState == Gravity && !Context.LivingGuiFallen)
-            {
-                _gravityHandle.Update(_gravityProcessingGroup);
-            }
-
+            _hub.Update();
             StateChanged?.Invoke(CurrentState);
         }
 

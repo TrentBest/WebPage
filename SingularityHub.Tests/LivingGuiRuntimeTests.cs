@@ -100,4 +100,17 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
         Assert.True(fsm.Context.MonikerReady);
     }
+
+    [Fact(DisplayName = "PageFSM registers its root and nested process groups with the Hub")]
+    public void PageFSM_RegistersRootAndNestedProcessGroupsWithHub()
+    {
+        using var fsm = new PageFSM();
+
+        Assert.Contains(fsm.Hub.ProcessGroups, group =>
+            group.Name == fsm.InstanceProcessingGroup && group.ParentName is null);
+        Assert.Contains(fsm.Hub.ProcessGroups, group =>
+            group.Name == fsm.LivingGuiProcessingGroup && group.ParentName == fsm.InstanceProcessingGroup);
+        Assert.Contains(fsm.Hub.ProcessGroups, group =>
+            group.Name == fsm.GravityProcessingGroup && group.ParentName == fsm.InstanceProcessingGroup);
+    }
 }
