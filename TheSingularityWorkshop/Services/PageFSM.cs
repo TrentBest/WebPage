@@ -141,7 +141,10 @@ namespace TheSingularityWorkshop.Services
 
         public void Update()
         {
-            if (!_disposed) fsm_API.Interaction.Update(ProcessingGroup);
+            if (!_disposed)
+                // PageFSM owns one live handle. Updating the whole processing group
+                // would tick every PageFSM in the process and couple unrelated handles.
+                _handle.Update(ProcessingGroup);
         }
 
         public void Dispose()
@@ -150,10 +153,7 @@ namespace TheSingularityWorkshop.Services
 
             // PageFSM definitions are process-global in FSM_API. Leaving this
             // instance registered means every later PageFSM update also executes
-            // this dead instance. Because the definition's Tick delegate is bound
-            // to the most recently built PageFSM, those stale handles can observe
-            // the wrong CurrentState and silently prevent population from advancing.
-            // Dispose must therefore unregister the live handle, not merely mark it.
+            // this dead instance. Dispose must therefore unregister the live handle.
             fsm_API.Interaction.DestroyInstance(_handle);
             _disposed = true;
         }
