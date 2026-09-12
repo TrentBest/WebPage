@@ -119,5 +119,6 @@ public sealed class OntologyMicroBundleTests
     {
         public IReadOnlyCollection<IMicroBundle> LoadedBundles { get; } = Array.Empty<IMicroBundle>();
         public bool LoadBundle(IMicroBundle bundle) => true;
+        public int ExecuteArbitrationPipeline() => 0;
     }
 }
