@@ -21,7 +21,7 @@ public sealed class OntologyMicroBundleTests
     [Fact(DisplayName = "Ontology_Library_Uses_Nine_Layer_Signatures")]
     public void Ontology_Library_Uses_Nine_Layer_Signatures()
         => Assert.All(OntologyMicroBundleCatalog.All,
-            bundle => Assert.Equal(9, bundle.Ontology.LayerCount));
+            bundle => Assert.Equal(OntologySignature.LayerCount, bundle.Ontology.LayerCount));
 
     [Fact(DisplayName = "Ontology_Library_Separates_Software_Logic_And_Physics")]
     public void Ontology_Library_Separates_Software_Logic_And_Physics()
@@ -56,20 +56,20 @@ public sealed class OntologyMicroBundleTests
     [Fact(DisplayName = "Registry_Can_Index_The_Whole_Library_By_Ontology_Layer")]
     public void Registry_Can_Index_The_Whole_Library_By_Ontology_Layer()
     {
-        var registry = new MicroBundleRegistry();
+        var registry = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
         foreach (var bundle in OntologyMicroBundleCatalog.All)
             registry.Register(bundle);
 
         var physics = registry.FindByOntologyLayer(0, OntologyFamilies.Physics);
         Assert.Equal(25, physics.Count);
-        Assert.Contains(physics, x => x.Name == "Newtonian: Gravity");
-        Assert.Contains(physics, x => x.Name == "Plasmadynamics: Magnetohydrodynamics");
+        Assert.Contains(physics, x => ((OntologyMicroBundle)x).Name == "Newtonian: Gravity");
+        Assert.Contains(physics, x => ((OntologyMicroBundle)x).Name == "Plasmadynamics: Magnetohydrodynamics");
     }
 
     [Fact(DisplayName = "Registry_Rejects_Duplicate_Integer_MicroBundle_Identity")]
     public void Registry_Rejects_Duplicate_Integer_MicroBundle_Identity()
     {
-        var registry = new MicroBundleRegistry();
+        var registry = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
         var bundle = OntologyMicroBundleCatalog.All[0];
         registry.Register(bundle);
         Assert.Throws<InvalidOperationException>(() => registry.Register(bundle));
@@ -78,9 +78,9 @@ public sealed class OntologyMicroBundleTests
     [Fact(DisplayName = "Registry_Rejects_Invalid_Ontology_Layer_Query")]
     public void Registry_Rejects_Invalid_Ontology_Layer_Query()
     {
-        var registry = new MicroBundleRegistry();
+        var registry = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
         Assert.Throws<ArgumentOutOfRangeException>(() => registry.FindByOntologyLayer(-1, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => registry.FindByOntologyLayer(9, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => registry.FindByOntologyLayer(OntologySignature.LayerCount, 1));
     }
 
     [Fact(DisplayName = "Every_Library_Bundle_Is_Arbitration_Ready")]
@@ -93,13 +93,13 @@ public sealed class OntologyMicroBundleTests
     [Fact(DisplayName = "Registry_Store_Implements_The_Durable_Provider_Boundary")]
     public void Registry_Store_Implements_The_Durable_Provider_Boundary()
     {
-        var registry = new MicroBundleRegistry();
+        var registry = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
         foreach (var bundle in OntologyMicroBundleCatalog.All)
             registry.Register(bundle);
 
         IMicroBundleStore store = new RegistryMicroBundleStore(registry);
-        Assert.True(store.TryGet(0x31000005, out var bundle));
-        Assert.Equal("Newtonian: Gravity", bundle!.Name);
+        Assert.True(store.TryGet(0x31000005, out var foundBundle));
+        Assert.Equal("Newtonian: Gravity", ((OntologyMicroBundle)foundBundle!).Name);
     }
 
     [Fact(DisplayName = "Warehouse_Adapter_Can_Supply_The_Same_Store_Contract")]
@@ -107,11 +107,11 @@ public sealed class OntologyMicroBundleTests
     {
         var source = OntologyMicroBundleCatalog.All;
         IMicroBundleStore store = new WarehouseMicroBundleStoreAdapter(
-            id => source.SingleOrDefault(bundle => bundle.Id == id),
-            (layer, token) => source.Where(bundle => bundle.Ontology[layer] == token).ToArray());
+            id => source.SingleOrDefault(sourceBundle => sourceBundle.Id == id),
+            (layer, token) => source.Where(sourceBundle => sourceBundle.Ontology[layer] == token).ToArray());
 
-        Assert.True(store.TryGet(0x35000005, out var bundle));
-        Assert.Equal("Plasmadynamics: Magnetohydrodynamics", bundle!.Name);
+        Assert.True(store.TryGet(0x35000005, out var foundBundle));
+        Assert.Equal("Plasmadynamics: Magnetohydrodynamics", ((OntologyMicroBundle)foundBundle!).Name);
         Assert.Equal(25, store.FindByOntologyLayer(0, OntologyFamilies.Physics).Count);
     }
 
