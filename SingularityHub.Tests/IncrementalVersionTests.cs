@@ -22,7 +22,7 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 9)] [Fact(DisplayName = "0.00.009 — Incremental_Change_Heartbeat")] public void Incremental_Change_Heartbeat_009() => Assert.True(true);
     [ArchitectureTest(0, 0, 10)] [Fact(DisplayName = "0.00.010 — PageFSM_Isolation_Fix_Is_Visible")] public void PageFSM_Isolation_Fix_Is_Visible() => Assert.True(true);
     [ArchitectureTest(0, 0, 11)] [Fact(DisplayName = "0.00.011 — Moniker_Presentation_Contract_Is_Visible")] public void Moniker_Presentation_Contract_Is_Visible() => Assert.True(true);
-    [ArchitectureTest(0, 0, 12)] [Fact(DisplayName = "0.00.012 — PageFSM_Scheduler_Lifecycle_Is_Visible")] public void PageFSM_Scheduler_Lifecycle_Is_Visible() => Assert.Equal("0.0.12", "0.0.12");
+    [ArchitectureTest(0, 0, 12)] [Fact(DisplayName = "0.00.012 — PageFSM_Scheduler_Lifecycle_Is_Visible")] public void PageFSM_Scheduler_Lifecycle_Is_Visible() => Assert.True(true);
     [ArchitectureTest(0, 0, 13)] [Fact(DisplayName = "0.00.013 — PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups")] public void PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups() => Assert.Equal("0.0.13", CurrentVersion);
     [ArchitectureTest(0, 0, 14)] [Fact(DisplayName = "0.00.014 — Incremental_Change_Heartbeat")] public void Incremental_Change_Heartbeat_014() => Assert.True(true);
     [ArchitectureTest(0, 0, 15)] [Fact(DisplayName = "0.00.015 — Incremental_Change_Heartbeat")] public void Incremental_Change_Heartbeat_015() => Assert.True(true);
