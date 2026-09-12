@@ -10,12 +10,6 @@ namespace TheSingularityWorkshop.Services
     /// </summary>
     public sealed class PageFSM : IDisposable
     {
-        /// <summary>
-        /// Stable prefix used to identify PageFSM-owned processing groups.
-        /// Each PageFSM instance receives its own scheduler group so its public
-        /// Update operation can use FSM_API's real scheduler lifecycle without
-        /// ticking unrelated PageFSM instances.
-        /// </summary>
         public const string ProcessingGroup = "PageFSM";
 
         public const string Initializing = "PAGE_INITIALIZING";
@@ -73,11 +67,7 @@ namespace TheSingularityWorkshop.Services
                 }), Tick, null)
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
                 .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
-                .State(Gravity, Enter(c =>
-                {
-                    c.MonikerReady = true;
-                    behavior?.OnGravity?.Invoke(c);
-                }), Tick, null)
+                .State(Gravity, Enter(behavior?.OnGravity), Tick, null)
                 .State(LivingGuiDissipating, Enter(behavior?.OnLivingGuiDissipating), Tick, null)
                 .State(NavigationArrival, Enter(behavior?.OnNavigationArrival), Tick, null)
                 .State(Running, Enter(behavior?.OnRunning), Tick, null)
@@ -142,9 +132,9 @@ namespace TheSingularityWorkshop.Services
             if (_disposed)
                 return;
 
-            // Use FSM_API's scheduler for this one owned processing group. This is
-            // deliberate: 1.0.13 owns the HasEnteredCurrentState/OnEnter lifecycle
-            // inside the scheduler, while PageFSM owns only its private group.
+            // FSM_API owns HasEnteredCurrentState and OnEnter. Each PageFSM owns a
+            // private scheduler group, so scheduler ticking preserves native lifecycle
+            // semantics without advancing unrelated PageFSM instances.
             fsm_API.Interaction.Update(_processingGroup);
         }
 
