@@ -6,12 +6,12 @@ namespace TheSingularityWorkshop.Services
 {
     /// <summary>
     /// The outermost FSM for the Workshop web experience.
-    /// Blazor is the presentation surface; FSM_API owns progression.
+    /// Blazor is the presentation surface; FSM_API owns progression and the
+    /// living-GUI/gravity work is isolated into dedicated scheduler groups.
     /// </summary>
     public sealed class PageFSM : IDisposable
     {
         public const string ProcessingGroup = "PageFSM";
-
         public const string Initializing = "PAGE_INITIALIZING";
         public const string Gateway = "GATEWAY";
         public const string GatewayExit = "GATEWAY_EXIT";
@@ -24,15 +24,22 @@ namespace TheSingularityWorkshop.Services
         public const string Running = "RUNNING";
         public const string ShutdownState = "SHUTDOWN";
 
-        private const long MonikerPresentationTicks = 91;
+        private const long GravityReleaseTicks = 1;
+        private const long NavigationDelayTicks = 91;
 
         private readonly FSMHandle _handle;
+        private readonly FSMHandle _livingGuiHandle;
+        private readonly FSMHandle _gravityHandle;
         private readonly string _processingGroup;
+        private readonly string _livingGuiProcessingGroup;
+        private readonly string _gravityProcessingGroup;
         private bool _disposed;
 
         public PageStateContext Context { get; }
         public string CurrentState => _handle.CurrentState;
         public string InstanceProcessingGroup => _processingGroup;
+        public string LivingGuiProcessingGroup => _livingGuiProcessingGroup;
+        public string GravityProcessingGroup => _gravityProcessingGroup;
         public event Action<string>? StateChanged;
 
         public sealed class Behavior
@@ -54,7 +61,12 @@ namespace TheSingularityWorkshop.Services
         {
             Context = new PageStateContext(singularityHub);
             _processingGroup = $"{ProcessingGroup}:{Guid.NewGuid():N}";
+            _livingGuiProcessingGroup = $"LivingGui:{Guid.NewGuid():N}";
+            _gravityProcessingGroup = $"Gravity:{Guid.NewGuid():N}";
+
             fsm_API.Create.CreateProcessingGroup(_processingGroup);
+            fsm_API.Create.CreateProcessingGroup(_livingGuiProcessingGroup);
+            fsm_API.Create.CreateProcessingGroup(_gravityProcessingGroup);
 
             fsm_API.Create.CreateFiniteStateMachine("PageFSM", -1, _processingGroup)
                 .State(Initializing, Enter(behavior?.OnInitialization), Tick, null)
@@ -78,11 +90,29 @@ namespace TheSingularityWorkshop.Services
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiPopulating, MonikerReveal, c => ((PageStateContext)c).LivingGuiPopulated)
-                .Transition(MonikerReveal, Gravity, c => ((PageStateContext)c).StateTicks >= 1)
-                .Transition(Gravity, NavigationArrival, c => ((PageStateContext)c).StateTicks >= MonikerPresentationTicks)
+                .Transition(MonikerReveal, Gravity, c => ((PageStateContext)c).StateTicks >= GravityReleaseTicks)
+                .Transition(Gravity, LivingGuiDissipating, c => ((PageStateContext)c).LivingGuiFallen)
+                .Transition(LivingGuiDissipating, NavigationArrival, c => ((PageStateContext)c).StateTicks >= NavigationDelayTicks)
+                .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
+                .BuildDefinition();
+
+            // These are intentionally separate process groups. Reaching critical
+            // mass stops the living GUI group; gravity has already been allocated
+            // and simply remains dormant until PageFSM enters GRAVITY.
+            fsm_API.Create.CreateFiniteStateMachine("LivingGuiFSM", -1, _livingGuiProcessingGroup)
+                .State("Populating", onEnter: null, onUpdate: _ => Context.AdvanceLivingGui(), onExit: null)
+                .WithInitialState("Populating")
+                .BuildDefinition();
+
+            fsm_API.Create.CreateFiniteStateMachine("GravityFSM", -1, _gravityProcessingGroup)
+                .State("Falling", onEnter: null, onUpdate: _ => Context.AdvanceGravity(), onExit: null)
+                .WithInitialState("Falling")
                 .BuildDefinition();
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, _processingGroup);
+            _livingGuiHandle = fsm_API.Create.CreateInstance("LivingGuiFSM", Context, _livingGuiProcessingGroup);
+            _gravityHandle = fsm_API.Create.CreateInstance("GravityFSM", Context, _gravityProcessingGroup);
+
             Update();
         }
 
@@ -101,12 +131,6 @@ namespace TheSingularityWorkshop.Services
             var context = (PageStateContext)stateContext;
             context.TotalTicks++;
             context.StateTicks++;
-
-            if (CurrentState == LivingGuiPopulating)
-                context.AdvanceLivingGui();
-            else if (CurrentState == Gravity)
-                context.AdvanceGravity();
-
             StateChanged?.Invoke(CurrentState);
         }
 
@@ -132,10 +156,16 @@ namespace TheSingularityWorkshop.Services
             if (_disposed)
                 return;
 
-            // FSM_API owns HasEnteredCurrentState and OnEnter. Each PageFSM owns a
-            // private scheduler group, so scheduler ticking preserves native lifecycle
-            // semantics without advancing unrelated PageFSM instances.
+            // FSM_API owns state-entry lifecycle for the page FSM. The two visual
+            // work groups are stepped only while their owning phase is active.
             fsm_API.Interaction.Update(_processingGroup);
+
+            if (CurrentState == LivingGuiPopulating && !Context.LivingGuiFrozen)
+                fsm_API.Interaction.Update(_livingGuiProcessingGroup);
+            else if (CurrentState == Gravity && !Context.LivingGuiFallen)
+                fsm_API.Interaction.Update(_gravityProcessingGroup);
+
+            StateChanged?.Invoke(CurrentState);
         }
 
         public void Dispose()
@@ -143,6 +173,8 @@ namespace TheSingularityWorkshop.Services
             if (_disposed) return;
 
             fsm_API.Interaction.DestroyFiniteStateMachine("PageFSM", _processingGroup);
+            fsm_API.Interaction.DestroyFiniteStateMachine("LivingGuiFSM", _livingGuiProcessingGroup);
+            fsm_API.Interaction.DestroyFiniteStateMachine("GravityFSM", _gravityProcessingGroup);
             _disposed = true;
         }
     }
