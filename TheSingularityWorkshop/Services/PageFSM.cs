@@ -1,6 +1,6 @@
 using System;
 using TheSingularityWorkshop.FSM_API;
-using TheSingularityWorkshop.SingularityHub;
+using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 
 namespace TheSingularityWorkshop.Services
@@ -30,14 +30,14 @@ namespace TheSingularityWorkshop.Services
         private const long NavigationDelayTicks = 91;
 
         private readonly FSMHandle _handle;
-        private readonly SingularityHub _hub;
+        private readonly HubKernel _hub;
         private readonly string _processingGroup;
         private readonly string _livingGuiProcessingGroup;
         private readonly string _gravityProcessingGroup;
         private bool _disposed;
 
         public PageStateContext Context { get; }
-        public SingularityHub Hub => _hub;
+        public HubKernel Hub => _hub;
         public string CurrentState => _handle.CurrentState;
         public string InstanceProcessingGroup => _processingGroup;
         public string LivingGuiProcessingGroup => _livingGuiProcessingGroup;
@@ -62,7 +62,7 @@ namespace TheSingularityWorkshop.Services
         public PageFSM(object? singularityHub = null, Behavior? behavior = null)
         {
             Context = new PageStateContext(singularityHub);
-            _hub = singularityHub as SingularityHub ?? new SingularityHub();
+            _hub = singularityHub as HubKernel ?? new HubKernel();
             _processingGroup = $"{ProcessingGroup}:{Guid.NewGuid():N}";
             _livingGuiProcessingGroup = $"LivingGui:{Guid.NewGuid():N}";
             _gravityProcessingGroup = $"Gravity:{Guid.NewGuid():N}";
@@ -137,9 +137,6 @@ namespace TheSingularityWorkshop.Services
             context.TotalTicks++;
             context.StateTicks++;
 
-            // PageFSM is a Hub-owned root. Its dependent FSMs are nested groups:
-            // step them here, inside the owning FSM update, and return to the FSM
-            // before the Hub proceeds to the next root process group.
             if (context.EnterRequested && !context.LivingGuiFrozen && !context.LivingGuiPopulated)
             {
                 _hub.UpdateNestedProcessGroups(_processingGroup);
