@@ -25,4 +25,19 @@ public interface IExperience
 
     /// <summary>Capabilities exposed by the experience.</summary>
     IReadOnlyList<ulong> Capabilities { get; }
+
+    /// <summary>
+    /// Integer identifiers for the sensory systems provided by the experience.
+    /// The experience is quantified by the number of distinct sensory systems it provides.
+    /// </summary>
+    IReadOnlyList<ulong> SensorySystems { get; }
+
+    /// <summary>Gets the number of distinct sensory systems provided by the experience.</summary>
+    int SenseCount => SensorySystems.Distinct().Count();
+
+    /// <summary>
+    /// Scheduler process-group identifiers used by the experience.
+    /// The experience exposes them; the Hub owns their stepping and lifecycle scheduling.
+    /// </summary>
+    IReadOnlyList<string> ProcessingGroups { get; }
 }
