@@ -42,8 +42,8 @@ public sealed class RecursiveGuiBuilderTests
         Assert.Equal("SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE", warning.Text);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 05 — recursive children remain independent subtrees")]
-    public void IncrementalUnitTest05_RecursiveChildrenRemainIndependentSubtrees()
+    [Fact(DisplayName = "Incremental Unit Test 06 — recursive children remain independent subtrees")]
+    public void IncrementalUnitTest06_RecursiveChildrenRemainIndependentSubtrees()
     {
         var root = GuiBuilder
             .Create("Panel", "root")
