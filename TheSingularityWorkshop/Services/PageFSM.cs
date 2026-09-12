@@ -90,6 +90,11 @@ namespace TheSingularityWorkshop.Services
                 .BuildDefinition();
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, ProcessingGroup);
+
+            // FSM_API instances begin in their declared initial state. Advance the
+            // page's initialization transition once so a newly created PageFSM is
+            // externally observable as the Gateway, not PAGE_INITIALIZING.
+            Update();
         }
 
         private Action<IStateContext> Enter(Action<PageStateContext>? behavior)
