@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Experiences;
 using Xunit;
 
@@ -87,6 +88,31 @@ public sealed class OntologyMicroBundleTests
     {
         var arbitrator = new TestArbitrator();
         Assert.All(OntologyMicroBundleCatalog.All, bundle => Assert.False(bundle.Arbitrate(arbitrator, 0)));
+    }
+
+    [Fact(DisplayName = "Registry_Store_Implements_The_Durable_Provider_Boundary")]
+    public void Registry_Store_Implements_The_Durable_Provider_Boundary()
+    {
+        var registry = new MicroBundleRegistry();
+        foreach (var bundle in OntologyMicroBundleCatalog.All)
+            registry.Register(bundle);
+
+        IMicroBundleStore store = new RegistryMicroBundleStore(registry);
+        Assert.True(store.TryGet(0x31000005, out var bundle));
+        Assert.Equal("Newtonian: Gravity", bundle!.Name);
+    }
+
+    [Fact(DisplayName = "Warehouse_Adapter_Can_Supply_The_Same_Store_Contract")]
+    public void Warehouse_Adapter_Can_Supply_The_Same_Store_Contract()
+    {
+        var source = OntologyMicroBundleCatalog.All;
+        IMicroBundleStore store = new WarehouseMicroBundleStoreAdapter(
+            id => source.SingleOrDefault(bundle => bundle.Id == id),
+            (layer, token) => source.Where(bundle => bundle.Ontology[layer] == token).ToArray());
+
+        Assert.True(store.TryGet(0x35000005, out var bundle));
+        Assert.Equal("Plasmadynamics: Magnetohydrodynamics", bundle!.Name);
+        Assert.Equal(25, store.FindByOntologyLayer(0, OntologyFamilies.Physics).Count);
     }
 
     private sealed class TestArbitrator : IArbitrator
