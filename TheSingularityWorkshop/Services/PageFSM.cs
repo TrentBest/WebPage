@@ -137,7 +137,15 @@ namespace TheSingularityWorkshop.Services
             context.TotalTicks++;
             context.StateTicks++;
 
-            if (context.EnterRequested && !context.LivingGuiFrozen && !context.LivingGuiPopulated)
+            // Nested groups are owned by the state that needs them. In particular,
+            // do not run LivingGui during GATEWAY_EXIT or LIVING_GUI_IGNITION:
+            // those states must establish the exact presentation boundary before
+            // the first population tick occurs. This also prevents the population
+            // group from being stepped early and making the moniker gate appear
+            // one heartbeat too soon.
+            if (CurrentState == LivingGuiPopulating &&
+                !context.LivingGuiFrozen &&
+                !context.LivingGuiPopulated)
             {
                 _hub.UpdateNestedProcessGroups(_processingGroup);
             }
