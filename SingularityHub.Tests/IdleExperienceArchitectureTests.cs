@@ -31,8 +31,17 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Equal(100, fsm.Context.LivingNodes.Count);
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
 
+        // FSM_API transitions into the next state first; its scheduler owns the
+        // following heartbeat's OnEnter lifecycle. The first Gravity heartbeat
+        // therefore establishes StateTicks == 1 and makes the moniker visible.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+        Assert.False(fsm.Context.MonikerReady);
+
+        fsm.Update();
+        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+        Assert.True(fsm.Context.MonikerReady);
+        Assert.Equal(1, fsm.Context.StateTicks);
 
         for (var tick = 2; tick <= 90; tick++)
         {
@@ -96,6 +105,11 @@ public sealed class IdleExperienceArchitectureTests
         Assert.False(fsm.Context.MonikerReady);
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
 
+        fsm.Update();
+        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+        Assert.False(fsm.Context.MonikerReady);
+
+        // OnEnter for Gravity runs on the scheduler's next heartbeat.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
