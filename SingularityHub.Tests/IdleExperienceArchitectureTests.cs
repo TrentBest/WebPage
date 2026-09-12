@@ -160,14 +160,20 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Empty(fsm.Context.LivingNodes);
 
         // 3. One heartbeat exits the gateway into Living GUI ignition.
+        // FSM_API transitions to the target state on this tick; the target state's
+        // OnEnter executes on the following heartbeat. Therefore ignition is
+        // intentionally observable with an empty GUI tree for this one tick.
         fsm.Update();
         Assert.Equal(PageFSM.LivingGuiIgnition, fsm.CurrentState);
-        Assert.Single(fsm.Context.LivingNodes);
+        Assert.Empty(fsm.Context.LivingNodes);
         Assert.False(fsm.Context.MonikerReady);
 
-        // 4. The next heartbeat enters population. Nothing may reveal the moniker yet.
+        // 4. The next heartbeat executes ignition and enters population. The seed
+        // must exist before population can continue, and nothing may reveal the
+        // moniker yet.
         fsm.Update();
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
+        Assert.Single(fsm.Context.LivingNodes);
         Assert.False(fsm.Context.MonikerReady);
         Assert.False(fsm.Context.LivingGuiFrozen);
 
@@ -184,7 +190,7 @@ public sealed class IdleExperienceArchitectureTests
         Assert.False(fsm.Context.MonikerReady);
 
         // 6. MONIKER_REVEAL is a sequencing boundary, not a visible presentation frame.
-        //    Its OnEnter occurs on the next heartbeat, which then starts GRAVITY.
+        // Its OnEnter occurs on the next heartbeat, which then starts GRAVITY.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
@@ -193,7 +199,7 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Equal(1, fsm.Context.StateTicks);
 
         // 7. Gravity owns the moniker presentation window. It must not arrive at the
-        //    navigation state early. 91 ticks at the 33 ms page update rate ~= 3 seconds.
+        // navigation state early. 91 ticks at the 33 ms page update rate ~= 3 seconds.
         for (var tick = 2; tick <= 90; tick++)
         {
             fsm.Update();
