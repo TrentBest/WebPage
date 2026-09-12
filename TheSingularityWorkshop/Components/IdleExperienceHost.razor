@@ -1,244 +1,64 @@
 @using Microsoft.AspNetCore.Components.Web
-@using TheSingularityWorkshop.Services
-@using TheSingularityWorkshop.Workshop.MicroBundles
+@using Microsoft.JSInterop
+@using TheSingularityWorkshop.Workshop.Experiences
 @implements IAsyncDisposable
+@inject IJSRuntime JS
 
-@if (_idleActive)
+@if (_active)
 {
-    <section class="idle-screen-saver" aria-label="Workshop idle experience">
-        <div class="idle-frame">
-            <header class="idle-header">
-                <span>WORKSHOP // IDLE</span>
-                <span>@_selectedExperience?.DisplayName</span>
-            </header>
-
-            @if (_selectedExperience?.Id == "pong")
-            {
-                <div class="pong-board" aria-label="Pong idle experience">
-                    <div class="pong-center-line"></div>
-                    <div class="pong-score pong-score-left">@_leftScore</div>
-                    <div class="pong-score pong-score-right">@_rightScore</div>
-                    <div class="pong-paddle pong-paddle-left"
-                         style="@($"--paddle-position:{_leftPaddle}%")"
-                         @onpointerdown="BeginLeftDrag"
-                         @onpointermove="DragLeftPaddle"
-                         @onpointerup="EndLeftDrag"
-                         @onpointercancel="EndLeftDrag"
-                         @onpointerdown:stopPropagation="true"
-                         @onpointermove:stopPropagation="true"
-                         @onpointerup:stopPropagation="true"
-                         @onpointercancel:stopPropagation="true"
-                         aria-label="Player paddle">
-                        <span>P</span><span>A</span><span>D</span><span>D</span><span>L</span><span>E</span>
-                    </div>
-                    <div class="pong-paddle pong-paddle-right"
-                         style="@($"--paddle-position:{_rightPaddle}%")"
-                         aria-label="AI paddle">
-                        <span>P</span><span>A</span><span>D</span><span>D</span><span>L</span><span>E</span>
-                    </div>
-                    <div class="pong-ball" style="@($"left:{_ballX}%;top:{_ballY}%")"></div>
-                </div>
-            }
-
-            <footer class="idle-footer">
-                <span>THE USER HAS GONE AWAY.</span>
-                <span>THE WORKSHOP HAS NOT.</span>
-            </footer>
+    <section class="pong-experience" tabindex="0" aria-label="PONG experience"
+             @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp">
+        <div class="pong-frame">
+            <header class="pong-header"><span>EXPERIENCE // PONG</span><span>SIGHT <b>+</b> HEARING</span></header>
+            <div class="pong-board">
+                <div class="pong-center-line"></div>
+                <div class="pong-score pong-score-left">@_runtime.PlayerScore</div>
+                <div class="pong-score pong-score-right">@_runtime.OpponentScore</div>
+                <div class="pong-paddle pong-paddle-left" style="top:@_runtime.PlayerPaddle%" aria-label="Player paddle"></div>
+                <div class="pong-paddle pong-paddle-right" style="top:@_runtime.OpponentPaddle%" aria-label="Opponent paddle"></div>
+                <div class="pong-ball" style="left:@_runtime.BallX%;top:@_runtime.BallY%"></div>
+                <div class="pong-help">↑ / W &nbsp; UP &nbsp;&nbsp; ↓ / S &nbsp; DOWN</div>
+            </div>
+            <footer class="pong-footer"><span>MICROBUNDLES: @_experience.MicroBundleIds.Count</span><span>INPUT // PHYSICS // PRESENTATION</span><button type="button" @onclick="Exit">RETURN</button></footer>
         </div>
     </section>
 }
 
 <style>
-    .idle-screen-saver { position:fixed; inset:0; z-index:90000; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 45%,rgba(0,234,255,.09),transparent 38%),rgba(1,3,8,.97); color:#dffaff; font-family:Consolas,'Courier New',monospace; animation:idleArrival .8s ease-out; }
-    .idle-frame { width:min(1100px,92vw); height:min(760px,88vh); display:flex; flex-direction:column; overflow:hidden; border:1px solid rgba(0,234,255,.65); box-shadow:0 0 22px rgba(0,234,255,.28),0 0 90px rgba(255,44,255,.12),inset 0 0 40px rgba(0,234,255,.035); background:rgba(2,7,17,.96); }
-    .idle-header,.idle-footer { display:flex; justify-content:space-between; gap:1rem; padding:.7rem 1rem; font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; border-bottom:1px solid rgba(0,234,255,.28); color:#8eefff; }
-    .idle-footer { border-top:1px solid rgba(0,234,255,.28); border-bottom:0; color:#ffb15c; }
-    .pong-board { position:relative; flex:1; min-height:0; margin:2rem; overflow:hidden; border:1px solid rgba(0,234,255,.38); background:radial-gradient(circle,rgba(0,234,255,.035),transparent 60%); }
-    .pong-center-line { position:absolute; top:0; bottom:0; left:50%; border-left:1px dashed rgba(255,255,255,.18); }
-    .pong-score { position:absolute; top:4%; font-size:clamp(3rem,8vw,6rem); color:rgba(0,234,255,.18); user-select:none; }
-    .pong-score-left { left:43%; }.pong-score-right { left:53%; }
-    .pong-paddle { position:absolute; top:clamp(calc(9% + 5px),var(--paddle-position),calc(91% - 5px)); width:10px; height:18%; transform:translateY(-50%); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; background:#00eaff; box-shadow:0 0 12px #00eaff,0 0 30px rgba(0,234,255,.55); color:#020711; font-size:8px; line-height:.92; font-weight:900; letter-spacing:0; user-select:none; cursor:ns-resize; touch-action:none; }
-    .pong-paddle-left { left:2%; }.pong-paddle-right { right:2%; background:#ff2cff; box-shadow:0 0 12px #ff2cff,0 0 30px rgba(255,44,255,.55); cursor:default; }
-    .pong-paddle span { display:block; }
-    .pong-ball { position:absolute; width:14px; height:14px; transform:translate(-50%,-50%); border-radius:0; background:#ffd34d; box-shadow:0 0 12px #ffd34d,0 0 30px rgba(255,211,77,.65); }
-    @@keyframes idleArrival { from { opacity:0; transform:scale(1.03); } to { opacity:1; transform:scale(1); } }
-    @@media(max-width:700px) { .idle-frame{width:96vw;height:90vh}.pong-board{margin:1rem}.idle-header,.idle-footer{font-size:.55rem;letter-spacing:.08em}.pong-paddle{width:7px;font-size:6px}.pong-ball{width:10px;height:10px} }
+    .pong-experience{position:fixed;inset:0;z-index:90000;outline:none;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(0,234,255,.09),transparent 38%),#010308;color:#dffaff;font-family:Consolas,'Courier New',monospace}
+    .pong-frame{width:min(1100px,92vw);height:min(760px,88vh);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(0,234,255,.65);box-shadow:0 0 22px rgba(0,234,255,.28),0 0 90px rgba(255,44,255,.12),inset 0 0 40px rgba(0,234,255,.035);background:rgba(2,7,17,.97)}
+    .pong-header,.pong-footer{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.7rem 1rem;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;border-bottom:1px solid rgba(0,234,255,.28);color:#8eefff}.pong-footer{border-top:1px solid rgba(0,234,255,.28);border-bottom:0;color:#ffb15c}.pong-footer button{border:1px solid rgba(0,234,255,.55);background:transparent;color:#8eefff;padding:.3rem .65rem;font:inherit;cursor:pointer}
+    .pong-board{position:relative;flex:1;min-height:0;margin:2rem;overflow:hidden;border:1px solid rgba(0,234,255,.38);background:radial-gradient(circle,rgba(0,234,255,.035),transparent 60%);box-shadow:inset 0 0 45px rgba(0,234,255,.025)}.pong-board::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 5px)}
+    .pong-center-line{position:absolute;top:0;bottom:0;left:50%;border-left:1px dashed rgba(255,255,255,.18)}.pong-score{position:absolute;top:4%;z-index:1;font-size:clamp(3rem,8vw,6rem);color:rgba(0,234,255,.18);user-select:none}.pong-score-left{left:43%}.pong-score-right{left:53%}
+    .pong-paddle{position:absolute;z-index:2;width:10px;height:18%;transform:translateY(-50%);background:#00eaff;box-shadow:0 0 12px #00eaff,0 0 30px rgba(0,234,255,.55)}.pong-paddle-left{left:2%}.pong-paddle-right{right:2%;background:#ff2cff;box-shadow:0 0 12px #ff2cff,0 0 30px rgba(255,44,255,.55)}.pong-ball{position:absolute;z-index:3;width:14px;height:14px;transform:translate(-50%,-50%);background:#ffd34d;box-shadow:0 0 12px #ffd34d,0 0 30px rgba(255,211,77,.65)}.pong-help{position:absolute;z-index:4;left:50%;bottom:2%;transform:translateX(-50%);font-size:.65rem;letter-spacing:.1em;color:rgba(223,250,255,.45);white-space:nowrap}
+    @@media(max-width:700px){.pong-frame{width:96vw;height:90vh}.pong-board{margin:1rem}.pong-header,.pong-footer{font-size:.55rem;letter-spacing:.08em}.pong-paddle{width:7px}.pong-ball{width:10px;height:10px}}
 </style>
 
 @code {
-    private const double FieldTop = 5;
-    private const double FieldBottom = 95;
-    private const double PaddleHalfHeight = 9;
-    private const double PaddleHalfWidth = .5;
-    private const double BallHalfWidth = 1;
-    private const double BallHalfHeight = 1;
-    private const double PaddleMinCenter = 9.7;
-    private const double PaddleMaxCenter = 90.3;
-
-    private readonly Random _random = new();
+    private static readonly TimeSpan IdleThreshold=TimeSpan.FromSeconds(7);
+    private readonly PongExperience _experience=new();
+    private readonly PongExperienceRuntime _runtime=new();
     private CancellationTokenSource? _shutdown;
     private Task? _loop;
-    private DateTime _lastActivityUtc = DateTime.UtcNow;
-    private bool _idleActive;
-    private IdleExperienceDefinition? _selectedExperience;
-    private PongMicroBundle? _pongBundle;
-    private bool _draggingLeftPaddle;
-    private double _ballX = 50;
-    private double _ballY = 50;
-    private double _ballVelocityX = .65;
-    private double _ballVelocityY = .42;
-    private double _leftPaddle = 50;
-    private double _rightPaddle = 50;
-    private int _leftScore;
-    private int _rightScore;
+    private DateTime _lastActivityUtc=DateTime.UtcNow;
+    private bool _active;
+    private IJSObjectReference? _audio;
 
-    private static readonly TimeSpan IdleThreshold = TimeSpan.FromSeconds(7);
+    protected override void OnInitialized(){_shutdown=new CancellationTokenSource();_runtime.SoundTriggered+=OnSound;_loop=RunAsync(_shutdown.Token);}
 
-    protected override void OnInitialized()
-    {
-        _pongBundle = MicroBundleCatalog.CreatePong();
-        _shutdown = new CancellationTokenSource();
-        _loop = RunAsync(_shutdown.Token);
-    }
-
+    /// <summary>Receives activity from the page shell so the idle Experience does not launch while the user is interacting with the gateway.</summary>
     public void RegisterActivity()
     {
-        _lastActivityUtc = DateTime.UtcNow;
-        if (_idleActive)
-        {
-            _idleActive = false;
-            _selectedExperience = null;
-            _leftScore = 0;
-            _rightScore = 0;
-            _draggingLeftPaddle = false;
-        }
+        _lastActivityUtc=DateTime.UtcNow;
     }
 
-    private async Task RunAsync(CancellationToken cancellationToken)
-    {
-        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(33));
-        try
-        {
-            while (await timer.WaitForNextTickAsync(cancellationToken))
-            {
-                var idle = DateTime.UtcNow - _lastActivityUtc >= IdleThreshold;
-                if (idle && !_idleActive)
-                {
-                    _idleActive = true;
-                    _selectedExperience = IdleExperienceCatalog.Select(_random);
-                    ResetPong();
-                }
+    private async Task RunAsync(CancellationToken token){using var timer=new PeriodicTimer(TimeSpan.FromMilliseconds(33));try{while(await timer.WaitForNextTickAsync(token)){if(!_active&&DateTime.UtcNow-_lastActivityUtc>=IdleThreshold){_active=true;_runtime.Reset();await InvokeAsync(StateHasChanged);}if(_active){_runtime.Step();await InvokeAsync(StateHasChanged);}}}catch(OperationCanceledException)when(token.IsCancellationRequested){}}
 
-                if (_idleActive && _selectedExperience?.Id == "pong")
-                {
-                    _pongBundle?.Update();
-                    TickPong();
-                }
+    private async void OnSound(PongSoundEvent sound){if(sound==PongSoundEvent.None||_audio is null)return;try{await _audio.InvokeVoidAsync("play",sound.ToString().ToLowerInvariant());}catch(JSDisconnectedException){}}
+    private Task HandleKeyDown(KeyboardEventArgs e){if(!_active)return Task.CompletedTask;RegisterActivity();var key=e.Key.ToLowerInvariant();_runtime.SetInput(key is "arrowup" or "w",key is "arrowdown" or "s");return Task.CompletedTask;}
+    private Task HandleKeyUp(KeyboardEventArgs e){if(!_active)return Task.CompletedTask;RegisterActivity();var key=e.Key.ToLowerInvariant();if(key is "arrowup" or "w" or "arrowdown" or "s")_runtime.SetInput(false,false);return Task.CompletedTask;}
+    private void Exit(){_active=false;RegisterActivity();_runtime.SetInput(false,false);}
 
-                await InvokeAsync(StateHasChanged);
-            }
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
-    }
-
-    private void ResetPong()
-    {
-        _ballX = 50;
-        _ballY = 50;
-        _ballVelocityX = _random.Next(0, 2) == 0 ? .65 : -.65;
-        _ballVelocityY = _random.Next(0, 2) == 0 ? .42 : -.42;
-        _leftPaddle = 50;
-        _rightPaddle = 50;
-        _draggingLeftPaddle = false;
-    }
-
-    private void TickPong()
-    {
-        _ballX += _ballVelocityX;
-        _ballY += _ballVelocityY;
-
-        if (_ballY - BallHalfHeight <= FieldTop)
-        {
-            _ballY = FieldTop + BallHalfHeight;
-            _ballVelocityY = Math.Abs(_ballVelocityY);
-        }
-        else if (_ballY + BallHalfHeight >= FieldBottom)
-        {
-            _ballY = FieldBottom - BallHalfHeight;
-            _ballVelocityY = -Math.Abs(_ballVelocityY);
-        }
-
-        if (!_draggingLeftPaddle)
-            _leftPaddle += Math.Clamp((_ballY - _leftPaddle) * .08, -1.6, 1.6);
-
-        _rightPaddle += Math.Clamp((_ballY - _rightPaddle) * .07, -1.45, 1.45);
-        _leftPaddle = Math.Clamp(_leftPaddle, PaddleMinCenter, PaddleMaxCenter);
-        _rightPaddle = Math.Clamp(_rightPaddle, PaddleMinCenter, PaddleMaxCenter);
-
-        if (BallOverlapsPaddle(_ballX, _ballY, 2, _leftPaddle) && _ballVelocityX < 0)
-        {
-            _ballX = 2 + PaddleHalfWidth + BallHalfWidth;
-            _ballVelocityX = Math.Abs(_ballVelocityX) + .015;
-        }
-        else if (BallOverlapsPaddle(_ballX, _ballY, 98, _rightPaddle) && _ballVelocityX > 0)
-        {
-            _ballX = 98 - PaddleHalfWidth - BallHalfWidth;
-            _ballVelocityX = -Math.Abs(_ballVelocityX) - .015;
-        }
-        else if (_ballX < -2)
-        {
-            _rightScore++;
-            ResetPong();
-        }
-        else if (_ballX > 102)
-        {
-            _leftScore++;
-            ResetPong();
-        }
-    }
-
-    private static bool BallOverlapsPaddle(double ballX, double ballY, double paddleX, double paddleY)
-    {
-        var ballLeft = ballX - BallHalfWidth;
-        var ballRight = ballX + BallHalfWidth;
-        var ballTop = ballY - BallHalfHeight;
-        var ballBottom = ballY + BallHalfHeight;
-        var paddleLeft = paddleX - PaddleHalfWidth;
-        var paddleRight = paddleX + PaddleHalfWidth;
-        var paddleTop = paddleY - PaddleHalfHeight;
-        var paddleBottom = paddleY + PaddleHalfHeight;
-
-        return ballLeft <= paddleRight
-            && ballRight >= paddleLeft
-            && ballTop <= paddleBottom
-            && ballBottom >= paddleTop;
-    }
-
-    private void BeginLeftDrag(PointerEventArgs _)
-    {
-        if (!_idleActive) return;
-        _draggingLeftPaddle = true;
-    }
-
-    private void DragLeftPaddle(PointerEventArgs e)
-    {
-        if (!_draggingLeftPaddle) return;
-        _leftPaddle = Math.Clamp(_leftPaddle + (e.MovementY / 7.0), PaddleMinCenter, PaddleMaxCenter);
-    }
-
-    private void EndLeftDrag(PointerEventArgs _)
-    {
-        _draggingLeftPaddle = false;
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_shutdown is null) return;
-        await _shutdown.CancelAsync();
-        if (_loop is not null)
-        {
-            try { await _loop; } catch (OperationCanceledException) { }
-        }
-        _shutdown.Dispose();
-    }
+    public async ValueTask DisposeAsync(){_runtime.SoundTriggered-=OnSound;if(_shutdown is not null){await _shutdown.CancelAsync();if(_loop is not null){try{await _loop;}catch(OperationCanceledException){}}_shutdown.Dispose();}if(_audio is not null)await _audio.DisposeAsync();}
+    protected override async Task OnAfterRenderAsync(bool firstRender){if(firstRender)_audio=await JS.InvokeAsync<IJSObjectReference>("import","./js/pong-audio.js");}
 }

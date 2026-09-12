@@ -6,10 +6,12 @@ on:
       - feature/living-workshop-landing
       - feature/pong-microbundle-vertical-slice
       - feature/experience-core-architecture
+      - feature/pong-experience
   pull_request:
     branches:
       - feature/living-workshop-landing
       - feature/experience-core-architecture
+      - feature/pong-experience
 
 jobs:
   test:
