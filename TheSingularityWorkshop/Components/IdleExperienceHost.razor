@@ -46,12 +46,18 @@
 
     protected override void OnInitialized(){_shutdown=new CancellationTokenSource();_runtime.SoundTriggered+=OnSound;_loop=RunAsync(_shutdown.Token);}
 
+    /// <summary>Receives activity from the page shell so the idle Experience does not launch while the user is interacting with the gateway.</summary>
+    public void RegisterActivity()
+    {
+        _lastActivityUtc=DateTime.UtcNow;
+    }
+
     private async Task RunAsync(CancellationToken token){using var timer=new PeriodicTimer(TimeSpan.FromMilliseconds(33));try{while(await timer.WaitForNextTickAsync(token)){if(!_active&&DateTime.UtcNow-_lastActivityUtc>=IdleThreshold){_active=true;_runtime.Reset();await InvokeAsync(StateHasChanged);}if(_active){_runtime.Step();await InvokeAsync(StateHasChanged);}}}catch(OperationCanceledException)when(token.IsCancellationRequested){}}
 
     private async void OnSound(PongSoundEvent sound){if(sound==PongSoundEvent.None||_audio is null)return;try{await _audio.InvokeVoidAsync("play",sound.ToString().ToLowerInvariant());}catch(JSDisconnectedException){}}
-    private Task HandleKeyDown(KeyboardEventArgs e){if(!_active)return Task.CompletedTask;var key=e.Key.ToLowerInvariant();_runtime.SetInput(key is "arrowup" or "w",key is "arrowdown" or "s");return Task.CompletedTask;}
-    private Task HandleKeyUp(KeyboardEventArgs e){if(!_active)return Task.CompletedTask;var key=e.Key.ToLowerInvariant();if(key is "arrowup" or "w" or "arrowdown" or "s")_runtime.SetInput(false,false);return Task.CompletedTask;}
-    private void Exit(){_active=false;_lastActivityUtc=DateTime.UtcNow;_runtime.SetInput(false,false);}
+    private Task HandleKeyDown(KeyboardEventArgs e){if(!_active)return Task.CompletedTask;RegisterActivity();var key=e.Key.ToLowerInvariant();_runtime.SetInput(key is "arrowup" or "w",key is "arrowdown" or "s");return Task.CompletedTask;}
+    private Task HandleKeyUp(KeyboardEventArgs e){if(!_active)return Task.CompletedTask;RegisterActivity();var key=e.Key.ToLowerInvariant();if(key is "arrowup" or "w" or "arrowdown" or "s")_runtime.SetInput(false,false);return Task.CompletedTask;}
+    private void Exit(){_active=false;RegisterActivity();_runtime.SetInput(false,false);}
 
     public async ValueTask DisposeAsync(){_runtime.SoundTriggered-=OnSound;if(_shutdown is not null){await _shutdown.CancelAsync();if(_loop is not null){try{await _loop;}catch(OperationCanceledException){}}_shutdown.Dispose();}if(_audio is not null)await _audio.DisposeAsync();}
     protected override async Task OnAfterRenderAsync(bool firstRender){if(firstRender)_audio=await JS.InvokeAsync<IJSObjectReference>("import","./js/pong-audio.js");}
