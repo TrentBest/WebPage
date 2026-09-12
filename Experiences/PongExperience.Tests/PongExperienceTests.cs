@@ -86,4 +86,44 @@ public sealed class PongExperienceTests
         Assert.Contains("Experience.Pong.Physics", groups);
         Assert.Contains("Experience.Pong.Presentation", groups);
     }
+
+    [Fact(DisplayName = "Pong_Runtime_Moves_The_Ball")]
+    public void Pong_Runtime_Moves_The_Ball()
+    {
+        var runtime = new PongExperienceRuntime(seed: 7);
+        var initialX = runtime.BallX;
+        var initialY = runtime.BallY;
+
+        runtime.Step();
+
+        Assert.NotEqual(initialX, runtime.BallX);
+        Assert.NotEqual(initialY, runtime.BallY);
+    }
+
+    [Fact(DisplayName = "Pong_Runtime_Accepts_Up_And_Down")]
+    public void Pong_Runtime_Accepts_Up_And_Down()
+    {
+        var runtime = new PongExperienceRuntime(seed: 7);
+        runtime.MovePlayer(-10);
+        var upPosition = runtime.PlayerPaddle;
+        runtime.MovePlayer(20);
+        var downPosition = runtime.PlayerPaddle;
+
+        Assert.True(upPosition < 50);
+        Assert.True(downPosition > upPosition);
+    }
+
+    [Fact(DisplayName = "Pong_Runtime_Emits_Sound_For_Collisions")]
+    public void Pong_Runtime_Emits_Sound_For_Collisions()
+    {
+        var runtime = new PongExperienceRuntime(seed: 7);
+        var sounds = new List<PongSoundEvent>();
+        runtime.SoundTriggered += sounds.Add;
+
+        while (runtime.LastSound != PongSoundEvent.Wall && sounds.Count == 0)
+            runtime.Step();
+
+        Assert.NotEmpty(sounds);
+        Assert.Contains(PongSoundEvent.Wall, sounds);
+    }
 }
