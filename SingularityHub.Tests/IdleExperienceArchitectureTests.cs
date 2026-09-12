@@ -82,9 +82,6 @@ public sealed class IdleExperienceArchitectureTests
 
         var newborn = context.LivingNodes[^1];
 
-        // The newborn is thrown from the parent's current position, but it has
-        // an independent destination and remains at absolute seed size until
-        // the flight completes.
         Assert.Equal(6, newborn.Size);
         Assert.Equal(newborn.SeedX, newborn.X);
         Assert.Equal(newborn.SeedY, newborn.Y);
@@ -150,32 +147,25 @@ public sealed class IdleExperienceArchitectureTests
     {
         using var fsm = new PageFSM();
 
-        // 1. Gateway exists before user input.
         Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
         Assert.False(fsm.Context.LivingGuiPopulated);
         Assert.False(fsm.Context.MonikerReady);
 
-        // 2. Click immediately leaves the gateway, but does not skip its exit state.
         fsm.RequestEnter();
         Assert.Equal(PageFSM.GatewayExit, fsm.CurrentState);
         Assert.Empty(fsm.Context.LivingNodes);
 
-        // 3. One heartbeat exits the gateway into Living GUI ignition.
-        // The target state is not entered until its next heartbeat.
         fsm.Update();
         Assert.Equal(PageFSM.LivingGuiIgnition, fsm.CurrentState);
         Assert.Empty(fsm.Context.LivingNodes);
         Assert.False(fsm.Context.MonikerReady);
 
-        // 4. The next heartbeat enters ignition, creates exactly one centered seed,
-        // and then transitions into population. Nothing may reveal the moniker yet.
         fsm.Update();
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
         Assert.Single(fsm.Context.LivingNodes);
         Assert.False(fsm.Context.MonikerReady);
         Assert.False(fsm.Context.LivingGuiFrozen);
 
-        // 5. Population must reach exactly 100 before the moniker state can exist.
         var guard = 0;
         while (fsm.CurrentState == PageFSM.LivingGuiPopulating && guard++ < 5000)
             fsm.Update();
@@ -187,8 +177,6 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.LivingGuiPopulated);
         Assert.False(fsm.Context.MonikerReady);
 
-        // 6. MONIKER_REVEAL is a sequencing boundary only. Its heartbeat enters
-        // GRAVITY, where the moniker becomes visibly ready.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
@@ -196,8 +184,6 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.LivingGuiFrozen);
         Assert.Equal(1, fsm.Context.StateTicks);
 
-        // 7. Gravity owns the moniker presentation window. It must not arrive at the
-        // navigation state early. 91 ticks at the 33 ms page update rate ~= 3 seconds.
         for (var tick = 2; tick <= 90; tick++)
         {
             fsm.Update();
@@ -205,7 +191,6 @@ public sealed class IdleExperienceArchitectureTests
             Assert.Equal(tick, fsm.Context.StateTicks);
         }
 
-        // 8. The 91st gravity heartbeat ends the three-second presentation window.
         fsm.Update();
         Assert.Equal(PageFSM.NavigationArrival, fsm.CurrentState);
         Assert.Equal(91, fsm.Context.StateTicks);
@@ -216,10 +201,10 @@ public sealed class IdleExperienceArchitectureTests
     {
         using (var fsm = new PageFSM())
         {
-            Assert.Equal(1, FSM_API.Internal.GetFSMHandleCountInGroup(PageFSM.ProcessingGroup));
+            Assert.Equal(1, FSM_API.Internal.GetFSMHandleCountInGroup(fsm.InstanceProcessingGroup));
         }
 
-        Assert.Equal(0, FSM_API.Internal.GetFSMHandleCountInGroup(PageFSM.ProcessingGroup));
+        Assert.Equal(0, FSM_API.Internal.GetFSMHandleCountInGroup(fsm.InstanceProcessingGroup));
     }
 
     [Fact(DisplayName = "Incremental Unit Test 08 — PageFSM Update advances only its owning handle")]
@@ -300,7 +285,6 @@ public sealed class IdleExperienceArchitectureTests
     [Fact(DisplayName = "Flex Living GUI reaches the first count beyond one hundred within six generations")]
     public void FlexLivingGui_ReachesBeyondOneHundred()
     {
-        // 1 + 2 + 4 + 8 + 16 + 32 + 64 = 127 manifested nodes.
         var total = Enumerable.Range(0, 7).Sum(generation => 1 << generation);
         Assert.Equal(127, total);
         Assert.True(total >= 100);
