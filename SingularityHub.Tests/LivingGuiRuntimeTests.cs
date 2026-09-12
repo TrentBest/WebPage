@@ -60,6 +60,9 @@ public sealed class LivingGuiRuntimeTests
         Assert.NotEqual((startX, startY), (root.X, root.Y));
 
         fsm.Update();
+        Assert.Equal(72, root.Size);
+
+        fsm.Update();
         Assert.Equal(96, root.Size);
     }
 
