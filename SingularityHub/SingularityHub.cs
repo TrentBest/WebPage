@@ -32,51 +32,37 @@ public sealed class SingularityHub : ISingularityHub
         Audit = new ArbitrationAudit();
     }
 
-    /// <summary>Bundles retained by the Hub after dependency validation.</summary>
     public IReadOnlyCollection<IMicroBundle> LoadedBundles => _loadedBundles;
-
-    /// <summary>Arbitration mutation history retained for inspection and undo tooling.</summary>
     public IArbitrationAudit Audit { get; }
-
-    /// <summary>Process groups registered with this Hub in registration order.</summary>
     public IReadOnlyList<ProcessGroupRegistration> ProcessGroups => _registrations;
 
-    /// <summary>Currently active process groups.</summary>
     public IReadOnlyCollection<ProcessGroupSnapshot> ActiveGroups =>
         _processGroups
             .Where(pair => pair.Value == ProcessGroupState.Active)
             .Select(pair => new ProcessGroupSnapshot(pair.Key, pair.Value))
             .ToArray();
 
-    /// <summary>Registers a process group with the Hub scheduler.</summary>
     public SingularityHub RegisterProcessGroup(string processGroup, string? parentProcessGroup = null)
     {
         if (string.IsNullOrWhiteSpace(processGroup))
             throw new ArgumentException("A process group name is required.", nameof(processGroup));
-
         if (_registrations.Exists(x => x.Name == processGroup))
             throw new InvalidOperationException($"Process group '{processGroup}' is already registered.");
-
         if (parentProcessGroup is not null && !_registrations.Exists(x => x.Name == parentProcessGroup))
             throw new InvalidOperationException($"Parent process group '{parentProcessGroup}' must be registered first.");
-
         _registrations.Add(new ProcessGroupRegistration(processGroup, parentProcessGroup));
         return this;
     }
 
-    /// <summary>Registers several root process groups fluently.</summary>
     public SingularityHub RegisterProcessGroups(params string[] processGroups)
     {
         if (processGroups is null)
             throw new ArgumentNullException(nameof(processGroups));
-
         foreach (var processGroup in processGroups)
             RegisterProcessGroup(processGroup);
-
         return this;
     }
 
-    /// <summary>Steps only Hub-owned root process groups.</summary>
     public void Update()
     {
         foreach (var registration in _registrations)
@@ -86,12 +72,10 @@ public sealed class SingularityHub : ISingularityHub
         }
     }
 
-    /// <summary>Steps only the direct nested children of an owning process group.</summary>
     public void UpdateNestedProcessGroups(string parentProcessGroup)
     {
         if (string.IsNullOrWhiteSpace(parentProcessGroup))
             throw new ArgumentException("A parent process group name is required.", nameof(parentProcessGroup));
-
         foreach (var registration in _registrations)
         {
             if (registration.ParentName == parentProcessGroup)
@@ -99,56 +83,53 @@ public sealed class SingularityHub : ISingularityHub
         }
     }
 
+    /// <summary>
+    /// Steps one explicitly registered process group without implicitly stepping
+    /// its siblings or children. This is the scheduler boundary used when a
+    /// parent FSM selects exactly one nested runtime pipeline for the heartbeat.
+    /// </summary>
+    public void UpdateProcessGroup(string processGroup)
+    {
+        if (string.IsNullOrWhiteSpace(processGroup))
+            throw new ArgumentException("A process group name is required.", nameof(processGroup));
+        if (!_registrations.Exists(x => x.Name == processGroup))
+            throw new InvalidOperationException($"Process group '{processGroup}' is not registered.");
+        _update(processGroup);
+    }
+
     public bool LoadBundle(IMicroBundle bundle)
     {
         if (bundle is null)
             throw new ArgumentNullException(nameof(bundle));
-
         if (_loadedBundles.Any(existing => existing.Id == bundle.Id))
             return false;
-
         foreach (var dependency in bundle.Dependencies)
         {
             if (_loadedBundles.All(existing => existing.Id != dependency))
                 return false;
         }
-
         _loadedBundles.Add(bundle);
         _loadedBundles.Sort((left, right) => left.Id.CompareTo(right.Id));
         return true;
     }
 
-    /// <summary>
-    /// Runs bounded arbitration rounds. The return value is the number of
-    /// bundle mutations accepted across all rounds, not the number of rounds.
-    /// </summary>
     public int ExecuteArbitrationPipeline()
     {
         var mutations = 0;
-
         for (var round = 0; round < MaximumArbitrationRounds; round++)
         {
             var changedThisRound = false;
-
             foreach (var bundle in _loadedBundles.OrderBy(bundle => bundle.Id))
             {
                 if (!bundle.Arbitrate(this, round))
                     continue;
-
                 changedThisRound = true;
                 mutations++;
-                Audit.Record(new ArbitrationEvent(
-                    round,
-                    bundle.Id,
-                    bundle.Ontology.StructuralId,
-                    MutationType.StructuralMutation,
-                    0));
+                Audit.Record(new ArbitrationEvent(round, bundle.Id, bundle.Ontology.StructuralId, MutationType.StructuralMutation, 0));
             }
-
             if (!changedThisRound)
                 break;
         }
-
         return mutations;
     }
 
@@ -162,7 +143,6 @@ public sealed class SingularityHub : ISingularityHub
     {
         if (_processGroups.ContainsKey(id))
             return false;
-
         _processGroups[id] = ProcessGroupState.Registered;
         return true;
     }
@@ -171,7 +151,6 @@ public sealed class SingularityHub : ISingularityHub
     {
         if (!_processGroups.TryGetValue(id, out var state) || state != ProcessGroupState.Registered)
             return false;
-
         _processGroups[id] = ProcessGroupState.Active;
         return true;
     }
@@ -180,21 +159,16 @@ public sealed class SingularityHub : ISingularityHub
     {
         if (!_processGroups.TryGetValue(id, out var state) || state != ProcessGroupState.Active)
             return false;
-
         _processGroups[id] = ProcessGroupState.Completed;
         return true;
     }
 
-    /// <summary>Immutable description of one registered scheduler process group.</summary>
     public sealed record ProcessGroupRegistration(string Name, string? ParentName);
 }
 
-/// <summary>Ordered, append-only arbitration audit used by the Hub contract.</summary>
 public sealed class ArbitrationAudit : IArbitrationAudit
 {
     private readonly List<ArbitrationEvent> _events = new();
-
     public IReadOnlyList<ArbitrationEvent> Events => _events;
-
     public void Record(ArbitrationEvent arbitrationEvent) => _events.Add(arbitrationEvent);
 }
