@@ -10,14 +10,10 @@ namespace TheSingularityWorkshop.Services
     /// </summary>
     public sealed class PageStateContext : IStateContext
     {
-        /// <summary>
-        /// The exact narrative threshold at which the living GUI freezes and the Workshop
-        /// moniker becomes eligible for presentation. This is intentionally public so all
-        /// presentation and tests consume one source of truth.
-        /// </summary>
         public const int CriticalMass = 100;
 
         private const double SeedSize = 6;
+        private const double DefaultNodeSize = 48;
         private const double MaximumNodeSize = 96;
         private const double MinX = 8;
         private const double MaxX = 92;
@@ -58,8 +54,11 @@ namespace TheSingularityWorkshop.Services
         {
             if (_livingNodes.Count != 0) return;
 
+            // The first object is deliberately a literal G:0 seed. It is the root
+            // from which every later lineage can be read without an external index.
             _livingNodes.Add(new LivingNodeState(
-                "1", 1, 50, 50, SeedSize, 50, 50, 0, 4, 50, 50));
+                "G:0", 0, 50, 50, SeedSize, 50, 50, 0, 0, 50, 50,
+                growthReady: false, seedDoubled: false));
 
             LivingGuiFrozen = false;
             LivingGuiPopulated = false;
@@ -69,9 +68,9 @@ namespace TheSingularityWorkshop.Services
         }
 
         /// <summary>
-        /// Advances the swarm by one FSM heartbeat. At exactly <see cref="CriticalMass"/>
-        /// nodes, all GUI motion freezes and the moniker gate opens in the same state
-        /// mutation. There is no later gravity-dependent branding gate.
+        /// Advances one living seed at a time through the visual lifecycle:
+        /// seed -> double -> fly to a random point -> expand to default size -> grow
+        /// -> reproduce. The exact 100-node boundary freezes the field.
         /// </summary>
         public void AdvanceLivingGui()
         {
@@ -82,6 +81,15 @@ namespace TheSingularityWorkshop.Services
 
             foreach (var node in _livingNodes)
             {
+                // A new seed first visibly doubles before it is launched.
+                if (!node.SeedDoubled)
+                {
+                    node.Size = SeedSize * 2;
+                    node.SeedDoubled = true;
+                    continue;
+                }
+
+                // The doubled seed then travels like the Pong ball to its chosen point.
                 if (node.SeedTicks < node.SeedFlightDuration)
                 {
                     node.SeedTicks++;
@@ -91,11 +99,21 @@ namespace TheSingularityWorkshop.Services
                     continue;
                 }
 
+                // On arrival it expands to its normal/default GUI size.
+                if (!node.GrowthReady)
+                {
+                    node.Size = DefaultNodeSize;
+                    node.GrowthReady = true;
+                    continue;
+                }
+
+                // Then it grows. A completed node produces another seed carrying
+                // its own readable lineage: G:1 -> G:1-0, G:1-1; G:0 -> G:1, G:2...
                 node.Size *= 2;
 
                 if (node.Size >= MaximumNodeSize)
                 {
-                    node.Size = SeedSize;
+                    node.Size = DefaultNodeSize;
                     node.OffspringCount++;
                     newborns.Add(CreateSeed(node));
                 }
@@ -110,10 +128,6 @@ namespace TheSingularityWorkshop.Services
 
                 LivingGuiFrozen = true;
                 LivingGuiPopulated = true;
-
-                // Hard presentation contract: the Workshop moniker becomes eligible
-                // at the exact 100-node boundary and remains eligible until this page
-                // context is discarded.
                 MonikerReady = true;
             }
         }
@@ -123,8 +137,12 @@ namespace TheSingularityWorkshop.Services
             var (targetX, targetY) = NextChaoticPosition();
             var flightDuration = _random.Next(MinimumSeedFlightTicks, MaximumSeedFlightTicks + 1);
 
+            var lineage = parent.Generation == 0
+                ? $"G:{parent.OffspringCount}"
+                : $"{parent.Lineage}-{parent.OffspringCount - 1}";
+
             return new LivingNodeState(
-                $"{parent.Lineage}.{parent.OffspringCount}",
+                lineage,
                 parent.Generation + 1,
                 parent.X,
                 parent.Y,
@@ -134,7 +152,9 @@ namespace TheSingularityWorkshop.Services
                 0,
                 flightDuration,
                 targetX,
-                targetY);
+                targetY,
+                growthReady: false,
+                seedDoubled: false);
         }
 
         private (double X, double Y) NextChaoticPosition()
@@ -144,10 +164,6 @@ namespace TheSingularityWorkshop.Services
                 MinY + _random.NextDouble() * (MaxY - MinY));
         }
 
-        /// <summary>
-        /// Starts physics only after the critical-mass boundary has frozen the swarm.
-        /// The moniker gate is intentionally independent of gravity timing.
-        /// </summary>
         public void AdvanceGravity()
         {
             if (!LivingGuiFrozen)
@@ -177,7 +193,9 @@ namespace TheSingularityWorkshop.Services
                 int seedTicks,
                 int seedFlightDuration,
                 double targetX,
-                double targetY)
+                double targetY,
+                bool growthReady,
+                bool seedDoubled)
             {
                 Lineage = lineage;
                 Generation = generation;
@@ -190,6 +208,8 @@ namespace TheSingularityWorkshop.Services
                 SeedFlightDuration = seedFlightDuration;
                 TargetX = targetX;
                 TargetY = targetY;
+                GrowthReady = growthReady;
+                SeedDoubled = seedDoubled;
             }
 
             public string Lineage { get; }
@@ -204,6 +224,8 @@ namespace TheSingularityWorkshop.Services
             public int SeedFlightDuration { get; }
             public double TargetX { get; }
             public double TargetY { get; }
+            public bool GrowthReady { get; internal set; }
+            public bool SeedDoubled { get; internal set; }
             public double GravityVelocity { get; internal set; }
             public double Rotation { get; internal set; }
         }
