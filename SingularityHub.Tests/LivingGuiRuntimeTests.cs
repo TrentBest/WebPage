@@ -19,7 +19,13 @@ public sealed class LivingGuiRuntimeTests
         Assert.Empty(fsm.Context.LivingNodes);
 
         fsm.RequestEnter();
-        fsm.Update();
+
+        // GatewayExit is a real lifecycle phase. The living GUI seed is created
+        // by the LivingGuiIgnition state entry, so the contract must drive the
+        // page FSM through that boundary rather than assuming it happens in the
+        // same heartbeat as the gateway request.
+        for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
+            fsm.Update();
 
         Assert.NotEqual(PageFSM.Gateway, fsm.CurrentState);
         Assert.NotEmpty(fsm.Context.LivingNodes);
