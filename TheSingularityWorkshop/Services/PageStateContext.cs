@@ -6,11 +6,17 @@ namespace TheSingularityWorkshop.Services
 {
     /// <summary>
     /// Runtime data carried by the page-level FSM.
-    /// The living GUI swarm is state, not Razor-owned timing state.
+    /// The living GUI swarm and its presentation gates are state, not Razor-owned timing state.
     /// </summary>
     public sealed class PageStateContext : IStateContext
     {
-        private const int CriticalMass = 100;
+        /// <summary>
+        /// The exact narrative threshold at which the living GUI freezes and the Workshop
+        /// moniker becomes eligible for presentation. This is intentionally public so all
+        /// presentation and tests consume one source of truth.
+        /// </summary>
+        public const int CriticalMass = 100;
+
         private const double SeedSize = 6;
         private const double MaximumNodeSize = 96;
         private const double MinX = 8;
@@ -52,8 +58,6 @@ namespace TheSingularityWorkshop.Services
         {
             if (_livingNodes.Count != 0) return;
 
-            // The first living GUI is deliberately dead-center. Chaos begins only
-            // after the user has entered the experience and the first seed exists.
             _livingNodes.Add(new LivingNodeState(
                 "1", 1, 50, 50, SeedSize, 50, 50, 0, 4, 50, 50));
 
@@ -65,12 +69,9 @@ namespace TheSingularityWorkshop.Services
         }
 
         /// <summary>
-        /// Advances the swarm by one FSM heartbeat.
-        /// Newborn GUIs are thrown from their parent's location toward independent
-        /// destinations while remaining at seed size. Their throw duration is varied,
-        /// so the swarm never becomes a synchronized tree layout. Only after the throw
-        /// completes does the GUI enter its growth cycle. At maximum size it resets to
-        /// seed size and launches a new child. At 100 nodes, all living-GUI updates stop.
+        /// Advances the swarm by one FSM heartbeat. At exactly <see cref="CriticalMass"/>
+        /// nodes, all GUI motion freezes and the moniker gate opens in the same state
+        /// mutation. There is no later gravity-dependent branding gate.
         /// </summary>
         public void AdvanceLivingGui()
         {
@@ -90,9 +91,6 @@ namespace TheSingularityWorkshop.Services
                     continue;
                 }
 
-                // A living GUI doubles before it reproduces. The newborn is tiny and
-                // independent, so parent growth and child growth are intentionally out
-                // of phase with one another.
                 node.Size *= 2;
 
                 if (node.Size >= MaximumNodeSize)
@@ -112,6 +110,11 @@ namespace TheSingularityWorkshop.Services
 
                 LivingGuiFrozen = true;
                 LivingGuiPopulated = true;
+
+                // Hard presentation contract: the Workshop moniker becomes eligible
+                // at the exact 100-node boundary and remains eligible until this page
+                // context is discarded.
+                MonikerReady = true;
             }
         }
 
@@ -136,15 +139,14 @@ namespace TheSingularityWorkshop.Services
 
         private (double X, double Y) NextChaoticPosition()
         {
-            // Randomized, bounded destinations deliberately replace quadrant balancing.
-            // The result should feel alive rather than like a tree being laid out.
             return (
                 MinX + _random.NextDouble() * (MaxX - MinX),
                 MinY + _random.NextDouble() * (MaxY - MinY));
         }
 
         /// <summary>
-        /// Starts physics only after the moniker has been instantiated by the FSM.
+        /// Starts physics only after the critical-mass boundary has frozen the swarm.
+        /// The moniker gate is intentionally independent of gravity timing.
         /// </summary>
         public void AdvanceGravity()
         {
