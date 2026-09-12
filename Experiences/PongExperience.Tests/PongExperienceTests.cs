@@ -10,7 +10,6 @@ public sealed class PongExperienceTests
     public void Pong_Experience_Provides_Stable_Identity_And_Version()
     {
         var experience = new PongExperience();
-
         Assert.Equal(PongExperience.ExperienceId, experience.Id);
         Assert.Equal("PONG", experience.Name);
         Assert.Equal(new BundleVersion(1, 0, 0), experience.Version);
@@ -20,7 +19,6 @@ public sealed class PongExperienceTests
     public void Pong_Experience_Provides_Visual_Sound_And_Sensory_Systems()
     {
         var experience = new PongExperience();
-
         Assert.Contains(PongCapabilityIds.Visual, experience.Capabilities);
         Assert.Contains(PongCapabilityIds.Sound, experience.Capabilities);
         Assert.Contains(PongSenseIds.Sight, experience.SensorySystems);
@@ -31,9 +29,7 @@ public sealed class PongExperienceTests
     [Fact(DisplayName = "Pong_Experience_Contains_Input_Bundle")]
     public void Pong_Experience_Contains_Input_Bundle()
     {
-        var experience = new PongExperience();
-
-        Assert.Contains(PongMicroBundleIds.InputBehavior, experience.MicroBundleIds);
+        Assert.Contains(PongMicroBundleIds.InputBehavior, new PongExperience().MicroBundleIds);
     }
 
     [Fact(DisplayName = "Pong_Experience_Composes_Assets_Presentation_And_Behavior")]
@@ -41,7 +37,6 @@ public sealed class PongExperienceTests
     {
         var experience = new PongExperience();
         var bundles = PongMicroBundleCatalog.All;
-
         Assert.Equal(experience.MicroBundleIds.Count, bundles.Count);
         Assert.Contains(bundles, bundle => bundle.Kind == PongMicroBundleKind.Asset);
         Assert.Contains(bundles, bundle => bundle.Kind == PongMicroBundleKind.Presentation);
@@ -53,7 +48,6 @@ public sealed class PongExperienceTests
     {
         var visual = PongExperience.MicroBundles.Single(bundle => bundle.Id == PongMicroBundleIds.VisualPresentation);
         var sound = PongExperience.MicroBundles.Single(bundle => bundle.Id == PongMicroBundleIds.SoundPresentation);
-
         Assert.Contains(PongMicroBundleIds.ArenaAsset, visual.Dependencies);
         Assert.Contains(PongMicroBundleIds.PaddleAsset, visual.Dependencies);
         Assert.Contains(PongMicroBundleIds.BallAsset, visual.Dependencies);
@@ -66,7 +60,6 @@ public sealed class PongExperienceTests
     {
         var physics = PongExperience.MicroBundles.Single(bundle => bundle.Id == PongMicroBundleIds.BallPhysicsBehavior);
         var scoring = PongExperience.MicroBundles.Single(bundle => bundle.Id == PongMicroBundleIds.ScoreBehavior);
-
         Assert.Contains(PongMicroBundleIds.BallAsset, physics.Dependencies);
         Assert.Contains(PongMicroBundleIds.ArenaAsset, physics.Dependencies);
         Assert.Contains(PongMicroBundleIds.ScoreAsset, scoring.Dependencies);
@@ -77,11 +70,23 @@ public sealed class PongExperienceTests
     public void Pong_Experience_Exposes_Three_Hub_Process_Groups()
     {
         var experience = new PongExperience();
-
         Assert.Equal(3, experience.ProcessingGroups.Count);
         Assert.Contains("Experience.Pong.Input", experience.ProcessingGroups);
         Assert.Contains("Experience.Pong.Physics", experience.ProcessingGroups);
         Assert.Contains("Experience.Pong.Presentation", experience.ProcessingGroups);
+    }
+
+    [Fact(DisplayName = "Pong_Experience_Is_Explicitly_Admitted_To_Idle")]
+    public void Pong_Experience_Is_Explicitly_Admitted_To_Idle()
+        => Assert.IsAssignableFrom<IIdleExperience>(new PongExperience());
+
+    [Fact(DisplayName = "Pong_Experience_Bundles_Inherit_Experience_Ontology")]
+    public void Pong_Experience_Bundles_Inherit_Experience_Ontology()
+    {
+        var experience = new PongExperience();
+        foreach (var bundle in PongMicroBundleCatalog.All)
+            for (var layer = 0; layer < 8; layer++)
+                Assert.Equal(experience.Ontology[layer], bundle.Ontology[layer]);
     }
 
     [Fact(DisplayName = "Pong_Runtime_Executes_Physics")]
@@ -90,9 +95,7 @@ public sealed class PongExperienceTests
         var runtime = new PongExperienceRuntime(seed: 7);
         var initialX = runtime.BallX;
         var initialY = runtime.BallY;
-
         runtime.Step();
-
         Assert.NotEqual(initialX, runtime.BallX);
         Assert.NotEqual(initialY, runtime.BallY);
     }
@@ -105,7 +108,6 @@ public sealed class PongExperienceTests
         var upPosition = runtime.PlayerPaddle;
         runtime.MovePlayer(20);
         var downPosition = runtime.PlayerPaddle;
-
         Assert.True(upPosition < 50);
         Assert.True(downPosition > upPosition);
     }
@@ -116,11 +118,69 @@ public sealed class PongExperienceTests
         var runtime = new PongExperienceRuntime(seed: 7);
         var sounds = new List<PongSoundEvent>();
         runtime.SoundTriggered += sounds.Add;
-
         while (sounds.Count == 0)
             runtime.Step();
-
-        Assert.NotEmpty(sounds);
         Assert.Contains(sounds, sound => sound is PongSoundEvent.Wall or PongSoundEvent.Paddle or PongSoundEvent.Score);
+    }
+
+    [Fact(DisplayName = "Pong_Experience_Loads_From_Integer_Identity_And_Retains_All_Bundles")]
+    public void Pong_Experience_Loads_From_Integer_Identity_And_Retains_All_Bundles()
+    {
+        var experiences = new ExperienceRegistry();
+        var bundles = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
+        experiences.Register(new PongExperience());
+        foreach (var bundle in PongMicroBundleCatalog.All)
+            bundles.Register(bundle);
+
+        var host = new ExperienceRuntimeHost(new ExperienceLoader(experiences, bundles));
+        var loaded = host.Activate(PongExperience.ExperienceId, requireIdle: true);
+
+        Assert.True(loaded.IsReady);
+        Assert.Equal(PongMicroBundleCatalog.All.Count, loaded.Bundles.Count);
+        Assert.Equal(PongMicroBundleCatalog.All.Count, loaded.DependencyOrder.Count);
+        Assert.True(host.IsActive(PongExperience.ExperienceId));
+    }
+
+    [Fact(DisplayName = "Pong_Experience_Resolves_Deep_Dependencies_Before_Consumers")]
+    public void Pong_Experience_Resolves_Deep_Dependencies_Before_Consumers()
+    {
+        var experiences = new ExperienceRegistry();
+        var bundles = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
+        experiences.Register(new PongExperience());
+        foreach (var bundle in PongMicroBundleCatalog.All)
+            bundles.Register(bundle);
+
+        var result = new ExperienceLoader(experiences, bundles).Load(PongExperience.ExperienceId);
+        var order = result.DependencyOrder.ToList();
+
+        Assert.True(result.IsLoadable);
+        Assert.True(order.IndexOf(PongMicroBundleIds.BallPhysicsBehavior) < order.IndexOf(PongMicroBundleIds.ScoreBehavior));
+        Assert.True(order.IndexOf(PongMicroBundleIds.ScoreAsset) < order.IndexOf(PongMicroBundleIds.ScoreBehavior));
+    }
+
+    [Fact(DisplayName = "Pong_MicroBundles_Are_Queryable_Through_The_Ontology_Index")]
+    public void Pong_MicroBundles_Are_Queryable_Through_The_Ontology_Index()
+    {
+        var registry = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
+        foreach (var bundle in PongMicroBundleCatalog.All)
+            registry.Register(bundle);
+        var matches = registry.FindByOntologyLayer(0, 7);
+        Assert.Equal(PongMicroBundleCatalog.All.Count, matches.Count);
+        Assert.Contains(matches, bundle => bundle.Id == PongMicroBundleIds.BallAsset);
+    }
+
+    [Fact(DisplayName = "Pong_Experience_Fails_Load_When_A_Required_Bundle_Is_Missing")]
+    public void Pong_Experience_Fails_Load_When_A_Required_Bundle_Is_Missing()
+    {
+        var experiences = new ExperienceRegistry();
+        var bundles = new TheSingularityWorkshop.Workshop.Experiences.MicroBundleRegistry();
+        experiences.Register(new PongExperience());
+        foreach (var bundle in PongMicroBundleCatalog.All.Where(bundle => bundle.Id != PongMicroBundleIds.BallAsset))
+            bundles.Register(bundle);
+
+        var result = new ExperienceLoader(experiences, bundles).Load(PongExperience.ExperienceId);
+
+        Assert.False(result.IsLoadable);
+        Assert.Contains(result.Errors, error => error.Contains(PongMicroBundleIds.BallAsset.ToString()));
     }
 }
