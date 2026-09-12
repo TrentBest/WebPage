@@ -8,6 +8,62 @@ They are **not UI components**.
 That distinction matters because the Workshop is separating what a piece of software
 *does* from how a particular host chooses to *show it*.
 
+## Recursive composition
+
+A MicroBundle may contain other MicroBundles, and those children may themselves contain
+children without a fixed authored depth. A domain is therefore not a special container
+concept: **a domain can itself be a MicroBundle** and can master the bundles beneath it.
+
+Composition is resolved during Development. The compiler validates missing children and
+cycles, deduplicates shared children, and emits a deterministic finite closure. Runtime
+receives that compiled closure rather than recursively discovering definitions.
+
+```text
+Authored MicroBundle
+        |
+        +--> MicroBundle
+        |       +--> MicroBundle
+        |       +--> MicroBundle
+        |
+        +--> MicroBundle
+                +--> ...
+        |
+        v
+Development compiler
+        |
+        v
+finite static runtime closure
+```
+
+This gives us the useful combination:
+
+> **Composition is recursive. Compilation is finite. Runtime is static.**
+
+## Ontology addressing
+
+MicroBundles are also addressable through the Hub's nine-layer integer
+`OntologySignature`. The ontology coordinate is semantic identity, not a folder tree.
+
+The first ontology-backed library establishes broad families such as:
+
+```text
+Software Abstractions
+Digital Logic
+Physics
+    +-- Newtonian
+    +-- Electricity and Magnetism
+    +-- Thermodynamics
+    +-- Hydrodynamics
+    +-- Plasmadynamics
+```
+
+Physics topics occupy the **ninth ontology layer**. Their final-layer tokens are globally
+unique across the physics families, so a token identifies a topic without becoming a
+per-family slot that collides with the same numeric value elsewhere.
+
+The important rule is that all nine coordinates remain available even when a particular
+library branch has not yet assigned semantic meaning to every intermediate layer.
+
 ## Current lifecycle model
 
 The runtime shell uses `FSM_API` through `IStateContext` and delegates visible
@@ -25,7 +81,7 @@ MicroBundle
 
 ## Living Workshop application
 
-The landing page is now a direct experiment in the same separation:
+The landing page is a direct experiment in the same separation:
 
 ```text
 GATEWAY
@@ -59,31 +115,9 @@ The landing behavior is deliberately not implemented as a collection of CSS time
 `FSMManagerService` supplies the application heartbeat; `PageFSM` owns progression;
 the LivingGui and Gravity scheduler groups are separate runtime units.
 
-## Reusable animation direction
-
-Animations are a natural next MicroBundle category.
-
-For example, a future animation bundle could describe:
-
-```text
-BreathingGlow
-PushThroughScreen
-SpawnAndTravel
-KelpSway
-PanelContract
-```
-
-The semantic bundle should say what happens and expose state/progress. A provider
-translates that behavior into CSS, SVG, Unity transforms, WPF animations, or another
-host mechanism.
-
-That lets the same animation capability be requested by multiple manifestations
-without making the bundle itself know that a browser exists.
-
 ## Addressing: ontology + integer variant
 
-The Hub already defines a nine-layer `OntologySignature`. A concrete MicroBundle
-address adds an integer variant slot:
+A concrete MicroBundle address can add an integer variant slot to the nine-layer ontology:
 
 ```text
 OntologySignature (9 integer layers)
@@ -135,10 +169,6 @@ any Workshop host
 resolve address -> retrieve version -> verify -> load -> arbitrate
 ```
 
-The important constraint is that publication must be **address-first and globally
-unique**, not "last writer wins". Once an exact address is occupied, a second
-publisher must receive a collision rather than silently replacing the first bundle.
-
 Persistence, authentication/ownership, package storage, versioning, trust/signing,
 and CDN retrieval belong behind this boundary. Do not leak those concerns into the
 presentation components.
@@ -160,6 +190,12 @@ MicroBundle should not become permanently dependent on its first host.
 Strings remain useful for people, authoring, debugging, and communication. Runtime
 identity and AI-facing transport should increasingly use deterministic integer
 coordinates where appropriate.
+
+### Preserve recursive composition
+
+Do not introduce a separate Domain abstraction merely to hold MicroBundles. If something
+masters a collection of lesser MicroBundles, model that master as a MicroBundle and let
+the development compiler flatten its recursive composition.
 
 ### Document architectural direction
 
