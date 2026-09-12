@@ -120,6 +120,20 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(newborn.X != initialX || newborn.Y != initialY);
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 02 — entering the Workshop leaves the gateway immediately")]
+    public void IncrementalUnitTest02_EnteringWorkshopLeavesGatewayImmediately()
+    {
+        using var fsm = new PageFSM();
+
+        Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
+        Assert.False(fsm.Context.EnterRequested);
+
+        fsm.RequestEnter();
+
+        Assert.True(fsm.Context.EnterRequested);
+        Assert.Equal(PageFSM.GatewayExit, fsm.CurrentState);
+    }
+
     [Fact(DisplayName = "Living GUI freezes exactly at critical mass and stops updating")]
     public void LivingGui_FreezesAtOneHundred()
     {
