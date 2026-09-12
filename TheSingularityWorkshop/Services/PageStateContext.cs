@@ -15,6 +15,7 @@ namespace TheSingularityWorkshop.Services
         private const double SeedSize = 18;
         private const double DefaultNodeSize = 48;
         private const double MaximumNodeSize = 96;
+        private const double GrowthStep = 24;
         private const double MinX = 8;
         private const double MaxX = 92;
         private const double MinY = 10;
@@ -54,7 +55,6 @@ namespace TheSingularityWorkshop.Services
         {
             if (_livingNodes.Count != 0) return;
 
-            // One visible label starts the whole sequence.
             _livingNodes.Add(new LivingNodeState(
                 "G:0", 0, 50, 50, SeedSize, 50, 50, 0, 0, 50, 50,
                 growthReady: false, seedDoubled: false));
@@ -69,7 +69,8 @@ namespace TheSingularityWorkshop.Services
         /// <summary>
         /// Advances one living seed at a time through the visual lifecycle:
         /// seed -> double -> fly to a random point -> expand to default size -> grow
-        /// -> reproduce. The exact 100-node boundary freezes the field.
+        /// -> reproduce. Growth advances in visible steps from 48 to 72 to 96.
+        /// The exact 100-node boundary freezes the field.
         /// </summary>
         public void AdvanceLivingGui()
         {
@@ -103,7 +104,7 @@ namespace TheSingularityWorkshop.Services
                     continue;
                 }
 
-                node.Size *= 2;
+                node.Size += GrowthStep;
 
                 if (node.Size >= MaximumNodeSize)
                 {
