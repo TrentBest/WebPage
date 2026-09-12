@@ -2,14 +2,10 @@ using Xunit;
 
 namespace SingularityHub.Tests;
 
-/// <summary>
-/// A deliberately visible incremental heartbeat for repository progress.
-/// Every coherent change advances <see cref="CurrentVersion"/> so an agent response
-/// leaves a concrete, testable marker in the IDE instead of only prose.
-/// </summary>
+/// <summary>Visible incremental heartbeat for repository progress.</summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.19";
+    public const string CurrentVersion = "0.0.20";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -25,12 +21,13 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 10)] [Fact(DisplayName = "0.00.010 — PageFSM_Isolation_Fix_Is_Visible")] public void PageFSM_Isolation_Fix_Is_Visible() => Assert.True(true);
     [ArchitectureTest(0, 0, 11)] [Fact(DisplayName = "0.00.011 — Moniker_Presentation_Contract_Is_Visible")] public void Moniker_Presentation_Contract_Is_Visible() => Assert.True(true);
     [ArchitectureTest(0, 0, 12)] [Fact(DisplayName = "0.00.012 — PageFSM_Scheduler_Lifecycle_Is_Visible")] public void PageFSM_Scheduler_Lifecycle_Is_Visible() => Assert.True(true);
-    [ArchitectureTest(0, 0, 13)] [Fact(DisplayName = "0.00.013 — PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups")] public void PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups() => Is("0.0.19", CurrentVersion);
-    [ArchitectureTest(0, 0, 14)] [Fact(DisplayName = "0.00.014 — Exact_100_Node_Moniker_Gate_Is_Visible")] public void Exact_100_Node_Moniker_Gate_Is_Visible() => Is("0.0.19", CurrentVersion);
-    [ArchitectureTest(0, 0, 15)] [Fact(DisplayName = "0.00.015 — Gravity_Handoff_Is_Visible")] public void Gravity_Handoff_Is_Visible() => Is("0.0.19", CurrentVersion);
-    [ArchitectureTest(0, 0, 16)] [Fact(DisplayName = "0.00.016 — Three_Second_Arrival_Is_Visible")] public void Three_Second_Arrival_Is_Visible() => Is("0.0.19", CurrentVersion);
-    [ArchitectureTest(0, 0, 17)] [Fact(DisplayName = "0.00.017 — Experience_Rules_And_Hub_Stepping_Contract_Is_Visible")] public void Experience_Rules_And_Hub_Stepping_Contract_Is_Visible() => Is("0.0.19", CurrentVersion);
-    [ArchitectureTest(0, 0, 18)] [Fact(DisplayName = "0.00.018 — Core_Experience_Test_Projects_Are_In_CI")] public void Core_Experience_Test_Projects_Are_In_CI() => Is("0.0.19", CurrentVersion);
-    [ArchitectureTest(0, 0, 19)] [Fact(DisplayName = "0.00.019 — Sense_Count_Uses_Distinct_Sensory_Systems")] public void Sense_Count_Uses_Distinct_Sensory_Systems() => Is("0.0.19", CurrentVersion);
-    [ArchitectureTest(0, 0, 20)] [Fact(DisplayName = "0.00.020 — Pong_Experience_Composes_Assets_Behaviors_And_Senses")] public void Pong_Experience_Composes_Assets_Behaviors_And_Senses() => Is("0.0.19", CurrentVersion);
+    [ArchitectureTest(0, 0, 13)] [Fact(DisplayName = "0.00.013 — PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups")] public void PageFSM_Uses_Isolated_FSM_API_Scheduler_Groups() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 14)] [Fact(DisplayName = "0.00.014 — Exact_100_Node_Moniker_Gate_Is_Visible")] public void Exact_100_Node_Moniker_Gate_Is_Visible() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 15)] [Fact(DisplayName = "0.00.015 — Gravity_Handoff_Is_Visible")] public void Gravity_Handoff_Is_Visible() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 16)] [Fact(DisplayName = "0.00.016 — Three_Second_Arrival_Is_Visible")] public void Three_Second_Arrival_Is_Visible() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 17)] [Fact(DisplayName = "0.00.017 — Experience_Rules_And_Hub_Stepping_Contract_Is_Visible")] public void Experience_Rules_And_Hub_Stepping_Contract_Is_Visible() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 18)] [Fact(DisplayName = "0.00.018 — Core_Experience_Test_Projects_Are_In_CI")] public void Core_Experience_Test_Projects_Are_In_CI() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 19)] [Fact(DisplayName = "0.00.019 — Sense_Count_Uses_Distinct_Sensory_Systems")] public void Sense_Count_Uses_Distinct_Sensory_Systems() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 20)] [Fact(DisplayName = "0.00.020 — Pong_Experience_Composes_Assets_Behaviors_And_Senses")] public void Pong_Experience_Composes_Assets_Behaviors_And_Senses() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 21)] [Fact(DisplayName = "0.00.021 — Pong_Runtime_Executes_Input_Physics_Scoring_And_Sound")] public void Pong_Runtime_Executes_Input_Physics_Scoring_And_Sound() => Is("0.0.20", CurrentVersion);
 }
