@@ -107,7 +107,22 @@ public static class OntologyMicroBundleCatalog
         };
 
         for (var i = 0; i < topics.Length; i++)
-            b.Add(Create(prefix + (ulong)(i + 1), $"{name}: {topics[i]}", OntologyFamilies.Physics, family, 1, i + 1));
+        {
+            // The topic token is deliberately placed at the ninth ontology layer. The
+            // intermediate layers remain available for future semantic refinement.
+            b.Add(Create(
+                prefix + (ulong)(i + 1),
+                $"{name}: {topics[i]}",
+                OntologyFamilies.Physics,
+                family,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                i + 1));
+        }
     }
 
     private static IMicroBundle Create(ulong id, string name, params int[] layers)
