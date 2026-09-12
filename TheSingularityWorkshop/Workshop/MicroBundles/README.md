@@ -1,229 +1,171 @@
 # MicroBundles
 
 MicroBundles are a current **architectural experiment** in The Singularity Workshop.
-They are intentionally small, independently schedulable units of behavior.
+They are independently schedulable units of behavior.
 
 They are **not UI components**.
 
-That distinction matters because the Workshop is trying to separate what a piece of
-software *is doing* from how a particular host chooses to *show it*.
+That distinction matters because the Workshop is separating what a piece of software
+*does* from how a particular host chooses to *show it*.
 
-The current lifecycle model uses `FSM_API` through `IStateContext`. A MicroBundle
-carries state/lifecycle information and delegates visible manifestation to an
-`IMicroBundleProvider`.
+## Current lifecycle model
+
+The runtime shell uses `FSM_API` through `IStateContext` and delegates visible
+manifestation to an `IMicroBundleProvider`.
 
 ```text
 MicroBundle
     |
     +-- IStateContext
-    |      +-- Phase
-    |      +-- ParentId
-    |      +-- Generation
-    |
     +-- FSM_API lifecycle
-    |
     +-- IMicroBundleProvider
            |
            +-- Manifestation
 ```
 
-## Why this exists
+## Living Workshop application
 
-The larger Workshop needs to operate across different manifestation domains.
-A behavior should therefore be able to describe **what is happening** without
-assuming that the answer is HTML, CSS, WPF, Unity, WebGL, TTS, or another host.
-
-For example, a semantic effect such as:
+The landing page is now a direct experiment in the same separation:
 
 ```text
-Trace
-Breathe
-Collapse
-```
-
-should not require the MicroBundle itself to understand CSS animation. The provider
-owns that translation.
-
-This is the same general separation the Workshop is pursuing elsewhere:
-
-```text
-SEMANTICS
+GATEWAY
    |
    v
-STATE / IDENTITY
+LIVING GUI
+   |
+   +-- isolated LivingGui FSM_API group
+   |      Seed -> Grow -> Reproduce -> Fly
+   |
+   +-- exactly 100
+   |      -> freeze group
    |
    v
-MANIFESTATION
+MONIKER behind GUI
+   |
+   v
+preallocated Gravity FSM_API group
+   |
+   v
+FALL AWAY
+   |
+   v
+3 second dissipating phase
+   |
+   v
+browser chrome / page arrival
 ```
 
-## Relationship to the living landing page
+The landing behavior is deliberately not implemented as a collection of CSS timers.
+`FSMManagerService` supplies the application heartbeat; `PageFSM` owns progression;
+the LivingGui and Gravity scheduler groups are separate runtime units.
 
-The Workshop landing experience is deliberately becoming a test case for this idea.
+## Reusable animation direction
 
-A GUI control can begin as an ordinary interface element and become a living
-behavior:
+Animations are a natural next MicroBundle category.
+
+For example, a future animation bundle could describe:
 
 ```text
-Seed
-  |
-  v
-Grow
-  |
-  v
-Live
-  |
-  v
-Reproduce
-  |
-  +----> child begins its own lifecycle
-  |
-  v
-Critical Mass
-  |
-  v
-Freeze
-  |
-  v
-Collapse / Gravity
+BreathingGlow
+PushThroughScreen
+SpawnAndTravel
+KelpSway
+PanelContract
 ```
 
-The current landing experiment now introduces another deterministic behavior before
-that living GUI appears:
+The semantic bundle should say what happens and expose state/progress. A provider
+translates that behavior into CSS, SVG, Unity transforms, WPF animations, or another
+host mechanism.
+
+That lets the same animation capability be requested by multiple manifestations
+without making the bundle itself know that a browser exists.
+
+## Addressing: ontology + integer variant
+
+The Hub already defines a nine-layer `OntologySignature`. A concrete MicroBundle
+address adds an integer variant slot:
 
 ```text
-Wait ~10 seconds
-      |
-      v
-Pong
-      |
-      | FSM_API
-      | cyan = visitor
-      | magenta = machine
-      v
-Living GUI
+OntologySignature (9 integer layers)
+        +
+VariantId [0, int.MaxValue - 1]
+        =
+MicroBundleAddress
 ```
 
-The Pong phase is implemented in `Components/PongField.razor`. It is intentionally
-part of the Workshop's architecture demonstration rather than a standalone game.
+Each ontology coordinate therefore has `int.MaxValue` addressable variant slots.
+An **exact address has one occupant**. Variant `42` and variant `43` may both exist
+under the same ontology; two publishers cannot both claim `(ontology, 42)`.
 
-The current WebPage implementation is still experimental. Do not assume that the
-landing page's timer or rendering code represents the final MicroBundle architecture.
-The behavior is the important artifact; the implementation is still being forged.
+The current code makes this boundary explicit:
 
-## Observable behavior
+- `SingularityHub.Abstractions/MicroBundleAddress.cs` — value/address contract.
+- `SingularityHub/MicroBundleRegistry.cs` — in-process one-occupant rule.
+- `SingularityHub.Tests/MicroBundleAddressTests.cs` — executable uniqueness proof.
 
-The next landing enhancement is a scrolling feed of facts derived from the actual
-runtime/codebase. The purpose is to let the interface explain itself without turning
-into a conventional instruction panel.
+This is intentionally separate from `OntologySignature.StructuralId`. The ontology
+identifies the structural kind; the variant identifies a concrete addressable slot.
 
-Examples include:
+## Public hosting direction
 
-- waiting ten seconds starts Pong
-- FSM_API drives Pong state
-- the visitor controls the cyan paddle
-- the magenta paddle is autonomous
-- the first serve goes toward the AI
-- the machine maintains score
-- clicking the warning or Workshop button dismisses Pong
-- the GUI reproduces
-- nodes carry generation and lineage
-- critical mass eventually occurs
-- the system freezes and collapses
+The desired end state is that a published MicroBundle is available to every Workshop
+host immediately after publication, including bundles created by users.
 
-The long-term direction is a real observable experience/data model rather than
-hard-coded marketing text. The GUI should be able to observe the machine it is
-demonstrating.
-
-## Integer-backed identity direction
-
-Another Workshop thread is moving human-readable identity toward compact integer
-identity for runtime and AI-facing transport.
-
-Strings remain useful — especially for people, authoring, debugging, and
-communication — but they do not have to be the representation carried through
-every hot path.
-
-The intended direction is approximately:
+The current WebPage is a client-side application, so an in-process registry cannot
+honestly provide that property. The next infrastructure layer therefore needs a
+shared/public catalog behind the same address contract:
 
 ```text
-Human-readable concept
-        |
-        v
-String identity / documentation
-        |
-        v
-Integer identity / mapping
-        |
-        v
-Deterministic command / runtime state
+Publisher
+   |
+   v
+validate ontology + variant ownership
+   |
+   v
+public catalog / manifest
+   |
+   +--> bundle package + version + dependencies
+   |
+   +--> immutable address
+   |
+   v
+any Workshop host
+   |
+   v
+resolve address -> retrieve version -> verify -> load -> arbitrate
 ```
 
-The exact representation is still evolving. This README intentionally describes
-the direction rather than pretending the future API is already final.
+The important constraint is that publication must be **address-first and globally
+unique**, not "last writer wins". Once an exact address is occupied, a second
+publisher must receive a collision rather than silently replacing the first bundle.
 
-## AI / command boundary
-
-MicroBundles are also relevant to the Workshop's AI work because a deterministic
-runtime needs a deterministic boundary.
-
-The broader experimental stack currently looks conceptually like:
-
-```text
-LLM
- |
- v
-Protocol AI
- |
- v
-Grammar AI
- |
- v
-Command AI
- |
- v
-FSM_API / deterministic execution
- |
- v
-MicroBundle / provider / manifestation
- |
- v
-App AI
-```
-
-The `/ai` page currently presents these concepts as an architectural model. App AI
-is an emerging construct: the idea that an AI receives a goal, derives the application
-needed to accomplish it, and assembles that application from deterministic constructs.
-
-Names and boundaries may change as the work evolves. The durable problem is how to
-let probabilistic intelligence interact with deterministic machinery without
-allowing ambiguity to leak into execution.
+Persistence, authentication/ownership, package storage, versioning, trust/signing,
+and CDN retrieval belong behind this boundary. Do not leak those concerns into the
+presentation components.
 
 ## Development guideposts
 
-### Preserve the separation
-
-Do not casually put host-specific rendering logic into the semantic bundle.
-
 ### Preserve lifecycle clarity
 
-A MicroBundle should have a clear state/lifecycle story. If a behavior is becoming
-a collection of unrelated timer callbacks, stop and reconsider the boundary.
+A MicroBundle should have a clear lifecycle. If a behavior becomes a collection of
+unrelated timer callbacks, reconsider the boundary.
 
-### Preserve the experiment
+### Preserve manifestation portability
 
-The current implementation is allowed to be temporary. The behavior and lessons
-learned from it are not disposable.
+Blazor is one manifestation. Unity/WebGL and WPF are other targets. A semantic
+MicroBundle should not become permanently dependent on its first host.
 
-### Keep manifestation portable
+### Preserve integer identity
 
-Blazor is the current web manifestation. Unity/WebGL is another. Do not make a
-behavior permanently dependent on whichever host happened to demonstrate it first.
+Strings remain useful for people, authoring, debugging, and communication. Runtime
+identity and AI-facing transport should increasingly use deterministic integer
+coordinates where appropriate.
 
-### Document changes in direction
+### Document architectural direction
 
-The Workshop's destination is comparatively stable while the road is deliberately
-fluid. Update this document when the architectural model changes, rather than
-freezing temporary implementation details into doctrine.
+The road is fluid. Update this document and `CURRENT_VERTICAL_SLICE.md` when a
+boundary changes instead of allowing the next agent to infer the architecture from
+stale code.
 
 ---
 
