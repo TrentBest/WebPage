@@ -3,12 +3,11 @@ name: .NET Tests
 on:
   push:
     branches:
-      - feature/living-workshop-landing
-      - feature/pong-microbundle-vertical-slice
-      - feature/experience-core-architecture
+      - '**'
   pull_request:
     branches:
-      - feature/living-workshop-landing
+      - master
+      - feature/public-facing-workshop
       - feature/experience-core-architecture
 
 jobs:
@@ -28,15 +27,21 @@ jobs:
           dotnet restore SingularityHub.Tests/SingularityHub.Tests.csproj
           dotnet restore Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj
           dotnet restore Experiences/PongExperience.Tests/PongExperience.Tests.csproj
+          dotnet restore Experiences/OntologyMicroBundle.Tests/OntologyMicroBundle.Tests.csproj
+          dotnet restore FSM_Layer.Tests/FSM_Layer.Tests.csproj
 
       - name: Build
         run: |
           dotnet build SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-restore
+          dotnet build Experiences/OntologyMicroBundle.Tests/OntologyMicroBundle.Tests.csproj --configuration Release --no-restore
+          dotnet build FSM_Layer.Tests/FSM_Layer.Tests.csproj --configuration Release --no-restore
 
       - name: Test
         run: |
           dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
           dotnet test Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
           dotnet test Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
+          dotnet test Experiences/OntologyMicroBundle.Tests/OntologyMicroBundle.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
+          dotnet test FSM_Layer.Tests/FSM_Layer.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
