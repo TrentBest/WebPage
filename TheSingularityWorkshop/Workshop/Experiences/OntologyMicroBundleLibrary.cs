@@ -108,8 +108,10 @@ public static class OntologyMicroBundleCatalog
 
         for (var i = 0; i < topics.Length; i++)
         {
-            // The topic token is deliberately placed at the ninth ontology layer. The
-            // intermediate layers remain available for future semantic refinement.
+            // The topic token is globally unique at the ninth ontology layer. Encoding the
+            // family into the token prevents the same 1..5 topic slot from colliding across
+            // the five physics families.
+            var topicToken = (family * 100) + (i + 1);
             b.Add(Create(
                 prefix + (ulong)(i + 1),
                 $"{name}: {topics[i]}",
@@ -121,7 +123,7 @@ public static class OntologyMicroBundleCatalog
                 0,
                 0,
                 0,
-                i + 1));
+                topicToken));
         }
     }
 
