@@ -6,4 +6,7 @@
     <RootNamespace>TheSingularityWorkshop.SingularityHub</RootNamespace>
     <AssemblyName>SingularityHub.Abstractions</AssemblyName>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" />
+  </ItemGroup>
 </Project>
