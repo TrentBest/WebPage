@@ -36,6 +36,7 @@ public sealed class PongExperience : IExperience
     public IReadOnlyList<ulong> MicroBundleIds => BundleIds;
     public IReadOnlyList<ulong> Capabilities => CapabilityIds;
     public IReadOnlyList<ulong> SensorySystems => SensorySystemIds;
+    public int SenseCount => SensorySystems.Distinct().Count();
     public IReadOnlyList<string> ProcessingGroups => Groups;
     public static IReadOnlyList<IMicroBundle> MicroBundles => PongMicroBundleCatalog.All;
 }
