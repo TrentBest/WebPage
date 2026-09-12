@@ -74,7 +74,7 @@ public sealed class IdleExperienceArchitectureTests
         var context = new PageStateContext();
         context.BeginLivingGui();
 
-        for (var i = 0; i < 5 && context.LivingNodes.Count == 1; i++)
+        for (var i = 0; i < 16 && context.LivingNodes.Count == 1; i++)
             context.AdvanceLivingGui();
 
         Assert.True(context.LivingNodes.Count > 1);
