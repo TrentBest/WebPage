@@ -8,8 +8,8 @@ namespace TheSingularityWorkshop.Services
     /// <summary>
     /// The outermost FSM for the Workshop web experience.
     /// Blazor is the presentation surface; FSM_API owns progression while the
-    /// Hub owns root process-group scheduling and this FSM explicitly invokes
-    /// the selected nested process group when its own update requires it.
+    /// Hub owns process-group scheduling and this FSM selects exactly one nested
+    /// runtime pipeline after each page heartbeat.
     /// </summary>
     public sealed class PageFSM : IDisposable
     {
@@ -87,7 +87,14 @@ namespace TheSingularityWorkshop.Services
                 }), Tick, null)
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
                 .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
-                .State(Gravity, Enter(behavior?.OnGravity), Tick, null)
+                .State(Gravity, Enter(c =>
+                {
+                    // A gravity run is a fresh scheduler phase. Clear any stale
+                    // terminal flag before the first gravity heartbeat is selected.
+                    c.GravityReleased = false;
+                    c.LivingGuiFallen = false;
+                    behavior?.OnGravity?.Invoke(c);
+                }), Tick, null)
                 .State(LivingGuiDissipating, Enter(behavior?.OnLivingGuiDissipating), Tick, null)
                 .State(NavigationArrival, Enter(behavior?.OnNavigationArrival), Tick, null)
                 .State(Running, Enter(behavior?.OnRunning), Tick, null)
@@ -142,18 +149,6 @@ namespace TheSingularityWorkshop.Services
             var context = (PageStateContext)stateContext;
             context.TotalTicks++;
             context.StateTicks++;
-
-            if (CurrentState == LivingGuiPopulating &&
-                !context.LivingGuiFrozen &&
-                !context.LivingGuiPopulated)
-            {
-                _hub.UpdateProcessGroup(_livingGuiProcessingGroup);
-            }
-            else if (CurrentState == Gravity && !context.LivingGuiFallen)
-            {
-                _hub.UpdateProcessGroup(_gravityProcessingGroup);
-            }
-
             StateChanged?.Invoke(CurrentState);
         }
 
@@ -174,12 +169,31 @@ namespace TheSingularityWorkshop.Services
             if (!_disposed) _handle.TransitionTo(ShutdownState);
         }
 
-        /// <summary>Steps the Hub. The Hub steps PageFSM; PageFSM selects its nested group.</summary>
+        /// <summary>
+        /// Advances exactly one page heartbeat, then selects the one nested
+        /// process group owned by the resulting presentation state. Selecting
+        /// after the root heartbeat makes state-transition boundaries explicit:
+        /// entering GRAVITY cannot accidentally inherit population ticks, and a
+        /// growth heartbeat cannot be lost because the root FSM transitioned first.
+        /// </summary>
         public void Update()
         {
             if (_disposed)
                 return;
+
             _hub.Update();
+
+            if (CurrentState == LivingGuiPopulating &&
+                !Context.LivingGuiFrozen &&
+                !Context.LivingGuiPopulated)
+            {
+                _hub.UpdateProcessGroup(_livingGuiProcessingGroup);
+            }
+            else if (CurrentState == Gravity && !Context.LivingGuiFallen)
+            {
+                _hub.UpdateProcessGroup(_gravityProcessingGroup);
+            }
+
             StateChanged?.Invoke(CurrentState);
         }
 
