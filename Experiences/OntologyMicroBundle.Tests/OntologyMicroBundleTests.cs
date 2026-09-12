@@ -21,7 +21,7 @@ public sealed class OntologyMicroBundleTests
     [Fact(DisplayName = "Ontology_Library_Uses_Nine_Layer_Signatures")]
     public void Ontology_Library_Uses_Nine_Layer_Signatures()
         => Assert.All(OntologyMicroBundleCatalog.All,
-            bundle => Assert.Equal(OntologySignature.LayerCount, bundle.Ontology.LayerCount));
+            bundle => Assert.Equal(OntologySignature.LayerCount, bundle.Ontology.Layers.Count));
 
     [Fact(DisplayName = "Ontology_Library_Separates_Software_Logic_And_Physics")]
     public void Ontology_Library_Separates_Software_Logic_And_Physics()
