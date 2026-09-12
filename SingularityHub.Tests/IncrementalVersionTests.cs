@@ -2,15 +2,9 @@ using Xunit;
 
 namespace SingularityHub.Tests;
 
-/// <summary>
-/// A deliberately visible incremental heartbeat for repository progress.
-/// Every coherent change advances <see cref="CurrentVersion"/> so an agent response
-/// leaves a concrete, testable marker in the IDE instead of only prose.
-/// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.36";
-
+    public const string CurrentVersion = "0.0.37";
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
     [ArchitectureTest(0, 0, 1)] [Fact(DisplayName = "0.00.001 — Incremental_Version_Heartbeat")] public void Incremental_Version_Heartbeat() => Assert.True(true);
@@ -49,4 +43,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 34)] [Fact(DisplayName = "0.00.034 — Hub_Contracts_And_Runtime_Are_Reconciled")] public void Hub_Contracts_And_Runtime_Are_Reconciled() => Is("0.0.36", CurrentVersion);
     [ArchitectureTest(0, 0, 35)] [Fact(DisplayName = "0.00.035 — Living_GUI_Nested_Scheduler_Starts_Only_In_Populating_State")] public void Living_GUI_Nested_Scheduler_Starts_Only_In_Populating_State() => Is("0.0.36", CurrentVersion);
     [ArchitectureTest(0, 0, 36)] [Fact(DisplayName = "0.00.036 — Population_Gate_And_Seed_Launch_Are_Heartbeat_Observable")] public void Population_Gate_And_Seed_Launch_Are_Heartbeat_Observable() => Is("0.0.36", CurrentVersion);
+    [ArchitectureTest(0, 0, 37)] [Fact(DisplayName = "0.00.037 — Seed_Flight_And_Exact_Population_Boundary_Are_Explicit")] public void Seed_Flight_And_Exact_Population_Boundary_Are_Explicit() => Is("0.0.37", CurrentVersion);
 }
