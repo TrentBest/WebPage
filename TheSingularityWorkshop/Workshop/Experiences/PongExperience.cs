@@ -24,25 +24,10 @@ public sealed class PongExperience : IExperience
     ];
 
     private static readonly ulong[] CapabilityIds =
-    [
-        PongCapabilityIds.Visual,
-        PongCapabilityIds.Sound,
-        PongCapabilityIds.Input,
-        PongCapabilityIds.Behavior
-    ];
-
-    private static readonly ulong[] SensorySystemIds =
-    [
-        PongSenseIds.Sight,
-        PongSenseIds.Hearing
-    ];
-
+    [PongCapabilityIds.Visual, PongCapabilityIds.Sound, PongCapabilityIds.Input, PongCapabilityIds.Behavior];
+    private static readonly ulong[] SensorySystemIds = [PongSenseIds.Sight, PongSenseIds.Hearing];
     private static readonly string[] Groups =
-    [
-        "Experience.Pong.Input",
-        "Experience.Pong.Physics",
-        "Experience.Pong.Presentation"
-    ];
+    ["Experience.Pong.Input", "Experience.Pong.Physics", "Experience.Pong.Presentation"];
 
     public ulong Id => ExperienceId;
     public string Name => "PONG";
@@ -52,9 +37,7 @@ public sealed class PongExperience : IExperience
     public IReadOnlyList<ulong> Capabilities => CapabilityIds;
     public IReadOnlyList<ulong> SensorySystems => SensorySystemIds;
     public IReadOnlyList<string> ProcessingGroups => Groups;
-
-    /// <summary>Gets the immutable MicroBundle definitions composing Pong.</summary>
-    public static IReadOnlyList<PongMicroBundleDefinition> MicroBundles => PongMicroBundleCatalog.All;
+    public static IReadOnlyList<IMicroBundle> MicroBundles => PongMicroBundleCatalog.All;
 }
 
 /// <summary>Stable integer identities for the Pong MicroBundles.</summary>
@@ -87,14 +70,7 @@ public static class PongSenseIds
     public const ulong Hearing = 2;
 }
 
-/// <summary>Defines the asset and behavior role of one Pong MicroBundle.</summary>
-public sealed record PongMicroBundleDefinition(
-    ulong Id,
-    string Name,
-    PongMicroBundleKind Kind,
-    IReadOnlyList<ulong> Dependencies);
-
-/// <summary>Separates authored assets from executable behavior/presentation bundles.</summary>
+/// <summary>Separates authored assets from executable behavior and presentation bundles.</summary>
 public enum PongMicroBundleKind
 {
     Asset,
@@ -102,10 +78,38 @@ public enum PongMicroBundleKind
     Behavior
 }
 
+/// <summary>
+/// Concrete Pong MicroBundle. Its identity, ontology, version, dependencies and
+/// arbitration boundary are runtime data; a host decides how the bundle is manifested.
+/// </summary>
+public sealed class PongMicroBundle : IMicroBundle
+{
+    public PongMicroBundle(ulong id, string name, PongMicroBundleKind kind, IReadOnlyList<ulong> dependencies)
+    {
+        Id = id;
+        Name = name;
+        Kind = kind;
+        Dependencies = dependencies;
+    }
+
+    public ulong Id { get; }
+    public string Name { get; }
+    public PongMicroBundleKind Kind { get; }
+    public OntologySignature Ontology => new(7, 1, 2, 3, 4, 5, 6, 8, unchecked((int)Id));
+    public BundleVersion Version => new(1, 0, 0);
+    public IReadOnlyList<ulong> Dependencies { get; }
+
+    public bool Arbitrate(IArbitrator arbitrator, int roundIndex)
+    {
+        ArgumentNullException.ThrowIfNull(arbitrator);
+        return true;
+    }
+}
+
 /// <summary>Canonical MicroBundle catalog for the Pong experience.</summary>
 public static class PongMicroBundleCatalog
 {
-    private static readonly PongMicroBundleDefinition[] Definitions =
+    private static readonly PongMicroBundle[] Definitions =
     [
         new(PongMicroBundleIds.ArenaAsset, "Arena", PongMicroBundleKind.Asset, []),
         new(PongMicroBundleIds.PaddleAsset, "Paddle", PongMicroBundleKind.Asset, []),
@@ -122,5 +126,5 @@ public static class PongMicroBundleCatalog
             [PongMicroBundleIds.ScoreAsset, PongMicroBundleIds.BallPhysicsBehavior])
     ];
 
-    public static IReadOnlyList<PongMicroBundleDefinition> All => Definitions;
+    public static IReadOnlyList<PongMicroBundle> All => Definitions;
 }
