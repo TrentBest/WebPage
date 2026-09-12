@@ -80,6 +80,19 @@ namespace TheSingularityWorkshop.Services
                 {
                     node.Size = SeedSize * 2;
                     node.SeedDoubled = true;
+
+                    // Doubling is also the launch event. Advance the seed into
+                    // flight on this same scheduler tick so the lifecycle is
+                    // visibly "double, then travel" rather than requiring an
+                    // invisible extra heartbeat before movement begins.
+                    if (node.SeedFlightDuration > 0)
+                    {
+                        node.SeedTicks = 1;
+                        var progress = Math.Min(1d, (double)node.SeedTicks / node.SeedFlightDuration);
+                        node.X = node.SeedX + ((node.TargetX - node.SeedX) * progress);
+                        node.Y = node.SeedY + ((node.TargetY - node.SeedY) * progress);
+                    }
+
                     continue;
                 }
 
