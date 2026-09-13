@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.59";
+    public const string CurrentVersion = "0.0.60";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -71,5 +71,6 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 56)] [Fact(DisplayName = "0.00.056 — Incremental_Version_Advances_To_Zero_Zero_56")] public void Incremental_Version_Advances_To_Zero_Zero_56() => Is("0.0.56", "0.0.56");
     [ArchitectureTest(0, 0, 57)] [Fact(DisplayName = "0.00.057 — Idle_Fallback_Cannot_Compete_With_Deliberate_Experience")] public void Idle_Fallback_Cannot_Compete_With_Deliberate_Experience() => Is("0.0.57", "0.0.57");
     [ArchitectureTest(0, 0, 58)] [Fact(DisplayName = "0.00.058 — Incremental_Version_Advances_After_Idle_Isolation_Fix")] public void Incremental_Version_Advances_After_Idle_Isolation_Fix() => Is("0.0.58", "0.0.58");
-    [ArchitectureTest(0, 0, 59)] [Fact(DisplayName = "0.00.059 — Recursive_GUI_Tree_Has_A_Blazor_Manifestation_Boundary")] public void Recursive_GUI_Tree_Has_A_Blazor_Manifestation_Boundary() => Is("0.0.59", CurrentVersion);
+    [ArchitectureTest(0, 0, 59)] [Fact(DisplayName = "0.00.059 — Recursive_GUI_Tree_Has_A_Blazor_Manifestation_Boundary")] public void Recursive_GUI_Tree_Has_A_Blazor_Manifestation_Boundary() => Is("0.0.59", "0.0.59");
+    [ArchitectureTest(0, 0, 60)] [Fact(DisplayName = "0.00.060 — Living_GUI_Seeds_Fly_Scale_Grow_Reproduce_And_Recover")] public void Living_GUI_Seeds_Fly_Scale_Grow_Reproduce_And_Recover() => Is("0.0.60", CurrentVersion);
 }
