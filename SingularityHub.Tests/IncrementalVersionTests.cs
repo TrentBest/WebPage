@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.40";
+    public const string CurrentVersion = "0.0.41";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -53,4 +53,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 38)] [Fact(DisplayName = "0.00.038 — Selected_Nested_Scheduling_And_Seed_Growth_Cadence_Are_Explicit")] public void Selected_Nested_Scheduling_And_Seed_Growth_Cadence_Are_Explicit() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 39)] [Fact(DisplayName = "0.00.039 — Nested_Runtime_Selection_Occurs_After_Page_Heartbeat")] public void Nested_Runtime_Selection_Occurs_After_Page_Heartbeat() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 40)] [Fact(DisplayName = "0.00.040 — Living_GUI_Viewport_Takeover_Is_Deployable")] public void Living_GUI_Viewport_Takeover_Is_Deployable() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 41)] [Fact(DisplayName = "0.00.041 — Living_GUI_FSM_State_Is_Rendered_Through_The_Workshop_Surface")] public void Living_GUI_FSM_State_Is_Rendered_Through_The_Workshop_Surface() => Is(CurrentVersion, CurrentVersion);
 }
