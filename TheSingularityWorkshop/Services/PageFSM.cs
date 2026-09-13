@@ -38,6 +38,8 @@ namespace TheSingularityWorkshop.Services
         public PageStateContext Context { get; }
         public HubKernel Hub => _hub;
         public string CurrentState => _handle.CurrentState;
+        public bool IsValid => _handle.IsValid;
+        public bool LivingGuiIsValid => _livingGuiRuntime.IsValid;
         public string LivingGuiState => _livingGuiRuntime.CurrentState;
         public string InstanceProcessingGroup => _processingGroup;
         public string LivingGuiProcessingGroup => _livingGuiRuntime.ProcessingGroup;
