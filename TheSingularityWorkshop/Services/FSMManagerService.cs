@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TheSingularityWorkshop.SingularityHub;
+using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 
 namespace TheSingularityWorkshop.Services
 {
@@ -36,7 +36,7 @@ namespace TheSingularityWorkshop.Services
         /// This is the critical composition boundary: PageFSM and LivingGuiFsm must
         /// schedule through the same Hub instance that the host registered.
         /// </summary>
-        public FSMManagerService(SingularityHub hub)
+        public FSMManagerService(HubKernel hub)
         {
             Page = new PageFSM(hub);
             _heartbeatTask = RunHeartbeatAsync(_shutdown.Token);
