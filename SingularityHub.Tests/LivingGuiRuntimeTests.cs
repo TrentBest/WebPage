@@ -107,7 +107,7 @@ public sealed class LivingGuiRuntimeTests
         {
             fsm.LivingGuiProcessingGroup,
             fsm.LivingGuiRootGrowthProcessingGroup,
-            fsm.LivingGuiChildRootingProcessingGroup,
+            fsm.LivingGuiSeedFlightProcessingGroup,
             fsm.LivingGuiMatureGrowthProcessingGroup,
             fsm.LivingGuiReproductionProcessingGroup
         };
@@ -118,7 +118,7 @@ public sealed class LivingGuiRuntimeTests
         Assert.Contains(fsm.Hub.ProcessGroups, group =>
             group.Name == fsm.LivingGuiRootGrowthProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
         Assert.Contains(fsm.Hub.ProcessGroups, group =>
-            group.Name == fsm.LivingGuiChildRootingProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
+            group.Name == fsm.LivingGuiSeedFlightProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
         Assert.Contains(fsm.Hub.ProcessGroups, group =>
             group.Name == fsm.LivingGuiMatureGrowthProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
         Assert.Contains(fsm.Hub.ProcessGroups, group =>
@@ -139,7 +139,7 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(LivingGuiFsm.ReproductionState, fsm.LivingGuiActivePhase);
 
         fsm.Update();
-        Assert.Equal(LivingGuiFsm.ChildRootingState, fsm.LivingGuiActivePhase);
+        Assert.Equal(LivingGuiFsm.SeedFlightState, fsm.LivingGuiActivePhase);
     }
 
     [Fact(DisplayName = "Living GUI lineage names root children and descendants deterministically")]
