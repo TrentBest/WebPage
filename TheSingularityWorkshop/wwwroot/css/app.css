@@ -155,6 +155,54 @@ html.workshop-splash-released .page > main > article.workshop-content {
     50% { filter: brightness(1.35); transform: translateY(-.035em); }
 }
 
+/*
+   LIVING GUI PANEL GEOMETRY
+   -------------------------
+   This is deliberately global host CSS. The LivingGui component is nested
+   inside Home's landing panel, so the panel—not the browser viewport—is the
+   coordinate system for the first node. Keeping these rules outside component
+   CSS isolation also makes the containment contract explicit.
+*/
+.hypervisor-shell > .living-launch-stage {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.hypervisor-shell > .living-launch-stage > .living-sequence-shell {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.hypervisor-shell > .living-launch-stage > .living-sequence-shell > .living-canvas {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.hypervisor-shell > .living-launch-stage > .living-sequence-shell > .living-canvas > .architecture-node.root-node {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    transform: translate(-50%, -50%) !important;
+}
+
 h1:focus {
     outline: none;
 }
