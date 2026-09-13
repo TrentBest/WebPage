@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.54";
+    public const string CurrentVersion = "0.0.55";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -67,4 +67,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 52)] [Fact(DisplayName = "0.00.052 — Living_GUI_Root_Uses_Explicit_Center_Anchor")] public void Living_GUI_Root_Uses_Explicit_Center_Anchor() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 53)] [Fact(DisplayName = "0.00.053 — Living_GUI_Root_Uses_Unambiguous_Viewport_Center")] public void Living_GUI_Root_Uses_Unambiguous_Viewport_Center() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 54)] [Fact(DisplayName = "0.00.054 — Living_GUI_Root_Is_Anchored_To_The_Landing_Panel")] public void Living_GUI_Root_Is_Anchored_To_The_Landing_Panel() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 55)] [Fact(DisplayName = "0.00.055 — Living_GUI_Root_Is_Centered_By_The_Panel_Grid")] public void Living_GUI_Root_Is_Centered_By_The_Panel_Grid() => Is(CurrentVersion, CurrentVersion);
 }
