@@ -171,25 +171,31 @@ namespace TheSingularityWorkshop.Services
 
         /// <summary>
         /// Advances exactly one page heartbeat, then selects the one nested
-        /// process group owned by the resulting presentation state. Selecting
-        /// after the root heartbeat makes state-transition boundaries explicit:
-        /// entering GRAVITY cannot accidentally inherit population ticks, and a
-        /// growth heartbeat cannot be lost because the root FSM transitioned first.
+        /// process group owned by the state that was already active at the start
+        /// of that heartbeat. A newly-entered state gets its first nested tick on
+        /// the following heartbeat. This preserves a clean one-heartbeat boundary:
+        /// entering LIVING_GUI_POPULATING creates the seed, but does not also
+        /// advance it; entering GRAVITY likewise does not inherit a population or
+        /// gravity tick from the transition heartbeat.
         /// </summary>
         public void Update()
         {
             if (_disposed)
                 return;
 
+            var stateBeforeHeartbeat = CurrentState;
             _hub.Update();
 
-            if (CurrentState == LivingGuiPopulating &&
+            if (stateBeforeHeartbeat == LivingGuiPopulating &&
+                CurrentState == LivingGuiPopulating &&
                 !Context.LivingGuiFrozen &&
                 !Context.LivingGuiPopulated)
             {
                 _hub.UpdateProcessGroup(_livingGuiProcessingGroup);
             }
-            else if (CurrentState == Gravity && !Context.LivingGuiFallen)
+            else if (stateBeforeHeartbeat == Gravity &&
+                     CurrentState == Gravity &&
+                     !Context.LivingGuiFallen)
             {
                 _hub.UpdateProcessGroup(_gravityProcessingGroup);
             }
