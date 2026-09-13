@@ -11,7 +11,7 @@ public sealed class IncrementalVersion067Tests
     [Fact(DisplayName = "0.00.067 — SingularityHub_Exposes_Routing")]
     public void SingularityHubExposesRouting()
     {
-        ISingularityHub hub = new SingularityHub(_ => { });
+        ISingularityHub hub = new TheSingularityWorkshop.SingularityHub.SingularityHub(_ => { });
 
         Assert.Equal(Version, Version);
         Assert.NotNull(hub.Routing);
@@ -21,7 +21,7 @@ public sealed class IncrementalVersion067Tests
     [Fact(DisplayName = "SingularityHub routing registers and resolves destinations")]
     public void RoutingRegistersAndResolves()
     {
-        ISingularityHub hub = new SingularityHub(_ => { });
+        ISingularityHub hub = new TheSingularityWorkshop.SingularityHub.SingularityHub(_ => { });
         var route = new SingularityRoute(101, "/library", "LIBRARY", 7001);
 
         Assert.True(hub.Routing.Register(route));
