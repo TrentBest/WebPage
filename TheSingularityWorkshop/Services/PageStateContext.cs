@@ -27,8 +27,8 @@ namespace TheSingularityWorkshop.Services
         private readonly Random _random = new();
         private readonly List<LivingNodeState> _livingNodes = new();
 
-        public string Name { get; set; } = "PageFSMContext";
-        public bool IsValid { get; set; } = true;
+        public string Name { get; set; }
+        public bool IsValid { get; set; }
         public object? SingularityHub { get; }
 
         public bool EnterRequested { get; set; }
@@ -49,7 +49,17 @@ namespace TheSingularityWorkshop.Services
         public bool NeedsChildRooting => !NeedsRootGrowth && _livingNodes.Exists(node => !node.IsRoot && !node.GrowthReady);
         public bool NeedsMatureGrowth => !NeedsRootGrowth && !NeedsChildRooting && _livingNodes.Exists(node => node.Size < MaximumNodeSize);
 
-        public PageStateContext(object? singularityHub = null) => SingularityHub = singularityHub;
+        /// <summary>
+        /// Creates a valid, active FSM context.
+        /// The validity flag is assigned explicitly after the context identity is initialized,
+        /// matching the FSM_API contract used by live instances.
+        /// </summary>
+        public PageStateContext(object? singularityHub = null)
+        {
+            Name = "PageFSMContext";
+            IsValid = true;
+            SingularityHub = singularityHub;
+        }
 
         public void ResetStateClock() => StateTicks = 0;
 
