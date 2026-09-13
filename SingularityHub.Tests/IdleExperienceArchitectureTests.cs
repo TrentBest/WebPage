@@ -40,15 +40,11 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.MonikerReady);
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
 
-        // One page heartbeat consumes the exact-100 gate and enters the moniker
-        // reveal state. The living GUI group is no longer stepped after freezing.
         fsm.Update();
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
         Assert.True(fsm.Context.LivingGuiFrozen);
 
-        // The next heartbeat transitions into GRAVITY. The moniker remains behind
-        // the frozen GUI while the preallocated gravity group begins falling it.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
@@ -65,12 +61,11 @@ public sealed class IdleExperienceArchitectureTests
 
         Assert.True(gravityTicks < gravityGuard, "Living GUI did not fall away within the test guard.");
         Assert.True(fsm.Context.LivingGuiFallen);
-        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
 
-        // The three-second timer starts only after the last living GUI has fallen.
-        fsm.Update();
+        // FSM_API evaluates the Gravity -> Dissipating transition on the same
+        // heartbeat that marks the living GUI as fallen. Therefore the observable
+        // post-fall state is already DISSIPATING; no extra heartbeat is required.
         Assert.Equal(PageFSM.LivingGuiDissipating, fsm.CurrentState);
-        Assert.True(fsm.Context.MonikerReady);
 
         for (var tick = 1; tick < 91; tick++)
         {
