@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.42";
+    public const string CurrentVersion = "0.0.43";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -55,4 +55,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 40)] [Fact(DisplayName = "0.00.040 — Living_GUI_Viewport_Takeover_Is_Deployable")] public void Living_GUI_Viewport_Takeover_Is_Deployable() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 41)] [Fact(DisplayName = "0.00.041 — Living_GUI_FSM_State_Is_Rendered_Through_The_Workshop_Surface")] public void Living_GUI_FSM_State_Is_Rendered_Through_The_Workshop_Surface() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 42)] [Fact(DisplayName = "0.00.042 — Living_GUI_FSM_State_Is_Exposed_Through_The_Service_Facade")] public void Living_GUI_FSM_State_Is_Exposed_Through_The_Service_Facade() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 43)] [Fact(DisplayName = "0.00.043 — Living_GUI_Nodes_Use_Compact_Size_And_Generation_Layers")] public void Living_GUI_Nodes_Use_Compact_Size_And_Generation_Layers() => Is(CurrentVersion, CurrentVersion);
 }
