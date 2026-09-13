@@ -20,6 +20,7 @@ public sealed class LivingGuiFsm : IDisposable
     public const string MatureGrowthState = "MATURE_GROWTH";
     public const string ReproductionState = "REPRODUCTION";
     public const string ParentRecoveryState = "PARENT_RECOVERY";
+    public const string IdleState = "IDLE";
 
     private readonly HubKernel _hub;
     private readonly PageStateContext _context;
@@ -139,18 +140,22 @@ public sealed class LivingGuiFsm : IDisposable
     /// Selects the most urgent lifecycle work first. Reproduction and parent
     /// recovery must outrank newborn flight: a parent begins contracting as soon
     /// as it creates an offspring, rather than waiting behind the child's journey.
+    /// A frozen or otherwise empty runtime has no active phase and must never
+    /// masquerade as parent recovery.
     /// </summary>
     public string ActivePhase
     {
         get
         {
+            if (_context.LivingGuiFrozen || _context.LivingGuiPopulated)
+                return IdleState;
             if (_context.NeedsRootGrowth) return RootGrowthState;
             if (_context.NeedsReproduction) return ReproductionState;
             if (_context.NeedsParentRecovery) return ParentRecoveryState;
             if (_context.NeedsSeedFlight) return SeedFlightState;
             if (_context.NeedsSeedScaling) return SeedScalingState;
             if (_context.NeedsMatureGrowth) return MatureGrowthState;
-            return ParentRecoveryState;
+            return IdleState;
         }
     }
 
