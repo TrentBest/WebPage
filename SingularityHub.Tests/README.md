@@ -1,17 +1,35 @@
-# Architecture and Incremental Tests
+# SingularityHub.Tests
 
-These tests are not disposable cleanup targets. They are breadcrumbs for the landing architecture.
+## Digital test nomenclature
 
-## Key tests
+Every behavioral test has a stable digital address:
 
-- `IdleExperienceArchitectureTests.Unit 04` — exact landing presentation sequence.
-- `Incremental Unit Test 07` — disposing a PageFSM unregisters its handle.
-- `Incremental Unit Test 08` — one PageFSM update does not advance another.
-- `Incremental Unit Test 09` — the moniker remains hidden until exactly 100 nodes, then persists through gravity.
-- `IncrementalVersionTests` — visible proof-of-work heartbeat for repository changes.
+`L.GG.TTT`
 
-## Agent rule
+- `L` = architectural layer.
+- `GG` = test group / production contract.
+- `TTT` = individual test within that contract.
 
-For every meaningful change, advance `CurrentVersion` and add/update the corresponding meaningful version assertion. See `../AGENT_INCREMENTAL_RULE.md`.
+The address is deliberately independent of source-file names and test-runner order. It is the number we use when discussing a specific test, for example `4.03.005`.
 
-Do not weaken sequence tests merely to get green. If the contract fails, repair the implementation or explicitly update the canonical presentation contract with the user's approval.
+## One-to-one test ownership
+
+Behavioral test classes follow the production type they test. A production type gets one corresponding test class, and that class owns the complete public surface of that type. Do not create `*DomainTests` aggregation classes that mix unrelated production types.
+
+Interfaces and value types are production contracts too; they receive the same one-to-one treatment when they have public behavior or surface that must be verified.
+
+## Version heartbeat
+
+`IncrementalVersionTests.cs` is the **only** incremental-version test class in this project.
+
+Each repository commit that advances the architecture adds exactly one new version heartbeat to that class:
+
+```csharp
+[ArchitectureTest(0, 0, 77)]
+[Fact(DisplayName = "V0.0.77 — Incremental_Heartbeat")]
+public void V0_0_77() => Assert.Equal("0.0.77", "0.0.77");
+```
+
+The version string is intentionally boring. It records the version claimed by the commit. It does not replace behavioral tests, and behavioral tests must not be moved into the version ledger.
+
+There must not be another `IncrementalVersion###Tests.cs` class.
