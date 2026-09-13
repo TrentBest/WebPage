@@ -21,6 +21,10 @@ public sealed class LivingGuiFsm : IDisposable
     private readonly HubKernel _hub;
     private readonly PageStateContext _context;
     private readonly FSMHandle _handle;
+    private readonly FSMHandle _rootGrowthHandle;
+    private readonly FSMHandle _childRootingHandle;
+    private readonly FSMHandle _matureGrowthHandle;
+    private readonly FSMHandle _reproductionHandle;
     private readonly string _processingGroup;
     private readonly string _rootGrowthGroup;
     private readonly string _childRootingGroup;
@@ -77,10 +81,16 @@ public sealed class LivingGuiFsm : IDisposable
             .BuildDefinition();
 
         _handle = fsm_API.Create.CreateInstance("LivingGuiFSM", context, _processingGroup);
-        fsm_API.Create.CreateInstance("LivingGuiRootGrowthFSM", context, _rootGrowthGroup);
-        fsm_API.Create.CreateInstance("LivingGuiChildRootingFSM", context, _childRootingGroup);
-        fsm_API.Create.CreateInstance("LivingGuiMatureGrowthFSM", context, _matureGrowthGroup);
-        fsm_API.Create.CreateInstance("LivingGuiReproductionFSM", context, _reproductionGroup);
+        _rootGrowthHandle = fsm_API.Create.CreateInstance("LivingGuiRootGrowthFSM", context, _rootGrowthGroup);
+        _childRootingHandle = fsm_API.Create.CreateInstance("LivingGuiChildRootingFSM", context, _childRootingGroup);
+        _matureGrowthHandle = fsm_API.Create.CreateInstance("LivingGuiMatureGrowthFSM", context, _matureGrowthGroup);
+        _reproductionHandle = fsm_API.Create.CreateInstance("LivingGuiReproductionFSM", context, _reproductionGroup);
+
+        // FSM_API refuses to process an instance whose context is invalid.
+        // Fail immediately at composition time rather than allowing a visually
+        // dead Living GUI to masquerade as a running FSM.
+        if (!IsValid)
+            throw new InvalidOperationException("Living GUI FSM instances were created with an invalid PageStateContext.");
     }
 
     public string CurrentState => _handle.CurrentState;
@@ -89,6 +99,18 @@ public sealed class LivingGuiFsm : IDisposable
     public string ChildRootingProcessingGroup => _childRootingGroup;
     public string MatureGrowthProcessingGroup => _matureGrowthGroup;
     public string ReproductionProcessingGroup => _reproductionGroup;
+
+    /// <summary>
+    /// True only when the Living GUI context and every live phase instance are valid.
+    /// This is intentionally derived from the actual FSM handles rather than duplicated state.
+    /// </summary>
+    public bool IsValid =>
+        _context.IsValid &&
+        _handle.IsValid &&
+        _rootGrowthHandle.IsValid &&
+        _childRootingHandle.IsValid &&
+        _matureGrowthHandle.IsValid &&
+        _reproductionHandle.IsValid;
 
     public string ActivePhase
     {
@@ -108,7 +130,7 @@ public sealed class LivingGuiFsm : IDisposable
     /// </summary>
     public void Update()
     {
-        if (_disposed || _context.LivingGuiFrozen)
+        if (_disposed || !_context.IsValid || _context.LivingGuiFrozen)
             return;
 
         switch (ActivePhase)
