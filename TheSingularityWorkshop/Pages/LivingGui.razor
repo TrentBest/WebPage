@@ -38,9 +38,11 @@ else
 </div>
 
 <style>
-    .living-sequence-shell { position:absolute; inset:0; z-index:10000; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
+    /* The living sequence is a viewport-level takeover. Do not let an inherited
+       article/layout clipping context swallow the very first node. */
+    .living-sequence-shell { position:fixed; inset:0; z-index:100000; width:100vw; height:100dvh; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
-    .living-canvas { position:absolute; inset:0; z-index:10; overflow:hidden; perspective:1200px; }
+    .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; overflow:hidden; perspective:1200px; }
     .architecture-node { position:absolute; z-index:20; box-sizing:border-box; min-width:18px; min-height:18px; padding:3px 5px; display:flex; align-items:center; justify-content:center; border:2px solid #ff7a00; border-radius:5px; background:rgba(5,6,8,.92); color:#fff; font:700 .72rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 12px rgba(255,122,0,.28),inset 0 0 12px rgba(255,122,0,.06); }
     .node-label { display:block; pointer-events:none; text-shadow:0 0 7px rgba(255,211,77,.75); }
     .gravity-node { pointer-events:none; }
