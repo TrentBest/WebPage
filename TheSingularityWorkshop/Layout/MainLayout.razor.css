@@ -9,198 +9,41 @@
     background: #050a14;
 }
 
-.sidebar {
-    background: linear-gradient(180deg, #07111f 0%, #030812 100%);
-    border-right: 1px solid #19384b;
-}
+.sidebar { background: linear-gradient(180deg, #07111f 0%, #030812 100%); border-right: 1px solid #19384b; }
 
-main {
-    flex: 1 1 auto;
-    min-width: 0;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow: hidden;
-    background: #050a14;
-}
+main { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: #050a14; }
 
-.top-row {
-    flex: 0 0 3.5rem;
-    background: #050a14;
-    border-bottom: 1px solid #00eaff;
-    height: 3.5rem;
-    min-height: 3.5rem;
-    display: flex;
-    align-items: center;
-    transition: flex-basis 900ms cubic-bezier(.16,1,.3,1),
-                height 900ms cubic-bezier(.16,1,.3,1),
-                min-height 900ms cubic-bezier(.16,1,.3,1),
-                opacity 700ms ease,
-                padding 900ms cubic-bezier(.16,1,.3,1);
-}
+.top-row { flex: 0 0 3.5rem; background: #050a14; border-bottom: 1px solid #00eaff; height: 3.5rem; min-height: 3.5rem; display: flex; align-items: center; transition: flex-basis 900ms cubic-bezier(.16,1,.3,1), height 900ms cubic-bezier(.16,1,.3,1), min-height 900ms cubic-bezier(.16,1,.3,1), opacity 700ms ease, padding 900ms cubic-bezier(.16,1,.3,1); }
+.workshop-tab-header { justify-content: center; text-align: center; }
+.workshop-tab-title { display: inline-block; color: #dcefff; font-family: Consolas, 'Courier New', monospace; font-size: clamp(.8rem, 1.2vw, 1.05rem); font-weight: 700; letter-spacing: .22em; text-transform: uppercase; text-shadow: 0 0 8px rgba(0, 234, 255, .35); animation: workshopTabBreath 4s ease-in-out infinite; }
+@keyframes workshopTabBreath { 0%, 100% { opacity: .72; letter-spacing: .19em; } 50% { opacity: 1; letter-spacing: .24em; } }
+.top-row ::deep a, .top-row ::deep .btn-link { white-space: nowrap; margin-left: 1.5rem; text-decoration: none; color: #00eaff; }
+.top-row ::deep a:hover, .top-row ::deep .btn-link:hover { color: #ff2cff; }
+.top-row ::deep a:first-child { overflow: hidden; text-overflow: ellipsis; }
 
-.workshop-tab-header {
-    justify-content: center;
-    text-align: center;
-}
+article { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; height: auto; overflow: auto; overflow-x: hidden; padding: 0 !important; background: #050a14; transition: height 900ms cubic-bezier(.16,1,.3,1), padding 900ms cubic-bezier(.16,1,.3,1); }
+article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: hidden !important; }
 
-.workshop-tab-title {
-    display: inline-block;
-    color: #dcefff;
-    font-family: Consolas, 'Courier New', monospace;
-    font-size: clamp(.8rem, 1.2vw, 1.05rem);
-    font-weight: 700;
-    letter-spacing: .22em;
-    text-transform: uppercase;
-    text-shadow: 0 0 8px rgba(0, 234, 255, .35);
-    animation: workshopTabBreath 4s ease-in-out infinite;
-}
-
-@keyframes workshopTabBreath {
-    0%, 100% { opacity: .72; letter-spacing: .19em; }
-    50% { opacity: 1; letter-spacing: .24em; }
-}
-
-.top-row ::deep a,
-.top-row ::deep .btn-link {
-    white-space: nowrap;
-    margin-left: 1.5rem;
-    text-decoration: none;
-    color: #00eaff;
-}
-
-.top-row ::deep a:hover,
-.top-row ::deep .btn-link:hover { color: #ff2cff; }
-
-.top-row ::deep a:first-child {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-article {
-    flex: 1 1 auto;
-    min-width: 0;
-    min-height: 0;
-    height: auto;
-    overflow: auto;
-    overflow-x: hidden;
-    padding: 0 !important;
-    background: #050a14;
-    transition: height 900ms cubic-bezier(.16,1,.3,1),
-                padding 900ms cubic-bezier(.16,1,.3,1);
-}
-
-article:has(.hypervisor-shell),
-article:has(.living-sequence-shell) {
-    overflow: hidden !important;
-}
-
-/* The landing page starts as one uninterrupted browser panel. The chrome
-   remains mounted so its arrival can resize the panel instead of causing a
-   hard reflow. This is the final three-second post-gravity presentation step. */
-.workshop-page .workshop-sidebar {
-    width: 0;
-    flex: 0 0 0;
-    border-right-width: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: width 900ms cubic-bezier(.16,1,.3,1),
-                flex-basis 900ms cubic-bezier(.16,1,.3,1),
-                border-right-width 900ms ease,
-                opacity 600ms ease;
-}
-
-.workshop-page.workshop-chrome-visible .workshop-sidebar {
-    width: 200px;
-    flex-basis: 200px;
-    border-right-width: 1px;
-    opacity: 1;
-}
-
-.workshop-page .workshop-top-row-placeholder {
-    flex-basis: 0;
-    height: 0;
-    min-height: 0;
-    padding: 0 !important;
-    border-bottom-width: 0;
-    opacity: 0;
-    overflow: hidden;
-}
-
-.workshop-page.workshop-chrome-visible .workshop-top-row-placeholder {
-    flex-basis: 3.5rem;
-    height: 3.5rem;
-    min-height: 3.5rem;
-    padding-left: 2rem !important;
-    padding-right: 1.5rem !important;
-    border-bottom-width: 1px;
-    opacity: 1;
-}
+.workshop-page .workshop-sidebar { width: 0; flex: 0 0 0; border-right-width: 0; opacity: 0; overflow: hidden; transition: width 900ms cubic-bezier(.16,1,.3,1), flex-basis 900ms cubic-bezier(.16,1,.3,1), border-right-width 900ms ease, opacity 600ms ease; }
+.workshop-page.workshop-chrome-visible .workshop-sidebar { width: 200px; flex-basis: 200px; border-right-width: 1px; opacity: 1; }
+.workshop-page .workshop-top-row-placeholder { flex-basis: 0; height: 0; min-height: 0; padding: 0 !important; border-bottom-width: 0; opacity: 0; overflow: hidden; }
+.workshop-page.workshop-chrome-visible .workshop-top-row-placeholder { flex-basis: 3.5rem; height: 3.5rem; min-height: 3.5rem; padding-left: 2rem !important; padding-right: 1.5rem !important; border-bottom-width: 1px; opacity: 1; }
 
 @media (max-width: 640.98px) {
     .top-row { justify-content: center; }
     .workshop-tab-title { max-width: 85vw; overflow: hidden; text-overflow: ellipsis; }
-
-    .workshop-page .workshop-sidebar {
-        width: 100%;
-        flex: 0 0 0;
-        height: 0;
-        min-height: 0;
-        border-right: 0;
-        border-bottom: 0;
-    }
-
-    .workshop-page.workshop-chrome-visible .workshop-sidebar {
-        width: 100%;
-        flex-basis: auto;
-        height: auto;
-        min-height: 0;
-        border-bottom: 1px solid #19384b;
-    }
-
-    .workshop-page.workshop-chrome-visible .workshop-top-row-placeholder {
-        flex-basis: 3.5rem;
-        height: 3.5rem;
-        min-height: 3.5rem;
-        padding: 0 1rem !important;
-    }
+    .workshop-page .workshop-sidebar { width: 100%; flex: 0 0 0; height: 0; min-height: 0; border-right: 0; border-bottom: 0; }
+    .workshop-page.workshop-chrome-visible .workshop-sidebar { width: 100%; flex-basis: auto; height: auto; min-height: 0; border-bottom: 1px solid #19384b; }
+    .workshop-page.workshop-chrome-visible .workshop-top-row-placeholder { flex-basis: 3.5rem; height: 3.5rem; min-height: 3.5rem; padding: 0 1rem !important; }
 }
 
 @media (min-width: 641px) {
-    .page {
-        flex-direction: row;
-        height: 100dvh;
-        min-height: 100dvh;
-    }
-
-    .sidebar {
-        width: 200px;
-        height: 100%;
-        position: relative;
-        flex: 0 0 200px;
-        overflow: hidden;
-    }
-
-    main {
-        flex: 1 1 auto;
-        height: 100%;
-        min-height: 0;
-    }
-
-    .top-row {
-        position: relative;
-        z-index: 1;
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
+    .page { flex-direction: row; height: 100dvh; min-height: 100dvh; }
+    .sidebar { width: 200px; height: 100%; position: relative; flex: 0 0 200px; overflow: hidden; }
+    main { flex: 1 1 auto; height: 100%; min-height: 0; }
+    .top-row { position: relative; z-index: 1; padding-left: 2rem !important; padding-right: 1.5rem !important; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .workshop-page .workshop-sidebar,
-    .workshop-page .workshop-top-row-placeholder,
-    .top-row,
-    article {
-        transition: none;
-    }
+    .workshop-page .workshop-sidebar, .workshop-page .workshop-top-row-placeholder, .top-row, article { transition: none; }
 }
