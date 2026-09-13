@@ -61,13 +61,13 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(1, child.Generation);
         Assert.False(child.IsRoot);
         Assert.Equal(40, child.Size);
-        Assert.InRange(child.X, 10, 90);
-        Assert.InRange(child.Y, 10, 90);
-        Assert.Equal(50, root.X);
-        Assert.Equal(50, root.Y);
+        Assert.Equal(50, child.X);
+        Assert.Equal(50, child.Y);
+        Assert.InRange(child.TargetX, 10, 90);
+        Assert.InRange(child.TargetY, 10, 90);
     }
 
-    [Fact(DisplayName = "Living GUI child reaches default size quickly, then grows to reproduction size")]
+    [Fact(DisplayName = "Living GUI child reaches default size through flight and scaling, then grows to reproduction size")]
     public void LivingGui_ChildReachesDefaultAndGrows()
     {
         using var fsm = new PageFSM();
@@ -81,21 +81,24 @@ public sealed class LivingGuiRuntimeTests
         Assert.True(fsm.Context.LivingNodes.Count >= 2);
         var child = fsm.Context.LivingNodes[1];
 
-        fsm.Update();
+        ticks = 0;
+        while (child.Size < 200 && ticks++ < guard)
+            fsm.Update();
+
+        Assert.True(child.Size >= 200, "Living GUI child did not complete flight and scaling within the scheduler guard.");
         Assert.Equal(200, child.Size);
         Assert.True(child.GrowthReady);
+        Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, child.Phase);
 
-        fsm.Update();
-        Assert.Equal(250, child.Size);
+        // Mature growth is intentionally round-robin so the root cannot starve
+        // descendants. Advance until this specific child reaches reproduction.
+        ticks = 0;
+        while (child.Size < 400 && ticks++ < guard)
+            fsm.Update();
 
-        fsm.Update();
-        Assert.Equal(300, child.Size);
-
-        fsm.Update();
-        Assert.Equal(350, child.Size);
-
-        fsm.Update();
+        Assert.True(child.Size >= 400, "Living GUI child did not receive mature-growth turns within the scheduler guard.");
         Assert.Equal(400, child.Size);
+        Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, child.Phase);
     }
 
     [Fact(DisplayName = "Living GUI exposes distinct FSM process groups for every lifecycle phase")]
@@ -125,7 +128,7 @@ public sealed class LivingGuiRuntimeTests
             group.Name == fsm.LivingGuiReproductionProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
     }
 
-    [Fact(DisplayName = "Living GUI selects root growth before child rooting and mature growth")]
+    [Fact(DisplayName = "Living GUI selects root growth, reproduction, recovery, then seed flight")]
     public void LivingGui_SelectsPhaseInLifecycleOrder()
     {
         using var fsm = new PageFSM();
@@ -137,6 +140,12 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
         fsm.Update();
         Assert.Equal(LivingGuiFsm.ReproductionState, fsm.LivingGuiActivePhase);
+
+        fsm.Update();
+        Assert.Equal(LivingGuiFsm.ParentRecoveryState, fsm.LivingGuiActivePhase);
+
+        fsm.Update();
+        Assert.Equal(LivingGuiFsm.ParentRecoveryState, fsm.LivingGuiActivePhase);
 
         fsm.Update();
         Assert.Equal(LivingGuiFsm.SeedFlightState, fsm.LivingGuiActivePhase);

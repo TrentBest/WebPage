@@ -29,6 +29,7 @@ namespace TheSingularityWorkshop.Services
 
         private readonly Random _random = new();
         private readonly List<LivingNodeState> _livingNodes = new();
+        private int _matureGrowthCursor;
 
         public string Name { get; set; }
         public bool IsValid { get; set; }
@@ -73,6 +74,7 @@ namespace TheSingularityWorkshop.Services
                 growthReady: true, seedDoubled: false, isRoot: true,
                 phase: LivingNodePhase.RootGrowth));
 
+            _matureGrowthCursor = 0;
             LivingGuiFrozen = false;
             LivingGuiPopulated = false;
             PopulationCompletedTick = -1;
@@ -141,10 +143,16 @@ namespace TheSingularityWorkshop.Services
 
         public void AdvanceMatureGrowth()
         {
-            if (LivingGuiFrozen) return;
+            if (LivingGuiFrozen || _livingNodes.Count == 0) return;
 
-            foreach (var node in _livingNodes)
+            // Mature nodes share the growth heartbeat round-robin. Without a cursor,
+            // the first node in the collection (the root) can monopolize every growth
+            // turn and prevent later generations from ever reaching reproduction.
+            for (var offset = 0; offset < _livingNodes.Count; offset++)
             {
+                var index = (_matureGrowthCursor + offset) % _livingNodes.Count;
+                var node = _livingNodes[index];
+
                 if (node.Phase != LivingNodePhase.MatureGrowth || node.Size >= MaximumNodeSize)
                     continue;
 
@@ -154,6 +162,8 @@ namespace TheSingularityWorkshop.Services
                     node.SeedDoubled = true;
                     node.Phase = LivingNodePhase.ReproductionPending;
                 }
+
+                _matureGrowthCursor = (index + 1) % _livingNodes.Count;
                 break;
             }
         }

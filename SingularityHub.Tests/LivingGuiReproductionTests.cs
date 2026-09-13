@@ -100,7 +100,10 @@ public sealed class LivingGuiReproductionTests
         Assert.Equal(PageStateContext.LivingNodePhase.ParentRecovery, parent.Phase);
         Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, seed.Phase);
 
-        using var runtime = new LivingGuiFsm(new TheSingularityWorkshop.SingularityHub.SingularityHub(), context, "TestParent");
+        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        hub.RegisterProcessGroup("TestParent");
+
+        using var runtime = new LivingGuiFsm(hub, context, "TestParent");
 
         Assert.Equal(LivingGuiFsm.ParentRecoveryState, runtime.ActivePhase);
         runtime.Update();
