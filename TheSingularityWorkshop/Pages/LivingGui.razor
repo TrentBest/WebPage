@@ -44,61 +44,34 @@ else
 </div>
 
 <style>
-    .living-sequence-shell { position:fixed; inset:0; z-index:100000; width:100vw; height:100dvh; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
+    .living-sequence-shell { position:absolute; inset:0; z-index:10000; width:100%; height:100%; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
     .living-fsm-label { position:absolute; left:1.25rem; top:1.25rem; z-index:30; min-width:min(280px,72vw); box-sizing:border-box; padding:.7rem .9rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:.2rem; border:2px solid #ff7a00; border-radius:6px; background:rgba(2,3,4,.94); box-shadow:0 0 14px rgba(255,122,0,.35),0 0 36px rgba(255,122,0,.12),inset 0 0 18px rgba(255,122,0,.05); text-align:left; pointer-events:none; }
     .living-fsm-title { font-size:clamp(1rem,2vw,1.45rem); font-weight:900; letter-spacing:.14em; color:#fff; text-shadow:0 0 7px rgba(255,122,0,.8); }
-    .living-fsm-state,.living-fsm-count { font-size:clamp(.65rem,1vw,.82rem); font-weight:700; letter-spacing:.06em; color:#ffd34d; }
-    .living-fsm-count { color:#00eaff; }
+    .living-fsm-state,.living-fsm-count { font-size:clamp(.65rem,1vw,.82rem); font-weight:700; letter-spacing:.06em; color:#ffd34d; }.living-fsm-count { color:#00eaff; }
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
     .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; overflow:hidden; perspective:1200px; }
     .architecture-node { position:absolute; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); }
-    .node-label { display:block; pointer-events:none; text-shadow:0 0 5px rgba(255,211,77,.65); }
-    .gravity-node { pointer-events:none; }
+    .node-label { display:block; pointer-events:none; text-shadow:0 0 5px rgba(255,211,77,.65); }.gravity-node { pointer-events:none; }
     .moniker-title { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.82; letter-spacing:.075em; text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%; }
     .moniker-title>div { white-space:nowrap; }.moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }.moniker-title>div:nth-child(2) span { animation-delay:-.4s; }.moniker-title>div:nth-child(3) span { animation-delay:-.8s; }
     .blue{color:#00a8ff}.magenta{color:#ff2cff}.orange{color:#ff7a00}.red{color:#ff3030}.yellow{color:#ffd34d}.green{color:#52e05a}
-    @@keyframes kelpSway{0%,100%{transform:rotate(-1.2deg) skewX(-.6deg)}25%{transform:rotate(1deg) skewX(.9deg) translateY(-3px)}50%{transform:rotate(-.6deg) skewX(-1deg) translateY(2px)}75%{transform:rotate(1.4deg) skewX(.7deg) translateY(-2px)}}
-    @@keyframes letterDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-    @@media(max-width:800px){.architecture-node{font-size:.52rem;padding:1px 2px}.living-fsm-label{left:.75rem;top:.75rem}.moniker-title{font-size:clamp(1.65rem,8vw,3.5rem)}}
-    @@media(prefers-reduced-motion:reduce){.living-sequence-shell *, .living-sequence-shell *::before, .living-sequence-shell *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+    @@keyframes kelpSway{0%,100%{transform:rotate(-1.2deg) skewX(-.6deg)}25%{transform:rotate(1deg) skewX(.9deg) translateY(-3px)}50%{transform:rotate(-.6deg) skewX(-1deg) translateY(2px)}75%{transform:rotate(1.4deg) skewX(.7deg) translateY(-2px)}}@@keyframes letterDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+    @@media(max-width:800px){.architecture-node{font-size:.52rem;padding:1px 2px}.living-fsm-label{left:.75rem;top:.75rem}.moniker-title{font-size:clamp(1.65rem,8vw,3.5rem)}}@@media(prefers-reduced-motion:reduce){.living-sequence-shell *, .living-sequence-shell *::before, .living-sequence-shell *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 
 @code {
-    private bool MonikerInstantiated =>
-        FSM.Context.MonikerReady &&
-        FSM.Context.LivingNodes.Count == PageStateContext.CriticalMass;
-
+    private bool MonikerInstantiated => FSM.Context.MonikerReady && FSM.Context.LivingNodes.Count == PageStateContext.CriticalMass;
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
 
-    protected override void OnInitialized()
-    {
-        FSM.StateChanged += HandleFSMStateChanged;
-    }
+    protected override void OnInitialized() => FSM.StateChanged += HandleFSMStateChanged;
+    private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
 
-    private void HandleFSMStateChanged(string state)
-    {
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    private static string NodeLeft(PageStateContext.LivingNodeState node) =>
-        node.IsRoot ? "50%" : $"{node.X}%";
-
-    private static string NodeTop(PageStateContext.LivingNodeState node) =>
-        node.IsRoot ? "50%" : $"{node.Y}%";
-
-    private static string NodeSize(PageStateContext.LivingNodeState node) =>
-        $"{node.Size:0.##}px";
-
-    private static string NodeTransform(PageStateContext.LivingNodeState node) =>
-        $"translate(-50%,-50%) rotate({node.Rotation:0.##}deg)";
-
+    private static string NodeLeft(PageStateContext.LivingNodeState node) => $"{node.X:0.###}%";
+    private static string NodeTop(PageStateContext.LivingNodeState node) => $"{node.Y:0.###}%";
+    private static string NodeSize(PageStateContext.LivingNodeState node) => $"{node.Size:0.##}px";
+    private static string NodeTransform(PageStateContext.LivingNodeState node) => $"translate(-50%,-50%) rotate({node.Rotation:0.##}deg)";
     private static int NodeLayer(PageStateContext.LivingNodeState node) => 20 + node.Generation;
-
-    private static double NodeOpacity(PageStateContext.LivingNodeState node)
-    {
-        if (node.Y <= 100) return 1;
-        return Math.Clamp(1 - ((node.Y - 100) / 30), 0, 1);
-    }
+    private static double NodeOpacity(PageStateContext.LivingNodeState node) => node.Y <= 100 ? 1 : Math.Clamp(1 - ((node.Y - 100) / 30), 0, 1);
 
     public void Dispose() => FSM.StateChanged -= HandleFSMStateChanged;
 }
