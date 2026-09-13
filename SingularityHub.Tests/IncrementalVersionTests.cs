@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.46";
+    public const string CurrentVersion = "0.0.47";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -59,4 +59,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 44)] [Fact(DisplayName = "0.00.044 — Living_GUI_Root_Is_Centered_And_Generations_Are_Rooted_In_Place")] public void Living_GUI_Root_Is_Centered_And_Generations_Are_Rooted_In_Place() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 45)] [Fact(DisplayName = "0.00.045 — Living_GUI_Uses_Hierarchical_Phase_FSM_Process_Groups")] public void Living_GUI_Uses_Hierarchical_Phase_FSM_Process_Groups() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 46)] [Fact(DisplayName = "0.00.046 — FSM_Manager_Uses_Registered_Hub_Instance")] public void Fsm_Manager_Uses_Registered_Hub_Instance() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 47)] [Fact(DisplayName = "0.00.047 — FSM_Manager_Hub_Composition_Test_Does_Not_Assume_Hub_Ownership")] public void Fsm_Manager_Hub_Composition_Test_Does_Not_Assume_Hub_Ownership() => Is(CurrentVersion, CurrentVersion);
 }
