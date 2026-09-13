@@ -15,6 +15,7 @@ public sealed class LivingGuiFsm : IDisposable
     public const string LifecycleState = "ALIVE";
     public const string RootGrowthState = "ROOT_GROWTH";
     public const string SeedFlightState = "SEED_FLIGHT";
+    public const string ChildRootingState = SeedFlightState;
     public const string SeedScalingState = "SEED_SCALING";
     public const string MatureGrowthState = "MATURE_GROWTH";
     public const string ReproductionState = "REPRODUCTION";
@@ -118,6 +119,7 @@ public sealed class LivingGuiFsm : IDisposable
     public string ProcessingGroup => _processingGroup;
     public string RootGrowthProcessingGroup => _rootGrowthGroup;
     public string SeedFlightProcessingGroup => _seedFlightGroup;
+    public string ChildRootingProcessingGroup => _seedFlightGroup;
     public string SeedScalingProcessingGroup => _seedScalingGroup;
     public string MatureGrowthProcessingGroup => _matureGrowthGroup;
     public string ReproductionProcessingGroup => _reproductionGroup;
