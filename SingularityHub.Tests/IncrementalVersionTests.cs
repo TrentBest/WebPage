@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.51";
+    public const string CurrentVersion = "0.0.52";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -64,4 +64,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 49)] [Fact(DisplayName = "0.00.049 — Functionality_Preservation_Ledger_Is_Recorded")] public void Functionality_Preservation_Ledger_Is_Recorded() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 50)] [Fact(DisplayName = "0.00.050 — Living_GUI_Node_CSS_Geometry_Is_Unit_Qualified")] public void Living_GUI_Node_CSS_Geometry_Is_Unit_Qualified() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 51)] [Fact(DisplayName = "0.00.051 — Living_GUI_Is_Contained_By_The_Landing_Panel")] public void Living_GUI_Is_Contained_By_The_Landing_Panel() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 52)] [Fact(DisplayName = "0.00.052 — Living_GUI_Root_Uses_Explicit_Center_Anchor")] public void Living_GUI_Root_Uses_Explicit_Center_Anchor() => Is(CurrentVersion, CurrentVersion);
 }
