@@ -7,8 +7,8 @@ namespace TheSingularityWorkshop.Services
 {
     /// <summary>
     /// The outermost FSM for the Workshop web experience.
-    /// Blazor is presentation only. FSM_API owns progression, while the Hub owns
-    /// the process-group scheduler and nested Living GUI/physics runtimes.
+    /// Blazor is presentation only. FSM_API owns progression and the Hub owns the
+    /// application heartbeat boundary, including the nested Living GUI/physics groups.
     /// </summary>
     public sealed class PageFSM : IDisposable
     {
@@ -144,12 +144,33 @@ namespace TheSingularityWorkshop.Services
             };
         }
 
+        /// <summary>
+        /// This is the page FSM's actual FSM_API update callback. The Hub has already
+        /// entered the page process group when this method runs. Nested experience
+        /// process groups are therefore advanced from inside the authoritative FSM
+        /// execution cycle instead of a second application-side stepping loop.
+        /// </summary>
         private void Tick(IStateContext stateContext)
         {
             var context = (PageStateContext)stateContext;
+            var stateBeforeTick = _handle.CurrentState;
+
             context.TotalTicks++;
             context.StateTicks++;
-            StateChanged?.Invoke(CurrentState);
+
+            if (stateBeforeTick == LivingGuiPopulating &&
+                !context.LivingGuiFrozen &&
+                !context.LivingGuiPopulated)
+            {
+                _livingGuiRuntime.Update();
+            }
+            else if (stateBeforeTick == Gravity &&
+                     !context.LivingGuiFallen)
+            {
+                _hub.UpdateProcessGroup(_gravityProcessingGroup);
+            }
+
+            StateChanged?.Invoke(stateBeforeTick);
         }
 
         public void RequestEnter()
@@ -170,32 +191,16 @@ namespace TheSingularityWorkshop.Services
         }
 
         /// <summary>
-        /// Advances the page FSM once. The Living GUI process-group gate opens
-        /// only when this heartbeat began in LivingGuiPopulating, which itself is
-        /// unreachable until the user requests entry from the gateway.
+        /// Advances the application by handing one heartbeat to the Hub.
+        /// The Hub delegates the registered root process groups to FSM_API's
+        /// <see cref="fsm_API.Interaction.Update(string)"/> execution mechanism.
         /// </summary>
         public void Update()
         {
             if (_disposed)
                 return;
 
-            var stateBeforeHeartbeat = CurrentState;
             _hub.Update();
-
-            if (stateBeforeHeartbeat == LivingGuiPopulating &&
-                CurrentState == LivingGuiPopulating &&
-                !Context.LivingGuiFrozen &&
-                !Context.LivingGuiPopulated)
-            {
-                _livingGuiRuntime.Update();
-            }
-            else if (stateBeforeHeartbeat == Gravity &&
-                     CurrentState == Gravity &&
-                     !Context.LivingGuiFallen)
-            {
-                _hub.UpdateProcessGroup(_gravityProcessingGroup);
-            }
-
             StateChanged?.Invoke(CurrentState);
         }
 
