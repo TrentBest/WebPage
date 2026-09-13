@@ -1,4 +1,3 @@
-using TheSingularityWorkshop.Workshop.Experiences;
 using Xunit;
 
 namespace SingularityHub.Tests;
@@ -9,7 +8,9 @@ public sealed class IncrementalVersion069Tests
     [Fact(DisplayName = "0.00.069 — Pong_Is_A_Concrete_Workshop_Experience")]
     public void PongIsAConcreteWorkshopExperience()
     {
-        IExperience experience = new PongExperience();
+        TheSingularityWorkshop.SingularityHub.IExperience experience =
+            new TheSingularityWorkshop.Workshop.Experiences.PongExperience();
+
         Assert.Equal("0.0.69", "0.0.69");
         Assert.Equal(3001UL, experience.Id);
         Assert.Equal("PONG", experience.Name);
