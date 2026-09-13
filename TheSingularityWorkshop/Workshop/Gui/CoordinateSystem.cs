@@ -40,7 +40,13 @@ public readonly record struct CoordinateSystem(
 
     public double DeltaY(double fromY, double toY) => toY - fromY;
 
-    public static CoordinateSystem Normalized { get; } = new();
+    /// <summary>
+    /// Gets the canonical normalized GUI coordinate system.
+    /// Explicit constructor arguments are required because <c>new()</c> on a
+    /// value type uses the CLR zero-initialized representation rather than the
+    /// optional parameter defaults declared on the primary constructor.
+    /// </summary>
+    public static CoordinateSystem Normalized { get; } = new(0, 100, 50, 50);
 
     private double ValidateAndProject(double value, double origin)
     {
