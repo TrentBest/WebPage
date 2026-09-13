@@ -30,6 +30,7 @@ namespace TheSingularityWorkshop.Services
         private const long NavigationDelayTicks = 91;
 
         private readonly FSMHandle _handle;
+        private readonly FSMHandle _livingGuiHandle;
         private readonly HubKernel _hub;
         private readonly string _processingGroup;
         private readonly string _livingGuiProcessingGroup;
@@ -39,6 +40,7 @@ namespace TheSingularityWorkshop.Services
         public PageStateContext Context { get; }
         public HubKernel Hub => _hub;
         public string CurrentState => _handle.CurrentState;
+        public string LivingGuiState => _livingGuiHandle.CurrentState;
         public string InstanceProcessingGroup => _processingGroup;
         public string LivingGuiProcessingGroup => _livingGuiProcessingGroup;
         public string GravityProcessingGroup => _gravityProcessingGroup;
@@ -89,8 +91,6 @@ namespace TheSingularityWorkshop.Services
                 .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
                 .State(Gravity, Enter(c =>
                 {
-                    // A gravity run is a fresh scheduler phase. Clear any stale
-                    // terminal flag before the first gravity heartbeat is selected.
                     c.GravityReleased = false;
                     c.LivingGuiFallen = false;
                     behavior?.OnGravity?.Invoke(c);
@@ -128,7 +128,7 @@ namespace TheSingularityWorkshop.Services
                 .BuildDefinition();
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, _processingGroup);
-            fsm_API.Create.CreateInstance("LivingGuiFSM", Context, _livingGuiProcessingGroup);
+            _livingGuiHandle = fsm_API.Create.CreateInstance("LivingGuiFSM", Context, _livingGuiProcessingGroup);
             fsm_API.Create.CreateInstance("GravityFSM", Context, _gravityProcessingGroup);
 
             Update();
@@ -173,10 +173,7 @@ namespace TheSingularityWorkshop.Services
         /// Advances exactly one page heartbeat, then selects the one nested
         /// process group owned by the state that was already active at the start
         /// of that heartbeat. A newly-entered state gets its first nested tick on
-        /// the following heartbeat. This preserves a clean one-heartbeat boundary:
-        /// entering LIVING_GUI_POPULATING creates the seed, but does not also
-        /// advance it; entering GRAVITY likewise does not inherit a population or
-        /// gravity tick from the transition heartbeat.
+        /// the following heartbeat.
         /// </summary>
         public void Update()
         {
