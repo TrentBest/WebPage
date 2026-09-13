@@ -1,5 +1,5 @@
 using TheSingularityWorkshop.Services;
-using TheSingularityWorkshop.SingularityHub;
+using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 using Xunit;
 
 namespace SingularityHub.Tests;
@@ -111,6 +111,8 @@ public sealed class LivingGuiRuntimeTests
         Assert.Contains(fsm.Hub.ProcessGroups, group =>
             group.Name == fsm.LivingGuiMatureGrowthProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
         Assert.Contains(fsm.Hub.ProcessGroups, group =>
+            group.Name == fsm.LivingGuiMatureGrowthProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
+        Assert.Contains(fsm.Hub.ProcessGroups, group =>
             group.Name == fsm.LivingGuiReproductionProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
     }
 
@@ -182,7 +184,7 @@ public sealed class LivingGuiRuntimeTests
     [Fact(DisplayName = "FSM manager and PageFSM share the registered Hub instance")]
     public void FsmManager_UsesRegisteredHubInstance()
     {
-        using var hub = new SingularityHub();
+        using var hub = new HubKernel();
         using var manager = new FSMManagerService(hub);
 
         Assert.Same(hub, manager.Page.Hub);
