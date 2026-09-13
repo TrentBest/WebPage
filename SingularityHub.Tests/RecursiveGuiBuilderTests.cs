@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.RenderTree;
+using Microsoft.AspNetCore.Components.Rendering;
 using TheSingularityWorkshop.Workshop.Gui;
 using Xunit;
 
@@ -56,5 +59,27 @@ public sealed class RecursiveGuiBuilderTests
         Assert.Equal("Left", root.Find("left-button").Text);
         Assert.Equal("Right", root.Find("right-button").Text);
         Assert.Throws<InvalidOperationException>(() => root.Find("missing"));
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 59 — the semantic GUI tree can be manifested by Blazor")]
+    public void IncrementalUnitTest59_SemanticTreeCanBeManifestedByBlazor()
+    {
+        var root = GuiBuilder
+            .Create("Panel", "root")
+            .Property("class", "workshop-panel")
+            .Child("Button", "enter", button => button
+                .Child("Text", "label", text => text.Text("Enter Workshop")))
+            .Build();
+
+        var renderTree = new RenderTreeBuilder();
+        BlazorGuiRenderer.Render(root)(renderTree);
+
+        var frames = renderTree.GetFrames().Array;
+
+        Assert.Contains(frames, frame => frame.FrameType == RenderTreeFrameType.Element && frame.ElementName == "div");
+        Assert.Contains(frames, frame => frame.FrameType == RenderTreeFrameType.Attribute && frame.AttributeName == "id" && (string?)frame.AttributeValue == "root");
+        Assert.Contains(frames, frame => frame.FrameType == RenderTreeFrameType.Element && frame.ElementName == "button");
+        Assert.Contains(frames, frame => frame.FrameType == RenderTreeFrameType.Element && frame.ElementName == "span");
+        Assert.Contains(frames, frame => frame.FrameType == RenderTreeFrameType.Text && frame.TextContent == "Enter Workshop");
     }
 }
