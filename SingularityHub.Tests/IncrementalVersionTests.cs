@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.70";
+    public const string CurrentVersion = "0.0.72";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -76,4 +76,6 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 61)] [Fact(DisplayName = "0.00.061 — Living_GUI_Page_FSM_Exposes_The_New_Generation_Phases")] public void Living_GUI_Page_FSM_Exposes_The_New_Generation_Phases() => Is("0.0.61", "0.0.61");
     [ArchitectureTest(0, 0, 62)] [Fact(DisplayName = "0.00.062 — Living_GUI_Reproduction_Recovery_Is_Prioritized")] public void Living_GUI_Reproduction_Recovery_Is_Prioritized() => Is("0.0.62", "0.0.62");
     [ArchitectureTest(0, 0, 70)] [Fact(DisplayName = "0.00.070 — Hub_Heartbeat_Is_The_FSM_API_Execution_Boundary")] public void Hub_Heartbeat_Is_The_FSM_API_Execution_Boundary() => Is("0.0.70", CurrentVersion);
+    [ArchitectureTest(0, 0, 71)] [Fact(DisplayName = "0.00.071 — Pong_Physics_Is_Advanced_By_FSM_API")] public void Pong_Physics_Is_Advanced_By_FSM_API() => Is("0.0.71", CurrentVersion);
+    [ArchitectureTest(0, 0, 72)] [Fact(DisplayName = "0.00.072 — Pong_FSM_Definition_And_Instance_Use_One_Stable_Name")] public void Pong_FSM_Definition_And_Instance_Use_One_Stable_Name() => Is("0.0.72", CurrentVersion);
 }
