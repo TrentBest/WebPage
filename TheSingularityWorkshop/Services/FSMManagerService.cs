@@ -21,6 +21,7 @@ namespace TheSingularityWorkshop.Services
         public PageFSM Page { get; }
         public PageStateContext Context => Page.Context;
         public string CurrentState => Page.CurrentState;
+        public string LivingGuiState => Page.LivingGuiState;
 
         public event Action<string>? StateChanged
         {
