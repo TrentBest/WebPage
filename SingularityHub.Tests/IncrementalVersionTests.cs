@@ -14,9 +14,9 @@ namespace SingularityHub.Tests;
 public sealed class IncrementalVersionTests
 {
     /// <summary>Version claimed by the current repository commit.</summary>
-    public const string CurrentVersion = "0.0.78";
+    public const string CurrentVersion = "0.0.80";
 
-    [ArchitectureTest(0, 0, 78)]
-    [Fact(DisplayName = "V0.0.78 — Incremental_Heartbeat")]
-    public void V0_0_78() => Assert.Equal(CurrentVersion, "0.0.78");
+    [ArchitectureTest(0, 0, 80)]
+    [Fact(DisplayName = "V0.0.80 — Incremental_Heartbeat")]
+    public void V0_0_80() => Assert.Equal(CurrentVersion, "0.0.80");
 }
