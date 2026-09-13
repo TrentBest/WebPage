@@ -62,9 +62,9 @@ public sealed class CoordinateSystemGuiBuilder
     public CoordinateSystemGuiBuilder Point(string id, double x, double y)
     {
         var panel = _coordinates.ToPanel(x, y);
-        _builder.Child("coordinate-point", id)
+        _builder.Child("coordinate-point", id, point => point
             .Property("x", panel.X.ToString(System.Globalization.CultureInfo.InvariantCulture))
-            .Property("y", panel.Y.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            .Property("y", panel.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)));
         return this;
     }
 
