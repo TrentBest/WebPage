@@ -35,7 +35,7 @@ else
         @foreach (var node in FSM.Context.LivingNodes)
         {
             <div class="architecture-node @(GravityActive ? "gravity-node" : "")"
-                 style="left:@NodeLeft(node);top:@NodeTop(node);width:@node.Sizepx;height:@node.Sizepx;transform:translate(-50%,-50%) rotate(@node.Rotation)deg;opacity:@NodeOpacity(node);z-index:@NodeLayer(node);"
+                 style="left:@NodeLeft(node);top:@NodeTop(node);width:@node.Size;height:@node.Size;transform:translate(-50%,-50%) rotate(@node.Rotation)deg;opacity:@NodeOpacity(node);z-index:@NodeLayer(node);"
                  aria-label="@node.Lineage">
                 <span class="node-label">@node.Lineage</span>
             </div>
