@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.73";
+    public const string CurrentVersion = "0.0.74";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -79,4 +79,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 71)] [Fact(DisplayName = "0.00.071 — Pong_Physics_Is_Advanced_By_FSM_API")] public void Pong_Physics_Is_Advanced_By_FSM_API() => Is("0.0.71", CurrentVersion);
     [ArchitectureTest(0, 0, 72)] [Fact(DisplayName = "0.00.072 — Pong_FSM_Definition_And_Instance_Use_One_Stable_Name")] public void Pong_FSM_Definition_And_Instance_Use_One_Stable_Name() => Is("0.0.72", CurrentVersion);
     [ArchitectureTest(0, 0, 73)] [Fact(DisplayName = "0.00.073 — Idle_Host_Renders_Pong_State_Without_Owning_Physics")] public void Idle_Host_Renders_Pong_State_Without_Owning_Physics() => Is("0.0.73", CurrentVersion);
+    [ArchitectureTest(0, 0, 74)] [Fact(DisplayName = "0.00.074 — MicroBundle_Lifecycle_Disposes_Through_FSM_API")] public void MicroBundle_Lifecycle_Disposes_Through_FSM_API() => Is("0.0.74", CurrentVersion);
 }
