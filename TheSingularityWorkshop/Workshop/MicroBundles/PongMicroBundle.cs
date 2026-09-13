@@ -31,7 +31,7 @@ public sealed class PongMicroBundle : IDisposable
         _gameContext = new PongStateContext();
 
         FSM_API.FSM_API.Create.CreateProcessingGroup(_gameProcessingGroup);
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine($"PongGameFSM:{BundleId}:{Guid.NewGuid():N}", -1, _gameProcessingGroup)
+        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_gameContext.FsmName, -1, _gameProcessingGroup)
             .State(GameStateName, onEnter: null, onUpdate: _ => _gameContext.Advance(), onExit: null)
             .WithInitialState(GameStateName)
             .BuildDefinition();
