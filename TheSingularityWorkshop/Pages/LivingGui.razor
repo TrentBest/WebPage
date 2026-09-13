@@ -35,7 +35,7 @@ else
         @foreach (var node in FSM.Context.LivingNodes)
         {
             <div class="architecture-node @(GravityActive ? "gravity-node" : "")"
-                 style="left:@node.X%;top:@node.Y%;width:@NodeVisualSize(node)px;height:@NodeVisualSize(node)px;transform:translate(-50%,-50%) rotate(@node.Rotation)deg;opacity:@NodeOpacity(node);z-index:@NodeLayer(node);"
+                 style="left:clamp(100px,@node.X%,calc(100% - 100px));top:clamp(100px,@node.Y%,calc(100% - 100px));width:@NodeVisualSize(node)px;height:@NodeVisualSize(node)px;transform:translate(-50%,-50%) rotate(@node.Rotation)deg;opacity:@NodeOpacity(node);z-index:@NodeLayer(node);"
                  aria-label="@node.Lineage">
                 <span class="node-label">@node.Lineage</span>
             </div>
@@ -44,8 +44,6 @@ else
 </div>
 
 <style>
-    /* The living sequence is a viewport-level takeover. Do not let an inherited
-       article/layout clipping context swallow the first node or its FSM marker. */
     .living-sequence-shell { position:fixed; inset:0; z-index:100000; width:100vw; height:100dvh; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
     .living-fsm-label { position:absolute; left:1.25rem; top:1.25rem; z-index:30; min-width:min(280px,72vw); box-sizing:border-box; padding:.7rem .9rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:.2rem; border:2px solid #ff7a00; border-radius:6px; background:rgba(2,3,4,.94); box-shadow:0 0 14px rgba(255,122,0,.35),0 0 36px rgba(255,122,0,.12),inset 0 0 18px rgba(255,122,0,.05); text-align:left; pointer-events:none; }
     .living-fsm-title { font-size:clamp(1rem,2vw,1.45rem); font-weight:900; letter-spacing:.14em; color:#fff; text-shadow:0 0 7px rgba(255,122,0,.8); }
@@ -82,11 +80,9 @@ else
         _ = InvokeAsync(StateHasChanged);
     }
 
-    private static double NodeVisualSize(PageStateContext.LivingNodeState node) =>
-        Math.Clamp(node.Size * 0.55, 10, 48);
+    private static double NodeVisualSize(PageStateContext.LivingNodeState node) => node.Size;
 
-    private static int NodeLayer(PageStateContext.LivingNodeState node) =>
-        20 + node.Generation;
+    private static int NodeLayer(PageStateContext.LivingNodeState node) => 20 + node.Generation;
 
     private static double NodeOpacity(PageStateContext.LivingNodeState node)
     {
