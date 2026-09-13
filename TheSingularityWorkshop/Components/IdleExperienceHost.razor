@@ -1,6 +1,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.Services
 @using TheSingularityWorkshop.Workshop.MicroBundles
+@inject FSMManagerService FSM
 @implements IAsyncDisposable
 
 @if (_idleActive)
@@ -121,6 +122,22 @@
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
+                // Idle is a fallback capability. Once the user deliberately enters
+                // an Experience, this host must never compete with the Hub-selected
+                // Experience for the presentation surface.
+                if (FSM.Context.EnterRequested)
+                {
+                    if (_idleActive)
+                    {
+                        _idleActive = false;
+                        _selectedExperience = null;
+                        _draggingLeftPaddle = false;
+                    }
+
+                    await InvokeAsync(StateHasChanged);
+                    continue;
+                }
+
                 var idle = DateTime.UtcNow - _lastActivityUtc >= IdleThreshold;
                 if (idle && !_idleActive)
                 {
