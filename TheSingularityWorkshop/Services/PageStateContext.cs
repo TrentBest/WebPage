@@ -6,7 +6,7 @@ namespace TheSingularityWorkshop.Services
 {
     /// <summary>
     /// Runtime data carried by the page-level FSM.
-    /// The living GUI swarm and its presentation gates are state, not Razor-owned timing state.
+    /// The Living GUI and its phase FSMs operate on this context; Razor owns no timing.
     /// </summary>
     public sealed class PageStateContext : IStateContext
     {
@@ -45,6 +45,10 @@ namespace TheSingularityWorkshop.Services
         public bool LivingGuiFrozen { get; private set; }
         public IReadOnlyList<LivingNodeState> LivingNodes => _livingNodes;
 
+        public bool NeedsRootGrowth => _livingNodes.Exists(node => node.IsRoot && !node.SeedDoubled);
+        public bool NeedsChildRooting => !NeedsRootGrowth && _livingNodes.Exists(node => !node.IsRoot && !node.GrowthReady);
+        public bool NeedsMatureGrowth => !NeedsRootGrowth && !NeedsChildRooting && _livingNodes.Exists(node => node.Size < MaximumNodeSize);
+
         public PageStateContext(object? singularityHub = null) => SingularityHub = singularityHub;
 
         public void ResetStateClock() => StateTicks = 0;
@@ -65,14 +69,48 @@ namespace TheSingularityWorkshop.Services
             LivingGuiFallen = false;
         }
 
-        /// <summary>
-        /// Advances the visible living-GUI lifecycle.
-        /// The root is born at the center at 200px, immediately grows to 400px,
-        /// and then spawns a rooted child on the layer above at a random safe position.
-        /// Every child starts tiny, roots immediately, reaches the 200px default quickly,
-        /// and then follows the same 200px -> 400px -> reproduce lifecycle.
-        /// </summary>
-        public void AdvanceLivingGui()
+        public void AdvanceRootGrowth()
+        {
+            if (LivingGuiFrozen) return;
+
+            foreach (var node in _livingNodes)
+            {
+                if (!node.IsRoot || node.SeedDoubled) continue;
+
+                node.Size = Math.Min(MaximumNodeSize, node.Size + RootGrowthStep);
+                node.SeedDoubled = node.Size >= MaximumNodeSize;
+                break;
+            }
+        }
+
+        public void AdvanceChildRooting()
+        {
+            if (LivingGuiFrozen) return;
+
+            foreach (var node in _livingNodes)
+            {
+                if (node.IsRoot || node.GrowthReady) continue;
+
+                node.Size = Math.Min(DefaultNodeSize, node.Size + RootGrowthStep);
+                node.GrowthReady = node.Size >= DefaultNodeSize;
+                break;
+            }
+        }
+
+        public void AdvanceMatureGrowth()
+        {
+            if (LivingGuiFrozen) return;
+
+            foreach (var node in _livingNodes)
+            {
+                if (!node.GrowthReady || node.Size >= MaximumNodeSize) continue;
+
+                node.Size = Math.Min(MaximumNodeSize, node.Size + GrowthStep);
+                break;
+            }
+        }
+
+        public void AdvanceReproduction()
         {
             if (LivingGuiFrozen || _livingNodes.Count >= CriticalMass)
                 return;
@@ -81,25 +119,7 @@ namespace TheSingularityWorkshop.Services
 
             foreach (var node in _livingNodes)
             {
-                if (node.IsRoot && !node.SeedDoubled)
-                {
-                    node.Size = MaximumNodeSize;
-                    node.SeedDoubled = true;
-                    continue;
-                }
-
-                if (!node.GrowthReady)
-                {
-                    node.Size = Math.Min(DefaultNodeSize, node.Size + RootGrowthStep);
-                    node.GrowthReady = node.Size >= DefaultNodeSize;
-                    continue;
-                }
-
-                if (node.Size < MaximumNodeSize)
-                {
-                    node.Size = Math.Min(MaximumNodeSize, node.Size + GrowthStep);
-                    continue;
-                }
+                if (node.Size < MaximumNodeSize) continue;
 
                 node.OffspringCount++;
                 newborns.Add(CreateSeed(node));
@@ -122,7 +142,6 @@ namespace TheSingularityWorkshop.Services
         private LivingNodeState CreateSeed(LivingNodeState parent)
         {
             var (x, y) = NextSafePosition();
-
             var lineage = parent.Generation == 0
                 ? $"G:{parent.OffspringCount}"
                 : $"{parent.Lineage}-{parent.OffspringCount - 1}";
