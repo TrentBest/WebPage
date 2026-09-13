@@ -19,7 +19,7 @@
         }
     </div>
 
-    @if (Experience.CurrentState is "Intro" or "Living")
+    @if (Experience.CurrentState is "Intro" or "Living" or "FlexHello")
     {
         <div class="experience-layer">
             @if (Experience.CurrentState == "Intro")
@@ -56,6 +56,16 @@
                             <span class="warning-final">Viewer discretion and spare RAM advised.</span>
                         </div>
                     </div>
+                </section>
+            }
+
+            @if (Experience.CurrentState == "FlexHello")
+            {
+                <section class="flex-hello" aria-live="polite">
+                    <div class="flex-hello-orbit" aria-hidden="true"></div>
+                    <div class="flex-hello-kicker">FLEX EXPERIENCE</div>
+                    <div class="flex-hello-moniker">THE SINGULARITY WORKSHOP</div>
+                    <div class="flex-hello-state">STATE: @Experience.CurrentState</div>
                 </section>
             }
 
@@ -111,6 +121,13 @@
     .warning-body { font-size:clamp(.63rem,.92vw,.82rem); line-height:1.65; letter-spacing:.025em; color:#dceaf2; }
     .warning-body strong { color:#fff; } .warning-final { color:#ffb15c; }
 
+    .flex-hello { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.75rem; overflow:hidden; isolation:isolate; background:radial-gradient(circle at 50% 48%,rgba(0,234,255,.09),transparent 34%),#020711; }
+    .flex-hello::before { content:""; position:absolute; inset:0; z-index:-2; background-image:linear-gradient(rgba(0,234,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,44,255,.035) 1px,transparent 1px); background-size:44px 44px; animation:gridDrift 18s linear infinite; }
+    .flex-hello-orbit { position:absolute; width:min(55vw,720px); height:min(55vw,720px); border:1px solid rgba(0,234,255,.16); border-radius:50%; box-shadow:0 0 50px rgba(0,234,255,.06); animation:helloOrbit 6s ease-in-out infinite; }
+    .flex-hello-kicker { font-size:clamp(.7rem,1.2vw,1rem); letter-spacing:.42em; color:#ff9933; text-shadow:0 0 10px rgba(255,153,51,.7); animation:helloBreath 3.2s ease-in-out infinite; }
+    .flex-hello-moniker { font-size:clamp(1.5rem,5vw,4.2rem); font-weight:800; letter-spacing:.18em; text-align:center; color:#fff; text-shadow:0 0 12px #00eaff,0 0 34px rgba(0,234,255,.75),0 0 60px rgba(255,44,255,.28); animation:helloMoniker 3.8s ease-in-out infinite; }
+    .flex-hello-state { margin-top:.5rem; font-size:clamp(.65rem,1vw,.9rem); letter-spacing:.24em; color:#8eefff; opacity:.78; }
+
     .living-node { position:absolute; width:54px; height:54px; z-index:20; transition:left .08s linear,top .08s linear; }
     .living-node .node-core { position:absolute; inset:13px; border-radius:50%; background:#00eaff; box-shadow:0 0 10px #00eaff,0 0 30px rgba(0,234,255,.7); }
     .living-node .node-ring { position:absolute; inset:0; border:1px solid rgba(255,44,255,.65); border-radius:50%; animation:ring 2.8s ease-in-out infinite; }
@@ -129,6 +146,9 @@
     @@keyframes titleBreath { 0%,100%{text-shadow:0 0 8px #00eaff,0 0 22px rgba(0,234,255,.65);opacity:.92}50%{text-shadow:0 0 12px #00eaff,0 0 30px rgba(0,234,255,.9),0 0 45px rgba(255,44,255,.35);opacity:1} }
     @@keyframes warningBorderBreath { 0%,100%{border-color:#ff6600;box-shadow:0 0 10px rgba(255,102,0,.2),0 0 24px rgba(255,102,0,.1),inset 0 0 16px rgba(255,102,0,.035)}50%{border-color:#ff7a00;box-shadow:0 0 20px rgba(255,102,0,.48),0 0 42px rgba(255,102,0,.2),inset 0 0 24px rgba(255,102,0,.07)} }
     @@keyframes warningHeaderBreath { 0%,49%{color:#ff9933;text-shadow:0 0 8px rgba(255,153,51,.7)}50%,100%{color:#ffd34d;text-shadow:0 0 10px rgba(255,211,77,.8)} }
+    @@keyframes helloOrbit { 0%,100%{transform:scale(.94) rotateX(64deg) rotateZ(-12deg);opacity:.28}50%{transform:scale(1.04) rotateX(64deg) rotateZ(12deg);opacity:.75} }
+    @@keyframes helloBreath { 0%,100%{opacity:.7}50%{opacity:1} }
+    @@keyframes helloMoniker { 0%,100%{transform:scale(.97);opacity:.88}50%{transform:scale(1.025);opacity:1} }
     @@keyframes ring { 0%,100%{transform:scale(.86);opacity:.3}50%{transform:scale(1.18);opacity:.9} }
     @@keyframes fade-up { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:none} }
     @@keyframes moniker { 0%{opacity:0;transform:scale(.92)}35%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.03)} }
@@ -142,10 +162,11 @@
         .ambient-orbit{width:90vw;height:90vw}
         .living-node{width:42px;height:42px}
         .living-node span{top:47px}
+        .flex-hello-moniker{font-size:clamp(1.1rem,7vw,2.8rem);letter-spacing:.1em;padding:0 1rem}
     }
 
     @@media(prefers-reduced-motion:reduce){
-        .monolith-stage::before,.ambient-scan,.ambient-orbit,.ambient-signal,.monolith-btn::after,.hero-energy,.monolith-text,.workshop-warning,.warning-header{animation:none}
+        .monolith-stage::before,.ambient-scan,.ambient-orbit,.ambient-signal,.monolith-btn::after,.hero-energy,.monolith-text,.workshop-warning,.warning-header,.flex-hello-orbit,.flex-hello-kicker,.flex-hello-moniker{animation:none}
     }
 </style>
 
@@ -187,8 +208,12 @@
         warningHovered = false;
         await JS.InvokeVoidAsync("interop.markWorkshopVisited");
         Experience.RequestEntry();
-        EnsureNodeDefinition();
-        SpawnSeed(50, 50, 0);
+
+        if (Experience.CurrentState == "Living")
+        {
+            EnsureNodeDefinition();
+            SpawnSeed(50, 50, 0);
+        }
     }
 
     private void WarningHovered() => warningHovered = true;
