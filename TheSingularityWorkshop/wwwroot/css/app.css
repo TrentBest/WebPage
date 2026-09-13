@@ -158,10 +158,8 @@ html.workshop-splash-released .page > main > article.workshop-content {
 /*
    LIVING GUI PANEL GEOMETRY
    -------------------------
-   This is deliberately global host CSS. The LivingGui component is nested
-   inside Home's landing panel, so the panel—not the browser viewport—is the
-   coordinate system for the first node. Keeping these rules outside component
-   CSS isolation also makes the containment contract explicit.
+   The landing panel is the coordinate system. Do not use viewport coordinates
+   for the root: the panel must be able to move/resize independently of chrome.
 */
 .hypervisor-shell > .living-launch-stage {
     position: absolute !important;
@@ -181,6 +179,8 @@ html.workshop-splash-released .page > main > article.workshop-content {
     min-width: 0 !important;
     min-height: 0 !important;
     overflow: hidden !important;
+    border: 5px solid #ff2cff !important;
+    box-shadow: inset 0 0 0 2px rgba(255,211,77,.9), inset 0 0 28px rgba(255,44,255,.32), 0 0 24px rgba(255,44,255,.32) !important;
 }
 
 .hypervisor-shell > .living-launch-stage > .living-sequence-shell > .living-canvas {
@@ -191,16 +191,23 @@ html.workshop-splash-released .page > main > article.workshop-content {
     min-width: 0 !important;
     min-height: 0 !important;
     overflow: hidden !important;
+    display: grid !important;
+    place-items: center !important;
 }
 
+/*
+   ROOT GEOMETRY: the grid cell is the panel center. The root is intentionally
+   removed from absolute/fixed positioning so there is no alternate containing
+   block left to misinterpret 50%.
+*/
 .hypervisor-shell > .living-launch-stage > .living-sequence-shell > .living-canvas > .architecture-node.root-node {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
     right: auto !important;
     bottom: auto !important;
     margin: 0 !important;
-    transform: translate(-50%, -50%) !important;
+    transform: rotate(0deg) !important;
 }
 
 h1:focus {
