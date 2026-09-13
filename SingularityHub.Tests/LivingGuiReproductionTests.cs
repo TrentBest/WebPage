@@ -20,7 +20,9 @@ public sealed class LivingGuiReproductionTests
         Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
         Assert.Equal(200, root.Size);
 
-        context.AdvanceRootGrowth();
+        for (var i = 0; i < 4; i++)
+            context.AdvanceRootGrowth();
+
         Assert.Equal(400, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, root.Phase);
 
@@ -91,7 +93,8 @@ public sealed class LivingGuiReproductionTests
     {
         var context = new PageStateContext();
         context.BeginLivingGui();
-        context.AdvanceRootGrowth();
+        for (var i = 0; i < 4; i++)
+            context.AdvanceRootGrowth();
         context.AdvanceReproduction();
 
         var parent = context.LivingNodes[0];
