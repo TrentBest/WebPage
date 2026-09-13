@@ -158,8 +158,8 @@ html.workshop-splash-released .page > main > article.workshop-content {
 /*
    LIVING GUI PANEL GEOMETRY
    -------------------------
-   The landing panel is the coordinate system. Do not use viewport coordinates
-   for the root: the panel must be able to move/resize independently of chrome.
+   There is exactly one diagnostic panel boundary here. The root belongs to
+   that panel and is centered by its canvas grid, never by the browser viewport.
 */
 .hypervisor-shell > .living-launch-stage {
     position: absolute !important;
@@ -180,7 +180,7 @@ html.workshop-splash-released .page > main > article.workshop-content {
     min-height: 0 !important;
     overflow: hidden !important;
     border: 5px solid #ff2cff !important;
-    box-shadow: inset 0 0 0 2px rgba(255,211,77,.9), inset 0 0 28px rgba(255,44,255,.32), 0 0 24px rgba(255,44,255,.32) !important;
+    box-shadow: 0 0 24px rgba(255,44,255,.32), inset 0 0 28px rgba(255,44,255,.18) !important;
 }
 
 .hypervisor-shell > .living-launch-stage > .living-sequence-shell > .living-canvas {
