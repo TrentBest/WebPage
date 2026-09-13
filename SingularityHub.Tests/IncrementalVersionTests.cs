@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.56";
+    public const string CurrentVersion = "0.0.57";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -39,7 +39,7 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 24)] [Fact(DisplayName = "0.00.024 — Living_GUI_Scheduler_Is_Fed_Until_Frozen")] public void Living_GUI_Scheduler_Is_Fed_Until_Frozen() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 25)] [Fact(DisplayName = "0.00.025 — Living_GUI_Uses_Explicit_G0_Lineage")] public void Living_GUI_Uses_Explicit_G0_Lineage() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 26)] [Fact(DisplayName = "0.00.026 — Living_GUI_Renders_Bordered_Lineage_Labels")] public void Living_GUI_Renders_Bordered_Lineage_Labels() => Is(CurrentVersion, CurrentVersion);
-    [ArchitectureTest(0, 0, 27)] [Fact(DisplayName = "0.00.027 — Living_GUI_Seed_Double_Flight_Growth_Is_Tracked")] public void Living_GUI_Seed_Double_Flight_Growth_Is_Tracked() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 27)] [Fact(DisplayName = "0.00.027 — Living_GUI_Seed_Double_Flight_Growth_Is_Tracked")] public void Living_GUI_Seed_Double_FFlight_Growth_Is_Tracked() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 28)] [Fact(DisplayName = "0.00.028 — Living_GUI_Compile_Contract_Is_Synchronized")] public void Living_GUI_Compile_Contract_Is_Synchronized() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 29)] [Fact(DisplayName = "0.00.029 — Living_GUI_Growth_Advances_In_Visible_Steps")] public void Living_GUI_Growth_Advances_In_Visible_Steps() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 30)] [Fact(DisplayName = "0.00.030 — Version_Heartbeat_Is_Advanced_With_This_Change")] public void Version_Heartbeat_Is_Advanced_With_This_Change() => Is(CurrentVersion, CurrentVersion);
@@ -69,4 +69,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 54)] [Fact(DisplayName = "0.00.054 — Living_GUI_Root_Is_Anchored_To_The_Landing_Panel")] public void Living_GUI_Root_Is_Anchored_To_The_Landing_Panel() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 55)] [Fact(DisplayName = "0.00.055 — Living_GUI_Root_Is_Centered_By_The_Panel_Grid")] public void Living_GUI_Root_Is_Centered_By_The_Panel_Grid() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 56)] [Fact(DisplayName = "0.00.056 — Incremental_Version_Advances_To_Zero_Zero_56")] public void Incremental_Version_Advances_To_Zero_Zero_56() => Is("0.0.56", CurrentVersion);
+    [ArchitectureTest(0, 0, 57)] [Fact(DisplayName = "0.00.057 — Idle_Fallback_Cannot_Compete_With_Deliberate_Experience")] public void Idle_Fallback_Cannot_Compete_With_Deliberate_Experience() => Is("0.0.57", CurrentVersion);
 }
