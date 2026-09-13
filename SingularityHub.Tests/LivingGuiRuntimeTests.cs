@@ -10,31 +10,27 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class LivingGuiRuntimeTests
 {
-    [Fact(DisplayName = "Living GUI enters population after gateway request")]
-    public void LivingGui_EntersPopulationAfterGatewayRequest()
+    [Fact(DisplayName = "Living GUI enters population with a centered 200px root")]
+    public void LivingGui_EntersPopulationWithCenteredRoot()
     {
         using var fsm = new PageFSM();
-
-        Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
-        Assert.Empty(fsm.Context.LivingNodes);
-
         fsm.RequestEnter();
 
         for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
             fsm.Update();
 
-        Assert.NotEqual(PageFSM.Gateway, fsm.CurrentState);
-        Assert.NotEmpty(fsm.Context.LivingNodes);
-        Assert.Equal("G:0", fsm.Context.LivingNodes[0].Lineage);
-        Assert.Contains(fsm.CurrentState, new[]
-        {
-            PageFSM.LivingGuiIgnition,
-            PageFSM.LivingGuiPopulating
-        });
+        var root = Assert.Single(fsm.Context.LivingNodes);
+        Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
+        Assert.Equal("G:0", root.Lineage);
+        Assert.Equal(0, root.Generation);
+        Assert.True(root.IsRoot);
+        Assert.Equal(50, root.X);
+        Assert.Equal(50, root.Y);
+        Assert.Equal(200, root.Size);
     }
 
-    [Fact(DisplayName = "Living GUI seed doubles, travels, reaches default size, then grows")]
-    public void LivingGui_SeedLifecycle()
+    [Fact(DisplayName = "Living GUI root doubles immediately and then spawns a safe rooted child")]
+    public void LivingGui_RootDoublesAndSpawnsRootedChild()
     {
         using var fsm = new PageFSM();
         fsm.RequestEnter();
@@ -43,27 +39,51 @@ public sealed class LivingGuiRuntimeTests
             fsm.Update();
 
         var root = fsm.Context.LivingNodes[0];
-        var startX = root.X;
-        var startY = root.Y;
-        var startSize = root.Size;
-
         fsm.Update();
-        Assert.Equal(startSize * 2, root.Size);
+        Assert.Equal(400, root.Size);
         Assert.True(root.SeedDoubled);
 
-        var flightGuard = root.SeedFlightDuration + 2;
-        for (var ticks = 0; ticks < flightGuard && !root.GrowthReady; ticks++)
+        fsm.Update();
+
+        var child = Assert.Single(fsm.Context.LivingNodes, node => node.Lineage == "G:1");
+        Assert.Equal(1, child.Generation);
+        Assert.False(child.IsRoot);
+        Assert.Equal(40, child.Size);
+        Assert.InRange(child.X, 10, 90);
+        Assert.InRange(child.Y, 10, 90);
+        Assert.Equal(50, root.X);
+        Assert.Equal(50, root.Y);
+    }
+
+    [Fact(DisplayName = "Living GUI child reaches default size quickly, then grows to reproduction size")]
+    public void LivingGui_ChildReachesDefaultAndGrows()
+    {
+        using var fsm = new PageFSM();
+        fsm.RequestEnter();
+
+        const int guard = 10_000;
+        var ticks = 0;
+        while (fsm.Context.LivingNodes.Count < 2 && ticks++ < guard)
             fsm.Update();
 
-        Assert.True(root.GrowthReady);
-        Assert.Equal(48, root.Size);
-        Assert.NotEqual((startX, startY), (root.X, root.Y));
+        Assert.True(fsm.Context.LivingNodes.Count >= 2);
+        var child = fsm.Context.LivingNodes[1];
 
         fsm.Update();
-        Assert.Equal(72, root.Size);
+        Assert.Equal(200, child.Size);
+        Assert.True(child.GrowthReady);
 
         fsm.Update();
-        Assert.Equal(96, root.Size);
+        Assert.Equal(250, child.Size);
+
+        fsm.Update();
+        Assert.Equal(300, child.Size);
+
+        fsm.Update();
+        Assert.Equal(350, child.Size);
+
+        fsm.Update();
+        Assert.Equal(400, child.Size);
     }
 
     [Fact(DisplayName = "Living GUI lineage names root children and descendants deterministically")]
