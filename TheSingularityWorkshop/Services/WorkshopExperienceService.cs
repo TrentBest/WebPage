@@ -1,58 +1,40 @@
 namespace TheSingularityWorkshop.Services;
 
-/// <summary>
-/// Owns the host-level lifecycle state used by the Workshop landing presentation.
-/// The service deliberately does not render or step an Experience; it only exposes
-/// the current host phase and the selected Flex experience.
-/// </summary>
+/// <summary>Owns host lifecycle state without stepping an Experience.</summary>
 public sealed class WorkshopExperienceService
 {
-    /// <summary>Raised when the host lifecycle state changes.</summary>
     public event Action? StateChanged;
 
-    /// <summary>Gets the current host lifecycle state.</summary>
     public string CurrentState { get; private set; } = "Intro";
-
-    /// <summary>Gets whether the Unity layer should currently be visible.</summary>
     public bool ShowUnity => CurrentState == "Unity";
-
-    /// <summary>Gets the currently selected Flex experience.</summary>
+    public bool IsInitialized { get; private set; }
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
 
-    /// <summary>Marks the Workshop as visited without changing presentation state.</summary>
-    public void MarkVisited()
+    public void Initialize(bool returningVisitor = false)
     {
+        if (IsInitialized) return;
+        IsInitialized = true;
+        if (returningVisitor) MarkUnityStarted();
     }
 
-    /// <summary>
-    /// Initializes the host lifecycle. Initialization is intentionally idempotent so
-    /// Blazor rendering can safely call it more than once.
-    /// </summary>
-    public Task InitializeAsync()
-    {
-        return Task.CompletedTask;
-    }
+    public void MarkVisited() { }
 
-    /// <summary>
-    /// Enters the current Flex experience. The first Flex is the intentionally simple
-    /// moniker Hello World experience; richer experiences can be added to the catalog.
-    /// </summary>
     public void RequestEntry()
     {
-        SelectedFlexExperience = FlexExperienceCatalog.Select(new Random());
-        SetState("Flex");
+        SelectedFlexExperience = FlexExperienceCatalog.Select(Random.Shared);
+        SetState("FlexHello");
     }
 
-    /// <summary>Transitions to a named host lifecycle state.</summary>
+    public void Tick() { }
+
+    public void MarkUnityStarted() => SetState("Unity");
+
+    public void SetCriticalMassReached() => SetState("CriticalMass");
+
     public void SetState(string state)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(state);
-
-        if (CurrentState == state)
-        {
-            return;
-        }
-
+        if (CurrentState == state) return;
         CurrentState = state;
         StateChanged?.Invoke();
     }
