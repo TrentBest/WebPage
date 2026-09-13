@@ -26,7 +26,7 @@ public sealed class CoordinateSystemUtilitiesTests
     [InlineData(0, 0, 100, 0)]
     [InlineData(50, 0, 100, 50)]
     [InlineData(100, 0, 100, 100)]
-    [InlineData(25, -50, 50, 100)]
+    [InlineData(25, -50, 50, 75)]
     public void Normalize_Maps_Source_Range_To_Zero_To_OneHundred(double value, double minimum, double maximum, double expected)
         => Assert.Equal(expected, CoordinateSystemUtilities.Normalize(value, minimum, maximum));
 
@@ -34,7 +34,7 @@ public sealed class CoordinateSystemUtilitiesTests
     [InlineData(0, 0, 100, 0)]
     [InlineData(50, 0, 100, 50)]
     [InlineData(100, 0, 100, 100)]
-    [InlineData(25, -50, 50, -25)]
+    [InlineData(25, -50, 50, 25)]
     public void Denormalize_Maps_Zero_To_OneHundred_Back_To_Source_Range(double normalized, double minimum, double maximum, double expected)
         => Assert.Equal(expected, CoordinateSystemUtilities.Denormalize(normalized, minimum, maximum));
 
