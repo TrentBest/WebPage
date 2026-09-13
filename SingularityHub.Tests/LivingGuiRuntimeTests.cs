@@ -1,3 +1,4 @@
+using System.Linq;
 using TheSingularityWorkshop.Services;
 using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 using Xunit;
@@ -11,6 +12,16 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class LivingGuiRuntimeTests
 {
+    [Fact(DisplayName = "Page FSM context is explicitly valid at construction")]
+    public void PageFsm_ContextStartsValid()
+    {
+        using var fsm = new PageFSM();
+
+        Assert.True(fsm.Context.IsValid);
+        Assert.True(fsm.IsValid);
+        Assert.True(fsm.LivingGuiIsValid);
+    }
+
     [Fact(DisplayName = "Living GUI enters population with a centered 200px root")]
     public void LivingGui_EntersPopulationWithCenteredRoot()
     {
@@ -146,7 +157,7 @@ public sealed class LivingGuiRuntimeTests
         Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:0");
         Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:1");
         Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:2");
-        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage.StartsWith("G:1-", StringComparison.Ordinal));
+        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage.StartsWith("G:1-", System.StringComparison.Ordinal));
     }
 
     [Fact(DisplayName = "Living GUI reaches exact critical mass through its isolated scheduler")]
