@@ -1,13 +1,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TheSingularityWorkshop.SingularityHub;
 
 namespace TheSingularityWorkshop.Services
 {
     /// <summary>
     /// Compatibility facade over the real page-level FSM.
-    /// FSM_API owns progression; this service supplies the application heartbeat
-    /// so the page presentation can continue without Razor owning transitions.
+    /// FSM_API owns progression; the application heartbeat advances the page FSM,
+    /// while the registered SingularityHub singleton owns the process-group scheduler.
     /// </summary>
     public sealed class FSMManagerService : IDisposable
     {
@@ -30,9 +31,14 @@ namespace TheSingularityWorkshop.Services
             remove => Page.StateChanged -= value;
         }
 
-        public FSMManagerService()
+        /// <summary>
+        /// Creates the page FSM against the application's registered Hub.
+        /// This is the critical composition boundary: PageFSM and LivingGuiFsm must
+        /// schedule through the same Hub instance that the host registered.
+        /// </summary>
+        public FSMManagerService(SingularityHub hub)
         {
-            Page = new PageFSM();
+            Page = new PageFSM(hub);
             _heartbeatTask = RunHeartbeatAsync(_shutdown.Token);
         }
 
