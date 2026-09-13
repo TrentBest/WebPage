@@ -21,7 +21,7 @@ public sealed class WorkshopExperienceService
 
     public void RequestEntry()
     {
-        SelectedFlexExperience = FlexExperienceCatalog.Select(Random.Shared);
+        SelectedFlexExperience = FlexExperienceCatalog.SelectDefault();
         SetState("FlexHello");
     }
 
