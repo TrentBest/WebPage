@@ -61,14 +61,6 @@
                 <span class="node-label">@node.Lineage</span>
             </div>
         }
-
-        <!-- Deliberately independent rendering probe. This is NOT driven by the
-             FSM and exists to prove whether the browser can place a second GUI
-             element away from the upper-left corner. Fixed positioning removes
-             every component/layout containing block from the experiment. -->
-        <div class="layout-probe" aria-label="Independent layout probe">
-            <span>PROBE</span>
-        </div>
     </div>
 </div>
 
@@ -97,11 +89,6 @@
     .architecture-node { position:absolute; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); transition:width .08s linear,height .08s linear,opacity .08s linear; will-change:left,top,width,height,transform; }
     .node-label { display:block; pointer-events:none; text-shadow:0 0 5px rgba(255,211,77,.65); }.gravity-node { pointer-events:none; }
 
-    /* Independent second GUI marker: fixed to the viewport at 75%/25%.
-       If this renders anywhere except upper-left, the browser can position
-       elements and the fault is in the LivingGui/Home containing block chain. */
-    .layout-probe { position:fixed; left:75vw; top:25vh; z-index:2147483647; width:120px; height:120px; transform:translate(-50%,-50%); display:flex; align-items:center; justify-content:center; box-sizing:border-box; border:3px solid #52e05a; border-radius:50%; background:rgba(82,224,90,.14); color:#fff; font:900 1rem/1 Consolas,"Courier New",monospace; letter-spacing:.12em; text-shadow:0 0 8px #52e05a; box-shadow:0 0 14px #52e05a,0 0 40px rgba(82,224,90,.45),inset 0 0 22px rgba(82,224,90,.18); pointer-events:none; }
-    .node-label { display:block; pointer-events:none; text-shadow:0 0 5px rgba(255,211,77,.65); }
     .moniker-title { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.82; letter-spacing:.075em; text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%; }
     .moniker-title>div { white-space:nowrap; }.moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }.moniker-title>div:nth-child(2) span { animation-delay:-.4s; }.moniker-title>div:nth-child(3) span { animation-delay:-.8s; }
     .blue{color:#00a8ff}.magenta{color:#ff2cff}.orange{color:#ff7a00}.red{color:#ff3030}.yellow{color:#ffd34d}.green{color:#52e05a}
@@ -113,13 +100,29 @@
 @code {
     private bool MonikerInstantiated => FSM.Context.MonikerReady && FSM.Context.LivingNodes.Count == PageStateContext.CriticalMass;
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
-    protected override void OnInitialized() => FSM.StateChanged += HandleFSMStateChanged;
+
+    protected override void OnInitialized()
+    {
+        FSM.StateChanged += HandleFSMStateChanged;
+
+        // /living-gui is also a direct development route. If it is entered
+        // without first passing through Home's gateway button, use the same
+        // PageFSM entry contract rather than leaving the nested runtime alive
+        // with an empty context forever.
+        if (FSM.CurrentState == PageFSM.Gateway && !FSM.Context.EnterRequested)
+            FSM.RequestEnter();
+    }
+
     private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
     private static string NodeLeft(PageStateContext.LivingNodeState node) => $"calc(50% + {node.X - 50d:0.###}%)";
     private static string NodeTop(PageStateContext.LivingNodeState node) => $"calc(50% + {node.Y - 50d:0.###}%)";
     private static string NodeSize(PageStateContext.LivingNodeState node) => $"{node.Size:0.##}px";
     private static string NodeTransform(PageStateContext.LivingNodeState node) => $"translate(-50%,-50%) rotate({node.Rotation:0.##}deg)";
-    private static string RootTransform(PageStateContext.LivingNodeState node) => $"translate(-50%,-50%) rotate({node.Rotation:0.##}deg)";
+
+    // The root is already centered by .root-center-anchor. Applying another
+    // translate(-50%,-50%) here would double-center it and move it up/left.
+    private static string RootTransform(PageStateContext.LivingNodeState node) => $"rotate({node.Rotation:0.##}deg)";
+
     private static int NodeLayer(PageStateContext.LivingNodeState node) => 20 + node.Generation;
     private static double NodeOpacity(PageStateContext.LivingNodeState node) => node.Y <= 100 ? 1 : Math.Clamp(1 - ((node.Y - 100) / 30), 0, 1);
     public void Dispose() => FSM.StateChanged -= HandleFSMStateChanged;
