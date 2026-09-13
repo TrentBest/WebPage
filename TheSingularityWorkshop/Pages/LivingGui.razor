@@ -26,7 +26,7 @@
             <div class="moniker-title">
                 <div><span class="blue">T</span><span class="magenta">h</span><span class="orange">e</span></div>
                 <div><span class="red">S</span><span class="yellow">i</span><span class="green">n</span><span class="blue">g</span><span class="magenta">u</span><span class="orange">l</span><span class="red">a</span><span class="yellow">r</span><span class="green">i</span><span class="blue">t</span><span class="magenta">y</span></div>
-                <div><span class="orange">W</span><span class="red">o</span><span class="yellow">r</span><span class="green">k</span><span class="blue">s</span><span class="magenta">h</span><span class="orange">o</span><span class="red">o</span><span class="orange">p</span></div>
+                <div><span class="orange">W</span><span class="red">o</span><span class="yellow">r</span><span class="green">k</span><span class="blue">k</span><span class="blue">s</span><span class="magenta">h</span><span class="orange">o</span><span class="red">o</span><span class="orange">p</span></div>
             </div>
         </div>
     }
@@ -52,6 +52,14 @@
                 <span class="node-label">@node.Lineage</span>
             </div>
         }
+
+        <!-- Deliberately independent rendering probe. This is NOT driven by the
+             FSM and exists to prove whether the browser can place a second GUI
+             element away from the upper-left corner. Fixed positioning removes
+             every component/layout containing block from the experiment. -->
+        <div class="layout-probe" aria-label="Independent layout probe">
+            <span>PROBE</span>
+        </div>
     </div>
 </div>
 
@@ -65,13 +73,16 @@
     .living-fsm-state,.living-fsm-count,.living-fsm-root,.living-fsm-valid { font-size:clamp(.65rem,1vw,.82rem); font-weight:700; letter-spacing:.06em; color:#ffd34d; }.living-fsm-count { color:#00eaff; }.living-fsm-root { color:#52e05a; }.living-fsm-valid { color:#ff2cff; }
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
     .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; min-width:0; min-height:0; overflow:hidden; display:block; }
-
-    /* Do not rely on percentage left/top for the root. The anchor is a full
-       canvas overlay and flex-centers the root against the actual rendered panel. */
     .root-center-anchor { position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; pointer-events:none; }
     .architecture-node.root-node { position:relative !important; left:auto !important; top:auto !important; right:auto !important; bottom:auto !important; margin:0 !important; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); transition:width .08s linear,height .08s linear,opacity .08s linear; will-change:width,height,transform; }
     .architecture-node { position:absolute; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); transition:width .08s linear,height .08s linear,opacity .08s linear; will-change:left,top,width,height,transform; }
     .node-label { display:block; pointer-events:none; text-shadow:0 0 5px rgba(255,211,77,.65); }.gravity-node { pointer-events:none; }
+
+    /* Independent second GUI marker: fixed to the viewport at 75%/25%.
+       If this renders anywhere except upper-left, the browser can position
+       elements and the fault is in the LivingGui/Home containing block chain. */
+    .layout-probe { position:fixed; left:75vw; top:25vh; z-index:2147483647; width:120px; height:120px; transform:translate(-50%,-50%); display:flex; align-items:center; justify-content:center; box-sizing:border-box; border:3px solid #52e05a; border-radius:50%; background:rgba(82,224,90,.14); color:#fff; font:900 1rem/1 Consolas,"Courier New",monospace; letter-spacing:.12em; text-shadow:0 0 8px #52e05a; box-shadow:0 0 14px #52e05a,0 0 40px rgba(82,224,90,.45),inset 0 0 22px rgba(82,224,90,.18); pointer-events:none; }
+    .node-label { display:block; pointer-events:none; text-shadow:0 0 5px rgba(255,211,77,.65); }
     .moniker-title { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.82; letter-spacing:.075em; text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%; }
     .moniker-title>div { white-space:nowrap; }.moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }.moniker-title>div:nth-child(2) span { animation-delay:-.4s; }.moniker-title>div:nth-child(3) span { animation-delay:-.8s; }
     .blue{color:#00a8ff}.magenta{color:#ff2cff}.orange{color:#ff7a00}.red{color:#ff3030}.yellow{color:#ffd34d}.green{color:#52e05a}
