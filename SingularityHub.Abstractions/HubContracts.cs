@@ -35,4 +35,10 @@ public interface IExecutionProvider { CompletionToken Execute(WorkDescriptor wor
 public enum ProcessGroupState { Registered, Active, Completed }
 public readonly record struct ProcessGroupSnapshot(ulong Id, ProcessGroupState State);
 public interface IProcessGroupHost { bool Register(ulong id); bool Activate(ulong id); bool Complete(ulong id); IReadOnlyCollection<ProcessGroupSnapshot> ActiveGroups { get; } }
-public interface ISingularityHub : IArbitrator, IDataWarehouseLiaison, IProcessGroupHost { IArbitrationAudit Audit { get; } }
+
+/// <summary>Common Hub boundary for arbitration, scheduling, data, and routing.</summary>
+public interface ISingularityHub : IArbitrator, IDataWarehouseLiaison, IProcessGroupHost
+{
+    IArbitrationAudit Audit { get; }
+    ISingularityRouting Routing { get; }
+}
