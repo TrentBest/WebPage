@@ -4,20 +4,19 @@
 @inject FSMManagerService FSM
 @implements IDisposable
 
-@if (MonikerInstantiated)
-{
-    <PageTitle>The Singularity Workshop</PageTitle>
-}
-else
-{
-    <PageTitle>Living GUI</PageTitle>
-}
+<PageTitle>@(MonikerInstantiated ? "The Singularity Workshop" : "Living GUI")</PageTitle>
 
 <div class="living-sequence-shell @(MonikerInstantiated ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
     <div class="living-fsm-label" aria-live="polite">
         <span class="living-fsm-title">LIVING GUI</span>
         <span class="living-fsm-state">FSM_API :: @FSM.LivingGuiState :: @FSM.LivingGuiActivePhase</span>
         <span class="living-fsm-count">NODES :: @FSM.Context.LivingNodes.Count</span>
+        <span class="living-fsm-count">TICKS :: @FSM.Context.TotalTicks</span>
+        @if (FSM.Context.LivingNodes.Count > 0)
+        {
+            var root = FSM.Context.LivingNodes[0];
+            <span class="living-fsm-root">ROOT :: @root.X.ToString("0.##")%, @root.Y.ToString("0.##")% :: @root.Size.ToString("0.##")px</span>
+        }
     </div>
 
     @if (MonikerInstantiated)
@@ -34,7 +33,7 @@ else
     <main class="living-canvas" aria-label="Living GUI swarm">
         @foreach (var node in FSM.Context.LivingNodes)
         {
-            <div class="architecture-node @(GravityActive ? "gravity-node" : "")"
+            <div class="architecture-node @(node.IsRoot ? "root-node" : "") @(GravityActive ? "gravity-node" : "")"
                  style="left:@NodeLeft(node);top:@NodeTop(node);width:@NodeSize(node);height:@NodeSize(node);transform:@NodeTransform(node);opacity:@NodeOpacity(node);z-index:@NodeLayer(node);"
                  aria-label="@node.Lineage">
                 <span class="node-label">@node.Lineage</span>
@@ -44,13 +43,14 @@ else
 </div>
 
 <style>
-    .living-sequence-shell { position:absolute; inset:0; z-index:10000; width:100%; height:100%; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
-    .living-fsm-label { position:absolute; left:1.25rem; top:1.25rem; z-index:30; min-width:min(280px,72vw); box-sizing:border-box; padding:.7rem .9rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:.2rem; border:2px solid #ff7a00; border-radius:6px; background:rgba(2,3,4,.94); box-shadow:0 0 14px rgba(255,122,0,.35),0 0 36px rgba(255,122,0,.12),inset 0 0 18px rgba(255,122,0,.05); text-align:left; pointer-events:none; }
+    .living-sequence-shell { position:absolute; inset:0; z-index:10000; width:100%; height:100%; min-width:0; min-height:0; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
+    .living-fsm-label { position:absolute; left:1.25rem; top:1.25rem; z-index:100; min-width:min(300px,72vw); box-sizing:border-box; padding:.7rem .9rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:.2rem; border:2px solid #ff7a00; border-radius:6px; background:rgba(2,3,4,.94); box-shadow:0 0 14px rgba(255,122,0,.35),0 0 36px rgba(255,122,0,.12),inset 0 0 18px rgba(255,122,0,.05); text-align:left; pointer-events:none; }
     .living-fsm-title { font-size:clamp(1rem,2vw,1.45rem); font-weight:900; letter-spacing:.14em; color:#fff; text-shadow:0 0 7px rgba(255,122,0,.8); }
-    .living-fsm-state,.living-fsm-count { font-size:clamp(.65rem,1vw,.82rem); font-weight:700; letter-spacing:.06em; color:#ffd34d; }.living-fsm-count { color:#00eaff; }
+    .living-fsm-state,.living-fsm-count,.living-fsm-root { font-size:clamp(.65rem,1vw,.82rem); font-weight:700; letter-spacing:.06em; color:#ffd34d; }.living-fsm-count { color:#00eaff; }.living-fsm-root { color:#52e05a; }
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
-    .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; overflow:hidden; perspective:1200px; }
-    .architecture-node { position:absolute; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); }
+    .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; min-width:0; min-height:0; overflow:hidden; perspective:1200px; }
+    .architecture-node { position:absolute; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); transition:width .08s linear,height .08s linear,opacity .08s linear; will-change:left,top,width,height,transform; }
+    .architecture-node.root-node { left:50% !important; top:50% !important; }
     .node-label { display:block; pointer-events:none; text-shadow:0 0 5px rgba(255,211,77,.65); }.gravity-node { pointer-events:none; }
     .moniker-title { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.82; letter-spacing:.075em; text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%; }
     .moniker-title>div { white-space:nowrap; }.moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }.moniker-title>div:nth-child(2) span { animation-delay:-.4s; }.moniker-title>div:nth-child(3) span { animation-delay:-.8s; }
@@ -60,10 +60,14 @@ else
 </style>
 
 @code {
-    private bool MonikerInstantiated => FSM.Context.MonikerReady && FSM.Context.LivingNodes.Count == PageStateContext.CriticalMass;
+    private bool MonikerInstantiated =>
+        FSM.Context.MonikerReady &&
+        FSM.Context.LivingNodes.Count == PageStateContext.CriticalMass;
+
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
 
     protected override void OnInitialized() => FSM.StateChanged += HandleFSMStateChanged;
+
     private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
 
     private static string NodeLeft(PageStateContext.LivingNodeState node) => $"{node.X:0.###}%";
