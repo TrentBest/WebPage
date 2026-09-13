@@ -71,6 +71,7 @@ namespace TheSingularityWorkshop.Services
         /// <summary>
         /// Advances one living seed through the visible lifecycle:
         /// 18 -> 36 -> flight -> 48 -> 72 -> 96 -> reproduce.
+        /// The maximum-size heartbeat remains observable before reproduction begins.
         /// </summary>
         public void AdvanceLivingGui()
         {
@@ -113,14 +114,14 @@ namespace TheSingularityWorkshop.Services
                     continue;
                 }
 
-                node.Size += GrowthStep;
-
-                if (node.Size >= MaximumNodeSize)
+                if (node.Size < MaximumNodeSize)
                 {
-                    node.Size = DefaultNodeSize;
-                    node.OffspringCount++;
-                    newborns.Add(CreateSeed(node));
+                    node.Size = Math.Min(MaximumNodeSize, node.Size + GrowthStep);
+                    continue;
                 }
+
+                node.OffspringCount++;
+                newborns.Add(CreateSeed(node));
             }
 
             _livingNodes.AddRange(newborns);
