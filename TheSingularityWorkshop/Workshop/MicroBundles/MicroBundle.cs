@@ -1,3 +1,4 @@
+using System;
 using TheSingularityWorkshop.FSM_API;
 using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
 using TheSingularityWorkshop.SingularityHub;
@@ -11,10 +12,11 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// It also projects itself through the Hub-level micro-bundle contract so the
 /// runtime Element can participate in Hub arbitration without exposing its FSM mechanics.
 /// </summary>
-public sealed class MicroBundle : IMicroBundle, HubBundle
+public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
 {
     private readonly FSMHandle _fsm;
     private readonly IMicroBundleProvider _provider;
+    private bool _disposed;
 
     public MicroBundle(int id, string name, IMicroBundleProvider provider, int parentId = -1, int generation = 0)
     {
@@ -78,6 +80,8 @@ public sealed class MicroBundle : IMicroBundle, HubBundle
 
     public void Update()
     {
+        if (_disposed) return;
+
         // FSM_API's processing-group update owns the initial state entry and
         // regular transition evaluation. The lifecycle clock advances only
         // after the FSM has evaluated the current tick. This preserves the
@@ -93,9 +97,7 @@ public sealed class MicroBundle : IMicroBundle, HubBundle
         }
 
         if (Context is MicroBundleContext context)
-        {
             context.ElapsedMilliseconds++;
-        }
 
         Manifestation = _provider.Manifest(Context);
     }
@@ -103,9 +105,20 @@ public sealed class MicroBundle : IMicroBundle, HubBundle
     public void Invalidate()
     {
         if (Context is MicroBundleContext context)
-        {
             context.IsInvalidated = true;
-        }
+    }
+
+    /// <summary>
+    /// Destroys the MicroBundle lifecycle FSM through FSM_API. This keeps the
+    /// lifecycle scheduler free of stale bundle instances when an Experience
+    /// leaves the presentation surface.
+    /// </summary>
+    public void Dispose()
+    {
+        if (_disposed) return;
+
+        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(FsmName, ProcessingGroup);
+        _disposed = true;
     }
 
     private void EnterManifesting(IStateContext context) => ((MicroBundleContext)context).Phase = "Manifesting";
