@@ -24,6 +24,7 @@ namespace TheSingularityWorkshop.Services
         public string CurrentState => Page.CurrentState;
         public string LivingGuiState => Page.LivingGuiState;
         public string LivingGuiActivePhase => Page.LivingGuiActivePhase;
+        public bool LivingGuiIsValid => Page.LivingGuiIsValid;
 
         public event Action<string>? StateChanged
         {
