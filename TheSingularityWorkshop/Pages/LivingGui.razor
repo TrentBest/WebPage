@@ -30,7 +30,7 @@
         </div>
     }
 
-    <main class="living-canvas" aria-label="Living GUI swarm">
+    <div class="living-canvas" aria-label="Living GUI swarm">
         @if (FSM.Context.LivingNodes.Count > 0)
         {
             var root = FSM.Context.LivingNodes[0];
@@ -49,7 +49,7 @@
                 <span class="node-label">@node.Lineage</span>
             </div>
         }
-    </main>
+    </div>
 </div>
 
 <style>
@@ -58,7 +58,12 @@
     .living-fsm-title { font-size:clamp(1rem,2vw,1.45rem); font-weight:900; letter-spacing:.14em; color:#fff; text-shadow:0 0 7px rgba(255,122,0,.8); }
     .living-fsm-state,.living-fsm-count,.living-fsm-root { font-size:clamp(.65rem,1vw,.82rem); font-weight:700; letter-spacing:.06em; color:#ffd34d; }.living-fsm-count { color:#00eaff; }.living-fsm-root { color:#52e05a; }
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
-    .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; min-width:0; min-height:0; overflow:hidden; display:grid; place-items:center; }
+
+    /* This is deliberately a DIV, not MAIN. MainLayout.razor.css owns every
+       <main> element on the page; reusing that semantic element here caused
+       the Living GUI canvas to inherit layout rules from the host application.
+       The canvas is now a private layout surface owned entirely by this panel. */
+    .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; min-width:0; min-height:0; overflow:hidden; display:grid; place-items:center; align-items:center; justify-items:center; }
 
     /* The panel owns centering. The root is a normal grid item; it is never
        fixed to the browser viewport and never carries percentage positioning. */
