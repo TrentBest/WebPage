@@ -9,7 +9,7 @@ public sealed class IncrementalVersion071Tests
     [Fact(DisplayName = "0.00.071 — Pong_Physics_Is_Advanced_By_FSM_API")]
     public void PongPhysicsIsAdvancedByFsmApi()
     {
-        var pong = new PongMicroBundle();
+        using var pong = new PongMicroBundle();
         var initialX = pong.BallX;
 
         pong.Update();
