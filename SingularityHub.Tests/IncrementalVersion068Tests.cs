@@ -11,7 +11,7 @@ public sealed class IncrementalVersion068Tests
     [Fact(DisplayName = "0.00.068 — Routing_Rejects_Duplicate_Paths")]
     public void RoutingRejectsDuplicatePaths()
     {
-        ISingularityHub hub = new SingularityHub(_ => { });
+        ISingularityHub hub = new TheSingularityWorkshop.SingularityHub.SingularityHub(_ => { });
         var first = new SingularityRoute(1, "/about", "ABOUT", 8001);
         var duplicatePath = new SingularityRoute(2, "/about", "OTHER", 8002);
 
