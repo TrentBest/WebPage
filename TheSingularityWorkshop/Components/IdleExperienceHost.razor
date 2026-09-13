@@ -4,42 +4,39 @@
 @inject FSMManagerService FSM
 @implements IAsyncDisposable
 
-@if (_idleActive)
+@if (_idleActive && _pongBundle is not null)
 {
     <section class="idle-screen-saver" aria-label="Workshop idle experience">
         <div class="idle-frame">
             <header class="idle-header">
                 <span>WORKSHOP // IDLE</span>
-                <span>@_selectedExperience?.DisplayName</span>
+                <span>PONG</span>
             </header>
 
-            @if (_selectedExperience?.Id == "pong")
-            {
-                <div class="pong-board" aria-label="Pong idle experience">
-                    <div class="pong-center-line"></div>
-                    <div class="pong-score pong-score-left">@_leftScore</div>
-                    <div class="pong-score pong-score-right">@_rightScore</div>
-                    <div class="pong-paddle pong-paddle-left"
-                         style="@($"--paddle-position:{_leftPaddle}%")"
-                         @onpointerdown="BeginLeftDrag"
-                         @onpointermove="DragLeftPaddle"
-                         @onpointerup="EndLeftDrag"
-                         @onpointercancel="EndLeftDrag"
-                         @onpointerdown:stopPropagation="true"
-                         @onpointermove:stopPropagation="true"
-                         @onpointerup:stopPropagation="true"
-                         @onpointercancel:stopPropagation="true"
-                         aria-label="Player paddle">
-                        <span>P</span><span>A</span><span>D</span><span>D</span><span>L</span><span>E</span>
-                    </div>
-                    <div class="pong-paddle pong-paddle-right"
-                         style="@($"--paddle-position:{_rightPaddle}%")"
-                         aria-label="AI paddle">
-                        <span>P</span><span>A</span><span>D</span><span>D</span><span>L</span><span>E</span>
-                    </div>
-                    <div class="pong-ball" style="@($"left:{_ballX}%;top:{_ballY}%")"></div>
+            <div class="pong-board" aria-label="Pong idle experience">
+                <div class="pong-center-line"></div>
+                <div class="pong-score pong-score-left">@_pongBundle.LeftScore</div>
+                <div class="pong-score pong-score-right">@_pongBundle.RightScore</div>
+                <div class="pong-paddle pong-paddle-left"
+                     style="@($"--paddle-position:{_pongBundle.LeftPaddle}%")"
+                     @onpointerdown="BeginLeftDrag"
+                     @onpointermove="DragLeftPaddle"
+                     @onpointerup="EndLeftPaddleDrag"
+                     @onpointercancel="EndLeftPaddleDrag"
+                     @onpointerdown:stopPropagation="true"
+                     @onpointermove:stopPropagation="true"
+                     @onpointerup:stopPropagation="true"
+                     @onpointercancel:stopPropagation="true"
+                     aria-label="Player paddle">
+                    <span>P</span><span>A</span><span>D</span><span>D</span><span>L</span><span>E</span>
                 </div>
-            }
+                <div class="pong-paddle pong-paddle-right"
+                     style="@($"--paddle-position:{_pongBundle.RightPaddle}%")"
+                     aria-label="AI paddle">
+                    <span>P</span><span>A</span><span>D</span><span>D</span><span>L</span><span>E</span>
+                </div>
+                <div class="pong-ball" style="left:@(_pongBundle.BallX)%;top:@(_pongBundle.BallY)%"></div>
+            </div>
 
             <footer class="idle-footer">
                 <span>THE USER HAS GONE AWAY.</span>
@@ -67,37 +64,18 @@
 </style>
 
 @code {
-    private const double FieldTop = 5;
-    private const double FieldBottom = 95;
-    private const double PaddleHalfHeight = 9;
-    private const double PaddleHalfWidth = .5;
-    private const double BallHalfWidth = 1;
-    private const double BallHalfHeight = 1;
-    private const double PaddleMinCenter = 9.7;
-    private const double PaddleMaxCenter = 90.3;
-
     private readonly Random _random = new();
     private CancellationTokenSource? _shutdown;
     private Task? _loop;
     private DateTime _lastActivityUtc = DateTime.UtcNow;
     private bool _idleActive;
-    private IdleExperienceDefinition? _selectedExperience;
     private PongMicroBundle? _pongBundle;
     private bool _draggingLeftPaddle;
-    private double _ballX = 50;
-    private double _ballY = 50;
-    private double _ballVelocityX = .65;
-    private double _ballVelocityY = .42;
-    private double _leftPaddle = 50;
-    private double _rightPaddle = 50;
-    private int _leftScore;
-    private int _rightScore;
 
     private static readonly TimeSpan IdleThreshold = TimeSpan.FromSeconds(7);
 
     protected override void OnInitialized()
     {
-        _pongBundle = MicroBundleCatalog.CreatePong();
         _shutdown = new CancellationTokenSource();
         _loop = RunAsync(_shutdown.Token);
     }
@@ -106,51 +84,30 @@
     {
         _lastActivityUtc = DateTime.UtcNow;
         if (_idleActive)
-        {
-            _idleActive = false;
-            _selectedExperience = null;
-            _leftScore = 0;
-            _rightScore = 0;
-            _draggingLeftPaddle = false;
-        }
+            StopIdleExperience();
     }
 
     private async Task RunAsync(CancellationToken cancellationToken)
     {
+        // This timer is only the Blazor repaint/activity observer. It does not
+        // advance Pong. Pong simulation time belongs to its FSM_API process group.
         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(33));
         try
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                // Idle is a fallback capability. Once the user deliberately enters
-                // an Experience, this host must never compete with the Hub-selected
-                // Experience for the presentation surface.
                 if (FSM.Context.EnterRequested)
                 {
-                    if (_idleActive)
-                    {
-                        _idleActive = false;
-                        _selectedExperience = null;
-                        _draggingLeftPaddle = false;
-                    }
-
+                    StopIdleExperience();
                     await InvokeAsync(StateHasChanged);
                     continue;
                 }
 
-                var idle = DateTime.UtcNow - _lastActivityUtc >= IdleThreshold;
-                if (idle && !_idleActive)
-                {
-                    _idleActive = true;
-                    _selectedExperience = IdleExperienceCatalog.Select(_random);
-                    ResetPong();
-                }
+                if (!_idleActive && DateTime.UtcNow - _lastActivityUtc >= IdleThreshold)
+                    StartIdleExperience();
 
-                if (_idleActive && _selectedExperience?.Id == "pong")
-                {
-                    _pongBundle?.Update();
-                    TickPong();
-                }
+                if (_idleActive && _pongBundle is not null)
+                    _pongBundle.Update();
 
                 await InvokeAsync(StateHasChanged);
             }
@@ -158,92 +115,34 @@
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
 
-    private void ResetPong()
+    private void StartIdleExperience()
     {
-        _ballX = 50;
-        _ballY = 50;
-        _ballVelocityX = _random.Next(0, 2) == 0 ? .65 : -.65;
-        _ballVelocityY = _random.Next(0, 2) == 0 ? .42 : -.42;
-        _leftPaddle = 50;
-        _rightPaddle = 50;
+        StopIdleExperience();
+        _idleActive = true;
+        _pongBundle = MicroBundleCatalog.CreatePong();
+    }
+
+    private void StopIdleExperience()
+    {
+        _idleActive = false;
         _draggingLeftPaddle = false;
-    }
-
-    private void TickPong()
-    {
-        _ballX += _ballVelocityX;
-        _ballY += _ballVelocityY;
-
-        if (_ballY - BallHalfHeight <= FieldTop)
-        {
-            _ballY = FieldTop + BallHalfHeight;
-            _ballVelocityY = Math.Abs(_ballVelocityY);
-        }
-        else if (_ballY + BallHalfHeight >= FieldBottom)
-        {
-            _ballY = FieldBottom - BallHalfHeight;
-            _ballVelocityY = -Math.Abs(_ballVelocityY);
-        }
-
-        if (!_draggingLeftPaddle)
-            _leftPaddle += Math.Clamp((_ballY - _leftPaddle) * .08, -1.6, 1.6);
-
-        _rightPaddle += Math.Clamp((_ballY - _rightPaddle) * .07, -1.45, 1.45);
-        _leftPaddle = Math.Clamp(_leftPaddle, PaddleMinCenter, PaddleMaxCenter);
-        _rightPaddle = Math.Clamp(_rightPaddle, PaddleMinCenter, PaddleMaxCenter);
-
-        if (BallOverlapsPaddle(_ballX, _ballY, 2, _leftPaddle) && _ballVelocityX < 0)
-        {
-            _ballX = 2 + PaddleHalfWidth + BallHalfWidth;
-            _ballVelocityX = Math.Abs(_ballVelocityX) + .015;
-        }
-        else if (BallOverlapsPaddle(_ballX, _ballY, 98, _rightPaddle) && _ballVelocityX > 0)
-        {
-            _ballX = 98 - PaddleHalfWidth - BallHalfWidth;
-            _ballVelocityX = -Math.Abs(_ballVelocityX) - .015;
-        }
-        else if (_ballX < -2)
-        {
-            _rightScore++;
-            ResetPong();
-        }
-        else if (_ballX > 102)
-        {
-            _leftScore++;
-            ResetPong();
-        }
-    }
-
-    private static bool BallOverlapsPaddle(double ballX, double ballY, double paddleX, double paddleY)
-    {
-        var ballLeft = ballX - BallHalfWidth;
-        var ballRight = ballX + BallHalfWidth;
-        var ballTop = ballY - BallHalfHeight;
-        var ballBottom = ballY + BallHalfHeight;
-        var paddleLeft = paddleX - PaddleHalfWidth;
-        var paddleRight = paddleX + PaddleHalfWidth;
-        var paddleTop = paddleY - PaddleHalfHeight;
-        var paddleBottom = paddleY + PaddleHalfHeight;
-
-        return ballLeft <= paddleRight
-            && ballRight >= paddleLeft
-            && ballTop <= paddleBottom
-            && ballBottom >= paddleTop;
+        _pongBundle?.Dispose();
+        _pongBundle = null;
     }
 
     private void BeginLeftDrag(PointerEventArgs _)
     {
-        if (!_idleActive) return;
-        _draggingLeftPaddle = true;
+        if (_idleActive && _pongBundle is not null)
+            _draggingLeftPaddle = true;
     }
 
     private void DragLeftPaddle(PointerEventArgs e)
     {
-        if (!_draggingLeftPaddle) return;
-        _leftPaddle = Math.Clamp(_leftPaddle + (e.MovementY / 7.0), PaddleMinCenter, PaddleMaxCenter);
+        if (!_draggingLeftPaddle || _pongBundle is null) return;
+        _pongBundle.MoveLeftPaddle(e.MovementY / 7.0);
     }
 
-    private void EndLeftDrag(PointerEventArgs _)
+    private void EndLeftPaddleDrag(PointerEventArgs _)
     {
         _draggingLeftPaddle = false;
     }
@@ -251,11 +150,15 @@
     public async ValueTask DisposeAsync()
     {
         if (_shutdown is null) return;
+
         await _shutdown.CancelAsync();
         if (_loop is not null)
         {
             try { await _loop; } catch (OperationCanceledException) { }
         }
+
+        _pongBundle?.Dispose();
+        _pongBundle = null;
         _shutdown.Dispose();
     }
 }
