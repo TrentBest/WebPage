@@ -24,7 +24,7 @@ namespace TheSingularityWorkshop.Services
         private const double MaxX = 90;
         private const double MinY = 10;
         private const double MaxY = 90;
-        private const double RootGrowthStep = 200;
+        private const double RootGrowthStep = 50;
         private const double GravityAcceleration = 1.15;
 
         private readonly Random _random = new();

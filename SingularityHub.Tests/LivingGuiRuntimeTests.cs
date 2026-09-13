@@ -22,7 +22,7 @@ public sealed class LivingGuiRuntimeTests
         Assert.True(fsm.LivingGuiIsValid);
     }
 
-    [Fact(DisplayName = "Living GUI enters population with a centered 200px root")]
+    [Fact(DisplayName = "Living GUI enters population with a centered 200px root actor")]
     public void LivingGui_EntersPopulationWithCenteredRoot()
     {
         using var fsm = new PageFSM();
@@ -39,10 +39,11 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(50, root.X);
         Assert.Equal(50, root.Y);
         Assert.Equal(200, root.Size);
+        Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
     }
 
-    [Fact(DisplayName = "Living GUI root doubles immediately and then spawns a safe rooted child")]
-    public void LivingGui_RootDoublesAndSpawnsRootedChild()
+    [Fact(DisplayName = "Living GUI root actor animates from its original size to double before spawning")]
+    public void LivingGui_RootAnimatesToDoubleAndThenSpawnsSeed()
     {
         using var fsm = new PageFSM();
         fsm.RequestEnter();
@@ -51,9 +52,23 @@ public sealed class LivingGuiRuntimeTests
             fsm.Update();
 
         var root = fsm.Context.LivingNodes[0];
+
+        fsm.Update();
+        Assert.Equal(250, root.Size);
+        Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
+
+        fsm.Update();
+        Assert.Equal(300, root.Size);
+        Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
+
+        fsm.Update();
+        Assert.Equal(350, root.Size);
+        Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
+
         fsm.Update();
         Assert.Equal(400, root.Size);
         Assert.True(root.SeedDoubled);
+        Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, root.Phase);
 
         fsm.Update();
 
@@ -65,6 +80,7 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(50, child.Y);
         Assert.InRange(child.TargetX, 10, 90);
         Assert.InRange(child.TargetY, 10, 90);
+        Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, child.Phase);
     }
 
     [Fact(DisplayName = "Living GUI child reaches default size through flight and scaling, then grows to reproduction size")]
@@ -137,6 +153,12 @@ public sealed class LivingGuiRuntimeTests
         for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
             fsm.Update();
 
+        Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
+        fsm.Update();
+        Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
+        fsm.Update();
+        Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
+        fsm.Update();
         Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
         fsm.Update();
         Assert.Equal(LivingGuiFsm.ReproductionState, fsm.LivingGuiActivePhase);
