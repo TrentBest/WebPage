@@ -25,7 +25,7 @@
             <div class="moniker-title">
                 <div><span class="blue">T</span><span class="magenta">h</span><span class="orange">e</span></div>
                 <div><span class="red">S</span><span class="yellow">i</span><span class="green">n</span><span class="blue">g</span><span class="magenta">u</span><span class="orange">l</span><span class="red">a</span><span class="yellow">r</span><span class="green">i</span><span class="blue">t</span><span class="magenta">y</span></div>
-                <div><span class="orange">W</span><span class="red">o</span><span class="yellow">r</span><span class="green">k</span><span class="blue">s</span><span class="magenta">h</span><span class="orange">o</span><span class="red">o</span><span class="orange">p</span></div>
+                <div><span class="orange">W</span><span class="red">o</span><span class="yellow">r</span><span class="green">k</span><span class="blue">k</span><span class="blue">s</span><span class="magenta">h</span><span class="orange">o</span><span class="red">o</span><span class="orange">p</span></div>
             </div>
         </div>
     }
@@ -59,10 +59,10 @@
     .living-fsm-state,.living-fsm-count,.living-fsm-root { font-size:clamp(.65rem,1vw,.82rem); font-weight:700; letter-spacing:.06em; color:#ffd34d; }.living-fsm-count { color:#00eaff; }.living-fsm-root { color:#52e05a; }
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
 
-    /* This is deliberately a DIV, not MAIN. MainLayout.razor.css owns every
-       <main> element on the page; reusing that semantic element here caused
-       the Living GUI canvas to inherit layout rules from the host application.
-       The canvas is now a private layout surface owned entirely by this panel. */
+    /* Deliberately a DIV, not MAIN. The host layout owns every semantic main
+       element on the page; reusing that element here caused the Living GUI
+       canvas to inherit layout rules from the host application. The canvas is
+       now a private layout surface owned entirely by this panel. */
     .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; min-width:0; min-height:0; overflow:hidden; display:grid; place-items:center; align-items:center; justify-items:center; }
 
     /* The panel owns centering. The root is a normal grid item; it is never
