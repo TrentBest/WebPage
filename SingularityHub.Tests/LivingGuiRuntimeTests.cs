@@ -86,6 +86,50 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(400, child.Size);
     }
 
+    [Fact(DisplayName = "Living GUI exposes distinct FSM process groups for every lifecycle phase")]
+    public void LivingGui_ExposesDistinctPhaseProcessGroups()
+    {
+        using var fsm = new PageFSM();
+
+        var groups = new[]
+        {
+            fsm.LivingGuiProcessingGroup,
+            fsm.LivingGuiRootGrowthProcessingGroup,
+            fsm.LivingGuiChildRootingProcessingGroup,
+            fsm.LivingGuiMatureGrowthProcessingGroup,
+            fsm.LivingGuiReproductionProcessingGroup
+        };
+
+        Assert.Equal(groups.Length, groups.Distinct().Count());
+        Assert.Contains(fsm.Hub.ProcessGroups, group =>
+            group.Name == fsm.LivingGuiProcessingGroup && group.ParentName == fsm.InstanceProcessingGroup);
+        Assert.Contains(fsm.Hub.ProcessGroups, group =>
+            group.Name == fsm.LivingGuiRootGrowthProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
+        Assert.Contains(fsm.Hub.ProcessGroups, group =>
+            group.Name == fsm.LivingGuiChildRootingProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
+        Assert.Contains(fsm.Hub.ProcessGroups, group =>
+            group.Name == fsm.LivingGuiMatureGrowthProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
+        Assert.Contains(fsm.Hub.ProcessGroups, group =>
+            group.Name == fsm.LivingGuiReproductionProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
+    }
+
+    [Fact(DisplayName = "Living GUI selects root growth before child rooting and mature growth")]
+    public void LivingGui_SelectsPhaseInLifecycleOrder()
+    {
+        using var fsm = new PageFSM();
+        fsm.RequestEnter();
+
+        for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
+            fsm.Update();
+
+        Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
+        fsm.Update();
+        Assert.Equal(LivingGuiFsm.ReproductionState, fsm.LivingGuiActivePhase);
+
+        fsm.Update();
+        Assert.Equal(LivingGuiFsm.ChildRootingState, fsm.LivingGuiActivePhase);
+    }
+
     [Fact(DisplayName = "Living GUI lineage names root children and descendants deterministically")]
     public void LivingGui_LineageNaming()
     {
