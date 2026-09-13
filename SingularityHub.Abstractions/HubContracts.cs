@@ -24,6 +24,17 @@ public readonly record struct BundleVersion(int Major, int Minor, int Patch);
 public enum MutationType { StructuralMutation, PropertyInjection, DependencyResolution }
 
 public interface IMicroBundle { ulong Id { get; } OntologySignature Ontology { get; } BundleVersion Version { get; } IReadOnlyList<ulong> Dependencies { get; } bool Arbitrate(IArbitrator arbitrator, int roundIndex); }
+public interface IExperience
+{
+    ulong Id { get; }
+    string Name { get; }
+    BundleVersion Version { get; }
+    OntologySignature Ontology { get; }
+    IReadOnlyList<ulong> MicroBundleIds { get; }
+    IReadOnlyList<ulong> Capabilities { get; }
+    IReadOnlyList<ulong> SensorySystems { get; }
+    IReadOnlyList<string> ProcessingGroups { get; }
+}
 public readonly record struct ArbitrationEvent(int RoundIndex, ulong ActorId, ulong TargetCoordinates, MutationType MutationType, ulong CausalParentId);
 public interface IArbitrationAudit { IReadOnlyList<ArbitrationEvent> Events { get; } void Record(ArbitrationEvent arbitrationEvent); }
 public interface IArbitrator { IReadOnlyCollection<IMicroBundle> LoadedBundles { get; } bool LoadBundle(IMicroBundle bundle); int ExecuteArbitrationPipeline(); }

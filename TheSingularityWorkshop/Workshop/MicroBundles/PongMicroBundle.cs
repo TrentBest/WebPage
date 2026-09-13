@@ -95,7 +95,7 @@ public sealed class PongMicroBundle : IDisposable
         private double _ballVelocityY = .42;
 
         public string FsmName { get; } = $"PongGameFSM:{Guid.NewGuid():N}";
-        public string Name { get; } = "PongGameContext";
+        public string Name { get; set; } = "PongGameContext";
         public bool IsValid { get; set; } = true;
         public double BallX { get; private set; } = 50;
         public double BallY { get; private set; } = 50;
