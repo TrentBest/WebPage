@@ -41,19 +41,7 @@
             <div class="cartesian-origin">0,0</div>
         </div>
 
-        @if (FSM.Context.LivingNodes.Count > 0)
-        {
-            var root = FSM.Context.LivingNodes[0];
-            <div class="root-center-anchor">
-                <div class="architecture-node root-node"
-                     style="width:@NodeSize(root);height:@NodeSize(root);transform:@RootTransform(root);opacity:@NodeOpacity(root);z-index:@NodeLayer(root);"
-                     aria-label="@root.Lineage">
-                    <span class="node-label">@root.Lineage</span>
-                </div>
-            </div>
-        }
-
-        @foreach (var node in FSM.Context.LivingNodes.Skip(1))
+        @foreach (var node in FSM.Context.LivingNodes)
         {
             <div class="architecture-node @(node.IsRoot ? "root-node" : "") @(GravityActive ? "gravity-node" : "")"
                  style="left:@NodeLeft(node);top:@NodeTop(node);width:@NodeSize(node);height:@NodeSize(node);transform:@NodeTransform(node);opacity:@NodeOpacity(node);z-index:@NodeLayer(node);"
@@ -84,15 +72,18 @@
     .cartesian-plane::before { content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent 49.95%,rgba(0,234,255,.08) 50%,transparent 50.05%),linear-gradient(0deg,transparent 49.95%,rgba(255,44,255,.08) 50%,transparent 50.05%); }
     .cartesian-origin { position:absolute; left:50%; top:50%; transform:translate(8px,8px); color:rgba(255,255,255,.45); font-size:.55rem; font-weight:700; letter-spacing:.08em; }
 
-    .root-center-anchor { position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; pointer-events:none; }
-    .architecture-node.root-node { position:relative !important; left:auto !important; top:auto !important; right:auto !important; bottom:auto !important; margin:0 !important; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); transition:width .08s linear,height .08s linear,opacity .08s linear; will-change:width,height,transform; }
-    .architecture-node { position:absolute; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); transition:width .08s linear,height .08s linear,opacity .08s linear; will-change:left,top,width,height,transform; }
+    /* Every Living GUI node, including the root, now uses the same explicit
+       Cartesian projection. X=50,Y=50 therefore means exact panel center.
+       There is no separate flex anchor that can introduce a second coordinate
+       system or move the root independently of the FSM. */
+    .architecture-node { position:absolute; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); transition:left .08s linear,top .08s linear,width .08s linear,height .08s linear,opacity .08s linear; will-change:left,top,width,height,transform; }
+    .architecture-node.root-node { border-color:#ff7a00; }
     .node-label { display:block; pointer-events:none; text-shadow:0 0 5px rgba(255,211,77,.65); }.gravity-node { pointer-events:none; }
 
     .moniker-title { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:clamp(2.2rem,8vw,8rem); font-weight:900; line-height:.82; letter-spacing:.075em; text-shadow:0 0 26px rgba(255,48,48,.12); animation:kelpSway 6.5s ease-in-out infinite; transform-origin:50% 62%; }
     .moniker-title>div { white-space:nowrap; }.moniker-title span { display:inline-block; animation:letterDrift 4.8s ease-in-out infinite; }.moniker-title>div:nth-child(2) span { animation-delay:-.4s; }.moniker-title>div:nth-child(3) span { animation-delay:-.8s; }
     .blue{color:#00a8ff}.magenta{color:#ff2cff}.orange{color:#ff7a00}.red{color:#ff3030}.yellow{color:#ffd34d}.green{color:#52e05a}
-    @@keyframes livingPanelBreath { 0%, 100% { border-color:#00a8ff; box-shadow:0 0 24px rgba(0,168,255,.32),inset 0 0 28px rgba(0,168,255,.18); } 16.666% { border-color:#ff2cff; box-shadow:0 0 30px rgba(255,44,255,.38),inset 0 0 34px rgba(255,44,255,.22); } 33.333% { border-color:#ff7a00; box-shadow:0 0 30px rgba(255,122,0,.38),inset 0 0 34px rgba(255,122,0,.22); } 50% { border-color:#ff3030; box-shadow:0 0 30px rgba(255,48,48,.38),inset 0 0 34px rgba(255,48,48,.22); } 66.666% { border-color:#ffd34d; box-shadow:0 0 30px rgba(255,211,77,.38),inset 0 0 34px rgba(255,211,77,.22); } 83.333% { border-color:#52e05a; box-shadow:0 0 30px rgba(82,224,90,.38),inset 0 0 34px rgba(82,224,90,.22); } }
+    @@keyframes livingPanelBreath { 0%, 100% { border-color:#00a8ff; box-shadow:0 0 24px rgba(0,168,255,.32),inset 0 0 28px rgba(0,168,255,.18); } 16.666% { border-color:#ff2cff; box-shadow:0 0 30px rgba(255,44,255,.38),inset 0 0 34px rgba(255,44,255,.22); } 33.333% { border-color:#ff7a00; box-shadow:0 0 30px rgba(255,122,77,.38),inset 0 0 34px rgba(255,122,77,.22); } 50% { border-color:#ff3030; box-shadow:0 0 30px rgba(255,48,48,.38),inset 0 0 34px rgba(255,48,48,.22); } 66.666% { border-color:#ffd34d; box-shadow:0 0 30px rgba(255,211,77,.38),inset 0 0 34px rgba(255,211,77,.22); } 83.333% { border-color:#52e05a; box-shadow:0 0 30px rgba(82,224,90,.38),inset 0 0 34px rgba(82,224,90,.22); } }
     @@keyframes kelpSway{0%,100%{transform:rotate(-1.2deg) skewX(-.6deg)}25%{transform:rotate(1deg) skewX(.9deg) translateY(-3px)}50%{transform:rotate(-.6deg) skewX(-1deg) translateY(2px)}75%{transform:rotate(1.4deg) skewX(.7deg) translateY(-2px)}}@@keyframes letterDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
     @@media(max-width:800px){.architecture-node{font-size:.52rem;padding:1px 2px}.living-fsm-label{left:.75rem;top:.75rem}.moniker-title{font-size:clamp(1.65rem,8vw,3.5rem)}}@@media(prefers-reduced-motion:reduce){.living-sequence-shell *, .living-sequence-shell *::before, .living-sequence-shell *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
@@ -118,11 +109,6 @@
     private static string NodeTop(PageStateContext.LivingNodeState node) => $"calc(50% + {node.Y - 50d:0.###}%)";
     private static string NodeSize(PageStateContext.LivingNodeState node) => $"{node.Size:0.##}px";
     private static string NodeTransform(PageStateContext.LivingNodeState node) => $"translate(-50%,-50%) rotate({node.Rotation:0.##}deg)";
-
-    // The root is already centered by .root-center-anchor. Applying another
-    // translate(-50%,-50%) here would double-center it and move it up/left.
-    private static string RootTransform(PageStateContext.LivingNodeState node) => $"rotate({node.Rotation:0.##}deg)";
-
     private static int NodeLayer(PageStateContext.LivingNodeState node) => 20 + node.Generation;
     private static double NodeOpacity(PageStateContext.LivingNodeState node) => node.Y <= 100 ? 1 : Math.Clamp(1 - ((node.Y - 100) / 30), 0, 1);
     public void Dispose() => FSM.StateChanged -= HandleFSMStateChanged;
