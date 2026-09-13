@@ -31,7 +31,16 @@
         </div>
     }
 
-    <div class="living-canvas" aria-label="Living GUI swarm">
+    <div class="living-canvas" aria-label="Living GUI Cartesian plane">
+        <!-- The FSM's 0..100 coordinates are mapped onto a panel-centered
+             Cartesian plane. 50,50 is the origin. Positive X moves right;
+             positive Y moves down, preserving the existing FSM gravity model. -->
+        <div class="cartesian-plane" aria-hidden="true">
+            <div class="cartesian-axis cartesian-axis-x"></div>
+            <div class="cartesian-axis cartesian-axis-y"></div>
+            <div class="cartesian-origin">0,0</div>
+        </div>
+
         @if (FSM.Context.LivingNodes.Count > 0)
         {
             var root = FSM.Context.LivingNodes[0];
@@ -65,14 +74,24 @@
 
 <style>
     /* The launch stage in Home establishes the panel. The shell fills that
-       stage, while the explicit root-center-anchor below establishes a second,
-       unambiguous center coordinate system for the 50%,50% FSM root. */
+       stage, while the explicit Cartesian plane establishes a center-origin
+       coordinate system for the FSM's 0..100 simulation coordinates. */
     .living-sequence-shell { position:relative; width:100%; height:100%; min-width:0; min-height:0; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; border:5px solid #00a8ff; box-shadow:0 0 24px rgba(0,168,255,.32),inset 0 0 28px rgba(0,168,255,.18); animation:livingPanelBreath 12s ease-in-out infinite; box-sizing:border-box; }
     .living-fsm-label { position:absolute; left:1.25rem; top:1.25rem; z-index:100; min-width:min(300px,72vw); box-sizing:border-box; padding:.7rem .9rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:.2rem; border:2px solid #ff7a00; border-radius:6px; background:rgba(2,3,4,.94); box-shadow:0 0 14px rgba(255,122,0,.35),0 0 36px rgba(255,122,0,.12),inset 0 0 18px rgba(255,122,0,.05); text-align:left; pointer-events:none; }
     .living-fsm-title { font-size:clamp(1rem,2vw,1.45rem); font-weight:900; letter-spacing:.14em; color:#fff; text-shadow:0 0 7px rgba(255,122,0,.8); }
     .living-fsm-state,.living-fsm-count,.living-fsm-root,.living-fsm-valid { font-size:clamp(.65rem,1vw,.82rem); font-weight:700; letter-spacing:.06em; color:#ffd34d; }.living-fsm-count { color:#00eaff; }.living-fsm-root { color:#52e05a; }.living-fsm-valid { color:#ff2cff; }
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
     .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; min-width:0; min-height:0; overflow:hidden; display:block; }
+
+    /* Explicit panel-centered Cartesian plane. The origin is the exact center
+       of the rendered panel, independent of the document's top-left origin. */
+    .cartesian-plane { position:absolute; inset:0; z-index:5; pointer-events:none; overflow:hidden; }
+    .cartesian-axis { position:absolute; opacity:.32; }
+    .cartesian-axis-x { left:0; right:0; top:50%; height:1px; transform:translateY(-50%); background:linear-gradient(90deg,transparent 0%,rgba(0,234,255,.5) 12%,rgba(0,234,255,.9) 50%,rgba(0,234,255,.5) 88%,transparent 100%); box-shadow:0 0 8px rgba(0,234,255,.3); }
+    .cartesian-axis-y { top:0; bottom:0; left:50%; width:1px; transform:translateX(-50%); background:linear-gradient(180deg,transparent 0%,rgba(255,44,255,.5) 12%,rgba(255,44,255,.9) 50%,rgba(255,44,255,.5) 88%,transparent 100%); box-shadow:0 0 8px rgba(255,44,255,.3); }
+    .cartesian-plane::before { content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent 49.95%,rgba(0,234,255,.08) 50%,transparent 50.05%),linear-gradient(0deg,transparent 49.95%,rgba(255,44,255,.08) 50%,transparent 50.05%); }
+    .cartesian-origin { position:absolute; left:50%; top:50%; transform:translate(8px,8px); color:rgba(255,255,255,.45); font-size:.55rem; font-weight:700; letter-spacing:.08em; }
+
     .root-center-anchor { position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; pointer-events:none; }
     .architecture-node.root-node { position:relative !important; left:auto !important; top:auto !important; right:auto !important; bottom:auto !important; margin:0 !important; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); transition:width .08s linear,height .08s linear,opacity .08s linear; will-change:width,height,transform; }
     .architecture-node { position:absolute; box-sizing:border-box; min-width:10px; min-height:10px; padding:2px 3px; display:flex; align-items:center; justify-content:center; border:1px solid #ff7a00; border-radius:4px; background:rgba(5,6,8,.9); color:#fff; font:700 .58rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 8px rgba(255,122,0,.24),inset 0 0 8px rgba(255,122,0,.05); transition:width .08s linear,height .08s linear,opacity .08s linear; will-change:left,top,width,height,transform; }
@@ -96,8 +115,8 @@
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
     protected override void OnInitialized() => FSM.StateChanged += HandleFSMStateChanged;
     private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
-    private static string NodeLeft(PageStateContext.LivingNodeState node) => $"{node.X:0.###}%";
-    private static string NodeTop(PageStateContext.LivingNodeState node) => $"{node.Y:0.###}%";
+    private static string NodeLeft(PageStateContext.LivingNodeState node) => $"calc(50% + {node.X - 50d:0.###}%)";
+    private static string NodeTop(PageStateContext.LivingNodeState node) => $"calc(50% + {node.Y - 50d:0.###}%)";
     private static string NodeSize(PageStateContext.LivingNodeState node) => $"{node.Size:0.##}px";
     private static string NodeTransform(PageStateContext.LivingNodeState node) => $"translate(-50%,-50%) rotate({node.Rotation:0.##}deg)";
     private static string RootTransform(PageStateContext.LivingNodeState node) => $"translate(-50%,-50%) rotate({node.Rotation:0.##}deg)";
