@@ -22,6 +22,7 @@ namespace TheSingularityWorkshop.Services
         public PageStateContext Context => Page.Context;
         public string CurrentState => Page.CurrentState;
         public string LivingGuiState => Page.LivingGuiState;
+        public string LivingGuiActivePhase => Page.LivingGuiActivePhase;
 
         public event Action<string>? StateChanged
         {
