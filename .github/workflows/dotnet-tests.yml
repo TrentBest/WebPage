@@ -3,12 +3,11 @@ name: .NET Tests
 on:
   push:
     branches:
-      - feature/living-workshop-landing
-      - feature/pong-microbundle-vertical-slice
-      - feature/experience-core-architecture
+      - '**'
   pull_request:
     branches:
-      - feature/living-workshop-landing
+      - master
+      - feature/public-facing-workshop
       - feature/experience-core-architecture
 
 jobs:
