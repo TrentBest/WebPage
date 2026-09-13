@@ -1,103 +1,134 @@
-# Current Vertical Slice — Pong + Living Workshop Landing
+# Current Vertical Slice — Manifest → Hub → Idler → Flex
 
-Read this before changing the active experience.
+Read this before changing the active landing experience.
 
 ## Working branch
 
-`feature/pong-microbundle-vertical-slice`
+`development`
 
-Do not modify `master`.
+`master` remains the protected promotion target. Do not modify it during active development.
 
 ## Current objective
 
-Publish a deterministic, FSM_API-driven landing experience that demonstrates the technology through the experience itself.
+Build a deterministic, FSM_API-driven Workshop landing experience in which the **host is generic and the content is discovered**.
 
-## Presentation sequence
+The page launches the Hub with a WebPage host manifest. The Hub uses that manifest to locate the MicroBundle/Experience registry, discovers eligible Experiences, selects an Idler, and later selects a Flex when the visitor enters the Workshop.
 
-The gateway is the only first-contact surface. The Workshop moniker is absent until critical mass.
+The first concrete implementations are Pong and Living GUI. They are examples of the protocol, not hardcoded protocol names.
+
+## Intended presentation sequence
 
 ```text
-PAGE_INITIALIZING
-  -> GATEWAY
+WEBPAGE BOOT
+  -> load host manifest
+  -> start Hub
+  -> connect MicroBundle / Experience registry
+  -> discover available Idlers and Flexes
+  -> randomly select an available Idler
+  -> RUN IDLER (Pong is the first concrete one)
   -> user clicks Enter Workshop
-  -> GATEWAY_EXIT
-  -> LIVING_GUI_IGNITION
-  -> LIVING_GUI_POPULATING
-       one seed at center
-       each mature GUI doubles in size
-       mature GUI spawns a child
-       child animates from parent to a chaotic destination
-       process group stops at exactly 100
-  -> MONIKER_REVEAL
-       moniker is behind the frozen GUI
-  -> GRAVITY
-       preallocated Gravity FSM process group starts
-       GUI nodes fall away
-       moniker remains untouched and visible
-  -> LIVING_GUI_DISSIPATING
-       begins only after every GUI node has fallen away
-       91 FSM heartbeats at 33ms ~= 3 seconds
-  -> NAVIGATION_ARRIVAL
-       browser chrome and page structure ease into existence
-       content panel contracts with the chrome
-  -> RUNNING
+  -> randomly select an available Flex
+  -> RUN FLEX (Living GUI is the first concrete one)
+  -> present Workshop moniker for 3 seconds
+  -> reveal navigation / page chrome / primary panel
+  -> moniker continues in the primary panel
+  -> user selects a tab
+  -> clear moniker
+  -> present selected GUI / Experience
 ```
 
-### Non-negotiable presentation rules
+The exact visual Living GUI lifecycle remains an important demonstration inside that larger Experience lifecycle. Its internal sequence is:
 
-1. The moniker does not exist before exactly 100 living GUI nodes.
-2. Exactly 100 freezes the living GUI process group.
-3. Moniker reveal is independent of Gravity timing.
-4. Gravity is a separate, already allocated FSM_API process group.
-5. The moniker remains behind the falling GUI; do not redesign its kelp-like oscillation without an explicit visual request.
-6. The three-second delay begins only after the last GUI node has fallen away.
-7. Navigation/page chrome arrival is eased; it must not hard-snap the panel to its final size.
-8. UI components render FSM state. They do not own state transitions or authoritative timers.
+```text
+LIVING_GUI_IGNITION
+  -> LIVING_GUI_POPULATING
+       root grows
+       children root
+       children grow
+       reproduction continues
+  -> exactly 100 nodes
+  -> freeze Living GUI group
+  -> reveal moniker behind GUI
+  -> start preallocated Gravity group
+  -> all GUI nodes fall away
+  -> begin three-second dissipating phase only after the last node falls
+  -> ease navigation/page chrome into existence
+```
+
+## Non-negotiable architectural rules
+
+1. The WebPage manifest describes the host, not the concrete Experience inventory.
+2. The Hub discovers MicroBundles/Experiences through the registry boundary.
+3. Idler and Flex are capabilities/categories, not special hardcoded classes.
+4. The first implementations are Pong as Idler and Living GUI as Flex; replacing either must not require rewriting the bootstrap contract.
+5. The Hub owns runtime lifecycle and the application heartbeat.
+6. Experiences expose process groups; they do not independently step the global runtime.
+7. Blazor components render authoritative Hub/FSM state; they do not become the state machine.
+8. FSM_API remains the execution mechanism for meaningful lifecycle/state behavior.
+9. Do not replace a working capability with a simpler implementation until the behavior has been located and preserved elsewhere.
+10. AI/Grammar/Protocol work remains retained future architecture, but the runtime must operate without it.
+
+## Current transitional implementation
+
+The branch still contains static `IdleExperienceCatalog`, `FlexExperienceCatalog`, and `WorkshopDemoBundle` scaffolding. These are not yet the final registry-driven content boundary.
+
+Do not delete them merely because they are hardcoded. First move their functionality into the Experience/MicroBundle/registry model, prove the replacement, and only then remove the obsolete implementation.
 
 ## Important files
 
 | File | Responsibility |
 |---|---|
-| `WORKSHOP_PRESENTATION_CONTRACT.md` | Canonical behavior contract |
-| `CURRENT_VERTICAL_SLICE.md` | Active handoff map for the next agent |
-| `TheSingularityWorkshop/Services/PageStateContext.cs` | Living population, exact critical mass, gravity physics |
-| `TheSingularityWorkshop/Services/PageFSM.cs` | Page FSM plus isolated LivingGui and Gravity scheduler groups |
-| `TheSingularityWorkshop/Services/FSMManagerService.cs` | Application heartbeat; UI does not own stepping |
-| `TheSingularityWorkshop/Pages/Home.razor` | Gateway presentation |
-| `TheSingularityWorkshop/Pages/LivingGui.razor` | Living GUI manifestation and moniker layer |
-| `TheSingularityWorkshop/Layout/MainLayout.razor` | Final chrome arrival gate |
-| `TheSingularityWorkshop/Layout/MainLayout.razor.css` | Ease-in/out panel contraction when chrome arrives |
-| `TheSingularityWorkshop/Workshop/MicroBundles/MicroBundle.cs` | Runtime MicroBundle lifecycle shell |
-| `TheSingularityWorkshop/Workshop/MicroBundles/PongMicroBundle.cs` | First concrete MicroBundle |
-| `SingularityHub.Abstractions/HubContracts.cs` | Nine-layer ontology and Hub contracts |
+| `WORKSHOP_RUNTIME_ARCHITECTURE.md` | Canonical host/manifest/registry/Hub workflow |
+| `EXPERIENCE_THEORY.md` | Experience definition and runtime contract |
+| `TheSingularityWorkshop/Workshop/MicroBundles/README.md` | MicroBundle lifecycle/addressing/provider theory |
+| `TheSingularityWorkshop/Workshop/Experiences/IExperience.cs` | Experience contract |
+| `TheSingularityWorkshop/Services/IdleExperienceCatalog.cs` | Transitional Idler catalog; replace through registry |
+| `TheSingularityWorkshop/Services/FlexExperienceCatalog.cs` | Transitional Flex catalog; replace through registry |
+| `TheSingularityWorkshop/Infrastructure/Hub/HubRuntime.cs` | Web host composition adapter for Hub |
+| `TheSingularityWorkshop/Infrastructure/Hub/WorkshopDemoBundle.cs` | Transitional Hub composition proof |
+| `TheSingularityWorkshop/Services/PageStateContext.cs` | Living population, critical mass, gravity state |
+| `TheSingularityWorkshop/Services/PageFSM.cs` | Transitional page/landing orchestration |
+| `TheSingularityWorkshop/Services/FSMManagerService.cs` | Application heartbeat |
+| `TheSingularityWorkshop/Pages/Home.razor` | Landing presentation adapter |
+| `TheSingularityWorkshop/Pages/LivingGui.razor` | Living GUI manifestation |
 | `SingularityHub.Abstractions/MicroBundleAddress.cs` | Ontology + integer variant address |
-| `SingularityHub/MicroBundleRegistry.cs` | One-occupant-per-address registry rule |
-| `SingularityHub.Tests/IdleExperienceArchitectureTests.cs` | Executable presentation sequence |
-| `SingularityHub.Tests/MicroBundleAddressTests.cs` | Address capacity and uniqueness proof |
+| `SingularityHub/MicroBundleRegistry.cs` | Runtime uniqueness boundary |
 | `SingularityHub.Tests/IncrementalVersionTests.cs` | Visible incremental proof marker |
-| `AGENT_INCREMENTAL_RULE.md` | Mandatory agent proof rule |
+| `AGENT_INCREMENTAL_RULE.md` | Mandatory change/proof rule |
 
-## MicroBundle addressing direction
+## Registry direction
 
-The existing Hub already has a nine-layer `OntologySignature` and a `StructuralId`. The next layer is deliberately separate:
+The desired runtime boundary is:
 
 ```text
-OntologySignature (9 integer layers)
-        +
-VariantId (0 .. int.MaxValue - 1)
-        =
-MicroBundleAddress
+WebPage host manifest
+        |
+        v
+      Hub
+        |
+        v
+MicroBundle / Experience registry
+        |
+        +--> discover
+        +--> filter by capability
+        +--> select
+        +--> resolve version/dependencies
+        +--> load
+        +--> arbitrate
+        v
+Experience runtime
+        |
+        v
+FSM_API execution
 ```
 
-For each exact address there is one occupant. Different VariantIds may coexist under the same ontology. This gives each ontology coordinate `int.MaxValue` addressable variant slots without turning the ontology itself into a unique-instance identifier.
+The registry may initially be local/test-backed. The architectural contract should not assume that it is. The eventual public catalog can live behind the same address and manifest boundary.
 
-`MicroBundleRegistry` is currently the runtime uniqueness boundary. The next hosting step is to back the same contract with a durable/public catalog so a published MicroBundle becomes addressable to every Workshop host, not just the current process.
+## AI direction
 
-Do not invent a URL scheme before the address contract and persistence semantics are settled.
+AI is deliberately held for a later development phase. Keep the AI/Grammar/Protocol work and its documentation; do not make it a prerequisite for the landing runtime.
 
-## Known trap: CSS precedence
-
-The landing has both component-local styles and `wwwroot/css/workshop-landing.css`. The global stylesheet previously contained competing `!important` gateway rules. If a component appears to ignore its own geometry, inspect the global landing stylesheet before changing markup repeatedly.
+The future pipeline is expected to feed deterministic commands/selections into the Experience/MicroBundle boundary rather than replacing Hub ownership of runtime semantics.
 
 ## Mandatory agent behavior
 
