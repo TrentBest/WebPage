@@ -16,7 +16,7 @@ else
 <div class="living-sequence-shell @(MonikerInstantiated ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
     <div class="living-fsm-label" aria-live="polite">
         <span class="living-fsm-title">LIVING GUI</span>
-        <span class="living-fsm-state">FSM_API :: @FSM.LivingGuiState</span>
+        <span class="living-fsm-state">FSM_API :: @FSM.LivingGuiState :: @FSM.LivingGuiActivePhase</span>
         <span class="living-fsm-count">NODES :: @FSM.Context.LivingNodes.Count</span>
     </div>
 
@@ -35,7 +35,7 @@ else
         @foreach (var node in FSM.Context.LivingNodes)
         {
             <div class="architecture-node @(GravityActive ? "gravity-node" : "")"
-                 style="left:clamp(100px,@node.X%,calc(100% - 100px));top:clamp(100px,@node.Y%,calc(100% - 100px));width:@NodeVisualSize(node)px;height:@NodeVisualSize(node)px;transform:translate(-50%,-50%) rotate(@node.Rotation)deg;opacity:@NodeOpacity(node);z-index:@NodeLayer(node);"
+                 style="left:@NodeLeft(node);top:@NodeTop(node);width:@node.Size}px;height:@node.Sizepx;transform:translate(-50%,-50%) rotate(@node.Rotation)deg;opacity:@NodeOpacity(node);z-index:@NodeLayer(node);"
                  aria-label="@node.Lineage">
                 <span class="node-label">@node.Lineage</span>
             </div>
@@ -80,7 +80,11 @@ else
         _ = InvokeAsync(StateHasChanged);
     }
 
-    private static double NodeVisualSize(PageStateContext.LivingNodeState node) => node.Size;
+    private static string NodeLeft(PageStateContext.LivingNodeState node) =>
+        node.IsRoot ? "50%" : $"{node.X}%";
+
+    private static string NodeTop(PageStateContext.LivingNodeState node) =>
+        node.IsRoot ? "50%" : $"{node.Y}%";
 
     private static int NodeLayer(PageStateContext.LivingNodeState node) => 20 + node.Generation;
 
