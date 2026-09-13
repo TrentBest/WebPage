@@ -33,6 +33,7 @@ public interface IExperience
     IReadOnlyList<ulong> MicroBundleIds { get; }
     IReadOnlyList<ulong> Capabilities { get; }
     IReadOnlyList<ulong> SensorySystems { get; }
+    int SenseCount => SensorySystems.Distinct().Count();
     IReadOnlyList<string> ProcessingGroups { get; }
 }
 public readonly record struct ArbitrationEvent(int RoundIndex, ulong ActorId, ulong TargetCoordinates, MutationType MutationType, ulong CausalParentId);
