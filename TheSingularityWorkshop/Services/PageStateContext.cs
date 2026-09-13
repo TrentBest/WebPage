@@ -39,6 +39,7 @@ namespace TheSingularityWorkshop.Services
         public bool MonikerReady { get; internal set; }
         public bool GravityReleased { get; internal set; }
         public bool LivingGuiFallen { get; internal set; }
+        public bool NavigationReady { get; internal set; }
 
         public long PopulationCompletedTick { get; internal set; } = -1;
         public long StateTicks { get; set; }
@@ -54,11 +55,6 @@ namespace TheSingularityWorkshop.Services
         public bool NeedsReproduction => _livingNodes.Exists(node => node.Phase == LivingNodePhase.ReproductionPending);
         public bool NeedsParentRecovery => _livingNodes.Exists(node => node.Phase == LivingNodePhase.ParentRecovery);
 
-        /// <summary>
-        /// Creates a valid, active FSM context.
-        /// The validity flag is assigned explicitly after the context identity is initialized,
-        /// matching the FSM_API contract used by live instances.
-        /// </summary>
         public PageStateContext(object? singularityHub = null)
         {
             Name = "PageFSMContext";
@@ -83,6 +79,7 @@ namespace TheSingularityWorkshop.Services
             MonikerReady = false;
             GravityReleased = false;
             LivingGuiFallen = false;
+            NavigationReady = false;
         }
 
         public void AdvanceRootGrowth()
@@ -101,11 +98,6 @@ namespace TheSingularityWorkshop.Services
             }
         }
 
-        /// <summary>
-        /// Moves every newborn seed from its parent's birth point toward the
-        /// destination selected when the seed was created. This is the Pong-like
-        /// flight phase; no seed is allowed to grow while it is travelling.
-        /// </summary>
         public void AdvanceSeedFlight()
         {
             if (LivingGuiFrozen) return;
@@ -132,10 +124,6 @@ namespace TheSingularityWorkshop.Services
             }
         }
 
-        /// <summary>
-        /// Once a seed reaches its destination it expands from seed size to the
-        /// normal GUI size. Only after this phase does it enter the ordinary growth cycle.
-        /// </summary>
         public void AdvanceSeedScaling()
         {
             if (LivingGuiFrozen) return;
@@ -170,11 +158,6 @@ namespace TheSingularityWorkshop.Services
             }
         }
 
-        /// <summary>
-        /// A doubled GUI creates a tiny offspring at its own position, then immediately
-        /// enters the fast recovery phase. The offspring is deliberately born on the
-        /// next generation layer and must fly to its destination before growing.
-        /// </summary>
         public void AdvanceReproduction()
         {
             if (LivingGuiFrozen || _livingNodes.Count >= CriticalMass)
@@ -208,10 +191,6 @@ namespace TheSingularityWorkshop.Services
             }
         }
 
-        /// <summary>
-        /// The parent contracts quickly after reproduction, returning to its default size
-        /// before it is permitted to grow toward the next reproduction event.
-        /// </summary>
         public void AdvanceParentRecovery()
         {
             if (LivingGuiFrozen) return;

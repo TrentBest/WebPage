@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.61";
+    public const string CurrentVersion = "0.0.62";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -73,5 +73,6 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 58)] [Fact(DisplayName = "0.00.058 — Incremental_Version_Advances_After_Idle_Isolation_Fix")] public void Incremental_Version_Advances_After_Idle_Isolation_Fix() => Is("0.0.58", "0.0.58");
     [ArchitectureTest(0, 0, 59)] [Fact(DisplayName = "0.00.059 — Recursive_GUI_Tree_Has_A_Blazor_Manifestation_Boundary")] public void Recursive_GUI_Tree_Has_A_Blazor_Manifestation_Boundary() => Is("0.0.59", "0.0.59");
     [ArchitectureTest(0, 0, 60)] [Fact(DisplayName = "0.00.060 — Living_GUI_Seeds_Fly_Scale_Grow_Reproduce_And_Recover")] public void Living_GUI_Seeds_Fly_Scale_Grow_Reproduce_And_Recover() => Is("0.0.60", "0.0.60");
-    [ArchitectureTest(0, 0, 61)] [Fact(DisplayName = "0.00.061 — Living_GUI_Page_FSM_Exposes_The_New_Generation_Phases")] public void Living_GUI_Page_FSM_Exposes_The_New_Generation_Phases() => Is("0.0.61", CurrentVersion);
+    [ArchitectureTest(0, 0, 61)] [Fact(DisplayName = "0.00.061 — Living_GUI_Page_FSM_Exposes_The_New_Generation_Phases")] public void Living_GUI_Page_FSM_Exposes_The_New_Generation_Phases() => Is("0.0.61", "0.0.61");
+    [ArchitectureTest(0, 0, 62)] [Fact(DisplayName = "0.00.062 — Living_GUI_Reproduction_Recovery_Is_Prioritized")] public void Living_GUI_Reproduction_Recovery_Is_Prioritized() => Is("0.0.62", CurrentVersion);
 }

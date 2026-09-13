@@ -110,9 +110,6 @@ public sealed class LivingGuiFsm : IDisposable
         _reproductionHandle = fsm_API.Create.CreateInstance("LivingGuiReproductionFSM", context, _reproductionGroup);
         _parentRecoveryHandle = fsm_API.Create.CreateInstance("LivingGuiParentRecoveryFSM", context, _parentRecoveryGroup);
 
-        // FSM_API refuses to process an instance whose context is invalid.
-        // Fail immediately at composition time rather than allowing a visually
-        // dead Living GUI to masquerade as a running FSM.
         if (!IsValid)
             throw new InvalidOperationException("Living GUI FSM instances were created with an invalid PageStateContext.");
     }
@@ -126,10 +123,6 @@ public sealed class LivingGuiFsm : IDisposable
     public string ReproductionProcessingGroup => _reproductionGroup;
     public string ParentRecoveryProcessingGroup => _parentRecoveryGroup;
 
-    /// <summary>
-    /// True only when the Living GUI context and every live phase instance are valid.
-    /// This is intentionally derived from the actual FSM handles rather than duplicated state.
-    /// </summary>
     public bool IsValid =>
         _context.IsValid &&
         _handle.IsValid &&
@@ -140,24 +133,25 @@ public sealed class LivingGuiFsm : IDisposable
         _reproductionHandle.IsValid &&
         _parentRecoveryHandle.IsValid;
 
+    /// <summary>
+    /// Selects the most urgent lifecycle work first. Reproduction and parent
+    /// recovery must outrank newborn flight: a parent begins contracting as soon
+    /// as it creates an offspring, rather than waiting behind the child's journey.
+    /// </summary>
     public string ActivePhase
     {
         get
         {
             if (_context.NeedsRootGrowth) return RootGrowthState;
+            if (_context.NeedsReproduction) return ReproductionState;
+            if (_context.NeedsParentRecovery) return ParentRecoveryState;
             if (_context.NeedsSeedFlight) return SeedFlightState;
             if (_context.NeedsSeedScaling) return SeedScalingState;
             if (_context.NeedsMatureGrowth) return MatureGrowthState;
-            if (_context.NeedsReproduction) return ReproductionState;
             return ParentRecoveryState;
         }
     }
 
-    /// <summary>
-    /// Ticks exactly one phase process group. The page heartbeat is the only
-    /// caller allowed to open this gate, so the Living GUI is inert until the
-    /// user enters it and the outer FSM reaches its population state.
-    /// </summary>
     public void Update()
     {
         if (_disposed || !_context.IsValid || _context.LivingGuiFrozen)
@@ -168,6 +162,12 @@ public sealed class LivingGuiFsm : IDisposable
             case RootGrowthState:
                 _hub.UpdateProcessGroup(_rootGrowthGroup);
                 break;
+            case ReproductionState:
+                _hub.UpdateProcessGroup(_reproductionGroup);
+                break;
+            case ParentRecoveryState:
+                _hub.UpdateProcessGroup(_parentRecoveryGroup);
+                break;
             case SeedFlightState:
                 _hub.UpdateProcessGroup(_seedFlightGroup);
                 break;
@@ -176,12 +176,6 @@ public sealed class LivingGuiFsm : IDisposable
                 break;
             case MatureGrowthState:
                 _hub.UpdateProcessGroup(_matureGrowthGroup);
-                break;
-            case ReproductionState:
-                _hub.UpdateProcessGroup(_reproductionGroup);
-                break;
-            default:
-                _hub.UpdateProcessGroup(_parentRecoveryGroup);
                 break;
         }
     }

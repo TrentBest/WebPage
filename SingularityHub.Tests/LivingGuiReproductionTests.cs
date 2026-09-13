@@ -85,4 +85,29 @@ public sealed class LivingGuiReproductionTests
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, root.Phase);
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, seed.Phase);
     }
+
+    [Fact(DisplayName = "Incremental Unit Test 62 — reproduction parents recover before newborn flight")]
+    public void IncrementalUnitTest62_ReproductionParentRecoversBeforeSeedFlight()
+    {
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+        context.AdvanceRootGrowth();
+        context.AdvanceReproduction();
+
+        var parent = context.LivingNodes[0];
+        var seed = context.LivingNodes[1];
+
+        Assert.Equal(PageStateContext.LivingNodePhase.ParentRecovery, parent.Phase);
+        Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, seed.Phase);
+
+        using var runtime = new LivingGuiFsm(new TheSingularityWorkshop.SingularityHub.SingularityHub(), context, "TestParent");
+
+        Assert.Equal(LivingGuiFsm.ParentRecoveryState, runtime.ActivePhase);
+        runtime.Update();
+
+        Assert.Equal(300, parent.Size);
+        Assert.Equal(PageStateContext.LivingNodePhase.ParentRecovery, parent.Phase);
+        Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, seed.Phase);
+        Assert.Equal(LivingGuiFsm.ParentRecoveryState, runtime.ActivePhase);
+    }
 }
