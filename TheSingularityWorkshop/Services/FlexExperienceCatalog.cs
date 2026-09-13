@@ -7,13 +7,15 @@ namespace TheSingularityWorkshop.Services;
 /// </summary>
 public sealed record FlexExperienceDefinition(string Id, string DisplayName, string Description);
 
-/// <summary>
-/// Runtime catalog for Flex experiences. The first Flex is the Living GUI.
-/// </summary>
+/// <summary>Runtime catalog for solution-native Flex experiences.</summary>
 public static class FlexExperienceCatalog
 {
     private static readonly FlexExperienceDefinition[] Experiences =
     [
+        new(
+            "moniker-state",
+            "THE SINGULARITY WORKSHOP",
+            "The minimal Flex Experience: present the Workshop moniker and its current lifecycle state."),
         new(
             "living-gui",
             "LIVING GUI",
@@ -27,6 +29,8 @@ public static class FlexExperienceCatalog
         ArgumentNullException.ThrowIfNull(random);
         return Experiences[random.Next(Experiences.Length)];
     }
+
+    public static FlexExperienceDefinition SelectDefault() => Experiences[0];
 
     public static bool IsAvailable(string id) => Experiences.Any(x => x.Id == id);
 }
