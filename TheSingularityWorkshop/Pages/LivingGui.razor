@@ -14,6 +14,12 @@ else
 }
 
 <div class="living-sequence-shell @(MonikerInstantiated ? "moniker-live" : "") @(GravityActive ? "gravity-active" : "")">
+    <div class="living-fsm-label" aria-live="polite">
+        <span class="living-fsm-title">LIVING GUI</span>
+        <span class="living-fsm-state">FSM_API :: @FSM.LivingGuiState</span>
+        <span class="living-fsm-count">NODES :: @FSM.Context.LivingNodes.Count</span>
+    </div>
+
     @if (MonikerInstantiated)
     {
         <div class="moniker-layer" aria-hidden="true">
@@ -39,8 +45,12 @@ else
 
 <style>
     /* The living sequence is a viewport-level takeover. Do not let an inherited
-       article/layout clipping context swallow the very first node. */
+       article/layout clipping context swallow the first node or its FSM marker. */
     .living-sequence-shell { position:fixed; inset:0; z-index:100000; width:100vw; height:100dvh; overflow:hidden; isolation:isolate; background:#020304; color:#f4f7f8; font-family:Consolas,"Courier New",monospace; }
+    .living-fsm-label { position:absolute; left:50%; top:50%; z-index:30; transform:translate(-50%,-50%); min-width:min(360px,72vw); box-sizing:border-box; padding:1.15rem 1.4rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.35rem; border:3px solid #ff7a00; border-radius:8px; background:rgba(2,3,4,.94); box-shadow:0 0 18px rgba(255,122,0,.45),0 0 55px rgba(255,122,0,.16),inset 0 0 24px rgba(255,122,0,.07); text-align:center; pointer-events:none; }
+    .living-fsm-title { font-size:clamp(1.4rem,3vw,2.4rem); font-weight:900; letter-spacing:.16em; color:#fff; text-shadow:0 0 9px rgba(255,122,0,.9); }
+    .living-fsm-state,.living-fsm-count { font-size:clamp(.75rem,1.4vw,1rem); font-weight:700; letter-spacing:.08em; color:#ffd34d; }
+    .living-fsm-count { color:#00eaff; }
     .moniker-layer { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; pointer-events:none; }
     .living-canvas { position:absolute; inset:0; z-index:10; width:100%; height:100%; overflow:hidden; perspective:1200px; }
     .architecture-node { position:absolute; z-index:20; box-sizing:border-box; min-width:18px; min-height:18px; padding:3px 5px; display:flex; align-items:center; justify-content:center; border:2px solid #ff7a00; border-radius:5px; background:rgba(5,6,8,.92); color:#fff; font:700 .72rem/1 Consolas,"Courier New",monospace; text-align:center; white-space:nowrap; overflow:hidden; transform-origin:center; box-shadow:0 0 12px rgba(255,122,0,.28),inset 0 0 12px rgba(255,122,0,.06); }
