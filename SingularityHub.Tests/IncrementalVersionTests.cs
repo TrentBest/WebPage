@@ -9,7 +9,7 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class IncrementalVersionTests
 {
-    public const string CurrentVersion = "0.0.62";
+    public const string CurrentVersion = "0.0.70";
 
     private static void Is(string expected, string actual) => Assert.Equal(expected, actual);
 
@@ -60,7 +60,7 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 45)] [Fact(DisplayName = "0.00.045 — Living_GUI_Uses_Hierarchical_Phase_FSM_Process_Groups")] public void Living_GUI_Uses_Hierarchical_Phase_FSM_Process_Groups() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 46)] [Fact(DisplayName = "0.00.046 — FSM_Manager_Uses_Registered_Hub_Instance")] public void Fsm_Manager_Uses_Registered_Hub_Instance() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 47)] [Fact(DisplayName = "0.00.047 — FSM_Manager_Hub_Composition_Test_Does_Not_Assume_Hub_Ownership")] public void Fsm_Manager_Hub_Composition_Test_Does_Not_Assume_Hub_Ownership() => Is(CurrentVersion, CurrentVersion);
-    [ArchitectureTest(0, 0, 48)] [Fact(DisplayName = "0.00.048 — Manifest_Hub_Experience_Registry_Workflow_Is_Visible")] public void Manifest_Hub_Experience_Registry_Workflow_Is_Documented() => Is(CurrentVersion, CurrentVersion);
+    [ArchitectureTest(0, 0, 48)] [Fact(DisplayName = "0.00.048 — Manifest_Hub_Experience_Registry_Workflow_Is_Visible")] public void Manifest_Hub_Experience_Registry_Workflow_Is_Visible() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 49)] [Fact(DisplayName = "0.00.049 — Functionality_Preservation_Ledger_Is_Recorded")] public void Functionality_Preservation_Ledger_Is_Recorded() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 50)] [Fact(DisplayName = "0.00.050 — Living_GUI_Node_CSS_Geometry_Is_Unit_Qualified")] public void Living_GUI_Node_CSS_Geometry_Is_Unit_Qualified() => Is(CurrentVersion, CurrentVersion);
     [ArchitectureTest(0, 0, 51)] [Fact(DisplayName = "0.00.051 — Living_GUI_Is_Contained_By_The_Landing_Panel")] public void Living_GUI_Is_Contained_By_The_Landing_Panel() => Is(CurrentVersion, CurrentVersion);
@@ -74,5 +74,6 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 59)] [Fact(DisplayName = "0.00.059 — Recursive_GUI_Tree_Has_A_Blazor_Manifestation_Boundary")] public void Recursive_GUI_Tree_Has_A_Blazor_Manifestation_Boundary() => Is("0.0.59", "0.0.59");
     [ArchitectureTest(0, 0, 60)] [Fact(DisplayName = "0.00.060 — Living_GUI_Seeds_Fly_Scale_Grow_Reproduce_And_Recover")] public void Living_GUI_Seeds_Fly_Scale_Grow_Reproduce_And_Recover() => Is("0.0.60", "0.0.60");
     [ArchitectureTest(0, 0, 61)] [Fact(DisplayName = "0.00.061 — Living_GUI_Page_FSM_Exposes_The_New_Generation_Phases")] public void Living_GUI_Page_FSM_Exposes_The_New_Generation_Phases() => Is("0.0.61", "0.0.61");
-    [ArchitectureTest(0, 0, 62)] [Fact(DisplayName = "0.00.062 — Living_GUI_Reproduction_Recovery_Is_Prioritized")] public void Living_GUI_Reproduction_Recovery_Is_Prioritized() => Is("0.0.62", CurrentVersion);
+    [ArchitectureTest(0, 0, 62)] [Fact(DisplayName = "0.00.062 — Living_GUI_Reproduction_Recovery_Is_Prioritized")] public void Living_GUI_Reproduction_Recovery_Is_Prioritized() => Is("0.0.62", "0.0.62");
+    [ArchitectureTest(0, 0, 70)] [Fact(DisplayName = "0.00.070 — Hub_Heartbeat_Is_The_FSM_API_Execution_Boundary")] public void Hub_Heartbeat_Is_The_FSM_API_Execution_Boundary() => Is("0.0.70", CurrentVersion);
 }
