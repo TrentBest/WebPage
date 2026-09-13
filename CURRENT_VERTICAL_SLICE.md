@@ -130,6 +130,31 @@ AI is deliberately held for a later development phase. Keep the AI/Grammar/Proto
 
 The future pipeline is expected to feed deterministic commands/selections into the Experience/MicroBundle boundary rather than replacing Hub ownership of runtime semantics.
 
+## Functionality preservation ledger
+
+Before housekeeping removes or relocates code, use this matrix. The rule is **locate behavior -> identify boundary -> preserve with tests -> move/adapt -> document -> delete obsolete duplication**.
+
+| Area | Current implementation | Intended boundary | Status |
+|---|---|---|---|
+| Experience contract | `Workshop/Experiences/IExperience.cs` | Experience model | **Retain; evolve** |
+| Experience theory | `EXPERIENCE_THEORY.md` | Architectural contract | **Retain; reconcile documentation drift** |
+| MicroBundle contract/composition | `Workshop/MicroBundles/IMicroBundle.cs`, `MicroBundle.cs`, `MicroBundleContext.cs`, `MicroBundleManifestation.cs` | Focused runtime capability | **Retain; inspect** |
+| Provider boundary | `IMicroBundleProvider.cs`, `WebMicroBundleProvider.cs` | Provider/registry boundary | **Retain; inspect** |
+| Pong | `PongMicroBundle.cs` | First concrete Idler | **Retain; migrate selection into registry** |
+| Registry | `SingularityHub/MicroBundleRegistry.cs`, `MicroBundleAddress.cs` | Discovery/inventory | **Retain; make canonical** |
+| Idle catalog | `Services/IdleExperienceCatalog.cs` | Capability selection facade | **Transitional; preserve behavior before replacement** |
+| Flex catalog | `Services/FlexExperienceCatalog.cs` | Capability selection facade | **Transitional; preserve behavior before replacement** |
+| Demo bundle | `Infrastructure/Hub/WorkshopDemoBundle.cs` | Host bootstrap proof | **Transitional; retain until registry parity** |
+| Hub host runtime | `Infrastructure/Hub/HubRuntime.cs` | Host -> Hub lifecycle | **Retain; remove direct demo load after replacement** |
+| FSM manager | `Infrastructure/FSM/FSMManagerService.cs` | Host adapter to Hub scheduler | **Retain; reduce page ownership** |
+| Page FSM | `Infrastructure/FSM/PageFSM.cs` | Presentation/lifecycle adapter | **Transitional; preserve lifecycle semantics** |
+| Living GUI FSM/state | `Infrastructure/FSM/LivingGuiFsm.cs`, `PageStateContext.cs` | First concrete Flex runtime | **Retain; attach to Experience/Flex** |
+| Blazor landing/hosts | `Home.razor`, `IdleExperienceHost.razor`, `FlexExperienceHost.razor`, `WorkshopExperienceFeed.razor` | Presentation adapters | **Retain; remove hardcoded selection** |
+| Moniker lifecycle | Landing/PageFSM | Hub-selected Flex presentation state | **Preserve; move authority toward Hub** |
+| AI/Grammar/Protocol | Historical work/branches | Future deterministic producer pipeline | **Retain; deferred** |
+
+The concrete Experience tests and Living GUI runtime tests are the preservation anchors. No item above is a deletion candidate until its replacement behavior is proven.
+
 ## Mandatory agent behavior
 
 Every meaningful repository change must:
