@@ -44,9 +44,11 @@ namespace TheSingularityWorkshop.Services
         public string InstanceProcessingGroup => _processingGroup;
         public string LivingGuiProcessingGroup => _livingGuiRuntime.ProcessingGroup;
         public string LivingGuiRootGrowthProcessingGroup => _livingGuiRuntime.RootGrowthProcessingGroup;
-        public string LivingGuiChildRootingProcessingGroup => _livingGuiRuntime.ChildRootingProcessingGroup;
+        public string LivingGuiSeedFlightProcessingGroup => _livingGuiRuntime.SeedFlightProcessingGroup;
+        public string LivingGuiSeedScalingProcessingGroup => _livingGuiRuntime.SeedScalingProcessingGroup;
         public string LivingGuiMatureGrowthProcessingGroup => _livingGuiRuntime.MatureGrowthProcessingGroup;
         public string LivingGuiReproductionProcessingGroup => _livingGuiRuntime.ReproductionProcessingGroup;
+        public string LivingGuiParentRecoveryProcessingGroup => _livingGuiRuntime.ParentRecoveryProcessingGroup;
         public string LivingGuiActivePhase => _livingGuiRuntime.ActivePhase;
         public string GravityProcessingGroup => _gravityProcessingGroup;
         public event Action<string>? StateChanged;
