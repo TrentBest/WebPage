@@ -92,4 +92,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 107)]
     [Fact(DisplayName = "V0.0.107 — Collapse_Hub_Navigation_And_Turn_Build_Into_Create_Workspace")]
     public void V0_0_107_CollapseHubNavigationAndTurnBuildIntoCreateWorkspace() => Assert.Equal("0.0.107", "0.0.107");
+
+    [ArchitectureTest(0, 0, 108)]
+    [Fact(DisplayName = "V0.0.108 — Reforge_Explore_As_A_Spatial_Workshop_Experience")]
+    public void V0_0_108_ReforgeExploreAsASpatialWorkshopExperience() => Assert.Equal("0.0.108", "0.0.108");
 }
