@@ -1,8 +1,7 @@
 namespace TheSingularityWorkshop.Gui;
 
 /// <summary>
-/// Semantic fluent builder for a visual panel.
-/// Panels compose recursively from the same GUI vocabulary as every other GUI.
+/// Semantic fluent builder for a visual panel. Panels compose recursively from the same GUI vocabulary as every other GUI.
 /// </summary>
 public sealed class PanelGuiBuilder : ElementBuilder
 {
@@ -26,7 +25,7 @@ public sealed class PanelGuiBuilder : ElementBuilder
         return this;
     }
 
-    public PanelGuiBuilder Content(ElementBuilder child)
+    public new PanelGuiBuilder Content(ElementBuilder child)
     {
         Child(child);
         return this;

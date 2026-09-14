@@ -39,7 +39,7 @@ public sealed class FsmForgePreview
         _context = new FsmForgePreviewContext();
         _events.Clear();
 
-        FsmApi.Create.CreateFiniteStateMachine(name, processRate: 0, processingGroup: "ForgePreview")
+        FSM_API.Create.CreateFiniteStateMachine(name, processRate: 0, processingGroup: "ForgePreview")
             .State("Idle",
                 onEnter: ctx => _events.Add("OnEnter → Idle"),
                 onUpdate: ctx => _events.Add("OnUpdate → Idle"),
@@ -62,7 +62,7 @@ public sealed class FsmForgePreview
             .Transition("Forging", "Finished", ctx => ((FsmForgePreviewContext)ctx).UpdateCount >= 3)
             .BuildDefinition();
 
-        _handle = FsmApi.Create.CreateInstance(name, _context, "ForgePreview");
+        _handle = FSM_API.Create.CreateInstance(name, _context, "ForgePreview");
     }
 
     public void Tick()
