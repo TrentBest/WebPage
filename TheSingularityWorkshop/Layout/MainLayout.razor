@@ -1,12 +1,13 @@
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
+@inject IJSRuntime JS
 @implements IDisposable
 
 <div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden")">
     @if (!IsWorkshopLanding)
     {
-        <div class="sidebar">
+        <div class="sidebar workshop-sidebar">
             <NavMenu />
         </div>
     }
@@ -40,6 +41,8 @@
 
     private bool ShowWorkshopChrome => !IsWorkshopLanding || FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running;
 
+    private bool _chromeReleased;
+
     private string CurrentTabTitle
     {
         get
@@ -64,6 +67,27 @@
     protected override void OnInitialized()
     {
         FSM.StateChanged += HandleFSMStateChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!IsWorkshopLanding || !ShowWorkshopChrome || _chromeReleased)
+            return;
+
+        _chromeReleased = true;
+
+        // The PageFSM's moniker presentation window has completed. Tell the browser
+        // host to leave any presentation fullscreen, then release the splash lock.
+        // MainLayout already animates the sidebar/header geometry, so the experience
+        // surface gives back its space continuously instead of snapping smaller.
+        try
+        {
+            await JS.InvokeVoidAsync("eval", "if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();document.documentElement.classList.remove('workshop-splash-locked');document.documentElement.classList.add('workshop-splash-released');");
+        }
+        catch (JSException)
+        {
+            _chromeReleased = false;
+        }
     }
 
     private void HandleFSMStateChanged(string _) => InvokeAsync(StateHasChanged);
