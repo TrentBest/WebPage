@@ -13,16 +13,61 @@
     </div>
 
     @* --- LAYER 2: THE CHAOS SWARM & MONOLITH --- *@
-    @if (currentPhase == AppPhase.Monolith)
+    @if (currentPhase == AppPhase.Monolith || currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
     {
-        <div class="chaos-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;">
+        <div class="chaos-container @(currentPhase == AppPhase.Collapsing ? "gravity-failure" : "")" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;">
             
             @* The Initial Hook *@
-            <button class="monolith-btn" @onclick="EnterHello" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80vw; height: 80vh; background-image: url('/Images/TheSingularityWorkshopLogo.png'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: rgba(10, 10, 15, 0.9); border: 2px solid #00ffcc; border-radius: 15px; cursor: pointer; box-shadow: 0 0 50px rgba(0, 255, 204, 0.2); transition: all 0.3s ease;">
-                <div class="monolith-text" style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); font-size: 3rem; font-weight: bold; color: white; text-shadow: 0 0 10px #00ffcc; letter-spacing: 5px;">
-                    ENTER THE WORKSHOP
-                </div>
-            </button>
+            @if (currentPhase == AppPhase.Monolith)
+            {
+                <button class="monolith-btn" @onclick="EnterHello" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80vw; height: 80vh; background-image: url('/Images/TheSingularityWorkshopLogo.png'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: rgba(10, 10, 15, 0.9); border: 2px solid #00ffcc; border-radius: 15px; cursor: pointer; box-shadow: 0 0 50px rgba(0, 255, 204, 0.2); transition: all 0.3s ease;">
+                    <div class="monolith-text" style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); font-size: 3rem; font-weight: bold; color: white; text-shadow: 0 0 10px #00ffcc; letter-spacing: 5px;">
+                        ENTER THE WORKSHOP
+                    </div>
+                </button>
+            }
+
+            @* The Living Software (Breeding Buttons) *@
+            @if (currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
+            {
+                @foreach (var node in activeNodes)
+                {
+                    <button class="chaos-node" style="position: absolute; left: @(node.X)px; top: @(node.Y)px; width: @(node.Size)px; height: @(node.Size)px; z-index: @node.Generation; transform: translate(-50%, -50%); transition: width 0.1s linear, height 0.1s linear;">
+                        <div class="node-gen">GEN @node.Generation</div>
+                        <div class="node-lineage">[@node.Lineage]</div>
+                    </button>
+                }
+            }
+        </div>
+    }
+
+    @* --- LAYER 3: THE POST-COLLAPSE GATEWAY --- *@
+    @if (currentPhase == AppPhase.Gateway)
+    {
+        <div class="gateway-interface" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5, 2, 6, 0.85); backdrop-filter: blur(5px); animation: fadeIn 1.5s ease-out;">
+            
+            <div class="kernel-status mb-5 text-center">
+                <span class="oi oi-pulse" style="color: #00ffcc; font-size: 2rem; animation: strobe 1s infinite;"></span>
+                <h2 style="color: #00ffcc; font-weight: bold; letter-spacing: 3px; margin-top: 15px;">SOVEREIGN KERNEL ACTIVE</h2>
+                <p style="color: #aaa; font-size: 1rem; max-width: 500px;">
+                    DOM Authority Terminated. GPU Render Pipeline Online.<br/>
+                    Select your destination trajectory.
+                </p>
+            </div>
+
+            <div class="d-flex gap-4">
+                @* Path 1: The Showcase (Active) *@
+                <button class="btn gateway-btn active-path" @onclick="EnterShowcase">
+                    <h3 class="mb-1">THE SHOWCASE</h3>
+                    <span style="font-size: 0.8rem; opacity: 0.8;">Explore the Architectural Demonstrations</span>
+                </button>
+
+                @* Path 2: The Forge (Locked) *@
+                <button class="btn gateway-btn locked-path" disabled title="Infrastructure actively being built">
+                    <h3 class="mb-1" style="color: #ff3366;">THE FORGE</h3>
+                    <span style="font-size: 0.8rem; opacity: 0.8;">[ UNDER CONSTRUCTION ]</span>
+                </button>
+            </div>
         </div>
     }
 
@@ -78,7 +123,7 @@
     .active-path:hover { background: rgba(0, 255, 204, 0.1); border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); transform: translateX(5px); color: white; }
     .locked-path { border-left: 5px solid #ff3366; opacity: 0.6; cursor: not-allowed; }
 
-    /* Hello World Experience — the Workshop moniker as a living field. */
+    /* Hello World: the first Experience after the gateway click. */
     .hello-world { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; overflow:hidden; isolation:isolate; perspective:1000px; background:radial-gradient(circle at 50% 46%,rgba(0,234,255,.12),transparent 32%),radial-gradient(ellipse at 50% 90%,rgba(0,168,255,.12),transparent 48%),#020711; }
     .hello-world::before { content:""; position:absolute; inset:0; z-index:-4; background-image:linear-gradient(rgba(0,234,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,44,255,.035) 1px,transparent 1px); background-size:44px 44px; animation:helloGridDrift 18s linear infinite; }
     .hello-world::after { content:""; position:absolute; inset:0; z-index:-3; pointer-events:none; background:linear-gradient(180deg,rgba(2,7,17,.05),rgba(0,168,255,.035) 55%,rgba(2,7,17,.65)); }
@@ -117,22 +162,87 @@
 </style>
 
 @code {
-    private enum AppPhase { Monolith, Hello, Chaos, Collapsing, Gateway, Sovereign }
+    private enum AppPhase { Monolith, Chaos, Collapsing, Gateway, Sovereign, Hello }
     private AppPhase currentPhase = AppPhase.Monolith;
 
+    private class ChaosNode
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Size { get; set; }
+        public int Generation { get; set; }
+        public string Lineage { get; set; } = "";
+        public int OffspringCount { get; set; } = 0;
+    }
+
+    private List<ChaosNode> activeNodes = new();
+    private Timer chaosTimer = new();
+    private Random rng = new();
+    
+    private const int CriticalMassThreshold = 100; // Drops when 100 buttons fill the screen
     private const int MonikerPhaseStepDegrees = 27;
     private static readonly string[] Palette = ["#52e05a", "#00a8ff", "#ff2cff", "#ff3030", "#ff7a00", "#ffd34d"];
     private static readonly IReadOnlyList<IReadOnlyList<MonikerGlyph>> MonikerLines = BuildMonikerLines();
 
     protected override void OnInitialized()
     {
+        chaosTimer.Interval = 100;
+        chaosTimer.Elapsed += TickChaos;
     }
 
-    private async Task EnterHello()
+    private void EnterHello()
     {
-        await JS.InvokeVoidAsync("localStorage.setItem", "WorkshopVisited", "true");
         currentPhase = AppPhase.Hello;
+        StateHasChanged();
+    }
+
+    private void TickChaos(object? sender, ElapsedEventArgs e)
+    {
+        if (currentPhase != AppPhase.Chaos) return;
+        List<ChaosNode> newborns = new();
+        foreach (var node in activeNodes)
+        {
+            node.Size += 10;
+            if (node.Size > 180)
+            {
+                node.Size = 60;
+                node.OffspringCount++;
+                newborns.Add(new ChaosNode
+                {
+                    X = node.X + rng.Next(-200, 200),
+                    Y = node.Y + rng.Next(-200, 200),
+                    Generation = node.Generation + 1,
+                    Lineage = $"{node.Lineage}.{node.OffspringCount}",
+                    Size = 60
+                });
+            }
+        }
+        if (newborns.Any())
+        {
+            activeNodes.AddRange(newborns);
+            foreach(var n in activeNodes)
+            {
+                if (n.X < 100) n.X = 150; if (n.X > 1800) n.X = 1700;
+                if (n.Y < 100) n.Y = 150; if (n.Y > 900) n.Y = 800;
+            }
+        }
+        if (activeNodes.Count >= CriticalMassThreshold) _ = TriggerCollapse();
+        else InvokeAsync(StateHasChanged);
+    }
+
+    private async Task TriggerCollapse()
+    {
+        chaosTimer.Stop();
+        currentPhase = AppPhase.Collapsing;
         await InvokeAsync(StateHasChanged);
+        await Task.Delay(1500);
+        currentPhase = AppPhase.Gateway;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void EnterShowcase()
+    {
+        currentPhase = AppPhase.Sovereign;
     }
 
     private static IReadOnlyList<IReadOnlyList<MonikerGlyph>> BuildMonikerLines()
@@ -156,6 +266,8 @@
 
     public void Dispose()
     {
+        chaosTimer.Stop();
+        chaosTimer.Dispose();
     }
 
     private readonly record struct MonikerGlyph(char Character, int GlyphIndex, int PhaseDegrees, string Color);
