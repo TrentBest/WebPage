@@ -6,7 +6,7 @@ public sealed class WorkshopExperienceService
     public event Action? StateChanged;
 
     public string CurrentState { get; private set; } = "Intro";
-    public bool ShowUnity => CurrentState == "Unity";
+    public bool ShowUnity => false;
     public bool IsInitialized { get; private set; }
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
 
@@ -14,7 +14,6 @@ public sealed class WorkshopExperienceService
     {
         if (IsInitialized) return;
         IsInitialized = true;
-        if (returningVisitor) MarkUnityStarted();
     }
 
     public void MarkVisited() { }
@@ -27,7 +26,7 @@ public sealed class WorkshopExperienceService
 
     public void Tick() { }
 
-    public void MarkUnityStarted() => SetState("Unity");
+    public void MarkUnityStarted() { }
 
     public void SetCriticalMassReached() => SetState("CriticalMass");
 
