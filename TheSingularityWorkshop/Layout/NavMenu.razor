@@ -1,45 +1,38 @@
-﻿@using TheSingularityWorkshop.Shared
+@using TheSingularityWorkshop.Shared
 
-<div class="top-row ps-3 navbar navbar-dark workshop-navbar-brand">
-    <div class="container-fluid workshop-brand-stack" aria-label="The Singularity Workshop">
-        <a class="navbar-brand workshop-brand" href="">
+<div class="workshop-nav-shell @(collapseNavMenu ? "collapsed" : "expanded")">
+    <div class="workshop-nav-head">
+        <a class="navbar-brand workshop-brand" href="" aria-label="The Singularity Workshop">
             <span class="brand-word"><span class="brand-letter blue">T</span><span class="brand-letter magenta">H</span><span class="brand-letter orange">E</span></span>
             <span class="brand-word"><span class="brand-letter red">S</span><span class="brand-letter yellow">I</span><span class="brand-letter green">N</span><span class="brand-letter blue">G</span><span class="brand-letter magenta">U</span><span class="brand-letter orange">L</span><span class="brand-letter red">A</span><span class="brand-letter yellow">R</span><span class="brand-letter green">I</span><span class="brand-letter blue">T</span><span class="brand-letter magenta">Y</span></span>
             <span class="brand-word"><span class="brand-letter orange">W</span><span class="brand-letter red">O</span><span class="brand-letter yellow">R</span><span class="brand-letter green">K</span><span class="brand-letter blue">S</span><span class="brand-letter magenta">H</span><span class="brand-letter orange">O</span><span class="brand-letter red">P</span></span>
         </a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu"><span class="navbar-toggler-icon"></span></button>
+        <button type="button" title="@(collapseNavMenu ? "Expand Workshop navigation" : "Collapse Workshop navigation")" class="workshop-nav-toggle" @onclick="ToggleNavMenu" aria-label="@(collapseNavMenu ? "Expand Workshop navigation" : "Collapse Workshop navigation")">
+            @(collapseNavMenu ? "≪" : "≫")
+        </button>
     </div>
+
+    @if (!collapseNavMenu)
+    {
+        <div class="workshop-nav-links">
+            <NavLink class="nav-link explore-nav-item" href="explore"><span class="oi oi-eye" aria-hidden="true"></span> Explore</NavLink>
+            <NavLink class="nav-link create-nav-item" href="create"><span class="oi oi-wrench" aria-hidden="true"></span> Create</NavLink>
+            <NavLink class="nav-link about-nav-item" href="about-us"><span class="oi oi-info" aria-hidden="true"></span> About Us</NavLink>
+        </div>
+    }
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3"><NavLink class="nav-link" href="explore"><span class="oi oi-eye" aria-hidden="true"></span> Explore</NavLink></div>
-        <div class="nav-item px-3 build-nav-item"><NavLink class="nav-link" href="build"><span class="oi oi-wrench" aria-hidden="true"></span> Build</NavLink></div>
-        <div class="nav-item px-3 ai-nav-item"><NavLink class="nav-link" href="ai"><span class="oi oi-lightbulb" aria-hidden="true"></span> AI</NavLink></div>
-        <div class="nav-item px-3"><NavLink class="nav-link" href="living-gui"><span class="oi oi-pulse" aria-hidden="true"></span> Living GUI</NavLink></div>
-        <div class="nav-item px-3"><NavLink class="nav-link" href="fsm-suite"><span class="oi oi-list-rich" aria-hidden="true"></span> FSM Suite</NavLink></div>
-        <div class="nav-item px-3"><NavLink class="nav-link" href="hub"><span class="oi oi-cog" aria-hidden="true"></span> Singularity Hub</NavLink></div>
-        <div class="nav-item px-3"><NavLink class="nav-link" href="demos"><span class="oi oi-list" aria-hidden="true"></span> Demos</NavLink></div>
-        <div class="nav-item px-3"><NavLink class="nav-link" href="library"><span class="oi oi-book" aria-hidden="true"></span> Library</NavLink></div>
-        <div class="nav-item px-3"><NavLink class="nav-link" href="about-us"><span class="oi oi-info" aria-hidden="true"></span> About Us</NavLink></div>
-        <div class="nav-item px-3"><NavLink class="nav-link" href="privacypolicy"><span class="oi oi-info" aria-hidden="true"></span> Privacy Policy</NavLink></div>
-        <div class="nav-item px-3"><NavLink class="nav-link" href="naming-poll"><span class="oi oi-graph" aria-hidden="true"></span> Vote on Name</NavLink></div>
-        <LoginStatus />
-    </nav>
-</div>
+<style>
+    .workshop-nav-shell{position:relative;min-height:100vh;width:100%;box-sizing:border-box;padding:.75rem .5rem;background:linear-gradient(180deg,rgba(2,7,17,.98),rgba(7,2,17,.96));border-right:1px solid rgba(0,234,255,.22);box-shadow:inset -12px 0 30px rgba(255,44,255,.025)}
+    .workshop-nav-head{display:flex;align-items:center;justify-content:center;gap:.4rem;min-height:6rem}.workshop-nav-shell.expanded .workshop-nav-head{justify-content:space-between}
+    .workshop-brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.16rem;margin:0;padding:0;font-family:Consolas,'Courier New',monospace;font-size:clamp(.58rem,1vw,.86rem);font-weight:800;line-height:1;text-decoration:none;white-space:nowrap}.workshop-nav-shell.collapsed .workshop-brand{display:none}.workshop-brand .brand-word{display:block;width:max-content;line-height:1}.workshop-brand .brand-letter{display:inline-block;animation:workshopMonikerWave 3.8s cubic-bezier(.42,0,.58,1) infinite;transform-origin:50% 55%;transform-style:preserve-3d}.workshop-brand .blue{color:#00a8ff}.workshop-brand .magenta{color:#ff2cff}.workshop-brand .orange{color:#ff7a00}.workshop-brand .red{color:#ff3030}.workshop-brand .yellow{color:#ffd34d}.workshop-brand .green{color:#52e05a}.workshop-brand .brand-letter:nth-child(2){animation-delay:-.14s}.workshop-brand .brand-letter:nth-child(3){animation-delay:-.28s}.workshop-brand .brand-letter:nth-child(4){animation-delay:-.42s}.workshop-brand .brand-letter:nth-child(5){animation-delay:-.56s}.workshop-brand .brand-letter:nth-child(6){animation-delay:-.70s}.workshop-brand .brand-letter:nth-child(7){animation-delay:-.84s}.workshop-brand .brand-letter:nth-child(8){animation-delay:-.98s}.workshop-brand .brand-letter:nth-child(9){animation-delay:-1.12s}.workshop-brand .brand-letter:nth-child(10){animation-delay:-1.26s}.workshop-brand .brand-letter:nth-child(11){animation-delay:-1.40s}
+    .workshop-nav-toggle{width:2.4rem;height:2.4rem;border:1px solid rgba(0,234,255,.45);background:rgba(0,234,255,.04);color:#00eaff;font:800 1rem Consolas,'Courier New',monospace;box-shadow:0 0 14px rgba(0,234,255,.08);cursor:pointer}.workshop-nav-toggle:hover{color:#ff2cff;border-color:#ff2cff;box-shadow:0 0 18px rgba(255,44,255,.16)}
+    .workshop-nav-shell.collapsed .workshop-nav-toggle{margin:0 auto}.workshop-nav-links{display:flex;flex-direction:column;gap:.35rem;margin-top:.5rem}.workshop-nav-links .nav-link{padding:.7rem .75rem;border-left:2px solid transparent;color:#7e9aa5;text-decoration:none;font:700 .72rem Consolas,'Courier New',monospace;letter-spacing:.08em;text-transform:uppercase}.workshop-nav-links .nav-link:hover{color:#fff;border-left-color:#ff2cff;background:rgba(255,44,255,.045)}.workshop-nav-links .nav-link.active{color:#fff;border-left-color:#00eaff;background:linear-gradient(90deg,rgba(0,234,255,.07),transparent)}.create-nav-item{color:#ffd34d!important}.about-nav-item{color:#ff6fff!important}
+    @@keyframes workshopMonikerWave{0%,100%{transform:translateY(0) rotateX(0deg) rotateY(0deg) rotateZ(-1.65deg) scale(1);filter:brightness(.92) saturate(.96)}18%{transform:translateY(-.08em) rotateX(3deg) rotateY(-4deg) rotateZ(2.35deg) scale(1.012);filter:brightness(1.02) saturate(1.04)}38%{transform:translateY(-.18em) rotateX(-2deg) rotateY(6deg) rotateZ(3.65deg) scale(1.025);filter:brightness(1.1) saturate(1.12)}58%{transform:translateY(.055em) rotateX(4deg) rotateY(-7deg) rotateZ(-3.05deg) scale(1.008);filter:brightness(1.04) saturate(1.06)}78%{transform:translateY(-.12em) rotateX(-3deg) rotateY(5deg) rotateZ(2.25deg) scale(1.018);filter:brightness(1.07) saturate(1.1)}}
+    @@media(max-width:700px){.workshop-nav-shell{min-height:auto}.workshop-nav-shell.expanded{min-height:8rem}.workshop-nav-links{flex-direction:row;flex-wrap:wrap}.workshop-nav-links .nav-link{flex:1 1 auto}}
+</style>
 
 @code {
     private bool collapseNavMenu = true;
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 }
-
-<style>
-    .workshop-navbar-brand{min-height:7.5rem;padding:.75rem .5rem}.workshop-brand-stack{display:flex;align-items:center;justify-content:center;gap:.35rem}.workshop-brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.18rem;width:100%;margin:0;padding:0;font-family:Consolas,'Courier New',monospace;font-size:clamp(.7rem,1.25vw,1.05rem);font-weight:800;line-height:1;text-decoration:none;text-align:center;white-space:nowrap}.workshop-brand .brand-word{display:block;width:max-content;max-width:100%;white-space:nowrap;line-height:1}.workshop-brand .brand-letter{display:inline-block;animation:workshopMonikerWave 3.8s cubic-bezier(.42,0,.58,1) infinite;transform-origin:50% 55%;transform-style:preserve-3d;will-change:transform,filter}.workshop-brand .blue{color:#00a8ff}.workshop-brand .magenta{color:#ff2cff}.workshop-brand .orange{color:#ff7a00}.workshop-brand .red{color:#ff3030}.workshop-brand .yellow{color:#ffd34d}.workshop-brand .green{color:#52e05a}.workshop-brand .brand-letter:nth-child(2){animation-delay:-.14s}.workshop-brand .brand-letter:nth-child(3){animation-delay:-.28s}.workshop-brand .brand-letter:nth-child(4){animation-delay:-.42s}.workshop-brand .brand-letter:nth-child(5){animation-delay:-.56s}.workshop-brand .brand-letter:nth-child(6){animation-delay:-.70s}.workshop-brand .brand-letter:nth-child(7){animation-delay:-.84s}.workshop-brand .brand-letter:nth-child(8){animation-delay:-.98s}.workshop-brand .brand-letter:nth-child(9){animation-delay:-1.12s}.workshop-brand .brand-letter:nth-child(10){animation-delay:-1.26s}.workshop-brand .brand-letter:nth-child(11){animation-delay:-1.40s}
-    @@keyframes workshopMonikerWave{0%,100%{transform:translateY(0) rotateX(0deg) rotateY(0deg) rotateZ(-1.65deg) scale(1);filter:brightness(.92) saturate(.96)}18%{transform:translateY(-.08em) rotateX(3deg) rotateY(-4deg) rotateZ(2.35deg) scale(1.012);filter:brightness(1.02) saturate(1.04)}38%{transform:translateY(-.18em) rotateX(-2deg) rotateY(6deg) rotateZ(3.65deg) scale(1.025);filter:brightness(1.1) saturate(1.12)}58%{transform:translateY(.055em) rotateX(4deg) rotateY(-7deg) rotateZ(-3.05deg) scale(1.008);filter:brightness(1.04) saturate(1.06)}78%{transform:translateY(-.12em) rotateX(-3deg) rotateY(5deg) rotateZ(2.25deg) scale(1.018);filter:brightness(1.07) saturate(1.1)}}
-    .ai-nav-item .nav-link{color:#00eaff;text-shadow:0 0 8px rgba(0,234,255,.45);animation:aiNavBreath 2.8s ease-in-out infinite}.ai-nav-item .nav-link.active,.ai-nav-item .nav-link:hover{color:#ff2cff;text-shadow:0 0 10px rgba(255,44,255,.65)}@@keyframes aiNavBreath{0%,100%{opacity:.78}50%{opacity:1}}
-    .build-nav-item .nav-link{color:#ffd34d;text-shadow:0 0 8px rgba(255,211,77,.32);animation:buildNavBreath 3.6s ease-in-out infinite}.build-nav-item .nav-link.active,.build-nav-item .nav-link:hover{color:#ff2cff;text-shadow:0 0 10px rgba(255,44,255,.65)}@@keyframes buildNavBreath{0%,100%{opacity:.78}50%{opacity:1}}
-    .monolith-text{width:calc(100% - 2.5rem)!important;max-width:calc(100% - 2.5rem)!important;padding-inline:.4rem!important;box-sizing:border-box!important;font-size:clamp(.62rem,1.7vw,1.95rem)!important;letter-spacing:clamp(.035em,.09em,.11em)!important;line-height:1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;animation:workshopEnterBreath 2.8s ease-in-out infinite!important}.monolith-btn:hover .monolith-text{animation-duration:1.8s!important}
-    .ambient-signal::before,.ambient-signal::after{content:"";position:absolute;width:3px;height:3px;border-radius:50%;background:currentColor;box-shadow:0 0 7px currentColor,0 0 15px currentColor;opacity:0;animation:workshopSparkCrescendo 8s ease-in-out infinite}.ambient-signal::before{left:22px;top:-14px;animation-delay:-1.7s}.ambient-signal::after{left:-31px;top:17px;animation-delay:-4.1s}.signal-two::before{left:28px;top:25px;animation-delay:-2.6s}.signal-three::after{left:19px;top:-28px;animation-delay:-5.4s}
-    @@keyframes workshopEnterBreath{0%,100%{transform:translateX(-50%) scale(1);filter:brightness(.9);opacity:.9}50%{transform:translateX(-50%) scale(1.035);filter:brightness(1.22);opacity:1}}@@keyframes workshopSparkCrescendo{0%,12%{opacity:0;transform:scale(.2) translateY(8px)}25%{opacity:.35}48%{opacity:.85;transform:scale(1.4) translateY(0)}72%{opacity:1;transform:scale(.75) translateY(-5px)}100%{opacity:0;transform:scale(.1) translateY(-18px)}}
-</style>
