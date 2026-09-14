@@ -1,294 +1,392 @@
 ﻿@page "/"
 @using System.Timers
+@using TheSingularityWorkshop.FSM_API
 @inject IJSRuntime JS
+@inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 @implements IDisposable
 
 <PageTitle>The Singularity Workshop</PageTitle>
 
-<div class="hypervisor-shell" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #050206; font-family: monospace; color: white;">
-
-    @* --- LAYER 1: THE SOVEREIGN KERNEL (Silently Booting) --- *@
-    <div class="unity-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "all" : "none"); opacity: @(currentPhase == AppPhase.Gateway || currentPhase == AppPhase.Sovereign ? "1" : "0"); transition: opacity 1.5s ease-in;">
-        <canvas id="unity-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+<div class="workshop-root">
+    <div class="unity-layer @(Experience.ShowUnity ? "visible" : "")">
+        <canvas id="unity-canvas"></canvas>
+        @if (Experience.CurrentState == "Unity")
+        {
+            <div class="unity-transition" aria-hidden="true">
+                <div class="unity-made">MADE WITH UNITY</div>
+                <div class="unity-moniker">THE SINGULARITY WORKSHOP</div>
+            </div>
+        }
     </div>
 
-    @* --- LAYER 2: THE CHAOS SWARM & MONOLITH --- *@
-    @if (currentPhase == AppPhase.Monolith || currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
+    @if (Experience.CurrentState is "Intro" or "Living" or "FlexHello")
     {
-        <div class="chaos-container @(currentPhase == AppPhase.Collapsing ? "gravity-failure" : "")" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;">
-            
-            @* The Initial Hook *@
-            @if (currentPhase == AppPhase.Monolith)
+        <div class="experience-layer">
+            @if (Experience.CurrentState == "Intro")
             {
-                <button class="monolith-btn" @onclick="EnterHello" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80vw; height: 80vh; background-image: url('/Images/TheSingularityWorkshopLogo.png'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: rgba(10, 10, 15, 0.9); border: 2px solid #00ffcc; border-radius: 15px; cursor: pointer; box-shadow: 0 0 50px rgba(0, 255, 204, 0.2); transition: all 0.3s ease;">
-                    <div class="monolith-text" style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); font-size: 3rem; font-weight: bold; color: white; text-shadow: 0 0 10px #00ffcc; letter-spacing: 5px;">
-                        ENTER THE WORKSHOP
-                    </div>
-                </button>
-            }
+                <section class="monolith-stage">
+                    <div class="ambient-grid" aria-hidden="true"></div>
+                    <div class="ambient-scan" aria-hidden="true"></div>
+                    <div class="ambient-orbit ambient-orbit-one" aria-hidden="true"></div>
+                    <div class="ambient-orbit ambient-orbit-two" aria-hidden="true"></div>
+                    <div class="ambient-signal signal-one" aria-hidden="true"></div>
+                    <div class="ambient-signal signal-two" aria-hidden="true"></div>
+                    <div class="ambient-signal signal-three" aria-hidden="true"></div>
 
-            @* The Living Software (Breeding Buttons) *@
-            @if (currentPhase == AppPhase.Chaos || currentPhase == AppPhase.Collapsing)
-            {
-                @foreach (var node in activeNodes)
-                {
-                    <button class="chaos-node" style="position: absolute; left: @(node.X)px; top: @(node.Y)px; width: @(node.Size)px; height: @(node.Size)px; z-index: @node.Generation; transform: translate(-50%, -50%); transition: width 0.1s linear, height 0.1s linear;">
-                        <div class="node-gen">GEN @node.Generation</div>
-                        <div class="node-lineage">[@node.Lineage]</div>
+                    <button class="monolith-btn" @onclick="EnterWorkshop" @onmouseover="WarningHovered" aria-label="Enter The Singularity Workshop">
+                        <span class="hero-corner hero-corner-tl" aria-hidden="true"></span>
+                        <span class="hero-corner hero-corner-tr" aria-hidden="true"></span>
+                        <span class="hero-corner hero-corner-bl" aria-hidden="true"></span>
+                        <span class="hero-corner hero-corner-br" aria-hidden="true"></span>
+                        <span class="hero-energy" aria-hidden="true"></span>
+                        <img class="monolith-image" src="/Images/TheSingularityWorkshopLogo.png" alt="The Singularity Workshop" />
+                        <span class="monolith-text">ENTER THE WORKSHOP</span>
                     </button>
-                }
+
+                    <div class="workshop-warning" role="note">
+                        <div class="warning-header">
+                            <span class="warning-mark">⚠</span>
+                            <span>SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE</span>
+                            <span class="warning-mark">⚠</span>
+                        </div>
+                        <div class="warning-body">
+                            You are transitioning from Blazor WASM UI logic straight into a WebGL Unity engine build.<br />
+                            Both domains are aggressively driven by the same featherweight, pure C# <strong>50kb FSM_API</strong> —<br />
+                            fully agnostic and backwards-compatible down to legacy frameworks.<br />
+                            <span class="warning-final">Viewer discretion and spare RAM advised.</span>
+                        </div>
+                    </div>
+                </section>
+            }
+
+            @if (Experience.CurrentState == "FlexHello")
+            {
+                <section class="flex-hello" aria-live="polite">
+                    <div class="flex-hello-orbit" aria-hidden="true"></div>
+                    <div class="flex-hello-kicker">FLEX EXPERIENCE</div>
+                    <div class="flex-hello-moniker">THE SINGULARITY WORKSHOP</div>
+                    <div class="flex-hello-state">STATE: @Experience.CurrentState</div>
+                </section>
+            }
+
+            @foreach (var node in Nodes)
+            {
+                <div class="living-node @(node.IsSeed ? "seed" : "")" style="left:@(node.X)%;top:@(node.Y)%;transform:translate(-50%,-50%) rotate(@(node.Rotation)deg) scale(@(node.Scale));">
+                    <div class="node-core"></div>
+                    <div class="node-ring"></div>
+                    <span>GEN @node.Generation</span>
+                </div>
             }
         </div>
-    }
-
-    @* --- LAYER 3: THE POST-COLLAPSE GATEWAY --- *@
-    @if (currentPhase == AppPhase.Gateway)
-    {
-        <div class="gateway-interface" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5, 2, 6, 0.85); backdrop-filter: blur(5px); animation: fadeIn 1.5s ease-out;">
-            
-            <div class="kernel-status mb-5 text-center">
-                <span class="oi oi-pulse" style="color: #00ffcc; font-size: 2rem; animation: strobe 1s infinite;"></span>
-                <h2 style="color: #00ffcc; font-weight: bold; letter-spacing: 3px; margin-top: 15px;">SOVEREIGN KERNEL ACTIVE</h2>
-                <p style="color: #aaa; font-size: 1rem; max-width: 500px;">
-                    DOM Authority Terminated. GPU Render Pipeline Online.<br/>
-                    Select your destination trajectory.
-                </p>
-            </div>
-
-            <div class="d-flex gap-4">
-                @* Path 1: The Showcase (Active) *@
-                <button class="btn gateway-btn active-path" @onclick="EnterShowcase">
-                    <h3 class="mb-1">THE SHOWCASE</h3>
-                    <span style="font-size: 0.8rem; opacity: 0.8;">Explore the Architectural Demonstrations</span>
-                </button>
-
-                @* Path 2: The Forge (Locked) *@
-                <button class="btn gateway-btn locked-path" disabled title="Infrastructure actively being built">
-                    <h3 class="mb-1" style="color: #ff3366;">THE FORGE</h3>
-                    <span style="font-size: 0.8rem; opacity: 0.8;">[ UNDER CONSTRUCTION ]</span>
-                </button>
-            </div>
-        </div>
-    }
-
-    @if (currentPhase == AppPhase.Hello)
-    {
-        <section class="hello-world" aria-live="polite" aria-label="The Singularity Workshop">
-            <div class="hello-water" aria-hidden="true"></div>
-            <div class="hello-orbit hello-orbit-one" aria-hidden="true"></div>
-            <div class="hello-orbit hello-orbit-two" aria-hidden="true"></div>
-            <div class="hello-moniker" aria-label="THE SINGULARITY WORKSHOP">
-                @foreach (var line in MonikerLines)
-                {
-                    <div class="hello-line">
-                        @foreach (var glyph in line)
-                        {
-                            <span class="hello-glyph" style="--phase:@(glyph.PhaseDegrees)deg;--glyph-color:@glyph.Color;">@glyph.Character</span>
-                        }
-                    </div>
-                }
-            </div>
-        </section>
     }
 </div>
 
 <style>
-    /* Swarm Node Styles */
-    .chaos-node {
-        border-radius: 8px; border: 1px solid rgba(0, 255, 204, 0.5);
-        color: white; background: rgba(5, 2, 6, 0.8); backdrop-filter: blur(2px);
-        overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center;
-        box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); pointer-events: none;
+    .workshop-root { position:relative; width:100%; height:100%; min-height:100%; overflow:hidden; background:#020711; color:#fff; font-family:Consolas,'Courier New',monospace; }
+    .unity-layer,.unity-layer canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+    .unity-layer { z-index:1; opacity:0; pointer-events:none; transition:opacity 1.5s ease-in; background:#000; }
+    .unity-layer.visible { opacity:1; pointer-events:auto; }
+    .experience-layer { position:absolute; inset:0; z-index:10; overflow:hidden; background:radial-gradient(circle at 50% 44%,rgba(0,234,255,.08),transparent 30%),radial-gradient(circle at 28% 62%,rgba(255,44,255,.055),transparent 34%),#020711; }
+
+    .monolith-stage { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:clamp(1rem,2.5vh,1.5rem); overflow:hidden; isolation:isolate; background:radial-gradient(ellipse at 50% 45%,rgba(0,234,255,.075),transparent 38%),radial-gradient(ellipse at 50% 80%,rgba(255,44,255,.045),transparent 42%),#020711; }
+    .monolith-stage::before,.monolith-stage::after { content:""; position:absolute; inset:0; pointer-events:none; }
+    .monolith-stage::before { z-index:-2; opacity:.35; background-image:linear-gradient(rgba(0,234,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(0,234,255,.055) 1px,transparent 1px); background-size:44px 44px; transform:perspective(650px) rotateX(62deg) scale(1.8) translateY(18%); transform-origin:center bottom; animation:gridDrift 18s linear infinite; }
+    .monolith-stage::after { z-index:-1; background:linear-gradient(90deg,#020711 0%,transparent 16%,transparent 84%,#020711 100%),linear-gradient(0deg,#020711 0%,transparent 14%,transparent 88%,#020711 100%),repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 5px); mix-blend-mode:screen; }
+    .ambient-grid { position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(90deg,transparent 0 9%,rgba(0,234,255,.08) 9.1%,transparent 9.2% 90.8%,rgba(0,234,255,.08) 90.9%,transparent 91%),linear-gradient(0deg,transparent 0 14%,rgba(255,44,255,.055) 14.1%,transparent 14.2% 85.8%,rgba(255,44,255,.055) 85.9%,transparent 86%); opacity:.7; }
+    .ambient-scan { position:absolute; left:0; right:0; top:-15%; height:18%; z-index:0; pointer-events:none; background:linear-gradient(180deg,transparent,rgba(0,234,255,.055),transparent); filter:blur(3px); animation:scanSweep 8s ease-in-out infinite; }
+    .ambient-orbit { position:absolute; width:min(70vw,900px); height:min(70vw,900px); border:1px solid rgba(0,234,255,.09); border-radius:50%; pointer-events:none; z-index:-1; animation:orbitPulse 7s ease-in-out infinite; }
+    .ambient-orbit-one { transform:rotateX(66deg) rotateZ(-16deg); }
+    .ambient-orbit-two { width:min(50vw,650px); height:min(50vw,650px); transform:rotateX(66deg) rotateZ(32deg); animation-delay:-2.5s; border-color:rgba(255,44,255,.08); }
+    .ambient-signal { position:absolute; width:7px; height:7px; border-radius:50%; background:#00eaff; box-shadow:0 0 8px #00eaff,0 0 22px rgba(0,234,255,.7); pointer-events:none; z-index:0; animation:signalBlink 3s ease-in-out infinite; }
+    .signal-one { left:18%; top:31%; }
+    .signal-two { right:17%; top:57%; animation-delay:-1s; background:#ff2cff; box-shadow:0 0 8px #ff2cff,0 0 22px rgba(255,44,255,.7); }
+    .signal-three { left:31%; bottom:14%; animation-delay:-2s; }
+
+    .monolith-btn { position:relative; z-index:5; width:50%; height:50%; min-width:280px; min-height:220px; padding:0; display:flex; align-items:center; justify-content:center; overflow:hidden; background:rgba(3,10,22,.72); border:2px solid #00eaff; border-radius:18px; cursor:pointer; box-shadow:0 0 12px rgba(0,234,255,.5),0 0 45px rgba(0,234,255,.14),inset 0 0 35px rgba(0,234,255,.06); transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease; }
+    .monolith-btn::before { content:""; position:absolute; inset:7px; border:1px solid rgba(0,234,255,.15); border-radius:12px; pointer-events:none; }
+    .monolith-btn::after { content:""; position:absolute; inset:0; background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.08) 48%,transparent 61%); transform:translateX(-110%); animation:heroSweep 6s ease-in-out infinite; pointer-events:none; }
+    .monolith-btn:hover { transform:scale(1.012); border-color:#ff2cff; box-shadow:0 0 18px rgba(255,44,255,.7),0 0 60px rgba(0,234,255,.2),inset 0 0 40px rgba(255,44,255,.08); }
+    .monolith-btn:focus-visible { outline:2px solid #ffd34d; outline-offset:5px; }
+    .monolith-image { width:auto; height:auto; max-width:100%; max-height:100%; object-fit:contain; object-position:center; display:block; pointer-events:none; filter:saturate(1.08) contrast(1.04); }
+    .monolith-text { position:absolute; left:50%; bottom:8%; transform:translateX(-50%); width:100%; text-align:center; font-size:clamp(1.1rem,2.5vw,2.6rem); font-weight:700; color:#fff; text-shadow:0 0 8px #00eaff,0 0 22px rgba(0,234,255,.75),0 0 40px rgba(255,44,255,.25); letter-spacing:.18em; white-space:nowrap; pointer-events:none; animation:titleBreath 3.6s ease-in-out infinite; }
+    .hero-corner { position:absolute; width:46px; height:46px; z-index:4; pointer-events:none; }
+    .hero-corner::before,.hero-corner::after { content:""; position:absolute; background:rgba(0,234,255,.55); box-shadow:0 0 8px rgba(0,234,255,.35); }
+    .hero-corner::before { width:46px; height:1px; } .hero-corner::after { width:1px; height:46px; }
+    .hero-corner-tl { left:16px; top:16px; } .hero-corner-tr { right:16px; top:16px; transform:rotate(90deg); } .hero-corner-bl { left:16px; bottom:16px; transform:rotate(-90deg); } .hero-corner-br { right:16px; bottom:16px; transform:rotate(180deg); }
+    .hero-energy { position:absolute; width:72%; height:72%; border:1px solid rgba(255,44,255,.1); border-radius:50%; box-shadow:0 0 55px rgba(0,234,255,.04); pointer-events:none; animation:energyPulse 4.5s ease-in-out infinite; }
+
+    .workshop-warning { position:relative; z-index:6; width:min(680px,78%); box-sizing:border-box; padding:.75rem 1.25rem .9rem; text-align:center; color:#f1f7ff; background:rgba(20,10,2,.92); border:3px solid #ff6600; border-radius:5px; box-shadow:0 0 14px rgba(255,102,0,.24),0 0 28px rgba(255,102,0,.14),inset 0 0 20px rgba(255,102,0,.045); animation:warningBorderBreath 3.6s ease-in-out infinite; }
+    .warning-header { display:flex; align-items:center; justify-content:center; gap:.7rem; margin-bottom:.45rem; font-size:clamp(.68rem,1vw,.9rem); font-weight:700; letter-spacing:.14em; color:#ff9933; text-shadow:0 0 8px rgba(255,153,51,.65); animation:warningHeaderBreath 3.6s ease-in-out infinite; }
+    .warning-mark { color:#ffd34d; filter:drop-shadow(0 0 5px rgba(255,102,0,.7)); }
+    .warning-body { font-size:clamp(.63rem,.92vw,.82rem); line-height:1.65; letter-spacing:.025em; color:#dceaf2; }
+    .warning-body strong { color:#fff; } .warning-final { color:#ffb15c; }
+
+    .flex-hello { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.75rem; overflow:hidden; isolation:isolate; background:radial-gradient(circle at 50% 48%,rgba(0,234,255,.09),transparent 34%),#020711; }
+    .flex-hello::before { content:""; position:absolute; inset:0; z-index:-2; background-image:linear-gradient(rgba(0,234,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,44,255,.035) 1px,transparent 1px); background-size:44px 44px; animation:gridDrift 18s linear infinite; }
+    .flex-hello-orbit { position:absolute; width:min(55vw,720px); height:min(55vw,720px); border:1px solid rgba(0,234,255,.16); border-radius:50%; box-shadow:0 0 50px rgba(0,234,255,.06); animation:helloOrbit 6s ease-in-out infinite; }
+    .flex-hello-kicker { font-size:clamp(.7rem,1.2vw,1rem); letter-spacing:.42em; color:#ff9933; text-shadow:0 0 10px rgba(255,153,51,.7); animation:helloBreath 3.2s ease-in-out infinite; }
+    .flex-hello-moniker { font-size:clamp(1.5rem,5vw,4.2rem); font-weight:800; letter-spacing:.18em; text-align:center; color:#fff; text-shadow:0 0 12px #00eaff,0 0 34px rgba(0,234,255,.75),0 0 60px rgba(255,44,255,.28); animation:helloMoniker 3.8s ease-in-out infinite; }
+    .flex-hello-state { margin-top:.5rem; font-size:clamp(.65rem,1vw,.9rem); letter-spacing:.24em; color:#8eefff; opacity:.78; }
+
+    .living-node { position:absolute; width:54px; height:54px; z-index:20; transition:left .08s linear,top .08s linear; }
+    .living-node .node-core { position:absolute; inset:13px; border-radius:50%; background:#00eaff; box-shadow:0 0 10px #00eaff,0 0 30px rgba(0,234,255,.7); }
+    .living-node .node-ring { position:absolute; inset:0; border:1px solid rgba(255,44,255,.65); border-radius:50%; animation:ring 2.8s ease-in-out infinite; }
+    .living-node span { position:absolute; top:60px; left:50%; transform:translateX(-50%); font-size:9px; white-space:nowrap; opacity:.65; }
+    .living-node.seed .node-core { background:#fff; }
+    .unity-transition { position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1rem; background:radial-gradient(circle,rgba(0,0,0,.1),rgba(0,0,0,.65)); pointer-events:none; }
+    .unity-made { font-size:clamp(.8rem,1.5vw,1.2rem); letter-spacing:.35em; opacity:.85; animation:fade-up 1.2s ease forwards; }
+    .unity-moniker { font-size:clamp(1.4rem,4vw,3.5rem); font-weight:800; letter-spacing:.18em; text-align:center; text-shadow:0 0 15px #00eaff,0 0 40px rgba(255,44,255,.4); animation:moniker 2.8s ease forwards; }
+
+    @@keyframes gridDrift { from{background-position:0 0,0 0} to{background-position:0 44px,44px 0} }
+    @@keyframes scanSweep { 0%,15%{transform:translateY(-20vh);opacity:0}35%{opacity:1}70%{opacity:.7}100%{transform:translateY(650%);opacity:0} }
+    @@keyframes orbitPulse { 0%,100%{opacity:.25;transform:scale(.96) rotateX(66deg) rotateZ(-16deg)}50%{opacity:.7;transform:scale(1.03) rotateX(66deg) rotateZ(-16deg)} }
+    @@keyframes signalBlink { 0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1.5)} }
+    @@keyframes heroSweep { 0%,25%{transform:translateX(-110%)}55%,100%{transform:translateX(110%)} }
+    @@keyframes energyPulse { 0%,100%{transform:scale(.94);opacity:.2}50%{transform:scale(1.04);opacity:.65} }
+    @@keyframes titleBreath { 0%,100%{text-shadow:0 0 8px #00eaff,0 0 22px rgba(0,234,255,.65);opacity:.92}50%{text-shadow:0 0 12px #00eaff,0 0 30px rgba(0,234,255,.9),0 0 45px rgba(255,44,255,.35);opacity:1} }
+    @@keyframes warningBorderBreath { 0%,100%{border-color:#ff6600;box-shadow:0 0 10px rgba(255,102,0,.2),0 0 24px rgba(255,102,0,.1),inset 0 0 16px rgba(255,102,0,.035)}50%{border-color:#ff7a00;box-shadow:0 0 20px rgba(255,102,0,.48),0 0 42px rgba(255,102,0,.2),inset 0 0 24px rgba(255,102,0,.07)} }
+    @@keyframes warningHeaderBreath { 0%,49%{color:#ff9933;text-shadow:0 0 8px rgba(255,153,51,.7)}50%,100%{color:#ffd34d;text-shadow:0 0 10px rgba(255,211,77,.8)} }
+    @@keyframes helloOrbit { 0%,100%{transform:scale(.94) rotateX(64deg) rotateZ(-12deg);opacity:.28}50%{transform:scale(1.04) rotateX(64deg) rotateZ(12deg);opacity:.75} }
+    @@keyframes helloBreath { 0%,100%{opacity:.7}50%{opacity:1} }
+    @@keyframes helloMoniker { 0%,100%{transform:scale(.97);opacity:.88}50%{transform:scale(1.025);opacity:1} }
+    @@keyframes ring { 0%,100%{transform:scale(.86);opacity:.3}50%{transform:scale(1.18);opacity:.9} }
+    @@keyframes fade-up { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:none} }
+    @@keyframes moniker { 0%{opacity:0;transform:scale(.92)}35%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.03)} }
+
+    @@media(max-width:700px){
+        .monolith-btn{width:80%;height:50%;min-width:0}
+        .monolith-text{letter-spacing:.08em;font-size:clamp(.85rem,4vw,1.5rem)}
+        .workshop-warning{width:88%;padding:.65rem .8rem}
+        .warning-header{letter-spacing:.07em}
+        .warning-body br{display:none}
+        .ambient-orbit{width:90vw;height:90vw}
+        .living-node{width:42px;height:42px}
+        .living-node span{top:47px}
+        .flex-hello-moniker{font-size:clamp(1.1rem,7vw,2.8rem);letter-spacing:.1em;padding:0 1rem}
     }
-    .node-gen { font-size: 0.7rem; color: #00ffcc; font-weight: bold; }
-    .node-lineage { font-size: 0.6rem; opacity: 0.7; }
 
-    /* The Gravity Drop Animation */
-    .gravity-failure {
-        transform: translateY(150vh) rotate(10deg);
-        opacity: 0;
-        transition: all 1.5s cubic-bezier(0.55, 0.085, 0.68, 0.53);
-        pointer-events: none;
+    @@media(prefers-reduced-motion:reduce){
+        .monolith-stage::before,.ambient-scan,.ambient-orbit,.ambient-signal,.monolith-btn::after,.hero-energy,.monolith-text,.workshop-warning,.warning-header,.flex-hello-orbit,.flex-hello-kicker,.flex-hello-moniker{animation:none}
     }
-
-    /* Gateway Styles */
-    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @@keyframes strobe { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
-    
-    .gateway-btn {
-        background: rgba(10, 10, 15, 0.9); border: 1px solid #444; color: white;
-        padding: 20px 40px; width: 300px; text-align: left; border-radius: 8px; transition: all 0.3s;
-    }
-    .active-path { border-left: 5px solid #00ffcc; }
-    .active-path:hover { background: rgba(0, 255, 204, 0.1); border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); transform: translateX(5px); color: white; }
-    .locked-path { border-left: 5px solid #ff3366; opacity: 0.6; cursor: not-allowed; }
-
-    /* Hello World: the first Experience after the gateway click. */
-    .hello-world { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; overflow:hidden; isolation:isolate; perspective:1000px; background:radial-gradient(circle at 50% 46%,rgba(0,234,255,.12),transparent 32%),radial-gradient(ellipse at 50% 90%,rgba(0,168,255,.12),transparent 48%),#020711; }
-    .hello-world::before { content:""; position:absolute; inset:0; z-index:-4; background-image:linear-gradient(rgba(0,234,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,44,255,.035) 1px,transparent 1px); background-size:44px 44px; animation:helloGridDrift 18s linear infinite; }
-    .hello-world::after { content:""; position:absolute; inset:0; z-index:-3; pointer-events:none; background:linear-gradient(180deg,rgba(2,7,17,.05),rgba(0,168,255,.035) 55%,rgba(2,7,17,.65)); }
-    .hello-water { position:absolute; left:-12%; right:-12%; bottom:-18%; height:65%; z-index:-2; opacity:.72; background:radial-gradient(ellipse at 50% 100%,rgba(0,168,255,.2),transparent 60%),repeating-radial-gradient(ellipse at 50% 115%,transparent 0 7%,rgba(0,234,255,.045) 7.3% 7.6%,transparent 8% 14%); filter:blur(1px); transform:perspective(700px) rotateX(66deg); transform-origin:center bottom; animation:helloWaterBreath 8s ease-in-out infinite; }
-    .hello-orbit { position:absolute; border-radius:50%; pointer-events:none; z-index:-1; }
-    .hello-orbit-one { width:min(78vw,980px); height:min(48vw,600px); border:1px solid rgba(0,234,255,.12); transform:rotateX(68deg) rotateZ(-11deg); animation:helloOrbitOne 11s ease-in-out infinite; }
-    .hello-orbit-two { width:min(58vw,760px); height:min(34vw,440px); border:1px solid rgba(255,44,255,.09); transform:rotateX(68deg) rotateZ(19deg); animation:helloOrbitTwo 13s ease-in-out infinite; }
-    .hello-moniker { position:relative; z-index:4; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(.08rem,.3vw,.24rem); transform-style:preserve-3d; text-align:center; color:#fff; }
-    .hello-line { display:flex; align-items:center; justify-content:center; transform-style:preserve-3d; white-space:nowrap; }
-    .hello-line:nth-child(1) { font-size:clamp(1rem,2.1vw,1.8rem); letter-spacing:.42em; }
-    .hello-line:nth-child(2) { font-size:clamp(2rem,7vw,6.5rem); letter-spacing:.11em; font-weight:900; }
-    .hello-line:nth-child(3) { font-size:clamp(1.45rem,4.8vw,4.6rem); letter-spacing:.2em; font-weight:850; }
-    @@property --wave-time { syntax: "&lt;number&gt;"; inherits: false; initial-value: 0; }
-    /*
-       The motion is the requested wave model:
-         phase = glyphIndex * phaseStep
-         x = sin(time * fx + phase) * Ax
-         y = sin(time * fy + phase + phiY) * Ay
-         z = sin(time * fz + phase + phiZ) * Az
-         rotateX = sin(time * rx + phase + phiRX) * Rx
-         rotateY = sin(time * ry + phase + phiRY) * Ry
-         rotateZ = sin(time * rz + phase + phiRZ) * Rz
-
-       --wave-time is a shared unitless cycle variable. Every glyph gets a different phase.
-    */
-    .hello-glyph { --phase:0deg; --glyph-color:#fff; display:inline-block; position:relative; color:var(--glyph-color); transform-style:preserve-3d; transform-origin:center 72%; will-change:transform,filter; text-shadow:0 0 7px color-mix(in srgb,var(--glyph-color) 82%,white),0 0 18px color-mix(in srgb,var(--glyph-color) 48%,transparent); animation:helloGlyphWave 9s linear infinite; }
-    .hello-glyph::after { content:""; position:absolute; left:20%; right:20%; bottom:-.2em; height:.08em; border-radius:50%; background:var(--glyph-color); opacity:.28; filter:blur(4px); transform:scaleX(.7); }
-    @@keyframes helloGlyphWave { from { --wave-time:0; } to { --wave-time:1; } }
-    .hello-glyph { transform:translate3d(calc(sin(calc(var(--wave-time) * 360deg + var(--phase))) * 18px),calc(sin(calc(var(--wave-time) * 421.2deg + var(--phase) + 55deg)) * 14px),calc(sin(calc(var(--wave-time) * 298.8deg + var(--phase) + 120deg)) * 24px)) rotateX(calc(sin(calc(var(--wave-time) * 388.8deg + var(--phase) + 20deg)) * 7deg)) rotateY(calc(sin(calc(var(--wave-time) * 327.6deg + var(--phase) + 95deg)) * 11deg)) rotateZ(calc(sin(calc(var(--wave-time) * 406.8deg + var(--phase) + 145deg)) * 4.5deg)); }
-    @@keyframes helloGridDrift { from{background-position:0 0,0 0} to{background-position:0 44px,44px 0} }
-    @@keyframes helloWaterBreath { 0%,100%{opacity:.42;transform:perspective(700px) rotateX(66deg) scale(1)} 50%{opacity:.82;transform:perspective(700px) rotateX(66deg) scale(1.04,1.08)} }
-    @@keyframes helloOrbitOne { 0%,100%{opacity:.18;transform:scale(.96) rotateX(68deg) rotateZ(-11deg)} 50%{opacity:.72;transform:scale(1.04) rotateX(68deg) rotateZ(9deg)} }
-    @@keyframes helloOrbitTwo { 0%,100%{opacity:.12;transform:scale(1.02) rotateX(68deg) rotateZ(19deg)} 50%{opacity:.55;transform:scale(.94) rotateX(68deg) rotateZ(-15deg)} }
-    @@media(max-width:700px){ .hello-line:nth-child(1){font-size:clamp(.8rem,3vw,1.2rem);letter-spacing:.3em} .hello-line:nth-child(2){font-size:clamp(1.45rem,8vw,3.6rem);letter-spacing:.07em} .hello-line:nth-child(3){font-size:clamp(1.05rem,6vw,2.6rem);letter-spacing:.12em} }
-    @@media(prefers-reduced-motion:reduce){ .hello-water,.hello-orbit,.hello-glyph{animation:none} .hello-glyph{transform:none} }
 </style>
 
 @code {
-    private enum AppPhase { Monolith, Chaos, Collapsing, Gateway, Sovereign, Hello }
-    private AppPhase currentPhase = AppPhase.Monolith;
-
-    private class ChaosNode
-    {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Size { get; set; }
-        public int Generation { get; set; }
-        public string Lineage { get; set; } = "";
-        public int OffspringCount { get; set; } = 0;
-    }
-
-    private List<ChaosNode> activeNodes = new();
-    private Timer chaosTimer = new();
-    private Random rng = new();
-    
-    private const int CriticalMassThreshold = 100; // Drops when 100 buttons fill the screen
-    private const int MonikerPhaseStepDegrees = 27;
-    private static readonly string[] Palette = ["#52e05a", "#00a8ff", "#ff2cff", "#ff3030", "#ff7a00", "#ffd34d"];
-    private static readonly IReadOnlyList<IReadOnlyList<MonikerGlyph>> MonikerLines = BuildMonikerLines();
+    private const string NodeDefinitionName = "WorkshopLivingGuiNode";
+    private const string NodeGroup = "WorkshopLivingGui";
+    private readonly List<LivingNode> Nodes = new();
+    private readonly System.Timers.Timer heartbeat = new(50);
+    private bool firstRender;
+    private bool warningHovered;
+    private int nextNodeId;
+    private bool nodeDefinitionBuilt;
+    private bool unityStarted;
 
     protected override void OnInitialized()
     {
-        chaosTimer.Interval = 100;
-        chaosTimer.Elapsed += TickChaos;
+        heartbeat.Elapsed += Tick;
+        Experience.StateChanged += ExperienceChanged;
     }
 
-    private void EnterHello()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        currentPhase = AppPhase.Hello;
-        StateHasChanged();
-    }
+        if (!firstRender || this.firstRender) return;
+        this.firstRender = true;
 
-    private void TickChaos(object? sender, ElapsedEventArgs e)
-    {
-        if (currentPhase != AppPhase.Chaos) return;
+        bool returningVisitor = await JS.InvokeAsync<bool>("interop.workshopVisited");
+        Experience.Initialize(returningVisitor);
+        heartbeat.Start();
 
-        List<ChaosNode> newborns = new();
-
-        foreach (var node in activeNodes)
+        if (returningVisitor)
         {
-            node.Size += 10;
+            unityStarted = true;
+            await StartUnity();
+        }
+    }
 
-            // Reproduce when reaching threshold
-            if (node.Size > 180) 
+    private async Task EnterWorkshop()
+    {
+        warningHovered = false;
+        await JS.InvokeVoidAsync("interop.markWorkshopVisited");
+        Experience.RequestEntry();
+
+        if (Experience.CurrentState == "Living")
+        {
+            EnsureNodeDefinition();
+            SpawnSeed(50, 50, 0);
+        }
+    }
+
+    private void WarningHovered() => warningHovered = true;
+
+    private void Tick(object? sender, ElapsedEventArgs e)
+    {
+        if (!Experience.IsInitialized) return;
+
+        if (Experience.CurrentState == "Living")
+        {
+            foreach (var node in Nodes.ToArray())
             {
-                node.Size = 60;
-                node.OffspringCount++;
-                
-                newborns.Add(new ChaosNode
+                node.Handle.Update(NodeGroup);
+                if (node.Context.ReproductionRequested)
                 {
-                    X = node.X + rng.Next(-200, 200),
-                    Y = node.Y + rng.Next(-200, 200),
-                    Generation = node.Generation + 1,
-                    Lineage = $"{node.Lineage}.{node.OffspringCount}",
-                    Size = 60
-                });
+                    node.Context.ReproductionRequested = false;
+                    SpawnChild(node);
+                }
             }
-        }
 
-        if (newborns.Any())
-        {
-            activeNodes.AddRange(newborns);
-            
-            // Constrain to screen
-            foreach(var n in activeNodes)
+            if (Nodes.Count >= 24)
             {
-                if (n.X < 100) n.X = 150; if (n.X > 1800) n.X = 1700;
-                if (n.Y < 100) n.Y = 150; if (n.Y > 900) n.Y = 800;
+                Experience.SetCriticalMassReached();
             }
         }
 
-        // TRIGGER THE GRAVITY DROP
-        if (activeNodes.Count >= CriticalMassThreshold)
+        Experience.Tick();
+
+        if (Experience.CurrentState == "Unity" && !unityStarted)
         {
-            _ = TriggerCollapse();
+            unityStarted = true;
+            _ = StartUnity();
         }
-        else
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task StartUnity()
+    {
+        try
         {
-            InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(100);
+            await JS.InvokeVoidAsync("interop.initUnity", "unity-canvas");
+            Experience.MarkUnityStarted();
         }
+        catch { }
     }
 
-    private async Task TriggerCollapse()
+    private void EnsureNodeDefinition()
     {
-        chaosTimer.Stop(); // Freeze calculations
-        
-        currentPhase = AppPhase.Collapsing; // CSS drops the container
-        await InvokeAsync(StateHasChanged);
-        
-        await Task.Delay(1500); // Wait for the drop animation to finish
+        if (nodeDefinitionBuilt) return;
 
-        currentPhase = AppPhase.Gateway; // Fade in the selection menu
-        await InvokeAsync(StateHasChanged);
+        FSM_API.FSM_API.Create.CreateFiniteStateMachine(NodeDefinitionName, -1, NodeGroup)
+            .State("Seed", NodeEnter, NodeSeedUpdate, NodeExit)
+            .State("Living", NodeEnter, NodeLivingUpdate, NodeExit)
+            .State("Reproducing", NodeReproduceEnter, NodeReproduceUpdate, NodeExit)
+            .WithInitialState("Seed")
+            .Transition("Seed", "Living", c => ((LivingNodeContext)c).DistanceToTarget <= 1.5)
+            .Transition("Living", "Reproducing", c => ((LivingNodeContext)c).Scale >= 2.0)
+            .Transition("Reproducing", "Living", c => ((LivingNodeContext)c).Scale <= 1.0)
+            .BuildDefinition();
+
+        nodeDefinitionBuilt = true;
     }
 
-    private void EnterShowcase()
+    private void SpawnSeed(double x, double y, int generation)
     {
-        // Removes the gateway, leaving the user completely in WebGL
-        currentPhase = AppPhase.Sovereign; 
-    }
-
-    private static IReadOnlyList<IReadOnlyList<MonikerGlyph>> BuildMonikerLines()
-    {
-        var words = new[] { "THE", "SINGULARITY", "WORKSHOP" };
-        var result = new List<IReadOnlyList<MonikerGlyph>>();
-        var glyphIndex = -words[0].Length;
-        foreach (var word in words)
+        var random = Random.Shared;
+        var targetX = Math.Clamp(x + random.NextDouble() * 60 - 30, 8, 92);
+        var targetY = Math.Clamp(y + random.NextDouble() * 60 - 30, 10, 88);
+        var context = new LivingNodeContext(nextNodeId++, generation, x, y, targetX, targetY)
         {
-            var line = new List<MonikerGlyph>(word.Length);
-            foreach (var character in word)
-            {
-                var paletteIndex = ((glyphIndex % Palette.Length) + Palette.Length) % Palette.Length;
-                line.Add(new MonikerGlyph(character, glyphIndex, glyphIndex * MonikerPhaseStepDegrees, Palette[paletteIndex]));
-                glyphIndex++;
-            }
-            result.Add(line);
-        }
-        return result;
+            Lineage = generation == 0 ? "0" : $"{generation}"
+        };
+        var handle = FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
+        Nodes.Add(new LivingNode(handle, context));
     }
+
+    private void SpawnChild(LivingNode parent)
+    {
+        var random = Random.Shared;
+        var angle = random.NextDouble() * Math.PI * 2;
+        var distance = 7 + random.NextDouble() * 13;
+        var x = Math.Clamp(parent.Context.X + Math.Cos(angle) * distance, 6, 94);
+        var y = Math.Clamp(parent.Context.Y + Math.Sin(angle) * distance, 8, 90);
+        var targetX = Math.Clamp(x + random.NextDouble() * 28 - 14, 6, 94);
+        var targetY = Math.Clamp(y + random.NextDouble() * 28 - 14, 8, 90);
+        var generation = parent.Context.Generation + 1;
+        var context = new LivingNodeContext(nextNodeId++, generation, x, y, targetX, targetY)
+        {
+            Lineage = $"{parent.Context.Lineage}.{random.Next(10, 99)}"
+        };
+        var handle = FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
+        Nodes.Add(new LivingNode(handle, context));
+    }
+
+    private static void NodeEnter(IStateContext context) { }
+    private static void NodeExit(IStateContext context) { }
+    private static void NodeSeedUpdate(IStateContext context)
+    {
+        var node = (LivingNodeContext)context;
+        var dx = node.TargetX - node.X;
+        var dy = node.TargetY - node.Y;
+        var distance = Math.Sqrt(dx * dx + dy * dy);
+        node.DistanceToTarget = distance;
+        if (distance > 0.01)
+        {
+            var step = Math.Min(1.8, distance);
+            node.X += dx / distance * step;
+            node.Y += dy / distance * step;
+            node.Rotation += 18;
+            node.Scale = Math.Min(1, node.Scale + .08);
+        }
+    }
+
+    private static void NodeLivingUpdate(IStateContext context)
+    {
+        var node = (LivingNodeContext)context;
+        node.Scale += .035;
+        node.Rotation += .6;
+        node.X = Math.Clamp(node.X + Math.Sin(node.Age * .035 + node.Id) * .035, 5, 95);
+        node.Y = Math.Clamp(node.Y + Math.Cos(node.Age * .029 + node.Id) * .035, 7, 93);
+        node.Age++;
+    }
+
+    private static void NodeReproduceEnter(IStateContext context) => ((LivingNodeContext)context).ReproductionRequested = true;
+    private static void NodeReproduceUpdate(IStateContext context)
+    {
+        var node = (LivingNodeContext)context;
+        node.Scale -= .12;
+        node.Rotation += 1.5;
+    }
+
+    private void ExperienceChanged() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
-        chaosTimer.Stop();
-        chaosTimer.Dispose();
+        heartbeat.Stop();
+        heartbeat.Elapsed -= Tick;
+        Experience.StateChanged -= ExperienceChanged;
+        heartbeat.Dispose();
     }
 
-    private readonly record struct MonikerGlyph(char Character, int GlyphIndex, int PhaseDegrees, string Color);
+    private sealed record LivingNode(FSMHandle Handle, LivingNodeContext Context)
+    {
+        public double X => Context.X;
+        public double Y => Context.Y;
+        public double Scale => Context.Scale;
+        public double Rotation => Context.Rotation;
+        public int Generation => Context.Generation;
+        public bool IsSeed => Handle.CurrentState == "Seed";
+    }
+
+    private sealed class LivingNodeContext : IStateContext
+    {
+        public LivingNodeContext(int id, int generation, double x, double y, double targetX, double targetY)
+        {
+            Id = id; Generation = generation; X = x; Y = y; TargetX = targetX; TargetY = targetY;
+        }
+        public string Name { get; set; } = NodeDefinitionName;
+        public bool IsValid { get; set; } = true;
+        public int Id { get; }
+        public int Generation { get; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double TargetX { get; }
+        public double TargetY { get; }
+        public double DistanceToTarget { get; set; } = double.MaxValue;
+        public double Scale { get; set; } = .15;
+        public double Rotation { get; set; }
+        public int Age { get; set; }
+        public string Lineage { get; set; } = "0";
+        public bool ReproductionRequested { get; set; }
+    }
 }
