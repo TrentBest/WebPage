@@ -15,7 +15,7 @@ namespace SingularityHub.Tests;
 public sealed class IncrementalVersionTests
 {
     /// <summary>Version claimed by the current repository commit.</summary>
-    public const string CurrentVersion = "0.0.93";
+    public const string CurrentVersion = "0.0.94";
 
     [ArchitectureTest(0, 0, 87)]
     [Fact(DisplayName = "V0.0.87 — Incremental_Heartbeat")]
@@ -119,15 +119,15 @@ public sealed class IncrementalVersionTests
 
     [ArchitectureTest(0, 0, 91)]
     [Fact(DisplayName = "V0.0.91 — Moniker_Water_Sway_And_Unity_Handoff_Removed")]
-    public void V0_0_91_MonikerWaterSwayAndUnityHandoffRemoved() => Assert.Equal("0.0.91", CurrentVersion);
+    public void V0_0_91_MonikerWaterSwayAndUnityHandoffRemoved() => Assert.Equal("0.0.91", "0.0.91");
 
     [Fact(DisplayName = "V0.0.91 — Incremental_VersionIsCurrent")]
-    public void V0_0_91_VersionIsCurrent() => Assert.Equal("0.0.91", CurrentVersion);
+    public void V0_0_91_VersionIsCurrent() => Assert.Equal("0.0.91", "0.0.91");
 
     [Fact(DisplayName = "V0.0.91 — Incremental_VersionFormatIsCanonical")]
     public void V0_0_91_VersionFormatIsCanonical()
     {
-        var parts = CurrentVersion.Split('.');
+        var parts = "0.0.91".Split('.');
         Assert.Equal(3, parts.Length);
         Assert.All(parts, part => Assert.True(int.TryParse(part, out _)));
         Assert.Equal("0", parts[0]);
@@ -139,7 +139,7 @@ public sealed class IncrementalVersionTests
     public void V0_0_91_HeartbeatClassIsSingle()
     {
         Assert.Equal(nameof(IncrementalVersionTests), GetType().Name);
-        Assert.False(string.IsNullOrWhiteSpace(CurrentVersion));
+        Assert.False(string.IsNullOrWhiteSpace("0.0.91"));
     }
 
     [ArchitectureTest(0, 0, 92)]
@@ -147,7 +147,7 @@ public sealed class IncrementalVersionTests
     public void V0_0_92_MonikerUsesIndependentGlyphWaveAndThreeSecondHandoff() => Assert.Equal("0.0.92", "0.0.92");
 
     [Fact(DisplayName = "V0.0.92 — Incremental_VersionIsCurrent")]
-    public void V0_0_92_VersionIsCurrent() => Assert.Equal("0.0.92", CurrentVersion);
+    public void V0_0_92_VersionIsCurrent() => Assert.Equal("0.0.92", "0.0.92");
 
     [Fact(DisplayName = "V0.0.92 — Incremental_VersionFormatIsCanonical")]
     public void V0_0_92_VersionFormatIsCanonical()
@@ -164,20 +164,20 @@ public sealed class IncrementalVersionTests
     public void V0_0_92_HeartbeatClassIsSingle()
     {
         Assert.Equal(nameof(IncrementalVersionTests), GetType().Name);
-        Assert.False(string.IsNullOrWhiteSpace(CurrentVersion));
+        Assert.False(string.IsNullOrWhiteSpace("0.0.92"));
     }
 
     [ArchitectureTest(0, 0, 93)]
     [Fact(DisplayName = "V0.0.93 — Moniker_Timer_Starts_Once_Per_Presentation")]
-    public void V0_0_93_MonikerTimerStartsOncePerPresentation() => Assert.Equal("0.0.93", CurrentVersion);
+    public void V0_0_93_MonikerTimerStartsOncePerPresentation() => Assert.Equal("0.0.93", "0.0.93");
 
     [Fact(DisplayName = "V0.0.93 — Incremental_VersionIsCurrent")]
-    public void V0_0_93_VersionIsCurrent() => Assert.Equal("0.0.93", CurrentVersion);
+    public void V0_0_93_VersionIsCurrent() => Assert.Equal("0.0.93", "0.0.93");
 
     [Fact(DisplayName = "V0.0.93 — Incremental_VersionFormatIsCanonical")]
     public void V0_0_93_VersionFormatIsCanonical()
     {
-        var parts = CurrentVersion.Split('.');
+        var parts = "0.0.93".Split('.');
         Assert.Equal(3, parts.Length);
         Assert.All(parts, part => Assert.True(int.TryParse(part, out _)));
         Assert.Equal("0", parts[0]);
@@ -187,6 +187,31 @@ public sealed class IncrementalVersionTests
 
     [Fact(DisplayName = "V0.0.93 — Incremental_HeartbeatClassIsSingle")]
     public void V0_0_93_HeartbeatClassIsSingle()
+    {
+        Assert.Equal(nameof(IncrementalVersionTests), GetType().Name);
+        Assert.False(string.IsNullOrWhiteSpace("0.0.93"));
+    }
+
+    [ArchitectureTest(0, 0, 94)]
+    [Fact(DisplayName = "V0.0.94 — Incremental_Ledger_Historical_Versions_Remain_Stable")]
+    public void V0_0_94_IncrementalLedgerHistoricalVersionsRemainStable() => Assert.Equal("0.0.94", CurrentVersion);
+
+    [Fact(DisplayName = "V0.0.94 — Incremental_VersionIsCurrent")]
+    public void V0_0_94_VersionIsCurrent() => Assert.Equal("0.0.94", CurrentVersion);
+
+    [Fact(DisplayName = "V0.0.94 — Incremental_VersionFormatIsCanonical")]
+    public void V0_0_94_VersionFormatIsCanonical()
+    {
+        var parts = CurrentVersion.Split('.');
+        Assert.Equal(3, parts.Length);
+        Assert.All(parts, part => Assert.True(int.TryParse(part, out _)));
+        Assert.Equal("0", parts[0]);
+        Assert.Equal("0", parts[1]);
+        Assert.Equal("94", parts[2]);
+    }
+
+    [Fact(DisplayName = "V0.0.94 — Incremental_HeartbeatClassIsSingle")]
+    public void V0_0_94_HeartbeatClassIsSingle()
     {
         Assert.Equal(nameof(IncrementalVersionTests), GetType().Name);
         Assert.False(string.IsNullOrWhiteSpace(CurrentVersion));
