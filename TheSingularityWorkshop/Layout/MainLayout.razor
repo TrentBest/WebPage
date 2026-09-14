@@ -90,7 +90,7 @@
 
     private void HandleFSMStateChanged(string state)
     {
-        if (state == PageFSM.MonikerReveal)
+        if (state == PageFSM.MonikerReveal && _monikerTimer is null)
             StartMonikerPresentationTimer();
 
         _ = InvokeAsync(StateHasChanged);
@@ -98,8 +98,6 @@
 
     private void StartMonikerPresentationTimer()
     {
-        _monikerTimer?.Cancel();
-        _monikerTimer?.Dispose();
         _monikerTimer = new CancellationTokenSource();
         var token = _monikerTimer.Token;
         _ = CompleteMonikerPresentationAsync(token);
@@ -115,7 +113,7 @@
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            // A new moniker presentation or disposal replaced this timer.
+            // Normal disposal cancellation.
         }
     }
 
