@@ -43,6 +43,7 @@ namespace TheSingularityWorkshop.Services
         public bool NavigationReady { get; internal set; }
 
         public long PopulationCompletedTick { get; internal set; } = -1;
+        public long MonikerPresentationStartTick { get; internal set; } = -1;
         public long StateTicks { get; set; }
         public long TotalTicks { get; set; }
 
@@ -145,9 +146,6 @@ namespace TheSingularityWorkshop.Services
         {
             if (LivingGuiFrozen || _livingNodes.Count == 0) return;
 
-            // Mature nodes share the growth heartbeat round-robin. Without a cursor,
-            // the first node in the collection (the root) can monopolize every growth
-            // turn and prevent later generations from ever reaching reproduction.
             for (var offset = 0; offset < _livingNodes.Count; offset++)
             {
                 var index = (_matureGrowthCursor + offset) % _livingNodes.Count;
