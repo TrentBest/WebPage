@@ -5,99 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Singularity Workshop</title>
     <base href="/" />
-
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="TheSingularityWorkshop.styles.css" rel="stylesheet" />
+    <style>
+        .workshop-warning { cursor:pointer!important; transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease!important; }
+        .workshop-warning:hover { transform:scale(1.012)!important; border-color:#ffb000!important; box-shadow:0 0 22px rgba(255,102,0,.65),0 0 55px rgba(255,102,0,.28),inset 0 0 28px rgba(255,102,0,.1)!important; }
+        .workshop-warning::after { content:"CLICK TO READ THE WHOLE RUNWAY"; display:block; margin-top:.35rem; font-size:.52rem; letter-spacing:.18em; color:rgba(255,177,92,.58); opacity:.7; }
+        .workshop-fineprint-overlay { position:fixed; inset:0; z-index:100000; display:flex; align-items:center; justify-content:center; padding:3vh 3vw; background:rgba(1,3,8,.92); backdrop-filter:blur(7px); animation:finePrintArrival .55s ease-out; }
+        .workshop-fineprint-shell { position:relative; width:min(1100px,92vw); height:min(82vh,820px); display:flex; flex-direction:column; overflow:hidden; border:3px solid #ff6600; border-radius:5px; background:rgba(12,7,3,.97); box-shadow:0 0 18px rgba(255,102,0,.55),0 0 65px rgba(255,102,0,.22),inset 0 0 35px rgba(255,102,0,.07); }
+        .workshop-fineprint-header { flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.8rem 1rem; color:#ffd34d; border-bottom:2px solid #ff6600; background:rgba(30,13,2,.98); text-transform:uppercase; letter-spacing:.14em; font:700 clamp(.68rem,1vw,.9rem) Consolas,'Courier New',monospace; animation:fineHeaderBreath 2.6s ease-in-out infinite; }
+        .workshop-fineprint-close,.workshop-fineprint-top { border:1px solid #ff6600; background:rgba(40,12,2,.8); color:#ffb15c; padding:.25rem .55rem; cursor:pointer; font:700 .72rem Consolas,'Courier New',monospace; }
+        .workshop-fineprint-close:hover,.workshop-fineprint-top:hover { color:#fff; box-shadow:0 0 12px rgba(255,102,0,.5); }
+        .workshop-fineprint-top { position:absolute; right:1rem; bottom:1rem; z-index:4; display:none; padding:.5rem .8rem; box-shadow:0 0 14px rgba(255,102,0,.4); }
+        .workshop-fineprint-top.visible { display:block; animation:topButtonPulse 1.2s ease-in-out infinite; }
+        .workshop-fineprint-scroll { position:relative; flex:1 1 auto; min-height:0; overflow-y:scroll; overflow-x:hidden; padding:1.2rem 1.5rem 12rem; color:#e9ded3; scrollbar-color:#ff6600 #1a0b03; scrollbar-width:auto; font:400 .92rem/1.62 Consolas,'Courier New',monospace; }
+        .workshop-fineprint-scroll::-webkit-scrollbar { width:14px; }
+        .workshop-fineprint-scroll::-webkit-scrollbar-track { background:#1a0b03; border-left:1px solid rgba(255,102,0,.3); }
+        .workshop-fineprint-scroll::-webkit-scrollbar-thumb { background:linear-gradient(#ffd34d,#ff6600); border:3px solid #1a0b03; border-radius:8px; box-shadow:0 0 10px rgba(255,102,0,.7); }
+        .workshop-fineprint-scroll::-webkit-scrollbar-thumb:hover { background:#ffb000; }
+        .fine-section { max-width:900px; margin:0 auto; }
+        .fine-section h3 { color:#ffb15c; letter-spacing:.12em; text-transform:uppercase; text-shadow:0 0 10px rgba(255,102,0,.55); }
+        .fine-line { margin:0 0 .42rem; }
+        .fine-technical .fine-line { color:#d8e9ef; }
+        .fine-humor .fine-line { color:#ffcfad; }
+        .fine-tiny { font-size:.31rem; line-height:1.18; letter-spacing:.015em; color:rgba(255,220,190,.72); }
+        .fine-tiny h3 { font-size:2rem; color:#ffd34d; text-align:center; margin:3rem 0 4rem; text-shadow:0 0 12px #ff6600,0 0 35px rgba(255,211,77,.5); }
+        .fine-tiny .fine-line { margin-bottom:.16rem; }
+        .fine-rushing .fine-tiny { font-size:.22rem; line-height:1.03; }
+        .fine-rushing .fine-tiny h3 { font-size:1.6rem; }
+        .fine-print-disclaimer { margin-top:3rem; padding:1rem; border-top:1px dashed rgba(255,102,0,.55); color:rgba(255,177,92,.7); text-align:center; font-size:.55rem; letter-spacing:.08em; }
+        @@keyframes finePrintArrival { from{opacity:0;transform:scale(.985)} to{opacity:1;transform:scale(1)} }
+        @@keyframes fineHeaderBreath { 0%,100%{text-shadow:0 0 5px rgba(255,102,0,.35)} 50%{text-shadow:0 0 12px rgba(255,211,77,.85),0 0 25px rgba(255,102,0,.45)} }
+        @@keyframes topButtonPulse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+        @@media(max-width:700px){ .workshop-fineprint-shell{width:95vw;height:88vh}.workshop-fineprint-scroll{padding:1rem .8rem 10rem;font-size:.78rem}.fine-tiny{font-size:.27rem}.fine-rushing .fine-tiny{font-size:.19rem} }
+    </style>
 </head>
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
+        <svg class="loading-progress"><circle r="40%" cx="50%" cy="50%" /><circle r="40%" cx="50%" cy="50%" /></svg>
         <div class="loading-progress-text"></div>
     </div>
-
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-
-    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
-
+    <div id="blazor-error-ui">An unhandled error has occurred.<a href="" class="reload">Reload</a><a class="dismiss">🗙</a></div>
     <script>
-        // 2. The Custom Blazor Bootloader (Bypasses Azure's MIME Bug)
+        const workshopLanding = window.location.pathname === "/" || window.location.pathname === "";
+        if (workshopLanding) document.documentElement.classList.add("workshop-splash-locked");
+    </script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script>
         Blazor.start({
-            loadBootResource: function (type, name, defaultUri, integrity) {
-                // Let Blazor handle dotnet.js natively using the default URI string
-                if (type === 'dotnetjs') {
-                    return defaultUri;
-                }
-
-                // Intercept ONLY WebAssembly binaries to force the correct MIME type
-                if (type === 'dotnetwasm' || defaultUri.endsWith('.wasm')) {
-                    return (async function () {
-                        const response = await fetch(defaultUri, { cache: 'no-store' });
-                        if (!response.ok) throw new Error("Failed to load: " + name);
-
-                        const buffer = await response.arrayBuffer();
-                        return new Response(buffer, { headers: { "content-type": "application/wasm" } });
-                    })();
-                }
+            loadBootResource:function(type,name,defaultUri,integrity){
+                if(type==='dotnetjs') return defaultUri;
+                if(type==='dotnetwasm'||defaultUri.endsWith('.wasm')) return (async function(){ const response=await fetch(defaultUri,{cache:'no-store'}); if(!response.ok) throw new Error("Failed to load: "+name); const buffer=await response.arrayBuffer(); return new Response(buffer,{headers:{"content-type":"application/wasm"}}); })();
             }
         });
-
-        // 3. The Sovereign Kernel Synapse (Instrumented for Debugging)
         window.interop = {
-            initUnity: function (canvasId) {
-                console.log("[Interop] 1. initUnity called for canvas:", canvasId);
-
-                const canvas = document.getElementById(canvasId);
-                if (!canvas) {
-                    console.error("[Interop] CRITICAL: Canvas element not found in the DOM!");
-                    return;
-                }
-
-                const buildUrl = "Workshop/Forge/Build";
-                const loaderUrl = buildUrl + "/Build001.loader.js";
-
-                console.log("[Interop] 2. Constructing Engine Configuration...");
-                const config = {
-                    dataUrl: buildUrl + "/Build001.data.br",
-                    frameworkUrl: buildUrl + "/Build001.framework.js.br",
-                    codeUrl: buildUrl + "/Build001.wasm.br",
-                    streamingAssetsUrl: "StreamingAssets",
-                    companyName: "The Singularity Workshop",
-                    productName: "Genesis",
-                };
-                console.table(config); // Prints a clean table of the target URLs
-
-                console.log("[Interop] 3. Injecting Unity loader script: " + loaderUrl);
-                const script = document.createElement("script");
-                script.src = loaderUrl;
-
-                script.onerror = () => {
-                    console.error("[Interop] CRITICAL: Failed to download loader.js! Check the Build folder path.");
-                };
-
-                script.onload = () => {
-                    console.log("[Interop] 4. Loader script executed. Firing createUnityInstance...");
-
-                    createUnityInstance(canvas, config, (progress) => {
-                        console.log("[Unity Engine] Boot Progress: " + (100 * progress).toFixed(1) + "%");
-                    }).then((instance) => {
-                        window.sovereignUnityInstance = instance;
-                        console.log("[Interop] 5. SUCCESS! Sovereign Kernel anchored to Blazor DOM.");
-                    }).catch((message) => {
-                        console.error("[Unity Engine] CRITICAL BOOT FAILURE:", message);
-                    });
-                };
+            initUnity:function(canvasId){
+                console.log("[Interop] 1. initUnity called for canvas:",canvasId);
+                const canvas=document.getElementById(canvasId); if(!canvas){console.error("[Interop] CRITICAL: Canvas element not found in the DOM!");return;}
+                const buildUrl="Workshop/Forge/Build"; const loaderUrl=buildUrl+"/Build001.loader.js";
+                const config={dataUrl:buildUrl+"/Build001.data.br",frameworkUrl:buildUrl+"/Build001.framework.js.br",codeUrl:buildUrl+"/Build001.wasm.br",streamingAssetsUrl:"StreamingAssets",companyName:"The Singularity Workshop",productName:"Genesis"};
+                console.table(config);
+                const script=document.createElement("script"); script.src=loaderUrl;
+                script.onerror=()=>console.error("[Interop] CRITICAL: Failed to download loader.js! Check the Build folder path.");
+                script.onload=()=>{ createUnityInstance(canvas,config,(progress)=>console.log("[Unity Engine] Boot Progress: "+(100*progress).toFixed(1)+"%")).then((instance)=>{window.sovereignUnityInstance=instance;console.log("[Interop] 5. SUCCESS! Sovereign Kernel anchored to Blazor DOM.");}).catch((message)=>console.error("[Unity Engine] CRITICAL BOOT FAILURE:",message)); };
                 document.body.appendChild(script);
-            }
+            },
+            workshopVisited:function(){ return localStorage.getItem("WorkshopVisited") === "true"; },
+            markWorkshopVisited:function(){ localStorage.setItem("WorkshopVisited","true"); }
         };
+
+        (function installWarningExperience(){
+            let activeOverlay=null,animationFrame=0,pauseUntil=0,tinyHeader=null;
+            const technical=[
+                "The Workshop is a living software environment assembled from deterministic state, event flow, and aggressively opinionated abstractions.",
+                "The landing surface is Blazor WebAssembly. The destination trajectory may cross into Unity WebGL without asking the DOM for permission.",
+                "The same lightweight C# state machinery can describe both sides of the boundary.",
+                "Finite state transitions are boring. Finite state transitions composed into a living machine are considerably less boring.",
+                "Runtime state is data. Data becomes behavior when the machine is allowed to own the transition.",
+                "The Workshop favors explicit state over scattered flags, timers, hidden callbacks, and mysterious side effects.",
+                "The visual shell is intentionally theatrical. The underlying engineering is not.",
+                "Some things are intentionally ephemeral. The architecture is designed around that distinction.",
+                "A user should see the result. A developer should be able to inspect the machinery that produced it.",
+                "If the system appears to be doing something impossible, first check whether the state machine has simply become more interesting than expected.",
+                "The Forge is not a metaphor for a folder. It is a metaphor for a process: ingest, normalize, compose, execute, observe, refine.",
+                "The Workshop is being built with the technology it is intended to demonstrate.",
+                "This page is therefore both product surface and laboratory specimen.",
+                "The gateway is deliberately quiet. The sequence beyond it is not.",
+                "You are being given the explanation before the machinery takes over.",
+                "The orange warning is not a trap. It is a runway."
+            ];
+            const humor=[
+                "Please remain calm. The software has been informed that you are curious.",
+                "No actual dragons were harmed during compilation. Several virtual ones were inconvenienced.",
+                "If you understand everything on the first pass, you are either extremely qualified or the page has failed.",
+                "The button was labeled ENTER. The card was labeled WARNING. We respect your commitment to chaos.",
+                "Somewhere, a perfectly respectable enterprise architecture diagram just developed anxiety.",
+                "Do not feed the state machine after midnight. It learns habits.",
+                "A sufficiently advanced abstraction is indistinguishable from a very organized bad idea.",
+                "The compiler remains suspicious but has agreed to cooperate.",
+                "Your browser did not ask for this. Your browser has nevertheless been included in the meeting.",
+                "There is no spoon. There is, however, a RenderTreeBuilder.",
+                "We briefly considered making this page sensible. The committee was dissolved.",
+                "If this paragraph is moving, congratulations: you have discovered that paragraphs can move.",
+                "Somewhere in the Workshop a variable is named something perfectly reasonable. We apologize for that outlier.",
+                "The warning is orange because orange is the universal color of regrettable confidence.",
+                "At this point the responsible thing to do would be to close this panel.",
+                "Obviously we will not be doing that."
+            ];
+            const tiny=[
+                "Tiny Print","This tiny print exists primarily because the phrase tiny print made the author laugh.",
+                "Nothing contained herein constitutes legal advice, financial advice, architectural advice, plumbing advice, relationship advice, or advice about whether your toaster is haunted.",
+                "The Workshop may contain traces of software.","The Workshop may also contain traces of traces.","If you find a trace of a trace, please do not report it. It is probably important.",
+                "Any resemblance between this paragraph and a responsible terms-of-service document is purely coincidental.","The user clicked the orange rectangle voluntarily.","The orange rectangle accepts no responsibility for the consequences of curiosity.","Curiosity is nevertheless encouraged.",
+                "Tiny text is not a substitute for documentation.","Documentation is not a substitute for understanding.","Understanding is not a substitute for coffee.","Coffee is not a substitute for sleep.","Sleep has been temporarily deprecated.",
+                "Deprecation warnings are feelings expressed by software.","Feelings are not currently represented in the FSM API.","This sentence is now too small to take seriously.","The next sentence is even smaller.","The sentence after that has filed a complaint.","Complaint denied.","Please continue scrolling.","No, really.","Still scrolling.","Excellent.","We are now legally somewhere between a footnote and a sneeze.","The rest is mostly nonsense.","You have been warned.","Again.","And again.","And again, but smaller."
+            ];
+            function addLines(parent,lines,count,prefix){for(let i=0;i<count;i++){const p=document.createElement("div");p.className="fine-line";p.textContent=prefix+lines[i%lines.length]+(i>=lines.length?" [iteration "+(i+1)+"]":"");parent.appendChild(p);}}
+            function closeExperience(){if(animationFrame)cancelAnimationFrame(animationFrame);animationFrame=0;if(activeOverlay)activeOverlay.remove();activeOverlay=null;pauseUntil=0;tinyHeader=null;}
+            let runAutoScroll=()=>{};
+            function returnToTop(scroll,topButton){pauseUntil=0;scroll.classList.remove("fine-rushing");scroll.scrollTo({top:0,behavior:"smooth"});topButton.classList.remove("visible");scroll.focus({preventScroll:true});window.setTimeout(()=>{if(activeOverlay)animationFrame=requestAnimationFrame(()=>runAutoScroll());},650);}
+            function openExperience(){
+                if(activeOverlay)return;
+                const overlay=document.createElement("div");overlay.className="workshop-fineprint-overlay";
+                const shell=document.createElement("section");shell.className="workshop-fineprint-shell";shell.setAttribute("aria-label","System advisory extended information");
+                const header=document.createElement("div");header.className="workshop-fineprint-header";header.innerHTML='<span>⚠ SYSTEM ADVISORY // EXTENDED DISCLOSURE STREAM</span>';
+                const close=document.createElement("button");close.className="workshop-fineprint-close";close.type="button";close.textContent="ESC / CLOSE";close.addEventListener("click",closeExperience);header.appendChild(close);
+                const scroll=document.createElement("div");scroll.className="workshop-fineprint-scroll";scroll.tabIndex=0;
+                const tech=document.createElement("section");tech.className="fine-section fine-technical";const techTitle=document.createElement("h3");techTitle.textContent="What you are about to see";tech.appendChild(techTitle);addLines(tech,technical,120,"// ");
+                const comedy=document.createElement("section");comedy.className="fine-section fine-humor";const comedyTitle=document.createElement("h3");comedyTitle.textContent="The situation deteriorates";comedy.appendChild(comedyTitle);addLines(comedy,humor,180,"// ");
+                const tinySection=document.createElement("section");tinySection.className="fine-section fine-tiny";tinyHeader=document.createElement("h3");tinyHeader.textContent="TINY PRINT";tinySection.appendChild(tinyHeader);addLines(tinySection,tiny,2200,"· ");
+                const disclaimer=document.createElement("div");disclaimer.className="fine-print-disclaimer";disclaimer.textContent="END OF EXTENDED DISCLOSURE // YOU MADE IT THIS FAR // PLEASE GO OUTSIDE // THE WORKSHOP WILL STILL BE HERE";tinySection.appendChild(disclaimer);
+                scroll.appendChild(tech);scroll.appendChild(comedy);scroll.appendChild(tinySection);shell.appendChild(header);shell.appendChild(scroll);
+                const topButton=document.createElement("button");topButton.className="workshop-fineprint-top";topButton.type="button";topButton.textContent="↟ RETURN TO TOP";topButton.setAttribute("aria-label","Return the advisory to the top");topButton.addEventListener("click",()=>returnToTop(scroll,topButton));shell.appendChild(topButton);
+                overlay.appendChild(shell);document.body.appendChild(overlay);activeOverlay=overlay;
+                overlay.addEventListener("click",event=>{if(event.target===overlay)closeExperience();});
+                let last=performance.now(),started=last,finished=false;
+                runAutoScroll=()=>{if(!activeOverlay||finished)return;const now=performance.now();const dt=Math.min(.05,(now-last)/1000);last=now;const maxScroll=Math.max(1,scroll.scrollHeight-scroll.clientHeight);if(pauseUntil&&now<pauseUntil){scroll.scrollTop=Math.max(scroll.scrollTop,0);}else{pauseUntil=0;const progress=Math.min(1,Math.max(0,scroll.scrollTop/maxScroll));if(progress>.34)scroll.classList.add("fine-rushing");const elapsed=Math.max(0,(now-started)/1000);if(elapsed>=2&&progress<1){const normalized=Math.min(1,progress/.5);const runway=Math.min(1,Math.max(0,(progress-.34)/.66));const earlySpeed=7+68*Math.pow(normalized,1.55);const lateSpeed=75+825*Math.pow(runway,2.05);const speed=progress<.5?earlySpeed:lateSpeed;scroll.scrollTop+=speed*dt;}}if(scroll.scrollTop+scroll.clientHeight>=scroll.scrollHeight-3){finished=true;scroll.scrollTop=maxScroll;topButton.classList.add("visible");animationFrame=0;return;}animationFrame=requestAnimationFrame(runAutoScroll);};
+                animationFrame=requestAnimationFrame(runAutoScroll);
+            }
+            document.addEventListener("click",event=>{const target=event.target instanceof Element?event.target:null;const warning=target?.closest(".workshop-warning");if(warning){event.preventDefault();openExperience();}});
+            document.addEventListener("keydown",event=>{if(event.key==="Escape"&&activeOverlay)closeExperience();});
+        })();
     </script>
 </body>
 </html>
