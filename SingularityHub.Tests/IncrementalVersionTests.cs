@@ -76,4 +76,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 103)]
     [Fact(DisplayName = "V0.0.103 — Glyphs_Oscillate_Gently_Around_Their_Pivots")]
     public void V0_0_103_GlyphsOscillateGentlyAroundTheirPivots() => Assert.Equal("0.0.103", "0.0.103");
+
+    [ArchitectureTest(0, 0, 104)]
+    [Fact(DisplayName = "V0.0.104 — Moniker_Wave_And_Hub_Manifestation_Are_Restored")]
+    public void V0_0_104_MonikerWaveAndHubManifestationAreRestored() => Assert.Equal("0.0.104", "0.0.104");
 }

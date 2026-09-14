@@ -5,7 +5,7 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden")">
+<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden") @(IsWorkshopLanding && ShowWorkshopChrome ? "workshop-hub-manifested" : "")">
     @if (!IsWorkshopLanding)
     {
         <div class="sidebar workshop-sidebar"><NavMenu /></div>
