@@ -96,10 +96,15 @@
 
     private void HandleFSMStateChanged(string state)
     {
-        // The current startup lineup ends with Moniker. The execution host owns
-        // the presentation window; the Moniker Experience does not decide when
-        // the Hub appears or when it has "finished".
-        if (state == PageFSM.MonikerReveal && _monikerTimer is null && !_startupPresentationComplete)
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleExperienceStateChanged()
+    {
+        // FlexHello is the actual visible Moniker Experience on the landing page.
+        // Start the host-owned presentation window when that Experience becomes
+        // visible, rather than waiting for PageFSM's internal MonikerReveal tick.
+        if (Experience.CurrentState == "FlexHello" && _monikerTimer is null && !_startupPresentationComplete)
             StartStartupPresentationTimer();
 
         _ = InvokeAsync(StateHasChanged);
@@ -130,8 +135,6 @@
             // Normal disposal cancellation.
         }
     }
-
-    private void HandleExperienceStateChanged() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
