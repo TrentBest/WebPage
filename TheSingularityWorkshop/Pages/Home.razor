@@ -101,26 +101,26 @@
          rotateY = sin(time * ry + phase + phiRY) * Ry
          rotateZ = sin(time * rz + phase + phiRZ) * Rz
 
-       --wave-time is the shared time variable. Every glyph gets a different phase.
+       --wave-time is a shared unitless cycle variable. Every glyph gets a different phase.
     */
     @@property --wave-time {
-        syntax: "<angle>";
+        syntax: "&lt;number&gt;";
         inherits: false;
-        initial-value: 0turn;
+        initial-value: 0;
     }
     .flex-hello-glyph { --phase:0deg; --glyph-color:#fff; display:inline-block; position:relative; color:var(--glyph-color); transform-style:preserve-3d; transform-origin:center 72%; will-change:transform,filter; text-shadow:0 0 7px color-mix(in srgb,var(--glyph-color) 82%,white),0 0 18px color-mix(in srgb,var(--glyph-color) 48%,transparent); animation:flexGlyphWave 9s linear infinite; }
     .flex-hello-glyph::after { content:""; position:absolute; left:20%; right:20%; bottom:-.2em; height:.08em; border-radius:50%; background:var(--glyph-color); opacity:.28; filter:blur(4px); transform:scaleX(.7); }
-    @@keyframes flexGlyphWave { from { --wave-time:0turn; } to { --wave-time:1turn; } }
+    @@keyframes flexGlyphWave { from { --wave-time:0; } to { --wave-time:1; } }
     .flex-hello-glyph {
         transform:
             translate3d(
-                calc(sin(calc(var(--wave-time) * 1 + var(--phase))) * 18px),
-                calc(sin(calc(var(--wave-time) * 1.17 + var(--phase) + 55deg)) * 14px),
-                calc(sin(calc(var(--wave-time) * .83 + var(--phase) + 120deg)) * 24px)
+                calc(sin(calc(var(--wave-time) * 360deg + var(--phase))) * 18px),
+                calc(sin(calc(var(--wave-time) * 421.2deg + var(--phase) + 55deg)) * 14px),
+                calc(sin(calc(var(--wave-time) * 298.8deg + var(--phase) + 120deg)) * 24px)
             )
-            rotateX(calc(sin(calc(var(--wave-time) * 1.08 + var(--phase) + 20deg)) * 7deg))
-            rotateY(calc(sin(calc(var(--wave-time) * .91 + var(--phase) + 95deg)) * 11deg))
-            rotateZ(calc(sin(calc(var(--wave-time) * 1.13 + var(--phase) + 145deg)) * 4.5deg));
+            rotateX(calc(sin(calc(var(--wave-time) * 388.8deg + var(--phase) + 20deg)) * 7deg))
+            rotateY(calc(sin(calc(var(--wave-time) * 327.6deg + var(--phase) + 95deg)) * 11deg))
+            rotateZ(calc(sin(calc(var(--wave-time) * 406.8deg + var(--phase) + 145deg)) * 4.5deg));
     }
     .flex-hello-state { position:relative; z-index:4; margin-top:.55rem; font-size:clamp(.65rem,1vw,.9rem); letter-spacing:.24em; color:#8eefff; opacity:.78; }
 
@@ -237,66 +237,49 @@
     private void SpawnSeed(double x, double y, int generation)
     {
         var random = Random.Shared;
-        var targetX = Math.Clamp(x + random.NextDouble() * 60 - 30, 8, 92);
-        var targetY = Math.Clamp(y + random.NextDouble() * 60 - 30, 10, 88);
-        var context = new LivingNodeContext(nextNodeId++, generation, x, y, targetX, targetY) { Lineage = generation == 0 ? "0" : $"{generation}" };
-        var handle = TheSingularityWorkshop.FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
-        Nodes.Add(new LivingNode(handle, context));
+        var targetX = Math.Clamp(x + random.NextDouble() * 20 - 10, 8, 92);
+        var targetY = Math.Clamp(y + random.NextDouble() * 20 - 10, 12, 88);
+        AddNode(x, y, targetX, targetY, generation, true);
     }
 
     private void SpawnChild(LivingNode parent)
     {
-        var random = Random.Shared;
-        var angle = random.NextDouble() * Math.PI * 2;
-        var distance = 7 + random.NextDouble() * 13;
-        var x = Math.Clamp(parent.Context.X + Math.Cos(angle) * distance, 6, 94);
-        var y = Math.Clamp(parent.Context.Y + Math.Sin(angle) * distance, 8, 90);
-        var targetX = Math.Clamp(x + random.NextDouble() * 28 - 14, 6, 94);
-        var targetY = Math.Clamp(y + random.NextDouble() * 28 - 14, 8, 90);
-        var generation = parent.Context.Generation + 1;
-        var context = new LivingNodeContext(nextNodeId++, generation, x, y, targetX, targetY) { Lineage = $"{parent.Context.Lineage}.{random.Next(10, 99)}" };
+        var angle = Random.Shared.NextDouble() * Math.PI * 2;
+        var distance = 12 + Random.Shared.NextDouble() * 10;
+        var targetX = Math.Clamp(parent.X + Math.Cos(angle) * distance, 8, 92);
+        var targetY = Math.Clamp(parent.Y + Math.Sin(angle) * distance, 12, 88);
+        AddNode(parent.X, parent.Y, targetX, targetY, parent.Generation + 1, false);
+    }
+
+    private void AddNode(double x, double y, double targetX, double targetY, int generation, bool seed)
+    {
+        var context = new LivingNodeContext
+        {
+            Id = ++nextNodeId,
+            X = x,
+            Y = y,
+            TargetX = targetX,
+            TargetY = targetY,
+            Generation = generation,
+            IsSeed = seed,
+            Scale = seed ? .55 : .2,
+            Rotation = Random.Shared.NextDouble() * 360 - 180
+        };
         var handle = TheSingularityWorkshop.FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
-        Nodes.Add(new LivingNode(handle, context));
+        Nodes.Add(new LivingNode(context, handle));
     }
 
     private static void NodeEnter(IStateContext context) { }
     private static void NodeExit(IStateContext context) { }
-    private static void NodeSeedUpdate(IStateContext context)
-    {
-        var node = (LivingNodeContext)context;
-        var dx = node.TargetX - node.X;
-        var dy = node.TargetY - node.Y;
-        var distance = Math.Sqrt(dx * dx + dy * dy);
-        node.DistanceToTarget = distance;
-        if (distance > 0.01)
-        {
-            var step = Math.Min(1.8, distance);
-            node.X += dx / distance * step;
-            node.Y += dy / distance * step;
-            node.Rotation += 18;
-            node.Scale = Math.Min(1, node.Scale + .08);
-        }
-    }
-
-    private static void NodeLivingUpdate(IStateContext context)
-    {
-        var node = (LivingNodeContext)context;
-        node.Scale += .035;
-        node.Rotation += .6;
-        node.X = Math.Clamp(node.X + Math.Sin(node.Age * .035 + node.Id) * .035, 5, 95);
-        node.Y = Math.Clamp(node.Y + Math.Cos(node.Age * .029 + node.Id) * .035, 7, 93);
-        node.Age++;
-    }
-
+    private static void NodeSeedUpdate(IStateContext context) { }
+    private static void NodeLivingUpdate(IStateContext context) { }
     private static void NodeReproduceEnter(IStateContext context) => ((LivingNodeContext)context).ReproductionRequested = true;
-    private static void NodeReproduceUpdate(IStateContext context)
-    {
-        var node = (LivingNodeContext)context;
-        node.Scale -= .12;
-        node.Rotation += 1.5;
-    }
+    private static void NodeReproduceUpdate(IStateContext context) { }
 
-    private void ExperienceChanged() => InvokeAsync(StateHasChanged);
+    private void ExperienceChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
 
     public void Dispose()
     {
@@ -307,32 +290,32 @@
     }
 
     private sealed record MonikerGlyph(char Character, int Index, int PhaseDegrees, string Color);
-    private sealed record LivingNode(FSMHandle Handle, LivingNodeContext Context)
+
+    private sealed class LivingNode
     {
+        public LivingNode(LivingNodeContext context, dynamic handle) { Context = context; Handle = handle; }
+        public LivingNodeContext Context { get; }
+        public dynamic Handle { get; }
         public double X => Context.X;
         public double Y => Context.Y;
-        public double Scale => Context.Scale;
         public double Rotation => Context.Rotation;
+        public double Scale => Context.Scale;
         public int Generation => Context.Generation;
-        public bool IsSeed => Handle.CurrentState == "Seed";
+        public bool IsSeed => Context.IsSeed;
     }
+
     private sealed class LivingNodeContext : IStateContext
     {
-        public LivingNodeContext(int id, int generation, double x, double y, double targetX, double targetY)
-        { Id = id; Generation = generation; X = x; Y = y; TargetX = targetX; TargetY = targetY; }
-        public string Name { get; set; } = NodeDefinitionName;
-        public bool IsValid { get; set; } = true;
-        public int Id { get; }
-        public int Generation { get; }
+        public int Id { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
-        public double TargetX { get; }
-        public double TargetY { get; }
-        public double DistanceToTarget { get; set; } = double.MaxValue;
-        public double Scale { get; set; } = .15;
+        public double TargetX { get; set; }
+        public double TargetY { get; set; }
+        public double Scale { get; set; }
         public double Rotation { get; set; }
-        public int Age { get; set; }
-        public string Lineage { get; set; } = "0";
+        public int Generation { get; set; }
+        public bool IsSeed { get; set; }
         public bool ReproductionRequested { get; set; }
+        public double DistanceToTarget => Math.Sqrt(Math.Pow(TargetX - X, 2) + Math.Pow(TargetY - Y, 2));
     }
 }
