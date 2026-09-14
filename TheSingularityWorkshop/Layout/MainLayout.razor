@@ -31,9 +31,15 @@
 
 @code {
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
-    private bool ShowWorkshopChrome => !IsWorkshopLanding || FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running;
+
+    // The Hub belongs to the execution host. It presents after the terminal
+    // startup Experience has had its presentation window, not after an arbitrary
+    // moniker-specific FSM transition completes.
+    private bool ShowWorkshopChrome => !IsWorkshopLanding || _startupPresentationComplete;
+
     private bool _entryRequested;
     private bool _chromeReleased;
+    private bool _startupPresentationComplete;
     private CancellationTokenSource? _monikerTimer;
 
     private string CurrentTabTitle
@@ -90,26 +96,34 @@
 
     private void HandleFSMStateChanged(string state)
     {
-        if (state == PageFSM.MonikerReveal && _monikerTimer is null)
-            StartMonikerPresentationTimer();
+        // The current startup lineup ends with Moniker. The execution host owns
+        // the presentation window; the Moniker Experience does not decide when
+        // the Hub appears or when it has "finished".
+        if (state == PageFSM.MonikerReveal && _monikerTimer is null && !_startupPresentationComplete)
+            StartStartupPresentationTimer();
 
         _ = InvokeAsync(StateHasChanged);
     }
 
-    private void StartMonikerPresentationTimer()
+    private void StartStartupPresentationTimer()
     {
         _monikerTimer = new CancellationTokenSource();
         var token = _monikerTimer.Token;
-        _ = CompleteMonikerPresentationAsync(token);
+        _ = CompleteStartupPresentationAsync(token);
     }
 
-    private async Task CompleteMonikerPresentationAsync(CancellationToken cancellationToken)
+    private async Task CompleteStartupPresentationAsync(CancellationToken cancellationToken)
     {
         try
         {
             await Task.Delay(FSM.Page.MonikerPresentationDuration, cancellationToken);
-            if (!cancellationToken.IsCancellationRequested && FSM.CurrentState is PageFSM.MonikerReveal or PageFSM.Gravity or PageFSM.LivingGuiDissipating)
-                FSM.SignalNavigationReady();
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            _startupPresentationComplete = true;
+            FSM.SignalNavigationReady();
+            await InvokeAsync(StateHasChanged);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
