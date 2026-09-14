@@ -26,7 +26,7 @@ namespace TheSingularityWorkshop.Services
         public const string ShutdownState = "SHUTDOWN";
 
         private const long GravityReleaseTicks = 1;
-        private const long NavigationDelayTicks = 91;
+        private const long MonikerPresentationTicks = 91;
 
         private readonly FSMHandle _handle;
         private readonly LivingGuiFsm _livingGuiRuntime;
@@ -117,7 +117,12 @@ namespace TheSingularityWorkshop.Services
                 })
                 .Transition(MonikerReveal, Gravity, c => ((PageStateContext)c).StateTicks >= GravityReleaseTicks)
                 .Transition(Gravity, LivingGuiDissipating, c => ((PageStateContext)c).LivingGuiFallen)
-                .Transition(LivingGuiDissipating, NavigationArrival, c => ((PageStateContext)c).StateTicks >= NavigationDelayTicks)
+                .Transition(LivingGuiDissipating, NavigationArrival, c =>
+                {
+                    var context = (PageStateContext)c;
+                    return context.PopulationCompletedTick >= 0 &&
+                           context.TotalTicks - context.PopulationCompletedTick >= MonikerPresentationTicks;
+                })
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
 
