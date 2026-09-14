@@ -84,4 +84,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 105)]
     [Fact(DisplayName = "V0.0.105 — Hub_Manifest_Expands_Slowly_And_Monikers_Share_One_Living_Wave")]
     public void V0_0_105_HubManifestExpandsSlowlyAndMonikersShareOneLivingWave() => Assert.Equal("0.0.105", "0.0.105");
+
+    [ArchitectureTest(0, 0, 106)]
+    [Fact(DisplayName = "V0.0.106 — Restore_Public_Explore_Build_And_AboutUs_Navigation_Surfaces")]
+    public void V0_0_106_RestorePublicExploreBuildAndAboutUsNavigationSurfaces() => Assert.Equal("0.0.106", "0.0.106");
 }

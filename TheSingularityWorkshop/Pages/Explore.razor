@@ -1,0 +1,95 @@
+@page "/explore"
+
+<PageTitle>Explore // The Singularity Workshop</PageTitle>
+
+<div class="explore-workshop">
+    <header class="explore-hero">
+        <div class="explore-kicker">THE SINGULARITY WORKSHOP // EXPLORE</div>
+        <h1>Enter the Workshop. See what is alive.</h1>
+        <p>
+            An <strong>Experience</strong> is not merely a page. It is an environment assembled from
+            capabilities, behavior, data, and MicroBundles. This site is becoming a place where those
+            Experiences can be explored, inspected, extended, and eventually created by its visitors.
+        </p>
+    </header>
+
+    <section class="explore-grid" aria-label="Workshop capabilities">
+        <article class="explore-card alive">
+            <span class="explore-status">ALIVE NOW</span>
+            <h2>Living GUI</h2>
+            <p>
+                Watch a user interface behave as a living system: nodes appear, reproduce, respond,
+                reach critical mass, and transition into the next part of the Experience.
+            </p>
+            <a class="explore-action" href="/living-gui">ENTER THE LIVING GUI →</a>
+        </article>
+
+        <article class="explore-card alive">
+            <span class="explore-status">ALIVE NOW</span>
+            <h2>FSM Suite</h2>
+            <p>
+                Explore the deterministic machinery behind state-driven behavior. The Workshop uses
+                FSM_API as both infrastructure and demonstration: the system should teach by running.
+            </p>
+            <a class="explore-action" href="/fsm-suite">EXPLORE FSM SUITE →</a>
+        </article>
+
+        <article class="explore-card available">
+            <span class="explore-status">AVAILABLE</span>
+            <h2>Demos</h2>
+            <p>
+                See practical experiments and older working concepts collected into one surface.
+                Some are demonstrations; others are seeds for future Experiences.
+            </p>
+            <a class="explore-action" href="/demos">VIEW DEMOS →</a>
+        </article>
+
+        <article class="explore-card available">
+            <span class="explore-status">AVAILABLE</span>
+            <h2>Library</h2>
+            <p>
+                Browse the things the Workshop knows about: assets, concepts, artifacts, and the
+                growing vocabulary from which Experiences can be assembled.
+            </p>
+            <a class="explore-action" href="/library">OPEN LIBRARY →</a>
+        </article>
+
+        <article class="explore-card building">
+            <span class="explore-status">UNDER DEVELOPMENT</span>
+            <h2>MicroBundles</h2>
+            <p>
+                A MicroBundle is a focused unit of capability. Experiences compose them, the Hub
+                arbitrates them, and future creators will be able to contribute new pieces without
+                rebuilding the entire world.
+            </p>
+            <a class="explore-action" href="/hub">SEE THE HUB →</a>
+        </article>
+
+        <article class="explore-card building">
+            <span class="explore-status">UNDER DEVELOPMENT</span>
+            <h2>AI Layers</h2>
+            <p>
+                Protocol AI, Grammar AI, Command AI, and the emerging App AI boundary turn probabilistic
+                intent into structured, inspectable interaction with deterministic tools and state.
+            </p>
+            <a class="explore-action" href="/ai">EXPLORE AI →</a>
+        </article>
+    </section>
+
+    <section class="explore-future">
+        <div>
+            <div class="explore-kicker">WHAT COMES NEXT</div>
+            <h2>Explore what exists. Then explore what is being built.</h2>
+        </div>
+        <p>
+            The Workshop is deliberately becoming both showroom and laboratory. Some Experiences are
+            finished enough to use today. Others expose a concept while it is still being forged. The
+            distinction is part of the experience: visitors should be able to see the machinery evolve,
+            understand why it works, and eventually participate in extending it.
+        </p>
+    </section>
+</div>
+
+<style>
+    .explore-workshop{min-height:calc(100vh - 5rem);margin:-1rem -1.5rem;padding:clamp(2rem,5vw,5rem);box-sizing:border-box;overflow:hidden;color:#eafcff;background:radial-gradient(circle at 15% 15%,rgba(0,234,255,.08),transparent 28%),radial-gradient(circle at 85% 70%,rgba(255,44,255,.08),transparent 30%),#020711;font-family:Consolas,'Courier New',monospace}.explore-hero{max-width:1000px;margin:0 auto clamp(2.5rem,6vw,5rem);text-align:center}.explore-kicker{color:#00eaff;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase}.explore-hero h1{margin:.8rem 0 1rem;font-size:clamp(2rem,5vw,4.6rem);line-height:.98;letter-spacing:-.04em}.explore-hero p{max-width:820px;margin:0 auto;color:#9ebac5;font-family:system-ui,sans-serif;font-size:clamp(.95rem,1.4vw,1.15rem);line-height:1.7}.explore-grid{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.explore-card{position:relative;padding:1.5rem;border:1px solid rgba(0,234,255,.22);background:rgba(3,12,24,.78);box-shadow:inset 0 0 30px rgba(0,234,255,.025);transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease}.explore-card:hover{transform:translateY(-7px);border-color:rgba(255,44,255,.65);box-shadow:0 0 28px rgba(255,44,255,.09),inset 0 0 30px rgba(255,44,255,.03)}.explore-card::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#00eaff,#ff2cff);opacity:.55}.explore-status{font-size:.6rem;letter-spacing:.16em;color:#6f8992}.alive .explore-status{color:#52e05a}.building .explore-status{color:#ffd34d}.explore-card h2{margin:1.1rem 0 .6rem;color:#fff;font-size:1.35rem}.explore-card p{min-height:8.2rem;color:#8eaab4;font-family:system-ui,sans-serif;font-size:.88rem;line-height:1.6}.explore-action{display:inline-block;color:#00eaff;font-size:.68rem;font-weight:800;letter-spacing:.1em;text-decoration:none}.explore-action:hover{color:#ff2cff}.explore-future{max-width:1200px;margin:clamp(3rem,7vw,6rem) auto 0;padding:1.5rem;border:1px dashed rgba(0,234,255,.25);display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;background:rgba(0,234,255,.018)}.explore-future h2{margin:.6rem 0 0;font-size:clamp(1.5rem,3vw,2.7rem);line-height:1.05}.explore-future p{margin:0;color:#829ca6;font-family:system-ui,sans-serif;line-height:1.65}@@media(max-width:950px){.explore-grid{grid-template-columns:1fr 1fr}.explore-future{grid-template-columns:1fr;gap:1rem}}@@media(max-width:650px){.explore-workshop{margin:-.5rem -.75rem;padding:2rem 1rem}.explore-grid{grid-template-columns:1fr}.explore-card p{min-height:auto}}
+</style>

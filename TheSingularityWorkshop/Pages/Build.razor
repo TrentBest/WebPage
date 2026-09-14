@@ -1,0 +1,84 @@
+@page "/build"
+
+<PageTitle>Build // The Singularity Workshop</PageTitle>
+
+<div class="build-workshop">
+    <header class="build-hero">
+        <div class="build-kicker">THE SINGULARITY WORKSHOP // BUILD</div>
+        <h1>Don't just use the machinery. Build with it.</h1>
+        <p>
+            Build is the Workshop's laboratory. Here the goal is to let you manipulate the same kinds of
+            deterministic structures that make the site alive: state machines, sequences, manifests,
+            MicroBundles, and eventually complete Experiences.
+        </p>
+    </header>
+
+    <section class="build-feature">
+        <div class="build-feature-copy">
+            <span class="build-status">AVAILABLE NOW</span>
+            <h2>FSM Graphical Editor</h2>
+            <p>
+                Start with the Finite State Machine itself. Inspect states, transitions, process groups,
+                actions, and predicates in a visual editor. The long-term goal is not to imitate a diagram
+                tool; it is to expose the actual FSM_API model so the editor becomes executable documentation.
+            </p>
+            <a href="/fsm-editor" class="build-action">OPEN FSM EDITOR →</a>
+        </div>
+        <div class="build-machine" aria-label="FSM sequence illustration">
+            <div class="machine-node">INITIALIZING</div>
+            <div class="machine-arrow">↓</div>
+            <div class="machine-node active">RUNNING</div>
+            <div class="machine-arrow">↓</div>
+            <div class="machine-node">TRANSITION</div>
+        </div>
+    </section>
+
+    <section class="build-grid">
+        <article class="build-card">
+            <span class="build-number">01</span>
+            <h2>Sequence</h2>
+            <p>
+                Build a sequence of states and transitions, then run it against a heartbeat. The sequence
+                should reveal exactly why the next state was selected rather than hiding that reasoning behind UI magic.
+            </p>
+        </article>
+        <article class="build-card">
+            <span class="build-number">02</span>
+            <h2>Manifest</h2>
+            <p>
+                Recalibrate the page against a local cached manifest. A future builder can edit an Experience
+                locally, validate its composition, and see the hosted environment adopt the resulting manifest.
+            </p>
+        </article>
+        <article class="build-card">
+            <span class="build-number">03</span>
+            <h2>Experience</h2>
+            <p>
+                Compose MicroBundles into something another person can actually enter and use. An Experience
+                is the environment; MicroBundles are focused pieces of capability within it.
+            </p>
+        </article>
+        <article class="build-card future">
+            <span class="build-number">04</span>
+            <h2>Publish & Extend</h2>
+            <p>
+                The destination is a creator loop: build something, host it, let others experience it, and
+                allow compatible contributions to be arbitrated into the result without rebuilding everything.
+            </p>
+        </article>
+    </section>
+
+    <section class="build-contract">
+        <div class="build-kicker">THE BUILDER'S CONTRACT</div>
+        <h2>The tool should teach the architecture by being the architecture.</h2>
+        <p>
+            When an interaction can be governed by an FSM, the Workshop should eventually use FSM_API to govern it.
+            That makes every builder more than a mockup: it becomes a working example of how the underlying technology
+            is intended to be used.
+        </p>
+    </section>
+</div>
+
+<style>
+    .build-workshop{min-height:calc(100vh - 5rem);margin:-1rem -1.5rem;padding:clamp(2rem,5vw,5rem);box-sizing:border-box;overflow:hidden;color:#eafcff;background:radial-gradient(circle at 80% 18%,rgba(255,44,255,.08),transparent 28%),radial-gradient(circle at 15% 75%,rgba(0,234,255,.07),transparent 30%),#020711;font-family:Consolas,'Courier New',monospace}.build-hero{max-width:1000px;margin:0 auto clamp(2.5rem,6vw,5rem);text-align:center}.build-kicker{color:#00eaff;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase}.build-hero h1{margin:.8rem 0 1rem;font-size:clamp(2rem,5vw,4.6rem);line-height:.98;letter-spacing:-.04em}.build-hero p{max-width:820px;margin:0 auto;color:#9ebac5;font-family:system-ui,sans-serif;font-size:clamp(.95rem,1.4vw,1.15rem);line-height:1.7}.build-feature{max-width:1300px;margin:0 auto;display:grid;grid-template-columns:1.2fr .8fr;gap:2rem;align-items:stretch}.build-feature-copy,.build-machine{padding:2rem;border:1px solid rgba(0,234,255,.24);background:rgba(3,12,24,.8);box-shadow:inset 0 0 35px rgba(0,234,255,.025)}.build-status{color:#52e05a;font-size:.62rem;letter-spacing:.16em}.build-feature h2{margin:1rem 0 .7rem;color:#fff;font-size:clamp(1.7rem,3vw,2.6rem)}.build-feature p{max-width:700px;color:#8eaab4;font-family:system-ui,sans-serif;line-height:1.65}.build-action{display:inline-block;margin-top:1rem;color:#00eaff;font-size:.7rem;font-weight:800;letter-spacing:.1em;text-decoration:none}.build-action:hover{color:#ff2cff}.build-machine{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.6rem;min-height:300px}.machine-node{width:min(100%,240px);padding:.9rem;text-align:center;border:1px solid rgba(0,234,255,.3);color:#8eaab4;font-size:.72rem;letter-spacing:.12em;background:rgba(0,234,255,.025);animation:buildNodeBreath 3.4s ease-in-out infinite}.machine-node.active{color:#fff;border-color:#ff2cff;box-shadow:0 0 22px rgba(255,44,255,.15);animation-delay:-1.2s}.machine-arrow{color:#00eaff;opacity:.7;animation:buildArrowPulse 2.2s ease-in-out infinite}.build-grid{max-width:1300px;margin:1rem auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}.build-card{padding:1.5rem;border:1px solid rgba(255,44,255,.18);background:rgba(3,12,24,.72);transition:transform .35s ease,border-color .35s ease}.build-card:hover{transform:translateY(-6px);border-color:rgba(0,234,255,.6)}.build-card.future{border-style:dashed}.build-number{color:#ff2cff;font-size:.62rem;letter-spacing:.15em}.build-card h2{margin:1rem 0 .6rem;color:#fff;font-size:1.25rem}.build-card p{margin:0;color:#829ca6;font-family:system-ui,sans-serif;font-size:.86rem;line-height:1.6}.build-contract{max-width:1000px;margin:clamp(3rem,7vw,6rem) auto 0;padding:1.6rem;border:1px dashed rgba(0,234,255,.25);text-align:center;background:rgba(0,234,255,.018)}.build-contract h2{margin:.7rem 0 1rem;font-size:clamp(1.5rem,3vw,2.6rem);line-height:1.05}.build-contract p{max-width:820px;margin:0 auto;color:#829ca6;font-family:system-ui,sans-serif;line-height:1.65}@@keyframes buildNodeBreath{0%,100%{transform:scale(1);opacity:.72}50%{transform:scale(1.025);opacity:1}}@@keyframes buildArrowPulse{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(3px)}}@@media(max-width:1000px){.build-feature{grid-template-columns:1fr}.build-grid{grid-template-columns:1fr 1fr}}@@media(max-width:650px){.build-workshop{margin:-.5rem -.75rem;padding:2rem 1rem}.build-grid{grid-template-columns:1fr}}
+</style>
