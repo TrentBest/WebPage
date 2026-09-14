@@ -199,14 +199,19 @@
     private void TickChaos(object? sender, ElapsedEventArgs e)
     {
         if (currentPhase != AppPhase.Chaos) return;
+
         List<ChaosNode> newborns = new();
+
         foreach (var node in activeNodes)
         {
             node.Size += 10;
-            if (node.Size > 180)
+
+            // Reproduce when reaching threshold
+            if (node.Size > 180) 
             {
                 node.Size = 60;
                 node.OffspringCount++;
+                
                 newborns.Add(new ChaosNode
                 {
                     X = node.X + rng.Next(-200, 200),
@@ -217,32 +222,47 @@
                 });
             }
         }
+
         if (newborns.Any())
         {
             activeNodes.AddRange(newborns);
+            
+            // Constrain to screen
             foreach(var n in activeNodes)
             {
                 if (n.X < 100) n.X = 150; if (n.X > 1800) n.X = 1700;
                 if (n.Y < 100) n.Y = 150; if (n.Y > 900) n.Y = 800;
             }
         }
-        if (activeNodes.Count >= CriticalMassThreshold) _ = TriggerCollapse();
-        else InvokeAsync(StateHasChanged);
+
+        // TRIGGER THE GRAVITY DROP
+        if (activeNodes.Count >= CriticalMassThreshold)
+        {
+            _ = TriggerCollapse();
+        }
+        else
+        {
+            InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task TriggerCollapse()
     {
-        chaosTimer.Stop();
-        currentPhase = AppPhase.Collapsing;
+        chaosTimer.Stop(); // Freeze calculations
+        
+        currentPhase = AppPhase.Collapsing; // CSS drops the container
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(1500);
-        currentPhase = AppPhase.Gateway;
+        
+        await Task.Delay(1500); // Wait for the drop animation to finish
+
+        currentPhase = AppPhase.Gateway; // Fade in the selection menu
         await InvokeAsync(StateHasChanged);
     }
 
     private void EnterShowcase()
     {
-        currentPhase = AppPhase.Sovereign;
+        // Removes the gateway, leaving the user completely in WebGL
+        currentPhase = AppPhase.Sovereign; 
     }
 
     private static IReadOnlyList<IReadOnlyList<MonikerGlyph>> BuildMonikerLines()
