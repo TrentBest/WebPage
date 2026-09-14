@@ -126,7 +126,7 @@ namespace TheSingularityWorkshop.Services
                 {
                     var context = (PageStateContext)c;
                     return context.MonikerPresentationStartTick >= 0 &&
-                           context.TotalTicks - context.MonikerPresentationStartTick >= MonikerPresentationTicks;
+                           context.TotalTicks - context.MonikerPresentationStartTick > MonikerPresentationTicks;
                 })
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
