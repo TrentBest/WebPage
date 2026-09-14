@@ -36,7 +36,7 @@
             "UNKNOWN", "Undisclosed")
     ];
 
-    private RenderFragment BuildGui()
+    private ElementBuilder BuildGui()
     {
         if (insideRoomId == "engineering")
         {
@@ -46,7 +46,7 @@
                 StartForgePreview,
                 TickForgePreview,
                 ResetForgePreview,
-                ExitRoom).Build();
+                ExitRoom);
         }
 
         return SpatialExploreGuiBuilder.Build(
@@ -63,7 +63,7 @@
             ApproachRoom,
             EnterSelectedRoom,
             UnlockUnknown,
-            ExitRoom).Build();
+            ExitRoom);
     }
 
     private void StartForgePreview()
