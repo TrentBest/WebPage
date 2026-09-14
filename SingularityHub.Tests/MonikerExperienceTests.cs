@@ -29,9 +29,9 @@ public sealed class MonikerExperienceTests
             "..", "..", "..", "..",
             "TheSingularityWorkshop", "Pages", "Home.razor"));
 
-        Assert.Contains(".flex-hello-moniker", home);
-        Assert.Contains(".flex-hello-line", home);
-        Assert.Contains(".flex-hello-glyph", home);
+        Assert.Contains(".hello-moniker", home);
+        Assert.Contains(".hello-line", home);
+        Assert.Contains(".hello-glyph", home);
         Assert.Contains("THE", home);
         Assert.Contains("SINGULARITY", home);
         Assert.Contains("WORKSHOP", home);
@@ -43,15 +43,15 @@ public sealed class MonikerExperienceTests
         Assert.Contains("rotateY(calc(sin", home);
         Assert.Contains("rotateZ(calc(sin", home);
         Assert.Contains("@@property --wave-time", home);
-        Assert.Contains("@@keyframes flexGlyphWave", home);
+        Assert.Contains("@@keyframes helloGlyphWave", home);
         Assert.DoesNotContain("MADE WITH UNITY", home);
         Assert.DoesNotContain("interop.initUnity", home);
 
-        Assert.Contains("#52e05a", css); // green
-        Assert.Contains("#00a8ff", css); // blue
-        Assert.Contains("#ff2cff", css); // magenta
-        Assert.Contains("#ff3030", css); // red
-        Assert.Contains("#ff7a00", css); // orange
-        Assert.Contains("#ffd34d", css); // yellow
+        Assert.Contains("#52e05a", css);
+        Assert.Contains("#00a8ff", css);
+        Assert.Contains("#ff2cff", css);
+        Assert.Contains("#ff3030", css);
+        Assert.Contains("#ff7a00", css);
+        Assert.Contains("#ffd34d", css);
     }
 }
