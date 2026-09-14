@@ -54,7 +54,40 @@
     }
 }
 
+/* Existing moniker wave, restored as the active landing presentation. */
+.hello-moniker {
+    animation: monikerKelpSway 7.5s ease-in-out infinite !important;
+    will-change: transform, filter;
+}
+
+.hello-glyph {
+    transform-origin: 50% 100%;
+    animation: helloGlyphAlive 3.6s ease-in-out infinite !important;
+    animation-delay: calc(var(--phase-index) * -.12s) !important;
+    will-change: transform, filter;
+}
+
+@keyframes monikerKelpSway {
+    0%,100% { transform: translate3d(0,0,0) rotate(-.35deg) skewX(-.25deg); filter: saturate(1) brightness(.96); }
+    18% { transform: translate3d(-.22%,.35%,0) rotate(.45deg) skewX(.35deg); filter: saturate(1.06) brightness(1); }
+    38% { transform: translate3d(.34%,-.25%,0) rotate(1deg) skewX(.65deg); filter: saturate(1.15) brightness(1.08); }
+    62% { transform: translate3d(-.3%,-.05%,0) rotate(-.8deg) skewX(-.55deg); filter: saturate(1.08) brightness(1.02); }
+    82% { transform: translate3d(.2%,.28%,0) rotate(.3deg) skewX(.2deg); filter: saturate(1.12) brightness(1.04); }
+}
+
+@keyframes helloGlyphAlive {
+    0%,100% { transform: translate3d(0,.02em,0) rotateX(-2deg) rotateY(-4deg) rotateZ(-1deg) scale(1); }
+    18% { transform: translate3d(-.02em,-.09em,0) rotateX(5deg) rotateY(8deg) rotateZ(2deg) scale(1.015); }
+    38% { transform: translate3d(.03em,-.18em,0) rotateX(-3deg) rotateY(-7deg) rotateZ(-3deg) scale(1.03); }
+    58% { transform: translate3d(-.025em,.08em,0) rotateX(6deg) rotateY(9deg) rotateZ(3deg) scale(1.01); }
+    78% { transform: translate3d(.02em,-.11em,0) rotateX(-5deg) rotateY(-8deg) rotateZ(-2deg) scale(1.02); }
+}
+
 @media (max-width: 700px) {
     .hypervisor-shell .monolith-btn { width: 80vw !important; height: 50vh !important; }
     .hypervisor-shell .monolith-image { width: min(68vw, 42vh) !important; height: min(68vw, 42vh) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hello-moniker,.hello-glyph { animation: none !important; }
 }
