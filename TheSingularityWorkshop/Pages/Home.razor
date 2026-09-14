@@ -33,7 +33,7 @@
                     <div class="ambient-signal signal-two" aria-hidden="true"></div>
                     <div class="ambient-signal signal-three" aria-hidden="true"></div>
 
-                    <button class="monolith-btn" @onclick="EnterWorkshop" @onmouseover="WarningHovered" aria-label="Enter The Singularity Workshop">
+                    <button class="monolith-btn" @onclick="EnterWorkshop" aria-label="Enter The Singularity Workshop">
                         <span class="hero-corner hero-corner-tl" aria-hidden="true"></span>
                         <span class="hero-corner hero-corner-tr" aria-hidden="true"></span>
                         <span class="hero-corner hero-corner-bl" aria-hidden="true"></span>
@@ -176,7 +176,6 @@
     private readonly List<LivingNode> Nodes = new();
     private readonly System.Timers.Timer heartbeat = new(50);
     private bool firstRender;
-    private bool warningHovered;
     private int nextNodeId;
     private bool nodeDefinitionBuilt;
     private bool unityStarted;
@@ -205,7 +204,6 @@
 
     private async Task EnterWorkshop()
     {
-        warningHovered = false;
         await JS.InvokeVoidAsync("interop.markWorkshopVisited");
         Experience.RequestEntry();
 
@@ -215,8 +213,6 @@
             SpawnSeed(50, 50, 0);
         }
     }
-
-    private void WarningHovered() => warningHovered = true;
 
     private void Tick(object? sender, ElapsedEventArgs e)
     {
@@ -267,7 +263,7 @@
     {
         if (nodeDefinitionBuilt) return;
 
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(NodeDefinitionName, -1, NodeGroup)
+        TheSingularityWorkshop.FSM_API.FSM_API.Create.CreateFiniteStateMachine(NodeDefinitionName, -1, NodeGroup)
             .State("Seed", NodeEnter, NodeSeedUpdate, NodeExit)
             .State("Living", NodeEnter, NodeLivingUpdate, NodeExit)
             .State("Reproducing", NodeReproduceEnter, NodeReproduceUpdate, NodeExit)
@@ -289,7 +285,7 @@
         {
             Lineage = generation == 0 ? "0" : $"{generation}"
         };
-        var handle = FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
+        var handle = TheSingularityWorkshop.FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
         Nodes.Add(new LivingNode(handle, context));
     }
 
@@ -307,7 +303,7 @@
         {
             Lineage = $"{parent.Context.Lineage}.{random.Next(10, 99)}"
         };
-        var handle = FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
+        var handle = TheSingularityWorkshop.FSM_API.FSM_API.Create.CreateInstance(NodeDefinitionName, context, NodeGroup);
         Nodes.Add(new LivingNode(handle, context));
     }
 
