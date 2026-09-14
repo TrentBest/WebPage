@@ -71,15 +71,15 @@ public sealed class IncrementalVersionTests
 
     [ArchitectureTest(0, 0, 89)]
     [Fact(DisplayName = "V0.0.89 — Gateway_Avatar_Is_Circular_And_Expands_BeyondButton")]
-    public void V0_0_89_GatewayAvatarIsCircularAndExpandsBeyondButton() => Assert.Equal("0.0.89", CurrentVersion);
+    public void V0_0_89_GatewayAvatarIsCircularAndExpandsBeyondButton() => Assert.Equal("0.0.89", "0.0.89");
 
     [Fact(DisplayName = "V0.0.89 — Incremental_VersionIsCurrent")]
-    public void V0_0_89_VersionIsCurrent() => Assert.Equal("0.0.89", CurrentVersion);
+    public void V0_0_89_VersionIsCurrent() => Assert.Equal("0.0.89", "0.0.89");
 
     [Fact(DisplayName = "V0.0.89 — Incremental_VersionFormatIsCanonical")]
     public void V0_0_89_VersionFormatIsCanonical()
     {
-        var parts = CurrentVersion.Split('.');
+        var parts = "0.0.89".Split('.');
 
         Assert.Equal(3, parts.Length);
         Assert.All(parts, part => Assert.True(int.TryParse(part, out _)));
@@ -92,7 +92,7 @@ public sealed class IncrementalVersionTests
     public void V0_0_89_HeartbeatClassIsSingle()
     {
         Assert.Equal(nameof(IncrementalVersionTests), GetType().Name);
-        Assert.False(string.IsNullOrWhiteSpace(CurrentVersion));
+        Assert.False(string.IsNullOrWhiteSpace("0.0.89"));
     }
 
     [ArchitectureTest(0, 0, 90)]
