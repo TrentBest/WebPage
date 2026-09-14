@@ -100,4 +100,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 109)]
     [Fact(DisplayName = "V0.0.109 — Explore_Presentation_Moved_From_CSS_Monolith_To_Recursive_GUI_Builders")]
     public void V0_0_109_ExplorePresentationMovedFromCssMonolithToRecursiveGuiBuilders() => Assert.Equal("0.0.109", "0.0.109");
+
+    [ArchitectureTest(0, 0, 111)]
+    [Fact(DisplayName = "V0.0.111 — Repair_Recursive_Composition_And_Force_Navigation_Collapse_After_Selection")]
+    public void V0_0_111_RepairRecursiveCompositionAndForceNavigationCollapseAfterSelection() => Assert.Equal("0.0.111", "0.0.111");
 }
