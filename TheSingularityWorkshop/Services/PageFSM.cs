@@ -92,7 +92,11 @@ namespace TheSingularityWorkshop.Services
                     behavior?.OnLivingGuiIgnition?.Invoke(c);
                 }), Tick, null)
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
-                .State(MonikerReveal, Enter(behavior?.OnMonikerReveal), Tick, null)
+                .State(MonikerReveal, Enter(c =>
+                {
+                    c.MonikerPresentationStartTick = c.TotalTicks;
+                    behavior?.OnMonikerReveal?.Invoke(c);
+                }), Tick, null)
                 .State(Gravity, Enter(c =>
                 {
                     c.GravityReleased = false;
@@ -112,6 +116,7 @@ namespace TheSingularityWorkshop.Services
                 {
                     var context = (PageStateContext)c;
                     return context.LivingGuiPopulated &&
+                           context.LivingNodes.Count == PageStateContext.CriticalMass &&
                            context.PopulationCompletedTick >= 0 &&
                            context.TotalTicks > context.PopulationCompletedTick;
                 })
@@ -120,8 +125,8 @@ namespace TheSingularityWorkshop.Services
                 .Transition(LivingGuiDissipating, NavigationArrival, c =>
                 {
                     var context = (PageStateContext)c;
-                    return context.PopulationCompletedTick >= 0 &&
-                           context.TotalTicks - context.PopulationCompletedTick >= MonikerPresentationTicks;
+                    return context.MonikerPresentationStartTick >= 0 &&
+                           context.TotalTicks - context.MonikerPresentationStartTick >= MonikerPresentationTicks;
                 })
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
