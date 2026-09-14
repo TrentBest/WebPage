@@ -36,15 +36,7 @@ namespace TheSingularityWorkshop.Services
         public bool EnterRequested
         {
             get => _enterRequested;
-            set
-            {
-                if (value && !_enterRequested && MonikerPresentationStartTick < 0)
-                {
-                    MonikerPresentationStartTick = TotalTicks;
-                    PopulationCompletedTick = TotalTicks;
-                }
-                _enterRequested = value;
-            }
+            set => _enterRequested = value;
         }
         public bool LivingGuiPopulated { get; internal set; }
         public bool MonikerReady { get; internal set; }
@@ -84,6 +76,8 @@ namespace TheSingularityWorkshop.Services
             GravityReleased = false;
             LivingGuiFallen = false;
             NavigationReady = false;
+            PopulationCompletedTick = -1;
+            MonikerPresentationStartTick = -1;
         }
 
         public void AdvanceRootGrowth()
@@ -171,7 +165,7 @@ namespace TheSingularityWorkshop.Services
                 LivingGuiFrozen = true;
                 LivingGuiPopulated = true;
                 MonikerReady = true;
-                if (PopulationCompletedTick < 0) PopulationCompletedTick = TotalTicks;
+                PopulationCompletedTick = TotalTicks;
             }
         }
 
