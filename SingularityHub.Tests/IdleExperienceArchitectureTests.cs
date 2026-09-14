@@ -61,10 +61,6 @@ public sealed class IdleExperienceArchitectureTests
 
         Assert.True(gravityTicks < gravityGuard, "Living GUI did not fall away within the test guard.");
         Assert.True(fsm.Context.LivingGuiFallen);
-
-        // FSM_API evaluates the Gravity -> Dissipating transition on the same
-        // heartbeat that marks the living GUI as fallen. Therefore the observable
-        // post-fall state is already DISSIPATING; no extra heartbeat is required.
         Assert.Equal(PageFSM.LivingGuiDissipating, fsm.CurrentState);
 
         for (var tick = 1; tick < 91; tick++)
@@ -147,5 +143,34 @@ public sealed class IdleExperienceArchitectureTests
         fsm.Update();
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 10 — moniker presentation defaults to three seconds and accepts a parameter")]
+    public void IncrementalUnitTest10_MonikerPresentationDurationIsConfigurable()
+    {
+        using var defaultFsm = new PageFSM();
+        using var customFsm = new PageFSM(monikerPresentationDuration: TimeSpan.FromSeconds(5));
+
+        Assert.Equal(TimeSpan.FromSeconds(3), defaultFsm.MonikerPresentationDuration);
+        Assert.Equal(TimeSpan.FromSeconds(5), customFsm.MonikerPresentationDuration);
+
+        defaultFsm.RequestEnter();
+        defaultFsm.Update();
+        defaultFsm.Update();
+        while (!defaultFsm.Context.LivingGuiPopulated)
+            defaultFsm.Update();
+        defaultFsm.Update();
+        Assert.Equal(PageFSM.MonikerReveal, defaultFsm.CurrentState);
+        Assert.False(defaultFsm.Context.NavigationReady);
+
+        defaultFsm.SignalNavigationReady();
+        defaultFsm.Update();
+        Assert.Equal(PageFSM.Gravity, defaultFsm.CurrentState);
+
+        while (!defaultFsm.Context.LivingGuiFallen)
+            defaultFsm.Update();
+        Assert.Equal(PageFSM.LivingGuiDissipating, defaultFsm.CurrentState);
+        defaultFsm.Update();
+        Assert.Equal(PageFSM.NavigationArrival, defaultFsm.CurrentState);
     }
 }

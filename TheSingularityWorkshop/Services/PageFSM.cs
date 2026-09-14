@@ -25,6 +25,7 @@ namespace TheSingularityWorkshop.Services
         public const string Running = "RUNNING";
         public const string ShutdownState = "SHUTDOWN";
 
+        public static readonly TimeSpan DefaultMonikerPresentationDuration = TimeSpan.FromSeconds(3);
         private const long GravityReleaseTicks = 1;
         private const long MonikerPresentationTicks = 91;
 
@@ -51,6 +52,7 @@ namespace TheSingularityWorkshop.Services
         public string LivingGuiParentRecoveryProcessingGroup => _livingGuiRuntime.ParentRecoveryProcessingGroup;
         public string LivingGuiActivePhase => _livingGuiRuntime.ActivePhase;
         public string GravityProcessingGroup => _gravityProcessingGroup;
+        public TimeSpan MonikerPresentationDuration { get; }
         public event Action<string>? StateChanged;
 
         public sealed class Behavior
@@ -68,10 +70,14 @@ namespace TheSingularityWorkshop.Services
             public Action<PageStateContext>? OnShutdown { get; init; }
         }
 
-        public PageFSM(object? singularityHub = null, Behavior? behavior = null)
+        public PageFSM(object? singularityHub = null, Behavior? behavior = null, TimeSpan? monikerPresentationDuration = null)
         {
             Context = new PageStateContext(singularityHub);
             _hub = singularityHub as HubKernel ?? new HubKernel();
+            MonikerPresentationDuration = monikerPresentationDuration ?? DefaultMonikerPresentationDuration;
+            if (MonikerPresentationDuration < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException(nameof(monikerPresentationDuration));
+
             _processingGroup = $"{ProcessingGroup}:{Guid.NewGuid():N}";
             _gravityProcessingGroup = $"Gravity:{Guid.NewGuid():N}";
 
@@ -125,7 +131,7 @@ namespace TheSingularityWorkshop.Services
                 .Transition(LivingGuiDissipating, NavigationArrival, c =>
                 {
                     var context = (PageStateContext)c;
-                    return context.StateTicks >= MonikerPresentationTicks;
+                    return context.NavigationReady || context.StateTicks >= MonikerPresentationTicks;
                 })
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
@@ -153,12 +159,6 @@ namespace TheSingularityWorkshop.Services
             };
         }
 
-        /// <summary>
-        /// This is the page FSM's actual FSM_API update callback. The Hub has already
-        /// entered the page process group when this method runs. Nested experience
-        /// process groups are therefore advanced from inside the authoritative FSM
-        /// execution cycle instead of a second application-side stepping loop.
-        /// </summary>
         private void Tick(IStateContext stateContext)
         {
             var context = (PageStateContext)stateContext;
@@ -199,11 +199,6 @@ namespace TheSingularityWorkshop.Services
             if (!_disposed) _handle.TransitionTo(ShutdownState);
         }
 
-        /// <summary>
-        /// Advances the application by handing one heartbeat to the Hub.
-        /// The Hub delegates the registered root process groups to FSM_API's
-        /// <see cref="fsm_API.Interaction.Update(string)"/> execution mechanism.
-        /// </summary>
         public void Update()
         {
             if (_disposed)

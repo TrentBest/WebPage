@@ -34,6 +34,7 @@
     private bool ShowWorkshopChrome => !IsWorkshopLanding || FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running;
     private bool _entryRequested;
     private bool _chromeReleased;
+    private CancellationTokenSource? _monikerTimer;
 
     private string CurrentTabTitle
     {
@@ -77,7 +78,9 @@
 
         try
         {
-            await JS.InvokeVoidAsync("eval", "if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();document.documentElement.classList.remove('workshop-splash-locked');document.documentElement.classList.add('workshop-splash-released');");
+            await JS.InvokeVoidAsync(
+                "eval",
+                "if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();document.documentElement.classList.remove('workshop-splash-locked');document.documentElement.classList.add('workshop-splash-released');");
         }
         catch (JSException)
         {
@@ -85,12 +88,44 @@
         }
     }
 
-    private void HandleFSMStateChanged(string _) => InvokeAsync(StateHasChanged);
+    private void HandleFSMStateChanged(string state)
+    {
+        if (state == PageFSM.MonikerReveal)
+            StartMonikerPresentationTimer();
+
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void StartMonikerPresentationTimer()
+    {
+        _monikerTimer?.Cancel();
+        _monikerTimer?.Dispose();
+        _monikerTimer = new CancellationTokenSource();
+        var token = _monikerTimer.Token;
+        _ = CompleteMonikerPresentationAsync(token);
+    }
+
+    private async Task CompleteMonikerPresentationAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(FSM.Page.MonikerPresentationDuration, cancellationToken);
+            if (!cancellationToken.IsCancellationRequested && FSM.CurrentState is PageFSM.MonikerReveal or PageFSM.Gravity or PageFSM.LivingGuiDissipating)
+                FSM.SignalNavigationReady();
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // A new moniker presentation or disposal replaced this timer.
+        }
+    }
+
     private void HandleExperienceStateChanged() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
         FSM.StateChanged -= HandleFSMStateChanged;
         Experience.StateChanged -= HandleExperienceStateChanged;
+        _monikerTimer?.Cancel();
+        _monikerTimer?.Dispose();
     }
 }
