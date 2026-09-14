@@ -125,9 +125,7 @@ namespace TheSingularityWorkshop.Services
                 .Transition(LivingGuiDissipating, NavigationArrival, c =>
                 {
                     var context = (PageStateContext)c;
-                    return context.StateTicks >= 1 &&
-                           context.MonikerPresentationStartTick >= 0 &&
-                           context.TotalTicks - context.MonikerPresentationStartTick > MonikerPresentationTicks;
+                    return context.StateTicks > MonikerPresentationTicks;
                 })
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
