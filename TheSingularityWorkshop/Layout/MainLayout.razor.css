@@ -13,7 +13,7 @@
 
 main { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: #050a14; }
 
-.top-row { flex: 0 0 3.5rem; background: #050a14; border-bottom: 1px solid #00eaff; height: 3.5rem; min-height: 3.5rem; display: flex; align-items: center; transition: flex-basis 1200ms cubic-bezier(.16,1,.3,1), height 1200ms cubic-bezier(.16,1,.3,1), min-height 1200ms cubic-bezier(.16,1,.3,1), opacity 1200ms ease, padding 1200ms cubic-bezier(.16,1,.3,1), border-color 1200ms ease; }
+.top-row { flex: 0 0 3.5rem; background: #050a14; border-bottom: 1px solid #00eaff; height: 3.5rem; min-height: 3.5rem; display: flex; align-items: center; transition: flex-basis 2000ms cubic-bezier(.16,1,.3,1), height 2000ms cubic-bezier(.16,1,.3,1), min-height 2000ms cubic-bezier(.16,1,.3,1), opacity 2000ms ease, padding 2000ms cubic-bezier(.16,1,.3,1), border-color 2000ms ease; }
 .workshop-tab-header { justify-content: center; text-align: center; }
 .workshop-tab-title { display: inline-block; color: #dcefff; font-family: Consolas, 'Courier New', monospace; font-size: clamp(.8rem, 1.2vw, 1.05rem); font-weight: 700; letter-spacing: .22em; text-transform: uppercase; text-shadow: 0 0 8px rgba(0, 234, 255, .35); animation: workshopTabBreath 4s ease-in-out infinite; }
 @keyframes workshopTabBreath { 0%, 100% { opacity: .72; letter-spacing: .19em; } 50% { opacity: 1; letter-spacing: .24em; } }
@@ -24,29 +24,28 @@ main { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; flex-directio
 article { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; height: auto; overflow: auto; overflow-x: hidden; padding: 0 !important; background: #050a14; transition: flex-basis 1200ms cubic-bezier(.16,1,.3,1), height 1200ms cubic-bezier(.16,1,.3,1), padding 1200ms cubic-bezier(.16,1,.3,1), transform 1200ms cubic-bezier(.16,1,.3,1); }
 article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: hidden !important; }
 
-.workshop-page .workshop-sidebar { width: 0; flex: 0 0 0; border-right-width: 0; opacity: 0; overflow: hidden; transition: width 1200ms cubic-bezier(.16,1,.3,1), flex-basis 1200ms cubic-bezier(.16,1,.3,1), border-right-width 1200ms ease, opacity 1200ms ease; }
+.workshop-page .workshop-sidebar { width: 0; flex: 0 0 0; border-right-width: 0; opacity: 0; overflow: hidden; transition: width 2000ms cubic-bezier(.16,1,.3,1), flex-basis 2000ms cubic-bezier(.16,1,.3,1), border-right-width 2000ms ease, opacity 2000ms ease; }
 .workshop-page.workshop-chrome-visible .workshop-sidebar { width: 200px; flex-basis: 200px; border-right-width: 1px; opacity: 1; }
 .workshop-page .workshop-top-row-placeholder { flex-basis: 0; height: 0; min-height: 0; padding: 0 !important; border-bottom-width: 0; opacity: 0; overflow: hidden; }
 .workshop-page.workshop-chrome-visible .workshop-top-row-placeholder { flex-basis: 3.5rem; height: 3.5rem; min-height: 3.5rem; padding-left: 2rem !important; padding-right: 1.5rem !important; border-bottom-width: 1px; opacity: 1; }
 .workshop-page .workshop-content { will-change: flex-basis, height, width; }
 
-/* The Hub is born with the landing page, so its chrome gets a single bright
-   manifestation pulse before settling into the normal living breath. The
-   finite pulse and infinite breath are both visual consequences of the same
-   host-owned lifecycle boundary; they do not alter FSM state progression. */
+/* The Hub manifests as one physical gesture: the chrome grows from a hairline
+   into its full geometry while its border wakes from dark cyan through a brief
+   white-hot peak and settles into a living breath. */
 .workshop-page.workshop-hub-manifested .workshop-sidebar {
-    animation: workshopHubBorderManifest 1600ms cubic-bezier(.16,1,.3,1) 1 forwards,
-               workshopHubBorderBreath 5.4s ease-in-out 1600ms infinite;
+    animation: workshopHubBorderManifest 2000ms cubic-bezier(.16,1,.3,1) 1 forwards,
+               workshopHubBorderBreath 5.4s ease-in-out 2000ms infinite;
 }
 .workshop-page.workshop-hub-manifested .workshop-tab-header {
-    animation: workshopHubBorderManifest 1600ms cubic-bezier(.16,1,.3,1) 1 forwards,
-               workshopHubBorderBreath 5.4s ease-in-out 1600ms infinite;
+    animation: workshopHubBorderManifest 2000ms cubic-bezier(.16,1,.3,1) 1 forwards,
+               workshopHubBorderBreath 5.4s ease-in-out 2000ms infinite;
 }
 @keyframes workshopHubBorderManifest {
     0% { border-color: rgba(0,234,255,0); }
-    24% { border-color: #ffffff; }
-    48% { border-color: #8fffff; }
-    72% { border-color: #19efff; }
+    22% { border-color: #ffffff; }
+    42% { border-color: #8fffff; }
+    68% { border-color: #19efff; }
     100% { border-color: #00eaff; }
 }
 @keyframes workshopHubBorderBreath {

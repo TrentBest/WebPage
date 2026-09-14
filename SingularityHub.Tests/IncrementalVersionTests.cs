@@ -80,4 +80,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 104)]
     [Fact(DisplayName = "V0.0.104 — Moniker_Wave_And_Hub_Manifestation_Are_Restored")]
     public void V0_0_104_MonikerWaveAndHubManifestationAreRestored() => Assert.Equal("0.0.104", "0.0.104");
+
+    [ArchitectureTest(0, 0, 105)]
+    [Fact(DisplayName = "V0.0.105 — Hub_Manifest_Expands_Slowly_And_Monikers_Share_One_Living_Wave")]
+    public void V0_0_105_HubManifestExpandsSlowlyAndMonikersShareOneLivingWave() => Assert.Equal("0.0.105", "0.0.105");
 }
