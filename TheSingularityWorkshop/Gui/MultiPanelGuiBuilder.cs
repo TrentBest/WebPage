@@ -19,7 +19,7 @@ public sealed class MultiPanelGuiBuilder : ElementBuilder
         return this;
     }
 
-    public MultiPanelGuiBuilder Content(ElementBuilder child)
+    public new MultiPanelGuiBuilder Content(ElementBuilder child)
     {
         Child(child);
         return this;

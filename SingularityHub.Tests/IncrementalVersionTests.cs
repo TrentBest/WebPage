@@ -108,4 +108,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 112)]
     [Fact(DisplayName = "V0.0.112 — FSM_Forge_Provides_Reusable_Stock_And_Live_Preview")]
     public void V0_0_112_FsmForgeProvidesReusableStockAndLivePreview() => Assert.Equal("0.0.112", "0.0.112");
+
+    [ArchitectureTest(0, 0, 113)]
+    [Fact(DisplayName = "V0.0.113 — Repair_FSM_Forge_API_Binding_And_Recursive_Render_Boundary")]
+    public void V0_0_113_RepairFsmForgeApiBindingAndRecursiveRenderBoundary() => Assert.Equal("0.0.113", "0.0.113");
 }
