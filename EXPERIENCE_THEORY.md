@@ -77,6 +77,41 @@ Experience
 
 The Experience describes **what participates**. The Hub decides **what runs now and when it steps**.
 
+## Rule 4 — Composition is an explicit manifest
+
+> **When a manifest is supplied, the execution host follows the manifest instead of reconstructing a default trail.**
+
+An `ExperienceManifest` is an ordered composition plan. It identifies Experiences for `Startup`, `Transitioning`, and `Running` phases. Ordering is significant: the developer composes the lineup, and the host executes that lineup rather than silently substituting its own preferred sequence.
+
+The manifest may also declare required capabilities. The canonical required branding capability is `HubCapabilityIds.Moniker`.
+
+This separates two responsibilities:
+
+- **Authoring/publishing policy** decides whether a composition is publishable and may require the Moniker capability.
+- **Runtime execution** follows the published composition and resolves the capabilities supplied by the Experiences in that composition.
+
+The Hub therefore does not need the author's Moniker implementation compiled into it. A separately compiled Experience can dock to the Hub by declaring the capability it provides.
+
+## Rule 5 — The Moniker is an Experience, not a special animation
+
+> **The Moniker is an Experience whose presentation is extensible through MicroBundles.**
+
+The Workshop's Moniker is one Experience that provides the `Moniker` capability. Its current floating-wave glyph treatment is only one presentation. A Moniker Experience may instead provide any combination of presentation and removal MicroBundles: assemble, orbit, dissolve, fold, scatter, grow, collapse, or future effects not yet imagined.
+
+Presentation and removal are deliberately separate contracts. This allows an Experience to define how it arrives **and** how it leaves without requiring the Hub to understand either animation.
+
+The developer decides where the Moniker Experience appears in the startup lineup. The host's responsibility is to honor that composition and to provide the startup presentation window for the terminal startup Experience; the Moniker does not own a global three-second rule merely because the current composition ends with it.
+
+## Rule 6 — The Hub can become the authoring surface
+
+> **The composition of the current page is itself an Experience and can expose its own manifest.**
+
+Once the startup presentation hands control to the Hub, a composition surface can expose the manifest that describes the page currently being experienced. A developer can inspect, edit, save, and eventually publish that composition rather than being forced to follow a hard-coded default trail.
+
+The same authoring surface can become the place where a developer creates or selects a Moniker Experience. The Moniker is therefore extensible at the same architectural boundary as every other Experience: composition, capabilities, MicroBundles, presentation, and removal.
+
+Publishing remains subject to the Workshop's mandatory Moniker policy: a composition without the required Moniker capability is not previewable/publishable. Runtime composition itself remains generic.
+
 ## Core Experiences
 
 A **core Experience** is an Experience whose implementation/test project is built directly into this solution. It is therefore part of the solution's compiled architectural surface rather than an externally configured development environment.
@@ -95,6 +130,10 @@ The distinction between Experience and Hub is important for the runtime cache/in
 ```text
 Experience manifest
        │
+       ├── ordered Startup experiences
+       ├── ordered Transitioning experiences
+       ├── ordered Running experiences
+       ├── required capabilities
        ├── ontology coordinates
        ├── sensory-system IDs
        ├── MicroBundle IDs
@@ -115,8 +154,4 @@ This is the intended direction for escaping page-specific orchestration. `PageFS
 
 Repository progress continues to use the incremental version heartbeat in `SingularityHub.Tests/IncrementalVersionTests.cs`.
 
-Version comparisons should use an explicit `Is(expected, actual)` assertion helper rather than an assertion whose intent is hidden in a generic `true` heartbeat. The current heartbeat for this Experience-rule pass is **0.0.17**.
-
-The architecture test coordinate added for the current CI/core-project pass is **0.00.018**.
-
-The next refinement of the sensory rule is explicitly proved by the contract test using duplicate sensory IDs and asserting a distinct count.
+Version comparisons should use an explicit `Is(expected, actual)` assertion helper rather than an assertion whose intent is hidden in a generic `true` heartbeat. The current heartbeat for this composition/Moniker contract pass is **0.0.98**.
