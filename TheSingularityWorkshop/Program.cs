@@ -8,6 +8,7 @@ using TheSingularityWorkshop;
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.SingularityHub;
+using TheSingularityWorkshop.Workshop.IO;
 
 internal class Program
 {
@@ -25,6 +26,7 @@ internal class Program
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<BlazorFSMIntegration>();
         builder.Services.AddScoped<WorkshopExperienceService>();
+        builder.Services.AddScoped<IWorkshopStorage, BrowserWorkshopStorage>();
 
         // The WebPage hosts the concrete Hub but owns no Hub mechanics.
         builder.Services.AddSingleton<SingularityHub>();
