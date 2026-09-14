@@ -1,6 +1,7 @@
 @page "/explore"
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.Gui
+@using TheSingularityWorkshop.Infrastructure.FsmForge
 @using TheSingularityWorkshop.Infrastructure.Hub
 @inject HubRuntime Runtime
 
@@ -14,6 +15,7 @@
     private string? selectedRoomId;
     private string? insideRoomId;
     private bool unknownUnlocked;
+    private readonly FsmForgePreview ForgePreview = new();
 
     private SpatialRoom? SelectedRoom => Rooms.FirstOrDefault(x => x.Id == selectedRoomId);
     private SpatialRoom? InsideRoom => Rooms.FirstOrDefault(x => x.Id == insideRoomId);
@@ -35,7 +37,19 @@
     ];
 
     private RenderFragment BuildGui()
-        => SpatialExploreGuiBuilder.Build(
+    {
+        if (insideRoomId == "engineering")
+        {
+            return FsmForgeGuiBuilder.Build(
+                this,
+                ForgePreview,
+                StartForgePreview,
+                TickForgePreview,
+                ResetForgePreview,
+                ExitRoom);
+        }
+
+        return SpatialExploreGuiBuilder.Build(
             this,
             Runtime,
             Rooms,
@@ -50,6 +64,22 @@
             EnterSelectedRoom,
             UnlockUnknown,
             ExitRoom);
+    }
+
+    private void StartForgePreview()
+    {
+        ForgePreview.Start();
+    }
+
+    private void TickForgePreview()
+    {
+        ForgePreview.Tick();
+    }
+
+    private void ResetForgePreview()
+    {
+        ForgePreview.Stop();
+    }
 
     private void HandleKeyDown(KeyboardEventArgs args)
     {
@@ -107,6 +137,7 @@
 
     private void ExitRoom()
     {
+        ForgePreview.Stop();
         insideRoomId = null;
     }
 }
