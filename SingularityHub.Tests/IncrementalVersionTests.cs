@@ -63,7 +63,7 @@ public sealed class IncrementalVersionTests
 
     [ArchitectureTest(0, 0, 100)]
     [Fact(DisplayName = "V0.0.100 — Simplify_Incremental_Ledger_To_One_Literal_Heartbeat_Per_Version")]
-    public void V0_0_100_SimplifyIncrementalLedgerToOneLiteralHeartbeatPerVersion() => Assert.Equal("0.0.100", "0.0.100");
+    public void V0_0_100_SimplifyIncrementalLedgerToOneLiteralHeartbeat() => Assert.Equal("0.0.100", "0.0.100");
 
     [ArchitectureTest(0, 0, 101)]
     [Fact(DisplayName = "V0.0.101 — Correct_Incremental_Heartbeat_Sequence")]
@@ -92,4 +92,12 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 107)]
     [Fact(DisplayName = "V0.0.107 — Collapse_Hub_Navigation_And_Turn_Build_Into_Create_Workspace")]
     public void V0_0_107_CollapseHubNavigationAndTurnBuildIntoCreateWorkspace() => Assert.Equal("0.0.107", "0.0.107");
+
+    [ArchitectureTest(0, 0, 108)]
+    [Fact(DisplayName = "V0.0.108 — Reforge_Explore_As_A_Spatial_Workshop_Experience")]
+    public void V0_0_108_ReforgeExploreAsASpatialWorkshopExperience() => Assert.Equal("0.0.108", "0.0.108");
+
+    [ArchitectureTest(0, 0, 109)]
+    [Fact(DisplayName = "V0.0.109 — Explore_Presentation_Moved_From_CSS_Monolith_To_Recursive_GUI_Builders")]
+    public void V0_0_109_ExplorePresentationMovedFromCssMonolithToRecursiveGuiBuilders() => Assert.Equal("0.0.109", "0.0.109");
 }
