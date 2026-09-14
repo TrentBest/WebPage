@@ -9,3 +9,18 @@ html.workshop-splash-locked,html.workshop-splash-locked body,html.workshop-splas
 .flex-hello-moniker{position:relative;display:inline-block;isolation:isolate;will-change:transform,filter;animation:monikerKelpSway 7.5s ease-in-out infinite}.flex-hello-moniker::before{content:"";position:absolute;inset:-18% -8%;z-index:-1;border-radius:50%;background:radial-gradient(ellipse at 50% 60%,rgba(0,234,255,.14),transparent 58%);filter:blur(16px);animation:monikerWaterPulse 5.8s ease-in-out infinite;pointer-events:none}@keyframes monikerKelpSway{0%,100%{transform:translate3d(0,0,0) rotate(-.35deg) skewX(-.25deg);filter:saturate(1) brightness(.94)}18%{transform:translate3d(-.22%,.35%,0) rotate(.45deg) skewX(.35deg)}38%{transform:translate3d(.34%,-.25%,0) rotate(1deg) skewX(.65deg);filter:saturate(1.12) brightness(1.04)}62%{transform:translate3d(-.3%,-.05%,0) rotate(-.8deg) skewX(-.55deg)}82%{transform:translate3d(.2%,.28%,0) rotate(.3deg) skewX(.2deg)}}@keyframes monikerWaterPulse{0%,100%{opacity:.34;transform:scale(.94,.9)}50%{opacity:.72;transform:scale(1.06,1.02)}}
 h1:focus{outline:none}a,.btn-link{color:#0071c1}.btn-primary{color:#fff;background-color:#1b6ec2;border-color:#1861ac}.btn:focus,.btn:active:focus,.btn-link.nav-link:focus,.form-control:focus,.form-check-input:focus{box-shadow:0 0 0 .1rem white,0 0 0 .25rem #258cfb}.content{padding-top:1.1rem}.valid.modified:not([type=checkbox]){outline:1px solid #26b050}.invalid{outline:1px solid red}.validation-message{color:red}#blazor-error-ui{background:lightyellow;bottom:0;box-shadow:0 -1px 2px rgba(0,0,0,.2);display:none;left:0;padding:.6rem 1.25rem .7rem;position:fixed;width:100%;z-index:1000}#blazor-error-ui .dismiss{cursor:pointer;position:absolute;right:.75rem;top:.5rem}.blazor-error-boundary{background:#b32121;padding:1rem 1rem 1rem 3.7rem;color:white}.blazor-error-boundary::after{content:"An error has occurred."}.loading-progress{position:relative;display:block;width:8rem;height:8rem;margin:20vh auto 1rem auto}.loading-progress circle{fill:none;stroke:#e0e0e0;stroke-width:.6rem;transform-origin:50% 50%;transform:rotate(-90deg)}.loading-progress circle:last-child{stroke:#1b6ec2;stroke-dasharray:calc(3.141 * var(--blazor-load-percentage,0%) * .8),500%;transition:stroke-dasharray .05s ease-in-out}.loading-progress-text{position:absolute;text-align:center;font-weight:bold;inset:calc(20vh + 3.25rem) 0 auto .2rem}.loading-progress-text:after{content:var(--blazor-load-percentage-text,"Loading")}code{color:#c02d76}
 @media(max-width:700px){.hello-glyph{font-size:clamp(1.8rem,11vw,3.8rem)}}@media(prefers-reduced-motion:reduce){.flex-hello-moniker,.flex-hello-moniker::before,.hello-moniker,.hello-glyph{animation:none}}
+
+/* The avatar border is the exact same inscribed circle as the image portal. */
+.monolith-btn{container-type:size}
+.monolith-btn::before{width:auto!important;height:72%!important;aspect-ratio:1!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important}
+.monolith-btn:hover::before{transform:translate(-50%,-50%) scale(1.2)!important}
+@container (max-aspect-ratio:1/1){.monolith-btn::before{width:72%!important;height:auto!important}}
+
+/* The Hub arrives as a layout transition, not a layout snap. */
+.workshop-page .workshop-sidebar,.workshop-page .workshop-top-row-placeholder,.top-row,article{transition-duration:1200ms}
+.workshop-page .workshop-sidebar{will-change:width,height,flex-basis,opacity}
+.workshop-page .workshop-top-row-placeholder{will-change:flex-basis,height,padding,opacity}
+.workshop-page .workshop-content{will-change:height,width}
+
+/* The internal state label is implementation telemetry, not part of the experience. */
+.flex-hello-state{display:none!important}
