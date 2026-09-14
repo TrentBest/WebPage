@@ -37,7 +37,7 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
 .workshop-page .workshop-content ::deep .hello-line:nth-child(1) { width: 3.15em; }
 .workshop-page .workshop-content ::deep .hello-line:nth-child(2) { width: 10.55em; }
 .workshop-page .workshop-content ::deep .hello-line:nth-child(3) { width: 7.7em; }
-.workshop-page .workshop-content ::deep .hello-glyph { position: absolute; left: calc(50% + (var(--glyph-index) - var(--glyph-midpoint)) * .95em); top: 50%; width: 1em; margin: 0; text-align: center; transform-origin: 50% 55%; transform-style: preserve-3d; animation: workshopMonikerWave 3.8s cubic-bezier(.42,0,.58,1) infinite !important; animation-delay: calc((var(--glyph-index) - var(--glyph-midpoint)) * -.14s) !important; will-change: transform, filter; }
+.workshop-page .workshop-content ::deep .hello-glyph { position: absolute; left: calc(50% + (var(--glyph-index) - var(--glyph-midpoint)) * .95em); top: 50%; width: 1em; margin: 0; text-align: center; transform-origin: 50% 55%; transform-style: preserve-3d; animation: workshopMonikerWave 3.8s cubic-bezier(.42,0,.58,1) infinite !important, workshopMonikerPivot 5.6s ease-in-out infinite !important; animation-delay: calc((var(--glyph-index) - var(--glyph-midpoint)) * -.14s), calc((var(--glyph-index) - var(--glyph-midpoint)) * -.23s) !important; will-change: transform, rotate, filter; }
 .workshop-page .workshop-content ::deep .hello-glyph:nth-child(1) { --glyph-index: 0; }
 .workshop-page .workshop-content ::deep .hello-glyph:nth-child(2) { --glyph-index: 1; }
 .workshop-page .workshop-content ::deep .hello-glyph:nth-child(3) { --glyph-index: 2; }
@@ -58,6 +58,13 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
     38% { transform: translate(-50%, -50%) translateY(-.18em) rotateX(-2deg) rotateY(6deg) rotateZ(3.2deg) scale(1.025); filter: brightness(1.1) saturate(1.12); }
     58% { transform: translate(-50%, -50%) translateY(.055em) rotateX(4deg) rotateY(-7deg) rotateZ(-2.6deg) scale(1.008); filter: brightness(1.04) saturate(1.06); }
     78% { transform: translate(-50%, -50%) translateY(-.12em) rotateX(-3deg) rotateY(5deg) rotateZ(1.8deg) scale(1.018); filter: brightness(1.07) saturate(1.1); }
+}
+
+/* A second, deliberately quieter motion lives on the individual rotation
+   property so it composes with the traveling wave instead of replacing it. */
+@keyframes workshopMonikerPivot {
+    0%, 100% { rotate: -0.45deg; }
+    50% { rotate: 0.45deg; }
 }
 
 @media (max-width: 640.98px) {
