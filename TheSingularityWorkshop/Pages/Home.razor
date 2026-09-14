@@ -8,7 +8,7 @@
 <PageTitle>The Singularity Workshop</PageTitle>
 
 <div class="workshop-root">
-    @if (Experience.CurrentState is "Intro" or "Living" or "FlexHello")
+    @if (Experience.CurrentState is "Intro" or "Living" or "FlexHello" or "CriticalMass")
     {
         <div class="experience-layer">
             @if (Experience.CurrentState == "Intro")
@@ -41,7 +41,7 @@
                 </section>
             }
 
-            @if (Experience.CurrentState == "FlexHello")
+            @if (Experience.CurrentState is "FlexHello" or "Living" or "CriticalMass")
             {
                 <section class="flex-hello" aria-live="polite" aria-label="The Singularity Workshop">
                     <div class="flex-hello-water" aria-hidden="true"></div>
@@ -90,6 +90,18 @@
     .flex-hello-line:nth-child(3) { font-size:clamp(1.45rem,4.8vw,4.6rem); letter-spacing:.2em; font-weight:850; }
     /* Unitless --wave-time avoids Razor interpreting CSS generic syntax as an HTML tag. */
     @@property --wave-time { syntax: "&lt;number&gt;"; inherits: false; initial-value: 0; }
+    /*
+       The motion is the requested wave model:
+         phase = glyphIndex * phaseStep
+         x = sin(time * fx + phase) * Ax
+         y = sin(time * fy + phase + phiY) * Ay
+         z = sin(time * fz + phase + phiZ) * Az
+         rotateX = sin(time * rx + phase + phiRX) * Rx
+         rotateY = sin(time * ry + phase + phiRY) * Ry
+         rotateZ = sin(time * rz + phase + phiRZ) * Rz
+
+       --wave-time is a shared unitless cycle variable. Every glyph gets a different phase.
+    */
     .flex-hello-glyph { --phase:0deg; --glyph-color:#fff; display:inline-block; position:relative; color:var(--glyph-color); transform-style:preserve-3d; transform-origin:center 72%; will-change:transform,filter; text-shadow:0 0 7px color-mix(in srgb,var(--glyph-color) 82%,white),0 0 18px color-mix(in srgb,var(--glyph-color) 48%,transparent); animation:flexGlyphWave 9s linear infinite; }
     .flex-hello-glyph::after { content:""; position:absolute; left:20%; right:20%; bottom:-.2em; height:.08em; border-radius:50%; background:var(--glyph-color); opacity:.28; filter:blur(4px); transform:scaleX(.7); }
     @@keyframes flexGlyphWave { from { --wave-time:0; } to { --wave-time:1; } }
@@ -136,17 +148,21 @@
     {
         await JS.InvokeVoidAsync("localStorage.setItem", "WorkshopVisited", "true");
         Experience.RequestEntry();
-        if (Experience.CurrentState == "Living")
-        {
-            EnsureNodeDefinition();
-            SpawnSeed(50, 50, 0);
-        }
+
+        // Present the moniker by itself first. Only after three seconds do we release
+        // the living constructs into the Experience; the moniker remains visible after release.
+        await Task.Delay(TimeSpan.FromSeconds(3));
+
+        if (Experience.CurrentState != "FlexHello") return;
+        Experience.SetState("Living");
+        EnsureNodeDefinition();
+        SpawnSeed(50, 50, 0);
     }
 
     private void Tick(object? sender, ElapsedEventArgs e)
     {
         if (!Experience.IsInitialized) return;
-        if (Experience.CurrentState == "Living")
+        if (Experience.CurrentState is "Living" or "CriticalMass")
         {
             foreach (var node in Nodes.ToArray())
             {
@@ -157,7 +173,7 @@
                     SpawnChild(node);
                 }
             }
-            if (Nodes.Count >= 24) Experience.SetCriticalMassReached();
+            if (Experience.CurrentState == "Living" && Nodes.Count >= 24) Experience.SetCriticalMassReached();
         }
         Experience.Tick();
         InvokeAsync(StateHasChanged);
