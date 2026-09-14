@@ -15,7 +15,7 @@ namespace SingularityHub.Tests;
 public sealed class IncrementalVersionTests
 {
     /// <summary>Version claimed by the current repository commit.</summary>
-    public const string CurrentVersion = "0.0.89";
+    public const string CurrentVersion = "0.0.90";
 
     [ArchitectureTest(0, 0, 87)]
     [Fact(DisplayName = "V0.0.87 — Incremental_Heartbeat")]
@@ -70,7 +70,7 @@ public sealed class IncrementalVersionTests
     }
 
     [ArchitectureTest(0, 0, 89)]
-    [Fact(DisplayName = "V0.0.89 — Gateway_Avatar_Is_Circular_And_Expands_Beyond_Button")]
+    [Fact(DisplayName = "V0.0.89 — Gateway_Avatar_Is_Circular_And_Expands_BeyondButton")]
     public void V0_0_89_GatewayAvatarIsCircularAndExpandsBeyondButton() => Assert.Equal("0.0.89", CurrentVersion);
 
     [Fact(DisplayName = "V0.0.89 — Incremental_VersionIsCurrent")]
@@ -90,6 +90,32 @@ public sealed class IncrementalVersionTests
 
     [Fact(DisplayName = "V0.0.89 — Incremental_HeartbeatClassIsSingle")]
     public void V0_0_89_HeartbeatClassIsSingle()
+    {
+        Assert.Equal(nameof(IncrementalVersionTests), GetType().Name);
+        Assert.False(string.IsNullOrWhiteSpace(CurrentVersion));
+    }
+
+    [ArchitectureTest(0, 0, 90)]
+    [Fact(DisplayName = "V0.0.90 — Browser_Visitor_Persistence_Contract_Restored")]
+    public void V0_0_90_BrowserVisitorPersistenceContractRestored() => Assert.Equal("0.0.90", CurrentVersion);
+
+    [Fact(DisplayName = "V0.0.90 — Incremental_VersionIsCurrent")]
+    public void V0_0_90_VersionIsCurrent() => Assert.Equal("0.0.90", CurrentVersion);
+
+    [Fact(DisplayName = "V0.0.90 — Incremental_VersionFormatIsCanonical")]
+    public void V0_0_90_VersionFormatIsCanonical()
+    {
+        var parts = CurrentVersion.Split('.');
+
+        Assert.Equal(3, parts.Length);
+        Assert.All(parts, part => Assert.True(int.TryParse(part, out _)));
+        Assert.Equal("0", parts[0]);
+        Assert.Equal("0", parts[1]);
+        Assert.Equal("90", parts[2]);
+    }
+
+    [Fact(DisplayName = "V0.0.90 — Incremental_HeartbeatClassIsSingle")]
+    public void V0_0_90_HeartbeatClassIsSingle()
     {
         Assert.Equal(nameof(IncrementalVersionTests), GetType().Name);
         Assert.False(string.IsNullOrWhiteSpace(CurrentVersion));
