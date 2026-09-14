@@ -1,46 +1,38 @@
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
+@inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 @inject IJSRuntime JS
 @implements IDisposable
 
 <div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden")">
     @if (!IsWorkshopLanding)
     {
-        <div class="sidebar workshop-sidebar">
-            <NavMenu />
-        </div>
+        <div class="sidebar workshop-sidebar"><NavMenu /></div>
     }
     else
     {
-        <div class="sidebar workshop-sidebar" aria-hidden="true">
-            <NavMenu />
-        </div>
+        <div class="sidebar workshop-sidebar" aria-hidden="true"><NavMenu /></div>
     }
 
     <main>
         @if (!IsWorkshopLanding || ShowWorkshopChrome)
         {
-            <div class="top-row px-4 workshop-tab-header">
-                <span class="workshop-tab-title">@CurrentTabTitle</span>
-            </div>
+            <div class="top-row px-4 workshop-tab-header"><span class="workshop-tab-title">@CurrentTabTitle</span></div>
         }
         else
         {
             <div class="top-row workshop-tab-header workshop-top-row-placeholder" aria-hidden="true"></div>
         }
 
-        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">
-            @Body
-        </article>
+        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">@Body</article>
     </main>
 </div>
 
 @code {
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
-
     private bool ShowWorkshopChrome => !IsWorkshopLanding || FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running;
-
+    private bool _entryRequested;
     private bool _chromeReleased;
 
     private string CurrentTabTitle
@@ -48,7 +40,6 @@
         get
         {
             var path = Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
-
             return path.ToLowerInvariant() switch
             {
                 "" => "THE WORKSHOP",
@@ -67,19 +58,23 @@
     protected override void OnInitialized()
     {
         FSM.StateChanged += HandleFSMStateChanged;
+        Experience.StateChanged += HandleExperienceStateChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (IsWorkshopLanding && !_entryRequested && Experience.CurrentState == "FlexHello")
+        {
+            _entryRequested = true;
+            FSM.RequestEnter();
+            return;
+        }
+
         if (!IsWorkshopLanding || !ShowWorkshopChrome || _chromeReleased)
             return;
 
         _chromeReleased = true;
 
-        // The PageFSM's moniker presentation window has completed. Tell the browser
-        // host to leave any presentation fullscreen, then release the splash lock.
-        // MainLayout already animates the sidebar/header geometry, so the experience
-        // surface gives back its space continuously instead of snapping smaller.
         try
         {
             await JS.InvokeVoidAsync("eval", "if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();document.documentElement.classList.remove('workshop-splash-locked');document.documentElement.classList.add('workshop-splash-released');");
@@ -91,9 +86,11 @@
     }
 
     private void HandleFSMStateChanged(string _) => InvokeAsync(StateHasChanged);
+    private void HandleExperienceStateChanged() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
         FSM.StateChanged -= HandleFSMStateChanged;
+        Experience.StateChanged -= HandleExperienceStateChanged;
     }
 }
