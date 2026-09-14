@@ -191,7 +191,10 @@
         if (!firstRender || this.firstRender) return;
         this.firstRender = true;
 
-        bool returningVisitor = await JS.InvokeAsync<bool>("interop.workshopVisited");
+        bool returningVisitor = string.Equals(
+            await JS.InvokeAsync<string?>("localStorage.getItem", "WorkshopVisited"),
+            "true",
+            StringComparison.OrdinalIgnoreCase);
         Experience.Initialize(returningVisitor);
         heartbeat.Start();
 
@@ -204,7 +207,7 @@
 
     private async Task EnterWorkshop()
     {
-        await JS.InvokeVoidAsync("interop.markWorkshopVisited");
+        await JS.InvokeVoidAsync("localStorage.setItem", "WorkshopVisited", "true");
         Experience.RequestEntry();
 
         if (Experience.CurrentState == "Living")
