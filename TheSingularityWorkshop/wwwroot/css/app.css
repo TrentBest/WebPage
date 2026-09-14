@@ -210,6 +210,66 @@ html.workshop-splash-released .page > main > article.workshop-content {
     transform: rotate(0deg) !important;
 }
 
+/*
+   MONIKER WATER
+   -------------
+   The Workshop moniker is a living surface, not a static title. Each glyph
+   receives a phase offset so the word moves as a field: a slow lateral wave,
+   slight vertical lift, and tiny rotational drift. The existing cyan/magenta
+   Workshop palette remains the source of the illumination.
+*/
+.flex-hello-moniker {
+    position: relative;
+    display: inline-block;
+    isolation: isolate;
+    will-change: transform, filter;
+    animation: monikerKelpSway 7.5s ease-in-out infinite;
+}
+
+.flex-hello-moniker::before {
+    content: "";
+    position: absolute;
+    inset: -18% -8%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 60%, rgba(0,234,255,.14), transparent 58%);
+    filter: blur(16px);
+    animation: monikerWaterPulse 5.8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes monikerKelpSway {
+    0%, 100% {
+        transform: translate3d(0, 0, 0) rotate(-.35deg) skewX(-.25deg);
+        filter: saturate(1) brightness(.94);
+    }
+    18% {
+        transform: translate3d(-.22%, .35%, 0) rotate(.45deg) skewX(.35deg);
+    }
+    38% {
+        transform: translate3d(.34%, -.25%, 0) rotate(1deg) skewX(.65deg);
+        filter: saturate(1.12) brightness(1.04);
+    }
+    62% {
+        transform: translate3d(-.3%, -.05%, 0) rotate(-.8deg) skewX(-.55deg);
+    }
+    82% {
+        transform: translate3d(.2%, .28%, 0) rotate(.3deg) skewX(.2deg);
+    }
+}
+
+@keyframes monikerWaterPulse {
+    0%, 100% { opacity: .34; transform: scale(.94, .9); }
+    50% { opacity: .72; transform: scale(1.06, 1.02); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .flex-hello-moniker,
+    .flex-hello-moniker::before {
+        animation: none;
+    }
+}
+
 h1:focus {
     outline: none;
 }
