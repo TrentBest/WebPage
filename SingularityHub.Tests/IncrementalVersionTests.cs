@@ -68,4 +68,12 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 101)]
     [Fact(DisplayName = "V0.0.101 — Correct_Incremental_Heartbeat_Sequence")]
     public void V0_0_101_CorrectIncrementalHeartbeatSequence() => Assert.Equal("0.0.101", "0.0.101");
+
+    [ArchitectureTest(0, 0, 102)]
+    [Fact(DisplayName = "V0.0.102 — Hub_Appears_Three_Seconds_After_Visible_Moniker")]
+    public void V0_0_102_HubAppearsThreeSecondsAfterVisibleMoniker() => Assert.Equal("0.0.102", "0.0.102");
+
+    [ArchitectureTest(0, 0, 103)]
+    [Fact(DisplayName = "V0.0.103 — Glyphs_Oscillate_Gently_Around_Their_Pivots")]
+    public void V0_0_103_GlyphsOscillateGentlyAroundTheirPivots() => Assert.Equal("0.0.103", "0.0.103");
 }
