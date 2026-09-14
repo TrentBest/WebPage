@@ -75,8 +75,6 @@
 
 <style>
     .experience-layer { position:absolute; inset:0; z-index:10; overflow:hidden; }
-
-    /* The Flex Experience is a field of independent glyphs, not one animated string. */
     .flex-hello { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.7rem; overflow:hidden; isolation:isolate; perspective:1000px; background:radial-gradient(circle at 50% 46%,rgba(0,234,255,.12),transparent 32%),radial-gradient(ellipse at 50% 90%,rgba(0,168,255,.12),transparent 48%),#020711; }
     .flex-hello::before { content:""; position:absolute; inset:0; z-index:-4; background-image:linear-gradient(rgba(0,234,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,44,255,.035) 1px,transparent 1px); background-size:44px 44px; animation:flexGridDrift 18s linear infinite; }
     .flex-hello::after { content:""; position:absolute; inset:0; z-index:-3; pointer-events:none; background:linear-gradient(180deg,rgba(2,7,17,.05),rgba(0,168,255,.035) 55%,rgba(2,7,17,.65)); }
@@ -90,55 +88,20 @@
     .flex-hello-line:nth-child(1) { font-size:clamp(1rem,2.1vw,1.8rem); letter-spacing:.42em; }
     .flex-hello-line:nth-child(2) { font-size:clamp(2rem,7vw,6.5rem); letter-spacing:.11em; font-weight:900; }
     .flex-hello-line:nth-child(3) { font-size:clamp(1.45rem,4.8vw,4.6rem); letter-spacing:.2em; font-weight:850; }
-
-    /*
-       The motion is the requested wave model:
-         phase = glyphIndex * phaseStep
-         x = sin(time * fx + phase) * Ax
-         y = sin(time * fy + phase + phiY) * Ay
-         z = sin(time * fz + phase + phiZ) * Az
-         rotateX = sin(time * rx + phase + phiRX) * Rx
-         rotateY = sin(time * ry + phase + phiRY) * Ry
-         rotateZ = sin(time * rz + phase + phiRZ) * Rz
-
-       --wave-time is a shared unitless cycle variable. Every glyph gets a different phase.
-    */
-    @@property --wave-time {
-        syntax: "&lt;number&gt;";
-        inherits: false;
-        initial-value: 0;
-    }
+    /* Unitless --wave-time avoids Razor interpreting CSS generic syntax as an HTML tag. */
+    @@property --wave-time { syntax: "&lt;number&gt;"; inherits: false; initial-value: 0; }
     .flex-hello-glyph { --phase:0deg; --glyph-color:#fff; display:inline-block; position:relative; color:var(--glyph-color); transform-style:preserve-3d; transform-origin:center 72%; will-change:transform,filter; text-shadow:0 0 7px color-mix(in srgb,var(--glyph-color) 82%,white),0 0 18px color-mix(in srgb,var(--glyph-color) 48%,transparent); animation:flexGlyphWave 9s linear infinite; }
     .flex-hello-glyph::after { content:""; position:absolute; left:20%; right:20%; bottom:-.2em; height:.08em; border-radius:50%; background:var(--glyph-color); opacity:.28; filter:blur(4px); transform:scaleX(.7); }
     @@keyframes flexGlyphWave { from { --wave-time:0; } to { --wave-time:1; } }
-    .flex-hello-glyph {
-        transform:
-            translate3d(
-                calc(sin(calc(var(--wave-time) * 360deg + var(--phase))) * 18px),
-                calc(sin(calc(var(--wave-time) * 421.2deg + var(--phase) + 55deg)) * 14px),
-                calc(sin(calc(var(--wave-time) * 298.8deg + var(--phase) + 120deg)) * 24px)
-            )
-            rotateX(calc(sin(calc(var(--wave-time) * 388.8deg + var(--phase) + 20deg)) * 7deg))
-            rotateY(calc(sin(calc(var(--wave-time) * 327.6deg + var(--phase) + 95deg)) * 11deg))
-            rotateZ(calc(sin(calc(var(--wave-time) * 406.8deg + var(--phase) + 145deg)) * 4.5deg));
-    }
+    .flex-hello-glyph { transform:translate3d(calc(sin(calc(var(--wave-time) * 360deg + var(--phase))) * 18px),calc(sin(calc(var(--wave-time) * 421.2deg + var(--phase) + 55deg)) * 14px),calc(sin(calc(var(--wave-time) * 298.8deg + var(--phase) + 120deg)) * 24px)) rotateX(calc(sin(calc(var(--wave-time) * 388.8deg + var(--phase) + 20deg)) * 7deg)) rotateY(calc(sin(calc(var(--wave-time) * 327.6deg + var(--phase) + 95deg)) * 11deg)) rotateZ(calc(sin(calc(var(--wave-time) * 406.8deg + var(--phase) + 145deg)) * 4.5deg)); }
     .flex-hello-state { position:relative; z-index:4; margin-top:.55rem; font-size:clamp(.65rem,1vw,.9rem); letter-spacing:.24em; color:#8eefff; opacity:.78; }
-
     @@keyframes flexGridDrift { from{background-position:0 0,0 0} to{background-position:0 44px,44px 0} }
     @@keyframes flexWaterBreath { 0%,100%{opacity:.42;transform:perspective(700px) rotateX(66deg) scale(1)} 50%{opacity:.82;transform:perspective(700px) rotateX(66deg) scale(1.04,1.08)} }
     @@keyframes flexOrbitOne { 0%,100%{opacity:.18;transform:scale(.96) rotateX(68deg) rotateZ(-11deg)} 50%{opacity:.72;transform:scale(1.04) rotateX(68deg) rotateZ(9deg)} }
     @@keyframes flexOrbitTwo { 0%,100%{opacity:.12;transform:scale(1.02) rotateX(68deg) rotateZ(19deg)} 50%{opacity:.55;transform:scale(.94) rotateX(68deg) rotateZ(-15deg)} }
     @@keyframes flexHelloBreath { 0%,100%{opacity:.7} 50%{opacity:1} }
-
-    @@media(max-width:700px){
-        .flex-hello-line:nth-child(1){font-size:clamp(.8rem,3vw,1.2rem);letter-spacing:.3em}
-        .flex-hello-line:nth-child(2){font-size:clamp(1.45rem,8vw,3.6rem);letter-spacing:.07em}
-        .flex-hello-line:nth-child(3){font-size:clamp(1.05rem,6vw,2.6rem);letter-spacing:.12em}
-    }
-    @@media(prefers-reduced-motion:reduce){
-        .flex-hello-water,.flex-hello-orbit,.flex-hello-kicker,.flex-hello-glyph{animation:none}
-        .flex-hello-glyph{transform:none}
-    }
+    @@media(max-width:700px){ .flex-hello-line:nth-child(1){font-size:clamp(.8rem,3vw,1.2rem);letter-spacing:.3em} .flex-hello-line:nth-child(2){font-size:clamp(1.45rem,8vw,3.6rem);letter-spacing:.07em} .flex-hello-line:nth-child(3){font-size:clamp(1.05rem,6vw,2.6rem);letter-spacing:.12em} }
+    @@media(prefers-reduced-motion:reduce){ .flex-hello-water,.flex-hello-orbit,.flex-hello-kicker,.flex-hello-glyph{animation:none} .flex-hello-glyph{transform:none} }
 </style>
 
 @code {
@@ -256,6 +219,8 @@
         var context = new LivingNodeContext
         {
             Id = ++nextNodeId,
+            Name = $"WorkshopLivingGuiNode-{nextNodeId}",
+            IsValid = true,
             X = x,
             Y = y,
             TargetX = targetX,
@@ -276,10 +241,7 @@
     private static void NodeReproduceEnter(IStateContext context) => ((LivingNodeContext)context).ReproductionRequested = true;
     private static void NodeReproduceUpdate(IStateContext context) { }
 
-    private void ExperienceChanged()
-    {
-        InvokeAsync(StateHasChanged);
-    }
+    private void ExperienceChanged() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
@@ -306,6 +268,9 @@
 
     private sealed class LivingNodeContext : IStateContext
     {
+        public string Name { get; set; } = string.Empty;
+        public int Context_ID { get; } = Random.Shared.Next();
+        public bool IsValid { get; set; }
         public int Id { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
