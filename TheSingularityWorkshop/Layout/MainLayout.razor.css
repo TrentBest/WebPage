@@ -30,14 +30,14 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
 .workshop-page.workshop-chrome-visible .workshop-top-row-placeholder { flex-basis: 3.5rem; height: 3.5rem; min-height: 3.5rem; padding-left: 2rem !important; padding-right: 1.5rem !important; border-bottom-width: 1px; opacity: 1; }
 .workshop-page .workshop-content { will-change: flex-basis, height, width; }
 
-/* The moniker is a field of independently animated glyphs. The parent never
-   pivots: each letter rides its own delayed wave and has its own rotation. */
+/* One traveling wave. Every row samples the same horizontal wave; row
+   membership changes only the vertical level, never the wave clock. */
 .workshop-page .workshop-content ::deep .hello-moniker { animation: none !important; transform: none !important; transform-style: preserve-3d; }
 .workshop-page .workshop-content ::deep .hello-line { position: relative; display: block; height: 1em; margin: 0; }
 .workshop-page .workshop-content ::deep .hello-line:nth-child(1) { width: 3.15em; }
 .workshop-page .workshop-content ::deep .hello-line:nth-child(2) { width: 10.55em; }
 .workshop-page .workshop-content ::deep .hello-line:nth-child(3) { width: 7.7em; }
-.workshop-page .workshop-content ::deep .hello-glyph { position: absolute; left: calc(50% + (var(--glyph-index) - var(--glyph-midpoint)) * .95em); top: 50%; width: 1em; margin: 0; text-align: center; transform-origin: 50% 55%; transform-style: preserve-3d; animation: workshopMonikerWave 3.8s cubic-bezier(.42,0,.58,1) infinite !important; animation-delay: calc(var(--phase-index) * -.11s) !important; will-change: transform, filter; }
+.workshop-page .workshop-content ::deep .hello-glyph { position: absolute; left: calc(50% + (var(--glyph-index) - var(--glyph-midpoint)) * .95em); top: 50%; width: 1em; margin: 0; text-align: center; transform-origin: 50% 55%; transform-style: preserve-3d; animation: workshopMonikerWave 3.8s cubic-bezier(.42,0,.58,1) infinite !important; animation-delay: calc((var(--glyph-index) - var(--glyph-midpoint)) * -.14s) !important; will-change: transform, filter; }
 .workshop-page .workshop-content ::deep .hello-glyph:nth-child(1) { --glyph-index: 0; }
 .workshop-page .workshop-content ::deep .hello-glyph:nth-child(2) { --glyph-index: 1; }
 .workshop-page .workshop-content ::deep .hello-glyph:nth-child(3) { --glyph-index: 2; }
@@ -53,11 +53,11 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
 .workshop-page .workshop-content ::deep .hello-line:nth-child(2) { --glyph-midpoint: 5; }
 .workshop-page .workshop-content ::deep .hello-line:nth-child(3) { --glyph-midpoint: 3.5; }
 @keyframes workshopMonikerWave {
-    0%, 100% { transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(-1.2deg) scale(1); filter: brightness(.92) saturate(.96); }
-    18% { transform: translate(calc(-50% - .025em), calc(-50% - .08em)) rotateX(3deg) rotateY(-4deg) rotateZ(2deg) scale(1.012); filter: brightness(1.02) saturate(1.04); }
-    38% { transform: translate(calc(-50% + .035em), calc(-50% - .18em)) rotateX(-2deg) rotateY(6deg) rotateZ(3.2deg) scale(1.025); filter: brightness(1.1) saturate(1.12); }
-    58% { transform: translate(calc(-50% - .03em), calc(-50% + .055em)) rotateX(4deg) rotateY(-7deg) rotateZ(-2.6deg) scale(1.008); filter: brightness(1.04) saturate(1.06); }
-    78% { transform: translate(calc(-50% + .02em), calc(-50% - .12em)) rotateX(-3deg) rotateY(5deg) rotateZ(1.8deg) scale(1.018); filter: brightness(1.07) saturate(1.1); }
+    0%, 100% { transform: translate(-50%, -50%) translateY(0) rotateX(0deg) rotateY(0deg) rotateZ(-1.2deg) scale(1); filter: brightness(.92) saturate(.96); }
+    18% { transform: translate(-50%, -50%) translateY(-.08em) rotateX(3deg) rotateY(-4deg) rotateZ(2deg) scale(1.012); filter: brightness(1.02) saturate(1.04); }
+    38% { transform: translate(-50%, -50%) translateY(-.18em) rotateX(-2deg) rotateY(6deg) rotateZ(3.2deg) scale(1.025); filter: brightness(1.1) saturate(1.12); }
+    58% { transform: translate(-50%, -50%) translateY(.055em) rotateX(4deg) rotateY(-7deg) rotateZ(-2.6deg) scale(1.008); filter: brightness(1.04) saturate(1.06); }
+    78% { transform: translate(-50%, -50%) translateY(-.12em) rotateX(-3deg) rotateY(5deg) rotateZ(1.8deg) scale(1.018); filter: brightness(1.07) saturate(1.1); }
 }
 
 @media (max-width: 640.98px) {
