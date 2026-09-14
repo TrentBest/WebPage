@@ -14,6 +14,7 @@
     max-height: none !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
+    container-type: size;
 }
 
 .hypervisor-shell .monolith-image {
@@ -30,14 +31,30 @@
     overflow: hidden !important;
 }
 
-@media (max-width: 700px) {
-    .hypervisor-shell .monolith-btn {
-        width: 80vw !important;
-        height: 50vh !important;
-    }
+.hypervisor-shell .monolith-btn::before {
+    z-index: 2 !important;
+    width: auto !important;
+    height: 72% !important;
+    aspect-ratio: 1 !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
 
-    .hypervisor-shell .monolith-image {
-        width: min(68vw, 42vh) !important;
-        height: min(68vw, 42vh) !important;
+.hypervisor-shell .avatar-portal { z-index: 1 !important; }
+
+.hypervisor-shell .monolith-btn:hover::before {
+    transform: translate(-50%, -50%) scale(1.2) !important;
+}
+
+@container (max-aspect-ratio: 1 / 1) {
+    .hypervisor-shell .monolith-btn::before {
+        width: 72% !important;
+        height: auto !important;
     }
+}
+
+@media (max-width: 700px) {
+    .hypervisor-shell .monolith-btn { width: 80vw !important; height: 50vh !important; }
+    .hypervisor-shell .monolith-image { width: min(68vw, 42vh) !important; height: min(68vw, 42vh) !important; }
 }
