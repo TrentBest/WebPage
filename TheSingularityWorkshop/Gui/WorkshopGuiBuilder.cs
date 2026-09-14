@@ -88,6 +88,13 @@ public class ElementBuilder
         return this;
     }
 
+    /// <summary>
+    /// Adds a child using the same semantic name used by composite GUI builders.
+    /// This keeps recursive composition fluent even when a builder has narrowed
+    /// back to the base ElementBuilder after an event or attribute operation.
+    /// </summary>
+    public ElementBuilder Content(ElementBuilder child) => Child(child);
+
     public ElementBuilder OnClick(Action action)
         => Attribute("onclick", EventCallback.Factory.Create(_receiver, action));
 
