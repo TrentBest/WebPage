@@ -1,48 +1,47 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace TheSingularityWorkshop.Gui;
 
 /// <summary>
-/// Small fluent entry point for Workshop-owned GUI construction.
-///
-/// The builder deliberately wraps Blazor's RenderTreeBuilder instead of making
-/// RenderTreeBuilder the vocabulary of the application. The Workshop can grow
-/// semantic operations here as the living GUI develops.
+/// Workshop-owned fluent vocabulary for recursive GUI construction.
+/// Application code describes GUI intent here; Blazor's RenderTreeBuilder remains
+/// an implementation detail at the rendering boundary.
 /// </summary>
 public static class WorkshopGui
 {
-    public static ElementBuilder Element(string tagName)
-        => new(tagName);
+    public static ElementBuilder Element(object receiver, string tagName)
+        => new(receiver, tagName);
 
-    public static ElementBuilder Panel()
-        => Element("div");
+    public static PanelGuiBuilder Panel(object receiver)
+        => new(receiver);
 
-    public static ElementBuilder Button()
-        => Element("button");
+    public static MultiPanelGuiBuilder MultiPanel(object receiver)
+        => new(receiver);
 
-    public static ElementBuilder Image()
-        => Element("img");
+    public static ButtonGuiBuilder Button(object receiver)
+        => new(receiver);
+
+    public static ElementBuilder Image(object receiver)
+        => Element(receiver, "img");
 }
 
 /// <summary>
-/// Fluent description of a small Blazor element tree.
+/// Recursive fluent description of a Blazor element.
 /// </summary>
-public sealed class ElementBuilder
+public class ElementBuilder
 {
+    private readonly object _receiver;
     private readonly string _tagName;
     private readonly List<(string Name, object? Value)> _attributes = new();
     private readonly List<RenderFragment> _children = new();
+    private readonly Dictionary<string, string> _styles = new(StringComparer.Ordinal);
 
-    internal ElementBuilder(string tagName)
+    internal ElementBuilder(object receiver, string tagName)
     {
+        _receiver = receiver;
         _tagName = tagName;
-    }
-
-    public ElementBuilder Class(string className)
-    {
-        _attributes.Add(("class", className));
-        return this;
     }
 
     public ElementBuilder Attribute(string name, object? value)
@@ -50,6 +49,26 @@ public sealed class ElementBuilder
         _attributes.Add((name, value));
         return this;
     }
+
+    public ElementBuilder AriaLabel(string value) => Attribute("aria-label", value);
+
+    public ElementBuilder Title(string value) => Attribute("title", value);
+
+    public ElementBuilder TabIndex(int value) => Attribute("tabindex", value);
+
+    public ElementBuilder Class(string className) => Attribute("class", className);
+
+    public ElementBuilder Style(string name, string value)
+    {
+        _styles[name] = value;
+        return this;
+    }
+
+    public ElementBuilder Position(double x, double y)
+        => Style("position", "absolute")
+            .Style("left", $"{x:0.##}%")
+            .Style("top", $"{y:0.##}%")
+            .Style("transform", "translate(-50%, -50%)");
 
     public ElementBuilder Text(string text)
     {
@@ -69,24 +88,45 @@ public sealed class ElementBuilder
         return this;
     }
 
-    /// <summary>
-    /// Produces the Blazor render fragment at the boundary of the Workshop GUI
-    /// abstraction. Application code should normally remain in fluent semantics.
-    /// </summary>
+    public ElementBuilder OnClick(Action action)
+        => Attribute("onclick", EventCallback.Factory.Create(_receiver, action));
+
+    public ElementBuilder OnKeyDown(Action<KeyboardEventArgs> action)
+        => Attribute("onkeydown", EventCallback.Factory.Create<KeyboardEventArgs>(_receiver, action));
+
+    public ElementBuilder OnMouseEnter(Action action)
+        => Attribute("onmouseenter", EventCallback.Factory.Create(_receiver, action));
+
+    public ElementBuilder OnMouseLeave(Action action)
+        => Attribute("onmouseleave", EventCallback.Factory.Create(_receiver, action));
+
+    public ElementBuilder PreventDefault(string eventName)
+        => Attribute($"{eventName}:preventDefault", true);
+
+    public ElementBuilder BuildChildren(params ElementBuilder[] children)
+    {
+        foreach (var child in children)
+            Child(child);
+
+        return this;
+    }
+
     public RenderFragment Build() => builder =>
     {
         builder.OpenElement(0, _tagName);
 
         var sequence = 1;
         foreach (var attribute in _attributes)
-        {
             builder.AddAttribute(sequence++, attribute.Name, attribute.Value);
+
+        if (_styles.Count > 0)
+        {
+            var style = string.Join(";", _styles.Select(x => $"{x.Key}:{x.Value}"));
+            builder.AddAttribute(sequence++, "style", style);
         }
 
         foreach (var child in _children)
-        {
             builder.AddContent(sequence++, child);
-        }
 
         builder.CloseElement();
     };
