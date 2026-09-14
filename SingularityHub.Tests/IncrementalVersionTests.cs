@@ -104,4 +104,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 111)]
     [Fact(DisplayName = "V0.0.111 — Repair_Recursive_Composition_And_Force_Navigation_Collapse_After_Selection")]
     public void V0_0_111_RepairRecursiveCompositionAndForceNavigationCollapseAfterSelection() => Assert.Equal("0.0.111", "0.0.111");
+
+    [ArchitectureTest(0, 0, 112)]
+    [Fact(DisplayName = "V0.0.112 — FSM_Forge_Provides_Reusable_Stock_And_Live_Preview")]
+    public void V0_0_112_FsmForgeProvidesReusableStockAndLivePreview() => Assert.Equal("0.0.112", "0.0.112");
 }
