@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using TheSingularityWorkshop.Infrastructure.Hub;
 
 namespace TheSingularityWorkshop.Gui;
@@ -141,7 +142,7 @@ public static class SpatialExploreGuiBuilder
         var header = WorkshopGui.Panel(receiver)
             .Style("margin", ".75rem")
             .Style("padding", ".8rem 1rem")
-            .Style("border", $"1px solid rgba(0,234,255,.18)")
+            .Style("border", "1px solid rgba(0,234,255,.18)")
             .Style("background", "rgba(1,7,15,.82)")
             .Style("display", "flex")
             .Style("justify-content", "space-between")
@@ -448,133 +449,76 @@ public static class SpatialExploreGuiBuilder
         var selected = rooms.FirstOrDefault(x => x.Id == selectedRoomId);
 
         if (inside is not null)
-            panel.Content(RoomDetails(receiver, inside, "INSIDE EXPERIENCE", exitRoom, true));
-        else if (selected is not null)
         {
-            panel.Content(RoomDetails(receiver, selected, "FOCUS ACQUIRED", null, false));
-            if (selected.Id == "unknown" && !unknownUnlocked)
-                panel.Content(Warning(receiver, unlockUnknown));
-            else
-                panel.Content(EnterButton(receiver, enterSelectedRoom));
+            panel.Content(WorkshopGui.Element(receiver, "h2").Style("margin", ".8rem 0 .3rem").Style("font-size", "1.2rem").Text(inside.Name));
+            panel.Content(WorkshopGui.Element(receiver, "div").Style("color", Magenta).Style("font-size", ".48rem").Style("letter-spacing", ".12em").Text("INSIDE EXPERIENCE"));
+            panel.Content(WorkshopGui.Element(receiver, "p").Style("margin", ".8rem 0").Style("color", "#91aab2").Style("font-family", "system-ui, sans-serif").Style("font-size", ".8rem").Text(inside.Description));
+            panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "auto").Style("padding", ".7rem").Style("border", "1px solid rgba(0,234,255,.12)").Style("color", "#58747e").Style("font-size", ".55rem").Text($"ARCHITECTURE // {inside.Architecture}"));
+            panel.Content(ActionButton(receiver, "← EXIT TO MAP", exitRoom, Cyan));
+            return panel;
+        }
+
+        if (selected is null)
+        {
+            panel.Content(WorkshopGui.Element(receiver, "h2").Style("margin", ".8rem 0 .3rem").Style("font-size", "1.2rem").Text("Select a space"));
+            panel.Content(WorkshopGui.Element(receiver, "p").Style("color", "#718e99").Style("font-family", "system-ui, sans-serif").Style("font-size", ".8rem").Text("Approach a boundary or interactable. Focus is the first form of discovery."));
+            panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "auto").Style("color", "#46636e").Style("font-size", ".48rem").Style("letter-spacing", ".12em").Text("WORKSHOP // SPATIAL MODEL"));
+            return panel;
+        }
+
+        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".8rem").Style("color", selected.Architecture == "UNKNOWN" ? Yellow : Cyan).Style("font-size", ".5rem").Style("letter-spacing", ".18em").Text(selected.Architecture));
+        panel.Content(WorkshopGui.Element(receiver, "h2").Style("margin", ".5rem 0 .25rem").Style("font-size", "1.5rem").Text(selected.Name));
+        panel.Content(WorkshopGui.Element(receiver, "div").Style("color", "#58747e").Style("font-size", ".5rem").Style("letter-spacing", ".1em").Text(selected.Kind));
+        panel.Content(WorkshopGui.Element(receiver, "p").Style("margin", ".9rem 0").Style("color", "#91aab2").Style("font-family", "system-ui, sans-serif").Style("font-size", ".8rem").Text(selected.Description));
+
+        if (selected.Id == "unknown" && !unknownUnlocked)
+        {
+            panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "auto").Style("padding", ".75rem").Style("border", $"1px solid {Yellow}55").Style("background", "rgba(255,211,77,.04)").Style("color", Yellow).Style("font-size", ".52rem").Style("letter-spacing", ".08em").Text("WARNING // UNMAPPED STRUCTURE"));
+            panel.Content(ActionButton(receiver, "WARNING...", unlockUnknown, Yellow));
         }
         else
-            panel.Content(Orientation(receiver));
+        {
+            panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "auto").Style("padding", ".7rem").Style("border", "1px solid rgba(0,234,255,.12)").Style("color", "#58747e").Style("font-size", ".55rem").Text($"BOUNDARY // {selected.Architecture}"));
+            panel.Content(ActionButton(receiver, "ENTER ROOM →", enterSelectedRoom, Magenta));
+        }
 
-        panel.Content(BoundaryKey(receiver));
         return panel;
     }
 
-    private static ElementBuilder RoomDetails(object receiver, SpatialRoom room, string state, Action? exitRoom, bool inside)
-    {
-        var details = WorkshopGui.Panel(receiver).Style("padding-top", "1.5rem").Style("border", "0").Style("background", "transparent");
-        details.Content(WorkshopGui.Element(receiver, "span").Style("color", Green).Style("font-size", ".48rem").Style("letter-spacing", ".16em").Text(state));
-        details.Heading(room.Name).Style("margin", ".6rem 0 .7rem").Style("color", White).Style("font-size", "1.45rem").Style("line-height", "1.05");
-        details.Paragraph(room.Description).Style("margin", "0").Style("color", "#75929c").Style("font-family", "system-ui, sans-serif").Style("font-size", ".8rem").Style("line-height", "1.55");
-        details.Content(DetailRow(receiver, "BOUNDARY", room.Boundary));
-        details.Content(DetailRow(receiver, "LIVE DATA", room.Data));
-        if (inside && exitRoom is not null)
-            details.Content(WorkshopGui.Button(receiver).Label("← EXIT TO MAP").Style("width", "100%").Style("margin-top", "1.2rem").Style("padding", ".8rem").Style("border", $"1px solid {Cyan}").Style("background", "rgba(0,234,255,.035)").Style("color", Cyan).Style("font", "800 .55rem Consolas").Style("letter-spacing", ".12em").OnClick(exitRoom));
-        return details;
-    }
-
-    private static ElementBuilder DetailRow(object receiver, string label, string value)
-    {
-        var row = WorkshopGui.MultiPanel(receiver)
-            .Style("display", "flex").Style("justify-content", "space-between").Style("gap", "1rem")
-            .Style("margin-top", "1rem").Style("padding", ".55rem 0")
-            .Style("border-top", "1px solid rgba(0,234,255,.08)").Style("font-size", ".47rem");
-        row.Content(WorkshopGui.Element(receiver, "span").Style("color", "#4d6973").Text(label));
-        row.Content(WorkshopGui.Element(receiver, "strong").Style("color", "#d8faff").Style("text-align", "right").Text(value));
-        return row;
-    }
-
-    private static ElementBuilder Warning(object receiver, Action unlockUnknown)
-    {
-        var frame = WorkshopGui.Panel(receiver)
-            .Style("margin-top", "1.2rem").Style("padding", ".8rem")
-            .Style("border", $"1px dashed {Yellow}").Style("background", "rgba(255,211,77,.025)")
-            .Style("align-items", "center").Style("text-align", "center");
-        frame.Content(WorkshopGui.Element(receiver, "span").Style("color", Yellow).Style("font-size", ".45rem").Style("letter-spacing", ".14em").Text("UNMAPPED STRUCTURE"));
-        frame.Content(WorkshopGui.Element(receiver, "strong").Style("margin", ".55rem 0").Style("color", White).Style("font-size", ".6rem").Text("PROCEED WITH DISCOVERY?"));
-        frame.Content(WorkshopGui.Button(receiver).Label("WARNING...").Style("width", "100%").Style("padding", ".7rem").Style("border", $"1px solid {Yellow}").Style("background", "rgba(255,211,77,.06)").Style("color", Yellow).Style("font", "800 .62rem Consolas").Style("letter-spacing", ".1em").OnClick(unlockUnknown));
-        return frame;
-    }
-
-    private static ElementBuilder EnterButton(object receiver, Action enterSelectedRoom)
-        => WorkshopGui.Button(receiver).Label("ENTER ROOM →")
-            .Style("width", "100%").Style("margin-top", "1.2rem").Style("padding", ".8rem")
-            .Style("border", $"1px solid {Cyan}").Style("background", "rgba(0,234,255,.035)")
-            .Style("color", Cyan).Style("font", "800 .55rem Consolas").Style("letter-spacing", ".12em")
-            .OnClick(enterSelectedRoom);
-
-    private static ElementBuilder Orientation(object receiver)
-    {
-        var panel = WorkshopGui.Panel(receiver).Style("padding-top", "1.5rem").Style("border", "0").Style("background", "transparent");
-        panel.Content(WorkshopGui.Element(receiver, "span").Style("color", Green).Style("font-size", ".48rem").Style("letter-spacing", ".16em").Text("NO TARGET"));
-        panel.Heading("Explore freely.").Style("margin", ".6rem 0 .7rem").Style("color", White).Style("font-size", "1.45rem");
-        panel.Paragraph("Your avatar is the dot. The Workshop is the map. Move through the environment and approach anything that catches your eye.")
-            .Style("color", "#75929c").Style("font-family", "system-ui, sans-serif").Style("font-size", ".8rem").Style("line-height", "1.55");
-
-        var rules = WorkshopGui.MultiPanel(receiver).Style("display", "grid").Style("gap", ".6rem").Style("margin-top", "1.3rem");
-        rules.Panel(p => Rule(p, "01", "APPROACH", "Walk toward a structure."));
-        rules.Panel(p => Rule(p, "02", "BREATHE", "Hovering reveals what can be touched."));
-        rules.Panel(p => Rule(p, "03", "ENTER", "Cross the boundary and change worlds."));
-        rules.Panel(p => Rule(p, "04", "EXIT", "Return to where you were."));
-        panel.Content(rules);
-        return panel;
-    }
-
-    private static void Rule(PanelGuiBuilder panel, string number, string title, string description)
-    {
-        panel.Style("display", "grid").Style("grid-template-columns", "1.4rem 1fr").Style("column-gap", ".45rem")
-            .Style("padding-bottom", ".55rem").Style("border-bottom", "1px solid rgba(0,234,255,.07)");
-        panel.Content(WorkshopGui.Element(panel, "b").Style("color", Magenta).Style("font-size", ".5rem").Text(number));
-        panel.Content(WorkshopGui.Element(panel, "span").Style("color", "#d9faff").Style("font-size", ".5rem").Style("letter-spacing", ".1em").Text(title));
-        panel.Content(WorkshopGui.Element(panel, "small").Style("grid-column", "2").Style("color", "#536f79").Style("font-family", "system-ui, sans-serif").Style("font-size", ".65rem").Text(description));
-    }
-
-    private static ElementBuilder BoundaryKey(object receiver)
-    {
-        var key = WorkshopGui.MultiPanel(receiver).Style("margin-top", "auto").Style("padding-top", "1rem").Style("border-top", "1px solid rgba(0,234,255,.12)").Style("display", "grid").Style("gap", ".5rem");
-        KeyRow(key, receiver, Green, "EXPERIENCE", "presentation / sensory");
-        KeyRow(key, receiver, Cyan, "ENGINEERING", "FSM / Hub / runtime");
-        KeyRow(key, receiver, Magenta, "CREATION", "MicroBundles / composition");
-        return key;
-    }
-
-    private static void KeyRow(MultiPanelGuiBuilder key, object receiver, string color, string name, string detail)
-    {
-        var row = WorkshopGui.MultiPanel(receiver).Style("display", "grid").Style("grid-template-columns", "8px 1fr").Style("column-gap", ".5rem").Style("align-items", "center");
-        row.Content(WorkshopGui.Element(receiver, "i").Style("width", "6px").Style("height", "6px").Style("border-radius", "50%").Style("background", color));
-        row.Content(WorkshopGui.Element(receiver, "span").Style("font-size", ".48rem").Style("letter-spacing", ".08em").Text(name));
-        row.Content(WorkshopGui.Element(receiver, "small").Style("grid-column", "2").Style("color", "#4d6973").Style("font-size", ".42rem").Text(detail));
-        key.Content(row);
-    }
+    private static ElementBuilder ActionButton(object receiver, string label, Action action, string accent)
+        => WorkshopGui.Button(receiver).Label(label)
+            .Style("margin-top", ".7rem")
+            .Style("padding", ".7rem .8rem")
+            .Style("border", $"1px solid {accent}77")
+            .Style("background", $"{accent}12")
+            .Style("color", accent)
+            .Style("font-family", "inherit")
+            .Style("font-size", ".55rem")
+            .Style("letter-spacing", ".12em")
+            .Style("cursor", "pointer")
+            .OnClick(action);
 
     private static ElementBuilder Footer(object receiver)
-    {
-        var footer = WorkshopGui.MultiPanel(receiver)
-            .Style("display", "flex").Style("justify-content", "space-between").Style("gap", "1rem")
-            .Style("padding", ".35rem .75rem").Style("color", "#405b65")
-            .Style("font-size", ".43rem").Style("letter-spacing", ".08em");
-        footer.Content(WorkshopGui.Element(receiver, "span").Style("color", Cyan).Text("THE BUILDER IS THE DOCUMENTATION."));
-        footer.Content(WorkshopGui.Element(receiver, "span").Text("THIS MAP IS AN EXPERIENCE, NOT A CARD CATALOG."));
-        footer.Content(WorkshopGui.Element(receiver, "span").Text("V0.0.109"));
-        return footer;
-    }
+        => WorkshopGui.Panel(receiver)
+            .Style("margin", ".75rem")
+            .Style("padding", ".65rem 1rem")
+            .Style("border", "1px solid rgba(0,234,255,.1)")
+            .Style("background", "rgba(1,5,10,.7)")
+            .Style("align-items", "center")
+            .Style("text-align", "center")
+            .Style("z-index", "2")
+            .Content(WorkshopGui.Element(receiver, "span").Style("color", "#5a7781").Style("font-size", ".48rem").Style("letter-spacing", ".16em").Text("THE BUILDER IS THE DOCUMENTATION."))
+            .Content(WorkshopGui.Element(receiver, "span").Style("color", "#334b54").Style("font-size", ".43rem").Style("letter-spacing", ".1em").Text("EXPERIENCE // NOT A CARD CATALOG"));
 
-    private static ElementBuilder Animate(object receiver, string attributeName, string values, string dur, string begin)
+    private static ElementBuilder Animate(object receiver, string attributeName, string values, string duration, string begin)
         => WorkshopGui.Element(receiver, "animate")
             .Attribute("attributeName", attributeName)
             .Attribute("values", values)
-            .Attribute("dur", dur)
+            .Attribute("dur", duration)
             .Attribute("begin", begin)
             .Attribute("repeatCount", "indefinite");
 }
 
-/// <summary>
-/// Data needed to present one spatially discoverable Workshop structure.
-/// </summary>
 public sealed record SpatialRoom(
     string Id,
     string Name,
@@ -582,5 +526,5 @@ public sealed record SpatialRoom(
     double X,
     double Y,
     string Description,
-    string Boundary,
-    string Data);
+    string Architecture,
+    string? Capability);
