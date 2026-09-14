@@ -4,8 +4,8 @@ namespace SingularityHub.Tests;
 
 /// <summary>
 /// The chronological development heartbeat for the repository.
-/// Each development commit gets one immutable, literal heartbeat test.
-/// Behavioral tests belong in their own test files.
+/// Each development version is represented by one literal assertion.
+/// Behavioral coverage belongs in the other test files.
 /// </summary>
 public sealed class IncrementalVersionTests
 {
@@ -60,4 +60,12 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 99)]
     [Fact(DisplayName = "V0.0.99 — Restore_Hub_Contracts_And_Simplify_Incremental_Heartbeat")]
     public void V0_0_99_RestoreHubContractsAndSimplifyIncrementalHeartbeat() => Assert.Equal("0.0.99", "0.0.99");
+
+    [ArchitectureTest(0, 0, 100)]
+    [Fact(DisplayName = "V0.0.100 — Simplify_Incremental_Ledger_To_One_Literal_Heartbeat_Per_Version")]
+    public void V0_0_100_SimplifyIncrementalLedgerToOneLiteralHeartbeatPerVersion() => Assert.Equal("0.0.100", "0.0.100");
+
+    [ArchitectureTest(0, 0, 101)]
+    [Fact(DisplayName = "V0.0.101 — Correct_Incremental_Heartbeat_Sequence")]
+    public void V0_0_101_CorrectIncrementalHeartbeatSequence() => Assert.Equal("0.0.101", "0.0.101");
 }
