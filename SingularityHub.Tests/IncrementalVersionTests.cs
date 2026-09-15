@@ -128,4 +128,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 117)]
     [Fact(DisplayName = "V0.0.117 — Explore_Blueprint_Panel_Becomes_Viewport_Canvas")]
     public void V0_0_117_ExploreBlueprintPanelBecomesViewportCanvas() => Assert.Equal("0.0.117", "0.0.117");
+
+    [ArchitectureTest(0, 0, 118)]
+    [Fact(DisplayName = "V0.0.118 — Explore_Spatial_Placement_Probe_Is_350x200_And_Offset_From_Player_Origin")]
+    public void V0_0_118_ExploreSpatialPlacementProbeIs350x200AndOffsetFromPlayerOrigin() => Assert.Equal("0.0.118", "0.0.118");
 }
