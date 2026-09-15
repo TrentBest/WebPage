@@ -41,19 +41,19 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
     public SoftwarePatternsAnnotationMicroBundle SoftwarePatternsAnnotation { get; }
 
     /// <inheritdoc />
-    public ulong ExperienceId => ExploreExperienceMicroBundle.ExperienceId;
+    ulong IExperience.Id => ExperienceId;
 
     /// <inheritdoc />
-    public string Name => "WORKSHOP EXPLORE";
+    string IExperience.Name => "WORKSHOP EXPLORE";
 
     /// <inheritdoc />
-    public BundleVersion Version => new(1, 0, 0);
+    BundleVersion IExperience.Version => new(1, 0, 0);
 
     /// <inheritdoc />
-    public OntologySignature Ontology => new(1, 1, 1, 1, 1, 1, 1, 1, checked((int)ExploreExperienceMicroBundle.ExperienceId));
+    OntologySignature IExperience.Ontology => new(1, 1, 1, 1, 1, 1, 1, 1, checked((int)ExperienceId));
 
     /// <inheritdoc />
-    public IReadOnlyList<ulong> MicroBundleIds =>
+    IReadOnlyList<ulong> IExperience.MicroBundleIds =>
     [
         Navigation.Id,
         User.Id,
@@ -64,7 +64,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
     ];
 
     /// <inheritdoc />
-    public IReadOnlyList<ulong> Capabilities =>
+    IReadOnlyList<ulong> IExperience.Capabilities =>
     [
         HubCapabilityIds.SpatialNavigation,
         HubCapabilityIds.VisitorIdentity,
@@ -74,10 +74,10 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
     ];
 
     /// <inheritdoc />
-    public IReadOnlyList<ulong> SensorySystems => [1];
+    IReadOnlyList<ulong> IExperience.SensorySystems => [1];
 
     /// <inheritdoc />
-    public IReadOnlyList<string> ProcessingGroups =>
+    IReadOnlyList<string> IExperience.ProcessingGroups =>
     [
         "MicroBundle_2100",
         "MicroBundle_2101",
