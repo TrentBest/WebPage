@@ -116,4 +116,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 114)]
     [Fact(DisplayName = "V0.0.114 — Repair_FSM_API_Type_Alias_And_Forge_Preview_Construction")]
     public void V0_0_114_RepairFsmApiTypeAliasAndForgePreviewConstruction() => Assert.Equal("0.0.114", "0.0.114");
+
+    [ArchitectureTest(0, 0, 115)]
+    [Fact(DisplayName = "V0.0.115 — Explore_Workshop_Forge_Floorplan_And_Breathing_Avatar")]
+    public void V0_0_115_ExploreWorkshopForgeFloorplanAndBreathingAvatar() => Assert.Equal("0.0.115", "0.0.115");
 }
