@@ -47,4 +47,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 123)] [Fact(DisplayName = "V0.0.123 — Chemistry_Lab_Atom_Domain_And_Elemental_Arbitration_Foundation")] public void V0_0_123_ChemistryLabAtomDomainAndElementalArbitrationFoundation() => Assert.Equal("0.0.123", "0.0.123");
     [ArchitectureTest(0, 0, 124)] [Fact(DisplayName = "V0.0.124 — Chemistry_MicroBundle_Bridges_Workshop_And_Hub_Contracts")] public void V0_0_124_ChemistryMicroBundleBridgesWorkshopAndHubContracts() => Assert.Equal("0.0.124", "0.0.124");
     [ArchitectureTest(0, 0, 125)] [Fact(DisplayName = "V0.0.125 — Architectural_Shop_Draws_And_Captures_Floor_Plans_With_Vertical_Circulation")] public void V0_0_125_ArchitecturalShopDrawsAndCapturesFloorPlansWithVerticalCirculation() => Assert.Equal("0.0.125", "0.0.125");
+    [ArchitectureTest(0, 0, 126)] [Fact(DisplayName = "V0.0.126 — Research_Hadron_Collider_And_Workshop_Orbital_Tether")] public void V0_0_126_ResearchHadronColliderAndWorkshopOrbitalTether() => Assert.Equal("0.0.126", "0.0.126");
 }
