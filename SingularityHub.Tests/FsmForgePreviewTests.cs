@@ -30,6 +30,7 @@ public sealed class FsmForgePreviewTests
         Assert.Equal(
             new[]
             {
+                "OnEnter → Idle",
                 "OnUpdate → Idle",
                 "OnExit → Idle"
             },
