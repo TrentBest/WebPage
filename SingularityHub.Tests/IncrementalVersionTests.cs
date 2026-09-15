@@ -63,7 +63,7 @@ public sealed class IncrementalVersionTests
 
     [ArchitectureTest(0, 0, 100)]
     [Fact(DisplayName = "V0.0.100 — Simplify_Incremental_Ledger_To_One_Literal_Heartbeat_Per_Version")]
-    public void V0_0_100_SimplifyIncrementalLedgerToOneLiteralHeartbeatPerVersion() => Assert.Equal("0.0.100", "0.0.100");
+    public void V0_0_100_SimplifyIncrementalLedgerToOneLiteralHeartbeat() => Assert.Equal("0.0.100", "0.0.100");
 
     [ArchitectureTest(0, 0, 101)]
     [Fact(DisplayName = "V0.0.101 — Correct_Incremental_Heartbeat_Sequence")]
@@ -92,4 +92,44 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 107)]
     [Fact(DisplayName = "V0.0.107 — Collapse_Hub_Navigation_And_Turn_Build_Into_Create_Workspace")]
     public void V0_0_107_CollapseHubNavigationAndTurnBuildIntoCreateWorkspace() => Assert.Equal("0.0.107", "0.0.107");
+
+    [ArchitectureTest(0, 0, 108)]
+    [Fact(DisplayName = "V0.0.108 — Reforge_Explore_As_A_Spatial_Workshop_Experience")]
+    public void V0_0_108_ReforgeExploreAsASpatialWorkshopExperience() => Assert.Equal("0.0.108", "0.0.108");
+
+    [ArchitectureTest(0, 0, 109)]
+    [Fact(DisplayName = "V0.0.109 — Explore_Presentation_Moved_From_CSS_Monolith_To_Recursive_GUI_Builders")]
+    public void V0_0_109_ExplorePresentationMovedFromCssMonolithToRecursiveGuiBuilders() => Assert.Equal("0.0.109", "0.0.109");
+
+    [ArchitectureTest(0, 0, 111)]
+    [Fact(DisplayName = "V0.0.111 — Repair_Recursive_Composition_And_Force_Navigation_Collapse_After_Selection")]
+    public void V0_0_111_RepairRecursiveCompositionAndForceNavigationCollapseAfterSelection() => Assert.Equal("0.0.111", "0.0.111");
+
+    [ArchitectureTest(0, 0, 112)]
+    [Fact(DisplayName = "V0.0.112 — FSM_Forge_Provides_Reusable_Stock_And_Live_Preview")]
+    public void V0_0_112_FsmForgeProvidesReusableStockAndLivePreview() => Assert.Equal("0.0.112", "0.0.112");
+
+    [ArchitectureTest(0, 0, 113)]
+    [Fact(DisplayName = "V0.0.113 — Repair_FSM_Forge_API_Binding_And_Recursive_Render_Boundary")]
+    public void V0_0_113_RepairFsmForgeApiBindingAndRecursiveRenderBoundary() => Assert.Equal("0.0.113", "0.0.113");
+
+    [ArchitectureTest(0, 0, 114)]
+    [Fact(DisplayName = "V0.0.114 — Repair_FSM_API_Type_Alias_And_Forge_Preview_Construction")]
+    public void V0_0_114_RepairFsmApiTypeAliasAndForgePreviewConstruction() => Assert.Equal("0.0.114", "0.0.114");
+
+    [ArchitectureTest(0, 0, 115)]
+    [Fact(DisplayName = "V0.0.115 — Explore_Workshop_Forge_Floorplan_And_Breathing_Avatar")]
+    public void V0_0_115_ExploreWorkshopForgeFloorplanAndBreathingAvatar() => Assert.Equal("0.0.115", "0.0.115");
+
+    [ArchitectureTest(0, 0, 116)]
+    [Fact(DisplayName = "V0.0.116 — Explore_Becomes_A_Navigable_Workshop_Blueprint_With_Click_To_Walk")]
+    public void V0_0_116_ExploreBecomesANavigableWorkshopBlueprintWithClickToWalk() => Assert.Equal("0.0.116", "0.0.116");
+
+    [ArchitectureTest(0, 0, 117)]
+    [Fact(DisplayName = "V0.0.117 — Explore_Blueprint_Panel_Becomes_Viewport_Canvas")]
+    public void V0_0_117_ExploreBlueprintPanelBecomesViewportCanvas() => Assert.Equal("0.0.117", "0.0.117");
+
+    [ArchitectureTest(0, 0, 118)]
+    [Fact(DisplayName = "V0.0.118 — Explore_Spatial_Placement_Probe_Is_350x200_And_Offset_From_Player_Origin")]
+    public void V0_0_118_ExploreSpatialPlacementProbeIs350x200AndOffsetFromPlayerOrigin() => Assert.Equal("0.0.118", "0.0.118");
 }
