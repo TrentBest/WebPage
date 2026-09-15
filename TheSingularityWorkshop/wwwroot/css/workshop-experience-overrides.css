@@ -1,0 +1,18 @@
+/* Global Workshop experience overrides. These are intentionally tiny: the
+   recursive builders remain authoritative for presentation; this file only
+   handles document-level viewport behavior that component-scoped CSS cannot. */
+html:has(#workshop-spatial-map),
+body:has(#workshop-spatial-map),
+#app:has(#workshop-spatial-map),
+.page:has(#workshop-spatial-map),
+main:has(#workshop-spatial-map),
+article:has(#workshop-spatial-map) {
+    overflow: hidden !important;
+}
+
+/* The avatar portal on the opening gesture is deliberately just a little
+   heavier than the monolith border so the visitor reads it as the identity
+   core of the Workshop rather than another decorative ring. */
+.monolith-btn::before {
+    border-width: 3px !important;
+}
