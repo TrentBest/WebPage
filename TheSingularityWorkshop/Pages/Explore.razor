@@ -1,9 +1,7 @@
 @page "/explore"
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.Gui
-@using TheSingularityWorkshop.Infrastructure.Hub
 @using TheSingularityWorkshop.Workshop.MicroBundles
-@inject HubRuntime Runtime
 @implements IDisposable
 
 <PageTitle>Explore // The Singularity Workshop</PageTitle>
@@ -58,7 +56,6 @@
 
         var world = SpatialWorldGuiBuilder.Build(
             this,
-            Runtime,
             Rooms,
             unknownUnlocked,
             AvatarX,
