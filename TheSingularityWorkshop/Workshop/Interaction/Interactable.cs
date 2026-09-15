@@ -13,13 +13,20 @@ public enum InteractionScope
     Contents
 }
 
+/// <summary>Input that may cause an interactable to execute.</summary>
+[Flags]
+public enum InteractionTrigger
+{
+    None = 0,
+    Hover = 1,
+    Click = 2,
+    HoverOrClick = Hover | Click
+}
+
 /// <summary>Stable point at which a visitor arrives before an interaction executes.</summary>
 public readonly record struct InteractionPoint(double X, double Y, double Z = 0);
 
-/// <summary>
-/// Runtime context used to determine which interactions are currently eligible.
-/// Context is deliberately small so it can be projected into 2D, 2.5D, or 3D later.
-/// </summary>
+/// <summary>Runtime context used to determine which interactions are currently eligible.</summary>
 public sealed record InteractionContext(
     string SurfaceId,
     InteractionScope Scope,
@@ -34,20 +41,13 @@ public interface IInteractableBehavior
     void Execute(InteractionContext context);
 }
 
-/// <summary>
-/// Cheap eligibility predicate evaluated before behavior. Expensive interaction
-/// logic must not be invoked for an interactable that fails this filter.
-/// </summary>
+/// <summary>Cheap eligibility predicate evaluated before behavior.</summary>
 public interface IInteractableAvailabilityFilter
 {
     bool CanRun(Interactable interactable, InteractionContext context);
 }
 
-/// <summary>
-/// A generic interaction node. Children form a hierarchy such as:
-/// Workshop → Chemistry Lab → Desk → Drawer → Drawer Contents.
-/// A child is not evaluated until its parent surface is active.
-/// </summary>
+/// <summary>Generic interaction node with hierarchical children and declared input triggers.</summary>
 public sealed class Interactable
 {
     private readonly List<Interactable> _children = [];
@@ -58,7 +58,8 @@ public sealed class Interactable
         InteractionScope scope,
         InteractionPoint interactionPoint,
         IInteractableBehavior behavior,
-        IInteractableAvailabilityFilter? availabilityFilter = null)
+        IInteractableAvailabilityFilter? availabilityFilter = null,
+        InteractionTrigger triggers = InteractionTrigger.Click)
     {
         if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Interactable id is required.", nameof(id));
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Interactable name is required.", nameof(name));
@@ -70,6 +71,7 @@ public sealed class Interactable
         InteractionPoint = interactionPoint;
         Behavior = behavior;
         AvailabilityFilter = availabilityFilter;
+        Triggers = triggers;
     }
 
     public string Id { get; }
@@ -78,6 +80,7 @@ public sealed class Interactable
     public InteractionPoint InteractionPoint { get; }
     public IInteractableBehavior Behavior { get; }
     public IInteractableAvailabilityFilter? AvailabilityFilter { get; }
+    public InteractionTrigger Triggers { get; }
     public Interactable? Parent { get; private set; }
     public IReadOnlyList<Interactable> Children => _children;
 
@@ -97,12 +100,27 @@ public sealed class Interactable
         ArgumentNullException.ThrowIfNull(context);
         return AvailabilityFilter?.CanRun(this, context) ?? true;
     }
+
+    public bool Supports(InteractionTrigger trigger) => (Triggers & trigger) == trigger;
 }
 
-/// <summary>
-/// Filters a hierarchy before behavior evaluation. Only the active surface's
-/// runnable children are returned; hidden or unavailable branches are not inspected.
-/// </summary>
+/// <summary>Executes an eligible interactable only for a declared trigger.</summary>
+public sealed class InteractableExecutor
+{
+    public bool TryExecute(Interactable interactable, InteractionTrigger trigger, InteractionContext context)
+    {
+        ArgumentNullException.ThrowIfNull(interactable);
+        ArgumentNullException.ThrowIfNull(context);
+
+        if (!interactable.Supports(trigger) || !interactable.CanRun(context))
+            return false;
+
+        interactable.Behavior.Execute(context);
+        return true;
+    }
+}
+
+/// <summary>Filters a hierarchy before behavior evaluation.</summary>
 public sealed class InteractableFilter
 {
     public IReadOnlyList<Interactable> GetRunnable(
@@ -112,9 +130,7 @@ public sealed class InteractableFilter
         ArgumentNullException.ThrowIfNull(candidates);
         ArgumentNullException.ThrowIfNull(context);
 
-        return candidates
-            .Where(x => x.CanRun(context))
-            .ToArray();
+        return candidates.Where(x => x.CanRun(context)).ToArray();
     }
 }
 
