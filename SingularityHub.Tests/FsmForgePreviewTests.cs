@@ -31,18 +31,24 @@ public sealed class FsmForgePreviewTests
             new[]
             {
                 "OnUpdate → Idle",
-                "OnExit → Idle",
-                "OnEnter → Forging"
+                "OnExit → Idle"
             },
             preview.Events);
 
         preview.Tick();
+        Assert.Equal("Forging", preview.State);
+        Assert.Contains("OnEnter → Forging", preview.Events);
+        Assert.Contains("OnUpdate → Forging (1)", preview.Events);
+
         preview.Tick();
         preview.Tick();
 
         Assert.Equal("Finished", preview.State);
         Assert.Equal(3, preview.TickCount);
         Assert.Contains("OnExit → Forging", preview.Events);
+
+        preview.Tick();
+        Assert.Equal("Finished", preview.State);
         Assert.Contains("OnEnter → Finished", preview.Events);
 
         preview.Stop();
