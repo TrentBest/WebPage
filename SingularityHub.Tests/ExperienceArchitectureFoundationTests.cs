@@ -63,7 +63,7 @@ public sealed class ExperienceArchitectureFoundationTests : IDisposable
     public void MicroBundle_HubArbitrationConvergesAfterItsContribution()
     {
         using var bundle = new MicroBundle(1999, "Arbitration Test", new WebMicroBundleProvider());
-        var hub = new SingularityHub();
+        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub();
         var contract = (TheSingularityWorkshop.SingularityHub.IMicroBundle)bundle;
 
         Assert.True(contract.Arbitrate(hub, 0));
