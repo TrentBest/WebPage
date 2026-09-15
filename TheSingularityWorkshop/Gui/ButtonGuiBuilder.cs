@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Components.Web;
+
 namespace TheSingularityWorkshop.Gui;
 
 /// <summary>
@@ -49,6 +51,18 @@ public sealed class ButtonGuiBuilder : ElementBuilder
     }
 
     public new ButtonGuiBuilder OnClick(Action action)
+    {
+        base.OnClick(action);
+        return this;
+    }
+
+    public new ButtonGuiBuilder OnClick(Func<Task> action)
+    {
+        base.OnClick(action);
+        return this;
+    }
+
+    public new ButtonGuiBuilder OnClick(Action<MouseEventArgs> action)
     {
         base.OnClick(action);
         return this;
