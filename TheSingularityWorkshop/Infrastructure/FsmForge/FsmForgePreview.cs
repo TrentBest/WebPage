@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.FSM_API;
+using FsmApi = TheSingularityWorkshop.FSM_API.FSM_API;
 
 namespace TheSingularityWorkshop.Infrastructure.FsmForge;
 
@@ -39,7 +40,7 @@ public sealed class FsmForgePreview
         _context = new FsmForgePreviewContext();
         _events.Clear();
 
-        FSM_API.Create.CreateFiniteStateMachine(name, processRate: 0, processingGroup: "ForgePreview")
+        FsmApi.Create.CreateFiniteStateMachine(name, processRate: -1, processingGroup: "ForgePreview")
             .State("Idle",
                 onEnter: ctx => _events.Add("OnEnter → Idle"),
                 onUpdate: ctx => _events.Add("OnUpdate → Idle"),
@@ -62,7 +63,7 @@ public sealed class FsmForgePreview
             .Transition("Forging", "Finished", ctx => ((FsmForgePreviewContext)ctx).UpdateCount >= 3)
             .BuildDefinition();
 
-        _handle = FSM_API.Create.CreateInstance(name, _context, "ForgePreview");
+        _handle = FsmApi.Create.CreateInstance(name, _context, "ForgePreview");
     }
 
     public void Tick()
