@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TheSingularityWorkshop.Infrastructure.FsmForge;
 using TheSingularityWorkshop.SingularityHub;
 
@@ -15,12 +16,13 @@ public sealed class FsmForgeMicroBundle : IDisposable
     public const int BundleId = 2103;
 
     private readonly MicroBundle _lifecycle;
+    private readonly FsmForgePreview _preview;
     private bool _disposed;
 
     public FsmForgeMicroBundle()
     {
         _lifecycle = new MicroBundle(BundleId, "FSM FORGE", new WebMicroBundleProvider());
-        Preview = new FsmForgePreview();
+        _preview = new FsmForgePreview();
         Presentation = new MicroBundlePresentation(
             "The Forge",
             "FSM WORKSHOP",
@@ -34,21 +36,21 @@ public sealed class FsmForgeMicroBundle : IDisposable
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
     public MicroBundlePresentation Presentation { get; }
 
-    public string State => Preview.State;
-    public int TickCount => Preview.TickCount;
-    public IReadOnlyList<string> Events => Preview.Events;
-    public bool IsRunning => Preview.IsRunning;
+    public string State => _preview.State;
+    public int TickCount => _preview.TickCount;
+    public IReadOnlyList<string> Events => _preview.Events;
+    public bool IsRunning => _preview.IsRunning;
 
-    public void Start() => Preview.Start();
-    public void Tick() => Preview.Tick();
-    public void Reset() => Preview.Stop();
+    public void Start() => _preview.Start();
+    public void Tick() => _preview.Tick();
+    public void Reset() => _preview.Stop();
     public void Update() => _lifecycle.Update();
     public void Invalidate() => _lifecycle.Invalidate();
 
     public void Dispose()
     {
         if (_disposed) return;
-        Preview.Stop();
+        _preview.Stop();
         _lifecycle.Dispose();
         _disposed = true;
     }
