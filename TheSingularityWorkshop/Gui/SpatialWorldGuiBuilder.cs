@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using TheSingularityWorkshop.Infrastructure.Hub;
+using TheSingularityWorkshop.Workshop.Experience;
+using TheSingularityWorkshop.Workshop.Interaction;
 
 namespace TheSingularityWorkshop.Gui;
 
@@ -19,15 +21,17 @@ public static class SpatialWorldGuiBuilder
 
     public static ElementBuilder Build(
         object receiver,
-        IReadOnlyList<SpatialRoom> rooms,
+        IReadOnlyList<ExperienceSpace> rooms,
         bool unknownUnlocked,
         double avatarX,
         double avatarY,
         string tourKicker,
         string tourMessage,
+        string? hoveredInteractableId,
         Func<KeyboardEventArgs, Task> onKeyDown,
         Func<double, double, Task> moveAvatarTo,
-        Func<string, Task> interactRoom)
+        Func<string, Task> interactRoom,
+        Action<string?> setHoveredInteractable)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed")
@@ -48,24 +52,28 @@ public static class SpatialWorldGuiBuilder
             avatarY,
             tourKicker,
             tourMessage,
+            hoveredInteractableId,
             onKeyDown,
             moveAvatarTo,
-            interactRoom));
+            interactRoom,
+            setHoveredInteractable));
 
         return root;
     }
 
     private static ElementBuilder World(
         object receiver,
-        IReadOnlyList<SpatialRoom> rooms,
+        IReadOnlyList<ExperienceSpace> rooms,
         bool unknownUnlocked,
         double avatarX,
         double avatarY,
         string tourKicker,
         string tourMessage,
+        string? hoveredInteractableId,
         Func<KeyboardEventArgs, Task> onKeyDown,
         Func<double, double, Task> moveAvatarTo,
-        Func<string, Task> interactRoom)
+        Func<string, Task> interactRoom,
+        Action<string?> setHoveredInteractable)
     {
         var world = WorkshopGui.Panel(receiver)
             .Style("position", "absolute")
@@ -97,7 +105,13 @@ public static class SpatialWorldGuiBuilder
         foreach (var room in rooms)
         {
             var locked = room.Id == "unknown" && !unknownUnlocked;
-            camera.Content(Building(receiver, room, locked, interactRoom));
+            camera.Content(Building(
+                receiver,
+                room,
+                locked,
+                string.Equals(room.Id, hoveredInteractableId, StringComparison.Ordinal),
+                interactRoom,
+                setHoveredInteractable));
         }
 
         world.Content(camera);
@@ -219,21 +233,22 @@ public static class SpatialWorldGuiBuilder
 
     private static ElementBuilder Building(
         object receiver,
-        SpatialRoom room,
+        ExperienceSpace room,
         bool locked,
-        Func<string, Task> interactRoom)
+        bool hovered,
+        Func<string, Task> interactRoom,
+        Action<string?> setHoveredInteractable)
     {
-        var accent = locked
-            ? Yellow
-            : room.Id == "engineering" ? Cyan : Green;
+        var interactable = ToInteractable(room);
+        var accent = locked ? Yellow : Accent(room.Id);
 
-        return WorkshopGui.Button(receiver)
+        var building = WorkshopGui.Button(receiver)
             .PositionAt(room.X, room.Y)
             .Style("z-index", "5")
             .Style("width", $"{room.Width}%")
             .Style("height", $"{room.Height}%")
             .Style("padding", "0")
-            .Style("border", $"2px solid {accent}99")
+            .Style("border", $"2px solid {accent}{(hovered ? "ee" : "99")}")
             .Style("border-radius", "0")
             .Style("background", locked ? "rgba(30,24,3,.35)" : "rgba(0,20,30,.3)")
             .Style("color", White)
@@ -241,28 +256,68 @@ public static class SpatialWorldGuiBuilder
             .Style("cursor", locked ? "default" : "pointer")
             .Style("box-sizing", "border-box")
             .Style("pointer-events", locked ? "none" : "auto")
+            .Style("transition", "transform .16s ease, border-color .16s ease, box-shadow .16s ease")
+            .Style("transform", hovered ? "scale(1.025)" : "scale(1)")
+            .Style("box-shadow", hovered ? $"0 0 36px {accent}55" : $"0 0 12px {accent}16")
             .AriaLabel(locked ? "Unmapped structure" : $"Interact with {room.Name}")
-            .OnClick(() => interactRoom(room.Id))
-            .Content(WorkshopGui.Element(receiver, "span")
-                .Style("position", "absolute")
-                .Style("left", "50%")
-                .Style("top", "10%")
-                .Style("transform", "translateX(-50%)")
-                .Style("padding", ".2rem .4rem")
-                .Style("background", "rgba(1,4,10,.85)")
-                .Style("border", $"1px solid {accent}55")
-                .Style("font-size", "clamp(.42rem, 1vw, .75rem)")
-                .Style("letter-spacing", ".06em")
-                .Style("max-width", "90%")
-                .Style("white-space", "normal")
-                .Style("text-align", "center")
-                .Style("pointer-events", "none")
-                .Text(room.Name))
-            .Content(WorkshopGui.Element(receiver, "div")
-                .Style("position", "absolute")
-                .Style("inset", "8%")
-                .Style("border", $"1px solid {accent}55")
-                .Style("pointer-events", "none"));
+            .OnMouseEnter(() => setHoveredInteractable(locked ? null : interactable.Id))
+            .OnMouseLeave(() => setHoveredInteractable(null))
+            .OnClick(() => interactRoom(room.Id));
+
+        building.Content(InteractableSchematicGuiBuilder.Build(receiver, interactable, hovered));
+        building.Content(WorkshopGui.Element(receiver, "span")
+            .Style("position", "absolute")
+            .Style("left", "50%")
+            .Style("top", "8%")
+            .Style("transform", "translateX(-50%)")
+            .Style("z-index", "2")
+            .Style("padding", ".2rem .4rem")
+            .Style("background", "rgba(1,4,10,.9)")
+            .Style("border", $"1px solid {accent}{(hovered ? "cc" : "55")}")
+            .Style("font-size", "clamp(.42rem, 1vw, .75rem)")
+            .Style("letter-spacing", ".06em")
+            .Style("max-width", "90%")
+            .Style("white-space", "normal")
+            .Style("text-align", "center")
+            .Style("pointer-events", "none")
+            .Text(room.Name));
+
+        return building;
+    }
+
+    private static Interactable ToInteractable(ExperienceSpace room)
+    {
+        var schematic = room.Id switch
+        {
+            "engineering" => "forge",
+            "creation" => "creation-bay",
+            "experience" => "research-facility",
+            "unknown" => "unknown",
+            _ => "default"
+        };
+
+        return new Interactable(
+            room.Id,
+            room.Name,
+            InteractionScope.World,
+            new InteractionPoint(room.EntranceX, room.EntranceY),
+            NoOpInteractableBehavior.Instance,
+            triggers: InteractionTrigger.HoverOrClick,
+            presentation: new InteractablePresentation(room.Kind, room.Description, schematic));
+    }
+
+    private static string Accent(string id)
+        => id switch
+        {
+            "engineering" => Cyan,
+            "creation" => Green,
+            _ => Cyan
+        };
+
+    private sealed class NoOpInteractableBehavior : IInteractableBehavior
+    {
+        public static readonly NoOpInteractableBehavior Instance = new();
+        public void Execute(InteractionContext context) { }
     }
 
     private static ElementBuilder Avatar(object receiver)
