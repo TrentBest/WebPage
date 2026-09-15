@@ -17,13 +17,20 @@ public enum MaterialApplication
 }
 
 /// <summary>Elemental contribution of an atom to a material.</summary>
-public readonly record struct ElementalFraction(Atom Element, double Fraction)
+public readonly record struct ElementalFraction
 {
-    public ElementalFraction
+    public ElementalFraction(Atom element, double fraction)
     {
-        if (Fraction <= 0 || Fraction > 1)
-            throw new ArgumentOutOfRangeException(nameof(Fraction), "Elemental fraction must be greater than zero and no greater than one.");
+        ArgumentNullException.ThrowIfNull(element);
+        if (fraction <= 0 || fraction > 1)
+            throw new ArgumentOutOfRangeException(nameof(fraction), "Elemental fraction must be greater than zero and no greater than one.");
+
+        Element = element;
+        Fraction = fraction;
     }
+
+    public Atom Element { get; }
+    public double Fraction { get; }
 }
 
 /// <summary>
@@ -31,20 +38,43 @@ public readonly record struct ElementalFraction(Atom Element, double Fraction)
 /// the chemistry arbitrator can reason about newly installed content without
 /// knowing what the content is pretending to be.
 /// </summary>
-public sealed record MaterialComposition(
-    string Id,
-    string Name,
-    MaterialApplication Application,
-    IReadOnlyList<ElementalFraction> Elements)
+public sealed record MaterialComposition
 {
-    public MaterialComposition(string id, string name, MaterialApplication application, params ElementalFraction[] elements)
+    public MaterialComposition(
+        string id,
+        string name,
+        MaterialApplication application,
+        IReadOnlyList<ElementalFraction> elements)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            throw new ArgumentException("Material id is required.", nameof(id));
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Material name is required.", nameof(name));
+        ArgumentNullException.ThrowIfNull(elements);
+        if (elements.Count == 0)
+            throw new ArgumentException("At least one elemental contribution is required.", nameof(elements));
+        if (elements.Sum(x => x.Fraction) > 1.000001)
+            throw new ArgumentException("Elemental fractions cannot exceed one.", nameof(elements));
+
+        Id = id;
+        Name = name;
+        Application = application;
+        Elements = elements.ToArray();
+    }
+
+    public MaterialComposition(
+        string id,
+        string name,
+        MaterialApplication application,
+        params ElementalFraction[] elements)
         : this(id, name, application, (IReadOnlyList<ElementalFraction>)elements)
     {
-        if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Material id is required.", nameof(id));
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Material name is required.", nameof(name));
-        if (elements is null || elements.Length == 0) throw new ArgumentException("At least one elemental contribution is required.", nameof(elements));
-        if (elements.Sum(x => x.Fraction) > 1.000001) throw new ArgumentException("Elemental fractions cannot exceed one.", nameof(elements));
     }
+
+    public string Id { get; }
+    public string Name { get; }
+    public MaterialApplication Application { get; }
+    public IReadOnlyList<ElementalFraction> Elements { get; }
 }
 
 /// <summary>
@@ -56,9 +86,12 @@ public interface IElementalMaterialSource
     IReadOnlyList<MaterialComposition> Materials { get; }
 }
 
-/// <summary>Default physical behavior inferred from elemental composition and application.</summary>
+/// <summary>
+/// Default physical behavior inferred from elemental composition and application.
+/// Values are normalized factors, not laboratory measurements.
+/// </summary>
 public readonly record struct MaterialPhysicsDefaults(
-    double DensityKgPerM3,
+    double DensityFactor,
     double Hardness,
     double Flexibility,
     double ThermalConductivity,
