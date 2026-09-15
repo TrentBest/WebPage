@@ -11,11 +11,13 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 public sealed class SpatialNavigationMicroBundle : IDisposable
 {
     public const int BundleId = 2101;
+    public const double WorldCenterX = 50;
+    public const double WorldCenterY = 50;
 
     private readonly MicroBundle _lifecycle;
     private bool _disposed;
 
-    public SpatialNavigationMicroBundle(double startX = 50, double startY = 54)
+    public SpatialNavigationMicroBundle(double startX = WorldCenterX, double startY = WorldCenterY)
     {
         _lifecycle = new MicroBundle(BundleId, "SPATIAL NAVIGATION", new WebMicroBundleProvider());
         X = ClampX(startX);
@@ -46,6 +48,18 @@ public sealed class SpatialNavigationMicroBundle : IDisposable
     {
         if (_disposed) return;
         MoveTo(x, y + offsetY);
+    }
+
+    public void ApproachEntrance(SpatialRoom room, double offset = 0)
+    {
+        if (_disposed) return;
+        MoveTo(room.EntranceX, room.EntranceY + offset);
+    }
+
+    public void MoveToExit(SpatialRoom room)
+    {
+        if (_disposed) return;
+        MoveTo(room.ExitX, room.ExitY);
     }
 
     public void Update() => _lifecycle.Update();
