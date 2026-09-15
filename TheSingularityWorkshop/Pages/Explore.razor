@@ -9,11 +9,11 @@
 @BuildGui().Build()
 
 @code {
-    private const double WalkStep = 1.5;
+    private const double WalkStep = SpatialNavigationMicroBundle.DefaultMovementStep;
+    private const bool UnknownUnlocked = false;
 
     private readonly ExploreExperienceMicroBundle Experience = new();
     private string? insideRoomId;
-    private bool unknownUnlocked;
     private int walkGeneration;
 
     private static readonly IReadOnlyList<SpatialRoom> Rooms =
@@ -49,7 +49,7 @@
                 return "You did not open a menu. You walked here. That distinction matters. Experiences should feel inhabited, not merely displayed.";
 
             var nearest = Rooms
-                .Where(room => room.Id != "unknown" || unknownUnlocked)
+                .Where(room => room.Id != "unknown" || UnknownUnlocked)
                 .OrderBy(room => DistanceSquared(room.X, room.Y))
                 .FirstOrDefault();
 
@@ -89,7 +89,7 @@
         var world = SpatialWorldGuiBuilder.Build(
             this,
             Rooms,
-            unknownUnlocked,
+            UnknownUnlocked,
             AvatarX,
             AvatarY,
             TourKicker,
@@ -177,7 +177,8 @@
             await Task.Delay(65);
         }
 
-        Experience.Pathfinding.ClearPath();
+        if (generation == walkGeneration)
+            Experience.Pathfinding.ClearPath();
     }
 
     /// <summary>
@@ -195,7 +196,7 @@
         if (room is null)
             return;
 
-        if (room.Id == "unknown" && !unknownUnlocked)
+        if (room.Id == "unknown" && !UnknownUnlocked)
             return;
 
         var targetX = room.EntranceX;
