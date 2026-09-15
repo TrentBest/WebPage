@@ -28,7 +28,7 @@ public readonly record struct InteractionPoint(double X, double Y, double Z = 0)
 
 /// <summary>
 /// Location of an input within the interactable's own containing surface.
-/// Normalized coordinates are useful for resolving nested/sub-interactables.
+/// Local coordinates are renderer-neutral and may be used to resolve children.
 /// </summary>
 public readonly record struct InteractionHit(
     double LocalX,
@@ -56,11 +56,32 @@ public interface IInteractableBehavior
 /// <summary>Cheap eligibility predicate evaluated before behavior.</summary>
 public interface IInteractableAvailabilityFilter
 {
-    bool CanRun(Interactable interactable, InteractionContext context);
+    bool CanRun(IInteractable interactable, InteractionContext context);
 }
 
-/// <summary>Generic interaction node with hierarchical children and declared input triggers.</summary>
-public sealed class Interactable
+/// <summary>
+/// Platform-neutral interaction contract.
+/// Experiences may add domain-specific interaction semantics without replacing this contract.
+/// </summary>
+public interface IInteractable
+{
+    string Id { get; }
+    string Name { get; }
+    InteractionScope Scope { get; }
+    InteractionPoint InteractionPoint { get; }
+    IInteractableBehavior Behavior { get; }
+    IInteractableAvailabilityFilter? AvailabilityFilter { get; }
+    InteractionTrigger Triggers { get; }
+    InteractablePresentation Presentation { get; }
+    IInteractable? Parent { get; }
+    IReadOnlyList<IInteractable> Children { get; }
+
+    bool CanRun(InteractionContext context);
+    bool Supports(InteractionTrigger trigger);
+}
+
+/// <summary>Default mutable interaction node with hierarchical children and declared input triggers.</summary>
+public class Interactable : IInteractable
 {
     private readonly List<Interactable> _children = [];
 
@@ -96,17 +117,21 @@ public sealed class Interactable
     public IInteractableAvailabilityFilter? AvailabilityFilter { get; }
     public InteractionTrigger Triggers { get; }
     public InteractablePresentation Presentation { get; }
-    public Interactable? Parent { get; private set; }
-    public IReadOnlyList<Interactable> Children => _children;
+    public IInteractable? Parent { get; private set; }
+    public IReadOnlyList<IInteractable> Children => _children;
 
-    public Interactable AddChild(Interactable child)
+    public Interactable AddChild(IInteractable child)
     {
         ArgumentNullException.ThrowIfNull(child);
         if (ReferenceEquals(child, this)) throw new ArgumentException("An interactable cannot contain itself.", nameof(child));
         if (child.Parent is not null) throw new InvalidOperationException($"Interactable '{child.Id}' already has a parent.");
 
-        child.Parent = this;
-        _children.Add(child);
+        if (child is Interactable concrete)
+            concrete.Parent = this;
+        else
+            throw new ArgumentException("The default Interactable hierarchy requires children derived from Interactable.", nameof(child));
+
+        _children.Add(concrete);
         return this;
     }
 
@@ -122,7 +147,7 @@ public sealed class Interactable
 /// <summary>Executes an eligible interactable only for a declared trigger.</summary>
 public sealed class InteractableExecutor
 {
-    public bool TryExecute(Interactable interactable, InteractionTrigger trigger, InteractionContext context)
+    public bool TryExecute(IInteractable interactable, InteractionTrigger trigger, InteractionContext context)
     {
         ArgumentNullException.ThrowIfNull(interactable);
         ArgumentNullException.ThrowIfNull(context);
@@ -138,8 +163,8 @@ public sealed class InteractableExecutor
 /// <summary>Filters a hierarchy before behavior evaluation.</summary>
 public sealed class InteractableFilter
 {
-    public IReadOnlyList<Interactable> GetRunnable(
-        IEnumerable<Interactable> candidates,
+    public IReadOnlyList<IInteractable> GetRunnable(
+        IEnumerable<IInteractable> candidates,
         InteractionContext context)
     {
         ArgumentNullException.ThrowIfNull(candidates);
@@ -152,7 +177,7 @@ public sealed class InteractableFilter
 /// <summary>Common filter that activates a node only on its owning surface and scope.</summary>
 public sealed class SurfaceScopeFilter : IInteractableAvailabilityFilter
 {
-    public bool CanRun(Interactable interactable, InteractionContext context)
+    public bool CanRun(IInteractable interactable, InteractionContext context)
         => string.Equals(interactable.Parent?.Id ?? interactable.Id, context.SurfaceId, StringComparison.Ordinal)
            && interactable.Scope == context.Scope;
 }
@@ -160,6 +185,6 @@ public sealed class SurfaceScopeFilter : IInteractableAvailabilityFilter
 /// <summary>Filter for a drawer/container that is eligible only after it has been opened.</summary>
 public sealed class OpenContainerFilter : IInteractableAvailabilityFilter
 {
-    public bool CanRun(Interactable interactable, InteractionContext context)
+    public bool CanRun(IInteractable interactable, InteractionContext context)
         => context.IsContainerOpen(interactable.Parent?.Id ?? interactable.Id);
 }
