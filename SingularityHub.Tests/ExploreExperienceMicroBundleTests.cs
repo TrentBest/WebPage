@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.Gui;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
@@ -6,14 +7,24 @@ namespace SingularityHub.Tests;
 public sealed class ExploreExperienceMicroBundleTests
 {
     [Fact]
-    public void ExploreExperience_ComposesSpatialConferenceAndForgeCapabilities()
+    public void ExploreExperience_ComposesSpatialUserConferenceAndForgeCapabilities()
     {
         using var experience = new ExploreExperienceMicroBundle();
 
         Assert.Equal((ulong)ExploreExperienceMicroBundle.BundleId, experience.Id);
         Assert.Equal((ulong)SpatialNavigationMicroBundle.BundleId, experience.Navigation.Id);
+        Assert.Equal((ulong)UserMicroBundle.BundleId, experience.User.Id);
         Assert.Equal((ulong)ConferenceMicroBundle.BundleId, experience.Conference.Id);
         Assert.Equal((ulong)FsmForgeMicroBundle.BundleId, experience.Forge.Id);
+    }
+
+    [Fact]
+    public void SpatialNavigation_DefaultsVisitorToWorldCenter()
+    {
+        using var navigation = new SpatialNavigationMicroBundle();
+
+        Assert.Equal(SpatialNavigationMicroBundle.WorldCenterX, navigation.X);
+        Assert.Equal(SpatialNavigationMicroBundle.WorldCenterY, navigation.Y);
     }
 
     [Fact]
@@ -31,14 +42,40 @@ public sealed class ExploreExperienceMicroBundleTests
     }
 
     [Fact]
-    public void SpatialNavigation_ApproachProducesRoomEntryPosition()
+    public void SpatialNavigation_ApproachUsesDefinedRoomEntrance()
     {
         using var navigation = new SpatialNavigationMicroBundle();
+        var room = new SpatialRoom(
+            "forge", "The Forge", "FSM WORKSHOP",
+            73, 30,
+            73, 46,
+            73, 46,
+            "", "FORGE", null);
 
-        navigation.Approach(73, 30);
+        navigation.ApproachEntrance(room);
 
-        Assert.Equal(73, navigation.X);
-        Assert.Equal(36, navigation.Y);
+        Assert.Equal(room.EntranceX, navigation.X);
+        Assert.Equal(room.EntranceY, navigation.Y);
+
+        navigation.MoveToExit(room);
+        Assert.Equal(room.ExitX, navigation.X);
+        Assert.Equal(room.ExitY, navigation.Y);
+    }
+
+    [Fact]
+    public void User_ProvidesAnonymousIdentityAndAccountPromotion()
+    {
+        using var user = new UserMicroBundle();
+
+        Assert.True(user.IsAnonymous);
+        Assert.False(user.IsAuthenticated);
+        Assert.Equal("Anonymous", user.DisplayName);
+
+        user.CreateAccount("Workshop Visitor");
+
+        Assert.False(user.IsAnonymous);
+        Assert.True(user.IsAuthenticated);
+        Assert.Equal("Workshop Visitor", user.DisplayName);
     }
 
     [Fact]
