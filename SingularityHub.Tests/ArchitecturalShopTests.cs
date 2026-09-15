@@ -20,7 +20,8 @@ public sealed class ArchitecturalShopTests
         Assert.Single(structure.Floors);
         Assert.Contains(structure.Floors[0].Cells, cell => cell is { X: 6, Y: 6, Kind: ArchitecturalCellKind.Room });
         Assert.Contains(structure.Floors[0].Cells, cell => cell is { X: 7, Y: 6, Kind: ArchitecturalCellKind.Stair });
-        Assert.Equal(1, structure.VerticalConnectorCount + 2 - 2);
+        Assert.Equal(4, structure.VerticalConnectorCount);
+        Assert.Equal(2, structure.TotalCellCount);
     }
 
     [Fact]
