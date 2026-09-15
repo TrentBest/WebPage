@@ -59,7 +59,8 @@ public sealed class Interactable
         InteractionPoint interactionPoint,
         IInteractableBehavior behavior,
         IInteractableAvailabilityFilter? availabilityFilter = null,
-        InteractionTrigger triggers = InteractionTrigger.Click)
+        InteractionTrigger triggers = InteractionTrigger.Click,
+        InteractablePresentation? presentation = null)
     {
         if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Interactable id is required.", nameof(id));
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Interactable name is required.", nameof(name));
@@ -72,6 +73,7 @@ public sealed class Interactable
         Behavior = behavior;
         AvailabilityFilter = availabilityFilter;
         Triggers = triggers;
+        Presentation = presentation ?? InteractablePresentation.Default(name);
     }
 
     public string Id { get; }
@@ -81,6 +83,7 @@ public sealed class Interactable
     public IInteractableBehavior Behavior { get; }
     public IInteractableAvailabilityFilter? AvailabilityFilter { get; }
     public InteractionTrigger Triggers { get; }
+    public InteractablePresentation Presentation { get; }
     public Interactable? Parent { get; private set; }
     public IReadOnlyList<Interactable> Children => _children;
 
