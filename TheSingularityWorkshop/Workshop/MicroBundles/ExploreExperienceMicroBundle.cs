@@ -23,6 +23,8 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         Navigation = new SpatialNavigationMicroBundle();
         Conference = new ConferenceMicroBundle();
         Forge = new FsmForgeMicroBundle();
+        SoftwarePatterns = new SoftwarePatternsMicroBundle();
+        SoftwarePatternsAnnotation = new SoftwarePatternsAnnotationMicroBundle(SoftwarePatterns);
     }
 
     public ulong Id => (ulong)_lifecycle.Id;
@@ -32,6 +34,8 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     public SpatialNavigationMicroBundle Navigation { get; }
     public ConferenceMicroBundle Conference { get; }
     public FsmForgeMicroBundle Forge { get; }
+    public SoftwarePatternsMicroBundle SoftwarePatterns { get; }
+    public SoftwarePatternsAnnotationMicroBundle SoftwarePatternsAnnotation { get; }
 
     /// <summary>Advances the composed capability lifecycles without owning their presentation.</summary>
     public void Update()
@@ -41,6 +45,8 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         Navigation.Update();
         Conference.Update();
         Forge.Update();
+        SoftwarePatterns.Update();
+        SoftwarePatternsAnnotation.Update();
     }
 
     public void Invalidate() => _lifecycle.Invalidate();
@@ -48,6 +54,8 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
+        SoftwarePatternsAnnotation.Dispose();
+        SoftwarePatterns.Dispose();
         Forge.Dispose();
         Conference.Dispose();
         Navigation.Dispose();
