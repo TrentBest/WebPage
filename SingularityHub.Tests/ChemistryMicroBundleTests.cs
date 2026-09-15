@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using HubArbitrator = TheSingularityWorkshop.SingularityHub.IArbitrator;
+using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Chemistry;
-using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
 namespace SingularityHub.Tests;
@@ -35,7 +36,7 @@ public sealed class ChemistryMicroBundleTests
             new ElementalFraction(iron, 0.05));
 
         var source = new MaterialSourceBundle(material);
-        var results = new ElementalArbitrator().Evaluate(new IMicroBundle[] { source });
+        var results = new ElementalArbitrator().Evaluate(new HubBundle[] { source });
         var result = Assert.Single(results);
 
         Assert.Equal(MaterialApplication.Armor, result.Application);
@@ -61,7 +62,16 @@ public sealed class ChemistryMicroBundleTests
         Assert.Equal("weapon-frame", chemistry.ResolvedMaterials.Single().MaterialId);
     }
 
-    private sealed class MaterialSourceBundle : IMicroBundle, IElementalMaterialSource
+    [Fact]
+    public void ChemistryMicroBundle_Implements_The_Workshop_And_Hub_Contracts()
+    {
+        using var chemistry = new ChemistryMicroBundle();
+
+        Assert.IsAssignableFrom<TheSingularityWorkshop.Workshop.MicroBundles.IMicroBundle>(chemistry);
+        Assert.IsAssignableFrom<HubBundle>(chemistry);
+    }
+
+    private sealed class MaterialSourceBundle : HubBundle, IElementalMaterialSource
     {
         public MaterialSourceBundle(MaterialComposition material) => Materials = [material];
         public ulong Id => 99001;
@@ -69,14 +79,14 @@ public sealed class ChemistryMicroBundleTests
         public BundleVersion Version => new(1, 0, 0);
         public IReadOnlyList<ulong> Dependencies => [];
         public IReadOnlyList<MaterialComposition> Materials { get; }
-        public bool Arbitrate(IArbitrator arbitrator, int roundIndex) => false;
+        public bool Arbitrate(HubArbitrator arbitrator, int roundIndex) => false;
     }
 
-    private sealed class TestArbitrator : IArbitrator
+    private sealed class TestArbitrator : HubArbitrator
     {
-        public TestArbitrator(params IMicroBundle[] bundles) => LoadedBundles = bundles;
-        public IReadOnlyCollection<IMicroBundle> LoadedBundles { get; }
-        public bool LoadBundle(IMicroBundle bundle) => false;
+        public TestArbitrator(params HubBundle[] bundles) => LoadedBundles = bundles;
+        public IReadOnlyCollection<HubBundle> LoadedBundles { get; }
+        public bool LoadBundle(HubBundle bundle) => false;
         public int ExecuteArbitrationPipeline() => 0;
     }
 }
