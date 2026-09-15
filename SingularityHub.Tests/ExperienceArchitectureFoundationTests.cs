@@ -21,6 +21,7 @@ public sealed class ExperienceArchitectureFoundationTests : IDisposable
         var ids = new[]
         {
             experience.Navigation.Id,
+            experience.Pathfinding.Id,
             experience.User.Id,
             experience.Conference.Id,
             experience.Forge.Id,
@@ -29,6 +30,7 @@ public sealed class ExperienceArchitectureFoundationTests : IDisposable
         };
 
         Assert.Equal(ids.Length, ids.Distinct().Count());
+        Assert.Equal((ulong)PathfindingMicroBundle.BundleId, experience.Pathfinding.Id);
         Assert.Equal((ulong)ConferenceMicroBundle.BundleId, experience.Conference.Id);
         Assert.NotEqual(experience.User.Id, experience.Conference.Id);
     }
@@ -42,11 +44,13 @@ public sealed class ExperienceArchitectureFoundationTests : IDisposable
         Assert.Equal(ExploreExperienceMicroBundle.ExperienceId, experience.Id);
         Assert.Equal("WORKSHOP EXPLORE", experience.Name);
         Assert.Contains(concrete.Navigation.Id, experience.MicroBundleIds);
+        Assert.Contains(concrete.Pathfinding.Id, experience.MicroBundleIds);
         Assert.Contains(concrete.Forge.Id, experience.MicroBundleIds);
         Assert.Contains(HubCapabilityIds.SpatialNavigation, experience.Capabilities);
+        Assert.Contains(HubCapabilityIds.Pathfinding, experience.Capabilities);
         Assert.Contains(HubCapabilityIds.FsmForge, experience.Capabilities);
         Assert.Equal(1, experience.SenseCount);
-        Assert.Contains("MicroBundle_2101", experience.ProcessingGroups);
+        Assert.Contains("MicroBundle_2105", experience.ProcessingGroups);
     }
 
     [Fact]
