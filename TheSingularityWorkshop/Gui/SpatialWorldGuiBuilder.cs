@@ -26,7 +26,6 @@ public static class SpatialWorldGuiBuilder
         string tourKicker,
         string tourMessage,
         Func<KeyboardEventArgs, Task> onKeyDown,
-        Action<double, double> moveAvatar,
         Func<double, double, Task> moveAvatarTo,
         Func<string, Task> interactRoom)
     {
@@ -51,7 +50,6 @@ public static class SpatialWorldGuiBuilder
             tourKicker,
             tourMessage,
             onKeyDown,
-            moveAvatar,
             moveAvatarTo,
             interactRoom));
 
@@ -67,7 +65,6 @@ public static class SpatialWorldGuiBuilder
         string tourKicker,
         string tourMessage,
         Func<KeyboardEventArgs, Task> onKeyDown,
-        Action<double, double> moveAvatar,
         Func<double, double, Task> moveAvatarTo,
         Func<string, Task> interactRoom)
     {
