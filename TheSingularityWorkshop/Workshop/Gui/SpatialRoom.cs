@@ -1,4 +1,4 @@
-namespace TheSingularityWorkshop.Gui;
+namespace TheSingularityWorkshop.Workshop.Gui;
 
 /// <summary>
 /// Spatial identity for a Workshop suite.
