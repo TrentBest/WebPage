@@ -124,4 +124,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 116)]
     [Fact(DisplayName = "V0.0.116 — Explore_Becomes_A_Navigable_Workshop_Blueprint_With_Click_To_Walk")]
     public void V0_0_116_ExploreBecomesANavigableWorkshopBlueprintWithClickToWalk() => Assert.Equal("0.0.116", "0.0.116");
+
+    [ArchitectureTest(0, 0, 117)]
+    [Fact(DisplayName = "V0.0.117 — Explore_Blueprint_Panel_Becomes_Viewport_Canvas")]
+    public void V0_0_117_ExploreBlueprintPanelBecomesViewportCanvas() => Assert.Equal("0.0.117", "0.0.117");
 }
