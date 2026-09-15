@@ -1,6 +1,7 @@
 @page "/explore"
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.Gui
+@using TheSingularityWorkshop.Workshop.Experience
 @using TheSingularityWorkshop.Workshop.MicroBundles
 @implements IDisposable
 
@@ -14,9 +15,10 @@
 
     private readonly ExploreExperienceMicroBundle Experience = new();
     private string? insideRoomId;
+    private string? hoveredInteractableId;
     private int walkGeneration;
 
-    private static readonly IReadOnlyList<SpatialRoom> Rooms =
+    private static readonly IReadOnlyList<ExperienceSpace> Rooms =
     [
         new("experience", "Experience Deck", "LIVING SPACE", 25, 28, 25, 42, 25, 42,
             "The sensory side of the Workshop. This is where an Experience becomes something a visitor can actually inhabit.",
@@ -37,14 +39,23 @@
     private bool ConferenceJoined => Experience.Conference.Joined;
     private FsmForgeMicroBundle Forge => Experience.Forge;
 
-    private string TourKicker => insideRoomId is not null
-        ? "YOU FOUND A DOOR"
-        : "THE WORKSHOP IS A PLACE YOU CAN ENTER";
+    private string TourKicker => hoveredInteractableId is not null
+        ? "INTERACTABLE // LIVE SCHEMATIC"
+        : insideRoomId is not null
+            ? "YOU FOUND A DOOR"
+            : "THE WORKSHOP IS A PLACE YOU CAN ENTER";
 
     private string TourMessage
     {
         get
         {
+            if (hoveredInteractableId is not null)
+            {
+                var hovered = Rooms.FirstOrDefault(room => room.Id == hoveredInteractableId);
+                if (hovered is not null)
+                    return $"{hovered.Name} — {hovered.Description} Hover is inspection; click when you want to approach the interaction point.";
+            }
+
             if (insideRoomId is not null)
                 return "You did not open a menu. You walked here. That distinction matters. Experiences should feel inhabited, not merely displayed.";
 
@@ -94,9 +105,11 @@
             AvatarY,
             TourKicker,
             TourMessage,
+            hoveredInteractableId,
             HandleKeyDown,
             MoveAvatarTo,
-            InteractRoom);
+            InteractRoom,
+            SetHoveredInteractable);
 
         return WorkshopGui.MultiPanel(this)
             .Style("position", "fixed")
@@ -106,6 +119,15 @@
             .Style("overflow", "hidden")
             .Content(world)
             .Content(UserNameLabel());
+    }
+
+    private void SetHoveredInteractable(string? id)
+    {
+        if (insideRoomId is not null)
+            return;
+
+        hoveredInteractableId = id;
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private ElementBuilder UserNameLabel()
@@ -199,6 +221,7 @@
         if (room.Id == "unknown" && !UnknownUnlocked)
             return;
 
+        hoveredInteractableId = null;
         var targetX = room.EntranceX;
         var targetY = room.EntranceY;
         await MoveAvatarTo(targetX, targetY);
@@ -221,6 +244,7 @@
             Experience.Navigation.MoveToExit(room);
 
         insideRoomId = null;
+        hoveredInteractableId = null;
     }
 
     public void Dispose() => Experience.Dispose();
