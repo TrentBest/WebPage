@@ -95,7 +95,6 @@
             TourKicker,
             TourMessage,
             HandleKeyDown,
-            MoveAvatar,
             MoveAvatarTo,
             InteractRoom);
 
@@ -154,14 +153,6 @@
         await MoveAvatarTo(Experience.Navigation.X + dx, Experience.Navigation.Y + dy);
     }
 
-    private void MoveAvatar(double dx, double dy)
-    {
-        if (insideRoomId is not null)
-            return;
-
-        Experience.Navigation.Move(dx, dy);
-    }
-
     private async Task MoveAvatarTo(double x, double y)
     {
         if (insideRoomId is not null)
@@ -207,8 +198,12 @@
         if (room.Id == "unknown" && !unknownUnlocked)
             return;
 
-        await MoveAvatarTo(room.EntranceX, room.EntranceY);
-        if (walkGeneration <= 0 || insideRoomId is not null)
+        var targetX = room.EntranceX;
+        var targetY = room.EntranceY;
+        await MoveAvatarTo(targetX, targetY);
+
+        if (Math.Abs(Experience.Navigation.X - targetX) > 0.5 ||
+            Math.Abs(Experience.Navigation.Y - targetY) > 0.5)
             return;
 
         await Task.Delay(300);
