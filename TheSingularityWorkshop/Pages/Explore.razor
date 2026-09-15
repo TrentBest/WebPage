@@ -4,6 +4,7 @@
 @using TheSingularityWorkshop.Workshop.Architecture
 @using TheSingularityWorkshop.Workshop.Chemistry
 @using TheSingularityWorkshop.Workshop.Experience
+@using TheSingularityWorkshop.Workshop.Interaction
 @using TheSingularityWorkshop.Workshop.MicroBundles
 @implements IDisposable
 
@@ -21,6 +22,7 @@
     private readonly SpaceElevatorStructure SpaceElevator = SpaceElevatorTemplates.WorkshopOrbitalTether;
     private string? insideRoomId;
     private string? hoveredInteractableId;
+    private WorkshopSign? openSign;
     private int walkGeneration;
 
     private static readonly IReadOnlyList<ExperienceSpace> Rooms =
@@ -67,7 +69,7 @@
             {
                 var hovered = Rooms.FirstOrDefault(room => room.Id == hoveredInteractableId);
                 if (hovered is not null)
-                    return $"{hovered.Name} — {hovered.Description} Hover is inspection; click when you want to approach the interaction point.";
+                    return $"{hovered.Name} — {hovered.Description} Hover is inspection; click when you want to approach the interaction point. Read SIGN for the building face.";
             }
 
             if (insideRoomId is not null)
@@ -151,10 +153,13 @@
             TourKicker,
             TourMessage,
             hoveredInteractableId,
+            openSign,
             HandleKeyDown,
             MoveAvatarTo,
             InteractRoom,
-            SetHoveredInteractable);
+            SetHoveredInteractable,
+            ShowSign,
+            CloseSign);
 
         return WorkshopGui.MultiPanel(this)
             .Style("position", "fixed")
@@ -168,10 +173,23 @@
 
     private void SetHoveredInteractable(string? id)
     {
-        if (insideRoomId is not null)
+        if (insideRoomId is not null || openSign is not null)
             return;
 
         hoveredInteractableId = id;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void ShowSign(WorkshopSign sign)
+    {
+        openSign = sign;
+        hoveredInteractableId = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void CloseSign()
+    {
+        openSign = null;
         _ = InvokeAsync(StateHasChanged);
     }
 
@@ -252,7 +270,7 @@
 
     private async Task HandleKeyDown(KeyboardEventArgs args)
     {
-        if (insideRoomId is not null)
+        if (insideRoomId is not null || openSign is not null)
             return;
 
         var dx = args.Key.ToLowerInvariant() switch
@@ -276,7 +294,7 @@
 
     private async Task MoveAvatarTo(double x, double y)
     {
-        if (insideRoomId is not null)
+        if (insideRoomId is not null || openSign is not null)
             return;
 
         var generation = ++walkGeneration;
@@ -304,7 +322,7 @@
 
     private async Task InteractRoom(string id)
     {
-        if (insideRoomId is not null)
+        if (insideRoomId is not null || openSign is not null)
             return;
 
         var room = Rooms.FirstOrDefault(x => x.Id == id);
@@ -332,6 +350,7 @@
         Forge.Reset();
         Experience.Conference.Leave();
         Collider.Reset();
+        openSign = null;
 
         var room = Rooms.FirstOrDefault(x => x.Id == insideRoomId);
         if (room is not null)
