@@ -26,11 +26,23 @@ public enum InteractionTrigger
 /// <summary>Stable point at which a visitor arrives before an interaction executes.</summary>
 public readonly record struct InteractionPoint(double X, double Y, double Z = 0);
 
-/// <summary>Runtime context used to determine which interactions are currently eligible.</summary>
+/// <summary>
+/// Location of an input within the interactable's own containing surface.
+/// Normalized coordinates are useful for resolving nested/sub-interactables.
+/// </summary>
+public readonly record struct InteractionHit(
+    double LocalX,
+    double LocalY,
+    double NormalizedX,
+    double NormalizedY);
+
+/// <summary>Runtime context supplied to an interactable when input reaches it.</summary>
 public sealed record InteractionContext(
     string SurfaceId,
     InteractionScope Scope,
-    IReadOnlySet<string> OpenContainerIds)
+    IReadOnlySet<string> OpenContainerIds,
+    InteractionTrigger Trigger = InteractionTrigger.None,
+    InteractionHit? Hit = null)
 {
     public bool IsContainerOpen(string id) => OpenContainerIds.Contains(id);
 }
@@ -118,7 +130,7 @@ public sealed class InteractableExecutor
         if (!interactable.Supports(trigger) || !interactable.CanRun(context))
             return false;
 
-        interactable.Behavior.Execute(context);
+        interactable.Behavior.Execute(context with { Trigger = trigger });
         return true;
     }
 }
