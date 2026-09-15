@@ -9,9 +9,37 @@
 
 <style>
     /* Explore is a viewport-bound spatial canvas. The blueprint panel is the world surface. */
+    html:has(#workshop-spatial-map),
+    body:has(#workshop-spatial-map) {
+        overflow: hidden !important;
+    }
+
+    /* The GUI builder deliberately owns the visual layer stack. Keep the entry warp
+       behind the Workshop world instead of letting its SVG become a black curtain. */
+    div:has(> div > #workshop-spatial-map) {
+        height: 100vh !important;
+        max-height: 100vh !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    div:has(> div > #workshop-spatial-map) > div:first-child {
+        z-index: 0 !important;
+    }
+
+    div:has(> div > #workshop-spatial-map) > div:first-child svg {
+        background: transparent !important;
+    }
+
+    div:has(> div > #workshop-spatial-map) > div:nth-child(3) {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+    }
+
     #workshop-spatial-map {
         min-height: 0 !important;
-        height: calc(100vh - 13rem) !important;
+        height: 100% !important;
         z-index: 30 !important;
     }
 </style>
