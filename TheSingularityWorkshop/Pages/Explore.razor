@@ -1,83 +1,20 @@
 @page "/explore"
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.Gui
-@using TheSingularityWorkshop.Infrastructure.FsmForge
 @using TheSingularityWorkshop.Infrastructure.Hub
+@using TheSingularityWorkshop.Workshop.MicroBundles
 @inject HubRuntime Runtime
+@implements IDisposable
 
 <PageTitle>Explore // The Singularity Workshop</PageTitle>
-
-<style>
-    html:has(#workshop-spatial-map),
-    body:has(#workshop-spatial-map) {
-        overflow: hidden !important;
-    }
-
-    div:has(> div > #workshop-spatial-map) {
-        height: 100vh !important;
-        max-height: 100vh !important;
-        min-height: 0 !important;
-        overflow: hidden !important;
-    }
-
-    div:has(> div > #workshop-spatial-map) > div:first-child {
-        z-index: 0 !important;
-    }
-
-    div:has(> div > #workshop-spatial-map) > div:first-child svg {
-        background: transparent !important;
-    }
-
-    div:has(> div > #workshop-spatial-map) > div:nth-child(3) {
-        flex: 1 1 auto !important;
-        min-height: 0 !important;
-        overflow: hidden !important;
-    }
-
-    #workshop-spatial-map {
-        min-height: 0 !important;
-        height: 100% !important;
-        z-index: 30 !important;
-        cursor: crosshair;
-    }
-
-    /* The first real spatial room prototype: a fixed-size blueprint object
-       living inside the map's coordinate system, not the browser viewport. */
-    #workshop-spatial-map [title="Approach Yup"] {
-        width: 350px !important;
-        height: 200px !important;
-        padding: 0 !important;
-        border: 6px solid #00eaff !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        box-shadow: 0 0 28px rgba(0,234,255,.12) !important;
-    }
-
-    #workshop-spatial-map [title="Approach Yup"] > div:first-child {
-        inset: 3% !important;
-        border: 2px solid rgba(0,234,255,.5) !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    #workshop-spatial-map [title="Approach Yup"] > div:first-child > div {
-        background: rgba(0,234,255,.45) !important;
-    }
-</style>
 
 @BuildGui().Build()
 
 @code {
-    private double AvatarX { get; set; } = 50;
-    private double AvatarY { get; set; } = 54;
+    private readonly ExploreExperienceMicroBundle Experience = new();
     private string? selectedRoomId;
     private string? insideRoomId;
     private bool unknownUnlocked;
-    private bool conferenceJoined;
-    private readonly FsmForgePreview ForgePreview = new();
-
-    private SpatialRoom? SelectedRoom => Rooms.FirstOrDefault(x => x.Id == selectedRoomId);
-    private SpatialRoom? InsideRoom => Rooms.FirstOrDefault(x => x.Id == insideRoomId);
 
     private static readonly IReadOnlyList<SpatialRoom> Rooms =
     [
@@ -98,13 +35,18 @@
             "UNKNOWN", "Undisclosed")
     ];
 
+    private double AvatarX => Experience.Navigation.X;
+    private double AvatarY => Experience.Navigation.Y;
+    private bool ConferenceJoined => Experience.Conference.Joined;
+    private FsmForgeMicroBundle Forge => Experience.Forge;
+
     private ElementBuilder BuildGui()
     {
         if (insideRoomId == "conference")
         {
             return ConferenceRoomGuiBuilder.Build(
                 this,
-                conferenceJoined,
+                ConferenceJoined,
                 JoinConference,
                 LeaveConference,
                 ExitRoom);
@@ -114,19 +56,18 @@
         {
             return FsmForgeGuiBuilder.Build(
                 this,
-                ForgePreview,
-                StartForgePreview,
-                TickForgePreview,
-                ResetForgePreview,
+                Forge.Preview,
+                Forge.Start,
+                Forge.Tick,
+                Forge.Reset,
                 ExitRoom);
         }
 
-        return SpatialExploreGuiBuilder.Build(
+        return SpatialWorldGuiBuilder.Build(
             this,
             Runtime,
             Rooms,
             selectedRoomId,
-            insideRoomId,
             unknownUnlocked,
             AvatarX,
             AvatarY,
@@ -135,16 +76,11 @@
             MoveAvatarTo,
             ApproachRoom,
             EnterSelectedRoom,
-            UnlockUnknown,
-            ExitRoom);
+            UnlockUnknown);
     }
 
-    private void StartForgePreview() => ForgePreview.Start();
-    private void TickForgePreview() => ForgePreview.Tick();
-    private void ResetForgePreview() => ForgePreview.Stop();
-
-    private void JoinConference() => conferenceJoined = true;
-    private void LeaveConference() => conferenceJoined = false;
+    private void JoinConference() => Experience.Conference.Join();
+    private void LeaveConference() => Experience.Conference.Leave();
 
     private void HandleKeyDown(KeyboardEventArgs args)
     {
@@ -171,28 +107,25 @@
 
     private void MoveAvatar(double dx, double dy)
     {
-        if (InsideRoom is not null)
+        if (insideRoomId is not null)
             return;
 
-        AvatarX = Math.Clamp(AvatarX + dx, 4, 96);
-        AvatarY = Math.Clamp(AvatarY + dy, 8, 92);
+        Experience.Navigation.Move(dx, dy);
     }
 
     private void MoveAvatarTo(double x, double y)
     {
-        if (InsideRoom is not null)
+        if (insideRoomId is not null)
             return;
 
-        AvatarX = Math.Clamp(x, 4, 96);
-        AvatarY = Math.Clamp(y, 8, 92);
+        Experience.Navigation.MoveTo(x, y);
         selectedRoomId = null;
     }
 
     private void ApproachRoom(string id)
     {
         var room = Rooms.First(x => x.Id == id);
-        AvatarX = room.X;
-        AvatarY = room.Y + 6;
+        Experience.Navigation.Approach(room.X, room.Y);
         selectedRoomId = id;
     }
 
@@ -204,6 +137,8 @@
         insideRoomId = SelectedRoom.Id == "yup" ? "conference" : SelectedRoom.Id;
     }
 
+    private SpatialRoom? SelectedRoom => Rooms.FirstOrDefault(x => x.Id == selectedRoomId);
+
     private void UnlockUnknown()
     {
         unknownUnlocked = true;
@@ -212,8 +147,10 @@
 
     private void ExitRoom()
     {
-        ForgePreview.Stop();
-        conferenceJoined = false;
+        Forge.Reset();
+        Experience.Conference.Leave();
         insideRoomId = null;
     }
+
+    public void Dispose() => Experience.Dispose();
 }
