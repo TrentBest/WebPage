@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Components;
-using TheSingularityWorkshop.Infrastructure.FsmForge;
+using TheSingularityWorkshop.Workshop.MicroBundles;
 
 namespace TheSingularityWorkshop.Gui;
 
 /// <summary>
 /// Recursive GUI composition for the FSM Forge.
-/// The Forge exposes reusable FSM products and a live preview without exposing
-/// the underlying Blazor implementation to the page.
+/// The builder consumes the Forge MicroBundle facade and its semantic presentation
+/// contract; it does not reach through the Experience into Forge infrastructure.
 /// </summary>
 public static class FsmForgeGuiBuilder
 {
@@ -19,10 +19,7 @@ public static class FsmForgeGuiBuilder
 
     public static ElementBuilder Build(
         object receiver,
-        FsmForgePreview preview,
-        Action startPreview,
-        Action tickPreview,
-        Action stopPreview,
+        FsmForgeMicroBundle forge,
         Action exitForge)
     {
         var workspace = WorkshopGui.MultiPanel(receiver)
@@ -33,12 +30,12 @@ public static class FsmForgeGuiBuilder
             .Style("gap", ".75rem")
             .Style("overflow", "hidden");
 
-        workspace.Content(Stock(receiver));
-        workspace.Content(Preview(receiver, preview, startPreview, tickPreview, stopPreview, exitForge));
+        workspace.Content(Stock(receiver, forge.Presentation));
+        workspace.Content(Preview(receiver, forge, exitForge));
         return workspace;
     }
 
-    private static ElementBuilder Stock(object receiver)
+    private static ElementBuilder Stock(object receiver, MicroBundlePresentation presentation)
     {
         var panel = WorkshopGui.Panel(receiver)
             .Style("min-width", "0")
@@ -52,17 +49,17 @@ public static class FsmForgeGuiBuilder
             .Style("color", Cyan)
             .Style("font-size", ".5rem")
             .Style("letter-spacing", ".18em")
-            .Text("FSM FORGE // STOCK"));
+            .Text(presentation.Surface + " // STOCK"));
         panel.Content(WorkshopGui.Element(receiver, "h2")
             .Style("margin", ".45rem 0 .25rem")
             .Style("font-size", "clamp(1.2rem,2vw,1.8rem)")
-            .Text("Raw material → reusable behavior"));
+            .Text(presentation.Title));
         panel.Content(WorkshopGui.Element(receiver, "p")
             .Style("margin", "0 0 .8rem")
             .Style("color", "#718e99")
             .Style("font-family", "system-ui, sans-serif")
             .Style("font-size", ".75rem")
-            .Text("Choose a piece of FSM behavior. Every product is a scaffold for the real FSM API, not a decorative code sample."));
+            .Text(presentation.Description));
 
         var products = WorkshopGui.MultiPanel(receiver)
             .Style("display", "grid")
@@ -123,10 +120,7 @@ public static class FsmForgeGuiBuilder
 
     private static ElementBuilder Preview(
         object receiver,
-        FsmForgePreview preview,
-        Action startPreview,
-        Action tickPreview,
-        Action stopPreview,
+        FsmForgeMicroBundle forge,
         Action exitForge)
     {
         var panel = WorkshopGui.Panel(receiver)
@@ -145,15 +139,15 @@ public static class FsmForgeGuiBuilder
         panel.Content(WorkshopGui.Element(receiver, "h2")
             .Style("margin", ".45rem 0")
             .Style("font-size", "1.35rem")
-            .Text("Watch the FSM work"));
+            .Text(forge.Presentation.Title));
 
         var state = WorkshopGui.Panel(receiver)
             .Style("align-items", "center")
             .Style("justify-content", "center")
             .Style("min-height", "150px")
             .Style("padding", "1rem")
-            .Style("border", $"1px solid {StateAccent(preview.State)}55")
-            .Style("background", $"{StateAccent(preview.State)}08")
+            .Style("border", $"1px solid {StateAccent(forge.State)}55")
+            .Style("background", $"{StateAccent(forge.State)}08")
             .Style("text-align", "center");
         state.Content(WorkshopGui.Element(receiver, "div")
             .Style("color", "#58747e")
@@ -163,12 +157,12 @@ public static class FsmForgeGuiBuilder
         state.Content(WorkshopGui.Element(receiver, "strong")
             .Style("margin", ".35rem 0")
             .Style("font-size", "clamp(1.6rem,4vw,2.7rem)")
-            .Style("color", StateAccent(preview.State))
-            .Text(preview.State));
+            .Style("color", StateAccent(forge.State))
+            .Text(forge.State));
         state.Content(WorkshopGui.Element(receiver, "div")
             .Style("color", White)
             .Style("font-size", ".55rem")
-            .Text($"UPDATE COUNT // {preview.TickCount}"));
+            .Text($"UPDATE COUNT // {forge.TickCount}"));
         panel.Content(state);
 
         var controls = WorkshopGui.MultiPanel(receiver)
@@ -176,9 +170,9 @@ public static class FsmForgeGuiBuilder
             .Style("grid-template-columns", "repeat(3,1fr)")
             .Style("gap", ".35rem")
             .Style("margin-top", ".65rem");
-        controls.Content(Action(receiver, "FORGE", startPreview, Cyan));
-        controls.Content(Action(receiver, "TICK", tickPreview, Green));
-        controls.Content(Action(receiver, "RESET", stopPreview, Yellow));
+        controls.Content(Action(receiver, "FORGE", forge.Start, Cyan));
+        controls.Content(Action(receiver, "TICK", forge.Tick, Green));
+        controls.Content(Action(receiver, "RESET", forge.Reset, Yellow));
         panel.Content(controls);
 
         var events = WorkshopGui.Panel(receiver)
@@ -193,8 +187,7 @@ public static class FsmForgeGuiBuilder
             .Style("letter-spacing", ".12em")
             .Text("LIFECYCLE TRACE"));
 
-        var trace = preview.Events.TakeLast(8).ToArray();
-        foreach (var entry in trace)
+        foreach (var entry in forge.Events.TakeLast(8))
             events.Content(WorkshopGui.Element(receiver, "div")
                 .Style("color", "#8caab3")
                 .Style("font-size", ".55rem")
