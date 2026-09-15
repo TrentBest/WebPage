@@ -54,13 +54,7 @@
 
         if (insideRoomId == "engineering")
         {
-            return FsmForgeGuiBuilder.Build(
-                this,
-                Forge.Preview,
-                Forge.Start,
-                Forge.Tick,
-                Forge.Reset,
-                ExitRoom);
+            return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
         }
 
         return SpatialWorldGuiBuilder.Build(
