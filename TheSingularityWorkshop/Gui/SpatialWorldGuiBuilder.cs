@@ -12,7 +12,6 @@ namespace TheSingularityWorkshop.Gui;
 public static class SpatialWorldGuiBuilder
 {
     private const string Cyan = "#00eaff";
-    private const string Magenta = "#ff2cff";
     private const string Green = "#52e05a";
     private const string Yellow = "#ffd34d";
     private const string White = "#ffffff";
@@ -20,7 +19,6 @@ public static class SpatialWorldGuiBuilder
 
     public static ElementBuilder Build(
         object receiver,
-        HubRuntime runtime,
         IReadOnlyList<SpatialRoom> rooms,
         bool unknownUnlocked,
         double avatarX,
@@ -30,8 +28,6 @@ public static class SpatialWorldGuiBuilder
         Action<double, double> moveAvatarTo,
         Func<string, Task> interactRoom)
     {
-        _ = runtime;
-
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed")
             .Style("inset", "0")
@@ -81,8 +77,6 @@ public static class SpatialWorldGuiBuilder
             .OnKeyDown(onKeyDown)
             .PreventDefault("onkeydown");
 
-        // The camera layer is deliberately translated by the visitor's world
-        // position. Everything spatial moves together; the avatar does not.
         var camera = WorkshopGui.Panel(receiver)
             .Style("position", "absolute")
             .Style("inset", "0")
@@ -105,18 +99,12 @@ public static class SpatialWorldGuiBuilder
         world.Content(camera);
         world.Content(WalkSurface(receiver, avatarX, avatarY, moveAvatarTo));
         world.Content(Avatar(receiver));
-        world.Content(MovementHint(receiver));
         return world;
     }
 
     private static string CameraTransform(double avatarX, double avatarY)
         => $"translate(calc(50vw - {avatarX:0.##}vw), calc(50vh - {avatarY:0.##}vh))";
 
-    /// <summary>
-    /// The walk surface is screen-relative. A click away from the centered
-    /// avatar becomes a world-space destination by applying that screen delta
-    /// to the visitor's current world coordinate.
-    /// </summary>
     private static ElementBuilder WalkSurface(
         object receiver,
         double avatarX,
@@ -278,19 +266,4 @@ public static class SpatialWorldGuiBuilder
                 .Attribute("cy", "20")
                 .Attribute("r", "4")
                 .Attribute("fill", White));
-
-    private static ElementBuilder MovementHint(object receiver)
-        => WorkshopGui.Element(receiver, "span")
-            .Style("position", "absolute")
-            .Style("left", "50%")
-            .Style("bottom", "1rem")
-            .Style("transform", "translateX(-50%)")
-            .Style("z-index", "8")
-            .Style("padding", ".25rem .5rem")
-            .Style("background", "rgba(1,5,11,.58)")
-            .Style("color", "rgba(255,255,255,.48)")
-            .Style("font-size", ".42rem")
-            .Style("letter-spacing", ".12em")
-            .Style("pointer-events", "none")
-            .Text("WASD / ARROWS / CLICK TO WALK");
 }
