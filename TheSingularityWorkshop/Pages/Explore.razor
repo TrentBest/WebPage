@@ -8,14 +8,11 @@
 <PageTitle>Explore // The Singularity Workshop</PageTitle>
 
 <style>
-    /* Explore is a viewport-bound spatial canvas. The blueprint panel is the world surface. */
     html:has(#workshop-spatial-map),
     body:has(#workshop-spatial-map) {
         overflow: hidden !important;
     }
 
-    /* The GUI builder deliberately owns the visual layer stack. Keep the entry warp
-       behind the Workshop world instead of letting its SVG become a black curtain. */
     div:has(> div > #workshop-spatial-map) {
         height: 100vh !important;
         max-height: 100vh !important;
@@ -42,9 +39,27 @@
         height: 100% !important;
         z-index: 30 !important;
     }
+
+    /* Deliberately simple spatial-placement probe.
+       The player's starting point is the center of the scene (roughly 50%, 54%).
+       This button lives slightly up and left of that origin: quadrant II. */
+    #yup-spatial-probe {
+        position: fixed;
+        left: 30%;
+        top: 31%;
+        width: 350px;
+        height: 200px;
+        z-index: 100;
+        box-sizing: border-box;
+        font: 700 2rem Consolas, 'Courier New', monospace;
+        letter-spacing: .08em;
+        cursor: pointer;
+    }
 </style>
 
 @BuildGui().Build()
+
+<button id="yup-spatial-probe" type="button">Yup</button>
 
 @code {
     private double AvatarX { get; set; } = 50;
@@ -105,9 +120,7 @@
     }
 
     private void StartForgePreview() => ForgePreview.Start();
-
     private void TickForgePreview() => ForgePreview.Tick();
-
     private void ResetForgePreview() => ForgePreview.Stop();
 
     private void HandleKeyDown(KeyboardEventArgs args)
