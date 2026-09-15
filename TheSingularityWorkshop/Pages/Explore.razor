@@ -12,7 +12,6 @@
 
 @code {
     private readonly ExploreExperienceMicroBundle Experience = new();
-    private string? selectedRoomId;
     private string? insideRoomId;
     private bool unknownUnlocked;
 
@@ -61,20 +60,19 @@
             this,
             Runtime,
             Rooms,
-            selectedRoomId,
             unknownUnlocked,
             AvatarX,
             AvatarY,
             HandleKeyDown,
             MoveAvatar,
             MoveAvatarTo,
-            ApproachRoom,
-            EnterSelectedRoom,
-            UnlockUnknown);
+            InteractRoom);
 
         return WorkshopGui.MultiPanel(this)
-            .Style("position", "fixed").Style("inset", "0")
-            .Style("width", "100vw").Style("height", "100vh")
+            .Style("position", "fixed")
+            .Style("inset", "0")
+            .Style("width", "100vw")
+            .Style("height", "100vh")
             .Style("overflow", "hidden")
             .Content(world)
             .Content(UserNameLabel());
@@ -83,8 +81,8 @@
     private ElementBuilder UserNameLabel()
         => WorkshopGui.Element(this, "span")
             .Style("position", "fixed")
-            .Style("left", $"{AvatarX}%")
-            .Style("top", $"calc({AvatarY}% - 24px)")
+            .Style("left", "50%")
+            .Style("top", "calc(50% - 24px)")
             .Style("transform", "translateX(-50%)")
             .Style("z-index", "20")
             .Style("padding", ".12rem .35rem")
@@ -138,31 +136,31 @@
             return;
 
         Experience.Navigation.MoveTo(x, y);
-        selectedRoomId = null;
     }
 
-    private void ApproachRoom(string id)
+    /// <summary>
+    /// Spatial interaction is direct: clicking an enterable structure is the
+    /// interaction request. The visitor is first moved to the object's defined
+    /// interaction point, the camera visibly follows, and only then is the
+    /// object's experience activated.
+    /// </summary>
+    private async Task InteractRoom(string id)
     {
-        var room = Rooms.First(x => x.Id == id);
-        Experience.Navigation.ApproachEntrance(room);
-        selectedRoomId = id;
-    }
-
-    private void EnterSelectedRoom()
-    {
-        if (SelectedRoom is null || (SelectedRoom.Id == "unknown" && !unknownUnlocked))
+        if (insideRoomId is not null)
             return;
 
-        insideRoomId = SelectedRoom.Id == "yup" ? "conference" : SelectedRoom.Id;
-    }
+        var room = Rooms.FirstOrDefault(x => x.Id == id);
+        if (room is null)
+            return;
 
-    private SpatialRoom? SelectedRoom => Rooms.FirstOrDefault(x => x.Id == selectedRoomId);
+        if (room.Id == "unknown" && !unknownUnlocked)
+            return;
 
-    private void UnlockUnknown()
-    {
-        unknownUnlocked = true;
-        selectedRoomId = "unknown";
-        ApproachRoom("unknown");
+        Experience.Navigation.ApproachEntrance(room);
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(300);
+
+        insideRoomId = room.Id == "yup" ? "conference" : room.Id;
     }
 
     private void ExitRoom()
@@ -176,7 +174,6 @@
             Experience.Navigation.MoveToExit(room);
 
         insideRoomId = null;
-        selectedRoomId = null;
     }
 
     public void Dispose() => Experience.Dispose();
