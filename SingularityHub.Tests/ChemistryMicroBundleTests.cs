@@ -4,6 +4,7 @@ using HubArbitrator = TheSingularityWorkshop.SingularityHub.IArbitrator;
 using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Chemistry;
+using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
 namespace SingularityHub.Tests;
