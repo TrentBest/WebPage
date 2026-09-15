@@ -4,7 +4,7 @@ namespace TheSingularityWorkshop.Gui;
 /// Spatial identity for a Workshop landmark. Geometry and presentation belong to
 /// GUI builders; the Experience only consumes this world-domain descriptor.
 /// </summary>
-public sealed record SpatialRoom(
+public sealed record SpatialRoomRecord(
     string Id,
     string Name,
     string Kind,
