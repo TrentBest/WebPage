@@ -10,7 +10,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// </summary>
 public sealed class ConferenceMicroBundle : IDisposable
 {
-    public const int BundleId = 2102;
+    public const int BundleId = 2104;
 
     private readonly MicroBundle _lifecycle;
     private bool _disposed;
