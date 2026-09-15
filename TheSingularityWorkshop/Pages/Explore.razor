@@ -25,9 +25,9 @@
         new("experience", "Experience Deck", "LIVING SPACE", 25, 28,
             "The sensory side of the Workshop. This is where an Experience becomes something a visitor can actually inhabit.",
             "EXPERIENCE", "Living GUI / presentation"),
-        new("engineering", "Engineering Core", "RUNTIME MACHINE", 73, 30,
-            "The machinery beneath the experience: deterministic state, Hub coordination, process groups, and runtime observation.",
-            "ENGINEERING", "FSM / Hub / audit"),
+        new("engineering", "The Forge", "FSM WORKSHOP", 73, 30,
+            "The Workshop's first real building: a place for shaping state, lifecycle, reusable substrates, and executable machinery.",
+            "FORGE", "FSM / lifecycle / composition"),
         new("creation", "Creation Bay", "BUILDER SPACE", 34, 72,
             "The composition boundary. Focused capabilities become MicroBundles, then recipes, then executable Experiences.",
             "CREATION", "MicroBundles / composition"),
@@ -60,26 +60,18 @@
             AvatarY,
             HandleKeyDown,
             MoveAvatar,
+            MoveAvatarTo,
             ApproachRoom,
             EnterSelectedRoom,
             UnlockUnknown,
             ExitRoom);
     }
 
-    private void StartForgePreview()
-    {
-        ForgePreview.Start();
-    }
+    private void StartForgePreview() => ForgePreview.Start();
 
-    private void TickForgePreview()
-    {
-        ForgePreview.Tick();
-    }
+    private void TickForgePreview() => ForgePreview.Tick();
 
-    private void ResetForgePreview()
-    {
-        ForgePreview.Stop();
-    }
+    private void ResetForgePreview() => ForgePreview.Stop();
 
     private void HandleKeyDown(KeyboardEventArgs args)
     {
@@ -111,6 +103,15 @@
 
         AvatarX = Math.Clamp(AvatarX + dx, 4, 96);
         AvatarY = Math.Clamp(AvatarY + dy, 8, 92);
+    }
+
+    private void MoveAvatarTo(double x, double y)
+    {
+        if (InsideRoom is not null)
+            return;
+
+        AvatarX = Math.Clamp(x, 4, 96);
+        AvatarY = Math.Clamp(y, 8, 92);
     }
 
     private void ApproachRoom(string id)
