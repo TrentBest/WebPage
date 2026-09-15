@@ -27,9 +27,14 @@ public sealed class FsmForgePreviewTests
 
         preview.Tick();
         Assert.Equal("Forging", preview.State);
-        Assert.Contains("OnEnter → Idle", preview.Events);
-        Assert.Contains("OnExit → Idle", preview.Events);
-        Assert.Contains("OnEnter → Forging", preview.Events);
+        Assert.Equal(
+            new[]
+            {
+                "OnUpdate → Idle",
+                "OnExit → Idle",
+                "OnEnter → Forging"
+            },
+            preview.Events);
 
         preview.Tick();
         preview.Tick();
