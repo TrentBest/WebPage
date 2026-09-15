@@ -20,8 +20,24 @@ public sealed class ArchitecturalShopTests
         Assert.Single(structure.Floors);
         Assert.Contains(structure.Floors[0].Cells, cell => cell is { X: 6, Y: 6, Kind: ArchitecturalCellKind.Room });
         Assert.Contains(structure.Floors[0].Cells, cell => cell is { X: 7, Y: 6, Kind: ArchitecturalCellKind.Stair });
-        Assert.Equal(4, structure.VerticalConnectorCount);
+        Assert.Equal(1, structure.VerticalConnectorCount);
         Assert.Equal(2, structure.TotalCellCount);
+    }
+
+    [Fact]
+    public void Editor_ChangingVerticalCell_RemovesItsConnector()
+    {
+        var editor = new ArchitecturalShopEditor();
+
+        editor.SelectTool(ArchitecturalCellKind.Elevator);
+        editor.Apply(4, 4);
+        Assert.Single(editor.Plan.VerticalConnectors);
+
+        editor.SelectTool(ArchitecturalCellKind.Room);
+        editor.Apply(4, 4);
+
+        Assert.Empty(editor.Plan.VerticalConnectors);
+        Assert.Equal(ArchitecturalCellKind.Room, editor.Plan.CellAt(4, 4)!.Value.Kind);
     }
 
     [Fact]
