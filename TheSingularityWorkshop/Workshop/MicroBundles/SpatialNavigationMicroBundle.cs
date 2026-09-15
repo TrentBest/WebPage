@@ -1,6 +1,7 @@
 using System;
 using TheSingularityWorkshop.Gui;
 using TheSingularityWorkshop.SingularityHub;
+using TheSingularityWorkshop.Workshop.Experience;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
@@ -52,16 +53,16 @@ public sealed class SpatialNavigationMicroBundle : IDisposable
         MoveTo(x, y + offsetY);
     }
 
-    public void ApproachEntrance(SpatialRoom room, double offset = 0)
+    public void ApproachEntrance(ExperienceSpace experienceSpace, double offset = 0)
     {
         if (_disposed) return;
-        MoveTo(room.EntranceX, room.EntranceY + offset);
+        MoveTo(experienceSpace.EntranceX, experienceSpace.EntranceY + offset);
     }
 
-    public void MoveToExit(SpatialRoom room)
+    public void MoveToExit(ExperienceSpace experienceSpace)
     {
         if (_disposed) return;
-        MoveTo(room.ExitX, room.ExitY);
+        MoveTo(experienceSpace.ExitX, experienceSpace.ExitY);
     }
 
     public void Update() => _lifecycle.Update();
