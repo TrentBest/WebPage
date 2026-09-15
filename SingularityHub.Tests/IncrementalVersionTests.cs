@@ -120,4 +120,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 115)]
     [Fact(DisplayName = "V0.0.115 — Explore_Workshop_Forge_Floorplan_And_Breathing_Avatar")]
     public void V0_0_115_ExploreWorkshopForgeFloorplanAndBreathingAvatar() => Assert.Equal("0.0.115", "0.0.115");
+
+    [ArchitectureTest(0, 0, 116)]
+    [Fact(DisplayName = "V0.0.116 — Explore_Becomes_A_Navigable_Workshop_Blueprint_With_Click_To_Walk")]
+    public void V0_0_116_ExploreBecomesANavigableWorkshopBlueprintWithClickToWalk() => Assert.Equal("0.0.116", "0.0.116");
 }
