@@ -28,10 +28,13 @@ public static class SpatialWorldGuiBuilder
         string tourKicker,
         string tourMessage,
         string? hoveredInteractableId,
+        WorkshopSign? openSign,
         Func<KeyboardEventArgs, Task> onKeyDown,
         Func<double, double, Task> moveAvatarTo,
         Func<string, Task> interactRoom,
-        Action<string?> setHoveredInteractable)
+        Action<string?> setHoveredInteractable,
+        Action<WorkshopSign> showSign,
+        Action closeSign)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed")
@@ -53,10 +56,13 @@ public static class SpatialWorldGuiBuilder
             tourKicker,
             tourMessage,
             hoveredInteractableId,
+            openSign,
             onKeyDown,
             moveAvatarTo,
             interactRoom,
-            setHoveredInteractable));
+            setHoveredInteractable,
+            showSign,
+            closeSign));
 
         return root;
     }
@@ -70,10 +76,13 @@ public static class SpatialWorldGuiBuilder
         string tourKicker,
         string tourMessage,
         string? hoveredInteractableId,
+        WorkshopSign? openSign,
         Func<KeyboardEventArgs, Task> onKeyDown,
         Func<double, double, Task> moveAvatarTo,
         Func<string, Task> interactRoom,
-        Action<string?> setHoveredInteractable)
+        Action<string?> setHoveredInteractable,
+        Action<WorkshopSign> showSign,
+        Action closeSign)
     {
         var world = WorkshopGui.Panel(receiver)
             .Style("position", "absolute")
@@ -111,13 +120,15 @@ public static class SpatialWorldGuiBuilder
                 locked,
                 string.Equals(room.Id, hoveredInteractableId, StringComparison.Ordinal),
                 interactRoom,
-                setHoveredInteractable));
+                setHoveredInteractable,
+                showSign));
         }
 
         world.Content(camera);
         world.Content(WalkSurface(receiver, avatarX, avatarY, moveAvatarTo));
         world.Content(Avatar(receiver));
         world.Content(TourCard(receiver, tourKicker, tourMessage));
+        world.Content(WorkshopInteractableGuiBuilder.SignFace(receiver, openSign, closeSign));
         return world;
     }
 
@@ -237,16 +248,27 @@ public static class SpatialWorldGuiBuilder
         bool locked,
         bool hovered,
         Func<string, Task> interactRoom,
-        Action<string?> setHoveredInteractable)
+        Action<string?> setHoveredInteractable,
+        Action<WorkshopSign> showSign)
     {
         var interactable = ToInteractable(room);
         var accent = locked ? Yellow : Accent(room.Id);
 
-        var building = WorkshopGui.Button(receiver)
-            .PositionAt(room.X, room.Y)
-            .Style("z-index", "5")
+        var frame = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute")
+            .Style("left", $"{room.X:0.##}%")
+            .Style("top", $"{room.Y:0.##}%")
             .Style("width", $"{room.Width}%")
             .Style("height", $"{room.Height}%")
+            .Style("box-sizing", "border-box")
+            .Style("z-index", "5")
+            .Style("pointer-events", "none");
+
+        var building = WorkshopGui.Button(receiver)
+            .Style("position", "absolute")
+            .Style("inset", "0")
+            .Style("width", "100%")
+            .Style("height", "100%")
             .Style("padding", "0")
             .Style("border", $"2px solid {accent}{(hovered ? "ee" : "99")}")
             .Style("border-radius", "0")
@@ -282,26 +304,38 @@ public static class SpatialWorldGuiBuilder
             .Style("pointer-events", "none")
             .Text(room.Name));
 
-        return building;
+        frame.Content(building);
+        frame.Content(WorkshopInteractableGuiBuilder.SignButton(receiver, interactable, showSign)
+            .Style("pointer-events", locked ? "none" : "auto"));
+        return frame;
     }
 
-    private static Interactable ToInteractable(ExperienceSpace room)
+    private static WorkshopInteractable ToInteractable(ExperienceSpace room)
     {
         var schematic = room.Id switch
         {
             "engineering" => "forge",
             "creation" => "creation-bay",
             "experience" => "research-facility",
+            "architecture" => "architectural-shop",
+            "research" => "research-facility",
+            "space-elevator" => "space-elevator",
             "unknown" => "unknown",
             _ => "default"
         };
 
-        return new Interactable(
+        return new WorkshopInteractable(
             room.Id,
             room.Name,
             InteractionScope.World,
             new InteractionPoint(room.EntranceX, room.EntranceY),
             NoOpInteractableBehavior.Instance,
+            new WorkshopSign(
+                $"{room.Id}-sign",
+                room.Name,
+                room.Kind,
+                room.Description,
+                $"CAPABILITY // {room.Capability}"),
             triggers: InteractionTrigger.HoverOrClick,
             presentation: new InteractablePresentation(room.Kind, room.Description, schematic));
     }
