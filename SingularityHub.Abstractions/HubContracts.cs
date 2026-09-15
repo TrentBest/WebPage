@@ -66,8 +66,12 @@ public enum ExperienceExecutionPhase
 /// <summary>Stable runtime capability identifiers shared across independently compiled Experiences.</summary>
 public static class HubCapabilityIds
 {
-    /// <summary>Capability identifying an Experience that can provide a user-defined Moniker presentation.</summary>
     public const ulong Moniker = 0x4D4F4E494B455201UL;
+    public const ulong SpatialNavigation = 0x5350415449414C01UL;
+    public const ulong VisitorIdentity = 0x5553455200000001UL;
+    public const ulong Conference = 0x434F4E4645520101UL;
+    public const ulong FsmForge = 0x464F524745000001UL;
+    public const ulong SoftwarePatterns = 0x5041545445524E01UL;
 }
 
 /// <summary>
@@ -81,14 +85,9 @@ public readonly record struct ExperienceManifest(
     IReadOnlyList<ulong> Running,
     IReadOnlyList<ulong> RequiredCapabilities)
 {
-    /// <summary>Returns whether the manifest explicitly requires a capability.</summary>
     public bool RequiresCapability(ulong capabilityId) => RequiredCapabilities.Contains(capabilityId);
-
-    /// <summary>Returns whether an Experience identity appears in any phase.</summary>
     public bool ContainsExperience(ulong experienceId)
-        => Startup.Contains(experienceId)
-        || Transitioning.Contains(experienceId)
-        || Running.Contains(experienceId);
+        => Startup.Contains(experienceId) || Transitioning.Contains(experienceId) || Running.Contains(experienceId);
 }
 
 /// <summary>
