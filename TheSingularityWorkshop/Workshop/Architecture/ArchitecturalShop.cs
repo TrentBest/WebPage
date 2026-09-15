@@ -43,7 +43,15 @@ public sealed record ArchitecturalFloorPlan(
     IReadOnlyList<ArchitecturalVerticalConnector> VerticalConnectors)
 {
     public ArchitecturalCell? CellAt(int x, int y)
-        => Cells.FirstOrDefault(cell => cell.X == x && cell.Y == y);
+    {
+        foreach (var cell in Cells)
+        {
+            if (cell.X == x && cell.Y == y)
+                return cell;
+        }
+
+        return null;
+    }
 
     public ArchitecturalFloorPlan WithCell(int x, int y, ArchitecturalCellKind kind)
     {
@@ -54,7 +62,11 @@ public sealed record ArchitecturalFloorPlan(
         if (kind != ArchitecturalCellKind.Empty)
             cells.Add(new ArchitecturalCell(x, y, kind));
 
-        return this with { Cells = cells };
+        var connectors = VerticalConnectors
+            .Where(connector => connector.X != x || connector.Y != y)
+            .ToArray();
+
+        return this with { Cells = cells, VerticalConnectors = connectors };
     }
 
     public ArchitecturalFloorPlan AddVerticalConnector(ArchitecturalVerticalConnector connector)
@@ -63,7 +75,8 @@ public sealed record ArchitecturalFloorPlan(
             throw new ArgumentOutOfRangeException(nameof(connector));
 
         var connectors = VerticalConnectors
-            .Where(existing => existing.Id != connector.Id)
+            .Where(existing => existing.Id != connector.Id
+                && (existing.X != connector.X || existing.Y != connector.Y))
             .Append(connector)
             .ToArray();
         return this with { VerticalConnectors = connectors };
@@ -89,7 +102,7 @@ public sealed record ArchitecturalStructure(
 /// </summary>
 public sealed class ArchitecturalShopEditor
 {
-    public ArchitecturalFloorPlan Plan { get; private set; } = ArchitecturalFloorPlanTemplates.OpenWorkshop;
+    public ArchitecturalFloorPlan Plan { get; private set; } = ArchitecturalFloorPlanTemplates.Blank;
     public ArchitecturalStructure? CapturedStructure { get; private set; }
     public ArchitecturalCellKind SelectedTool { get; private set; } = ArchitecturalCellKind.Wall;
 
@@ -132,6 +145,9 @@ public sealed class ArchitecturalShopEditor
 
 public static class ArchitecturalFloorPlanTemplates
 {
+    public static ArchitecturalFloorPlan Blank =>
+        new("blank", "New Floor Plan", 20, 14, [], []);
+
     public static ArchitecturalFloorPlan OpenWorkshop => Build(
         "open-workshop", "Open Workshop", 20, 14,
         [
