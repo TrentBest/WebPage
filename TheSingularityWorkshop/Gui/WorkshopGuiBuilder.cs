@@ -118,6 +118,14 @@ public class ElementBuilder
         => Attribute("onclick", EventCallback.Factory.Create(_receiver, action));
 
     /// <summary>
+    /// Supports asynchronous interaction semantics. This is important for
+    /// spatial experiences where an interaction may first move the visitor to
+    /// an object's interaction point and only then activate the object.
+    /// </summary>
+    public ElementBuilder OnClick(Func<Task> action)
+        => Attribute("onclick", EventCallback.Factory.Create(_receiver, action));
+
+    /// <summary>
     /// Handles pointer clicks while preserving the browser event payload. This
     /// is the primitive required by spatial builders to interpret map-relative
     /// coordinates without a page-specific JavaScript dependency.
@@ -126,7 +134,7 @@ public class ElementBuilder
         => Attribute("onclick", EventCallback.Factory.Create<MouseEventArgs>(_receiver, action));
 
     public ElementBuilder OnKeyDown(Action<KeyboardEventArgs> action)
-        => Attribute("onkeydown", EventCallback.Factory.Create<KeyboardEventArgs>(_receiver, action));
+        => Attribute("onkeydown", EventCallback.Factory.Create(_receiver, action));
 
     public ElementBuilder OnMouseEnter(Action action)
         => Attribute("onmouseenter", EventCallback.Factory.Create(_receiver, action));
