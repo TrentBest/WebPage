@@ -71,7 +71,10 @@ public sealed class FsmForgePreview
         if (_handle is null)
             return;
 
-        _handle.Update("ForgePreview");
+        // Use the API's processing-group tick rather than calling FSMHandle.Update()
+        // directly. TickAll owns the lifecycle gate that invokes OnEnter exactly once
+        // for a state whose handle has not entered it yet.
+        FsmApi.Interaction.TickAll("ForgePreview");
     }
 
     public void Stop()
