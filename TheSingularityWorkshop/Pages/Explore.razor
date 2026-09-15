@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.Gui
 @using TheSingularityWorkshop.Workshop.Architecture
+@using TheSingularityWorkshop.Workshop.Chemistry
 @using TheSingularityWorkshop.Workshop.Experience
 @using TheSingularityWorkshop.Workshop.MicroBundles
 @implements IDisposable
@@ -16,6 +17,8 @@
 
     private readonly ExploreExperienceMicroBundle Experience = new();
     private readonly ArchitecturalShopEditor ArchitectureShop = new();
+    private readonly HadronColliderSimulator Collider = new();
+    private readonly SpaceElevatorStructure SpaceElevator = SpaceElevatorTemplates.WorkshopOrbitalTether;
     private string? insideRoomId;
     private string? hoveredInteractableId;
     private int walkGeneration;
@@ -28,12 +31,18 @@
         new("engineering", "The Forge", "FSM WORKSHOP", 73, 30, 73, 46, 73, 46,
             "The Workshop's first real building: a place for shaping state, lifecycle, reusable substrates, and executable machinery.",
             "FORGE", "FSM / lifecycle / composition", 30, 25),
+        new("research", "Research Laboratory", "PARTICLE PHYSICS", 52, 48, 52, 66, 52, 66,
+            "A research facility for chemistry, materials, computation, and controlled experiments — including a hadron collider simulator.",
+            "RESEARCH", "Chemistry / materials / collider simulation", 18, 16),
         new("creation", "Creation Bay", "BUILDER SPACE", 34, 72, 34, 88, 34, 88,
             "The composition boundary. Focused capabilities become MicroBundles, then recipes, then executable Experiences.",
             "CREATION", "MicroBundles / composition", 31, 23),
         new("architecture", "Architectural Shop", "DESIGN STUDIO", 8, 76, 8, 92, 8, 92,
             "Draw a floor plan, place doors and rooms, and introduce the vertical circulation that turns a sketch into a structure.",
             "ARCHITECTURE", "Floor plans / structures / vertical circulation", 25, 20),
+        new("space-elevator", "Space Elevator", "ORBITAL ACCESS", 66, 28, 66, 68, 66, 68,
+            "The Workshop's vertical road into space: ground anchor, tether, climber, counterweight, and an orbital station at the top.",
+            "SPACE", "Orbital infrastructure / station", 7, 40),
         new("unknown", "Unknown Annex", "UNMAPPED", 79, 76, 79, 90, 79, 90,
             "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.",
             "UNKNOWN", "Undisclosed", 24, 20)
@@ -78,6 +87,8 @@
                 "creation" => "CREATION BAY — small capabilities become MicroBundles. Compose enough of them and you stop writing a page and start building an Experience.",
                 "experience" => "EXPERIENCE DECK — this is the destination: technology becomes an environment someone can enter, explore, and remember.",
                 "architecture" => "ARCHITECTURAL SHOP — draw the bones of a place. Walls, rooms, doors, stairs, elevators, and ladders become data first; later they can become an actual Workshop structure.",
+                "research" => "RESEARCH LABORATORY — the Workshop's experimental engine. Materials, chemistry, computation, and a hadron collider simulator belong here.",
+                "space-elevator" => "SPACE ELEVATOR — the Workshop does not stop at the roof. The tether rises to an orbital station and makes space part of the same navigable architecture.",
                 _ => nearest.Description
             };
         }
@@ -114,6 +125,22 @@
                 CaptureArchitecture,
                 ExitRoom);
         }
+
+        if (insideRoomId == "research")
+        {
+            return HadronColliderGuiBuilder.Build(
+                this,
+                Collider,
+                ConfigureCollider,
+                InjectCollider,
+                AccelerateCollider,
+                CollideCollider,
+                ResetCollider,
+                ExitRoom);
+        }
+
+        if (insideRoomId == "space-elevator")
+            return SpaceElevatorGuiBuilder.Build(this, SpaceElevator, ExitRoom);
 
         var world = SpatialWorldGuiBuilder.Build(
             this,
@@ -187,6 +214,36 @@
     private void CaptureArchitecture()
     {
         ArchitectureShop.Capture();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void ConfigureCollider()
+    {
+        Collider.Configure(HadronKind.Proton, HadronKind.Proton, 7, 2.5);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void InjectCollider()
+    {
+        Collider.Inject();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void AccelerateCollider()
+    {
+        Collider.Accelerate();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void CollideCollider()
+    {
+        Collider.Collide("HADRON DETECTOR");
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void ResetCollider()
+    {
+        Collider.Reset();
         _ = InvokeAsync(StateHasChanged);
     }
 
@@ -274,6 +331,7 @@
     {
         Forge.Reset();
         Experience.Conference.Leave();
+        Collider.Reset();
 
         var room = Rooms.FirstOrDefault(x => x.Id == insideRoomId);
         if (room is not null)
