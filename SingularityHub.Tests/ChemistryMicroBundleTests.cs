@@ -35,7 +35,7 @@ public sealed class ChemistryMicroBundleTests
             new ElementalFraction(iron, 0.05));
 
         var source = new MaterialSourceBundle(material);
-        var results = new ElementalArbitrator().Evaluate(new HubBundle[] { source });
+        var results = new ElementalArbitrator().Evaluate(new IMicroBundle[] { source });
         var result = Assert.Single(results);
 
         Assert.Equal(MaterialApplication.Armor, result.Application);
@@ -61,7 +61,7 @@ public sealed class ChemistryMicroBundleTests
         Assert.Equal("weapon-frame", chemistry.ResolvedMaterials.Single().MaterialId);
     }
 
-    private sealed class MaterialSourceBundle : HubBundle, IElementalMaterialSource
+    private sealed class MaterialSourceBundle : IMicroBundle, IElementalMaterialSource
     {
         public MaterialSourceBundle(MaterialComposition material) => Materials = [material];
         public ulong Id => 99001;
@@ -74,9 +74,9 @@ public sealed class ChemistryMicroBundleTests
 
     private sealed class TestArbitrator : IArbitrator
     {
-        public TestArbitrator(params HubBundle[] bundles) => LoadedBundles = bundles;
-        public IReadOnlyCollection<HubBundle> LoadedBundles { get; }
-        public bool LoadBundle(HubBundle bundle) => false;
+        public TestArbitrator(params IMicroBundle[] bundles) => LoadedBundles = bundles;
+        public IReadOnlyCollection<IMicroBundle> LoadedBundles { get; }
+        public bool LoadBundle(IMicroBundle bundle) => false;
         public int ExecuteArbitrationPipeline() => 0;
     }
 }
