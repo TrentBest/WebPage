@@ -117,6 +117,14 @@ public class ElementBuilder
     public ElementBuilder OnClick(Action action)
         => Attribute("onclick", EventCallback.Factory.Create(_receiver, action));
 
+    /// <summary>
+    /// Handles pointer clicks while preserving the browser event payload. This
+    /// is the primitive required by spatial builders to interpret map-relative
+    /// coordinates without a page-specific JavaScript dependency.
+    /// </summary>
+    public ElementBuilder OnClick(Action<MouseEventArgs> action)
+        => Attribute("onclick", EventCallback.Factory.Create<MouseEventArgs>(_receiver, action));
+
     public ElementBuilder OnKeyDown(Action<KeyboardEventArgs> action)
         => Attribute("onkeydown", EventCallback.Factory.Create<KeyboardEventArgs>(_receiver, action));
 
