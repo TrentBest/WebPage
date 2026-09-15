@@ -73,8 +73,55 @@ public sealed class InteractableFilterTests
         Assert.Equal("reagent-x", open[0].Id);
     }
 
+    [Fact]
+    public void Interactable_Supports_Hover_And_Click_Independently()
+    {
+        var hoverOnly = new Interactable(
+            "hover",
+            "Hover Action",
+            InteractionScope.World,
+            new InteractionPoint(10, 10),
+            new RecordingBehavior(),
+            triggers: InteractionTrigger.Hover);
+        var both = new Interactable(
+            "both",
+            "Hover Or Click",
+            InteractionScope.World,
+            new InteractionPoint(10, 10),
+            new RecordingBehavior(),
+            triggers: InteractionTrigger.HoverOrClick);
+
+        Assert.True(hoverOnly.Supports(InteractionTrigger.Hover));
+        Assert.False(hoverOnly.Supports(InteractionTrigger.Click));
+        Assert.True(both.Supports(InteractionTrigger.Hover));
+        Assert.True(both.Supports(InteractionTrigger.Click));
+    }
+
+    [Fact]
+    public void InteractableExecutor_Runs_Behavior_Only_For_Supported_Eligible_Trigger()
+    {
+        var behavior = new RecordingBehavior();
+        var interactable = new Interactable(
+            "sample",
+            "Sample",
+            InteractionScope.World,
+            new InteractionPoint(10, 10),
+            behavior,
+            triggers: InteractionTrigger.HoverOrClick);
+        var context = new InteractionContext("world", InteractionScope.World, new HashSet<string>());
+
+        var executor = new InteractableExecutor();
+
+        Assert.True(executor.TryExecute(interactable, InteractionTrigger.Hover, context));
+        Assert.Equal(1, behavior.ExecutionCount);
+        Assert.True(executor.TryExecute(interactable, InteractionTrigger.Click, context));
+        Assert.Equal(2, behavior.ExecutionCount);
+    }
+
     private sealed class RecordingBehavior : IInteractableBehavior
     {
-        public void Execute(InteractionContext context) { }
+        public int ExecutionCount { get; private set; }
+
+        public void Execute(InteractionContext context) => ExecutionCount++;
     }
 }
