@@ -22,6 +22,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
     {
         _lifecycle = new MicroBundle(BundleId, "WORKSHOP EXPLORE EXPERIENCE", new WebMicroBundleProvider());
         Navigation = new SpatialNavigationMicroBundle();
+        Pathfinding = new PathfindingMicroBundle();
         User = new UserMicroBundle();
         Conference = new ConferenceMicroBundle();
         Forge = new FsmForgeMicroBundle();
@@ -34,6 +35,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
 
     public SpatialNavigationMicroBundle Navigation { get; }
+    public PathfindingMicroBundle Pathfinding { get; }
     public UserMicroBundle User { get; }
     public ConferenceMicroBundle Conference { get; }
     public FsmForgeMicroBundle Forge { get; }
@@ -56,6 +58,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
     IReadOnlyList<ulong> IExperience.MicroBundleIds =>
     [
         Navigation.Id,
+        Pathfinding.Id,
         User.Id,
         Conference.Id,
         Forge.Id,
@@ -67,6 +70,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
     IReadOnlyList<ulong> IExperience.Capabilities =>
     [
         HubCapabilityIds.SpatialNavigation,
+        HubCapabilityIds.Pathfinding,
         HubCapabilityIds.VisitorIdentity,
         HubCapabilityIds.Conference,
         HubCapabilityIds.FsmForge,
@@ -81,6 +85,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
     [
         "MicroBundle_2100",
         "MicroBundle_2101",
+        "MicroBundle_2105",
         "MicroBundle_2102",
         "MicroBundle_2104",
         "MicroBundle_2103",
@@ -94,6 +99,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
         if (_disposed) return;
         _lifecycle.Update();
         Navigation.Update();
+        Pathfinding.Update();
         User.Update();
         Conference.Update();
         Forge.Update();
@@ -111,6 +117,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
         Forge.Dispose();
         Conference.Dispose();
         User.Dispose();
+        Pathfinding.Dispose();
         Navigation.Dispose();
         _lifecycle.Dispose();
         _disposed = true;
