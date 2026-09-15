@@ -7,6 +7,15 @@
 
 <PageTitle>Explore // The Singularity Workshop</PageTitle>
 
+<style>
+    /* Explore is a viewport-bound spatial canvas. The blueprint panel is the world surface. */
+    #workshop-spatial-map {
+        min-height: 0 !important;
+        height: calc(100vh - 13rem) !important;
+        z-index: 30 !important;
+    }
+</style>
+
 @BuildGui().Build()
 
 @code {
