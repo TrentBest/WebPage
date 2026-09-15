@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.Workshop.MicroBundles;
+using Xunit;
 
 namespace SingularityHub.Tests;
 
@@ -55,5 +56,20 @@ public sealed class ExploreExperienceMicroBundleTests
         conference.Leave();
         Assert.False(conference.Joined);
         Assert.Equal(0, conference.ParticipantCount);
+    }
+
+    [Fact]
+    public void FsmForge_ExpressesItsOwnPresentationAndFacadeState()
+    {
+        using var forge = new FsmForgeMicroBundle();
+
+        Assert.Equal("The Forge", forge.Presentation.Title);
+        Assert.Equal("FSM WORKSHOP", forge.Presentation.Surface);
+        Assert.Contains("STATE LIFECYCLE", forge.Presentation.Capabilities);
+        Assert.Equal("NOT STARTED", forge.State);
+
+        forge.Start();
+
+        Assert.True(forge.IsRunning);
     }
 }
