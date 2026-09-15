@@ -38,8 +38,7 @@ public static class SpatialWorldGuiBuilder
             .Style("background", Ink)
             .Style("color", White)
             .Style("font-family", "Consolas, 'Courier New', monospace")
-            .Style("box-sizing", "border-box")
-            .Attribute("class", "workshop-spatial-experience");
+            .Style("box-sizing", "border-box");
 
         root.Content(World(
             receiver,
@@ -75,6 +74,7 @@ public static class SpatialWorldGuiBuilder
             .Style("background", "#020a12")
             .Style("border", "0")
             .Style("box-sizing", "border-box")
+            .Style("touch-action", "manipulation")
             .Attribute("id", "workshop-spatial-map")
             .Attribute("tabindex", "0")
             .AriaLabel("Workshop world. Click a place to walk. Use WASD or arrow keys.")
@@ -112,14 +112,13 @@ public static class SpatialWorldGuiBuilder
 
     private static ElementBuilder TourCard(object receiver, string kicker, string message)
         => WorkshopGui.Element(receiver, "section")
-            .Attribute("class", "workshop-tour-card")
             .Style("position", "fixed")
             .Style("left", "50%")
-            .Style("bottom", "1.2rem")
+            .Style("top", ".7rem")
             .Style("transform", "translateX(-50%)")
             .Style("z-index", "30")
-            .Style("width", "min(680px, calc(100vw - 2rem))")
-            .Style("padding", ".8rem 1rem")
+            .Style("width", "min(680px, calc(100vw - 1rem))")
+            .Style("padding", ".65rem .8rem")
             .Style("box-sizing", "border-box")
             .Style("border", "1px solid rgba(0,234,255,.34)")
             .Style("border-left", "3px solid rgba(0,234,255,.78)")
@@ -134,10 +133,11 @@ public static class SpatialWorldGuiBuilder
                 .Style("margin-bottom", ".35rem")
                 .Text(kicker))
             .Content(WorkshopGui.Element(receiver, "div")
-                .Style("font-size", "clamp(.58rem, 1.15vw, .78rem)")
-                .Style("line-height", "1.55")
+                .Style("font-size", "clamp(.56rem, 1.15vw, .78rem)")
+                .Style("line-height", "1.45")
                 .Style("letter-spacing", ".04em")
                 .Style("color", White)
+                .Style("max-width", "100%")
                 .Text(message));
 
     private static ElementBuilder WalkSurface(
@@ -251,9 +251,11 @@ public static class SpatialWorldGuiBuilder
                 .Style("padding", ".2rem .4rem")
                 .Style("background", "rgba(1,4,10,.85)")
                 .Style("border", $"1px solid {accent}55")
-                .Style("font-size", room.Id == "engineering" ? ".75rem" : ".55rem")
-                .Style("letter-spacing", ".1em")
-                .Style("white-space", "nowrap")
+                .Style("font-size", "clamp(.42rem, 1vw, .75rem)")
+                .Style("letter-spacing", ".06em")
+                .Style("max-width", "90%")
+                .Style("white-space", "normal")
+                .Style("text-align", "center")
                 .Style("pointer-events", "none")
                 .Text(room.Name))
             .Content(WorkshopGui.Element(receiver, "div")
