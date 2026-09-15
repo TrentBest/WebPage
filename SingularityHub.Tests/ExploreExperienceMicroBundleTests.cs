@@ -72,4 +72,42 @@ public sealed class ExploreExperienceMicroBundleTests
 
         Assert.True(forge.IsRunning);
     }
+
+    [Fact]
+    public void SoftwarePatterns_FormFocusedBundlesGroupsAndAnnotatedHierarchy()
+    {
+        using var patterns = new SoftwarePatternsMicroBundle();
+        using var annotation = new SoftwarePatternsAnnotationMicroBundle(patterns);
+
+        Assert.Equal((ulong)SoftwarePatternsMicroBundle.BundleId, patterns.Id);
+        Assert.Equal(3, patterns.Groups.Count);
+        Assert.Equal(8, patterns.Patterns.Count);
+
+        Assert.Equal((ulong)CreationalPatternsMicroBundle.BundleId, patterns.Creational.Id);
+        Assert.Equal((ulong)StructuralPatternsMicroBundle.BundleId, patterns.Structural.Id);
+        Assert.Equal((ulong)BehavioralPatternsMicroBundle.BundleId, patterns.Behavioral.Id);
+
+        Assert.Contains(patterns.Creational.Patterns, pattern => pattern is FactoryMicroBundle);
+        Assert.Contains(patterns.Creational.Patterns, pattern => pattern is BuilderMicroBundle);
+        Assert.Contains(patterns.Structural.Patterns, pattern => pattern is FacadeMicroBundle);
+        Assert.Contains(patterns.Structural.Patterns, pattern => pattern is CompositeMicroBundle);
+        Assert.Contains(patterns.Behavioral.Patterns, pattern => pattern is CommandMicroBundle);
+        Assert.Contains(patterns.Behavioral.Patterns, pattern => pattern is ObserverMicroBundle);
+        Assert.Contains(patterns.Behavioral.Patterns, pattern => pattern is StrategyMicroBundle);
+
+        Assert.Equal(12, annotation.ReferencedBundles.Count);
+        Assert.Equal(12, annotation.Annotations.Count);
+        Assert.All(annotation.Annotations, item => Assert.NotEmpty(item.Tags));
+    }
+
+    [Fact]
+    public void ExploreExperience_ExposesPatternFamilyAndAnnotationAsMicroBundles()
+    {
+        using var experience = new ExploreExperienceMicroBundle();
+
+        Assert.Equal((ulong)SoftwarePatternsMicroBundle.BundleId, experience.SoftwarePatterns.Id);
+        Assert.Equal((ulong)SoftwarePatternsAnnotationMicroBundle.BundleId, experience.SoftwarePatternsAnnotation.Id);
+        Assert.Same(experience.SoftwarePatterns, experience.SoftwarePatternsAnnotation.Patterns);
+        Assert.Equal(8, experience.SoftwarePatterns.Patterns.Count);
+    }
 }
