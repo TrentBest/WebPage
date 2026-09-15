@@ -9,6 +9,8 @@
 @BuildGui().Build()
 
 @code {
+    private const double WalkStep = 1.5;
+
     private readonly ExploreExperienceMicroBundle Experience = new();
     private string? insideRoomId;
     private bool unknownUnlocked;
@@ -133,19 +135,19 @@
         {
             case "w":
             case "arrowup":
-                MoveAvatar(0, -3);
+                MoveAvatar(0, -WalkStep);
                 break;
             case "s":
             case "arrowdown":
-                MoveAvatar(0, 3);
+                MoveAvatar(0, WalkStep);
                 break;
             case "a":
             case "arrowleft":
-                MoveAvatar(-3, 0);
+                MoveAvatar(-WalkStep, 0);
                 break;
             case "d":
             case "arrowright":
-                MoveAvatar(3, 0);
+                MoveAvatar(WalkStep, 0);
                 break;
         }
     }
