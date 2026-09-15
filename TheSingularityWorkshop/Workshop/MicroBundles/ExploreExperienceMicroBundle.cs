@@ -21,6 +21,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     {
         _lifecycle = new MicroBundle(BundleId, "WORKSHOP EXPLORE EXPERIENCE", new WebMicroBundleProvider());
         Navigation = new SpatialNavigationMicroBundle();
+        User = new UserMicroBundle();
         Conference = new ConferenceMicroBundle();
         Forge = new FsmForgeMicroBundle();
         SoftwarePatterns = new SoftwarePatternsMicroBundle();
@@ -32,6 +33,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
 
     public SpatialNavigationMicroBundle Navigation { get; }
+    public UserMicroBundle User { get; }
     public ConferenceMicroBundle Conference { get; }
     public FsmForgeMicroBundle Forge { get; }
     public SoftwarePatternsMicroBundle SoftwarePatterns { get; }
@@ -43,6 +45,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         if (_disposed) return;
         _lifecycle.Update();
         Navigation.Update();
+        User.Update();
         Conference.Update();
         Forge.Update();
         SoftwarePatterns.Update();
@@ -58,6 +61,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         SoftwarePatterns.Dispose();
         Forge.Dispose();
         Conference.Dispose();
+        User.Dispose();
         Navigation.Dispose();
         _lifecycle.Dispose();
         _disposed = true;
