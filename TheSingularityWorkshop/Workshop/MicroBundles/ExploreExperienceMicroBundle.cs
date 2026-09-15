@@ -10,7 +10,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// Humans remain in the loop by choosing where to go, what to enter, and which
 /// capabilities to activate.
 /// </summary>
-public sealed class ExploreExperienceMicroBundle : IDisposable
+public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
 {
     public const int BundleId = 2100;
     public const ulong ExperienceId = 3002;
@@ -40,16 +40,20 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     public SoftwarePatternsMicroBundle SoftwarePatterns { get; }
     public SoftwarePatternsAnnotationMicroBundle SoftwarePatternsAnnotation { get; }
 
-    /// <summary>Experience identity is distinct from the MicroBundle that owns the composition lifecycle.</summary>
-    ulong IExperience.Id => ExperienceId;
+    /// <inheritdoc />
+    public ulong ExperienceId => ExploreExperienceMicroBundle.ExperienceId;
 
-    string IExperience.Name => "WORKSHOP EXPLORE";
+    /// <inheritdoc />
+    public string Name => "WORKSHOP EXPLORE";
 
-    BundleVersion IExperience.Version => new(1, 0, 0);
+    /// <inheritdoc />
+    public BundleVersion Version => new(1, 0, 0);
 
-    OntologySignature IExperience.Ontology => new(1, 1, 1, 1, 1, 1, 1, 1, checked((int)ExperienceId));
+    /// <inheritdoc />
+    public OntologySignature Ontology => new(1, 1, 1, 1, 1, 1, 1, 1, checked((int)ExploreExperienceMicroBundle.ExperienceId));
 
-    IReadOnlyList<ulong> IExperience.MicroBundleIds =>
+    /// <inheritdoc />
+    public IReadOnlyList<ulong> MicroBundleIds =>
     [
         Navigation.Id,
         User.Id,
@@ -59,7 +63,8 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         SoftwarePatternsAnnotation.Id
     ];
 
-    IReadOnlyList<ulong> IExperience.Capabilities =>
+    /// <inheritdoc />
+    public IReadOnlyList<ulong> Capabilities =>
     [
         HubCapabilityIds.SpatialNavigation,
         HubCapabilityIds.VisitorIdentity,
@@ -68,9 +73,11 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         HubCapabilityIds.SoftwarePatterns
     ];
 
-    IReadOnlyList<ulong> IExperience.SensorySystems => [1];
+    /// <inheritdoc />
+    public IReadOnlyList<ulong> SensorySystems => [1];
 
-    IReadOnlyList<string> IExperience.ProcessingGroups =>
+    /// <inheritdoc />
+    public IReadOnlyList<string> ProcessingGroups =>
     [
         "MicroBundle_2100",
         "MicroBundle_2101",
