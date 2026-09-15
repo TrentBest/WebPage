@@ -25,7 +25,7 @@ public static class SpatialWorldGuiBuilder
         double avatarY,
         string tourKicker,
         string tourMessage,
-        Action<KeyboardEventArgs> onKeyDown,
+        Func<KeyboardEventArgs, Task> onKeyDown,
         Action<double, double> moveAvatar,
         Func<double, double, Task> moveAvatarTo,
         Func<string, Task> interactRoom)
@@ -66,7 +66,7 @@ public static class SpatialWorldGuiBuilder
         double avatarY,
         string tourKicker,
         string tourMessage,
-        Action<KeyboardEventArgs> onKeyDown,
+        Func<KeyboardEventArgs, Task> onKeyDown,
         Action<double, double> moveAvatar,
         Func<double, double, Task> moveAvatarTo,
         Func<string, Task> interactRoom)
