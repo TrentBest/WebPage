@@ -34,6 +34,7 @@ public class ElementBuilder
 {
     private readonly object _receiver;
     private readonly string _tagName;
+    private readonly RenderFragment? _rawFragment;
     private readonly List<(string Name, object? Value)> _attributes = new();
     private readonly List<RenderFragment> _children = new();
     private readonly Dictionary<string, string> _styles = new(StringComparer.Ordinal);
@@ -42,6 +43,24 @@ public class ElementBuilder
     {
         _receiver = receiver;
         _tagName = tagName;
+    }
+
+    private ElementBuilder(RenderFragment rawFragment)
+    {
+        _receiver = new object();
+        _tagName = string.Empty;
+        _rawFragment = rawFragment;
+    }
+
+    /// <summary>
+    /// Allows an existing RenderFragment-producing builder to cross back into
+    /// the recursive ElementBuilder vocabulary without making pages understand
+    /// the concrete rendering representation.
+    /// </summary>
+    public static implicit operator ElementBuilder(RenderFragment fragment)
+    {
+        ArgumentNullException.ThrowIfNull(fragment);
+        return new ElementBuilder(fragment);
     }
 
     public ElementBuilder Attribute(string name, object? value)
@@ -118,23 +137,29 @@ public class ElementBuilder
         return this;
     }
 
-    public RenderFragment Build() => builder =>
+    public RenderFragment Build()
     {
-        builder.OpenElement(0, _tagName);
+        if (_rawFragment is not null)
+            return _rawFragment;
 
-        var sequence = 1;
-        foreach (var attribute in _attributes)
-            builder.AddAttribute(sequence++, attribute.Name, attribute.Value);
-
-        if (_styles.Count > 0)
+        return builder =>
         {
-            var style = string.Join(";", _styles.Select(x => $"{x.Key}:{x.Value}"));
-            builder.AddAttribute(sequence++, "style", style);
-        }
+            builder.OpenElement(0, _tagName);
 
-        foreach (var child in _children)
-            builder.AddContent(sequence++, child);
+            var sequence = 1;
+            foreach (var attribute in _attributes)
+                builder.AddAttribute(sequence++, attribute.Name, attribute.Value);
 
-        builder.CloseElement();
-    };
+            if (_styles.Count > 0)
+            {
+                var style = string.Join(";", _styles.Select(x => $"{x.Key}:{x.Value}"));
+                builder.AddAttribute(sequence++, "style", style);
+            }
+
+            foreach (var child in _children)
+                builder.AddContent(sequence++, child);
+
+            builder.CloseElement();
+        };
+    }
 }
