@@ -1,0 +1,41 @@
+name: .NET Tests
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - master
+      - feature/public-facing-workshop
+      - feature/experience-core-architecture
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: |
+          dotnet restore SingularityHub.Tests/SingularityHub.Tests.csproj
+          dotnet restore Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj
+          dotnet restore Experiences/PongExperience.Tests/PongExperience.Tests.csproj
+
+      - name: Build
+        run: |
+          dotnet build SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-restore
+          dotnet build Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-restore
+          dotnet build Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: |
+          dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
+          dotnet test Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
+          dotnet test Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"

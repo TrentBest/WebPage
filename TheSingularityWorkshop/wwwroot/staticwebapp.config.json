@@ -1,0 +1,25 @@
+{
+  "routes": [
+    {
+      "route": "/Workshop/Forge/Build/*.js.br",
+      "headers": {
+        "Content-Encoding": "br",
+        "Content-Type": "application/javascript"
+      }
+    },
+    {
+      "route": "/Workshop/Forge/Build/*.wasm.br",
+      "headers": {
+        "Content-Encoding": "br",
+        "Content-Type": "application/wasm"
+      }
+    },
+    {
+      "route": "/Workshop/Forge/Build/*.data.br",
+      "headers": {
+        "Content-Encoding": "br",
+        "Content-Type": "application/octet-stream"
+      }
+    }
+  ]
+}

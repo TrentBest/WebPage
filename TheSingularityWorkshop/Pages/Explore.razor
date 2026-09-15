@@ -1,0 +1,174 @@
+@page "/explore"
+@using Microsoft.AspNetCore.Components.Web
+@using TheSingularityWorkshop.Gui
+@using TheSingularityWorkshop.Workshop.MicroBundles
+@implements IDisposable
+
+<PageTitle>Explore // The Singularity Workshop</PageTitle>
+
+@BuildGui().Build()
+
+@code {
+    private readonly ExploreExperienceMicroBundle Experience = new();
+    private string? insideRoomId;
+    private bool unknownUnlocked;
+
+    private static readonly IReadOnlyList<SpatialRoom> Rooms =
+    [
+        new("experience", "Experience Deck", "LIVING SPACE", 25, 28, 25, 42, 25, 42,
+            "The sensory side of the Workshop. This is where an Experience becomes something a visitor can actually inhabit.",
+            "EXPERIENCE", "Living GUI / presentation"),
+        new("engineering", "The Forge", "FSM WORKSHOP", 73, 30, 73, 46, 73, 46,
+            "The Workshop's first real building: a place for shaping state, lifecycle, reusable substrates, and executable machinery.",
+            "FORGE", "FSM / lifecycle / composition"),
+        new("creation", "Creation Bay", "BUILDER SPACE", 34, 72, 34, 88, 34, 88,
+            "The composition boundary. Focused capabilities become MicroBundles, then recipes, then executable Experiences.",
+            "CREATION", "MicroBundles / composition"),
+        new("unknown", "Unknown Annex", "UNMAPPED", 79, 76, 79, 90, 79, 90,
+            "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.",
+            "UNKNOWN", "Undisclosed")
+    ];
+
+    private double AvatarX => Experience.Navigation.X;
+    private double AvatarY => Experience.Navigation.Y;
+    private bool ConferenceJoined => Experience.Conference.Joined;
+    private FsmForgeMicroBundle Forge => Experience.Forge;
+
+    private ElementBuilder BuildGui()
+    {
+        if (insideRoomId == "conference")
+        {
+            return ConferenceRoomGuiBuilder.Build(
+                this,
+                ConferenceJoined,
+                JoinConference,
+                LeaveConference,
+                ExitRoom);
+        }
+
+        if (insideRoomId == "engineering")
+        {
+            return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
+        }
+
+        var world = SpatialWorldGuiBuilder.Build(
+            this,
+            Rooms,
+            unknownUnlocked,
+            AvatarX,
+            AvatarY,
+            HandleKeyDown,
+            MoveAvatar,
+            MoveAvatarTo,
+            InteractRoom);
+
+        return WorkshopGui.MultiPanel(this)
+            .Style("position", "fixed")
+            .Style("inset", "0")
+            .Style("width", "100vw")
+            .Style("height", "100vh")
+            .Style("overflow", "hidden")
+            .Content(world)
+            .Content(UserNameLabel());
+    }
+
+    private ElementBuilder UserNameLabel()
+        => WorkshopGui.Element(this, "span")
+            .Style("position", "fixed")
+            .Style("left", "50%")
+            .Style("top", "calc(50% - 24px)")
+            .Style("transform", "translateX(-50%)")
+            .Style("z-index", "20")
+            .Style("padding", ".12rem .35rem")
+            .Style("border", "1px solid rgba(255,255,255,.18)")
+            .Style("background", "rgba(1,4,10,.82)")
+            .Style("color", "#ffffff")
+            .Style("font-family", "Consolas, 'Courier New', monospace")
+            .Style("font-size", ".5rem")
+            .Style("letter-spacing", ".12em")
+            .Style("white-space", "nowrap")
+            .Style("pointer-events", "none")
+            .Text(Experience.User.DisplayName);
+
+    private void JoinConference() => Experience.Conference.Join();
+    private void LeaveConference() => Experience.Conference.Leave();
+
+    private void HandleKeyDown(KeyboardEventArgs args)
+    {
+        switch (args.Key.ToLowerInvariant())
+        {
+            case "w":
+            case "arrowup":
+                MoveAvatar(0, -3);
+                break;
+            case "s":
+            case "arrowdown":
+                MoveAvatar(0, 3);
+                break;
+            case "a":
+            case "arrowleft":
+                MoveAvatar(-3, 0);
+                break;
+            case "d":
+            case "arrowright":
+                MoveAvatar(3, 0);
+                break;
+        }
+    }
+
+    private void MoveAvatar(double dx, double dy)
+    {
+        if (insideRoomId is not null)
+            return;
+
+        Experience.Navigation.Move(dx, dy);
+    }
+
+    private void MoveAvatarTo(double x, double y)
+    {
+        if (insideRoomId is not null)
+            return;
+
+        Experience.Navigation.MoveTo(x, y);
+    }
+
+    /// <summary>
+    /// Spatial interaction is direct: clicking an enterable structure is the
+    /// interaction request. The visitor is first moved to the object's defined
+    /// interaction point, the camera visibly follows, and only then is the
+    /// object's experience activated.
+    /// </summary>
+    private async Task InteractRoom(string id)
+    {
+        if (insideRoomId is not null)
+            return;
+
+        var room = Rooms.FirstOrDefault(x => x.Id == id);
+        if (room is null)
+            return;
+
+        if (room.Id == "unknown" && !unknownUnlocked)
+            return;
+
+        Experience.Navigation.ApproachEntrance(room);
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(300);
+
+        insideRoomId = room.Id == "unknown" ? "unknown" : room.Id;
+    }
+
+    private void ExitRoom()
+    {
+        Forge.Reset();
+        Experience.Conference.Leave();
+
+        var roomId = insideRoomId == "conference" ? "yup" : insideRoomId;
+        var room = Rooms.FirstOrDefault(x => x.Id == roomId);
+        if (room is not null)
+            Experience.Navigation.MoveToExit(room);
+
+        insideRoomId = null;
+    }
+
+    public void Dispose() => Experience.Dispose();
+}

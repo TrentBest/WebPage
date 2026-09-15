@@ -1,0 +1,28 @@
+@page "/hub"
+@using TheSingularityWorkshop.Infrastructure.Hub
+@inject HubRuntime Runtime
+
+<PageTitle>Singularity Hub</PageTitle>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Singularity Hub</h1>
+        <p class="lead text-muted">The WebPage is hosting the platform-neutral Hub kernel.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4"><div class="card h-100 shadow-sm"><div class="card-body"><h2 class="h5">Bundles</h2><div class="display-6">@Runtime.Hub.LoadedBundles.Count</div><p class="text-muted mb-0">Loaded MicroBundles</p></div></div></div>
+        <div class="col-md-4"><div class="card h-100 shadow-sm"><div class="card-body"><h2 class="h5">Arbitration</h2><div class="display-6">@Runtime.ArbitrationMutations</div><p class="text-muted mb-0">Mutations observed</p></div></div></div>
+        <div class="col-md-4"><div class="card h-100 shadow-sm"><div class="card-body"><h2 class="h5">Audit Graph</h2><div class="display-6">@Runtime.Hub.Audit.Events.Count</div><p class="text-muted mb-0">Recorded events</p></div></div></div>
+    </div>
+
+    <div class="mt-5 p-4 border rounded bg-light">
+        <h2 class="h4">Kernel boundaries</h2>
+        <ul>
+            <li>Hub owns bundle registration and deterministic arbitration.</li>
+            <li>Process-group lifecycle is tracked without owning execution mechanics.</li>
+            <li>Execution providers remain an abstract platform boundary.</li>
+            <li>Runtime ontology identity is a fixed nine-layer integer signature.</li>
+        </ul>
+    </div>
+</div>

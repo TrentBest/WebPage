@@ -1,16 +1,142 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject TheSingularityWorkshop.Services.FSMManagerService FSM
+@inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden") @(IsWorkshopLanding && ShowWorkshopChrome ? "workshop-hub-manifested" : "") @(IsCreatePage ? "workshop-create-page" : "")">
+    @if (!IsWorkshopLanding)
+    {
+        <div class="sidebar workshop-sidebar"><NavMenu /></div>
+    }
+    else
+    {
+        <div class="sidebar workshop-sidebar" aria-hidden="true"><NavMenu /></div>
+    }
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+        @if (!IsWorkshopLanding || ShowWorkshopChrome)
+        {
+            <div class="top-row px-4 workshop-tab-header"><span class="workshop-tab-title">@CurrentTabTitle</span></div>
+        }
+        else
+        {
+            <div class="top-row workshop-tab-header workshop-top-row-placeholder" aria-hidden="true"></div>
+        }
 
-        <article class="content px-4">
-            @Body
-        </article>
+        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">@Body</article>
     </main>
 </div>
+
+@code {
+    private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
+    private bool IsCreatePage => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Equals("create", StringComparison.OrdinalIgnoreCase);
+
+    // The Hub belongs to the execution host. It presents after the terminal
+    // startup Experience has had its presentation window, not after an arbitrary
+    // moniker-specific FSM transition completes.
+    private bool ShowWorkshopChrome => !IsWorkshopLanding || _startupPresentationComplete;
+
+    private bool _entryRequested;
+    private bool _chromeReleased;
+    private bool _startupPresentationComplete;
+    private CancellationTokenSource? _monikerTimer;
+
+    private string CurrentTabTitle
+    {
+        get
+        {
+            var path = Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
+            return path.ToLowerInvariant() switch
+            {
+                "" => "THE WORKSHOP",
+                "explore" => "EXPLORE",
+                "create" => "CREATE",
+                "about-us" => "ABOUT US",
+                "about" => "ABOUT US",
+                "privacypolicy" => "PRIVACY POLICY",
+                "naming-poll" => "VOTE ON NAME",
+                _ => path.Replace('-', ' ').ToUpperInvariant()
+            };
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        FSM.StateChanged += HandleFSMStateChanged;
+        Experience.StateChanged += HandleExperienceStateChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (IsWorkshopLanding && !_entryRequested && Experience.CurrentState == "FlexHello")
+        {
+            _entryRequested = true;
+            FSM.RequestEnter();
+            return;
+        }
+
+        if (!IsWorkshopLanding || !ShowWorkshopChrome || _chromeReleased)
+            return;
+
+        _chromeReleased = true;
+
+        try
+        {
+            await JS.InvokeVoidAsync(
+                "eval",
+                "if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();document.documentElement.classList.remove('workshop-splash-locked');document.documentElement.classList.add('workshop-splash-released');");
+        }
+        catch (JSException)
+        {
+            _chromeReleased = false;
+        }
+    }
+
+    private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
+
+    private void HandleExperienceStateChanged()
+    {
+        if (Experience.CurrentState == "FlexHello" && _monikerTimer is null && !_startupPresentationComplete)
+            StartStartupPresentationTimer();
+
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void StartStartupPresentationTimer()
+    {
+        _monikerTimer = new CancellationTokenSource();
+        var token = _monikerTimer.Token;
+        _ = CompleteStartupPresentationAsync(token);
+    }
+
+    private async Task CompleteStartupPresentationAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(FSM.Page.MonikerPresentationDuration, cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            _startupPresentationComplete = true;
+            FSM.SignalNavigationReady();
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
+    public void Dispose()
+    {
+        FSM.StateChanged -= HandleFSMStateChanged;
+        Experience.StateChanged -= HandleExperienceStateChanged;
+        _monikerTimer?.Cancel();
+        _monikerTimer?.Dispose();
+    }
+}
+
+<style>
+    .workshop-create-page .workshop-sidebar{width:3.8rem;flex:0 0 3.8rem;max-width:3.8rem;transition:width .35s ease,flex-basis .35s ease}.workshop-create-page .workshop-sidebar:has(.workshop-nav-shell.expanded){width:15rem;flex-basis:15rem;max-width:15rem}.workshop-create-page main{min-width:0}.workshop-create-page .content{padding-left:.5rem!important;padding-right:.5rem!important}
+</style>

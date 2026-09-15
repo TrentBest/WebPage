@@ -1,105 +1,104 @@
-/* Sidebar - Overriding default blue/purple to TSW dark */
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(38, 43, 50) 0%, rgb(25, 30, 35) 70%);
-}
-
-/* Base structural definitions (retained from original) */
-.page {
+﻿.page {
     position: relative;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+    background: #050a14;
 }
 
-main {
-    flex: 1;
+.sidebar { background: linear-gradient(180deg, #07111f 0%, #030812 100%); border-right: 1px solid #19384b; }
+
+main { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: #050a14; }
+
+.top-row { flex: 0 0 3.5rem; background: #050a14; border-bottom: 1px solid #00eaff; height: 3.5rem; min-height: 3.5rem; display: flex; align-items: center; transition: flex-basis 2000ms cubic-bezier(.16,1,.3,1), height 2000ms cubic-bezier(.16,1,.3,1), min-height 2000ms cubic-bezier(.16,1,.3,1), opacity 2000ms ease, padding 2000ms cubic-bezier(.16,1,.3,1), border-color 2000ms ease; }
+.workshop-tab-header { justify-content: center; text-align: center; }
+.workshop-tab-title { display: inline-block; color: #dcefff; font-family: Consolas, 'Courier New', monospace; font-size: clamp(.8rem, 1.2vw, 1.05rem); font-weight: 700; letter-spacing: .22em; text-transform: uppercase; text-shadow: 0 0 8px rgba(0, 234, 255, .35); animation: workshopTabBreath 4s ease-in-out infinite; }
+@keyframes workshopTabBreath { 0%, 100% { opacity: .72; letter-spacing: .19em; } 50% { opacity: 1; letter-spacing: .24em; } }
+.top-row ::deep a, .top-row ::deep .btn-link { white-space: nowrap; margin-left: 1.5rem; text-decoration: none; color: #00eaff; }
+.top-row ::deep a:hover, .top-row ::deep .btn-link:hover { color: #ff2cff; }
+.top-row ::deep a:first-child { overflow: hidden; text-overflow: ellipsis; }
+
+article { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; height: auto; overflow: auto; overflow-x: hidden; padding: 0 !important; background: #050a14; transition: flex-basis 1200ms cubic-bezier(.16,1,.3,1), height 1200ms cubic-bezier(.16,1,.3,1), padding 1200ms cubic-bezier(.16,1,.3,1), transform 1200ms cubic-bezier(.16,1,.3,1); }
+article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: hidden !important; }
+
+.workshop-page .workshop-sidebar { width: 0; flex: 0 0 0; border-right-width: 0; opacity: 0; overflow: hidden; transition: width 2000ms cubic-bezier(.16,1,.3,1), flex-basis 2000ms cubic-bezier(.16,1,.3,1), border-right-width 2000ms ease, opacity 2000ms ease; }
+.workshop-page.workshop-chrome-visible .workshop-sidebar { width: 200px; flex-basis: 200px; border-right-width: 1px; opacity: 1; }
+.workshop-page .workshop-top-row-placeholder { flex-basis: 0; height: 0; min-height: 0; padding: 0 !important; border-bottom-width: 0; opacity: 0; overflow: hidden; }
+.workshop-page.workshop-chrome-visible .workshop-top-row-placeholder { flex-basis: 3.5rem; height: 3.5rem; min-height: 3.5rem; padding-left: 2rem !important; padding-right: 1.5rem !important; border-bottom-width: 1px; opacity: 1; }
+.workshop-page .workshop-content { will-change: flex-basis, height, width; }
+
+/* The Hub manifests as one physical gesture: the chrome grows from a hairline
+   into its full geometry while its border wakes from dark cyan through a brief
+   white-hot peak and settles into a living breath. */
+.workshop-page.workshop-hub-manifested .workshop-sidebar {
+    animation: workshopHubBorderManifest 2000ms cubic-bezier(.16,1,.3,1) 1 forwards,
+               workshopHubBorderBreath 5.4s ease-in-out 2000ms infinite;
+}
+.workshop-page.workshop-hub-manifested .workshop-tab-header {
+    animation: workshopHubBorderManifest 2000ms cubic-bezier(.16,1,.3,1) 1 forwards,
+               workshopHubBorderBreath 5.4s ease-in-out 2000ms infinite;
+}
+@keyframes workshopHubBorderManifest {
+    0% { border-color: rgba(0,234,255,0); }
+    22% { border-color: #ffffff; }
+    42% { border-color: #8fffff; }
+    68% { border-color: #19efff; }
+    100% { border-color: #00eaff; }
+}
+@keyframes workshopHubBorderBreath {
+    0%, 100% { border-color: #00eaff; }
+    50% { border-color: #76f5ff; }
 }
 
-/* Top Row - Overriding light gray to TSW dark */
-.top-row {
-    background-color: var(--tsw-dark);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Soft white border for depth */
-    justify-content: flex-end;
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
+/* One traveling wave. Every row samples the same horizontal wave; row
+   membership changes only the vertical level, never the wave clock. */
+.workshop-page .workshop-content ::deep .hello-moniker { animation: none !important; transform: none !important; transform-style: preserve-3d; }
+.workshop-page .workshop-content ::deep .hello-line { position: relative; display: block; height: 1em; margin: 0; }
+.workshop-page .workshop-content ::deep .hello-line:nth-child(1) { width: 3.15em; }
+.workshop-page .workshop-content ::deep .hello-line:nth-child(2) { width: 10.55em; }
+.workshop-page .workshop-content ::deep .hello-line:nth-child(3) { width: 7.7em; }
+.workshop-page .workshop-content ::deep .hello-glyph { position: absolute; left: calc(50% + (var(--glyph-index) - var(--glyph-midpoint)) * .95em); top: 50%; width: 1em; margin: 0; text-align: center; transform-origin: 50% 55%; transform-style: preserve-3d; animation: workshopMonikerWave 3.8s cubic-bezier(.42,0,.58,1) infinite !important; animation-delay: calc((var(--glyph-index) - var(--glyph-midpoint)) * -.14s) !important; will-change: transform, filter; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(1) { --glyph-index: 0; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(2) { --glyph-index: 1; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(3) { --glyph-index: 2; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(4) { --glyph-index: 3; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(5) { --glyph-index: 4; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(6) { --glyph-index: 5; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(7) { --glyph-index: 6; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(8) { --glyph-index: 7; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(9) { --glyph-index: 8; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(10) { --glyph-index: 9; }
+.workshop-page .workshop-content ::deep .hello-glyph:nth-child(11) { --glyph-index: 10; }
+.workshop-page .workshop-content ::deep .hello-line:nth-child(1) { --glyph-midpoint: 1; }
+.workshop-page .workshop-content ::deep .hello-line:nth-child(2) { --glyph-midpoint: 5; }
+.workshop-page .workshop-content ::deep .hello-line:nth-child(3) { --glyph-midpoint: 3.5; }
+@keyframes workshopMonikerWave {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0) rotateX(0deg) rotateY(0deg) rotateZ(-1.65deg) scale(1); filter: brightness(.92) saturate(.96); }
+    18% { transform: translate(-50%, -50%) translateY(-.08em) rotateX(3deg) rotateY(-4deg) rotateZ(2.35deg) scale(1.012); filter: brightness(1.02) saturate(1.04); }
+    38% { transform: translate(-50%, -50%) translateY(-.18em) rotateX(-2deg) rotateY(6deg) rotateZ(3.65deg) scale(1.025); filter: brightness(1.1) saturate(1.12); }
+    58% { transform: translate(-50%, -50%) translateY(.055em) rotateX(4deg) rotateY(-7deg) rotateZ(-3.05deg) scale(1.008); filter: brightness(1.04) saturate(1.06); }
+    78% { transform: translate(-50%, -50%) translateY(-.12em) rotateX(-3deg) rotateY(5deg) rotateZ(2.25deg) scale(1.018); filter: brightness(1.07) saturate(1.1); }
 }
 
-    /* Links in Top Row - Overriding default blue to TSW primary */
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-        color: var(--tsw-primary); /* Electric Cyan */
-    }
-
-        .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-            text-decoration: underline;
-            color: var(--tsw-secondary); /* Gold/Yellow on hover */
-        }
-
-        .top-row ::deep a:first-child {
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-/* Media Queries (retained from original for responsiveness) */
 @media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-        .top-row ::deep a, .top-row ::deep .btn-link {
-            margin-left: 0;
-        }
+    .top-row { justify-content: center; }
+    .workshop-tab-title { max-width: 85vw; overflow: hidden; text-overflow: ellipsis; }
+    .workshop-page .workshop-sidebar { width: 100%; flex: 0 0 0; height: 0; min-height: 0; border-right: 0; border-bottom: 0; }
+    .workshop-page.workshop-chrome-visible .workshop-sidebar { width: 100%; flex-basis: auto; height: auto; min-height: 0; border-bottom: 1px solid #19384b; }
+    .workshop-page.workshop-chrome-visible .workshop-top-row-placeholder { flex-basis: 3.5rem; height: 3.5rem; min-height: 3.5rem; padding: 0 1rem !important; }
 }
 
 @media (min-width: 641px) {
-    .page {
-        flex-direction: row;
-        
-        height: 100vh;
-        overflow: scroll;
-    }
+    .page { flex-direction: row; height: 100dvh; min-height: 100dvh; }
+    .sidebar { width: 200px; height: 100%; position: relative; flex: 0 0 200px; overflow: hidden; }
+    main { flex: 1 1 auto; height: 100%; min-height: 0; }
+    .top-row { position: relative; z-index: 1; padding-left: 2rem !important; padding-right: 1.5rem !important; }
+}
 
-    .sidebar {
-        width: 200px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
-
-    main {
-        flex: 1;
-        
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        overflow: scroll; 
-    }
-
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        /* Re-apply padding to the now separated top-row */
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
-
-        .top-row.auth ::deep a:first-child {
-            flex: 1;
-            text-align: right;
-            width: 0;
-        }
-
-    article {
-        /* This is the content area containing @Body */
-        /* NEW: Tell content area to take all remaining height and hide its own scrollbar */
-        flex-grow: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-       padding-top: 1.5rem !important;
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
+@media (prefers-reduced-motion: reduce) {
+    .workshop-page .workshop-sidebar, .workshop-page .workshop-top-row-placeholder, .top-row, article { transition: none; }
+    .workshop-page .workshop-content ::deep .hello-moniker, .workshop-page .workshop-content ::deep .hello-glyph { animation: none !important; }
 }

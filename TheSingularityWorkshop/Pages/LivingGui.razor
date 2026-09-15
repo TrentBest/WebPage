@@ -1,0 +1,146 @@
+@page "/living-gui"
+@using System
+@using TheSingularityWorkshop.Services
+@inject FSMManagerService FSM
+@implements IDisposable
+
+<PageTitle>Living GUI</PageTitle>
+
+<div class="living-experience-panel" aria-label="Living GUI experience">
+    @foreach (var actor in FSM.Context.LivingNodes)
+    {
+        <label class="living-actor @(actor.IsRoot ? "living-actor-root" : "") @(GravityActive ? "living-actor-gravity" : "")"
+               style="left:@ActorLeft(actor);top:@ActorTop(actor);width:@ActorSize(actor);height:@ActorSize(actor);transform:@ActorTransform(actor);opacity:@ActorOpacity(actor);"
+               aria-label="@actor.Lineage">
+            @actor.Lineage
+        </label>
+    }
+</div>
+
+<style>
+    /* The Living GUI is an experience hosted by the panel supplied to it.
+       The panel is the coordinate space. The experience contributes actors;
+       it does not create a second GUI, diagnostic overlay, or coordinate plane. */
+    .living-experience-panel {
+        position:relative;
+        width:100%;
+        height:100%;
+        min-width:0;
+        min-height:0;
+        overflow:hidden;
+        box-sizing:border-box;
+        isolation:isolate;
+        background:
+            radial-gradient(circle at 50% 50%,rgba(0,168,255,.055),transparent 34%),
+            radial-gradient(circle at 18% 82%,rgba(255,44,255,.035),transparent 30%),
+            #020304;
+        color:#f4f7f8;
+        font-family:Consolas,"Courier New",monospace;
+    }
+
+    .living-experience-panel::before {
+        content:"";
+        position:absolute;
+        inset:0;
+        pointer-events:none;
+        background:
+            linear-gradient(90deg,rgba(0,168,255,.035) 1px,transparent 1px),
+            linear-gradient(0deg,rgba(255,44,255,.025) 1px,transparent 1px);
+        background-size:32px 32px;
+        mask-image:radial-gradient(circle at center,black,transparent 78%);
+    }
+
+    /* The actor is the GUI element of the experience. Its FSM position is a
+       percentage of the supplied panel, so 50,50 is the exact panel center. */
+    .living-actor {
+        position:absolute;
+        box-sizing:border-box;
+        min-width:10px;
+        min-height:10px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:0 12px;
+        border:6px solid #00a8ff;
+        border-radius:14px;
+        background:
+            linear-gradient(145deg,rgba(0,168,255,.16),rgba(255,44,255,.08) 48%,rgba(255,122,0,.12)),
+            rgba(3,6,10,.94);
+        color:#fff;
+        font:900 .72rem/1 Consolas,"Courier New",monospace;
+        letter-spacing:.12em;
+        text-align:center;
+        white-space:nowrap;
+        overflow:hidden;
+        text-shadow:0 0 9px rgba(255,255,255,.8);
+        box-shadow:
+            0 0 12px rgba(0,168,255,.48),
+            0 0 34px rgba(0,168,255,.22),
+            inset 0 0 18px rgba(0,168,255,.12);
+        transition:left .08s linear,top .08s linear,width .08s linear,height .08s linear,opacity .08s linear;
+        will-change:left,top,width,height,transform;
+        animation:livingActorBreath 6s ease-in-out infinite;
+        transform-origin:center;
+        z-index:20;
+    }
+
+    .living-actor-root {
+        border-width:6px;
+        border-color:#ff7a00;
+        box-shadow:
+            0 0 16px rgba(255,122,0,.58),
+            0 0 42px rgba(255,122,0,.26),
+            inset 0 0 22px rgba(255,122,0,.13);
+    }
+
+    .living-actor-gravity {
+        pointer-events:none;
+    }
+
+    @@keyframes livingActorBreath {
+        0%,100% { border-color:#00a8ff; box-shadow:0 0 12px rgba(0,168,255,.48),0 0 34px rgba(0,168,255,.22),inset 0 0 18px rgba(0,168,255,.12); }
+        33.333% { border-color:#ff2cff; box-shadow:0 0 16px rgba(255,44,255,.52),0 0 38px rgba(255,44,255,.24),inset 0 0 20px rgba(255,44,255,.14); }
+        66.666% { border-color:#ff7a00; box-shadow:0 0 16px rgba(255,122,0,.54),0 0 40px rgba(255,122,0,.24),inset 0 0 20px rgba(255,122,0,.14); }
+    }
+
+    @@media(prefers-reduced-motion:reduce) {
+        .living-experience-panel *,
+        .living-experience-panel *::before,
+        .living-experience-panel *::after {
+            animation-duration:.01ms!important;
+            animation-iteration-count:1!important;
+            transition-duration:.01ms!important;
+        }
+    }
+</style>
+
+@code {
+    private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
+
+    protected override void OnInitialized()
+    {
+        FSM.StateChanged += HandleFSMStateChanged;
+
+        if (FSM.CurrentState == PageFSM.Gateway && !FSM.Context.EnterRequested)
+            FSM.RequestEnter();
+    }
+
+    private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
+
+    private static string ActorLeft(PageStateContext.LivingNodeState actor)
+        => $"{actor.X:0.###}%";
+
+    private static string ActorTop(PageStateContext.LivingNodeState actor)
+        => $"{actor.Y:0.###}%";
+
+    private static string ActorSize(PageStateContext.LivingNodeState actor)
+        => $"{actor.Size:0.##}px";
+
+    private static string ActorTransform(PageStateContext.LivingNodeState actor)
+        => $"translate(-50%,-50%) rotate({actor.Rotation:0.##}deg)";
+
+    private static double ActorOpacity(PageStateContext.LivingNodeState actor)
+        => actor.Y <= 100 ? 1 : Math.Clamp(1 - ((actor.Y - 100) / 30), 0, 1);
+
+    public void Dispose() => FSM.StateChanged -= HandleFSMStateChanged;
+}

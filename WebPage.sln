@@ -7,6 +7,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheSingularityWorkshop", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PollingAPI", "PollingAPI\PollingAPI.csproj", "{D60583FE-9885-47FF-B632-4278C1A66942}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingularityHub.Abstractions", "SingularityHub.Abstractions\SingularityHub.Abstractions.csproj", "{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingularityHub", "SingularityHub\SingularityHub.csproj", "{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingularityHub.Tests", "SingularityHub.Tests\SingularityHub.Tests.csproj", "{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingGuiExperience.Tests", "Experiences\LivingGuiExperience.Tests\LivingGuiExperience.Tests.csproj", "{85BC9796-A44D-4487-A898-2BE64A07B47E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PongExperience.Tests", "Experiences\PongExperience.Tests\PongExperience.Tests.csproj", "{9DA15EE9-AED4-4896-86FC-00041E92337A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,11 +31,31 @@ Global
 		{D60583FE-9885-47FF-B632-4278C1A66942}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D60583FE-9885-47FF-B632-4278C1A66942}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D60583FE-9885-47FF-B632-4278C1A66942}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F4A6C2D-0E8B-4A5F-B7D1-2A5D7D2D1001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D2B1F63-4F6A-45C2-91D8-7E6A3D5C1002}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7E34B92-65D1-4F08-8C2A-5B7E9D6C1003}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85BC9796-A44D-4487-A898-2BE64A07B47E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85BC9796-A44D-4487-A898-2BE64A07B47E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85BC9796-A44D-4487-A898-2BE64A07B47E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85BC9796-A44D-4487-A898-2BE64A07B47E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DA15EE9-AED4-4896-86FC-00041E92337A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DA15EE9-AED4-4896-86FC-00041E92337A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DA15EE9-AED4-4896-86FC-00041E92337A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DA15EE9-AED4-4896-86FC-00041E92337A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C0BAEBBA-7458-4C89-83BE-6B8BEC23E085}
-	EndGlobalSection
+	EndGlobal
 EndGlobal

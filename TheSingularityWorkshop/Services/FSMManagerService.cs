@@ -1,52 +1,79 @@
-﻿using TheSingularityWorkshop.FSM_API;
-using TheSingularityWorkshop.Services;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 
-
-public class FSMManagerService
+namespace TheSingularityWorkshop.Services
 {
-    // FSMHandle is your direct link to the live FSM instance
-    private FSMHandle _fsmHandle;
-
-    public PageStateContext Context { get; }
-
-    // Expose the current FSM state for UI components to bind to
-    public string CurrentState => _fsmHandle?.CurrentState ?? "Uninitialized";
-
-    public FSMManagerService()
-    {
-        // 1. Initialize the Context/Data Bag
-        Context = new PageStateContext();
-
-        // 2. Define the FSM blueprint (Initialization, Operation, Shutdown)
-        FSM_API.Create.CreateFiniteStateMachine("WebpageFSM", -1, "Update")
-            // Core States: Defining the three parts of your application state
-            .State("Idle", null, onUpdate: (c) => ((PageStateContext)c).Message = "Awaiting input...", null)
-            .State("Clicked", onEnter: (c) => ((PageStateContext)c).Message = "Button Clicked!",null, null)
-            .State("Processing", onEnter: (c) => ((PageStateContext)c).Message = "Processing...", null, null)
-            .Transition("Idle", "Clicked", (c) => ((PageStateContext)c).ClickCount > 0)
-            .Transition("Clicked", "Processing", (c) => true)
-            .Transition("Processing", "Idle", (c) => ((PageStateContext)c).ClickCount > 10) // Simulates a reset condition         
-            .BuildDefinition(); // Use BuildDefinition for API consistency
-
-        // 3. Create the FSM instance and connect it to the Context
-        // We use the "Update" processing group so the Heartbeat service will tick it.
-        _fsmHandle = FSM_API.Create.CreateInstance("WebpageFSM", Context, "Update");
-    }
-
     /// <summary>
-    /// Tells the FSM instance to take one "step" or "tick" forward.
+    /// Compatibility facade over the real page-level FSM.
+    /// FSM_API owns progression; the application heartbeat advances the page FSM,
+    /// while the registered SingularityHub singleton owns the process-group scheduler.
     /// </summary>
-    public void Step()
+    public sealed class FSMManagerService : IDisposable
     {
-        // This is for manual/event-driven updates, which should still use a group update
-        FSM_API.Interaction.Update("Update");
-    }
+        private const int HeartbeatMilliseconds = 33;
 
-    /// <summary>
-    /// Forces the FSM to transition to a new state, typically triggered by a UI event.
-    /// </summary>
-    public void ForceTransition(string nextStateName)
-    {
-        _fsmHandle?.TransitionTo(nextStateName);
+        private readonly CancellationTokenSource _shutdown = new();
+        private readonly PeriodicTimer _heartbeat = new(TimeSpan.FromMilliseconds(HeartbeatMilliseconds));
+        private readonly Task _heartbeatTask;
+        private bool _disposed;
+
+        public PageFSM Page { get; }
+        public PageStateContext Context => Page.Context;
+        public string CurrentState => Page.CurrentState;
+        public string LivingGuiState => Page.LivingGuiState;
+        public string LivingGuiActivePhase => Page.LivingGuiActivePhase;
+        public bool LivingGuiIsValid => Page.LivingGuiIsValid;
+
+        public event Action<string>? StateChanged
+        {
+            add => Page.StateChanged += value;
+            remove => Page.StateChanged -= value;
+        }
+
+        /// <summary>
+        /// Creates the page FSM against the application's registered Hub.
+        /// This is the critical composition boundary: PageFSM and LivingGuiFsm must
+        /// schedule through the same Hub instance that the host registered.
+        /// </summary>
+        public FSMManagerService(HubKernel hub)
+        {
+            Page = new PageFSM(hub);
+            _heartbeatTask = RunHeartbeatAsync(_shutdown.Token);
+        }
+
+        public void RequestEnter() => Page.RequestEnter();
+        public void SignalLivingGuiPopulated() => Page.SignalLivingGuiPopulated();
+        public void SignalMonikerReady() => Page.SignalMonikerReady();
+        public void SignalGravityReleased() => Page.SignalGravityReleased();
+        public void SignalLivingGuiFallen() => Page.SignalLivingGuiFallen();
+        public void SignalNavigationReady() => Page.SignalNavigationReady();
+        public void Step() => Page.Update();
+        public void Shutdown() => Page.Shutdown();
+
+        private async Task RunHeartbeatAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                while (await _heartbeat.WaitForNextTickAsync(cancellationToken))
+                    Page.Update();
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                // Normal service shutdown.
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+
+            _disposed = true;
+            _shutdown.Cancel();
+            _heartbeat.Dispose();
+            Page.Dispose();
+            _shutdown.Dispose();
+        }
     }
 }
