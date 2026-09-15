@@ -16,3 +16,40 @@ article:has(#workshop-spatial-map) {
 .monolith-btn::before {
     border-width: 3px !important;
 }
+
+/* Explore is a place first, but the story should remain legible while the
+   visitor is moving through it. Portrait screens get a compact field-note
+   treatment rather than letting blueprint labels collide with one another. */
+@media (orientation: portrait) {
+    .workshop-tour-card {
+        bottom: auto !important;
+        top: .7rem !important;
+        width: calc(100vw - 1rem) !important;
+        padding: .65rem .75rem !important;
+        border-left-width: 2px !important;
+        backdrop-filter: blur(10px);
+    }
+
+    .workshop-tour-card div:last-child {
+        font-size: .62rem !important;
+        line-height: 1.4 !important;
+    }
+
+    #workshop-spatial-map button span {
+        font-size: .42rem !important;
+        letter-spacing: .06em !important;
+        max-width: 90% !important;
+        white-space: normal !important;
+        text-align: center !important;
+    }
+
+    #workshop-spatial-map {
+        touch-action: manipulation;
+    }
+}
+
+@media (max-width: 700px) {
+    .workshop-tour-card {
+        width: calc(100vw - 1rem) !important;
+    }
+}
