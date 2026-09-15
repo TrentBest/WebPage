@@ -1,6 +1,7 @@
 @page "/explore"
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.Gui
+@using TheSingularityWorkshop.Workshop.Architecture
 @using TheSingularityWorkshop.Workshop.Experience
 @using TheSingularityWorkshop.Workshop.MicroBundles
 @implements IDisposable
@@ -14,6 +15,7 @@
     private const bool UnknownUnlocked = false;
 
     private readonly ExploreExperienceMicroBundle Experience = new();
+    private readonly ArchitecturalShopEditor ArchitectureShop = new();
     private string? insideRoomId;
     private string? hoveredInteractableId;
     private int walkGeneration;
@@ -29,6 +31,9 @@
         new("creation", "Creation Bay", "BUILDER SPACE", 34, 72, 34, 88, 34, 88,
             "The composition boundary. Focused capabilities become MicroBundles, then recipes, then executable Experiences.",
             "CREATION", "MicroBundles / composition", 31, 23),
+        new("architecture", "Architectural Shop", "DESIGN STUDIO", 8, 76, 8, 92, 8, 92,
+            "Draw a floor plan, place doors and rooms, and introduce the vertical circulation that turns a sketch into a structure.",
+            "ARCHITECTURE", "Floor plans / structures / vertical circulation", 25, 20),
         new("unknown", "Unknown Annex", "UNMAPPED", 79, 76, 79, 90, 79, 90,
             "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.",
             "UNKNOWN", "Undisclosed", 24, 20)
@@ -72,6 +77,7 @@
                 "engineering" => "THE FORGE — behavior becomes machinery here. State, lifecycle, transitions, and reusable capability are forged into something an Experience can use.",
                 "creation" => "CREATION BAY — small capabilities become MicroBundles. Compose enough of them and you stop writing a page and start building an Experience.",
                 "experience" => "EXPERIENCE DECK — this is the destination: technology becomes an environment someone can enter, explore, and remember.",
+                "architecture" => "ARCHITECTURAL SHOP — draw the bones of a place. Walls, rooms, doors, stairs, elevators, and ladders become data first; later they can become an actual Workshop structure.",
                 _ => nearest.Description
             };
         }
@@ -95,6 +101,18 @@
         if (insideRoomId == "engineering")
         {
             return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
+        }
+
+        if (insideRoomId == "architecture")
+        {
+            return ArchitecturalShopGuiBuilder.Build(
+                this,
+                ArchitectureShop,
+                SelectArchitectureTool,
+                ApplyArchitectureCell,
+                LoadArchitectureTemplate,
+                CaptureArchitecture,
+                ExitRoom);
         }
 
         var world = SpatialWorldGuiBuilder.Build(
@@ -147,6 +165,30 @@
             .Style("white-space", "nowrap")
             .Style("pointer-events", "none")
             .Text(Experience.User.DisplayName);
+
+    private void SelectArchitectureTool(ArchitecturalCellKind tool)
+    {
+        ArchitectureShop.SelectTool(tool);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void ApplyArchitectureCell(int x, int y)
+    {
+        ArchitectureShop.Apply(x, y);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void LoadArchitectureTemplate(ArchitecturalFloorPlan plan)
+    {
+        ArchitectureShop.Load(plan);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void CaptureArchitecture()
+    {
+        ArchitectureShop.Capture();
+        _ = InvokeAsync(StateHasChanged);
+    }
 
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
@@ -203,12 +245,6 @@
             Experience.Pathfinding.ClearPath();
     }
 
-    /// <summary>
-    /// Spatial interaction is direct: clicking an enterable structure is the
-    /// interaction request. The visitor is first pathfound to the object's
-    /// defined interaction point, the camera visibly follows, and only then
-    /// is the object's Experience activated.
-    /// </summary>
     private async Task InteractRoom(string id)
     {
         if (insideRoomId is not null)
