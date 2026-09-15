@@ -18,19 +18,19 @@
 
     private static readonly IReadOnlyList<SpatialRoom> Rooms =
     [
-        new("experience", "Experience Deck", "LIVING SPACE", 25, 28,
+        new("experience", "Experience Deck", "LIVING SPACE", 25, 28, 25, 42, 25, 42,
             "The sensory side of the Workshop. This is where an Experience becomes something a visitor can actually inhabit.",
             "EXPERIENCE", "Living GUI / presentation"),
-        new("engineering", "The Forge", "FSM WORKSHOP", 73, 30,
+        new("engineering", "The Forge", "FSM WORKSHOP", 73, 30, 73, 46, 73, 46,
             "The Workshop's first real building: a place for shaping state, lifecycle, reusable substrates, and executable machinery.",
             "FORGE", "FSM / lifecycle / composition"),
-        new("creation", "Creation Bay", "BUILDER SPACE", 34, 72,
+        new("creation", "Creation Bay", "BUILDER SPACE", 34, 72, 34, 88, 34, 88,
             "The composition boundary. Focused capabilities become MicroBundles, then recipes, then executable Experiences.",
             "CREATION", "MicroBundles / composition"),
-        new("yup", "Yup", "CONFERENCE ROOM", 78, 11,
+        new("yup", "Yup", "CONFERENCE ROOM", 78, 11, 78, 22, 78, 22,
             "The first spatial-room prototype. A room is a place with a boundary, a door, shared objects, and eventually other people.",
             "CONFERENCE", "Presence / conference / shared workspace"),
-        new("unknown", "Unknown Annex", "UNMAPPED", 79, 76,
+        new("unknown", "Unknown Annex", "UNMAPPED", 79, 76, 79, 90, 79, 90,
             "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.",
             "UNKNOWN", "Undisclosed")
     ];
@@ -57,7 +57,7 @@
             return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
         }
 
-        return SpatialWorldGuiBuilder.Build(
+        var world = SpatialWorldGuiBuilder.Build(
             this,
             Runtime,
             Rooms,
@@ -71,7 +71,32 @@
             ApproachRoom,
             EnterSelectedRoom,
             UnlockUnknown);
+
+        return WorkshopGui.MultiPanel(this)
+            .Style("position", "fixed").Style("inset", "0")
+            .Style("width", "100vw").Style("height", "100vh")
+            .Style("pointer-events", "none").Style("overflow", "hidden")
+            .Content(world)
+            .Content(UserNameLabel());
     }
+
+    private ElementBuilder UserNameLabel()
+        => WorkshopGui.Element(this, "span")
+            .Style("position", "fixed")
+            .Style("left", $"{AvatarX}%")
+            .Style("top", $"calc({AvatarY}% - 24px)")
+            .Style("transform", "translateX(-50%)")
+            .Style("z-index", "20")
+            .Style("padding", ".12rem .35rem")
+            .Style("border", "1px solid rgba(255,255,255,.18)")
+            .Style("background", "rgba(1,4,10,.82)")
+            .Style("color", "#ffffff")
+            .Style("font-family", "Consolas, 'Courier New', monospace")
+            .Style("font-size", ".5rem")
+            .Style("letter-spacing", ".12em")
+            .Style("white-space", "nowrap")
+            .Style("pointer-events", "none")
+            .Text(Experience.User.DisplayName);
 
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
@@ -119,7 +144,7 @@
     private void ApproachRoom(string id)
     {
         var room = Rooms.First(x => x.Id == id);
-        Experience.Navigation.Approach(room.X, room.Y);
+        Experience.Navigation.ApproachEntrance(room);
         selectedRoomId = id;
     }
 
@@ -137,13 +162,21 @@
     {
         unknownUnlocked = true;
         selectedRoomId = "unknown";
+        ApproachRoom("unknown");
     }
 
     private void ExitRoom()
     {
         Forge.Reset();
         Experience.Conference.Leave();
+
+        var roomId = insideRoomId == "conference" ? "yup" : insideRoomId;
+        var room = Rooms.FirstOrDefault(x => x.Id == roomId);
+        if (room is not null)
+            Experience.Navigation.MoveToExit(room);
+
         insideRoomId = null;
+        selectedRoomId = null;
     }
 
     public void Dispose() => Experience.Dispose();
