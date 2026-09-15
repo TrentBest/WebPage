@@ -15,11 +15,12 @@ public abstract class SoftwarePatternMicroBundle : IDisposable
     protected SoftwarePatternMicroBundle(int id, string name, MicroBundlePresentation presentation)
     {
         _lifecycle = new MicroBundle(id, name, new WebMicroBundleProvider());
+        Name = name;
         Presentation = presentation;
     }
 
     public ulong Id => (ulong)_lifecycle.Id;
-    public string Name => _lifecycle.Name;
+    public string Name { get; }
     public MicroBundleManifestation? Manifestation => _lifecycle.Manifestation;
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
     public MicroBundlePresentation Presentation { get; }
