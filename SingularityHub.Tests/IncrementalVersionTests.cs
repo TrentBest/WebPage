@@ -136,4 +136,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 119)]
     [Fact(DisplayName = "V0.0.119 — Explore_MicroBundle_Experience_Identity_And_Deliberate_Walking_Pace")]
     public void V0_0_119_ExploreMicroBundleExperienceIdentityAndDeliberateWalkingPace() => Assert.Equal("0.0.119", "0.0.119");
+
+    [ArchitectureTest(0, 0, 120)]
+    [Fact(DisplayName = "V0.0.120 — Explore_Pathfinding_MicroBundle_Routes_Around_Workshop_Suites")]
+    public void V0_0_120_ExplorePathfindingMicroBundleRoutesAroundWorkshopSuites() => Assert.Equal("0.0.120", "0.0.120");
 }
