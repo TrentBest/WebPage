@@ -1,6 +1,7 @@
 using System.Linq;
 using TheSingularityWorkshop.Gui;
 using TheSingularityWorkshop.Workshop.Agents;
+using TheSingularityWorkshop.Workshop.City;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
@@ -155,5 +156,76 @@ public sealed class SpatialSimulationTests
 
         Assert.NotEqual(normal, frustrated);
         Assert.Equal(new DigitenVector(-1, 0), frustrated);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 15 — waypoint destinations become imperfect walkable targets")]
+    public void DigitenWaypointSampler_ShrinksRadiusAroundObstacles()
+    {
+        var city = new DigitenCityTexture(7, 7);
+        for (var y = 1; y <= 5; y++)
+            for (var x = 1; x <= 5; x++)
+                city.SetBlocked(x, y);
+
+        city.SetBlocked(3, 3, blocked: false);
+
+        var found = DigitenWaypointSampler.TrySample(city, 3, 3, radius: 2, new System.Random(42), out var point);
+
+        Assert.True(found);
+        Assert.Equal((3, 3), point);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 16 — travel frustration grows off-line and clears on aligned travel")]
+    public void DigitenTravelFrustration_AccumulatesAndRecovers()
+    {
+        var frustration = new DigitenTravelFrustration(reversalThreshold: 1.0);
+        var desired = new DigitenVector(1, 0);
+
+        frustration.Observe(desired, new DigitenVector(0, 1), amount: 0.5);
+        Assert.True(frustration.Value > 0);
+        Assert.False(frustration.HasHadEnough);
+
+        frustration.Observe(desired, new DigitenVector(-1, 0), amount: 0.5);
+        Assert.True(frustration.HasHadEnough);
+
+        frustration.Observe(desired, desired, amount: 0.5);
+        Assert.True(frustration.Value < 1.0);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 17 — a citizen can live at home, spend Singularity currency, and feed attendance economics")]
+    public void SingularityCityEconomy_PersistsHomeCitizenAndBusinessActivity()
+    {
+        var economy = new SingularityCityEconomy();
+        var home = new SingularityHome("home-aster", 10, 12, Capacity: 2);
+        var citizen = new SingularityCitizen(3001, "Aster", home, startingBalance: 25);
+        var business = new SingularityBusiness("night-market", "Night Market", 18, 14, attendancePrice: 7);
+
+        economy.Register(citizen);
+        economy.Register(business);
+
+        Assert.True(citizen.Visit(business));
+        Assert.Equal(18, citizen.Wallet.Balance);
+        Assert.Equal(1, business.Attendance);
+        Assert.Equal(7, business.Revenue);
+        Assert.Equal("Attending:night-market", citizen.CurrentActivity);
+
+        citizen.ReturnHome();
+        Assert.Equal("Home", citizen.CurrentActivity);
+        Assert.Equal(25, economy.TotalCurrency);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 18 — DigiGroups turn arrival into intentional cooperative or competitive activity")]
+    public void DigiGroup_SeparatesIntentionalAggregationFromCrowdMovement()
+    {
+        var group = new DigiGroup("forge-shift-alpha", "Build Workshop foundation", DigiGroupMode.Cooperative);
+
+        Assert.True(group.Add(3001));
+        Assert.True(group.Add(3002));
+        Assert.False(group.Add(3001));
+        Assert.Equal(2, group.Members.Count);
+        Assert.True(group.Contains(3002));
+        Assert.Equal(DigiGroupMode.Cooperative, group.Mode);
+
+        Assert.True(group.Remove(3001));
+        Assert.False(group.Contains(3001));
     }
 }
