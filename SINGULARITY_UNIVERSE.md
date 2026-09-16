@@ -70,21 +70,61 @@ At minimum, persistent world state eventually includes:
 
 The first implementation may persist only the subset required for the current vertical slice. The model must not prevent the complete state from becoming persistent later.
 
-## 4. Digitens
+## 4. Digitens: inhabitants, not state machines
 
-A **Digiten** is a persistent agent/avatar capable of moving through Singularity World and entering Experiences and Domains.
+A **Digiten** is a persistent digital inhabitant of Singularity World. It is an actor with identity, location, goals, history, relationships, and time. It may exist and make progress when no human is watching. Human presence increases the required visible simulation and interaction detail; it does not create the Digiten's existence.
 
-Digitens do not need to know every object in the universe.
+A Digiten is **not** synonymous with an FSM. FSMs are behavioral machinery owned by the actor or by the processes with which it interacts.
 
-Their universal knowledge is intentionally small:
+The universal knowledge of a Digiten remains intentionally small:
 
-1. where they are;
-2. where they can attempt to go;
-3. how to choose a destination for a goal;
-4. how to navigate the current world's wayfinding system;
-5. how to interact with an object through the object's exposed contract.
+1. where it is;
+2. what it currently wants or is trying to accomplish;
+3. what destinations are available to its goal;
+4. how to navigate the current world's wayfinding contracts;
+5. how to inspect and use an object's public interaction/capability contract.
 
 A Digiten should discover specialized behavior from the environment rather than containing a giant switch statement for every machine, building, transit system, or fictional universe.
+
+### How many FSMs?
+
+There is deliberately no universal fixed number.
+
+The first Digiten vertical slice uses one FSM_API behavioral FSM to establish the actor's intent/lifecycle. As the simulation becomes richer, independent behavioral concerns may acquire concurrent FSMs:
+
+```text
+                         DIGITEN
+                            │
+          ┌─────────────────┼─────────────────┐
+          │                 │                 │
+       EXISTENCE         LOCOMOTION         SOCIAL
+          FSM                FSM               FSM
+          │                 │                 │
+          └──────────── GOAL / INTENT ────────┘
+                            │
+                      DOMAIN ROLE FSM
+                            │
+                       INTERACTION FSM
+```
+
+That is an architectural choice, not a prescribed count. We create an FSM when a concern needs independent lifecycle, scheduling, transition semantics, or concurrency. We do not create one FSM for every property.
+
+### Compact interpreted state
+
+A behavioral state can be represented compactly without making the representation the behavior model.
+
+A byte supplies **256 indexes**. An image or texture channel can therefore carry one interpreted state index per channel. Multiple channels can carry independent indexes. The index is resolved through the active behavior/domain catalog; the authoritative executable semantics remain in FSM_API.
+
+```text
+texture / image channel
+        │
+        ▼
+      0..255 ─────► behavior catalog ─────► FSM_API interpretation
+
+    compact storage                 executable meaning
+```
+
+This gives a plausible dense representation for enormous populations. A texture can become a world-state substrate or snapshot format without turning pixels into a second state-machine runtime. The pixel is storage; FSM_API remains behavior.
 
 ## 5. Goals and Missions
 
@@ -135,16 +175,14 @@ Construction Vehicle
        └── capability: drive
               └── action: navigate
 
-Digitens Agent
+Digiten Agent
        │
        └── discovers manifest
               │
               └── asks FSM-controlled vehicle to perform an action
 ```
 
-The vehicle is therefore both an object in the world and a capability provider.
-
-The current WebPage implementation begins this contract with `IVehicleCapabilitySource`, `VehicleCapability`, and `VehicleAction`. Construction vehicles now expose machine-specific capability manifests while retaining their lifecycle through FSM_API.
+The vehicle is both an object in the world and a capability provider. The current WebPage implementation begins this contract with `IVehicleCapabilitySource`, `VehicleCapability`, and `VehicleAction`. Construction vehicles expose machine-specific capability manifests while retaining their lifecycle through FSM_API.
 
 ## 7. FSM ownership
 
@@ -158,7 +196,7 @@ The intended relationship is:
                  Goal
                   │
                   ▼
-             Digitens Agent
+             Digiten Actor
                   │
            chooses what to do
                   │
@@ -180,7 +218,7 @@ The intended relationship is:
              world state
 ```
 
-The agent chooses and requests. The controlled object owns the specialized behavior. FSM_API supplies the deterministic lifecycle machinery.
+The agent chooses and requests. The controlled object owns specialized behavior. FSM_API supplies deterministic lifecycle machinery.
 
 ## 8. Navigation is hierarchical
 
@@ -212,7 +250,7 @@ The canonical demonstration journey is deliberately richer than a teleport:
 2. The Singularity World wayfinder identifies viable transit options.
 3. The Digiten walks to a taxi or tram.
 4. If using the tram, the Digiten navigates the surrounding monumental structure.
-5. At ticketing, the traveler selects a seat.
+5. At ticketing, the Digiten selects a seat.
 6. A persistent ticket is issued and carried by the Digiten.
 7. At boarding, the assigned seat is highlighted for that traveler while other Digitens independently find theirs.
 8. Boarding behavior is governed by FSMs rather than a single animation timer.
@@ -220,7 +258,7 @@ The canonical demonstration journey is deliberately richer than a teleport:
 10. The experience returns to the cab interior/top-down view.
 11. Arrival is announced.
 12. Digitens disembark according to their own navigation and goals; the world is allowed to look messy rather than forcing perfect choreography.
-13. The traveler acquires the space station's wayfinding capabilities.
+13. The traveler acquires the station's wayfinding capabilities.
 14. The traveler follows a loose route toward the Star Wars entrypoint while being free to shop, converse, inspect, or pause.
 15. A transport ship provides the domain transition.
 16. During transit, the traveler may explore the ship.
@@ -230,20 +268,20 @@ The canonical demonstration journey is deliberately richer than a teleport:
 20. The domain presents role choices such as Jedi, Sith, trooper, or droid according to that domain's rules.
 21. The Digiten is rolled into the selected role and continues as the same persistent agent within a new governed context.
 
-Every one of these stages is an opportunity for reusable MicroBundles and FSMs. None should require the WebPage host to know the story in advance.
+Every stage is an opportunity for reusable MicroBundles and FSMs. None should require the WebPage host to know the story in advance.
 
 ## 10. User and agent equivalence
 
 A user-controlled avatar and an autonomous Digiten should operate against the same world contracts.
 
-The user may personally make the Star Wars journey described above. An autonomous agent may make the same journey. They should encounter the same buildings, transit systems, tickets, gates, seats, shops, domain rules, and interaction contracts.
+The user may personally make the journey described above. An autonomous agent may make the same journey. They should encounter the same buildings, transit systems, tickets, gates, seats, shops, domain rules, and interaction contracts.
 
 The difference is the decision source:
 
 ```text
 Human input ───────┐
                    ├──> World interaction contracts ──> FSMs
-Digitens decision ─┘
+Digiten decision ──┘
 ```
 
 This is a foundational requirement. We do not build an artificial path for agents and a separate path for humans.
@@ -279,7 +317,7 @@ The Workshop contains capabilities such as:
 - simulation and experimentation;
 - future UGC authoring and publishing systems.
 
-The Workshop can eventually become the place where creators build the very MicroBundles and Experiences that populate Singularity World.
+The Workshop can eventually become the place where creators build the MicroBundles and Experiences that populate Singularity World.
 
 ## 13. UGC and domain economics
 
@@ -305,23 +343,25 @@ These laws are now part of the working architecture:
 
 1. **The world is spatial.** Objects have position, bounds, geometry, and interaction points.
 2. **The world is persistent.** Actors and important state survive beyond a single render.
-3. **Experiences are environments.** An Experience is comprised of MicroBundles.
-4. **Objects expose capabilities.** Agents discover specialized behavior from the object being operated.
-5. **Agents remain generic.** Digitens know navigation and goal selection, not every domain's implementation.
-6. **FSM_API owns FSM behavior.** We do not create a second FSM implementation in WebPage.
-7. **Humans and Digitens use the same world contracts.** Different decision sources must not produce different physics or interaction rules.
-8. **Navigation is hierarchical.** Local paths, wayfinding, transit, and domain transitions are distinct layers.
-9. **Rendering is manifestation.** GUI is allowed to be crude during development; it must not become the source of world truth.
-10. **Domain content remains domain-owned.** The platform supplies construction and execution infrastructure without pretending to be the owner of every fictional universe.
-11. **Construction is simulation.** Vehicles and workers should eventually perform actual work against world geometry.
-12. **Tests are architectural breadcrumbs.** Each meaningful increment receives an incremental unit test before the next architectural layer is added.
+3. **Digitens are inhabitants.** A Digiten is a persistent actor, not an FSM, sprite, or page-local script.
+4. **Experiences are environments.** An Experience is comprised of MicroBundles.
+5. **Objects expose capabilities.** Agents discover specialized behavior from the object being operated.
+6. **Agents remain generic.** Digitens know navigation and goal selection, not every domain's implementation.
+7. **FSM_API owns FSM behavior.** We do not create a second FSM implementation in WebPage.
+8. **Compact representations are interpretations.** A byte/pixel/channel may index behavior; it does not replace the executable FSM definition.
+9. **Humans and Digitens use the same world contracts.** Different decision sources must not produce different interaction rules.
+10. **Navigation is hierarchical.** Local paths, wayfinding, transit, and domain transitions are distinct layers.
+11. **Rendering is manifestation.** GUI is allowed to be crude during development; it must not become the source of world truth.
+12. **Domain content remains domain-owned.** The platform supplies construction and execution infrastructure without pretending to be the owner of every fictional universe.
+13. **Construction is simulation.** Vehicles and workers should eventually perform actual work against world geometry.
+14. **Tests are architectural breadcrumbs.** Each meaningful increment receives an incremental unit test before the next architectural layer is added.
 
 ## 15. Immediate implementation sequence
 
 The next vertical slices are:
 
 1. capability discovery from vehicles;
-2. a Digitens actor whose lifecycle is governed by FSM_API;
+2. a Digiten actor whose lifecycle is governed by FSM_API;
 3. vehicle-operation requests flowing through the discovered capability contract;
 4. renderer-neutral path scheduling and incremental movement;
 5. persistent spatial actor state;
