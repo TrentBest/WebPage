@@ -49,4 +49,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 129)] [Fact(DisplayName = "V0.0.129 — Crowd_Reversal_Prefers_The_Exact_Adjacent_Opposite_Cell")] public void V0_0_129_CrowdReversalPrefersTheExactAdjacentOppositeCell() => Assert.Equal("V0.0.129", "V0.0.129");
     [ArchitectureTest(0, 0, 130)] [Fact(DisplayName = "V0.0.130 — DigiGroup_Movement_Weights_Individual_Position_Toward_Shared_Center")] public void V0_0_130_DigiGroupMovementWeightsIndividualPositionTowardSharedCenter() => Assert.Equal("V0.0.130", "V0.0.130");
     [ArchitectureTest(0, 0, 131)] [Fact(DisplayName = "V0.0.131 — Avatar_Remains_Centered_While_The_Spatial_World_Moves")] public void V0_0_131_AvatarRemainsCenteredWhileTheSpatialWorldMoves() => Assert.Equal("V0.0.131", "V0.0.131");
+    [ArchitectureTest(0, 0, 132)] [Fact(DisplayName = "V0.0.132 — Left_Click_Moves_Through_Space_And_Buildings_Activate_On_Arrival")] public void V0_0_132_LeftClickMovesThroughSpaceAndBuildingsActivateOnArrival() => Assert.Equal("V0.0.132", "V0.0.132");
 }
