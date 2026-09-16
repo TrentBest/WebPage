@@ -164,4 +164,12 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 127)]
     [Fact(DisplayName = "V0.0.127 — Singularity_City_Becomes_A_Persistent_Explorable_Simulation_Substrate")]
     public void V0_0_127_SingularityCityBecomesAPersistentExplorableSimulationSubstrate() => Assert.Equal("0.0.127", "0.0.127");
+
+    [ArchitectureTest(0, 0, 128)]
+    [Fact(DisplayName = "V0.0.128 — Digiten_Intent_Enters_Pursuit_Before_Navigation")]
+    public void V0_0_128_DigitenIntentEntersPursuitBeforeNavigation() => Assert.Equal("V0.0.128", "V0.0.128");
+
+    [ArchitectureTest(0, 0, 129)]
+    [Fact(DisplayName = "V0.0.129 — Crowd_Reversal_Prefers_The_Exact_Adjacent_Opposite_Cell")]
+    public void V0_0_129_CrowdReversalPrefersTheExactAdjacentOppositeCell() => Assert.Equal("V0.0.129", "V0.0.129");
 }
