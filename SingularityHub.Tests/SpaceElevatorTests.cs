@@ -43,4 +43,14 @@ public sealed class SpaceElevatorTests
         Assert.Contains("TRI-RAIL", elevator.ClimberArchitecture);
         Assert.Contains("CARBON NANOTUBE", elevator.TetherMaterial);
     }
+
+    [Fact]
+    public void WorkshopOrbitalTether_ProvidesCommercialConcourseAndLeasingCapacity()
+    {
+        var elevator = SpaceElevatorTemplates.WorkshopOrbitalTether;
+
+        Assert.Contains(elevator.Components, component => component.Kind == SpaceElevatorComponentKind.CommercialConcourse);
+        Assert.True(elevator.CommercialLeasingEnabled);
+        Assert.True(elevator.CommercialStorefrontCapacity >= 1);
+    }
 }
