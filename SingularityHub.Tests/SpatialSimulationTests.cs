@@ -55,4 +55,20 @@ public sealed class SpatialSimulationTests
         Assert.Equal(4, crane.Single(part => part.Code == "OUTRIGGER").Count);
         Assert.Equal(4, crane.Single(part => part.Code == "TIRE").Count);
     }
+
+    [Fact(DisplayName = "Incremental Unit Test 10 — a Digitens can discover vehicle capabilities without knowing the machine type")]
+    public void DigitensVehicleAgent_DiscoversCapabilitiesFromVehicle()
+    {
+        using var backhoe = new ConstructionVehicleMicroBundle(2210, "Excavator One", ConstructionMachineKind.Backhoe);
+
+        Assert.Contains(backhoe.Capabilities, capability => capability.Id == "excavate");
+        Assert.Contains(backhoe.Capabilities.SelectMany(capability => capability.Actions), action => action.Id == "dig");
+        Assert.True(backhoe.CanPerform("dig"));
+        Assert.False(backhoe.CanPerform("fly"));
+
+        using var rover = new ConstructionVehicleMicroBundle(2211, "Survey Rover", ConstructionMachineKind.Rover);
+        Assert.True(rover.CanPerform("scan"));
+        Assert.True(rover.CanPerform("navigate"));
+        Assert.False(rover.CanPerform("dig"));
+    }
 }
