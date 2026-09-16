@@ -12,7 +12,7 @@
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
     private string? insideRoomId;
-    private bool unknownUnlocked;
+    private bool unknownUnlocked = false;
     private int detailLevel = 16;
 
     private static readonly IReadOnlyList<SpatialRoom> Rooms =
