@@ -28,27 +28,27 @@
 
     private static readonly IReadOnlyList<ExperienceSpace> Rooms =
     [
-        new("experience", "Experience Deck", "LIVING SPACE", 25, 28, 25, 42, 25, 42,
+        new("experience", "Experience Deck", "LIVING SPACE", 18, 18, 29, 40, 29, 40,
             "The sensory side of the Workshop. This is where an Experience becomes something a visitor can actually inhabit.",
-            "EXPERIENCE", "Living GUI / presentation", 25, 42),
-        new("engineering", "The Forge", "FSM WORKSHOP", 73, 30, 73, 46, 73, 46,
+            "EXPERIENCE", "Living GUI / presentation", 22, 18),
+        new("engineering", "The Forge", "FSM WORKSHOP", 66, 18, 78, 40, 78, 40,
             "The Workshop's first real building: a place for shaping state, lifecycle, reusable substrates, and executable machinery.",
-            "FORGE", "FSM / lifecycle / composition", 30, 25),
-        new("research", "Research Laboratory", "PARTICLE PHYSICS", 52, 48, 52, 66, 52, 66,
+            "FORGE", "FSM / lifecycle / composition", 24, 18),
+        new("research", "Research Laboratory", "PARTICLE PHYSICS", 43, 44, 53, 64, 53, 64,
             "A research facility for chemistry, materials, computation, and controlled experiments — including a hadron collider simulator.",
-            "RESEARCH", "Chemistry / materials / collider simulation", 18, 16),
-        new("creation", "Creation Bay", "BUILDER SPACE", 34, 72, 34, 88, 34, 88,
+            "RESEARCH", "Chemistry / materials / collider simulation", 20, 16),
+        new("creation", "Creation Bay", "BUILDER SPACE", 30, 72, 42, 90, 42, 90,
             "The composition boundary. Focused capabilities become MicroBundles, then recipes, then executable Experiences.",
-            "CREATION", "MicroBundles / composition", 31, 23),
-        new("architecture", "Architectural Shop", "DESIGN STUDIO", 8, 76, 8, 92, 8, 92,
+            "CREATION", "MicroBundles / composition", 24, 18),
+        new("architecture", "Architectural Shop", "DESIGN STUDIO", 4, 70, 15, 92, 15, 92,
             "Draw a floor plan, place doors and rooms, and introduce the vertical circulation that turns a sketch into a structure.",
-            "ARCHITECTURE", "Floor plans / structures / vertical circulation", 25, 20),
-        new("space-elevator", "Space Elevator", "ORBITAL ACCESS", 66, 28, 66, 68, 66, 68,
+            "ARCHITECTURE", "Floor plans / structures / vertical circulation", 22, 20),
+        new("space-elevator", "Space Elevator", "ORBITAL ACCESS", 80, 45, 86, 68, 86, 68,
             "The Workshop's vertical road into space: ground anchor, tether, climber, counterweight, and an orbital station at the top.",
-            "SPACE", "Orbital infrastructure / station", 7, 40),
-        new("unknown", "Unknown Annex", "UNMAPPED", 79, 76, 79, 90, 79, 90,
+            "SPACE", "Orbital infrastructure / station", 12, 42),
+        new("unknown", "Unknown Annex", "UNMAPPED", 64, 74, 70, 92, 70, 92,
             "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.",
-            "UNKNOWN", "Undisclosed", 24, 20)
+            "UNKNOWN", "Undisclosed", 12, 18)
     ];
 
     private double AvatarX => Experience.Navigation.X;
@@ -117,22 +117,7 @@
         if (insideRoomId == "space-elevator")
             return SpaceElevatorGuiBuilder.Build(this, SpaceElevator, ExitRoom);
 
-        var world = SpatialWorldGuiBuilder.Build(
-            this,
-            Rooms,
-            UnknownUnlocked,
-            AvatarX,
-            AvatarY,
-            TourKicker,
-            TourMessage,
-            hoveredInteractableId,
-            openSign,
-            HandleKeyDown,
-            MoveAvatarTo,
-            InteractRoom,
-            SetHoveredInteractable,
-            ShowSign,
-            CloseSign);
+        var world = SpatialWorldGuiBuilder.Build(this, Rooms, UnknownUnlocked, AvatarX, AvatarY, TourKicker, TourMessage, hoveredInteractableId, openSign, HandleKeyDown, MoveAvatarTo, InteractRoom, SetHoveredInteractable, ShowSign, CloseSign);
 
         var shell = WorkshopGui.MultiPanel(this)
             .Style("position", "fixed")
@@ -145,15 +130,7 @@
             .Content(WorkshopMapGuiBuilder.MapButton(this, mapOpen, ToggleMap));
 
         if (mapOpen)
-        {
-            shell.Content(WorkshopMapGuiBuilder.Build(
-                this,
-                Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked).ToArray(),
-                AvatarX,
-                AvatarY,
-                SelectMapDestination,
-                CloseMap));
-        }
+            shell.Content(WorkshopMapGuiBuilder.Build(this, Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked).ToArray(), AvatarX, AvatarY, SelectMapDestination, CloseMap));
 
         return shell;
     }
