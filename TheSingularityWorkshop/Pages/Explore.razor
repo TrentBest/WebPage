@@ -27,6 +27,12 @@
     private bool mapOpen;
     private int walkGeneration;
 
+    private bool tramBoarded;
+    private int tramProgress;
+    private double shipThrottle;
+    private string shipFlightMode = "docked";
+    private string shipDestination = "Orbital Station";
+
     private static readonly IReadOnlyList<ExperienceSpace> Rooms =
     [
         new("experience", "Experience Deck", "LIVING SPACE", 18, 18, 29, 40, 29, 40,
@@ -47,6 +53,12 @@
         new("space-elevator", "Space Elevator", "ORBITAL ACCESS", 80, 45, 86, 68, 86, 68,
             "The Workshop's vertical road into space: ground anchor, tether, climber, counterweight, and an orbital station at the top.",
             "SPACE", "Orbital infrastructure / station", 12, 42),
+        new("tram-terminal", "Singularity City Tram", "CITY TRANSIT", 18, 88, 29, 96, 29, 96,
+            "A real transportation Experience. Board here and the tram carries you through Singularity City toward the Space Elevator complex.",
+            "TRANSIT", "Tram / city circulation / announcements", 30, 9),
+        new("spaceship", "Singularity Spaceship Hangar", "VESSEL OPERATIONS", 48, 4, 60, 15, 60, 15,
+            "A hangar for player-operated vessels. Enter the ship, sit at the controls, and begin turning transportation into an Experience of its own.",
+            "VESSEL", "Cockpit / navigation / propulsion / systems", 30, 12),
         new("unknown", "Unknown Annex", "UNMAPPED", 64, 74, 70, 92, 70, 92,
             "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.",
             "UNKNOWN", "Undisclosed", 12, 18)
@@ -60,7 +72,7 @@
     private string TourKicker => hoveredInteractableId is not null
         ? "INTERACTABLE // LIVE SCHEMATIC"
         : insideRoomId is not null
-            ? "YOU FOUND A DOOR"
+            ? "YOU ARE INSIDE AN EXPERIENCE"
             : "THE WORKSHOP IS A PLACE YOU CAN ENTER";
 
     private string TourMessage
@@ -71,11 +83,11 @@
             {
                 var hovered = Rooms.FirstOrDefault(room => room.Id == hoveredInteractableId);
                 if (hovered is not null)
-                    return $"{hovered.Name} — {hovered.Description} Hover is inspection; click when you want to approach the interaction point. Read SIGN for the building face.";
+                    return $"{hovered.Name} — {hovered.Description} The structure is the interaction surface; click it and the Workshop will carry you to its interaction point before execution.";
             }
 
             if (insideRoomId is not null)
-                return "You did not open a menu. You walked here. That distinction matters. Experiences should feel inhabited, not merely displayed.";
+                return "You did not open a menu. You entered a place. From here, the Experience exposes its own living tools, controls, and nested interactions.";
 
             var nearest = Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked)
                 .OrderBy(room => DistanceSquared(room.X, room.Y)).FirstOrDefault();
@@ -91,6 +103,8 @@
                 "architecture" => "ARCHITECTURAL SHOP — draw the bones of a place. Walls, rooms, doors, stairs, elevators, and ladders become data first; later they can become an actual Workshop structure.",
                 "research" => "RESEARCH LABORATORY — the Workshop's experimental engine. Materials, chemistry, computation, and a hadron collider simulator belong here.",
                 "space-elevator" => "SPACE ELEVATOR — the Workshop does not stop at the roof. The tether rises to an orbital station and makes space part of the same navigable architecture.",
+                "tram-terminal" => "SINGULARITY CITY TRAM — the Workshop is only one place in a much larger universe. Walk to the terminal, board the vehicle, and ride the city instead of teleporting past it.",
+                "spaceship" => "SINGULARITY SPACESHIP HANGAR — this is where the Workshop stops merely demonstrating tools and starts giving the visitor a vessel they can operate.",
                 _ => nearest.Description
             };
         }
@@ -111,6 +125,11 @@
             return HadronColliderGuiBuilder.Build(this, Collider, ConfigureCollider, InjectCollider, AccelerateCollider, CollideCollider, ResetCollider, ExitRoom);
         if (insideRoomId == "space-elevator")
             return SpaceElevatorGuiBuilder.Build(this, SpaceElevator, ExitRoom);
+        if (insideRoomId == "tram-terminal")
+            return TramExperienceGuiBuilder.Build(this, "Space Elevator Complex", tramProgress, tramBoarded, BoardTram, ExitRoom);
+        if (insideRoomId == "spaceship")
+            return SpacecraftGuiBuilder.Build(this, shipFlightMode, shipThrottle, shipDestination,
+                SetShipFlightMode, SetShipThrottle, SetShipDestination, LaunchShip, ExitRoom);
 
         var world = SpatialWorldGuiBuilder.Build(this, Rooms, UnknownUnlocked, AvatarX, AvatarY, TourKicker, TourMessage,
             hoveredInteractableId, openSign, HandleKeyDown, MoveAvatarTo, InteractRoom, SetHoveredInteractable, ShowSign, CloseSign);
@@ -141,10 +160,6 @@
         _ = InvokeAsync(StateHasChanged);
     }
 
-    /// <summary>
-    /// The map uses the same pathfinding capability as avatar movement. It is
-    /// therefore a visualization of the Workshop surface, not a second layout.
-    /// </summary>
     private void RefreshMapRoutes()
     {
         mapRoutes.Clear();
@@ -221,6 +236,64 @@
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
 
+    private void SetShipFlightMode(string mode)
+    {
+        shipFlightMode = mode;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void SetShipThrottle(double throttle)
+    {
+        shipThrottle = Math.Clamp(throttle, 0, 100);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void SetShipDestination(string destination)
+    {
+        shipDestination = destination;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async void LaunchShip()
+    {
+        if (shipThrottle <= 0)
+            shipThrottle = 25;
+
+        shipFlightMode = "flight";
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(500);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task BoardTram()
+    {
+        if (tramBoarded)
+            return;
+
+        tramBoarded = true;
+        tramProgress = 0;
+        await InvokeAsync(StateHasChanged);
+
+        // The transit cadence advances the same Experience runtime used by the
+        // Workshop visitor. The visual route is a manifestation of this state,
+        // not a separate animation divorced from the Experience lifecycle.
+        for (var progress = 10; progress <= 100 && insideRoomId == "tram-terminal"; progress += 10)
+        {
+            tramProgress = progress;
+            Experience.Update();
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(120);
+        }
+
+        if (insideRoomId == "tram-terminal")
+        {
+            tramBoarded = false;
+            tramProgress = 0;
+            insideRoomId = "space-elevator";
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
     private async Task HandleKeyDown(KeyboardEventArgs args)
     {
         if (insideRoomId is not null || openSign is not null || mapOpen)
@@ -281,8 +354,30 @@
         if (Math.Abs(AvatarX - room.EntranceX) > 0.5 || Math.Abs(AvatarY - room.EntranceY) > 0.5)
             return;
 
-        await Task.Delay(300);
-        insideRoomId = room.Id;
+        var interactables = WorkshopInteractableCatalog.Create(Rooms, EnterInteractable);
+        if (!interactables.TryGetValue(id, out var interactable))
+            return;
+
+        var context = new InteractionContext(
+            "workshop-floor",
+            InteractionScope.World,
+            new HashSet<string>(StringComparer.Ordinal));
+
+        var executed = new InteractableExecutor().TryExecute(interactable, InteractionTrigger.Click, context);
+        if (!executed)
+            return;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void EnterInteractable(string id)
+    {
+        insideRoomId = id;
+        if (id == "tram-terminal")
+        {
+            tramBoarded = false;
+            tramProgress = 0;
+        }
     }
 
     private void ExitRoom()
@@ -293,6 +388,10 @@
         openSign = null;
         mapOpen = false;
         mapRoutes.Clear();
+        tramBoarded = false;
+        tramProgress = 0;
+        shipFlightMode = "docked";
+        shipThrottle = 0;
 
         var room = Rooms.FirstOrDefault(x => x.Id == insideRoomId);
         if (room is not null)
