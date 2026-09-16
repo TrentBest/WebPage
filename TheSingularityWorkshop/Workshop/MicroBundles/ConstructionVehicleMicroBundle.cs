@@ -1,17 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TheSingularityWorkshop.SingularityHub;
+using TheSingularityWorkshop.Workshop.Agents;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
 /// <summary>
-/// MicroBundle for a construction vehicle. A vehicle is a live data actor;
-/// its visual manifestation is merely one consumer of this state.
+/// MicroBundle for a construction vehicle. The vehicle is the authority for
+/// what the machine is and what the machine can do; an operating Digitens
+/// discovers this manifest instead of containing machine-specific knowledge.
+/// Lifecycle remains owned by FSM_API through <see cref="MicroBundle"/>.
 /// </summary>
-public sealed class ConstructionVehicleMicroBundle : IDisposable
+public sealed class ConstructionVehicleMicroBundle : IDisposable, IVehicleCapabilitySource
 {
     private readonly MicroBundle _lifecycle;
     private readonly Dictionary<string, string> _subsystemStatus = new(StringComparer.OrdinalIgnoreCase);
+    private readonly IReadOnlyList<VehicleCapability> _capabilities;
     private bool _disposed;
 
     public ConstructionVehicleMicroBundle(int bundleId, string name, ConstructionMachineKind kind)
@@ -22,6 +27,7 @@ public sealed class ConstructionVehicleMicroBundle : IDisposable
         _lifecycle = new MicroBundle(bundleId, $"CONSTRUCTION VEHICLE // {name.ToUpperInvariant()}", new WebMicroBundleProvider());
         Name = name;
         Kind = kind;
+        _capabilities = BuildCapabilities(kind);
     }
 
     public ulong Id => (ulong)_lifecycle.Id;
@@ -30,6 +36,10 @@ public sealed class ConstructionVehicleMicroBundle : IDisposable
     public VehicleOperatingStatus OperatingStatus { get; private set; } = VehicleOperatingStatus.Idle;
     public VehicleDriveStatus DriveStatus { get; private set; } = VehicleDriveStatus.Parked;
     public IReadOnlyDictionary<string, string> SubsystemStatus => _subsystemStatus;
+    public IReadOnlyList<VehicleCapability> Capabilities => _capabilities;
+
+    public bool CanPerform(string actionId)
+        => !string.IsNullOrWhiteSpace(actionId) && _capabilities.SelectMany(c => c.Actions).Any(a => string.Equals(a.Id, actionId, StringComparison.OrdinalIgnoreCase));
 
     public void SetOperatingStatus(VehicleOperatingStatus status)
     {
@@ -57,6 +67,44 @@ public sealed class ConstructionVehicleMicroBundle : IDisposable
         _lifecycle.Dispose();
         _disposed = true;
     }
+
+    private static IReadOnlyList<VehicleCapability> BuildCapabilities(ConstructionMachineKind kind)
+        => kind switch
+        {
+            ConstructionMachineKind.DumpTruck =>
+            [
+                Capability("haul", "Transport material", Action("load", "Load material", "bed"), Action("dump", "Empty the bed", "bed")),
+                Capability("drive", "Move material between locations", Action("navigate", "Navigate to a destination"))
+            ],
+            ConstructionMachineKind.Backhoe =>
+            [
+                Capability("excavate", "Dig and remove material", Action("dig", "Lower and operate the bucket", "grounding", "boom", "stick", "bucket")),
+                Capability("load", "Load excavated material", Action("scoop", "Scoop material into the bucket", "grounding", "boom", "stick", "bucket")),
+                Capability("drive", "Move the machine between work sites", Action("navigate", "Navigate to a destination"))
+            ],
+            ConstructionMachineKind.Crane =>
+            [
+                Capability("lift", "Lift and position suspended loads", Action("lift", "Raise a load", "outrigger", "boom", "hook"), Action("lower", "Lower a load", "outrigger", "boom", "hook")),
+                Capability("drive", "Move the crane between work sites", Action("navigate", "Navigate to a destination"))
+            ],
+            ConstructionMachineKind.Rover =>
+            [
+                Capability("survey", "Inspect and report on an area", Action("scan", "Scan the surrounding site", "sensor")),
+                Capability("drive", "Move autonomously between locations", Action("navigate", "Navigate to a destination"))
+            ],
+            ConstructionMachineKind.Lifter =>
+            [
+                Capability("lift", "Raise and position material", Action("fork-lift", "Lift a pallet or load", "mast", "fork")),
+                Capability("drive", "Move material between locations", Action("navigate", "Navigate to a destination"))
+            ],
+            _ => Array.Empty<VehicleCapability>()
+        };
+
+    private static VehicleCapability Capability(string id, string description, params VehicleAction[] actions)
+        => new(id, description, actions);
+
+    private static VehicleAction Action(string id, string description, params string[] requiredCapabilities)
+        => new(id, description, requiredCapabilities);
 }
 
 /// <summary>Primary work state, independent of locomotion.</summary>
