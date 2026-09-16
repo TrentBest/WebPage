@@ -45,6 +45,9 @@
         if (insideRoomId == "conference")
             return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
 
+        if (insideRoomId == "engineering")
+            return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
+
         var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom);
         return WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(UserNameLabel());
     }
@@ -87,7 +90,7 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    /// <summary>Approaches a spatial object, then invokes it only after arrival.</summary>
+    /// <summary>Approaches a spatial object, then enters its currently defined Experience plan.</summary>
     private async Task InteractRoom(string id)
     {
         if (insideRoomId is not null) return;
@@ -99,6 +102,14 @@
             Experience.Navigation.MoveTo(target.X + target.Width / 2, target.Y + target.Height / 2);
             await InvokeAsync(StateHasChanged);
             interactable.OnInteraction();
+
+            // The Forge is the first spatial building whose interior Experience
+            // plan exists today. Keep the handoff explicit until scene definitions
+            // become data-driven for every MicroBundle.
+            if (interactable.Id == "forge")
+                insideRoomId = "engineering";
+
+            await InvokeAsync(StateHasChanged);
             return;
         }
 
