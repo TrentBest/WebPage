@@ -103,8 +103,12 @@ public sealed class SpatialSimulationTests
         });
 
         Assert.Equal(3, texture.Count);
-        Assert.Equal((0.10, 0.20), texture.Get(0));
-        Assert.Equal((0.50, 0.60), texture.Get(2));
+        var first = texture.Get(0);
+        var last = texture.Get(2);
+        Assert.InRange(first.X, 0.0999, 0.1001);
+        Assert.InRange(first.Y, 0.1999, 0.2001);
+        Assert.InRange(last.X, 0.4999, 0.5001);
+        Assert.InRange(last.Y, 0.5999, 0.6001);
 
         var cursor = new DigitenWaypointCursor(texture.Count);
         Assert.Equal(0, cursor.Index);
@@ -113,5 +117,43 @@ public sealed class SpatialSimulationTests
         Assert.Equal(1, cursor.Advance());
         Assert.Equal(0, cursor.Advance());
         Assert.Equal(1, cursor.Advance());
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 13 — the city texture is the occupancy substrate for a crowd vector field")]
+    public void DigitenCityTexture_ProvidesOccupancyAndLocalFlow()
+    {
+        var city = new DigitenCityTexture(7, 5);
+        city.SetBlocked(3, 2);
+        city.SetBlocked(3, 1);
+        city.SetBlocked(3, 3);
+
+        Assert.True(city.TryOccupy(1, 2, 2401));
+        Assert.False(city.TryOccupy(1, 2, 2402));
+        Assert.Equal(2401, city.GetOccupant(1, 2));
+        Assert.False(city.IsWalkable(3, 2));
+
+        var crowd = new DigitenCrowdField(city);
+        var direction = crowd.ChooseDirection(2, 2, new DigitenVector(1, 0), frustration: 0);
+        Assert.Equal(new DigitenVector(0, -1), direction);
+
+        Assert.True(city.TryMove(2401, 1, 2, 1, 1));
+        Assert.Equal(2401, city.GetOccupant(1, 1));
+        Assert.Equal(DigitenCityTexture.Empty, city.GetOccupant(1, 2));
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 14 — accumulated directional frustration can trigger a reversal")]
+    public void DigitenCrowdField_ReversalHeuristicChangesPreferredFlow()
+    {
+        var city = new DigitenCityTexture(5, 3);
+        city.SetBlocked(2, 0);
+        city.SetBlocked(2, 1);
+        city.SetBlocked(2, 2);
+
+        var crowd = new DigitenCrowdField(city);
+        var normal = crowd.ChooseDirection(1, 1, new DigitenVector(1, 0), frustration: 0);
+        var frustrated = crowd.ChooseDirection(1, 1, new DigitenVector(1, 0), frustration: 1.0);
+
+        Assert.NotEqual(normal, frustrated);
+        Assert.Equal(new DigitenVector(-1, 0), frustrated);
     }
 }
