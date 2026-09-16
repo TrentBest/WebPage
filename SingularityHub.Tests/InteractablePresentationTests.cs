@@ -18,6 +18,8 @@ public sealed class InteractablePresentationTests
         Assert.Equal("INTERACTABLE", interactable.Presentation.Kicker);
         Assert.Equal("Sample", interactable.Presentation.Description);
         Assert.Equal("default", interactable.Presentation.SchematicId);
+        Assert.Equal("SAMPLE", interactable.Presentation.MapIntent.ThreadLabel);
+        Assert.Equal("#ffffff", interactable.Presentation.MapIntent.Accent);
     }
 
     [Fact]
@@ -40,6 +42,36 @@ public sealed class InteractablePresentationTests
         Assert.Same(presentation, interactable.Presentation);
         Assert.Equal("RESEARCH FACILITY", interactable.Presentation.Kicker);
         Assert.Equal("research-facility", interactable.Presentation.SchematicId);
+    }
+
+    [Fact]
+    public void Interactable_Presentation_Can_Declare_Map_Thread_Without_Choosing_A_Renderer()
+    {
+        var map = new InteractableMapPresentation(
+            "ORBITAL",
+            "#ff9f43",
+            LineWidth: 1.7,
+            LineOpacity: .72);
+
+        var presentation = new InteractablePresentation(
+            "SPACE ELEVATOR",
+            "A vertical road into orbit.",
+            "space-elevator",
+            Map: map);
+
+        var interactable = new Interactable(
+            "space-elevator",
+            "Space Elevator",
+            InteractionScope.World,
+            new InteractionPoint(86, 68),
+            new NoOpBehavior(),
+            presentation: presentation);
+
+        Assert.Same(map, interactable.Presentation.MapIntent);
+        Assert.Equal("ORBITAL", interactable.Presentation.MapIntent.ThreadLabel);
+        Assert.Equal("#ff9f43", interactable.Presentation.MapIntent.Accent);
+        Assert.Equal(1.7, interactable.Presentation.MapIntent.LineWidth);
+        Assert.Equal(.72, interactable.Presentation.MapIntent.LineOpacity);
     }
 
     private sealed class NoOpBehavior : IInteractableBehavior
