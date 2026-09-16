@@ -23,6 +23,7 @@
     private string? insideRoomId;
     private string? hoveredInteractableId;
     private WorkshopSign? openSign;
+    private bool mapOpen;
     private int walkGeneration;
 
     private static readonly IReadOnlyList<ExperienceSpace> Rooms =
@@ -102,44 +103,16 @@
     private ElementBuilder BuildGui()
     {
         if (insideRoomId == "conference")
-        {
-            return ConferenceRoomGuiBuilder.Build(
-                this,
-                ConferenceJoined,
-                JoinConference,
-                LeaveConference,
-                ExitRoom);
-        }
+            return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
 
         if (insideRoomId == "engineering")
-        {
             return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
-        }
 
         if (insideRoomId == "architecture")
-        {
-            return ArchitecturalShopGuiBuilder.Build(
-                this,
-                ArchitectureShop,
-                SelectArchitectureTool,
-                ApplyArchitectureCell,
-                LoadArchitectureTemplate,
-                CaptureArchitecture,
-                ExitRoom);
-        }
+            return ArchitecturalShopGuiBuilder.Build(this, ArchitectureShop, SelectArchitectureTool, ApplyArchitectureCell, LoadArchitectureTemplate, CaptureArchitecture, ExitRoom);
 
         if (insideRoomId == "research")
-        {
-            return HadronColliderGuiBuilder.Build(
-                this,
-                Collider,
-                ConfigureCollider,
-                InjectCollider,
-                AccelerateCollider,
-                CollideCollider,
-                ResetCollider,
-                ExitRoom);
-        }
+            return HadronColliderGuiBuilder.Build(this, Collider, ConfigureCollider, InjectCollider, AccelerateCollider, CollideCollider, ResetCollider, ExitRoom);
 
         if (insideRoomId == "space-elevator")
             return SpaceElevatorGuiBuilder.Build(this, SpaceElevator, ExitRoom);
@@ -161,19 +134,55 @@
             ShowSign,
             CloseSign);
 
-        return WorkshopGui.MultiPanel(this)
+        var shell = WorkshopGui.MultiPanel(this)
             .Style("position", "fixed")
             .Style("inset", "0")
             .Style("width", "100vw")
             .Style("height", "100vh")
             .Style("overflow", "hidden")
             .Content(world)
-            .Content(UserNameLabel());
+            .Content(UserNameLabel())
+            .Content(WorkshopMapGuiBuilder.MapButton(this, mapOpen, ToggleMap));
+
+        if (mapOpen)
+        {
+            shell.Content(WorkshopMapGuiBuilder.Build(
+                this,
+                Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked).ToArray(),
+                AvatarX,
+                AvatarY,
+                SelectMapDestination,
+                CloseMap));
+        }
+
+        return shell;
+    }
+
+    private void ToggleMap()
+    {
+        mapOpen = !mapOpen;
+        hoveredInteractableId = null;
+        openSign = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void CloseMap()
+    {
+        mapOpen = false;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SelectMapDestination(string id)
+    {
+        mapOpen = false;
+        hoveredInteractableId = null;
+        await InvokeAsync(StateHasChanged);
+        await InteractRoom(id);
     }
 
     private void SetHoveredInteractable(string? id)
     {
-        if (insideRoomId is not null || openSign is not null)
+        if (insideRoomId is not null || openSign is not null || mapOpen)
             return;
 
         hoveredInteractableId = id;
@@ -270,7 +279,7 @@
 
     private async Task HandleKeyDown(KeyboardEventArgs args)
     {
-        if (insideRoomId is not null || openSign is not null)
+        if (insideRoomId is not null || openSign is not null || mapOpen)
             return;
 
         var dx = args.Key.ToLowerInvariant() switch
@@ -294,18 +303,13 @@
 
     private async Task MoveAvatarTo(double x, double y)
     {
-        if (insideRoomId is not null || openSign is not null)
+        if (insideRoomId is not null || openSign is not null || mapOpen)
             return;
 
         var generation = ++walkGeneration;
         var obstacles = Rooms.Select(room => room.Footprint).ToArray();
 
-        if (!Experience.Pathfinding.TryPlan(
-                Experience.Navigation.X,
-                Experience.Navigation.Y,
-                x,
-                y,
-                obstacles))
+        if (!Experience.Pathfinding.TryPlan(Experience.Navigation.X, Experience.Navigation.Y, x, y, obstacles))
             return;
 
         while (generation == walkGeneration && Experience.Pathfinding.TryTakeNext(out var waypoint))
@@ -326,10 +330,7 @@
             return;
 
         var room = Rooms.FirstOrDefault(x => x.Id == id);
-        if (room is null)
-            return;
-
-        if (room.Id == "unknown" && !UnknownUnlocked)
+        if (room is null || (room.Id == "unknown" && !UnknownUnlocked))
             return;
 
         hoveredInteractableId = null;
@@ -337,8 +338,7 @@
         var targetY = room.EntranceY;
         await MoveAvatarTo(targetX, targetY);
 
-        if (Math.Abs(Experience.Navigation.X - targetX) > 0.5 ||
-            Math.Abs(Experience.Navigation.Y - targetY) > 0.5)
+        if (Math.Abs(Experience.Navigation.X - targetX) > 0.5 || Math.Abs(Experience.Navigation.Y - targetY) > 0.5)
             return;
 
         await Task.Delay(300);
@@ -351,6 +351,7 @@
         Experience.Conference.Leave();
         Collider.Reset();
         openSign = null;
+        mapOpen = false;
 
         var room = Rooms.FirstOrDefault(x => x.Id == insideRoomId);
         if (room is not null)
