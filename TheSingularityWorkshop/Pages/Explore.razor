@@ -1,5 +1,6 @@
 @page "/explore"
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
 @using TheSingularityWorkshop.Gui
 @using TheSingularityWorkshop.Workshop.MicroBundles
 @implements IDisposable
@@ -9,11 +10,14 @@
 @BuildGui().Build()
 
 @code {
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
     private string? insideRoomId;
     private bool unknownUnlocked = false;
     private int detailLevel = 16;
+    private IJSObjectReference? spatialModule;
 
     private static readonly IReadOnlyList<SpatialRoom> Rooms =
     [
@@ -64,6 +68,7 @@
             detailLevel,
             SetDetailLevel,
             HandleKeyDown,
+            HandleWorldClick,
             InteractRoom);
 
         return WorkshopGui.MultiPanel(this)
@@ -94,8 +99,7 @@
             .Style("pointer-events", "none")
             .Text(Experience.User.DisplayName);
 
-    private void SetDetailLevel(int level)
-        => detailLevel = Math.Clamp(level, 1, 64);
+    private void SetDetailLevel(int level) => detailLevel = Math.Clamp(level, 1, 64);
 
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
@@ -105,65 +109,66 @@
         switch (args.Key.ToLowerInvariant())
         {
             case "w":
-            case "arrowup":
-                MoveAvatar(0, -3);
-                break;
+            case "arrowup": MoveAvatar(0, -3); break;
             case "s":
-            case "arrowdown":
-                MoveAvatar(0, 3);
-                break;
+            case "arrowdown": MoveAvatar(0, 3); break;
             case "a":
-            case "arrowleft":
-                MoveAvatar(-3, 0);
-                break;
+            case "arrowleft": MoveAvatar(-3, 0); break;
             case "d":
-            case "arrowright":
-                MoveAvatar(3, 0);
-                break;
+            case "arrowright": MoveAvatar(3, 0); break;
         }
     }
 
     private void MoveAvatar(double dx, double dy)
     {
-        if (insideRoomId is not null)
-            return;
-
+        if (insideRoomId is not null) return;
         Experience.Navigation.Move(dx, dy);
     }
 
+    /// <summary>Moves the avatar to the world coordinate represented by an empty-space left click.</summary>
+    private async Task HandleWorldClick(MouseEventArgs args)
+    {
+        if (insideRoomId is not null) return;
+
+        spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
+        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToWorld", args.ClientX, args.ClientY, AvatarX, AvatarY);
+        Experience.Navigation.MoveTo(point.X, point.Y);
+        await InvokeAsync(StateHasChanged);
+    }
+
     /// <summary>
-    /// Spatial interaction is a world action. The visitor approaches the Forge
-    /// work area rather than being replaced by a page-shaped Forge dialog.
+    /// A building click is an intent to approach the building. The object is not
+    /// activated until the visitor reaches its declared interaction position.
     /// </summary>
     private async Task InteractRoom(string id)
     {
-        if (insideRoomId is not null)
-            return;
+        if (insideRoomId is not null) return;
 
-        if (id == "forge")
+        var interactable = Scene.Interactables.FirstOrDefault(item => item.Id == id);
+        if (interactable is not null)
         {
-            var forge = Scene.Interactables.FirstOrDefault(item => item.Id == "forge");
-            if (forge is null)
-                return;
-
-            Experience.Navigation.MoveTo(
-                forge.InteractionPoint.X + forge.InteractionPoint.Width / 2,
-                forge.InteractionPoint.Y + forge.InteractionPoint.Height / 2);
+            var target = interactable.InteractionPoint;
+            Experience.Navigation.MoveTo(target.X + target.Width / 2, target.Y + target.Height / 2);
             await InvokeAsync(StateHasChanged);
+            interactable.OnInteraction();
+
+            if (id == "forge")
+            {
+                await Task.Yield();
+                insideRoomId = "engineering";
+                await InvokeAsync(StateHasChanged);
+            }
+
             return;
         }
 
         var room = Rooms.FirstOrDefault(x => x.Id == id);
-        if (room is null)
-            return;
-
-        if (room.Id == "unknown" && !unknownUnlocked)
-            return;
+        if (room is null) return;
+        if (room.Id == "unknown" && !unknownUnlocked) return;
 
         Experience.Navigation.ApproachEntrance(room);
         await InvokeAsync(StateHasChanged);
         await Task.Delay(300);
-
         insideRoomId = room.Id == "unknown" ? "unknown" : room.Id;
     }
 
@@ -174,11 +179,14 @@
 
         var roomId = insideRoomId == "conference" ? "yup" : insideRoomId;
         var room = Rooms.FirstOrDefault(x => x.Id == roomId);
-        if (room is not null)
-            Experience.Navigation.MoveToExit(room);
-
+        if (room is not null) Experience.Navigation.MoveToExit(room);
         insideRoomId = null;
     }
 
-    public void Dispose() => Experience.Dispose();
+    public void Dispose()
+    {
+        Experience.Dispose();
+        if (spatialModule is not null)
+            _ = spatialModule.DisposeAsync();
+    }
 }
