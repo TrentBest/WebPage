@@ -91,4 +91,27 @@ public sealed class SpatialSimulationTests
         Assert.Equal("PursuingGoal", digiten.CurrentBehavior);
         Assert.Equal(23, digiten.BehaviorIndex);
     }
+
+    [Fact(DisplayName = "Incremental Unit Test 12 — Digitens can move to and fro using compact waypoint storage")]
+    public void DigitenWaypointTexture_ProvidesDeterministicToAndFroMovement()
+    {
+        var texture = new DigitenWaypointTexture(new[]
+        {
+            (0.10, 0.20),
+            (0.30, 0.40),
+            (0.50, 0.60)
+        });
+
+        Assert.Equal(3, texture.Count);
+        Assert.Equal((0.10, 0.20), texture.Get(0));
+        Assert.Equal((0.50, 0.60), texture.Get(2));
+
+        var cursor = new DigitenWaypointCursor(texture.Count);
+        Assert.Equal(0, cursor.Index);
+        Assert.Equal(1, cursor.Advance());
+        Assert.Equal(2, cursor.Advance());
+        Assert.Equal(1, cursor.Advance());
+        Assert.Equal(0, cursor.Advance());
+        Assert.Equal(1, cursor.Advance());
+    }
 }
