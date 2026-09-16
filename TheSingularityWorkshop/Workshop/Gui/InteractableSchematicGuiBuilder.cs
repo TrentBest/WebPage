@@ -14,7 +14,7 @@ public static class InteractableSchematicGuiBuilder
     private const string Yellow = "#ffd34d";
     private const string White = "#ffffff";
 
-    public static ElementBuilder Build(object receiver, Interactable interactable, bool hovered)
+    public static ElementBuilder Build(object receiver, IInteractable interactable, bool hovered)
     {
         ArgumentNullException.ThrowIfNull(interactable);
 
@@ -82,25 +82,13 @@ public static class InteractableSchematicGuiBuilder
                 .Attribute("stroke-opacity", ".9")
                 .Attribute("stroke-width", "1")
                 .Child(WorkshopGui.Element(receiver, "animate")
-                    .Attribute("attributeName", "x")
-                    .Attribute("values", "5;3;5")
-                    .Attribute("dur", "1.8s")
-                    .Attribute("repeatCount", "indefinite"))
+                    .Attribute("attributeName", "x").Attribute("values", "5;3;5").Attribute("dur", "1.8s").Attribute("repeatCount", "indefinite"))
                 .Child(WorkshopGui.Element(receiver, "animate")
-                    .Attribute("attributeName", "y")
-                    .Attribute("values", "5;3;5")
-                    .Attribute("dur", "1.8s")
-                    .Attribute("repeatCount", "indefinite"))
+                    .Attribute("attributeName", "y").Attribute("values", "5;3;5").Attribute("dur", "1.8s").Attribute("repeatCount", "indefinite"))
                 .Child(WorkshopGui.Element(receiver, "animate")
-                    .Attribute("attributeName", "width")
-                    .Attribute("values", "90;94;90")
-                    .Attribute("dur", "1.8s")
-                    .Attribute("repeatCount", "indefinite"))
+                    .Attribute("attributeName", "width").Attribute("values", "90;94;90").Attribute("dur", "1.8s").Attribute("repeatCount", "indefinite"))
                 .Child(WorkshopGui.Element(receiver, "animate")
-                    .Attribute("attributeName", "height")
-                    .Attribute("values", "50;54;50")
-                    .Attribute("dur", "1.8s")
-                    .Attribute("repeatCount", "indefinite")));
+                    .Attribute("attributeName", "height").Attribute("values", "50;54;50").Attribute("dur", "1.8s").Attribute("repeatCount", "indefinite")));
         }
 
         switch (schematicId)
@@ -115,78 +103,36 @@ public static class InteractableSchematicGuiBuilder
 
     private static void ResearchFacility(ElementBuilder svg, object receiver, string accent)
     {
-        Room(svg, receiver, accent, 5, 6, 90, 48);
-        Room(svg, receiver, accent, 10, 11, 24, 18);
-        Room(svg, receiver, accent, 38, 11, 24, 18);
-        Room(svg, receiver, accent, 66, 11, 24, 18);
-        Room(svg, receiver, accent, 10, 34, 24, 14);
-        Room(svg, receiver, accent, 38, 34, 24, 14);
-        Room(svg, receiver, accent, 66, 34, 24, 14);
-        Line(svg, receiver, accent, 34, 20, 38, 20);
-        Line(svg, receiver, accent, 62, 20, 66, 20);
-        Line(svg, receiver, accent, 34, 41, 38, 41);
-        Line(svg, receiver, accent, 62, 41, 66, 41);
-        Crosshair(svg, receiver, accent, 50, 30);
+        Room(svg, receiver, accent, 5, 6, 90, 48); Room(svg, receiver, accent, 10, 11, 24, 18); Room(svg, receiver, accent, 38, 11, 24, 18); Room(svg, receiver, accent, 66, 11, 24, 18); Room(svg, receiver, accent, 10, 34, 24, 14); Room(svg, receiver, accent, 38, 34, 24, 14); Room(svg, receiver, accent, 66, 34, 24, 14); Line(svg, receiver, accent, 34, 20, 38, 20); Line(svg, receiver, accent, 62, 20, 66, 20); Line(svg, receiver, accent, 34, 41, 38, 41); Line(svg, receiver, accent, 62, 41, 66, 41); Crosshair(svg, receiver, accent, 50, 30);
     }
 
     private static void Forge(ElementBuilder svg, object receiver, string accent)
     {
-        Room(svg, receiver, accent, 7, 7, 86, 46);
-        Room(svg, receiver, accent, 13, 13, 22, 34);
-        Room(svg, receiver, accent, 39, 13, 22, 34);
-        Room(svg, receiver, accent, 65, 13, 22, 34);
-        Line(svg, receiver, accent, 35, 30, 39, 30);
-        Line(svg, receiver, accent, 61, 30, 65, 30);
-        Crosshair(svg, receiver, accent, 50, 30);
+        Room(svg, receiver, accent, 7, 7, 86, 46); Room(svg, receiver, accent, 13, 13, 22, 34); Room(svg, receiver, accent, 39, 13, 22, 34); Room(svg, receiver, accent, 65, 13, 22, 34); Line(svg, receiver, accent, 35, 30, 39, 30); Line(svg, receiver, accent, 61, 30, 65, 30); Crosshair(svg, receiver, accent, 50, 30);
     }
 
     private static void CreationBay(ElementBuilder svg, object receiver, string accent)
     {
-        Room(svg, receiver, accent, 7, 7, 86, 46);
-        Room(svg, receiver, accent, 13, 14, 20, 32);
-        Room(svg, receiver, accent, 40, 14, 20, 32);
-        Room(svg, receiver, accent, 67, 14, 20, 32);
-        Line(svg, receiver, accent, 33, 30, 40, 30);
-        Line(svg, receiver, accent, 60, 30, 67, 30);
-        Crosshair(svg, receiver, accent, 50, 30);
+        Room(svg, receiver, accent, 7, 7, 86, 46); Room(svg, receiver, accent, 13, 14, 20, 32); Room(svg, receiver, accent, 40, 14, 20, 32); Room(svg, receiver, accent, 67, 14, 20, 32); Line(svg, receiver, accent, 33, 30, 40, 30); Line(svg, receiver, accent, 60, 30, 67, 30); Crosshair(svg, receiver, accent, 50, 30);
     }
 
     private static void DefaultBuilding(ElementBuilder svg, object receiver, string accent)
     {
-        Room(svg, receiver, accent, 8, 8, 84, 44);
-        Room(svg, receiver, accent, 18, 18, 24, 24);
-        Room(svg, receiver, accent, 58, 18, 24, 24);
-        Line(svg, receiver, accent, 42, 30, 58, 30);
-        Crosshair(svg, receiver, accent, 50, 30);
+        Room(svg, receiver, accent, 8, 8, 84, 44); Room(svg, receiver, accent, 18, 18, 24, 24); Room(svg, receiver, accent, 58, 18, 24, 24); Line(svg, receiver, accent, 42, 30, 58, 30); Crosshair(svg, receiver, accent, 50, 30);
     }
 
     private static void Room(ElementBuilder svg, object receiver, string accent, int x, int y, int width, int height)
-        => svg.Child(WorkshopGui.Element(receiver, "rect")
-            .Attribute("x", x).Attribute("y", y).Attribute("width", width).Attribute("height", height)
-            .Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-opacity", ".72").Attribute("stroke-width", ".6"));
+        => svg.Child(WorkshopGui.Element(receiver, "rect").Attribute("x", x).Attribute("y", y).Attribute("width", width).Attribute("height", height).Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-opacity", ".72").Attribute("stroke-width", ".6"));
 
     private static void Line(ElementBuilder svg, object receiver, string accent, int x1, int y1, int x2, int y2)
-        => svg.Child(WorkshopGui.Element(receiver, "line")
-            .Attribute("x1", x1).Attribute("y1", y1).Attribute("x2", x2).Attribute("y2", y2)
-            .Attribute("stroke", accent).Attribute("stroke-opacity", ".9").Attribute("stroke-width", ".55"));
+        => svg.Child(WorkshopGui.Element(receiver, "line").Attribute("x1", x1).Attribute("y1", y1).Attribute("x2", x2).Attribute("y2", y2).Attribute("stroke", accent).Attribute("stroke-opacity", ".9").Attribute("stroke-width", ".55"));
 
     private static void Crosshair(ElementBuilder svg, object receiver, string accent, int x, int y)
     {
-        svg.Child(WorkshopGui.Element(receiver, "circle")
-            .Attribute("cx", x).Attribute("cy", y).Attribute("r", "2.2")
-            .Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-width", ".55"));
-        Line(svg, receiver, accent, x - 6, y, x - 2, y);
-        Line(svg, receiver, accent, x + 2, y, x + 6, y);
-        Line(svg, receiver, accent, x, y - 6, x, y - 2);
-        Line(svg, receiver, accent, x, y + 2, x, y + 6);
+        svg.Child(WorkshopGui.Element(receiver, "circle").Attribute("cx", x).Attribute("cy", y).Attribute("r", "2.2").Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-width", ".55"));
+        Line(svg, receiver, accent, x - 6, y, x - 2, y); Line(svg, receiver, accent, x + 2, y, x + 6, y); Line(svg, receiver, accent, x, y - 6, x, y - 2); Line(svg, receiver, accent, x, y + 2, x, y + 6);
     }
 
     private static string Accent(string schematicId)
-        => schematicId switch
-        {
-            "forge" => Cyan,
-            "creation-bay" => Green,
-            "unknown" => Yellow,
-            _ => Cyan
-        };
+        => schematicId switch { "forge" => Cyan, "creation-bay" => Green, "unknown" => Yellow, _ => Cyan };
 }
