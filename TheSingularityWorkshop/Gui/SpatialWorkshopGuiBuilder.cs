@@ -26,7 +26,7 @@ public static class SpatialWorkshopGuiBuilder
     {
         var camera = new SpatialCamera(avatarX, avatarY);
         var world = WorkshopGui.Panel(receiver).Style("position", "absolute").Style("inset", "0").Style("overflow", "hidden").Style("outline", "none").Attribute("tabindex", "0").Attribute("autofocus", "autofocus").AriaLabel("The Workshop spatial experience. Click anywhere to move your avatar.").OnKeyDown(onKeyDown).OnClick(args => _ = onWorldClick(args)).PreventDefault("onkeydown");
-        var worldPlane = WorkshopGui.Panel(receiver).Style("position", "absolute").Style("left", "0").Style("top", "0").Style("width", $"{SpatialCamera.WorldWidthVw:0.###}vw").Style("height", $"{SpatialCamera.WorldHeightVh:0.###}vh").Style("transform", $"translate({camera.OffsetVw:0.###}vw, {camera.OffsetVh:0.###}vh)").Style("transition", "transform .18s linear").Style("transform-origin", "0 0");
+        var worldPlane = WorkshopGui.Panel(receiver).Style("position", "absolute").Style("left", "0").Style("top", "0").Style("width", $"{SpatialCamera.WorldWidthVw:0.###}vw").Style("height", $"{SpatialCamera.WorldHeightVh:0.###}vh").Style("transform", $"translate({camera.OffsetVw:0.###}vw, {camera.OffsetVh:0.###}vh)").Style("transition", "transform .18s ease-in-out").Style("transform-origin", "0 0");
         worldPlane.Content(Grid(receiver, detailLevel));
         worldPlane.Content(FloorPlan(receiver));
         foreach (var vehicle in scene.ConstructionVehicles) worldPlane.Content(Vehicle(receiver, vehicle));
