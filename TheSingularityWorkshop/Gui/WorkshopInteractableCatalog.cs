@@ -6,28 +6,40 @@ namespace TheSingularityWorkshop.Gui;
 /// <summary>
 /// Creates the renderer-neutral interactable descriptions used by spatial
 /// Workshop surfaces. This is intentionally separate from any renderer so the
-/// same presentation metadata can drive the world and its map.
+/// same interaction metadata can drive the world, its map, and future views.
 /// </summary>
 public static class WorkshopInteractableCatalog
 {
     public static IReadOnlyDictionary<string, IInteractable> Create(
         IEnumerable<ExperienceSpace> spaces)
-        => Create(spaces, null);
+        => Create(spaces, null, null);
 
     public static IReadOnlyDictionary<string, IInteractable> Create(
         IEnumerable<ExperienceSpace> spaces,
         Action<string>? onInteract)
+        => Create(spaces, onInteract, null);
+
+    public static IReadOnlyDictionary<string, IInteractable> Create(
+        IEnumerable<ExperienceSpace> spaces,
+        Action<string>? onInteract,
+        Action<string>? onHover)
     {
         ArgumentNullException.ThrowIfNull(spaces);
-        return spaces.ToDictionary(space => space.Id, space => Create(space, onInteract));
+        return spaces.ToDictionary(space => space.Id, space => Create(space, onInteract, onHover));
     }
 
     public static IInteractable Create(ExperienceSpace space)
-        => Create(space, null);
+        => Create(space, null, null);
 
     public static IInteractable Create(
         ExperienceSpace space,
         Action<string>? onInteract)
+        => Create(space, onInteract, null);
+
+    public static IInteractable Create(
+        ExperienceSpace space,
+        Action<string>? onInteract,
+        Action<string>? onHover)
     {
         ArgumentNullException.ThrowIfNull(space);
 
@@ -45,9 +57,9 @@ public static class WorkshopInteractableCatalog
             _ => ("default", "WORKSHOP", "#ffffff")
         };
 
-        IInteractableBehavior behavior = onInteract is null
-            ? NoOpBehavior.Instance
-            : new CallbackBehavior(() => onInteract(space.Id));
+        IInteractableBehavior behavior = new CallbackBehavior(
+            onHover is null ? null : () => onHover(space.Id),
+            onInteract is null ? null : () => onInteract(space.Id));
 
         return new WorkshopInteractable(
             space.Id,
@@ -71,16 +83,21 @@ public static class WorkshopInteractableCatalog
 
     private sealed class CallbackBehavior : IInteractableBehavior
     {
-        private readonly Action _action;
+        private readonly Action? _hover;
+        private readonly Action? _click;
 
-        public CallbackBehavior(Action action) => _action = action;
+        public CallbackBehavior(Action? hover, Action? click)
+        {
+            _hover = hover;
+            _click = click;
+        }
 
-        public void Execute(InteractionContext context) => _action();
-    }
-
-    private sealed class NoOpBehavior : IInteractableBehavior
-    {
-        public static readonly NoOpBehavior Instance = new();
-        public void Execute(InteractionContext context) { }
+        public void Execute(InteractionContext context)
+        {
+            if (context.Trigger == InteractionTrigger.Hover)
+                _hover?.Invoke();
+            else if (context.Trigger == InteractionTrigger.Click)
+                _click?.Invoke();
+        }
     }
 }
