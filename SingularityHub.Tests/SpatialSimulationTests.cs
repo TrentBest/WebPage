@@ -30,7 +30,7 @@ public sealed class SpatialSimulationTests
     [Fact(DisplayName = "Incremental Unit Test 08 — construction vehicles expose locomotion and work state independently")]
     public void ConstructionVehicle_TracksPrimaryAndSecondaryState()
     {
-        using var dumpTruck = new ConstructionVehicleMicroBundle(2201, "Hauler One", ConstructionVehicleKind.DumpTruck);
+        using var dumpTruck = new ConstructionVehicleMicroBundle(2201, "Hauler One", ConstructionMachineKind.DumpTruck);
         dumpTruck.SetDriveStatus(VehicleDriveStatus.Driving);
         dumpTruck.SetOperatingStatus(VehicleOperatingStatus.Full);
         dumpTruck.SetSubsystemStatus("Bed", "Loaded");
@@ -39,7 +39,7 @@ public sealed class SpatialSimulationTests
         Assert.Equal(VehicleOperatingStatus.Full, dumpTruck.OperatingStatus);
         Assert.Equal("Loaded", dumpTruck.SubsystemStatus["Bed"]);
 
-        using var backhoe = new ConstructionVehicleMicroBundle(2202, "Excavator One", ConstructionVehicleKind.Backhoe);
+        using var backhoe = new ConstructionVehicleMicroBundle(2202, "Excavator One", ConstructionMachineKind.Backhoe);
         backhoe.SetDriveStatus(VehicleDriveStatus.Parked);
         backhoe.SetOperatingStatus(VehicleOperatingStatus.Operating);
         backhoe.SetSubsystemStatus("Grounding", "Deployed");
