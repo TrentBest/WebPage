@@ -133,5 +133,5 @@ public sealed class SingularityCityEconomy
 
     public bool TryGetBusiness(string id, out SingularityBusiness? business) => _businesses.TryGetValue(id, out business);
 
-    public long TotalCurrency => _citizens.Sum(c => c.Wallet.Balance) + _businesses.Sum(b => b.Revenue);
+    public long TotalCurrency => _citizens.Values.Sum(c => c.Wallet.Balance) + _businesses.Values.Sum(b => b.Revenue);
 }
