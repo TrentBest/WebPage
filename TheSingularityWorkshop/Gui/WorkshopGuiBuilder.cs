@@ -142,6 +142,14 @@ public class ElementBuilder
     public ElementBuilder OnMouseLeave(Action action)
         => Attribute("onmouseleave", EventCallback.Factory.Create(_receiver, action));
 
+    /// <summary>
+    /// Preserves the pointer movement stream at the GUI boundary. Spatial
+    /// builders can consume the event payload without embedding Blazor event
+    /// handling into their world model.
+    /// </summary>
+    public ElementBuilder OnMouseMove(Action<MouseEventArgs> action)
+        => Attribute("onmousemove", EventCallback.Factory.Create<MouseEventArgs>(_receiver, action));
+
     public ElementBuilder PreventDefault(string eventName)
         => Attribute($"{eventName}:preventDefault", true);
 
