@@ -140,7 +140,7 @@ public sealed class DigitenContext : IStateContext
     }
 
     public int Id { get; }
-    public string Name { get; }
+    public string Name { get; set; }
     public bool IsValid { get; set; }
     public string BehaviorLabel { get; set; } = "Created";
     public byte BehaviorIndex { get; set; }
