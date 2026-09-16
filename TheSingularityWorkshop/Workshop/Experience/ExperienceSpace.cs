@@ -25,8 +25,15 @@ public sealed record ExperienceSpace(
     double Width = 24,
     double Height = 20)
 {
-    /// <summary>Returns the rectangular footprint consumed by pathfinding.</summary>
-    public SpatialObstacle Footprint => new(Id, X, Y, Width, Height);
+    /// <summary>
+    /// Returns the rectangular footprint consumed by pathfinding.
+    /// X/Y are the visual footprint's top-left coordinates, so the obstacle
+    /// center is derived from the dimensions rather than treating X/Y as its
+    /// center. This keeps the rendered blueprint and navigation geometry in
+    /// the same coordinate system.
+    /// </summary>
+    public SpatialObstacle Footprint =>
+        new(Id, X + Width / 2, Y + Height / 2, Width, Height);
 }
 
 /// <summary>
