@@ -5,7 +5,7 @@ using Xunit;
 
 namespace SingularityHub.Tests;
 
-/// <summary>Breadcrumbs for the spatial pointer contract: click intent, arrival, and interaction.</summary>
+/// <summary>Breadcrumbs for the spatial pointer contract: click intent, arrival, interaction, and scene entry.</summary>
 public sealed class SpatialPointerInteractionTests
 {
     [Fact(DisplayName = "Incremental Unit Test 21 — a spatial building exposes a declared arrival point and fires OnInteraction only when invoked")]
@@ -34,5 +34,14 @@ public sealed class SpatialPointerInteractionTests
         Assert.False(imageWorkshop.OnClick(new NormalizedPointer(0, 0)));
         Assert.Equal(0, imageWorkshop.InteractionCount);
         Assert.NotEqual(imageWorkshop.Bounds.X, imageWorkshop.InteractionPoint.X);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 23 — spatial interactables declare the scene they enter")]
+    public void SpatialInteractable_DeclaresExperienceScene()
+    {
+        var scene = SpatialWorkshopScene.CreateDefault();
+
+        Assert.Equal("forge", scene.Interactables.Single(item => item.Id == "forge").ExperienceId);
+        Assert.Equal("library", scene.Interactables.Single(item => item.Id == "blueprint-library").ExperienceId);
     }
 }
