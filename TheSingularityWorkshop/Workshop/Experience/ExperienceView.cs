@@ -1,7 +1,9 @@
 namespace TheSingularityWorkshop.Workshop.Experience;
 
 /// <summary>Renderer-neutral view currently presented by an Experience.</summary>
-public interface IExperienceView;
+public interface IExperienceView
+{
+}
 
 /// <summary>
 /// The Workshop's intentional close-up view of an Experience.
