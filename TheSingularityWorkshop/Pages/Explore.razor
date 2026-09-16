@@ -20,6 +20,7 @@
     private readonly ArchitecturalShopEditor ArchitectureShop = new();
     private readonly HadronColliderSimulator Collider = new();
     private readonly SpaceElevatorStructure SpaceElevator = SpaceElevatorTemplates.WorkshopOrbitalTether;
+    private readonly Dictionary<string, IReadOnlyList<SpatialWaypoint>> mapRoutes = new();
     private string? insideRoomId;
     private string? hoveredInteractableId;
     private WorkshopSign? openSign;
@@ -76,10 +77,8 @@
             if (insideRoomId is not null)
                 return "You did not open a menu. You walked here. That distinction matters. Experiences should feel inhabited, not merely displayed.";
 
-            var nearest = Rooms
-                .Where(room => room.Id != "unknown" || UnknownUnlocked)
-                .OrderBy(room => DistanceSquared(room.X, room.Y))
-                .FirstOrDefault();
+            var nearest = Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked)
+                .OrderBy(room => DistanceSquared(room.X, room.Y)).FirstOrDefault();
 
             if (nearest is null || DistanceSquared(nearest.X, nearest.Y) > 24 * 24)
                 return "Start anywhere. Walk the blueprint. Follow your curiosity. Every building is an idea made tangible.";
@@ -104,33 +103,28 @@
     {
         if (insideRoomId == "conference")
             return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
-
         if (insideRoomId == "engineering")
             return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
-
         if (insideRoomId == "architecture")
             return ArchitecturalShopGuiBuilder.Build(this, ArchitectureShop, SelectArchitectureTool, ApplyArchitectureCell, LoadArchitectureTemplate, CaptureArchitecture, ExitRoom);
-
         if (insideRoomId == "research")
             return HadronColliderGuiBuilder.Build(this, Collider, ConfigureCollider, InjectCollider, AccelerateCollider, CollideCollider, ResetCollider, ExitRoom);
-
         if (insideRoomId == "space-elevator")
             return SpaceElevatorGuiBuilder.Build(this, SpaceElevator, ExitRoom);
 
-        var world = SpatialWorldGuiBuilder.Build(this, Rooms, UnknownUnlocked, AvatarX, AvatarY, TourKicker, TourMessage, hoveredInteractableId, openSign, HandleKeyDown, MoveAvatarTo, InteractRoom, SetHoveredInteractable, ShowSign, CloseSign);
+        var world = SpatialWorldGuiBuilder.Build(this, Rooms, UnknownUnlocked, AvatarX, AvatarY, TourKicker, TourMessage,
+            hoveredInteractableId, openSign, HandleKeyDown, MoveAvatarTo, InteractRoom, SetHoveredInteractable, ShowSign, CloseSign);
 
         var shell = WorkshopGui.MultiPanel(this)
-            .Style("position", "fixed")
-            .Style("inset", "0")
-            .Style("width", "100vw")
-            .Style("height", "100vh")
-            .Style("overflow", "hidden")
-            .Content(world)
-            .Content(UserNameLabel())
+            .Style("position", "fixed").Style("inset", "0").Style("width", "100vw")
+            .Style("height", "100vh").Style("overflow", "hidden")
+            .Content(world).Content(UserNameLabel())
             .Content(WorkshopMapGuiBuilder.MapButton(this, mapOpen, ToggleMap));
 
         if (mapOpen)
-            shell.Content(WorkshopMapGuiBuilder.Build(this, Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked).ToArray(), AvatarX, AvatarY, SelectMapDestination, CloseMap));
+            shell.Content(WorkshopMapGuiBuilder.Build(this,
+                Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked).ToArray(),
+                AvatarX, AvatarY, mapRoutes, SelectMapDestination, CloseMap));
 
         return shell;
     }
@@ -140,18 +134,43 @@
         mapOpen = !mapOpen;
         hoveredInteractableId = null;
         openSign = null;
+        if (mapOpen)
+            RefreshMapRoutes();
+        else
+            mapRoutes.Clear();
         _ = InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// The map uses the same pathfinding capability as avatar movement. It is
+    /// therefore a visualization of the Workshop surface, not a second layout.
+    /// </summary>
+    private void RefreshMapRoutes()
+    {
+        mapRoutes.Clear();
+        var obstacles = Rooms.Select(room => room.Footprint).ToArray();
+
+        foreach (var room in Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked))
+        {
+            if (!Experience.Pathfinding.TryPlan(AvatarX, AvatarY, room.EntranceX, room.EntranceY, obstacles))
+                continue;
+
+            mapRoutes[room.Id] = Experience.Pathfinding.CurrentPath.ToArray();
+            Experience.Pathfinding.ClearPath();
+        }
     }
 
     private void CloseMap()
     {
         mapOpen = false;
+        mapRoutes.Clear();
         _ = InvokeAsync(StateHasChanged);
     }
 
     private async Task SelectMapDestination(string id)
     {
         mapOpen = false;
+        mapRoutes.Clear();
         hoveredInteractableId = null;
         await InvokeAsync(StateHasChanged);
         await InteractRoom(id);
@@ -161,7 +180,6 @@
     {
         if (insideRoomId is not null || openSign is not null || mapOpen)
             return;
-
         hoveredInteractableId = id;
         _ = InvokeAsync(StateHasChanged);
     }
@@ -181,75 +199,24 @@
 
     private ElementBuilder UserNameLabel()
         => WorkshopGui.Element(this, "span")
-            .Style("position", "fixed")
-            .Style("left", "50%")
-            .Style("top", "calc(50% - 30px)")
-            .Style("transform", "translateX(-50%)")
-            .Style("z-index", "20")
-            .Style("padding", ".12rem .35rem")
-            .Style("border", "1px solid rgba(255,255,255,.18)")
-            .Style("background", "rgba(1,4,10,.82)")
-            .Style("color", "#ffffff")
-            .Style("font-family", "Consolas, 'Courier New', monospace")
-            .Style("font-size", ".5rem")
-            .Style("letter-spacing", ".12em")
-            .Style("white-space", "nowrap")
-            .Style("pointer-events", "none")
-            .Text(Experience.User.DisplayName);
+            .Style("position", "fixed").Style("left", "50%").Style("top", "calc(50% - 30px)")
+            .Style("transform", "translateX(-50%)").Style("z-index", "20")
+            .Style("padding", ".12rem .35rem").Style("border", "1px solid rgba(255,255,255,.18)")
+            .Style("background", "rgba(1,4,10,.82)").Style("color", "#ffffff")
+            .Style("font-family", "Consolas, 'Courier New', monospace").Style("font-size", ".5rem")
+            .Style("letter-spacing", ".12em").Style("white-space", "nowrap")
+            .Style("pointer-events", "none").Text(Experience.User.DisplayName);
 
-    private void SelectArchitectureTool(ArchitecturalCellKind tool)
-    {
-        ArchitectureShop.SelectTool(tool);
-        _ = InvokeAsync(StateHasChanged);
-    }
+    private void SelectArchitectureTool(ArchitecturalCellKind tool) { ArchitectureShop.SelectTool(tool); _ = InvokeAsync(StateHasChanged); }
+    private void ApplyArchitectureCell(int x, int y) { ArchitectureShop.Apply(x, y); _ = InvokeAsync(StateHasChanged); }
+    private void LoadArchitectureTemplate(ArchitecturalFloorPlan plan) { ArchitectureShop.Load(plan); _ = InvokeAsync(StateHasChanged); }
+    private void CaptureArchitecture() { ArchitectureShop.Capture(); _ = InvokeAsync(StateHasChanged); }
 
-    private void ApplyArchitectureCell(int x, int y)
-    {
-        ArchitectureShop.Apply(x, y);
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    private void LoadArchitectureTemplate(ArchitecturalFloorPlan plan)
-    {
-        ArchitectureShop.Load(plan);
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    private void CaptureArchitecture()
-    {
-        ArchitectureShop.Capture();
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    private void ConfigureCollider()
-    {
-        Collider.Configure(HadronKind.Proton, HadronKind.Proton, 7, 2.5);
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    private void InjectCollider()
-    {
-        Collider.Inject();
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    private void AccelerateCollider()
-    {
-        Collider.Accelerate();
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    private void CollideCollider()
-    {
-        Collider.Collide("HADRON DETECTOR");
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    private void ResetCollider()
-    {
-        Collider.Reset();
-        _ = InvokeAsync(StateHasChanged);
-    }
+    private void ConfigureCollider() { Collider.Configure(HadronKind.Proton, HadronKind.Proton, 7, 2.5); _ = InvokeAsync(StateHasChanged); }
+    private void InjectCollider() { Collider.Inject(); _ = InvokeAsync(StateHasChanged); }
+    private void AccelerateCollider() { Collider.Accelerate(); _ = InvokeAsync(StateHasChanged); }
+    private void CollideCollider() { Collider.Collide("HADRON DETECTOR"); _ = InvokeAsync(StateHasChanged); }
+    private void ResetCollider() { Collider.Reset(); _ = InvokeAsync(StateHasChanged); }
 
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
@@ -274,8 +241,7 @@
 
         if (dx == 0 && dy == 0)
             return;
-
-        await MoveAvatarTo(Experience.Navigation.X + dx, Experience.Navigation.Y + dy);
+        await MoveAvatarTo(AvatarX + dx, AvatarY + dy);
     }
 
     private async Task MoveAvatarTo(double x, double y)
@@ -285,8 +251,7 @@
 
         var generation = ++walkGeneration;
         var obstacles = Rooms.Select(room => room.Footprint).ToArray();
-
-        if (!Experience.Pathfinding.TryPlan(Experience.Navigation.X, Experience.Navigation.Y, x, y, obstacles))
+        if (!Experience.Pathfinding.TryPlan(AvatarX, AvatarY, x, y, obstacles))
             return;
 
         while (generation == walkGeneration && Experience.Pathfinding.TryTakeNext(out var waypoint))
@@ -311,11 +276,9 @@
             return;
 
         hoveredInteractableId = null;
-        var targetX = room.EntranceX;
-        var targetY = room.EntranceY;
-        await MoveAvatarTo(targetX, targetY);
+        await MoveAvatarTo(room.EntranceX, room.EntranceY);
 
-        if (Math.Abs(Experience.Navigation.X - targetX) > 0.5 || Math.Abs(Experience.Navigation.Y - targetY) > 0.5)
+        if (Math.Abs(AvatarX - room.EntranceX) > 0.5 || Math.Abs(AvatarY - room.EntranceY) > 0.5)
             return;
 
         await Task.Delay(300);
@@ -329,6 +292,7 @@
         Collider.Reset();
         openSign = null;
         mapOpen = false;
+        mapRoutes.Clear();
 
         var room = Rooms.FirstOrDefault(x => x.Id == insideRoomId);
         if (room is not null)
