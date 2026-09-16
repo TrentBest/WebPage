@@ -108,11 +108,7 @@ public sealed class DigitenCityTexture
     }
 }
 
-/// <summary>
-/// A discrete local vector field. Each cell points toward the next cell that
-/// best advances a Digiten toward its desired destination while respecting
-/// blocked and occupied cells.
-/// </summary>
+/// <summary>A discrete local direction in the city occupancy surface.</summary>
 public readonly record struct DigitenVector(int X, int Y)
 {
     public static readonly DigitenVector Zero = new(0, 0);
@@ -141,9 +137,10 @@ public sealed class DigitenCrowdField
 
     /// <summary>
     /// Chooses a locally useful direction. DesiredDirection is the bird-flight
-    /// direction. Frustration biases the choice away from repeatedly selecting
-    /// blocked alternatives; high frustration permits a reversal toward the
-    /// destination instead of trapping the actor against an obstacle.
+    /// direction. When frustration reaches the reversal threshold, the actor
+    /// first prefers the exact opposite direction if that adjacent cell is
+    /// available. Otherwise the normal local alternatives are scored by their
+    /// alignment with the desired direction.
     /// </summary>
     public DigitenVector ChooseDirection(
         int x,
@@ -157,14 +154,17 @@ public sealed class DigitenCrowdField
 
         var desired = Normalize(desiredDirection);
         var forceReversal = frustration >= reversalThreshold;
+        var reverse = new DigitenVector(-Math.Sign(desiredDirection.X), -Math.Sign(desiredDirection.Y));
+
+        if (forceReversal && reverse != DigitenVector.Zero && IsAvailable(x, y, reverse))
+            return reverse;
+
         var best = DigitenVector.Zero;
         var bestScore = double.NegativeInfinity;
 
         foreach (var candidate in Directions)
         {
-            var nx = x + candidate.X;
-            var ny = y + candidate.Y;
-            if (!_city.IsWalkable(nx, ny) || _city.IsOccupied(nx, ny))
+            if (!IsAvailable(x, y, candidate))
                 continue;
 
             var alignment = candidate.X * desired.X + candidate.Y * desired.Y;
@@ -177,6 +177,13 @@ public sealed class DigitenCrowdField
         }
 
         return best;
+    }
+
+    private bool IsAvailable(int x, int y, DigitenVector direction)
+    {
+        var nx = x + direction.X;
+        var ny = y + direction.Y;
+        return _city.IsWalkable(nx, ny) && !_city.IsOccupied(nx, ny);
     }
 
     private static (double X, double Y) Normalize(DigitenVector direction)
