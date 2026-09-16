@@ -1,13 +1,14 @@
+using TheSingularityWorkshop.SingularityHub;
+
 namespace TheSingularityWorkshop.Workshop.Experience;
 
 /// <summary>
 /// Spatial manifestation of an Experience in the Workshop floorplan.
 ///
 /// An Experience is not a room. It is a composed environment of capabilities
-/// and MicroBundles. This descriptor supplies only the spatial facts required
-/// to locate and enter that Experience; its behavior belongs to MicroBundles,
-/// its composition belongs to the Experience contract, and its presentation
-/// belongs to GUI builders.
+/// and MicroBundles. This descriptor supplies spatial facts plus the optional
+/// authoritative ontology address used by semantic wayfinding. The map must
+/// never invent ontology coordinates merely to decorate a presentation.
 /// </summary>
 public sealed record ExperienceSpace(
     string Id,
@@ -23,7 +24,8 @@ public sealed record ExperienceSpace(
     string Architecture,
     string? Capability,
     double Width = 24,
-    double Height = 20)
+    double Height = 20,
+    OntologySignature? Ontology = null)
 {
     /// <summary>
     /// Returns the rectangular footprint consumed by pathfinding.
