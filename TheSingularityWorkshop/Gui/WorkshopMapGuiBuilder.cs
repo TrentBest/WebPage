@@ -26,6 +26,18 @@ public static class WorkshopMapGuiBuilder
             .Style("box-shadow", "0 0 20px rgba(255,255,255,.16)")
             .AriaLabel(open ? "Close Workshop map" : "Open Workshop map").OnClick(toggle);
 
+    /// <summary>Compatibility overload for callers that already have only spatial destinations.</summary>
+    public static ElementBuilder Build(
+        object receiver,
+        IReadOnlyList<ExperienceSpace> destinations,
+        double avatarX,
+        double avatarY,
+        IReadOnlyDictionary<string, IReadOnlyList<SpatialWaypoint>> routes,
+        Func<string, Task> selectDestination,
+        Action close)
+        => Build(receiver, destinations, WorkshopInteractableCatalog.Create(destinations),
+            avatarX, avatarY, routes, selectDestination, close);
+
     public static ElementBuilder Build(
         object receiver,
         IReadOnlyList<ExperienceSpace> destinations,
