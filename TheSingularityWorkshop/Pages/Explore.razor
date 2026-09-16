@@ -1,13 +1,405 @@
 @page "/explore"
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.Gui
+@using TheSingularityWorkshop.Workshop.Architecture
+@using TheSingularityWorkshop.Workshop.Chemistry
 @using TheSingularityWorkshop.Workshop.Experience
 @using TheSingularityWorkshop.Workshop.Interaction
-@inject NavigationManager Navigation
+@using TheSingularityWorkshop.Workshop.MicroBundles
+@implements IDisposable
 
-<PageTitle>Explore — The Singularity Workshop</PageTitle>
+<PageTitle>Explore // The Singularity Workshop</PageTitle>
+
+@BuildGui().Build()
 
 @code {
-    // The existing Explore implementation remains unchanged here except for
-    // the async callback adapter passed to the builder. The builder's contract
-    // is Action, while tram boarding is an asynchronous interaction.
+    private const double WalkStep = SpatialNavigationMicroBundle.DefaultMovementStep;
+    private const bool UnknownUnlocked = false;
+
+    private readonly ExploreExperienceMicroBundle Experience = new();
+    private readonly ArchitecturalShopEditor ArchitectureShop = new();
+    private readonly HadronColliderSimulator Collider = new();
+    private readonly SpaceElevatorStructure SpaceElevator = SpaceElevatorTemplates.WorkshopOrbitalTether;
+    private readonly Dictionary<string, IReadOnlyList<SpatialWaypoint>> mapRoutes = new();
+    private string? insideRoomId;
+    private string? hoveredInteractableId;
+    private WorkshopSign? openSign;
+    private bool mapOpen;
+    private int walkGeneration;
+
+    private bool tramBoarded;
+    private int tramProgress;
+    private double shipThrottle;
+    private string shipFlightMode = "docked";
+    private string shipDestination = "Orbital Station";
+
+    private static readonly IReadOnlyList<ExperienceSpace> Rooms =
+    [
+        new("experience", "Experience Deck", "LIVING SPACE", 18, 18, 29, 40, 29, 40,
+            "The sensory side of the Workshop. This is where an Experience becomes something a visitor can actually inhabit.",
+            "EXPERIENCE", "Living GUI / presentation", 22, 18),
+        new("engineering", "The Forge", "FSM WORKSHOP", 66, 18, 78, 40, 78, 40,
+            "The Workshop's first real building: a place for shaping state, lifecycle, reusable substrates, and executable machinery.",
+            "FORGE", "FSM / lifecycle / composition", 24, 18),
+        new("research", "Research Laboratory", "PARTICLE PHYSICS", 43, 44, 53, 64, 53, 64,
+            "A research facility for chemistry, materials, computation, and controlled experiments — including a hadron collider simulator.",
+            "RESEARCH", "Chemistry / materials / collider simulation", 20, 16),
+        new("creation", "Creation Bay", "BUILDER SPACE", 30, 72, 42, 90, 42, 90,
+            "The composition boundary. Focused capabilities become MicroBundles, then recipes, then executable Experiences.",
+            "CREATION", "MicroBundles / composition", 24, 18),
+        new("architecture", "Architectural Shop", "DESIGN STUDIO", 4, 70, 15, 92, 15, 92,
+            "Draw a floor plan, place doors and rooms, and introduce the vertical circulation that turns a sketch into a structure.",
+            "ARCHITECTURE", "Floor plans / structures / vertical circulation", 22, 20),
+        new("space-elevator", "Space Elevator", "ORBITAL ACCESS", 80, 45, 86, 68, 86, 68,
+            "The Workshop's vertical road into space: ground anchor, tether, climber, counterweight, and an orbital station at the top.",
+            "SPACE", "Orbital infrastructure / station", 12, 42),
+        new("tram-terminal", "Singularity City Tram", "CITY TRANSIT", 18, 88, 29, 96, 29, 96,
+            "A real transportation Experience. Board here and the tram carries you through Singularity City toward the Space Elevator complex.",
+            "TRANSIT", "Tram / city circulation / announcements", 30, 9),
+        new("spaceship", "Singularity Spaceship Hangar", "VESSEL OPERATIONS", 48, 4, 60, 15, 60, 15,
+            "A hangar for player-operated vessels. Enter the ship, sit at the controls, and begin turning transportation into an Experience of its own.",
+            "VESSEL", "Cockpit / navigation / propulsion / systems", 30, 12),
+        new("unknown", "Unknown Annex", "UNMAPPED", 64, 74, 70, 92, 70, 92,
+            "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.",
+            "UNKNOWN", "Undisclosed", 12, 18)
+    ];
+
+    private double AvatarX => Experience.Navigation.X;
+    private double AvatarY => Experience.Navigation.Y;
+    private bool ConferenceJoined => Experience.Conference.Joined;
+    private FsmForgeMicroBundle Forge => Experience.Forge;
+
+    private string TourKicker => hoveredInteractableId is not null
+        ? "INTERACTABLE // LIVE SCHEMATIC"
+        : insideRoomId is not null
+            ? "YOU ARE INSIDE AN EXPERIENCE"
+            : "THE WORKSHOP IS A PLACE YOU CAN ENTER";
+
+    private string TourMessage
+    {
+        get
+        {
+            if (hoveredInteractableId is not null)
+            {
+                var hovered = Rooms.FirstOrDefault(room => room.Id == hoveredInteractableId);
+                if (hovered is not null)
+                    return $"{hovered.Name} — {hovered.Description} The structure is the interaction surface; click it and the Workshop will carry you to its interaction point before execution.";
+            }
+
+            if (insideRoomId is not null)
+                return "You did not open a menu. You entered a place. From here, the Experience exposes its own living tools, controls, and nested interactions.";
+
+            var nearest = Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked)
+                .OrderBy(room => DistanceSquared(room.X, room.Y)).FirstOrDefault();
+
+            if (nearest is null || DistanceSquared(nearest.X, nearest.Y) > 24 * 24)
+                return "Start anywhere. Walk the blueprint. Follow your curiosity. Every building is an idea made tangible.";
+
+            return nearest.Id switch
+            {
+                "engineering" => "THE FORGE — behavior becomes machinery here. State, lifecycle, transitions, and reusable capability are forged into something an Experience can use.",
+                "creation" => "CREATION BAY — small capabilities become MicroBundles. Compose enough of them and you stop writing a page and start building an Experience.",
+                "experience" => "EXPERIENCE DECK — this is the destination: technology becomes an environment someone can enter, explore, and remember.",
+                "architecture" => "ARCHITECTURAL SHOP — draw the bones of a place. Walls, rooms, doors, stairs, elevators, and ladders become data first; later they can become an actual Workshop structure.",
+                "research" => "RESEARCH LABORATORY — the Workshop's experimental engine. Materials, chemistry, computation, and a hadron collider simulator belong here.",
+                "space-elevator" => "SPACE ELEVATOR — the Workshop does not stop at the roof. The tether rises to an orbital station and makes space part of the same navigable architecture.",
+                "tram-terminal" => "SINGULARITY CITY TRAM — the Workshop is only one place in a much larger universe. Walk to the terminal, board the vehicle, and ride the city instead of teleporting past it.",
+                "spaceship" => "SINGULARITY SPACESHIP HANGAR — this is where the Workshop stops merely demonstrating tools and starts giving the visitor a vessel they can operate.",
+                _ => nearest.Description
+            };
+        }
+    }
+
+    private double DistanceSquared(double x, double y)
+        => Math.Pow(AvatarX - x, 2) + Math.Pow(AvatarY - y, 2);
+
+    private ElementBuilder BuildGui()
+    {
+        if (insideRoomId == "conference")
+            return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
+        if (insideRoomId == "engineering")
+            return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
+        if (insideRoomId == "architecture")
+            return ArchitecturalShopGuiBuilder.Build(this, ArchitectureShop, SelectArchitectureTool, ApplyArchitectureCell, LoadArchitectureTemplate, CaptureArchitecture, ExitRoom);
+        if (insideRoomId == "research")
+            return HadronColliderGuiBuilder.Build(this, Collider, ConfigureCollider, InjectCollider, AccelerateCollider, CollideCollider, ResetCollider, ExitRoom);
+        if (insideRoomId == "space-elevator")
+            return SpaceElevatorGuiBuilder.Build(this, SpaceElevator, ExitRoom);
+        if (insideRoomId == "tram-terminal")
+            return TramExperienceGuiBuilder.Build(this, "Space Elevator Complex", tramProgress, tramBoarded, BoardTram, ExitRoom);
+        if (insideRoomId == "spaceship")
+            return SpacecraftGuiBuilder.Build(this, shipFlightMode, shipThrottle, shipDestination,
+                SetShipFlightMode, SetShipThrottle, SetShipDestination, LaunchShip, ExitRoom);
+
+        var world = SpatialWorldGuiBuilder.Build(this, Rooms, UnknownUnlocked, AvatarX, AvatarY, TourKicker, TourMessage,
+            hoveredInteractableId, openSign, HandleKeyDown, MoveAvatarTo, InteractRoom, SetHoveredInteractable, ShowSign, CloseSign);
+
+        var shell = WorkshopGui.MultiPanel(this)
+            .Style("position", "fixed").Style("inset", "0").Style("width", "100vw")
+            .Style("height", "100vh").Style("overflow", "hidden")
+            .Content(world).Content(UserNameLabel())
+            .Content(WorkshopMapGuiBuilder.MapButton(this, mapOpen, ToggleMap));
+
+        if (mapOpen)
+            shell.Content(WorkshopMapGuiBuilder.Build(this,
+                Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked).ToArray(),
+                AvatarX, AvatarY, mapRoutes, SelectMapDestination, CloseMap));
+
+        return shell;
+    }
+
+    private void ToggleMap()
+    {
+        mapOpen = !mapOpen;
+        hoveredInteractableId = null;
+        openSign = null;
+        if (mapOpen)
+            RefreshMapRoutes();
+        else
+            mapRoutes.Clear();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void RefreshMapRoutes()
+    {
+        mapRoutes.Clear();
+        var obstacles = Rooms.Select(room => room.Footprint).ToArray();
+
+        foreach (var room in Rooms.Where(room => room.Id != "unknown" || UnknownUnlocked))
+        {
+            if (!Experience.Pathfinding.TryPlan(AvatarX, AvatarY, room.EntranceX, room.EntranceY, obstacles))
+                continue;
+
+            mapRoutes[room.Id] = Experience.Pathfinding.CurrentPath.ToArray();
+            Experience.Pathfinding.ClearPath();
+        }
+    }
+
+    private void CloseMap()
+    {
+        mapOpen = false;
+        mapRoutes.Clear();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SelectMapDestination(string id)
+    {
+        mapOpen = false;
+        mapRoutes.Clear();
+        hoveredInteractableId = null;
+        await InvokeAsync(StateHasChanged);
+        await InteractRoom(id);
+    }
+
+    private void SetHoveredInteractable(string? id)
+    {
+        if (insideRoomId is not null || openSign is not null || mapOpen)
+            return;
+        hoveredInteractableId = id;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void ShowSign(WorkshopSign sign)
+    {
+        openSign = sign;
+        hoveredInteractableId = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void CloseSign()
+    {
+        openSign = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private ElementBuilder UserNameLabel()
+        => WorkshopGui.Element(this, "span")
+            .Style("position", "fixed").Style("left", "50%").Style("top", "calc(50% - 30px)")
+            .Style("transform", "translateX(-50%)").Style("z-index", "20")
+            .Style("padding", ".12rem .35rem").Style("border", "1px solid rgba(255,255,255,.18)")
+            .Style("background", "rgba(1,4,10,.82)").Style("color", "#ffffff")
+            .Style("font-family", "Consolas, 'Courier New', monospace").Style("font-size", ".5rem")
+            .Style("letter-spacing", ".12em").Style("white-space", "nowrap")
+            .Style("pointer-events", "none").Text(Experience.User.DisplayName);
+
+    private void SelectArchitectureTool(ArchitecturalCellKind tool) { ArchitectureShop.SelectTool(tool); _ = InvokeAsync(StateHasChanged); }
+    private void ApplyArchitectureCell(int x, int y) { ArchitectureShop.Apply(x, y); _ = InvokeAsync(StateHasChanged); }
+    private void LoadArchitectureTemplate(ArchitecturalFloorPlan plan) { ArchitectureShop.Load(plan); _ = InvokeAsync(StateHasChanged); }
+    private void CaptureArchitecture() { ArchitectureShop.Capture(); _ = InvokeAsync(StateHasChanged); }
+
+    private void ConfigureCollider() { Collider.Configure(HadronKind.Proton, HadronKind.Proton, 7, 2.5); _ = InvokeAsync(StateHasChanged); }
+    private void InjectCollider() { Collider.Inject(); _ = InvokeAsync(StateHasChanged); }
+    private void AccelerateCollider() { Collider.Accelerate(); _ = InvokeAsync(StateHasChanged); }
+    private void CollideCollider() { Collider.Collide("HADRON DETECTOR"); _ = InvokeAsync(StateHasChanged); }
+    private void ResetCollider() { Collider.Reset(); _ = InvokeAsync(StateHasChanged); }
+
+    private void JoinConference() => Experience.Conference.Join();
+    private void LeaveConference() => Experience.Conference.Leave();
+
+    private void SetShipFlightMode(string mode)
+    {
+        shipFlightMode = mode;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void SetShipThrottle(double throttle)
+    {
+        shipThrottle = Math.Clamp(throttle, 0, 100);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void SetShipDestination(string destination)
+    {
+        shipDestination = destination;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async void LaunchShip()
+    {
+        if (shipThrottle <= 0)
+            shipThrottle = 25;
+
+        shipFlightMode = "flight";
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(500);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task BoardTram()
+    {
+        if (tramBoarded)
+            return;
+
+        tramBoarded = true;
+        tramProgress = 0;
+        await InvokeAsync(StateHasChanged);
+
+        // The transit cadence advances the same Experience runtime used by the
+        // Workshop visitor. The visual route is a manifestation of this state,
+        // not a separate animation divorced from the Experience lifecycle.
+        for (var progress = 10; progress <= 100 && insideRoomId == "tram-terminal"; progress += 10)
+        {
+            tramProgress = progress;
+            Experience.Update();
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(120);
+        }
+
+        if (insideRoomId == "tram-terminal")
+        {
+            tramBoarded = false;
+            tramProgress = 0;
+            insideRoomId = "space-elevator";
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        if (insideRoomId is not null || openSign is not null || mapOpen)
+            return;
+
+        var dx = args.Key.ToLowerInvariant() switch
+        {
+            "a" or "arrowleft" => -WalkStep,
+            "d" or "arrowright" => WalkStep,
+            _ => 0
+        };
+        var dy = args.Key.ToLowerInvariant() switch
+        {
+            "w" or "arrowup" => -WalkStep,
+            "s" or "arrowdown" => WalkStep,
+            _ => 0
+        };
+
+        if (dx == 0 && dy == 0)
+            return;
+        await MoveAvatarTo(AvatarX + dx, AvatarY + dy);
+    }
+
+    private async Task MoveAvatarTo(double x, double y)
+    {
+        if (insideRoomId is not null || openSign is not null || mapOpen)
+            return;
+
+        var generation = ++walkGeneration;
+        var obstacles = Rooms.Select(room => room.Footprint).ToArray();
+        if (!Experience.Pathfinding.TryPlan(AvatarX, AvatarY, x, y, obstacles))
+            return;
+
+        while (generation == walkGeneration && Experience.Pathfinding.TryTakeNext(out var waypoint))
+        {
+            Experience.Navigation.MoveTo(waypoint.X, waypoint.Y);
+            Experience.Update();
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(65);
+        }
+
+        if (generation == walkGeneration)
+            Experience.Pathfinding.ClearPath();
+    }
+
+    private async Task InteractRoom(string id)
+    {
+        if (insideRoomId is not null || openSign is not null)
+            return;
+
+        var room = Rooms.FirstOrDefault(x => x.Id == id);
+        if (room is null || (room.Id == "unknown" && !UnknownUnlocked))
+            return;
+
+        hoveredInteractableId = null;
+        await MoveAvatarTo(room.EntranceX, room.EntranceY);
+
+        if (Math.Abs(AvatarX - room.EntranceX) > 0.5 || Math.Abs(AvatarY - room.EntranceY) > 0.5)
+            return;
+
+        var interactables = WorkshopInteractableCatalog.Create(Rooms, EnterInteractable);
+        if (!interactables.TryGetValue(id, out var interactable))
+            return;
+
+        var context = new InteractionContext(
+            "workshop-floor",
+            InteractionScope.World,
+            new HashSet<string>(StringComparer.Ordinal));
+
+        var executed = new InteractableExecutor().TryExecute(interactable, InteractionTrigger.Click, context);
+        if (!executed)
+            return;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void EnterInteractable(string id)
+    {
+        insideRoomId = id;
+        if (id == "tram-terminal")
+        {
+            tramBoarded = false;
+            tramProgress = 0;
+        }
+    }
+
+    private void ExitRoom()
+    {
+        Forge.Reset();
+        Experience.Conference.Leave();
+        Collider.Reset();
+        openSign = null;
+        mapOpen = false;
+        mapRoutes.Clear();
+        tramBoarded = false;
+        tramProgress = 0;
+        shipFlightMode = "docked";
+        shipThrottle = 0;
+
+        var room = Rooms.FirstOrDefault(x => x.Id == insideRoomId);
+        if (room is not null)
+            Experience.Navigation.MoveToExit(room);
+
+        insideRoomId = null;
+        hoveredInteractableId = null;
+    }
+
+    public void Dispose() => Experience.Dispose();
+}
