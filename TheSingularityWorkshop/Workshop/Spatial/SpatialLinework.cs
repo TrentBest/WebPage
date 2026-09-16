@@ -21,8 +21,8 @@ public sealed class SpatialLinework : IDisposable
     public SpatialLinework()
     {
         BuildFsm();
-        _fsm = FSM_API.Create.CreateInstance(_definitionName, _context, _processingGroup);
-        FSM_API.Interaction.Update(_processingGroup);
+        _fsm = FSM_API.FSM_API.Create.CreateInstance(_definitionName, _context, _processingGroup);
+        FSM_API.FSM_API.Interaction.Update(_processingGroup);
     }
 
     /// <summary>Current linework lifecycle state.</summary>
@@ -91,8 +91,8 @@ public sealed class SpatialLinework : IDisposable
 
     private void BuildFsm()
     {
-        FSM_API.Create.CreateProcessingGroup(_processingGroup);
-        FSM_API.Create.CreateFiniteStateMachine(_definitionName, -1, _processingGroup)
+        FSM_API.FSM_API.Create.CreateProcessingGroup(_processingGroup);
+        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_definitionName, -1, _processingGroup)
             .State("Idle", null, null, null)
             .State("Drawing", null, null, null)
             .Transition("Idle", "Drawing", context => ((LineworkContext)context).DrawingRequested)
@@ -101,7 +101,7 @@ public sealed class SpatialLinework : IDisposable
             .BuildDefinition();
     }
 
-    private void UpdateFsm() => FSM_API.Interaction.Update(_processingGroup);
+    private void UpdateFsm() => FSM_API.FSM_API.Interaction.Update(_processingGroup);
 
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 
@@ -109,7 +109,7 @@ public sealed class SpatialLinework : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        FSM_API.Interaction.DestroyFiniteStateMachine(_definitionName, _processingGroup);
+        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_definitionName, _processingGroup);
         _disposed = true;
         _lines.Clear();
     }
