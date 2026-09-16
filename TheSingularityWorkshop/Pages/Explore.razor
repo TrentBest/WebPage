@@ -59,10 +59,11 @@
         var world = SpatialWorkshopGuiBuilder.Build(
             this,
             Scene,
+            AvatarX,
+            AvatarY,
             detailLevel,
             SetDetailLevel,
             HandleKeyDown,
-            MoveAvatarTo,
             InteractRoom);
 
         return WorkshopGui.MultiPanel(this)
@@ -128,14 +129,6 @@
             return;
 
         Experience.Navigation.Move(dx, dy);
-    }
-
-    private void MoveAvatarTo(double x, double y)
-    {
-        if (insideRoomId is not null)
-            return;
-
-        Experience.Navigation.MoveTo(x, y);
     }
 
     /// <summary>
