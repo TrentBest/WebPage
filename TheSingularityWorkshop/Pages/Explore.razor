@@ -17,6 +17,7 @@
     private const bool UnknownUnlocked = false;
 
     private readonly ExploreExperienceMicroBundle Experience = new();
+    private readonly ExperienceViewState View = new();
     private readonly ArchitecturalShopEditor ArchitectureShop = new();
     private readonly HadronColliderSimulator Collider = new();
     private readonly SpaceElevatorStructure SpaceElevator = SpaceElevatorTemplates.WorkshopOrbitalTether;
@@ -115,21 +116,22 @@
 
     private ElementBuilder BuildGui()
     {
-        if (insideRoomId == "conference")
-            return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
-        if (insideRoomId == "engineering")
-            return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
-        if (insideRoomId == "architecture")
-            return ArchitecturalShopGuiBuilder.Build(this, ArchitectureShop, SelectArchitectureTool, ApplyArchitectureCell, LoadArchitectureTemplate, CaptureArchitecture, ExitRoom);
-        if (insideRoomId == "research")
-            return HadronColliderGuiBuilder.Build(this, Collider, ConfigureCollider, InjectCollider, AccelerateCollider, CollideCollider, ResetCollider, ExitRoom);
-        if (insideRoomId == "space-elevator")
-            return SpaceElevatorGuiBuilder.Build(this, SpaceElevator, ExitRoom);
-        if (insideRoomId == "tram-terminal")
-            return TramExperienceGuiBuilder.Build(this, "Space Elevator Complex", tramProgress, tramBoarded, BoardTram, ExitRoom);
-        if (insideRoomId == "spaceship")
-            return SpacecraftGuiBuilder.Build(this, shipFlightMode, shipThrottle, shipDestination,
-                SetShipFlightMode, SetShipThrottle, SetShipDestination, LaunchShip, ExitRoom);
+        var floorPlan = View.GetView<FloorPlan>();
+        if (floorPlan is not null)
+        {
+            return floorPlan.ExperienceId switch
+            {
+                "conference" => ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom),
+                "engineering" => FsmForgeGuiBuilder.Build(this, Forge, ExitRoom),
+                "architecture" => ArchitecturalShopGuiBuilder.Build(this, ArchitectureShop, SelectArchitectureTool, ApplyArchitectureCell, LoadArchitectureTemplate, CaptureArchitecture, ExitRoom),
+                "research" => HadronColliderGuiBuilder.Build(this, Collider, ConfigureCollider, InjectCollider, AccelerateCollider, CollideCollider, ResetCollider, ExitRoom),
+                "space-elevator" => SpaceElevatorGuiBuilder.Build(this, SpaceElevator, ExitRoom),
+                "tram-terminal" => TramExperienceGuiBuilder.Build(this, "Space Elevator Complex", tramProgress, tramBoarded, BoardTram, ExitRoom),
+                "spaceship" => SpacecraftGuiBuilder.Build(this, shipFlightMode, shipThrottle, shipDestination,
+                    SetShipFlightMode, SetShipThrottle, SetShipDestination, LaunchShip, ExitRoom),
+                _ => ExperienceFloorPlanGuiBuilder.Build(this, floorPlan.Space, ExitRoom)
+            };
+        }
 
         var world = SpatialWorldGuiBuilder.Build(this, Rooms, UnknownUnlocked, AvatarX, AvatarY, TourKicker, TourMessage,
             hoveredInteractableId, openSign, HandleKeyDown, MoveAvatarTo, InteractRoom, SetHoveredInteractable, ShowSign, CloseSign);
@@ -290,6 +292,7 @@
             tramBoarded = false;
             tramProgress = 0;
             insideRoomId = "space-elevator";
+            View.SetView(new FloorPlan(Rooms.First(room => room.Id == "space-elevator")));
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -351,7 +354,8 @@
         hoveredInteractableId = null;
         await MoveAvatarTo(room.EntranceX, room.EntranceY);
 
-        if (Math.Abs(AvatarX - room.EntranceX) > 0.5 || Math.Abs(AvatarY - room.EntranceY) > 0.5)
+        var resolvedTarget = Experience.Pathfinding.ResolvedTarget;
+        if (Math.Abs(AvatarX - resolvedTarget.X) > 0.5 || Math.Abs(AvatarY - resolvedTarget.Y) > 0.5)
             return;
 
         var interactables = WorkshopInteractableCatalog.Create(Rooms, EnterInteractable);
@@ -372,6 +376,11 @@
 
     private void EnterInteractable(string id)
     {
+        var space = Rooms.FirstOrDefault(room => room.Id == id);
+        if (space is null)
+            return;
+
+        View.SetView(new FloorPlan(space));
         insideRoomId = id;
         if (id == "tram-terminal")
         {
@@ -397,6 +406,7 @@
         if (room is not null)
             Experience.Navigation.MoveToExit(room);
 
+        View.Clear();
         insideRoomId = null;
         hoveredInteractableId = null;
     }
