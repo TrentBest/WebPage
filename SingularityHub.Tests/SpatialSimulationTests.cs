@@ -1,5 +1,6 @@
 using System.Linq;
 using TheSingularityWorkshop.Gui;
+using TheSingularityWorkshop.Workshop.Agents;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
@@ -56,7 +57,7 @@ public sealed class SpatialSimulationTests
         Assert.Equal(4, crane.Single(part => part.Code == "TIRE").Count);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 10 — a Digitens can discover vehicle capabilities without knowing the machine type")]
+    [Fact(DisplayName = "Incremental Unit Test 10 — a Digiten can discover vehicle capabilities without knowing the machine type")]
     public void DigitensVehicleAgent_DiscoversCapabilitiesFromVehicle()
     {
         using var backhoe = new ConstructionVehicleMicroBundle(2210, "Excavator One", ConstructionMachineKind.Backhoe);
@@ -70,5 +71,24 @@ public sealed class SpatialSimulationTests
         Assert.True(rover.CanPerform("scan"));
         Assert.True(rover.CanPerform("navigate"));
         Assert.False(rover.CanPerform("dig"));
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 11 — a Digiten is a persistent actor whose intent is interpreted by FSM_API")]
+    public void Digiten_BehaviorIsAnFSM_NotTheIdentityItself()
+    {
+        using var digiten = new DigitenMicroBundle(2301, "Aster", initialBehaviorIndex: 17);
+
+        Assert.Equal(17, digiten.BehaviorIndex);
+        Assert.Equal("Existing", digiten.CurrentBehavior);
+
+        digiten.SetGoal(new DigitenGoal("visit-workshop", "Visit the Workshop", BehaviorIndex: 23));
+        Assert.Equal("visit-workshop", digiten.Goal!.Id);
+        Assert.Equal(23, digiten.BehaviorIndex);
+
+        digiten.Update();
+        digiten.Update();
+
+        Assert.Equal("PursuingGoal", digiten.CurrentBehavior);
+        Assert.Equal(23, digiten.BehaviorIndex);
     }
 }
