@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components.Web;
-using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.Workshop.Experience;
 using TheSingularityWorkshop.Workshop.Interaction;
 
@@ -47,23 +46,9 @@ public static class SpatialWorldGuiBuilder
             .Style("font-family", "Consolas, 'Courier New', monospace")
             .Style("box-sizing", "border-box");
 
-        root.Content(World(
-            receiver,
-            rooms,
-            unknownUnlocked,
-            avatarX,
-            avatarY,
-            tourKicker,
-            tourMessage,
-            hoveredInteractableId,
-            openSign,
-            onKeyDown,
-            moveAvatarTo,
-            interactRoom,
-            setHoveredInteractable,
-            showSign,
-            closeSign));
-
+        root.Content(World(receiver, rooms, unknownUnlocked, avatarX, avatarY, tourKicker, tourMessage,
+            hoveredInteractableId, openSign, onKeyDown, moveAvatarTo, interactRoom,
+            setHoveredInteractable, showSign, closeSign));
         return root;
     }
 
@@ -110,18 +95,12 @@ public static class SpatialWorldGuiBuilder
             .Style("pointer-events", "none");
 
         camera.Content(Grid(receiver));
-
         foreach (var room in rooms)
         {
             var locked = room.Id == "unknown" && !unknownUnlocked;
-            camera.Content(Building(
-                receiver,
-                room,
-                locked,
+            camera.Content(Building(receiver, room, locked,
                 string.Equals(room.Id, hoveredInteractableId, StringComparison.Ordinal),
-                interactRoom,
-                setHoveredInteractable,
-                showSign));
+                interactRoom, setHoveredInteractable, showSign));
         }
 
         world.Content(camera);
@@ -165,11 +144,7 @@ public static class SpatialWorldGuiBuilder
                 .Style("max-width", "100%")
                 .Text(message));
 
-    private static ElementBuilder WalkSurface(
-        object receiver,
-        double avatarX,
-        double avatarY,
-        Func<double, double, Task> moveAvatarTo)
+    private static ElementBuilder WalkSurface(object receiver, double avatarX, double avatarY, Func<double, double, Task> moveAvatarTo)
     {
         const int cells = 24;
         var surface = WorkshopGui.Element(receiver, "div")
@@ -188,57 +163,36 @@ public static class SpatialWorldGuiBuilder
             var screenY = (row + .5) / cells * 100;
             var worldX = avatarX + screenX - 50;
             var worldY = avatarY + screenY - 50;
-
             surface.Content(WorkshopGui.Button(receiver)
-                .Style("display", "block")
-                .Style("width", "100%")
-                .Style("height", "100%")
-                .Style("min-width", "0")
-                .Style("min-height", "0")
-                .Style("margin", "0")
-                .Style("padding", "0")
-                .Style("border", "0")
-                .Style("outline", "none")
-                .Style("background", "transparent")
-                .Style("pointer-events", "auto")
+                .Style("display", "block").Style("width", "100%").Style("height", "100%")
+                .Style("min-width", "0").Style("min-height", "0").Style("margin", "0")
+                .Style("padding", "0").Style("border", "0").Style("outline", "none")
+                .Style("background", "transparent").Style("pointer-events", "auto")
                 .Style("cursor", "crosshair")
                 .AriaLabel($"Walk to {worldX:0.#}, {worldY:0.#}")
                 .OnClick(() => moveAvatarTo(worldX, worldY)));
         }
-
         return surface;
     }
 
     private static ElementBuilder Grid(object receiver)
     {
         var svg = WorkshopGui.Element(receiver, "svg")
-            .Attribute("viewBox", "0 0 100 100")
-            .Attribute("preserveAspectRatio", "none")
-            .Attribute("aria-hidden", "true")
-            .Style("position", "absolute")
-            .Style("inset", "0")
-            .Style("width", "100%")
-            .Style("height", "100%")
-            .Style("pointer-events", "none")
+            .Attribute("viewBox", "0 0 100 100").Attribute("preserveAspectRatio", "none")
+            .Attribute("aria-hidden", "true").Style("position", "absolute").Style("inset", "0")
+            .Style("width", "100%").Style("height", "100%").Style("pointer-events", "none")
             .Style("opacity", ".42");
 
         for (var i = 0; i <= 20; i++)
         {
             var p = i * 5;
             svg.Child(WorkshopGui.Element(receiver, "line")
-                .Attribute("x1", p).Attribute("y1", "0")
-                .Attribute("x2", p).Attribute("y2", "100")
-                .Attribute("stroke", Cyan)
-                .Attribute("stroke-opacity", ".12")
-                .Attribute("stroke-width", ".12"));
+                .Attribute("x1", p).Attribute("y1", "0").Attribute("x2", p).Attribute("y2", "100")
+                .Attribute("stroke", Cyan).Attribute("stroke-opacity", ".12").Attribute("stroke-width", ".12"));
             svg.Child(WorkshopGui.Element(receiver, "line")
-                .Attribute("x1", "0").Attribute("y1", p)
-                .Attribute("x2", "100").Attribute("y2", p)
-                .Attribute("stroke", Cyan)
-                .Attribute("stroke-opacity", ".12")
-                .Attribute("stroke-width", ".12"));
+                .Attribute("x1", "0").Attribute("y1", p).Attribute("x2", "100").Attribute("y2", p)
+                .Attribute("stroke", Cyan).Attribute("stroke-opacity", ".12").Attribute("stroke-width", ".12"));
         }
-
         return svg;
     }
 
@@ -254,7 +208,10 @@ public static class SpatialWorldGuiBuilder
         var interactable = ToInteractable(room);
         var accent = locked ? Yellow : Accent(room.Id);
 
-        var frame = WorkshopGui.Element(receiver, "div")
+        // Deliberately use a DIV rather than a BUTTON here. The schematic is a
+        // recursive GUI surface; nesting a button inside the building button
+        // produces invalid HTML and was preventing the building interaction.
+        var building = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute")
             .Style("left", $"{room.X:0.##}%")
             .Style("top", $"{room.Y:0.##}%")
@@ -262,25 +219,17 @@ public static class SpatialWorldGuiBuilder
             .Style("height", $"{room.Height}%")
             .Style("box-sizing", "border-box")
             .Style("z-index", "5")
-            .Style("pointer-events", "none");
-
-        var building = WorkshopGui.Button(receiver)
-            .Style("position", "absolute")
-            .Style("inset", "0")
-            .Style("width", "100%")
-            .Style("height", "100%")
-            .Style("padding", "0")
+            .Style("pointer-events", locked ? "none" : "auto")
+            .Style("cursor", locked ? "default" : "pointer")
             .Style("border", $"2px solid {accent}{(hovered ? "ee" : "99")}")
-            .Style("border-radius", "0")
             .Style("background", locked ? "rgba(30,24,3,.35)" : "rgba(0,20,30,.3)")
             .Style("color", White)
             .Style("font-family", "inherit")
-            .Style("cursor", locked ? "default" : "pointer")
-            .Style("box-sizing", "border-box")
-            .Style("pointer-events", locked ? "none" : "auto")
-            .Style("transition", "transform .16s ease, border-color .16s ease, box-shadow .16s ease")
+            .Style("transition", "transform .18s ease, border-color .18s ease, box-shadow .18s ease")
             .Style("transform", hovered ? "scale(1.025)" : "scale(1)")
-            .Style("box-shadow", hovered ? $"0 0 36px {accent}55" : $"0 0 12px {accent}16")
+            .Style("box-shadow", hovered ? $"0 0 36px {accent}66" : $"0 0 12px {accent}16")
+            .Attribute("role", "button")
+            .Attribute("tabindex", locked ? "-1" : "0")
             .AriaLabel(locked ? "Unmapped structure" : $"Interact with {room.Name}")
             .OnMouseEnter(() => setHoveredInteractable(locked ? null : interactable.Id))
             .OnMouseLeave(() => setHoveredInteractable(null))
@@ -288,22 +237,18 @@ public static class SpatialWorldGuiBuilder
 
         building.Content(InteractableSchematicGuiBuilder.Build(receiver, interactable, hovered));
         building.Content(WorkshopGui.Element(receiver, "span")
-            .Style("position", "absolute")
-            .Style("left", "50%")
-            .Style("top", "8%")
-            .Style("transform", "translateX(-50%)")
-            .Style("z-index", "2")
-            .Style("padding", ".2rem .4rem")
-            .Style("background", "rgba(1,4,10,.9)")
+            .Style("position", "absolute").Style("left", "50%").Style("top", "8%")
+            .Style("transform", "translateX(-50%)").Style("z-index", "2")
+            .Style("padding", ".2rem .4rem").Style("background", "rgba(1,4,10,.9)")
             .Style("border", $"1px solid {accent}{(hovered ? "cc" : "55")}")
             .Style("font-size", "clamp(.42rem, 1vw, .75rem)")
-            .Style("letter-spacing", ".06em")
-            .Style("max-width", "90%")
-            .Style("white-space", "normal")
-            .Style("text-align", "center")
-            .Style("pointer-events", "none")
-            .Text(room.Name));
+            .Style("letter-spacing", ".06em").Style("max-width", "90%")
+            .Style("white-space", "normal").Style("text-align", "center")
+            .Style("pointer-events", "none").Text(room.Name));
 
+        var frame = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0")
+            .Style("pointer-events", "none");
         frame.Content(building);
         frame.Content(WorkshopInteractableGuiBuilder.SignButton(receiver, interactable, showSign)
             .Style("pointer-events", locked ? "none" : "auto"));
@@ -325,16 +270,10 @@ public static class SpatialWorldGuiBuilder
         };
 
         return new WorkshopInteractable(
-            room.Id,
-            room.Name,
-            InteractionScope.World,
+            room.Id, room.Name, InteractionScope.World,
             new InteractionPoint(room.EntranceX, room.EntranceY),
             NoOpInteractableBehavior.Instance,
-            new WorkshopSign(
-                $"{room.Id}-sign",
-                room.Name,
-                room.Kind,
-                room.Description,
+            new WorkshopSign($"{room.Id}-sign", room.Name, room.Kind, room.Description,
                 $"CAPABILITY // {room.Capability}"),
             triggers: InteractionTrigger.HoverOrClick,
             presentation: new InteractablePresentation(room.Kind, room.Description, schematic));
@@ -345,6 +284,9 @@ public static class SpatialWorldGuiBuilder
         {
             "engineering" => Cyan,
             "creation" => Green,
+            "research" => "#b58cff",
+            "architecture" => Yellow,
+            "space-elevator" => "#ff9f43",
             _ => Cyan
         };
 
@@ -357,23 +299,15 @@ public static class SpatialWorldGuiBuilder
     private static ElementBuilder Avatar(object receiver)
         => WorkshopGui.Element(receiver, "div")
             .Attribute("aria-label", "Your position")
-            .Style("position", "absolute")
-            .Style("left", "50%")
-            .Style("top", "50%")
-            .Style("width", "42px")
-            .Style("height", "42px")
-            .Style("transform", "translate(-50%,-50%)")
-            .Style("z-index", "7")
-            .Style("pointer-events", "none")
-            .Style("border", $"1px solid {White}")
-            .Style("border-radius", "50%")
-            .Style("box-sizing", "border-box")
+            .Style("position", "absolute").Style("left", "50%").Style("top", "50%")
+            .Style("width", "42px").Style("height", "42px")
+            .Style("transform", "translate(-50%,-50%)").Style("z-index", "7")
+            .Style("pointer-events", "none").Style("border", $"1px solid {White}")
+            .Style("border-radius", "50%").Style("box-sizing", "border-box")
             .Style("overflow", "hidden")
             .Content(WorkshopGui.Image(receiver)
                 .Attribute("src", "https://avatars.githubusercontent.com/u/16405167?v=4")
                 .Attribute("alt", "Workshop visitor")
-                .Style("width", "100%")
-                .Style("height", "100%")
-                .Style("object-fit", "cover")
-                .Style("border-radius", "50%"));
+                .Style("width", "100%").Style("height", "100%")
+                .Style("object-fit", "cover").Style("border-radius", "50%"));
 }
