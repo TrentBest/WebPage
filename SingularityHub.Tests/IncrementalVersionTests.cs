@@ -172,4 +172,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 129)]
     [Fact(DisplayName = "V0.0.129 — Crowd_Reversal_Prefers_The_Exact_Adjacent_Opposite_Cell")]
     public void V0_0_129_CrowdReversalPrefersTheExactAdjacentOppositeCell() => Assert.Equal("V0.0.129", "V0.0.129");
+
+    [ArchitectureTest(0, 0, 130)]
+    [Fact(DisplayName = "V0.0.130 — DigiGroup_Movement_Weights_Individual_Position_Toward_Shared_Center")]
+    public void V0_0_130_DigiGroupMovementWeightsIndividualPositionTowardSharedCenter() => Assert.Equal("V0.0.130", "V0.0.130");
 }

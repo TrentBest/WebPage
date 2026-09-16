@@ -62,7 +62,6 @@ public sealed class SpatialSimulationTests
     public void DigitensVehicleAgent_DiscoversCapabilitiesFromVehicle()
     {
         using var backhoe = new ConstructionVehicleMicroBundle(2210, "Excavator One", ConstructionMachineKind.Backhoe);
-
         Assert.Contains(backhoe.Capabilities, capability => capability.Id == "excavate");
         Assert.Contains(backhoe.Capabilities.SelectMany(capability => capability.Actions), action => action.Id == "dig");
         Assert.True(backhoe.CanPerform("dig"));
@@ -78,7 +77,6 @@ public sealed class SpatialSimulationTests
     public void Digiten_BehaviorIsAnFSM_NotTheIdentityItself()
     {
         using var digiten = new DigitenMicroBundle(2301, "Aster", initialBehaviorIndex: 17);
-
         Assert.Equal(17, digiten.BehaviorIndex);
         Assert.Equal("Existing", digiten.CurrentBehavior);
 
@@ -96,13 +94,7 @@ public sealed class SpatialSimulationTests
     [Fact(DisplayName = "Incremental Unit Test 12 — Digitens can move to and fro using compact waypoint storage")]
     public void DigitenWaypointTexture_ProvidesDeterministicToAndFroMovement()
     {
-        var texture = new DigitenWaypointTexture(new[]
-        {
-            (0.10, 0.20),
-            (0.30, 0.40),
-            (0.50, 0.60)
-        });
-
+        var texture = new DigitenWaypointTexture(new[] { (0.10, 0.20), (0.30, 0.40), (0.50, 0.60) });
         Assert.Equal(3, texture.Count);
         var first = texture.Get(0);
         var last = texture.Get(2);
@@ -127,7 +119,6 @@ public sealed class SpatialSimulationTests
         city.SetBlocked(3, 2);
         city.SetBlocked(3, 1);
         city.SetBlocked(3, 3);
-
         Assert.True(city.TryOccupy(1, 2, 2401));
         Assert.False(city.TryOccupy(1, 2, 2402));
         Assert.Equal(2401, city.GetOccupant(1, 2));
@@ -136,7 +127,6 @@ public sealed class SpatialSimulationTests
         var crowd = new DigitenCrowdField(city);
         var direction = crowd.ChooseDirection(2, 2, new DigitenVector(1, 0), frustration: 0);
         Assert.Equal(new DigitenVector(0, -1), direction);
-
         Assert.True(city.TryMove(2401, 1, 2, 1, 1));
         Assert.Equal(2401, city.GetOccupant(1, 1));
         Assert.Equal(DigitenCityTexture.Empty, city.GetOccupant(1, 2));
@@ -149,11 +139,9 @@ public sealed class SpatialSimulationTests
         city.SetBlocked(2, 0);
         city.SetBlocked(2, 1);
         city.SetBlocked(2, 2);
-
         var crowd = new DigitenCrowdField(city);
         var normal = crowd.ChooseDirection(1, 1, new DigitenVector(1, 0), frustration: 0);
         var frustrated = crowd.ChooseDirection(1, 1, new DigitenVector(1, 0), frustration: 1.0);
-
         Assert.NotEqual(normal, frustrated);
         Assert.Equal(new DigitenVector(-1, 0), frustrated);
     }
@@ -165,11 +153,8 @@ public sealed class SpatialSimulationTests
         for (var y = 1; y <= 5; y++)
             for (var x = 1; x <= 5; x++)
                 city.SetBlocked(x, y);
-
         city.SetBlocked(3, 3, blocked: false);
-
         var found = DigitenWaypointSampler.TrySample(city, 3, 3, radius: 2, new System.Random(42), out var point);
-
         Assert.True(found);
         Assert.Equal((3, 3), point);
     }
@@ -179,14 +164,11 @@ public sealed class SpatialSimulationTests
     {
         var frustration = new DigitenTravelFrustration(reversalThreshold: 1.0);
         var desired = new DigitenVector(1, 0);
-
         frustration.Observe(desired, new DigitenVector(0, 1), amount: 0.5);
         Assert.True(frustration.Value > 0);
         Assert.False(frustration.HasHadEnough);
-
         frustration.Observe(desired, new DigitenVector(-1, 0), amount: 0.5);
         Assert.True(frustration.HasHadEnough);
-
         frustration.Observe(desired, desired, amount: 0.5);
         Assert.True(frustration.Value < 1.0);
     }
@@ -198,16 +180,13 @@ public sealed class SpatialSimulationTests
         var home = new SingularityHome("home-aster", 10, 12, Capacity: 2);
         var citizen = new SingularityCitizen(3001, "Aster", home, startingBalance: 25);
         var business = new SingularityBusiness("night-market", "Night Market", 18, 14, attendancePrice: 7);
-
         economy.Register(citizen);
         economy.Register(business);
-
         Assert.True(citizen.Visit(business));
         Assert.Equal(18, citizen.Wallet.Balance);
         Assert.Equal(1, business.Attendance);
         Assert.Equal(7, business.Revenue);
         Assert.Equal("Attending:night-market", citizen.CurrentActivity);
-
         citizen.ReturnHome();
         Assert.Equal("Home", citizen.CurrentActivity);
         Assert.Equal(25, economy.TotalCurrency);
@@ -217,15 +196,48 @@ public sealed class SpatialSimulationTests
     public void DigiGroup_SeparatesIntentionalAggregationFromCrowdMovement()
     {
         var group = new DigiGroup("forge-shift-alpha", "Build Workshop foundation", DigiGroupMode.Cooperative);
-
         Assert.True(group.Add(3001));
         Assert.True(group.Add(3002));
         Assert.False(group.Add(3001));
         Assert.Equal(2, group.Members.Count);
         Assert.True(group.Contains(3002));
         Assert.Equal(DigiGroupMode.Cooperative, group.Mode);
-
         Assert.True(group.Remove(3001));
         Assert.False(group.Contains(3001));
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 19 — DigiGroup movement pulls members toward the group center without making them one actor")]
+    public void DigiGroupMovement_WeightsMemberPositionTowardSharedCenter()
+    {
+        var city = new DigitenCityTexture(9, 5);
+        var group = new DigiGroup("forge-shift-alpha", "Move toward the Workshop", DigiGroupMode.Cooperative);
+        group.Add(3001);
+        group.Add(3002);
+        group.Add(3003);
+
+        var positions = new System.Collections.Generic.Dictionary<int, (int X, int Y)>
+        {
+            [3001] = (2, 1),
+            [3002] = (2, 2),
+            [3003] = (2, 3)
+        };
+
+        foreach (var pair in positions)
+            Assert.True(city.TryOccupy(pair.Value.X, pair.Value.Y, pair.Key));
+
+        var center = DigiGroupMovement.CalculateCenter(group, positions);
+        Assert.Equal((2d, 2d), center);
+
+        city.Release(3001);
+        var direction = DigiGroupMovement.ChooseMemberDirection(
+            city,
+            group,
+            memberId: 3001,
+            memberPosition: (2, 1),
+            groupCenter: center,
+            desiredDirection: new DigitenVector(1, 0),
+            cohesionWeight: 0.75);
+
+        Assert.Equal(new DigitenVector(1, 1), direction);
     }
 }
