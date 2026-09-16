@@ -11,7 +11,7 @@ public static class TramExperienceGuiBuilder
         string destination,
         int progress,
         bool boarded,
-        Action board,
+        Func<Task> board,
         Action exit)
     {
         var root = WorkshopGui.Panel(receiver)
@@ -43,7 +43,7 @@ public static class TramExperienceGuiBuilder
                 .Style("color", "#ffffff")
                 .Style("font-family", "inherit")
                 .Style("letter-spacing", ".12em")
-                .OnClick(board));
+                .OnClick(() => _ = board()));
         }
 
         return root;
