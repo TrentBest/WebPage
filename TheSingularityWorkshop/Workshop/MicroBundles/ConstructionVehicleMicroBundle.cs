@@ -14,7 +14,7 @@ public sealed class ConstructionVehicleMicroBundle : IDisposable
     private readonly Dictionary<string, string> _subsystemStatus = new(StringComparer.OrdinalIgnoreCase);
     private bool _disposed;
 
-    public ConstructionVehicleMicroBundle(int bundleId, string name, ConstructionVehicleKind kind)
+    public ConstructionVehicleMicroBundle(int bundleId, string name, ConstructionMachineKind kind)
     {
         if (bundleId <= 0) throw new ArgumentOutOfRangeException(nameof(bundleId));
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("A vehicle name is required.", nameof(name));
@@ -26,7 +26,7 @@ public sealed class ConstructionVehicleMicroBundle : IDisposable
 
     public ulong Id => (ulong)_lifecycle.Id;
     public string Name { get; }
-    public ConstructionVehicleKind Kind { get; }
+    public ConstructionMachineKind Kind { get; }
     public VehicleOperatingStatus OperatingStatus { get; private set; } = VehicleOperatingStatus.Idle;
     public VehicleDriveStatus DriveStatus { get; private set; } = VehicleDriveStatus.Parked;
     public IReadOnlyDictionary<string, string> SubsystemStatus => _subsystemStatus;
@@ -80,8 +80,8 @@ public enum VehicleDriveStatus
     Departing
 }
 
-/// <summary>Machine family. Each family can expose its own subsystem vocabulary.</summary>
-public enum ConstructionVehicleKind
+/// <summary>Machine family used to select its subsystem vocabulary.</summary>
+public enum ConstructionMachineKind
 {
     DumpTruck,
     Backhoe,
