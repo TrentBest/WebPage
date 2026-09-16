@@ -22,12 +22,12 @@ public sealed class SpatialWorkshopScene
     public static SpatialWorkshopScene CreateDefault()
         => new("engineering", new SpatialPoint(73, 42.5),
             [
-                new SpatialInteractable("forge", "The Forge", new SpatialBounds(58, 20, 30, 45), new SpatialBounds(70, 39, 6, 5), new SpatialRectangularHitRegion(0, 0, 1, 1)),
-                new SpatialInteractable("image-tools", "Image Workshop", new SpatialBounds(8, 18, 18, 14), new SpatialBounds(17, 24, 4, 3), new SpatialRectangularHitRegion(.08, .08, .84, .84)),
-                new SpatialInteractable("npc-studio", "NPC Studio", new SpatialBounds(12, 62, 20, 16), new SpatialBounds(21, 69, 4, 3), new SpatialRectangularHitRegion(.06, .06, .88, .88)),
-                new SpatialInteractable("fsm-bench", "FSM Workbench", new SpatialBounds(61, 32, 16, 12), new SpatialBounds(69, 37, 4, 3), new SpatialRectangularHitRegion(.04, .04, .92, .92)),
-                new SpatialInteractable("storage-bins", "Storage Bins", new SpatialBounds(80, 25, 12, 20), new SpatialBounds(86, 34, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9)),
-                new SpatialInteractable("blueprint-library", "Blueprint Library", new SpatialBounds(38, 16, 16, 14), new SpatialBounds(46, 22, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9))
+                new SpatialInteractable("forge", "The Forge", new SpatialBounds(58, 20, 30, 45), new SpatialBounds(70, 39, 6, 5), new SpatialRectangularHitRegion(0, 0, 1, 1), "forge"),
+                new SpatialInteractable("image-tools", "Image Workshop", new SpatialBounds(8, 18, 18, 14), new SpatialBounds(17, 24, 4, 3), new SpatialRectangularHitRegion(.08, .08, .84, .84), "image-workshop"),
+                new SpatialInteractable("npc-studio", "NPC Studio", new SpatialBounds(12, 62, 20, 16), new SpatialBounds(21, 69, 4, 3), new SpatialRectangularHitRegion(.06, .06, .88, .88), "npc-studio"),
+                new SpatialInteractable("fsm-bench", "FSM Workbench", new SpatialBounds(61, 32, 16, 12), new SpatialBounds(69, 37, 4, 3), new SpatialRectangularHitRegion(.04, .04, .92, .92), "fsm-workbench"),
+                new SpatialInteractable("storage-bins", "Storage Bins", new SpatialBounds(80, 25, 12, 20), new SpatialBounds(86, 34, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "storage"),
+                new SpatialInteractable("blueprint-library", "Blueprint Library", new SpatialBounds(38, 16, 16, 14), new SpatialBounds(46, 22, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "library")
             ],
             SpatialViewSettings.CreateDefault(),
             [
@@ -56,13 +56,14 @@ public readonly record struct SpatialRectangularHitRegion(double X, double Y, do
 /// <summary>A world object that owns its spatial hover and interaction lifecycle.</summary>
 public sealed class SpatialInteractable
 {
-    public SpatialInteractable(string id, string name, SpatialBounds bounds, SpatialBounds interactionPoint, SpatialRectangularHitRegion hitRegion)
+    public SpatialInteractable(string id, string name, SpatialBounds bounds, SpatialBounds interactionPoint, SpatialRectangularHitRegion hitRegion, string experienceId)
     {
         Id = id;
         Name = name;
         Bounds = bounds;
         InteractionPoint = interactionPoint;
         HitRegion = hitRegion;
+        ExperienceId = experienceId;
     }
 
     public string Id { get; }
@@ -70,6 +71,7 @@ public sealed class SpatialInteractable
     public SpatialBounds Bounds { get; }
     public SpatialBounds InteractionPoint { get; }
     public SpatialRectangularHitRegion HitRegion { get; }
+    public string ExperienceId { get; }
     public bool IsBreathing { get; private set; }
     public NormalizedPointer? LastHover { get; private set; }
     public int InteractionCount { get; private set; }
