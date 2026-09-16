@@ -13,12 +13,30 @@ public static class WorkshopMapGuiBuilder
     private const string White = "#ffffff";
     private const string Ink = "#01040a";
 
+    public static ElementBuilder MapButton(object receiver, bool open, Action toggle)
+        => WorkshopGui.Button(receiver)
+            .Label(open ? "CLOSE MAP" : "WORKSHOP MAP")
+            .Style("position", "fixed")
+            .Style("right", "1rem")
+            .Style("bottom", "1rem")
+            .Style("z-index", "80")
+            .Style("padding", ".55rem .75rem")
+            .Style("border", "1px solid rgba(255,255,255,.35)")
+            .Style("background", "rgba(1,4,10,.9)")
+            .Style("color", White)
+            .Style("font-family", "Consolas, 'Courier New', monospace")
+            .Style("font-size", ".46rem")
+            .Style("letter-spacing", ".12em")
+            .Style("cursor", "pointer")
+            .AriaLabel(open ? "Close Workshop map" : "Open Workshop map")
+            .OnClick(toggle);
+
     public static ElementBuilder Build(
         object receiver,
         IReadOnlyList<ExperienceSpace> destinations,
         double avatarX,
         double avatarY,
-        Action<string> selectDestination,
+        Func<string, Task> selectDestination,
         Action close)
     {
         ArgumentNullException.ThrowIfNull(destinations);
@@ -63,14 +81,7 @@ public static class WorkshopMapGuiBuilder
             var left = 50 + Math.Cos(angle * Math.PI / 180) * radial;
             var top = 50 + Math.Sin(angle * Math.PI / 180) * radial;
 
-            panel.Content(DestinationCard(
-                receiver,
-                destination,
-                thread,
-                accent,
-                left,
-                top,
-                selectDestination));
+            panel.Content(DestinationCard(receiver, destination, thread, accent, left, top, selectDestination));
         }
 
         panel.Content(Legend(receiver));
@@ -111,11 +122,7 @@ public static class WorkshopMapGuiBuilder
                 .Style("letter-spacing", ".1em")
                 .OnClick(close)));
 
-    private static ElementBuilder ThreadSvg(
-        object receiver,
-        IReadOnlyList<ExperienceSpace> destinations,
-        double avatarX,
-        double avatarY)
+    private static ElementBuilder ThreadSvg(object receiver, IReadOnlyList<ExperienceSpace> destinations, double avatarX, double avatarY)
     {
         var svg = WorkshopGui.Element(receiver, "svg")
             .Attribute("viewBox", "0 0 100 100")
@@ -129,7 +136,7 @@ public static class WorkshopMapGuiBuilder
 
         foreach (var destination in destinations)
         {
-            var (thread, accent) = ThreadFor(destination.Id);
+            var (_, accent) = ThreadFor(destination.Id);
             var dx = destination.X - avatarX;
             var dy = destination.Y - avatarY;
             var distance = Math.Sqrt(dx * dx + dy * dy);
@@ -173,14 +180,7 @@ public static class WorkshopMapGuiBuilder
                 .Attribute("src", "https://avatars.githubusercontent.com/u/16405167?v=4")
                 .Attribute("alt", "Visitor"));
 
-    private static ElementBuilder DestinationCard(
-        object receiver,
-        ExperienceSpace destination,
-        string thread,
-        string accent,
-        double left,
-        double top,
-        Action<string> selectDestination)
+    private static ElementBuilder DestinationCard(object receiver, ExperienceSpace destination, string thread, string accent, double left, double top, Func<string, Task> selectDestination)
         => WorkshopGui.Button(receiver)
             .Style("position", "absolute")
             .Style("left", $"{left:0.##}%")
