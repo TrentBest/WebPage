@@ -17,7 +17,8 @@ public sealed class SpatialInteractionTests
             "Power Outlet",
             new SpatialBounds(10, 10, 8, 8),
             new SpatialBounds(13, 14, 2, 2),
-            new SpatialRectangularHitRegion(.25, .25, .5, .5));
+            new SpatialRectangularHitRegion(.25, .25, .5, .5),
+            "power-outlet");
 
         Assert.False(item.OnHover(new NormalizedPointer(.1, .1)));
         Assert.False(item.IsBreathing);
