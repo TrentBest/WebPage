@@ -56,18 +56,12 @@
                 ExitRoom);
         }
 
-        if (insideRoomId == "engineering")
-        {
-            return FsmForgeGuiBuilder.Build(this, Forge, ExitRoom);
-        }
-
-        var world = SpatialWorldGuiBuilder.Build(
+        var world = SpatialWorkshopGuiBuilder.Build(
             this,
             Scene,
             detailLevel,
             SetDetailLevel,
             HandleKeyDown,
-            MoveAvatar,
             MoveAvatarTo,
             InteractRoom);
 
@@ -145,9 +139,8 @@
     }
 
     /// <summary>
-    /// Spatial interaction remains a world interaction: the visitor requests a
-    /// tool, approaches its interaction point, and only then enters its focused
-    /// MicroBundle experience.
+    /// Spatial interaction is a world action. The visitor approaches the Forge
+    /// work area rather than being replaced by a page-shaped Forge dialog.
     /// </summary>
     private async Task InteractRoom(string id)
     {
@@ -164,8 +157,6 @@
                 forge.InteractionPoint.X + forge.InteractionPoint.Width / 2,
                 forge.InteractionPoint.Y + forge.InteractionPoint.Height / 2);
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(300);
-            insideRoomId = "engineering";
             return;
         }
 
