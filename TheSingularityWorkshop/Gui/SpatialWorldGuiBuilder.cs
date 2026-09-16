@@ -13,8 +13,6 @@ namespace TheSingularityWorkshop.Gui;
 public static class SpatialWorldGuiBuilder
 {
     private const string Cyan = "#00eaff";
-    private const string Green = "#52e05a";
-    private const string Yellow = "#ffd34d";
     private const string White = "#ffffff";
     private const string Ink = "#01040a";
 
@@ -205,12 +203,12 @@ public static class SpatialWorldGuiBuilder
         Action<string?> setHoveredInteractable,
         Action<WorkshopSign> showSign)
     {
-        var interactable = ToInteractable(room);
-        var accent = locked ? Yellow : Accent(room.Id);
+        var interactable = WorkshopInteractableCatalog.Create(room);
+        var accent = locked ? "#ffd34d" : interactable.Presentation.MapIntent.Accent;
 
-        // Deliberately use a DIV rather than a BUTTON here. The schematic is a
-        // recursive GUI surface; nesting a button inside the building button
-        // produces invalid HTML and was preventing the building interaction.
+        // The building is the interactable. Hover and click are both owned by
+        // the same renderer-neutral contract; the builder only wires DOM input
+        // into that contract.
         var building = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute")
             .Style("left", $"{room.X:0.##}%")
@@ -231,7 +229,7 @@ public static class SpatialWorldGuiBuilder
             .Attribute("role", "button")
             .Attribute("tabindex", locked ? "-1" : "0")
             .AriaLabel(locked ? "Unmapped structure" : $"Interact with {room.Name}")
-            .OnMouseEnter(() => setHoveredInteractable(locked ? null : interactable.Id))
+            .OnMouseEnter(() => HoverInteractable(interactable, setHoveredInteractable))
             .OnMouseLeave(() => setHoveredInteractable(null))
             .OnClick(() => interactRoom(room.Id));
 
@@ -255,45 +253,19 @@ public static class SpatialWorldGuiBuilder
         return frame;
     }
 
-    private static WorkshopInteractable ToInteractable(ExperienceSpace room)
+    private static void HoverInteractable(
+        IInteractable interactable,
+        Action<string?> setHoveredInteractable)
     {
-        var schematic = room.Id switch
-        {
-            "engineering" => "forge",
-            "creation" => "creation-bay",
-            "experience" => "research-facility",
-            "architecture" => "architectural-shop",
-            "research" => "research-facility",
-            "space-elevator" => "space-elevator",
-            "unknown" => "unknown",
-            _ => "default"
-        };
+        var context = new InteractionContext(
+            "workshop-floor",
+            InteractionScope.World,
+            new HashSet<string>(StringComparer.Ordinal));
 
-        return new WorkshopInteractable(
-            room.Id, room.Name, InteractionScope.World,
-            new InteractionPoint(room.EntranceX, room.EntranceY),
-            NoOpInteractableBehavior.Instance,
-            new WorkshopSign($"{room.Id}-sign", room.Name, room.Kind, room.Description,
-                $"CAPABILITY // {room.Capability}"),
-            triggers: InteractionTrigger.HoverOrClick,
-            presentation: new InteractablePresentation(room.Kind, room.Description, schematic));
-    }
+        if (!new InteractableExecutor().TryExecute(interactable, InteractionTrigger.Hover, context))
+            return;
 
-    private static string Accent(string id)
-        => id switch
-        {
-            "engineering" => Cyan,
-            "creation" => Green,
-            "research" => "#b58cff",
-            "architecture" => Yellow,
-            "space-elevator" => "#ff9f43",
-            _ => Cyan
-        };
-
-    private sealed class NoOpInteractableBehavior : IInteractableBehavior
-    {
-        public static readonly NoOpInteractableBehavior Instance = new();
-        public void Execute(InteractionContext context) { }
+        setHoveredInteractable(interactable.Id);
     }
 
     private static ElementBuilder Avatar(object receiver)
