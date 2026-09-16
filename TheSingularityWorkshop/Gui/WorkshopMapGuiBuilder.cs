@@ -4,9 +4,9 @@ namespace TheSingularityWorkshop.Gui;
 
 /// <summary>
 /// Recursive fluent GUI for the Workshop's spatial wayfinding map.
-/// The map is a temporary spatial instrument placed in front of the visitor:
-/// destinations become cards, cards belong to semantic threads, and SVG
-/// threads visually connect the visitor to the direction of each destination.
+/// The map control lives beside the visitor so it is discovered as an instrument,
+/// not as a detached page control. Destinations become cards and SVG threads
+/// visually connect the visitor to their direction.
 /// </summary>
 public static class WorkshopMapGuiBuilder
 {
@@ -15,19 +15,21 @@ public static class WorkshopMapGuiBuilder
 
     public static ElementBuilder MapButton(object receiver, bool open, Action toggle)
         => WorkshopGui.Button(receiver)
-            .Label(open ? "CLOSE MAP" : "WORKSHOP MAP")
+            .Label(open ? "CLOSE MAP" : "MAP")
             .Style("position", "fixed")
-            .Style("right", "1rem")
-            .Style("bottom", "1rem")
-            .Style("z-index", "80")
-            .Style("padding", ".55rem .75rem")
-            .Style("border", "1px solid rgba(255,255,255,.35)")
-            .Style("background", "rgba(1,4,10,.9)")
+            .Style("left", "50%")
+            .Style("top", "calc(50% + 42px)")
+            .Style("transform", "translateX(-50%)")
+            .Style("z-index", "85")
+            .Style("padding", ".42rem .8rem")
+            .Style("border", "1px solid rgba(255,255,255,.5)")
+            .Style("background", "rgba(1,4,10,.94)")
             .Style("color", White)
             .Style("font-family", "Consolas, 'Courier New', monospace")
-            .Style("font-size", ".46rem")
-            .Style("letter-spacing", ".12em")
+            .Style("font-size", ".48rem")
+            .Style("letter-spacing", ".16em")
             .Style("cursor", "pointer")
+            .Style("box-shadow", "0 0 20px rgba(255,255,255,.16)")
             .AriaLabel(open ? "Close Workshop map" : "Open Workshop map")
             .OnClick(toggle);
 
