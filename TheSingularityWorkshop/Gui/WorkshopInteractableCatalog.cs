@@ -45,7 +45,7 @@ public static class WorkshopInteractableCatalog
             _ => ("default", "WORKSHOP", "#ffffff")
         };
 
-        var behavior = onInteract is null
+        IInteractableBehavior behavior = onInteract is null
             ? NoOpBehavior.Instance
             : new CallbackBehavior(() => onInteract(space.Id));
 
