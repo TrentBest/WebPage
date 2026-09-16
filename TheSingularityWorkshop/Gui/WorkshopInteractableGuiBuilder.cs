@@ -40,14 +40,12 @@ public static class WorkshopInteractableGuiBuilder
             .Style("letter-spacing", ".12em")
             .Style("cursor", "pointer")
             .AriaLabel($"Read sign: {sign.Title}")
+            .OnMouseEnter(() => showSign(sign))
             .OnClick(() => showSign(sign))
             .PreventDefault("onclick");
     }
 
-    public static ElementBuilder SignFace(
-        object receiver,
-        WorkshopSign? sign,
-        Action close)
+    public static ElementBuilder SignFace(object receiver, WorkshopSign? sign, Action close)
     {
         if (sign is null)
             return WorkshopGui.Element(receiver, "span").Style("display", "none");
