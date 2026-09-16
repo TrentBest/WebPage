@@ -53,12 +53,16 @@ public readonly record struct SpatialRectangularHitRegion(double X, double Y, do
     public bool Contains(NormalizedPointer point) => point.X >= X && point.X <= X + Width && point.Y >= Y && point.Y <= Y + Height;
 }
 
-/// <summary>A world object that owns its spatial interaction semantics.</summary>
+/// <summary>A world object that owns its spatial hover and interaction lifecycle.</summary>
 public sealed class SpatialInteractable
 {
     public SpatialInteractable(string id, string name, SpatialBounds bounds, SpatialBounds interactionPoint, SpatialRectangularHitRegion hitRegion)
     {
-        Id = id; Name = name; Bounds = bounds; InteractionPoint = interactionPoint; HitRegion = hitRegion;
+        Id = id;
+        Name = name;
+        Bounds = bounds;
+        InteractionPoint = interactionPoint;
+        HitRegion = hitRegion;
     }
 
     public string Id { get; }
@@ -68,14 +72,26 @@ public sealed class SpatialInteractable
     public SpatialRectangularHitRegion HitRegion { get; }
     public bool IsBreathing { get; private set; }
     public NormalizedPointer? LastHover { get; private set; }
+    public int InteractionCount { get; private set; }
+    public event Action? Interaction;
 
     public bool OnHover(NormalizedPointer point)
     {
         if (!HitRegion.Contains(point)) return false;
-        LastHover = point; IsBreathing = true; return true;
+        LastHover = point;
+        IsBreathing = true;
+        return true;
     }
 
     public void OnHoverExit() => IsBreathing = false;
+
+    /// <summary>Signals that the visitor has physically arrived at this object's interaction position.</summary>
+    public void OnInteraction()
+    {
+        InteractionCount++;
+        Interaction?.Invoke();
+    }
+
     public bool OnClick(NormalizedPointer point) => HitRegion.Contains(point);
 }
 
@@ -87,7 +103,9 @@ public sealed class SpatialViewSettings
     public static SpatialViewSettings CreateDefault()
     {
         var levels = Enumerable.Range(1, 62).Select(i => new SpatialDetailLevel($"LEVEL-{i:00}", i / 64d)).ToList();
-        levels.Add(SpatialDetailLevel.Device); levels.Add(SpatialDetailLevel.Stud); return new SpatialViewSettings(levels);
+        levels.Add(SpatialDetailLevel.Device);
+        levels.Add(SpatialDetailLevel.Stud);
+        return new SpatialViewSettings(levels);
     }
 }
 
