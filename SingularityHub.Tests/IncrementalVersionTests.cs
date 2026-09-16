@@ -15,7 +15,7 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 94)] [Fact(DisplayName = "V0.0.94 — Incremental_Ledger_Historical_Versions_Remain_Stable")] public void V0_0_94_IncrementalLedgerHistoricalVersionsRemainStable() => Assert.Equal("0.0.94", "0.0.94");
     [ArchitectureTest(0, 0, 95)] [Fact(DisplayName = "V0.0.95 — Hub_Presentation_Belongs_To_Startup_Phase")] public void V0_0_95_HubPresentationBelongsToStartupPhase() => Assert.Equal("0.0.95", "0.0.95");
     [ArchitectureTest(0, 0, 96)] [Fact(DisplayName = "V0.0.96 — Moniker_Rows_Sample_One_Shared_Wave")] public void V0_0_96_MonikerRowsSampleOneSharedWave() => Assert.Equal("0.0.96", "0.0.96");
-    [ArchitectureTest(0, 0, 97)] [Fact(DisplayName = "V0.0.97 — Incremental_StartupHost_And_SynchronizedWave_Ledger")] public void V0_0_97_StartupHostAndSynchronizedWaveLedger() => Assert.Equal("0.0.97", "0.0.97");
+    [ArchitectureTest(0, 0, 97)] [Fact(DisplayName = "V0.0.97 — Incremental_StartupHost_And_SynchronizedWave_Ledger")] public void V0_0_97_IncrementalStartupHostAndSynchronizedWaveLedger() => Assert.Equal("0.0.97", "0.0.97");
     [ArchitectureTest(0, 0, 98)] [Fact(DisplayName = "V0.0.98 — Manifest_Driven_Composition_And_Extensible_Moniker_Contract")] public void V0_0_98_ManifestDrivenCompositionAndExtensibleMonikerContract() => Assert.Equal("0.0.98", "0.0.98");
     [ArchitectureTest(0, 0, 99)] [Fact(DisplayName = "V0.0.99 — Restore_Hub_Contracts_And_Simplify_Incremental_Heartbeat")] public void V0_0_99_RestoreHubContractsAndSimplifyIncrementalHeartbeat() => Assert.Equal("0.0.99", "0.0.99");
     [ArchitectureTest(0, 0, 100)] [Fact(DisplayName = "V0.0.100 — Simplify_Incremental_Ledger_To_One_Literal_Heartbeat_Per_Version")] public void V0_0_100_SimplifyIncrementalLedgerToOneLiteralHeartbeat() => Assert.Equal("0.0.100", "0.0.100");
@@ -50,4 +50,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 130)] [Fact(DisplayName = "V0.0.130 — DigiGroup_Movement_Weights_Individual_Position_Toward_Shared_Center")] public void V0_0_130_DigiGroupMovementWeightsIndividualPositionTowardSharedCenter() => Assert.Equal("V0.0.130", "V0.0.130");
     [ArchitectureTest(0, 0, 131)] [Fact(DisplayName = "V0.0.131 — Avatar_Remains_Centered_While_The_Spatial_World_Moves")] public void V0_0_131_AvatarRemainsCenteredWhileTheSpatialWorldMoves() => Assert.Equal("V0.0.131", "V0.0.131");
     [ArchitectureTest(0, 0, 132)] [Fact(DisplayName = "V0.0.132 — Left_Click_Moves_Through_Space_And_Buildings_Activate_On_Arrival")] public void V0_0_132_LeftClickMovesThroughSpaceAndBuildingsActivateOnArrival() => Assert.Equal("V0.0.132", "V0.0.132");
+    [ArchitectureTest(0, 0, 133)] [Fact(DisplayName = "V0.0.133 — Forge_Interactable_Enters_Its_Existing_Experience_Plan_And_Movement_Eases")] public void V0_0_133_ForgeInteractableEntersItsExistingExperiencePlanAndMovementEases() => Assert.Equal("V0.0.133", "V0.0.133");
 }
