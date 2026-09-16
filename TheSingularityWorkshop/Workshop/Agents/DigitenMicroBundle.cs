@@ -77,12 +77,18 @@ public sealed class DigitenMicroBundle : IDisposable
     /// <summary>FSM context retained as the actor's durable behavioral state bag.</summary>
     public IStateContext Context => _context;
 
+    /// <summary>
+    /// Assigns intent to the actor. Selecting a goal does not silently select
+    /// locomotion: the FSM must first enter <c>PursuingGoal</c>, and navigation
+    /// becomes true only when the world has decided that travel is required.
+    /// </summary>
     public void SetGoal(DigitenGoal goal)
     {
         ArgumentNullException.ThrowIfNull(goal);
         _context.Goal = goal;
         _context.HasGoal = true;
-        _context.ShouldNavigate = true;
+        _context.ShouldNavigate = false;
+        _context.HasReachedInteraction = false;
         _context.InteractionComplete = false;
         _context.BehaviorIndex = goal.BehaviorIndex;
     }
