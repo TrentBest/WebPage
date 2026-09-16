@@ -9,7 +9,8 @@
 @BuildGui().Build()
 
 @code {
-    private readonly ExploreExperienceMicroBundle Experience = new();
+    private readonly ExploreExperienceMicroBundle Experience;
+    private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
     private string? insideRoomId;
     private bool unknownUnlocked;
 
@@ -28,6 +29,14 @@
             "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.",
             "UNKNOWN", "Undisclosed")
     ];
+
+    public ExploreExperienceMicroBundle ExperienceForTests => Experience;
+
+    public Explore()
+    {
+        Experience = new ExploreExperienceMicroBundle();
+        Experience.Navigation.MoveTo(Scene.StartingPosition.X, Scene.StartingPosition.Y);
+    }
 
     private double AvatarX => Experience.Navigation.X;
     private double AvatarY => Experience.Navigation.Y;
@@ -53,10 +62,7 @@
 
         var world = SpatialWorldGuiBuilder.Build(
             this,
-            Rooms,
-            unknownUnlocked,
-            AvatarX,
-            AvatarY,
+            Scene,
             HandleKeyDown,
             MoveAvatar,
             MoveAvatarTo,
@@ -133,15 +139,29 @@
     }
 
     /// <summary>
-    /// Spatial interaction is direct: clicking an enterable structure is the
-    /// interaction request. The visitor is first moved to the object's defined
-    /// interaction point, the camera visibly follows, and only then is the
-    /// object's experience activated.
+    /// Spatial interaction remains a world interaction: the visitor requests a
+    /// tool, approaches its interaction point, and only then enters its focused
+    /// MicroBundle experience.
     /// </summary>
     private async Task InteractRoom(string id)
     {
         if (insideRoomId is not null)
             return;
+
+        if (id == "forge")
+        {
+            var forge = Scene.Interactables.FirstOrDefault(item => item.Id == "forge");
+            if (forge is null)
+                return;
+
+            Experience.Navigation.MoveTo(
+                forge.InteractionPoint.X + forge.InteractionPoint.Width / 2,
+                forge.InteractionPoint.Y + forge.InteractionPoint.Height / 2);
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(300);
+            insideRoomId = "engineering";
+            return;
+        }
 
         var room = Rooms.FirstOrDefault(x => x.Id == id);
         if (room is null)
