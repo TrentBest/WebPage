@@ -23,20 +23,49 @@ public static class SpatialWorkshopGuiBuilder
 
     private static ElementBuilder World(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, int detailLevel, Action<KeyboardEventArgs> onKeyDown, Func<string, Task> interact)
     {
-        var world = WorkshopGui.Panel(receiver).Style("position", "absolute").Style("inset", "0").Style("overflow", "hidden").Attribute("tabindex", "0").AriaLabel("The Workshop spatial experience. You are inside the Forge.").OnKeyDown(onKeyDown).PreventDefault("onkeydown");
-        var camera = WorkshopGui.Panel(receiver).Style("position", "absolute").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("transform", $"translate(calc(50vw - {avatarX:0.##}vw), calc(50vh - {avatarY:0.##}vh))").Style("transition", "transform .28s linear");
-        camera.Content(Grid(receiver, detailLevel));
-        camera.Content(FloorPlan(receiver));
-        foreach (var vehicle in scene.ConstructionVehicles) camera.Content(Vehicle(receiver, vehicle));
-        foreach (var item in scene.Interactables) camera.Content(Interactable(receiver, item, interact));
-        world.Content(camera);
+        var camera = new SpatialCamera(avatarX, avatarY);
+        var world = WorkshopGui.Panel(receiver)
+            .Style("position", "absolute")
+            .Style("inset", "0")
+            .Style("overflow", "hidden")
+            .Style("outline", "none")
+            .Attribute("tabindex", "0")
+            .Attribute("autofocus", "autofocus")
+            .AriaLabel("The Workshop spatial experience. You are inside the Forge.")
+            .OnKeyDown(onKeyDown)
+            .PreventDefault("onkeydown");
+
+        var worldPlane = WorkshopGui.Panel(receiver)
+            .Style("position", "absolute")
+            .Style("left", "0")
+            .Style("top", "0")
+            .Style("width", $"{SpatialCamera.WorldWidthVw:0.###}vw")
+            .Style("height", $"{SpatialCamera.WorldHeightVh:0.###}vh")
+            .Style("transform", $"translate({camera.OffsetVw:0.###}vw, {camera.OffsetVh:0.###}vh)")
+            .Style("transition", "transform .18s linear")
+            .Style("transform-origin", "0 0");
+
+        worldPlane.Content(Grid(receiver, detailLevel));
+        worldPlane.Content(FloorPlan(receiver));
+        foreach (var vehicle in scene.ConstructionVehicles) worldPlane.Content(Vehicle(receiver, vehicle));
+        foreach (var item in scene.Interactables) worldPlane.Content(Interactable(receiver, item, interact));
+        world.Content(worldPlane);
         world.Content(Avatar(receiver));
         return world;
     }
 
     private static ElementBuilder Grid(object receiver, int detailLevel)
     {
-        var svg = WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100").Attribute("preserveAspectRatio", "none").Style("position", "absolute").Style("inset", "0").Style("width", "100%").Style("height", "100%").Style("pointer-events", "none").Style("opacity", detailLevel >= 32 ? ".48" : ".28");
+        var svg = WorkshopGui.Element(receiver, "svg")
+            .Attribute("viewBox", "0 0 100 100")
+            .Attribute("preserveAspectRatio", "none")
+            .Style("position", "absolute")
+            .Style("left", "0")
+            .Style("top", "0")
+            .Style("width", $"{SpatialCamera.WorldWidthVw:0.###}vw")
+            .Style("height", $"{SpatialCamera.WorldHeightVh:0.###}vh")
+            .Style("pointer-events", "none")
+            .Style("opacity", detailLevel >= 32 ? ".48" : ".28");
         var spacing = detailLevel >= 48 ? 2.5 : detailLevel >= 24 ? 5 : 10;
         for (var i = 0; i <= 100 / spacing; i++)
         {
@@ -48,23 +77,113 @@ public static class SpatialWorkshopGuiBuilder
     }
 
     private static ElementBuilder FloorPlan(object receiver)
-        => WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "4%").Style("top", "8%").Style("width", "92%").Style("height", "84%").Style("border", $"1px solid {Cyan}33").Style("box-shadow", $"inset 0 0 50px {Cyan}08").Style("pointer-events", "none").Content(WorkshopGui.Element(receiver, "span").Style("position", "absolute").Style("left", "1rem").Style("top", ".4rem").Style("font-size", ".48rem").Style("letter-spacing", ".2em").Style("color", $"{Cyan}99").Text("FORGE COMPLEX // LIVE FLOOR PLAN"));
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute")
+            .Style("left", $"{SpatialCamera.WorldToVw(4):0.###}vw")
+            .Style("top", $"{SpatialCamera.WorldToVh(8):0.###}vh")
+            .Style("width", $"{SpatialCamera.WorldToVw(92):0.###}vw")
+            .Style("height", $"{SpatialCamera.WorldToVh(84):0.###}vh")
+            .Style("box-sizing", "border-box")
+            .Style("border", $"1px solid {Cyan}33")
+            .Style("box-shadow", $"inset 0 0 50px {Cyan}08")
+            .Style("pointer-events", "none")
+            .Content(WorkshopGui.Element(receiver, "span").Style("position", "absolute").Style("left", "1rem").Style("top", ".4rem").Style("font-size", ".48rem").Style("letter-spacing", ".2em").Style("color", $"{Cyan}99").Text("WORKSHOP COMPLEX // SPATIAL MAP"));
 
     private static ElementBuilder Interactable(object receiver, SpatialInteractable item, Func<string, Task> interact)
     {
         var accent = item.Id switch { "image-tools" => Magenta, "npc-studio" => Yellow, "fsm-bench" => Cyan, "storage-bins" => Green, "blueprint-library" => White, _ => Cyan };
         var b = item.Bounds;
-        var surface = WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", $"{b.X:0.##}%").Style("top", $"{b.Y:0.##}%").Style("width", $"{b.Width:0.##}%").Style("height", $"{b.Height:0.##}%").Style("box-sizing", "border-box").Style("border", $"1px solid {accent}88").Style("background", $"linear-gradient(135deg, {accent}12, transparent 60%)").Style("cursor", "pointer").AriaLabel(item.Name).Title($"{item.Name} // spatial interactable").OnMouseEnter(() => item.OnHover(new NormalizedPointer(.5, .5))).OnMouseMove(_ => item.OnHover(new NormalizedPointer(.5, .5))).OnMouseLeave(item.OnHoverExit).OnClick(() => interact(item.Id));
+        var surface = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute")
+            .Style("left", $"{SpatialCamera.WorldToVw(b.X):0.###}vw")
+            .Style("top", $"{SpatialCamera.WorldToVh(b.Y):0.###}vh")
+            .Style("width", $"{SpatialCamera.WorldToVw(b.Width):0.###}vw")
+            .Style("height", $"{SpatialCamera.WorldToVh(b.Height):0.###}vh")
+            .Style("box-sizing", "border-box")
+            .Style("border", $"1px solid {accent}aa")
+            .Style("background", $"linear-gradient(180deg, {accent}20, #05070c 28%, #03050a 100%)")
+            .Style("box-shadow", $"inset 0 -12px 0 rgba(0,0,0,.3), 0 4px 0 rgba(0,0,0,.45)")
+            .Style("cursor", "pointer")
+            .Style("overflow", "visible")
+            .AriaLabel(item.Name)
+            .Title($"{item.Name} // spatial building")
+            .OnMouseEnter(() => item.OnHover(new NormalizedPointer(.5, .5)))
+            .OnMouseMove(_ => item.OnHover(new NormalizedPointer(.5, .5)))
+            .OnMouseLeave(item.OnHoverExit)
+            .OnClick(() => interact(item.Id));
+
         if (item.IsBreathing) surface.Style("animation", "workshop-interactable-breathe 1.25s ease-in-out infinite");
-        surface.Content(WorkshopGui.Element(receiver, "span").Style("position", "absolute").Style("left", "50%").Style("top", "50%").Style("transform", "translate(-50%,-50%)").Style("font-size", item.Id == "forge" ? ".8rem" : ".48rem").Style("letter-spacing", ".1em").Style("white-space", "nowrap").Style("pointer-events", "none").Text(item.Name));
+
+        surface.Content(BuildingRoof(receiver, accent));
+        surface.Content(BuildingDoor(receiver, accent));
+        surface.Content(BuildingSign(receiver, item.Name, accent));
         return surface;
     }
 
+    private static ElementBuilder BuildingRoof(object receiver, string accent)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute")
+            .Style("left", "3%")
+            .Style("top", "-10%")
+            .Style("width", "94%")
+            .Style("height", "24%")
+            .Style("background", $"linear-gradient(180deg, {accent}66, {accent}18)")
+            .Style("border", $"1px solid {accent}aa")
+            .Style("clip-path", "polygon(7% 0,93% 0,100% 100%,0 100%)")
+            .Style("pointer-events", "none");
+
+    private static ElementBuilder BuildingDoor(object receiver, string accent)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute")
+            .Style("left", "44%")
+            .Style("bottom", "0")
+            .Style("width", "12%")
+            .Style("height", "28%")
+            .Style("min-width", "12px")
+            .Style("background", "#010205")
+            .Style("border", $"1px solid {accent}99")
+            .Style("box-shadow", $"0 0 8px {accent}33")
+            .Style("pointer-events", "none");
+
+    private static ElementBuilder BuildingSign(object receiver, string name, string accent)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute")
+            .Style("left", "50%")
+            .Style("top", "40%")
+            .Style("transform", "translate(-50%,-50%)")
+            .Style("padding", ".2rem .4rem")
+            .Style("border", $"1px solid {accent}88")
+            .Style("background", "rgba(1,3,7,.88)")
+            .Style("color", White)
+            .Style("font-size", ".55rem")
+            .Style("letter-spacing", ".08em")
+            .Style("white-space", "nowrap")
+            .Style("pointer-events", "none")
+            .Text(name);
+
     private static ElementBuilder Vehicle(object receiver, ConstructionVehicle vehicle)
-        => WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", $"{vehicle.Position.X:0.##}%").Style("top", $"{vehicle.Position.Y:0.##}%").Style("transform", "translate(-50%,-50%)").Style("z-index", "4").Style("animation", $"workshop-vehicle-{vehicle.Kind.ToString().ToLowerInvariant()} 6s linear infinite").Content(ConstructionVehicleGuiBuilder.Build(receiver, vehicle));
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute")
+            .Style("left", $"{SpatialCamera.WorldToVw(vehicle.Position.X):0.###}vw")
+            .Style("top", $"{SpatialCamera.WorldToVh(vehicle.Position.Y):0.###}vh")
+            .Style("transform", "translate(-50%,-50%)")
+            .Style("z-index", "4")
+            .Style("animation", $"workshop-vehicle-{vehicle.Kind.ToString().ToLowerInvariant()} 6s linear infinite")
+            .Content(ConstructionVehicleGuiBuilder.Build(receiver, vehicle));
 
     private static ElementBuilder Avatar(object receiver)
-        => WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "50%").Style("top", "50%").Style("width", "14px").Style("height", "14px").Style("border", $"1px solid {White}").Style("border-radius", "50%").Style("box-shadow", $"0 0 12px {White}88").Style("transform", "translate(-50%,-50%)").Style("z-index", "10").Style("pointer-events", "none");
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "fixed")
+            .Style("left", "50%")
+            .Style("top", "50%")
+            .Style("width", "14px")
+            .Style("height", "14px")
+            .Style("border", $"1px solid {White}")
+            .Style("border-radius", "50%")
+            .Style("box-shadow", $"0 0 12px {White}88")
+            .Style("transform", "translate(-50%,-50%)")
+            .Style("z-index", "10")
+            .Style("pointer-events", "none");
 
     private static ElementBuilder ViewBar(object receiver, int detailLevel, Action<int> setDetailLevel)
         => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("right", "1rem").Style("top", "1rem").Style("z-index", "30").Style("display", "flex").Style("gap", ".25rem").Style("align-items", "center").Style("padding", ".35rem").Style("border", $"1px solid {Cyan}55").Style("background", "rgba(1,4,10,.86)").Content(ViewButton(receiver, "−", () => setDetailLevel(detailLevel - 1))).Content(WorkshopGui.Element(receiver, "span").Style("padding", "0 .35rem").Style("font-size", ".45rem").Style("letter-spacing", ".12em").Text($"DETAIL {detailLevel:00}/64")).Content(ViewButton(receiver, "+", () => setDetailLevel(detailLevel + 1))).Content(ViewButton(receiver, "STUD", () => setDetailLevel(64)));

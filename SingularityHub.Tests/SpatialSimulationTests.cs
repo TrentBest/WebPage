@@ -240,4 +240,18 @@ public sealed class SpatialSimulationTests
 
         Assert.Equal(new DigitenVector(1, 1), direction);
     }
+
+    [Fact(DisplayName = "Incremental Unit Test 20 — the avatar stays centered while the world camera follows its persistent position")]
+    public void SpatialCamera_CentersAvatarAndMovesWorldRelativeToIt()
+    {
+        var camera = new SpatialCamera(73, 42.5);
+        Assert.Equal(50d, SpatialCamera.WorldToVw(camera.AvatarX) + camera.OffsetVw, 6);
+        Assert.Equal(50d, SpatialCamera.WorldToVh(camera.AvatarY) + camera.OffsetVh, 6);
+        Assert.True(SpatialCamera.WorldWidthVw > 100);
+        Assert.True(SpatialCamera.WorldHeightVh > 100);
+
+        var moved = new SpatialCamera(76, 42.5);
+        Assert.Equal(-4.5d, moved.OffsetVw - camera.OffsetVw, 6);
+        Assert.Equal(camera.OffsetVh, moved.OffsetVh);
+    }
 }
