@@ -90,7 +90,36 @@ public static class WorkshopMapGuiBuilder
     }
 
     private static ElementBuilder Header(object receiver, Action close)
-        => WorkshopGui.Panel(receiver)
+    {
+        var title = WorkshopGui.Element(receiver, "div")
+            .Style("font-size", ".62rem")
+            .Style("letter-spacing", ".24em")
+            .Style("color", White)
+            .Text("WORKSHOP // SPATIAL MAP");
+
+        var subtitle = WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".25rem")
+            .Style("font-size", ".43rem")
+            .Style("letter-spacing", ".12em")
+            .Style("opacity", ".62")
+            .Text("FOLLOW A THREAD // SELECT A DESTINATION");
+
+        var copy = WorkshopGui.Element(receiver, "div")
+            .Content(title)
+            .Content(subtitle);
+
+        var closeButton = WorkshopGui.Button(receiver)
+            .Label("CLOSE MAP")
+            .Style("padding", ".35rem .55rem")
+            .Style("border", "1px solid rgba(255,255,255,.28)")
+            .Style("background", "rgba(255,255,255,.04)")
+            .Style("color", White)
+            .Style("font-family", "inherit")
+            .Style("font-size", ".45rem")
+            .Style("letter-spacing", ".1em")
+            .OnClick(close);
+
+        return WorkshopGui.Panel(receiver)
             .Style("position", "absolute")
             .Style("left", "1rem")
             .Style("right", "1rem")
@@ -99,28 +128,9 @@ public static class WorkshopMapGuiBuilder
             .Style("display", "flex")
             .Style("justify-content", "space-between")
             .Style("align-items", "center")
-            .Content(WorkshopGui.Element(receiver, "div")
-                .Content(WorkshopGui.Element(receiver, "div")
-                    .Style("font-size", ".62rem")
-                    .Style("letter-spacing", ".24em")
-                    .Style("color", White)
-                    .Text("WORKSHOP // SPATIAL MAP"))
-                .Content(WorkshopGui.Element(receiver, "div")
-                    .Style("margin-top", ".25rem")
-                    .Style("font-size", ".43rem")
-                    .Style("letter-spacing", ".12em")
-                    .Style("opacity", ".62")
-                    .Text("FOLLOW A THREAD // SELECT A DESTINATION")))
-            .Content(WorkshopGui.Button(receiver)
-                .Label("CLOSE MAP")
-                .Style("padding", ".35rem .55rem")
-                .Style("border", "1px solid rgba(255,255,255,.28)")
-                .Style("background", "rgba(255,255,255,.04)")
-                .Style("color", White)
-                .Style("font-family", "inherit")
-                .Style("font-size", ".45rem")
-                .Style("letter-spacing", ".1em")
-                .OnClick(close)));
+            .Content(copy)
+            .Content(closeButton);
+    }
 
     private static ElementBuilder ThreadSvg(object receiver, IReadOnlyList<ExperienceSpace> destinations, double avatarX, double avatarY)
     {
