@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using TheSingularityWorkshop.Gui;
 using TheSingularityWorkshop.Workshop.Experience;
 using TheSingularityWorkshop.Workshop.Interaction;
+using Xunit;
 
 namespace SingularityHub.Tests;
 
