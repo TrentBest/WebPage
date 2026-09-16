@@ -13,6 +13,7 @@
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
     private string? insideRoomId;
     private bool unknownUnlocked;
+    private int detailLevel = 16;
 
     private static readonly IReadOnlyList<SpatialRoom> Rooms =
     [
@@ -63,6 +64,8 @@
         var world = SpatialWorldGuiBuilder.Build(
             this,
             Scene,
+            detailLevel,
+            SetDetailLevel,
             HandleKeyDown,
             MoveAvatar,
             MoveAvatarTo,
@@ -95,6 +98,9 @@
             .Style("white-space", "nowrap")
             .Style("pointer-events", "none")
             .Text(Experience.User.DisplayName);
+
+    private void SetDetailLevel(int level)
+        => detailLevel = Math.Clamp(level, 1, 64);
 
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
