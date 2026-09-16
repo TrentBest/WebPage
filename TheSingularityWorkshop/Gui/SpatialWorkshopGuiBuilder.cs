@@ -11,48 +11,46 @@ public static class SpatialWorkshopGuiBuilder
     private const string White = "#ffffff";
     private const string Magenta = "#ff38d1";
 
-    public static ElementBuilder Build(
-        object receiver,
-        SpatialWorkshopScene scene,
-        int detailLevel,
-        Action<int> setDetailLevel,
-        Action<KeyboardEventArgs> onKeyDown,
-        Action<double, double> moveAvatarTo,
-        Func<string, Task> interact)
+    public static ElementBuilder Build(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY,
+        int detailLevel, Action<int> setDetailLevel, Action<KeyboardEventArgs> onKeyDown, Func<string, Task> interact)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0")
             .Style("width", "100vw").Style("height", "100vh")
-            .Style("overflow", "hidden")
-            .Style("background", "#020a12")
-            .Style("color", White)
-            .Style("font-family", "Consolas, 'Courier New', monospace")
+            .Style("overflow", "hidden").Style("background", "#020a12")
+            .Style("color", White).Style("font-family", "Consolas, 'Courier New', monospace")
             .Attribute("id", "workshop-spatial-experience");
 
-        root.Content(World(receiver, scene, detailLevel, onKeyDown, moveAvatarTo, interact));
+        root.Content(Styles(receiver));
+        root.Content(World(receiver, scene, avatarX, avatarY, detailLevel, onKeyDown, interact));
         root.Content(ViewBar(receiver, detailLevel, setDetailLevel));
         root.Content(ConstructionBanner(receiver));
         return root;
     }
 
-    private static ElementBuilder World(object receiver, SpatialWorkshopScene scene, int detailLevel,
-        Action<KeyboardEventArgs> onKeyDown, Action<double, double> moveAvatarTo, Func<string, Task> interact)
+    private static ElementBuilder World(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY,
+        int detailLevel, Action<KeyboardEventArgs> onKeyDown, Func<string, Task> interact)
     {
         var world = WorkshopGui.Panel(receiver)
-            .Style("position", "absolute").Style("inset", "0")
+            .Style("position", "absolute").Style("inset", "0").Style("overflow", "hidden")
             .Attribute("tabindex", "0")
             .AriaLabel("The Workshop spatial experience. You are inside the Forge.")
             .OnKeyDown(onKeyDown).PreventDefault("onkeydown");
 
-        world.Content(Grid(receiver, detailLevel));
-        world.Content(FloorPlan(receiver));
+        var camera = WorkshopGui.Panel(receiver)
+            .Style("position", "absolute").Style("inset", "0")
+            .Style("width", "100vw").Style("height", "100vh")
+            .Style("transform", $"translate(calc(50vw - {avatarX:0.##}vw), calc(50vh - {avatarY:0.##}vh))")
+            .Style("transition", "transform .28s linear");
 
+        camera.Content(Grid(receiver, detailLevel));
+        camera.Content(FloorPlan(receiver));
         foreach (var vehicle in scene.ConstructionVehicles)
-            world.Content(Vehicle(receiver, vehicle));
-
+            camera.Content(Vehicle(receiver, vehicle));
         foreach (var item in scene.Interactables)
-            world.Content(Interactable(receiver, item, interact));
+            camera.Content(Interactable(receiver, item, interact));
 
+        world.Content(camera);
         world.Content(Avatar(receiver));
         return world;
     }
@@ -62,8 +60,7 @@ public static class SpatialWorkshopGuiBuilder
         var svg = WorkshopGui.Element(receiver, "svg")
             .Attribute("viewBox", "0 0 100 100").Attribute("preserveAspectRatio", "none")
             .Style("position", "absolute").Style("inset", "0")
-            .Style("width", "100%").Style("height", "100%")
-            .Style("pointer-events", "none")
+            .Style("width", "100%").Style("height", "100%").Style("pointer-events", "none")
             .Style("opacity", detailLevel >= 32 ? ".48" : ".28");
 
         var spacing = detailLevel >= 48 ? 2.5 : detailLevel >= 24 ? 5 : 10;
@@ -181,4 +178,8 @@ public static class SpatialWorkshopGuiBuilder
             .Style("background", "rgba(1,4,10,.82)").Style("color", Yellow)
             .Style("font-size", ".5rem").Style("letter-spacing", ".18em")
             .Text("⚠ UNDER CONSTRUCTION // WORKSHOP COMPLEX EXPANDING");
+
+    private static ElementBuilder Styles(object receiver)
+        => WorkshopGui.Element(receiver, "style")
+            .Text("@keyframes workshop-interactable-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.8);transform:scale(1.025)}}@keyframes workshop-vehicle-crane{0%,100%{translate:0 0}50%{translate:8vw 2vh}}@keyframes workshop-vehicle-rover{0%,100%{translate:0 0}50%{translate:-7vw 1vh}}@keyframes workshop-vehicle-lifter{0%,100%{translate:0 0}50%{translate:5vw -2vh}}");
 }
