@@ -171,33 +171,35 @@ public static class SpatialWorldGuiBuilder
         var interactable = WorkshopInteractableCatalog.Create(room, onInteract: null, onHover: id => setHoveredInteractable(id));
         var accent = locked ? "#ffd34d" : interactable.Presentation.MapIntent.Accent;
 
-        var building = WorkshopGui.Element(receiver, "div")
+        // The interaction surface is deliberately the whole footprint. The
+        // schematic underneath is presentation-only, so SVG details can never
+        // steal the hover/click contract from the interactable itself.
+        var frame = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("left", $"{room.X:0.##}%").Style("top", $"{room.Y:0.##}%")
             .Style("width", $"{room.Width}%").Style("height", $"{room.Height}%").Style("box-sizing", "border-box")
-            .Style("z-index", "5").Style("pointer-events", locked ? "none" : "auto").Style("cursor", locked ? "default" : "pointer")
-            .Style("border", $"2px solid {accent}{(hovered ? "ee" : "99")}").Style("background", locked ? "rgba(30,24,3,.35)" : "rgba(0,20,30,.3)")
-            .Style("color", White).Style("font-family", "inherit")
-            .Style("transition", "transform .18s ease, border-color .18s ease, box-shadow .18s ease")
-            .Style("transform", hovered ? "scale(1.025)" : "scale(1)")
-            .Style("box-shadow", hovered ? $"0 0 36px {accent}66" : $"0 0 12px {accent}16")
+            .Style("z-index", hovered ? "8" : "5").Style("pointer-events", locked ? "none" : "auto")
+            .Style("cursor", locked ? "default" : "pointer")
+            .Style("transform", hovered ? "scale(1.018)" : "scale(1)")
+            .Style("transform-origin", "center")
+            .Style("transition", "transform .16s ease")
             .Attribute("role", "button").Attribute("tabindex", locked ? "-1" : "0")
             .AriaLabel(locked ? "Unmapped structure" : $"Interact with {room.Name}")
             .OnMouseEnter(() => HoverInteractable(interactable))
             .OnMouseLeave(() => setHoveredInteractable(null))
             .OnClick(() => interactRoom(room.Id));
 
-        building.Content(InteractableSchematicGuiBuilder.Build(receiver, interactable, hovered));
-        building.Content(WorkshopGui.Element(receiver, "span")
-            .Style("position", "absolute").Style("left", "50%").Style("top", "8%").Style("transform", "translateX(-50%)")
-            .Style("z-index", "2").Style("padding", ".2rem .4rem").Style("background", "rgba(1,4,10,.9)")
+        frame.Content(InteractableSchematicGuiBuilder.Build(receiver, interactable, hovered));
+        frame.Content(WorkshopGui.Element(receiver, "span")
+            .Style("position", "absolute").Style("left", "50%").Style("top", "5%").Style("transform", "translateX(-50%)")
+            .Style("z-index", "2").Style("padding", ".2rem .4rem").Style("background", "rgba(1,4,10,.92)")
             .Style("border", $"1px solid {accent}{(hovered ? "cc" : "55")}").Style("font-size", "clamp(.42rem, 1vw, .75rem)")
             .Style("letter-spacing", ".06em").Style("max-width", "90%").Style("white-space", "normal")
             .Style("text-align", "center").Style("pointer-events", "none").Text(room.Name));
 
-        var frame = WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("inset", "0").Style("pointer-events", "none");
-        frame.Content(building);
         if (interactable is WorkshopInteractable workshop)
-            frame.Content(WorkshopInteractableGuiBuilder.SignButton(receiver, workshop, showSign).Style("pointer-events", locked ? "none" : "auto"));
+            frame.Content(WorkshopInteractableGuiBuilder.SignButton(receiver, workshop, showSign)
+                .Style("pointer-events", locked ? "none" : "auto"));
+
         return frame;
     }
 
