@@ -18,23 +18,23 @@ public sealed class SpatialWorkshopScene
     public SpatialViewSettings View { get; }
     public IReadOnlyList<ConstructionVehicle> ConstructionVehicles { get; }
 
-    /// <summary>Creates the first high-tech Workshop complex.</summary>
+    /// <summary>Creates the first high-tech Workshop complex around a clear central origin.</summary>
     public static SpatialWorkshopScene CreateDefault()
-        => new("engineering", new SpatialPoint(73, 42.5),
+        => new("center", new SpatialPoint(50, 50),
             [
-                new SpatialInteractable("forge", "The Forge", new SpatialBounds(58, 20, 30, 45), new SpatialBounds(70, 39, 6, 5), new SpatialRectangularHitRegion(0, 0, 1, 1), "forge"),
-                new SpatialInteractable("image-tools", "Image Workshop", new SpatialBounds(8, 18, 18, 14), new SpatialBounds(17, 24, 4, 3), new SpatialRectangularHitRegion(.08, .08, .84, .84), "image-workshop"),
-                new SpatialInteractable("npc-studio", "NPC Studio", new SpatialBounds(12, 62, 20, 16), new SpatialBounds(21, 69, 4, 3), new SpatialRectangularHitRegion(.06, .06, .88, .88), "npc-studio"),
-                new SpatialInteractable("fsm-bench", "FSM Workbench", new SpatialBounds(61, 32, 16, 12), new SpatialBounds(69, 37, 4, 3), new SpatialRectangularHitRegion(.04, .04, .92, .92), "fsm-workbench"),
-                new SpatialInteractable("storage-bins", "Storage Bins", new SpatialBounds(80, 25, 12, 20), new SpatialBounds(86, 34, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "storage"),
-                new SpatialInteractable("blueprint-library", "Blueprint Library", new SpatialBounds(38, 16, 16, 14), new SpatialBounds(46, 22, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "library")
+                new SpatialInteractable("forge", "The Forge", new SpatialBounds(72, 14, 20, 25), new SpatialBounds(78, 41, 4, 3), new SpatialRectangularHitRegion(0, 0, 1, 1), "forge"),
+                new SpatialInteractable("image-tools", "Image Workshop", new SpatialBounds(8, 14, 18, 14), new SpatialBounds(17, 29, 4, 3), new SpatialRectangularHitRegion(.08, .08, .84, .84), "image-workshop"),
+                new SpatialInteractable("npc-studio", "NPC Studio", new SpatialBounds(8, 72, 20, 14), new SpatialBounds(18, 68, 4, 3), new SpatialRectangularHitRegion(.06, .06, .88, .88), "npc-studio"),
+                new SpatialInteractable("fsm-bench", "FSM Workbench", new SpatialBounds(68, 56, 16, 11), new SpatialBounds(75, 52, 4, 3), new SpatialRectangularHitRegion(.04, .04, .92, .92), "fsm-workbench"),
+                new SpatialInteractable("storage-bins", "Storage Bins", new SpatialBounds(88, 58, 8, 17), new SpatialBounds(85, 66, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "storage"),
+                new SpatialInteractable("blueprint-library", "Blueprint Library", new SpatialBounds(32, 12, 18, 14), new SpatialBounds(41, 28, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "library")
             ],
             SpatialViewSettings.CreateDefault(),
             [
-                new ConstructionVehicle("crane-01", "Fabrication Crane", ConstructionVehicleKind.Crane, new SpatialPoint(54, 55)),
-                new ConstructionVehicle("backhoe-01", "Site Tractor", ConstructionVehicleKind.Backhoe, new SpatialPoint(43, 52)),
-                new ConstructionVehicle("rover-01", "Site Rover", ConstructionVehicleKind.Rover, new SpatialPoint(35, 55)),
-                new ConstructionVehicle("lifter-01", "Material Lifter", ConstructionVehicleKind.Lifter, new SpatialPoint(87, 56))
+                new ConstructionVehicle("crane-01", "Fabrication Crane", ConstructionVehicleKind.Crane, new SpatialPoint(64, 72)),
+                new ConstructionVehicle("backhoe-01", "Site Tractor", ConstructionVehicleKind.Backhoe, new SpatialPoint(37, 70)),
+                new ConstructionVehicle("rover-01", "Site Rover", ConstructionVehicleKind.Rover, new SpatialPoint(31, 55)),
+                new ConstructionVehicle("lifter-01", "Material Lifter", ConstructionVehicleKind.Lifter, new SpatialPoint(89, 47))
             ]);
 }
 
@@ -53,10 +53,13 @@ public readonly record struct SpatialRectangularHitRegion(double X, double Y, do
     public bool Contains(NormalizedPointer point) => point.X >= X && point.X <= X + Width && point.Y >= Y && point.Y <= Y + Height;
 }
 
+/// <summary>A named place from which an interactable can be operated.</summary>
+public readonly record struct SpatialInteractionPoint(string Id, string Name, SpatialBounds Bounds);
+
 /// <summary>A world object that owns its spatial hover and interaction lifecycle.</summary>
 public sealed class SpatialInteractable
 {
-    public SpatialInteractable(string id, string name, SpatialBounds bounds, SpatialBounds interactionPoint, SpatialRectangularHitRegion hitRegion, string experienceId)
+    public SpatialInteractable(string id, string name, SpatialBounds bounds, SpatialBounds interactionPoint, SpatialRectangularHitRegion hitRegion, string experienceId, IReadOnlyList<SpatialInteractionPoint>? interactionPoints = null, IReadOnlyList<SpatialOpening>? openings = null)
     {
         Id = id;
         Name = name;
@@ -64,6 +67,10 @@ public sealed class SpatialInteractable
         InteractionPoint = interactionPoint;
         HitRegion = hitRegion;
         ExperienceId = experienceId;
+        InteractionPoints = interactionPoints is { Count: > 0 }
+            ? interactionPoints
+            : [new SpatialInteractionPoint("default", "Primary", interactionPoint)];
+        Openings = openings ?? [];
     }
 
     public string Id { get; }
@@ -72,6 +79,8 @@ public sealed class SpatialInteractable
     public SpatialBounds InteractionPoint { get; }
     public SpatialRectangularHitRegion HitRegion { get; }
     public string ExperienceId { get; }
+    public IReadOnlyList<SpatialInteractionPoint> InteractionPoints { get; }
+    public IReadOnlyList<SpatialOpening> Openings { get; }
     public bool IsBreathing { get; private set; }
     public NormalizedPointer? LastHover { get; private set; }
     public int InteractionCount { get; private set; }
@@ -87,7 +96,7 @@ public sealed class SpatialInteractable
 
     public void OnHoverExit() => IsBreathing = false;
 
-    /// <summary>Signals that the visitor has physically arrived at this object's interaction position.</summary>
+    /// <summary>Signals that the visitor has physically arrived at this object's selected interaction position.</summary>
     public void OnInteraction()
     {
         InteractionCount++;
