@@ -18,7 +18,7 @@ public enum InteractableVisualEffect
     Expand
 }
 
-/// <summary>Renderer-neutral presentation behavior for one interaction state.</summary>
+/// <summary>Renderer-neutral visual behavior for one interaction state.</summary>
 public sealed record InteractableVisualIntent(
     InteractableVisualEffect Effect,
     double Intensity = 1.0)
@@ -31,6 +31,21 @@ public sealed record InteractableVisualIntent(
 }
 
 /// <summary>
+/// Renderer-neutral wayfinding presentation declared by an interactable.
+/// A map renderer decides how the line is actually drawn; the interactable
+/// supplies the semantic label and visual parameters.
+/// </summary>
+public sealed record InteractableMapPresentation(
+    string ThreadLabel,
+    string Accent,
+    double LineWidth = 1.1,
+    double LineOpacity = 0.86)
+{
+    public static InteractableMapPresentation Default(string name)
+        => new(name.ToUpperInvariant(), "#ffffff");
+}
+
+/// <summary>
 /// Workshop-facing visual intent for an interactable.
 /// The interaction domain declares what may be shown; a renderer decides how
 /// that intent is manifested for a particular Experience.
@@ -40,10 +55,12 @@ public sealed record InteractablePresentation(
     string Description,
     string SchematicId = "default",
     InteractableVisualIntent? Hover = null,
-    InteractableVisualIntent? Interacting = null)
+    InteractableVisualIntent? Interacting = null,
+    InteractableMapPresentation? Map = null)
 {
     public InteractableVisualIntent HoverIntent => Hover ?? InteractableVisualIntent.Breathes();
     public InteractableVisualIntent InteractingIntent => Interacting ?? InteractableVisualIntent.Pulses();
+    public InteractableMapPresentation MapIntent => Map ?? InteractableMapPresentation.Default(Kicker);
 
     public static InteractablePresentation Default(string name)
         => new(
@@ -51,5 +68,6 @@ public sealed record InteractablePresentation(
             name,
             "default",
             InteractableVisualIntent.Breathes(),
-            InteractableVisualIntent.Pulses());
+            InteractableVisualIntent.Pulses(),
+            InteractableMapPresentation.Default(name));
 }
