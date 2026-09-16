@@ -12,6 +12,7 @@ public enum SpaceElevatorComponentKind
     TramPlatform,
     PowerTransferStation,
     TransitConcourse,
+    CommercialConcourse,
     SecurityOffice,
     BioSafetyStation
 }
@@ -40,8 +41,8 @@ public readonly record struct SpaceElevatorTerminal(
 /// <summary>
 /// Domain description of the Workshop space-elevator Experience.
 /// The elevator is a transportation district, not merely a vertical tether:
-/// terminals, trams, security, life-safety handling, power transfer and the
-/// orbital station are all structural parts of the Experience.
+/// terminals, trams, concourses, commerce, security, life-safety handling,
+/// power transfer and the orbital station are all structural parts.
 /// </summary>
 public sealed record SpaceElevatorStructure(
     string Id,
@@ -52,7 +53,9 @@ public sealed record SpaceElevatorStructure(
     IReadOnlyList<SpaceElevatorTerminal> Terminals,
     string TetherMaterial = "CARBON NANOTUBE // SPIDER-CARBON CONCEPT",
     int MidTetherPowerTransferStations = 3,
-    string ClimberArchitecture = "TRI-RAIL MAGLEV SLED")
+    string ClimberArchitecture = "TRI-RAIL MAGLEV SLED",
+    int CommercialStorefrontCapacity = 24,
+    bool CommercialLeasingEnabled = true)
 {
     public bool ReachesOrbitalStation =>
         StationAltitudeKilometers > 0 && TetherLengthKilometers >= StationAltitudeKilometers;
@@ -77,6 +80,7 @@ public static class SpaceElevatorTemplates
                 new("ground-anchor", SpaceElevatorComponentKind.Anchor, 0, "GROUND ANCHOR // HUB CORE"),
                 new("passenger-concourse", SpaceElevatorComponentKind.TransitConcourse, 0, "PASSENGER CONCOURSE"),
                 new("freight-concourse", SpaceElevatorComponentKind.TransitConcourse, 0, "FREIGHT CONCOURSE"),
+                new("commercial-concourse", SpaceElevatorComponentKind.CommercialConcourse, 0, "COMMERCIAL CONCOURSE // STOREFRONTS"),
                 new("security-office", SpaceElevatorComponentKind.SecurityOffice, 0, "SECURITY OFFICE"),
                 new("bio-safety", SpaceElevatorComponentKind.BioSafetyStation, 0, "BIOLOGICAL LIFE-SAFETY"),
                 new("tether", SpaceElevatorComponentKind.Tether, 35_786, "ORBITAL TETHER"),
