@@ -1,14 +1,13 @@
-window.spatialWorkshop = {
-    screenToWorld: function (clientX, clientY, avatarX, avatarY) {
-        const width = Math.max(window.innerWidth, 1);
-        const height = Math.max(window.innerHeight, 1);
-        const screenVw = clientX / width * 100;
-        const screenVh = clientY / height * 100;
-        const offsetVw = 50 - avatarX * 1.5;
-        const offsetVh = 50 - avatarY * 1.5;
-        return {
-            x: (screenVw - offsetVw) / 1.5,
-            y: (screenVh - offsetVh) / 1.5
-        };
-    }
-};
+/// <summary>Browser-side coordinate bridge for the avatar-centered Workshop camera.</summary>
+export function screenToWorld(clientX, clientY, avatarX, avatarY) {
+    const width = Math.max(window.innerWidth, 1);
+    const height = Math.max(window.innerHeight, 1);
+    const screenVw = clientX / width * 100;
+    const screenVh = clientY / height * 100;
+    const offsetVw = 50 - avatarX * 1.5;
+    const offsetVh = 50 - avatarY * 1.5;
+    return {
+        x: (screenVw - offsetVw) / 1.5,
+        y: (screenVh - offsetVh) / 1.5
+    };
+}
