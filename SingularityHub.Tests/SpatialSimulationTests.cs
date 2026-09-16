@@ -5,22 +5,13 @@ using Xunit;
 
 namespace SingularityHub.Tests;
 
-/// <summary>
-/// Spatial simulation breadcrumbs. These tests deliberately describe the machine
-/// underneath the visual manifestation rather than asserting HTML/CSS details.
-/// </summary>
+/// <summary>Spatial simulation breadcrumbs describing the machine underneath the visual manifestation.</summary>
 public sealed class SpatialSimulationTests
 {
     [Fact(DisplayName = "Incremental Unit Test 07 — Diablo pathfinding routes around blocked geometry")]
     public void Pathfinder_RoutesAroundObstacle()
     {
-        var path = DiabloPathfinder.FindPath(
-            9,
-            9,
-            (x, y) => !(x is >= 3 and <= 5 && y is >= 2 and <= 6),
-            new SpatialGridPoint(1, 4),
-            new SpatialGridPoint(7, 4));
-
+        var path = DiabloPathfinder.FindPath(9, 9, (x, y) => !(x is >= 3 and <= 5 && y is >= 2 and <= 6), new SpatialGridPoint(1, 4), new SpatialGridPoint(7, 4));
         Assert.NotEmpty(path);
         Assert.Equal(new SpatialGridPoint(1, 4), path.First());
         Assert.Equal(new SpatialGridPoint(7, 4), path.Last());
@@ -34,7 +25,6 @@ public sealed class SpatialSimulationTests
         dumpTruck.SetDriveStatus(VehicleDriveStatus.Driving);
         dumpTruck.SetOperatingStatus(VehicleOperatingStatus.Full);
         dumpTruck.SetSubsystemStatus("Bed", "Loaded");
-
         Assert.Equal(VehicleDriveStatus.Driving, dumpTruck.DriveStatus);
         Assert.Equal(VehicleOperatingStatus.Full, dumpTruck.OperatingStatus);
         Assert.Equal("Loaded", dumpTruck.SubsystemStatus["Bed"]);
@@ -45,10 +35,24 @@ public sealed class SpatialSimulationTests
         backhoe.SetSubsystemStatus("Grounding", "Deployed");
         backhoe.SetSubsystemStatus("Boom", "Raised");
         backhoe.SetSubsystemStatus("Bucket", "Digging");
-
         Assert.Equal(VehicleOperatingStatus.Operating, backhoe.OperatingStatus);
         Assert.Equal("Deployed", backhoe.SubsystemStatus["Grounding"]);
         Assert.Equal("Raised", backhoe.SubsystemStatus["Boom"]);
         Assert.Equal("Digging", backhoe.SubsystemStatus["Bucket"]);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 09 — construction machines manifest as semantic part assemblies")]
+    public void ConstructionVehicle_ManifestationContainsMachineParts()
+    {
+        var backhoe = ConstructionVehicleGuiBuilder.Parts(ConstructionVehicleKind.Backhoe);
+        Assert.Contains(backhoe, part => part.Code == "CAB");
+        Assert.Contains(backhoe, part => part.Code == "SCOOP");
+        Assert.Contains(backhoe, part => part.Code == "BOOM");
+        Assert.Contains(backhoe, part => part.Code == "BUCKET");
+        Assert.Equal(4, backhoe.Single(part => part.Code == "TIRE").Count);
+
+        var crane = ConstructionVehicleGuiBuilder.Parts(ConstructionVehicleKind.Crane);
+        Assert.Equal(4, crane.Single(part => part.Code == "OUTRIGGER").Count);
+        Assert.Equal(4, crane.Single(part => part.Code == "TIRE").Count);
     }
 }
