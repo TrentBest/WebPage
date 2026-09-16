@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.Workshop.Experience;
+using TheSingularityWorkshop.Workshop.Interaction;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 
 namespace TheSingularityWorkshop.Gui;
@@ -28,6 +29,7 @@ public static class WorkshopMapGuiBuilder
     public static ElementBuilder Build(
         object receiver,
         IReadOnlyList<ExperienceSpace> destinations,
+        IReadOnlyDictionary<string, IInteractable> interactables,
         double avatarX,
         double avatarY,
         IReadOnlyDictionary<string, IReadOnlyList<SpatialWaypoint>> routes,
@@ -35,6 +37,7 @@ public static class WorkshopMapGuiBuilder
         Action close)
     {
         ArgumentNullException.ThrowIfNull(destinations);
+        ArgumentNullException.ThrowIfNull(interactables);
         ArgumentNullException.ThrowIfNull(routes);
         ArgumentNullException.ThrowIfNull(selectDestination);
         ArgumentNullException.ThrowIfNull(close);
@@ -54,12 +57,18 @@ public static class WorkshopMapGuiBuilder
             .Style("background", "rgba(1,4,10,.96)").Style("box-shadow", "0 0 90px rgba(0,0,0,.7)");
 
         panel.Content(Header(receiver, close));
-        panel.Content(RouteSvg(receiver, destinations, avatarX, avatarY, routes));
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0")
+            .Style("pointer-events", "none")
+            .Content(RouteLines(receiver, destinations, interactables, avatarX, avatarY, routes)));
         panel.Content(Visitor(receiver));
 
         foreach (var destination in destinations)
         {
-            var (thread, accent) = ThreadFor(destination.Id);
+            if (!interactables.TryGetValue(destination.Id, out var interactable))
+                continue;
+
+            var presentation = interactable.Presentation.MapIntent;
             var dx = destination.X - avatarX;
             var dy = destination.Y - avatarY;
             var distance = Math.Sqrt(dx * dx + dy * dy);
@@ -67,7 +76,7 @@ public static class WorkshopMapGuiBuilder
             var radial = Math.Clamp(27 + distance * .32, 30, 42);
             var left = 50 + Math.Cos(angle * Math.PI / 180) * radial;
             var top = 50 + Math.Sin(angle * Math.PI / 180) * radial;
-            panel.Content(DataPill(receiver, destination, thread, accent, left, top, selectDestination));
+            panel.Content(DataPill(receiver, destination, presentation, left, top, selectDestination));
         }
 
         panel.Content(Legend(receiver));
@@ -96,42 +105,31 @@ public static class WorkshopMapGuiBuilder
                 .Style("font-family", "inherit").Style("font-size", ".45rem")
                 .Style("letter-spacing", ".1em").OnClick(close));
 
-    private static ElementBuilder RouteSvg(
+    private static ElementBuilder RouteLines(
         object receiver,
         IReadOnlyList<ExperienceSpace> destinations,
+        IReadOnlyDictionary<string, IInteractable> interactables,
         double avatarX,
         double avatarY,
         IReadOnlyDictionary<string, IReadOnlyList<SpatialWaypoint>> routes)
     {
-        var svg = WorkshopGui.Element(receiver, "svg")
-            .Attribute("viewBox", "0 0 100 100").Attribute("preserveAspectRatio", "none")
-            .Attribute("aria-hidden", "true").Style("position", "absolute").Style("inset", "0")
-            .Style("width", "100%").Style("height", "100%").Style("pointer-events", "none");
+        var root = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0")
+            .Style("pointer-events", "none");
 
         foreach (var destination in destinations)
         {
-            var (_, accent) = ThreadFor(destination.Id);
+            if (!interactables.TryGetValue(destination.Id, out var interactable))
+                continue;
+
             if (!routes.TryGetValue(destination.Id, out var route) || route.Count == 0)
                 route = [new SpatialWaypoint(avatarX, avatarY), new SpatialWaypoint(destination.EntranceX, destination.EntranceY)];
 
-            var points = route.Select(point =>
-                $"{50 + (point.X - avatarX) * .92:0.##},{50 + (point.Y - avatarY) * .92:0.##}");
-
-            svg.Child(WorkshopGui.Element(receiver, "polyline")
-                .Attribute("points", string.Join(" ", points)).Attribute("fill", "none")
-                .Attribute("stroke", accent).Attribute("stroke-opacity", ".86")
-                .Attribute("stroke-width", "1.1").Attribute("stroke-linecap", "round")
-                .Attribute("stroke-linejoin", "round"));
-
-            var end = route[^1];
-            var endX = 50 + (end.X - avatarX) * .92;
-            var endY = 50 + (end.Y - avatarY) * .92;
-            svg.Child(WorkshopGui.Element(receiver, "circle")
-                .Attribute("cx", endX.ToString("0.##")).Attribute("cy", endY.ToString("0.##"))
-                .Attribute("r", "1.8").Attribute("fill", Ink)
-                .Attribute("stroke", accent).Attribute("stroke-width", ".7"));
+            root.Content(WorkshopMapLineRenderer.Build(
+                receiver, route, avatarX, avatarY, interactable.Presentation.MapIntent));
         }
-        return svg;
+
+        return root;
     }
 
     private static ElementBuilder Visitor(object receiver)
@@ -147,22 +145,26 @@ public static class WorkshopMapGuiBuilder
                 .Style("object-fit", "cover").Style("border-radius", "50%"));
 
     private static ElementBuilder DataPill(
-        object receiver, ExperienceSpace destination, string thread, string accent,
-        double left, double top, Func<string, Task> selectDestination)
+        object receiver,
+        ExperienceSpace destination,
+        InteractableMapPresentation presentation,
+        double left,
+        double top,
+        Func<string, Task> selectDestination)
         => WorkshopGui.Button(receiver)
             .Style("position", "absolute").Style("left", $"{left:0.##}%").Style("top", $"{top:0.##}%")
             .Style("transform", "translate(-50%,-50%) rotate(-90deg)").Style("transform-origin", "center")
             .Style("z-index", "5").Style("width", "180px").Style("height", "46px")
-            .Style("padding", ".25rem .75rem").Style("border", $"2px solid {accent}aa")
+            .Style("padding", ".25rem .75rem").Style("border", $"2px solid {presentation.Accent}aa")
             .Style("border-radius", "999px").Style("background", Ink).Style("color", White)
             .Style("font-family", "inherit").Style("font-size", ".46rem")
             .Style("letter-spacing", ".08em").Style("text-align", "center")
-            .Style("cursor", "pointer").Style("box-shadow", $"0 0 22px {accent}22")
-            .AriaLabel($"Follow {thread} route to {destination.Name}")
+            .Style("cursor", "pointer").Style("box-shadow", $"0 0 22px {presentation.Accent}22")
+            .AriaLabel($"Follow {presentation.ThreadLabel} route to {destination.Name}")
             .OnClick(() => selectDestination(destination.Id))
             .Content(WorkshopGui.Element(receiver, "span")
-                .Style("color", accent).Style("letter-spacing", ".16em")
-                .Text($"{thread} // {destination.Name}"));
+                .Style("color", presentation.Accent).Style("letter-spacing", ".16em")
+                .Text($"{presentation.ThreadLabel} // {destination.Name}"));
 
     private static ElementBuilder Legend(object receiver)
         => WorkshopGui.Element(receiver, "div")
@@ -170,17 +172,4 @@ public static class WorkshopMapGuiBuilder
             .Style("z-index", "4").Style("font-size", ".4rem")
             .Style("letter-spacing", ".1em").Style("opacity", ".7")
             .Text("FOLLOW THE COLORED LINE // IT IS THE SAME PATH YOUR AVATAR WILL WALK");
-
-    private static (string Thread, string Accent) ThreadFor(string id)
-        => id switch
-        {
-            "engineering" => ("MACHINERY", "#00eaff"),
-            "creation" => ("CREATION", "#52e05a"),
-            "experience" => ("EXPERIENCE", "#ff70d9"),
-            "architecture" => ("ARCHITECTURE", "#ffd34d"),
-            "research" => ("RESEARCH", "#b58cff"),
-            "space-elevator" => ("ORBITAL", "#ff9f43"),
-            "unknown" => ("UNKNOWN", "#ff5577"),
-            _ => ("WORKSHOP", "#ffffff")
-        };
 }
