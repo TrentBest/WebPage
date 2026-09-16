@@ -43,7 +43,8 @@ public sealed class ExploreSpatialExperienceTests
             "The Forge",
             new SpatialBounds(20, 20, 30, 25),
             new SpatialBounds(30, 32, 10, 8),
-            new SpatialRectangularHitRegion(0, 0, 1, 1));
+            new SpatialRectangularHitRegion(0, 0, 1, 1),
+            "forge");
 
         Assert.False(interactable.IsBreathing);
         Assert.True(interactable.OnHover(new NormalizedPointer(0.5, 0.5)));
