@@ -2,11 +2,7 @@ using Xunit;
 
 namespace SingularityHub.Tests;
 
-/// <summary>
-/// The chronological development heartbeat for the repository.
-/// Each development version is represented by one literal assertion.
-/// Behavioral coverage belongs in the other test files.
-/// </summary>
+/// <summary>The chronological development heartbeat for the repository.</summary>
 public sealed class IncrementalVersionTests
 {
     [ArchitectureTest(0, 0, 87)]
@@ -132,4 +128,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 118)]
     [Fact(DisplayName = "V0.0.118 — Explore_Spatial_Placement_Probe_Is_350x200_And_Offset_From_Player_Origin")]
     public void V0_0_118_ExploreSpatialPlacementProbeIs350x200AndOffsetFromPlayerOrigin() => Assert.Equal("0.0.118", "0.0.118");
+
+    [ArchitectureTest(0, 0, 119)]
+    [Fact(DisplayName = "V0.0.119 — Persistent_World_And_Vehicle_Capability_Discovery_Boundary")]
+    public void V0_0_119_PersistentWorldAndVehicleCapabilityDiscoveryBoundary() => Assert.Equal("0.0.119", "0.0.119");
 }
