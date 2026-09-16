@@ -132,4 +132,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 119)]
     [Fact(DisplayName = "V0.0.119 — Persistent_World_And_Vehicle_Capability_Discovery_Boundary")]
     public void V0_0_119_PersistentWorldAndVehicleCapabilityDiscoveryBoundary() => Assert.Equal("0.0.119", "0.0.119");
+
+    [ArchitectureTest(0, 0, 120)]
+    [Fact(DisplayName = "V0.0.120 — Digiten_Is_A_Persistent_Actor_Whose_Behavior_Is_Governed_By_FSM_API")]
+    public void V0_0_120_DigitenIsAPersistentActorWhoseBehaviorIsGovernedByFsmApi() => Assert.Equal("0.0.120", "0.0.120");
 }
