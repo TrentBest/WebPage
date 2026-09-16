@@ -36,21 +36,21 @@ public sealed class WorkshopInteractable : Interactable
 /// Rendering remains the responsibility of a GUI builder; this model is usable
 /// in spatial, desktop, web, or other Experience manifestations.
 /// </summary>
-public sealed record WorkshopSign(
-    string Id,
-    string Title,
-    string[] Lines,
-    string Kicker = "WORKSHOP // SIGN")
+public sealed record WorkshopSign
 {
     public WorkshopSign(string id, string title, params string[] lines)
-        : this(id, title, lines, "WORKSHOP // SIGN")
     {
+        if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Sign id is required.", nameof(id));
+        if (string.IsNullOrWhiteSpace(title)) throw new ArgumentException("Sign title is required.", nameof(title));
+        ArgumentNullException.ThrowIfNull(lines);
+
+        Id = id;
+        Title = title;
+        Lines = lines;
     }
 
-    public WorkshopSign
-    {
-        if (string.IsNullOrWhiteSpace(Id)) throw new ArgumentException("Sign id is required.", nameof(Id));
-        if (string.IsNullOrWhiteSpace(Title)) throw new ArgumentException("Sign title is required.", nameof(Title));
-        ArgumentNullException.ThrowIfNull(Lines);
-    }
+    public string Id { get; }
+    public string Title { get; }
+    public string[] Lines { get; }
+    public string Kicker { get; init; } = "WORKSHOP // SIGN";
 }
