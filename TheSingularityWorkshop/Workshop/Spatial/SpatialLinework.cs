@@ -10,20 +10,19 @@ namespace TheSingularityWorkshop.Gui;
 /// </summary>
 public sealed class SpatialLinework : IDisposable
 {
-    private const string ProcessingGroup = "SpatialLinework";
-    private const string DefinitionName = "SpatialLineworkFSM";
-
+    private readonly string _processingGroup = $"SpatialLinework:{Guid.NewGuid():N}";
+    private readonly string _definitionName = $"SpatialLineworkFSM:{Guid.NewGuid():N}";
     private readonly LineworkContext _context = new();
     private readonly List<SpatialLine> _lines = [];
     private FSMHandle? _fsm;
     private bool _disposed;
 
-    /// <summary>Creates an empty linework controller with its FSM lifecycle.</summary>
+    /// <summary>Creates an empty linework controller with its own isolated FSM lifecycle.</summary>
     public SpatialLinework()
     {
         BuildFsm();
-        _fsm = FSM_API.Create.CreateInstance(DefinitionName, _context, ProcessingGroup);
-        FSM_API.Interaction.Update(ProcessingGroup);
+        _fsm = FSM_API.Create.CreateInstance(_definitionName, _context, _processingGroup);
+        FSM_API.Interaction.Update(_processingGroup);
     }
 
     /// <summary>Current linework lifecycle state.</summary>
@@ -92,20 +91,17 @@ public sealed class SpatialLinework : IDisposable
 
     private void BuildFsm()
     {
-        if (!FSM_API.Interaction.Exists(DefinitionName, ProcessingGroup))
-        {
-            FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
-            FSM_API.Create.CreateFiniteStateMachine(DefinitionName, -1, ProcessingGroup)
-                .State("Idle", null, null, null)
-                .State("Drawing", null, null, null)
-                .Transition("Idle", "Drawing", context => ((LineworkContext)context).DrawingRequested)
-                .Transition("Drawing", "Idle", context => !((LineworkContext)context).DrawingRequested)
-                .WithInitialState("Idle")
-                .BuildDefinition();
-        }
+        FSM_API.Create.CreateProcessingGroup(_processingGroup);
+        FSM_API.Create.CreateFiniteStateMachine(_definitionName, -1, _processingGroup)
+            .State("Idle", null, null, null)
+            .State("Drawing", null, null, null)
+            .Transition("Idle", "Drawing", context => ((LineworkContext)context).DrawingRequested)
+            .Transition("Drawing", "Idle", context => !((LineworkContext)context).DrawingRequested)
+            .WithInitialState("Idle")
+            .BuildDefinition();
     }
 
-    private void UpdateFsm() => FSM_API.Interaction.Update(ProcessingGroup);
+    private void UpdateFsm() => FSM_API.Interaction.Update(_processingGroup);
 
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 
@@ -113,14 +109,14 @@ public sealed class SpatialLinework : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        FSM_API.Interaction.DestroyFiniteStateMachine(DefinitionName, ProcessingGroup);
+        FSM_API.Interaction.DestroyFiniteStateMachine(_definitionName, _processingGroup);
         _disposed = true;
         _lines.Clear();
     }
 
     private sealed class LineworkContext : IStateContext
     {
-        public string Name { get; set; } = ProcessingGroup;
+        public string Name { get; set; } = "SpatialLinework";
         public bool IsValid { get; set; } = true;
         public bool DrawingRequested { get; set; }
         public double StartX { get; set; }
