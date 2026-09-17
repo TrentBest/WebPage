@@ -12,9 +12,7 @@ public static class SpatialGeometryGuiBuilder
     {
         var effectiveZoom = new SpatialCamera(50, 50, zoom).Clamped().Zoom;
         var svg = WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100").Attribute("preserveAspectRatio", "none")
-            .Style("position", "absolute").Style("left", "0").Style("top", "0")
-            .Style("width", $"{SpatialCamera.WorldWidthVw * effectiveZoom:0.###}vw").Style("height", $"{SpatialCamera.WorldHeightVh * effectiveZoom:0.###}vh")
-            .Style("pointer-events", "none").Attribute("aria-label", "Workshop schematic geometry");
+            .Style("position", "absolute").Style("left", "0").Style("top", "0").Style("width", $"{SpatialCamera.WorldWidthVw * effectiveZoom:0.###}vw").Style("height", $"{SpatialCamera.WorldHeightVh * effectiveZoom:0.###}vh").Style("pointer-events", "none").Attribute("aria-label", "Workshop schematic geometry");
         foreach (var building in SpatialGeometryEngine.FromInteractables(scene.Interactables)) svg.Child(BuildBuilding(receiver, building));
         svg.Child(BuildTransit(receiver, SpatialTransitManifest.CreateDefault()));
         svg.Child(CenterMarker(receiver));
@@ -45,8 +43,26 @@ public static class SpatialGeometryGuiBuilder
         group.Child(WorkshopGui.Element(receiver, "rect").Attribute("x", p.X).Attribute("y", p.Y).Attribute("width", p.Width).Attribute("height", p.Height).Attribute("fill", "#0b1820").Attribute("fill-opacity", ".94").Attribute("stroke", Cyan).Attribute("stroke-opacity", ".65").Attribute("stroke-width", ".25"));
         group.Child(WorkshopGui.Element(receiver, "line").Attribute("x1", p.X + .4).Attribute("y1", p.Y + .45).Attribute("x2", p.X + p.Width - .4).Attribute("y2", p.Y + .45).Attribute("stroke", Yellow).Attribute("stroke-opacity", ".9").Attribute("stroke-width", ".35"));
         group.Child(WorkshopGui.Element(receiver, "text").Attribute("x", p.X + p.Width / 2).Attribute("y", p.Y - .7).Attribute("fill", Cyan).Attribute("font-size", ".62").Attribute("font-family", "monospace").Attribute("text-anchor", "middle").Text("TRAM PLATFORM // WORKSHOP CENTRAL"));
-        foreach (var passenger in transit.Passengers) group.Child(WorkshopGui.Element(receiver, "circle").Attribute("cx", passenger.WaitingPosition.X).Attribute("cy", passenger.WaitingPosition.Y).Attribute("r", ".34").Attribute("fill", White).Attribute("fill-opacity", ".78"));
+        foreach (var passenger in transit.Passengers)
+        {
+            var rider = WorkshopGui.Element(receiver, "circle").Attribute("cx", passenger.WaitingPosition.X).Attribute("cy", passenger.WaitingPosition.Y).Attribute("r", ".34").Attribute("fill", White).Attribute("fill-opacity", ".78");
+            rider.Content(WorkshopGui.Element(receiver, "animateTransform").Attribute("attributeName", "transform").Attribute("type", "translate").Attribute("values", $"0 0;0 0;{transit.DockPoint.X - passenger.WaitingPosition.X:0.##} {transit.DockPoint.Y - passenger.WaitingPosition.Y:0.##};{transit.DockPoint.X - passenger.WaitingPosition.X:0.##} {transit.DockPoint.Y - passenger.WaitingPosition.Y:0.##};0 0").Attribute("keyTimes", "0;.45;.58;.82;1").Attribute("dur", "12s").Attribute("begin", $"{passenger.BoardingOrder * .18:0.##}s").Attribute("repeatCount", "indefinite"));
+            group.Child(rider);
+        }
+        group.Child(Tram(receiver, transit));
         return group;
+    }
+
+    private static ElementBuilder Tram(object receiver, SpatialTransitManifest transit)
+    {
+        var d = transit.DockPoint;
+        var tram = WorkshopGui.Element(receiver, "g");
+        tram.Content(WorkshopGui.Element(receiver, "animateTransform").Attribute("attributeName", "transform").Attribute("type", "translate").Attribute("values", $"-18 0;0 0;0 0;18 0;-18 0").Attribute("keyTimes", "0;.333;.5;.833;1").Attribute("dur", "12s").Attribute("repeatCount", "indefinite"));
+        tram.Content(WorkshopGui.Element(receiver, "rect").Attribute("x", d.X - 5).Attribute("y", d.Y - 1.15).Attribute("width", 10).Attribute("height", 2.3).Attribute("rx", ".45").Attribute("fill", "#102b35").Attribute("stroke", Cyan).Attribute("stroke-width", ".25"));
+        tram.Content(WorkshopGui.Element(receiver, "rect").Attribute("x", d.X - 1.25).Attribute("y", d.Y - 1.05).Attribute("width", 1.05).Attribute("height", 2.1).Attribute("fill", Yellow).Attribute("fill-opacity", ".75"));
+        tram.Content(WorkshopGui.Element(receiver, "rect").Attribute("x", d.X + .2).Attribute("y", d.Y - 1.05).Attribute("width", 1.05).Attribute("height", 2.1).Attribute("fill", Yellow).Attribute("fill-opacity", ".75"));
+        tram.Content(WorkshopGui.Element(receiver, "text").Attribute("x", d.X).Attribute("y", d.Y + .35).Attribute("fill", White).Attribute("font-size", ".48").Attribute("font-family", "monospace").Attribute("text-anchor", "middle").Text("TRAM"));
+        return tram;
     }
 
     private static ElementBuilder Opening(object receiver, SpatialBuildingGeometry building, SpatialOpening opening)
