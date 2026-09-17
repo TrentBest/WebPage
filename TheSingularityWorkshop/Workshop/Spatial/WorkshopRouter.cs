@@ -22,6 +22,9 @@ public sealed class WorkshopRouter
     /// <summary>Traversal frames from the root scene to the current scene.</summary>
     public IReadOnlyList<SpatialSceneFrame> Frames => _sceneStack.Frames;
 
+    /// <summary>The underlying traversal stack for diagnostics and tests.</summary>
+    public SpatialSceneStack SceneStack => _sceneStack;
+
     /// <summary>
     /// Routes into a child scene and records the parent's return position.
     /// </summary>
