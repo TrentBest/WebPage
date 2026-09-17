@@ -54,4 +54,17 @@ public sealed class MonikerExperienceTests
         Assert.Contains("#ff7a00", css);
         Assert.Contains("#ffd34d", css);
     }
+
+    [Fact(DisplayName = "Gateway avatar carries the monolith border and moniker starts in place")]
+    public void GatewayAvatarAndMonikerEntryAreStable()
+    {
+        var homeCss = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Pages", "Home.razor.css"));
+
+        Assert.Contains(".hypervisor-shell .avatar-portal", homeCss);
+        Assert.Contains("border: 2px solid #00eaff !important", homeCss);
+        Assert.Contains("animation-delay: 0s !important", homeCss);
+    }
 }
