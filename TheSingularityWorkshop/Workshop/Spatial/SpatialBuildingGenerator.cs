@@ -70,12 +70,15 @@ public static class SpatialBuildingGenerator
     {
         ArgumentNullException.ThrowIfNull(spec);
         if (string.IsNullOrWhiteSpace(experienceId)) throw new ArgumentException("An experience ID is required.", nameof(experienceId));
+
+        // Keep the building's broad-phase footprint intact, but inset the precise pointer region.
+        // This leaves the exact edge/corner pixels available to empty-space navigation.
         return new SpatialInteractable(
             spec.Id,
             spec.Name,
             spec.Bounds,
             interactionPoint,
-            new SpatialRectangularHitRegion(0, 0, 1, 1),
+            new SpatialRectangularHitRegion(.05, .05, .9, .9),
             experienceId,
             openings: spec.BuildingOpenings);
     }
