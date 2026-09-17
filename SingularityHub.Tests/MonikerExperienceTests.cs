@@ -55,16 +55,18 @@ public sealed class MonikerExperienceTests
         Assert.Contains("#ffd34d", css);
     }
 
-    [Fact(DisplayName = "Gateway avatar carries the monolith border and moniker starts in place")]
+    [Fact(DisplayName = "Gateway avatar border and moniker entry are enforced by the loaded global stylesheet")]
     public void GatewayAvatarAndMonikerEntryAreStable()
     {
-        var homeCss = File.ReadAllText(Path.Combine(
+        var css = File.ReadAllText(Path.Combine(
             AppContext.BaseDirectory,
             "..", "..", "..", "..",
-            "TheSingularityWorkshop", "Pages", "Home.razor.css"));
+            "TheSingularityWorkshop", "wwwroot", "css", "app.css"));
 
-        Assert.Contains(".hypervisor-shell .avatar-portal", homeCss);
-        Assert.Contains("border: 2px solid #00eaff !important", homeCss);
-        Assert.Contains("animation-delay: 0s !important", homeCss);
+        Assert.Contains(".monolith-btn .avatar-portal::after", css);
+        Assert.Contains("border:2px solid #00eaff", css);
+        Assert.Contains(".monolith-btn:hover .avatar-portal::after", css);
+        Assert.Contains("animation-delay:0s,0s!important", css);
+        Assert.Contains(".hello-glyph{--phase:0deg!important", css);
     }
 }
