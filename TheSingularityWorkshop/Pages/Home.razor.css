@@ -41,7 +41,12 @@
     transform: translate(-50%, -50%) !important;
 }
 
-.hypervisor-shell .avatar-portal { z-index: 1 !important; }
+.hypervisor-shell .avatar-portal {
+    z-index: 1 !important;
+    border: 2px solid #00eaff !important;
+    box-shadow: 0 0 12px rgba(0, 234, 255, .5), inset 0 0 12px rgba(0, 234, 255, .12) !important;
+    box-sizing: border-box !important;
+}
 
 .hypervisor-shell .monolith-btn:hover::before {
     transform: translate(-50%, -50%) scale(1.2) !important;
@@ -63,7 +68,7 @@
 .hello-glyph {
     transform-origin: 50% 100%;
     animation: helloGlyphAlive 3.6s ease-in-out infinite !important;
-    animation-delay: calc(var(--phase-index) * -.12s) !important;
+    animation-delay: 0s !important;
     will-change: transform, filter;
 }
 
