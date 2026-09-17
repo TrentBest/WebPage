@@ -14,6 +14,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
 {
     public const int BundleId = 2100;
 
+    private static readonly MicroBundleRegistry SharedRegistry = new();
     private readonly MicroBundle _lifecycle;
     private bool _disposed;
 
@@ -26,11 +27,18 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         Forge = new FsmForgeMicroBundle();
         SoftwarePatterns = new SoftwarePatternsMicroBundle();
         SoftwarePatternsAnnotation = new SoftwarePatternsAnnotationMicroBundle(SoftwarePatterns);
+        Moniker = GetOrLoadMoniker();
     }
 
     public ulong Id => (ulong)_lifecycle.Id;
     public MicroBundleManifestation? Manifestation => _lifecycle.Manifestation;
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
+
+    /// <summary>
+    /// The shared Workshop moniker capability. Multiple Experiences resolve this
+    /// to the same loaded bundle rather than constructing another copy.
+    /// </summary>
+    public MonikerMicroBundle Moniker { get; }
 
     public SpatialNavigationMicroBundle Navigation { get; }
     public UserMicroBundle User { get; }
@@ -39,7 +47,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     public SoftwarePatternsMicroBundle SoftwarePatterns { get; }
     public SoftwarePatternsAnnotationMicroBundle SoftwarePatternsAnnotation { get; }
 
-    /// <summary>Advances the composed capability lifecycles without owning their presentation.</summary>
+    /// <summary>Advances the composed capability lifecycles without owning the shared moniker lifecycle.</summary>
     public void Update()
     {
         if (_disposed) return;
@@ -65,5 +73,25 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         Navigation.Dispose();
         _lifecycle.Dispose();
         _disposed = true;
+    }
+
+    private static MonikerMicroBundle GetOrLoadMoniker()
+    {
+        var address = MicroBundleAddress.Create(
+            new OntologySignature(0, 0, 0, 0, 0, 0, 0, 0, MonikerMicroBundle.BundleId),
+            0);
+
+        if (SharedRegistry.TryGet(address, out var loaded) && loaded is MonikerMicroBundle existing)
+            return existing;
+
+        var created = new MonikerMicroBundle();
+        if (SharedRegistry.TryPublish(address, created))
+            return created;
+
+        // Another Experience may have populated the slot between lookup and publication.
+        created.Dispose();
+        return SharedRegistry.TryGet(address, out var winner) && winner is MonikerMicroBundle moniker
+            ? moniker
+            : throw new InvalidOperationException("The shared Workshop moniker could not be loaded.");
     }
 }
