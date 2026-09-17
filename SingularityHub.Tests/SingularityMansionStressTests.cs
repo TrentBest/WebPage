@@ -1,0 +1,40 @@
+using TheSingularityWorkshop.Gui;
+using Xunit;
+
+namespace SingularityHub.Tests;
+
+public sealed class SingularityMansionStressTests
+{
+    [Fact(DisplayName = "Incremental Unit Test 29 — Workshop contains the Singularity Mansion")]
+    public void WorkshopContainsMansionInteractable()
+    {
+        var scene = SpatialWorkshopScene.CreateDefault();
+
+        var mansion = Assert.Single(scene.Interactables.Where(item => item.ExperienceId == "mansion"));
+
+        Assert.Equal("Singularity Mansion", mansion.Name);
+        Assert.True(mansion.Bounds.Width >= 30);
+        Assert.True(mansion.Bounds.Height >= 30);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 29 — Mansion density increases line count")]
+    public void MansionDensityScalesLineCount()
+    {
+        using var baseline = SingularityMansionLineworkFactory.Create(1);
+        using var dense = SingularityMansionLineworkFactory.Create(2);
+
+        Assert.True(dense.Lines.Count > baseline.Lines.Count);
+        Assert.Equal(baseline.Lines.Count, baseline.TextureBuffer.Width);
+        Assert.Equal(dense.Lines.Count, dense.TextureBuffer.Width);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 29 — Renderer consumes the Mansion line substrate")]
+    public void RendererProducesOneRenderedLinePerMansionLine()
+    {
+        using var mansion = SingularityMansionLineworkFactory.Create(1);
+        var rendered = new SpatialLineRenderer().Render(mansion, SpatialLineStyleCatalog.Blueprint);
+
+        Assert.Equal(mansion.Lines.Count, rendered.Count);
+        Assert.Equal(mansion.Lines[0], rendered[0].Source);
+    }
+}
