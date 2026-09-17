@@ -12,10 +12,7 @@ public static class SpatialForgeLineworkFactory
     {
         var linework = new SpatialLinework();
 
-        // Exterior perimeter.
-        AddRectangle(linework, 8, 8, 84, 84);
-
-        // Entrance opening is represented by the two wall segments around the door.
+        // Exterior perimeter with an explicit entrance opening.
         AddLine(linework, 8, 8, 92, 8);
         AddLine(linework, 8, 8, 8, 92);
         AddLine(linework, 92, 8, 92, 92);
