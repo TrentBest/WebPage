@@ -8,14 +8,24 @@ namespace TheSingularityWorkshop.Workshop.Gui;
 /// Each child is built by the same builder contract, allowing a renderer to
 /// consume one tree for Blazor, WPF, Unity, Revit, or another host.
 /// </summary>
-public sealed class GuiBuilder
+public sealed class GuiBuilder : ICoreGuiBuilder<GuiNode>
 {
     private readonly NodeBuilder _root;
 
-    private GuiBuilder(NodeBuilder root)
+    private GuiBuilder(NodeBuilder root, GuiBuilder? parent = null)
     {
         _root = root;
+        Parent = parent;
     }
+
+    /// <summary>The semantic kind represented by this builder.</summary>
+    public string Kind => _root.Kind;
+
+    /// <summary>The stable semantic identifier represented by this builder.</summary>
+    public string GetBuilderId() => _root.Id;
+
+    /// <summary>The recursive parent builder, or <see langword="null"/> for a root.</summary>
+    public GuiBuilder? Parent { get; }
 
     public static GuiBuilder Create(string kind, string id)
         => new(new NodeBuilder(kind, id));
@@ -44,7 +54,7 @@ public sealed class GuiBuilder
     public GuiBuilder Child(string kind, string id, Action<GuiBuilder>? configure = null)
     {
         var child = new NodeBuilder(kind, id);
-        var builder = new GuiBuilder(child);
+        var builder = new GuiBuilder(child, this);
         configure?.Invoke(builder);
         _root.Children.Add(child);
         return this;
