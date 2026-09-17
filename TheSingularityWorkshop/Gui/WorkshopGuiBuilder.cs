@@ -49,6 +49,7 @@ public class ElementBuilder
     public ElementBuilder OnClick(Func<Task> action) => Attribute("onclick", EventCallback.Factory.Create(_receiver, action));
     public ElementBuilder OnClick(Action<MouseEventArgs> action) => Attribute("onclick", EventCallback.Factory.Create<MouseEventArgs>(_receiver, action));
     public ElementBuilder OnKeyDown(Action<KeyboardEventArgs> action) => Attribute("onkeydown", EventCallback.Factory.Create(_receiver, action));
+    public ElementBuilder OnWheel(Action<WheelEventArgs> action) => Attribute("onwheel", EventCallback.Factory.Create(_receiver, action));
     public ElementBuilder OnMouseEnter(Action action) => Attribute("onmouseenter", EventCallback.Factory.Create(_receiver, action));
     public ElementBuilder OnMouseLeave(Action action) => Attribute("onmouseleave", EventCallback.Factory.Create(_receiver, action));
     public ElementBuilder OnMouseMove(Action<MouseEventArgs> action) => Attribute("onmousemove", EventCallback.Factory.Create(_receiver, action));
