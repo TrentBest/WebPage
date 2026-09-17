@@ -31,7 +31,7 @@
     ];
 
     public ExploreExperienceMicroBundle ExperienceForTests => Experience;
-    public SpatialSceneStack SceneStackForTests => new(Router.CurrentSceneId);
+    public SpatialSceneStack SceneStackForTests => Router.SceneStack;
 
     public Explore()
     {
