@@ -67,9 +67,26 @@
 
 .hello-glyph {
     transform-origin: 50% 100%;
-    animation: helloGlyphAlive 3.6s ease-in-out infinite !important;
+    animation-name: helloGlyphAlive !important;
+    animation-duration: 3.6s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
     animation-delay: 0s !important;
     will-change: transform, filter;
+}
+
+/*
+   Moniker initialization guard.
+   The glyph renderer used to expose --phase-index, and older global CSS used
+   that value as a negative animation delay. That made the S/I/N glyphs enter
+   already part-way through their transform and visibly travel into position.
+   Keep the presentation wave, but make every glyph begin at the same local
+   animation origin. The stronger selector intentionally wins over legacy
+   global .hello-glyph rules.
+*/
+section.flex-hello .hello-moniker .hello-line .hello-glyph {
+    animation-name: helloGlyphAlive !important;
+    animation-delay: 0s !important;
 }
 
 @keyframes monikerKelpSway {
