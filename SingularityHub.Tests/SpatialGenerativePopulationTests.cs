@@ -29,7 +29,7 @@ public sealed class SpatialGenerativePopulationTests
         var firstObjects = SpatialSeededPopulationGenerator.Generate(first, region);
         var secondObjects = SpatialSeededPopulationGenerator.Generate(second, region);
 
-        Assert.NotEqual(firstObjects, secondObjects);
+        Assert.False(firstObjects.SequenceEqual(secondObjects));
     }
 
     [Fact(DisplayName = "Incremental Unit Test 45 — Generated interactables choose their own presentation")]
@@ -54,8 +54,9 @@ public sealed class SpatialGenerativePopulationTests
         var manifest = new SpatialPopulationManifest("utility", new SpatialBounds(0, 0, 500, 500), 3, new SpatialSeed("utility-v1"));
 
         var objects = SpatialSeededPopulationGenerator.Generate(manifest, new SpatialBounds(0, 0, 500, 500));
-        var functionality = Assert.Single(objects.Where(item => item.Kind == SpatialGeneratedObjectKind.Functionality).Take(1));
+        var functionality = objects.FirstOrDefault(item => item.Kind == SpatialGeneratedObjectKind.Functionality);
 
+        Assert.NotEqual(default, functionality);
         Assert.False(string.IsNullOrWhiteSpace(functionality.CapabilityId));
     }
 
@@ -63,10 +64,11 @@ public sealed class SpatialGenerativePopulationTests
     public void VastPopulationIsGeneratedByRegion()
     {
         var manifest = new SpatialPopulationManifest("city", new SpatialBounds(-100000, -100000, 200000, 200000), 1, new SpatialSeed("city-v1"));
+        var region = new SpatialBounds(5000, 5000, 100, 100);
 
-        var objects = SpatialSeededPopulationGenerator.Generate(manifest, new SpatialBounds(5000, 5000, 100, 100));
+        var objects = SpatialSeededPopulationGenerator.Generate(manifest, region);
 
         Assert.NotEmpty(objects);
-        Assert.All(objects, item => Assert.True(new SpatialBounds(5000, 5000, 100, 100).Contains(item.Position)));
+        Assert.All(objects, item => Assert.True(region.Contains(item.Position)));
     }
 }
