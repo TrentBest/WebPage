@@ -56,6 +56,31 @@ public sealed class SpatialSceneAndLineworkTests
         Assert.False(router.TryExit(out _));
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 27 — WorkshopRouter places Forge visitors inside the building")]
+    public void WorkshopRouterForgeEntryPointIsInsideInterior()
+    {
+        var router = new WorkshopRouter();
+
+        var entry = router.GetEntryPoint("forge");
+
+        Assert.Equal(new SpatialPoint(50, 78), entry);
+        Assert.True(entry.X > 8 && entry.X < 92);
+        Assert.True(entry.Y > 8 && entry.Y < 92);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 27 — WorkshopRouter exposes the Linework Lab as a nested scene")]
+    public void WorkshopRouterLineLabHasItsOwnEntryPoint()
+    {
+        var router = new WorkshopRouter();
+
+        router.Enter("forge", new SpatialPoint(50, 78));
+        router.Enter("line-lab", new SpatialPoint(50, 78));
+
+        Assert.Equal("line-lab", router.CurrentSceneId);
+        Assert.Equal(new SpatialPoint(50, 78), router.GetEntryPoint("line-lab"));
+        Assert.Equal("forge", router.Frames[^1].ParentSceneId);
+    }
+
     [Fact(DisplayName = "Incremental Unit Test 26 — squiggly styles expand a line into reusable render geometry")]
     public void LineRendererAppliesSquigglyEffect()
     {
