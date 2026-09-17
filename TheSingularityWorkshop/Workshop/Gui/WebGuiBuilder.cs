@@ -28,6 +28,14 @@ public sealed class WebGuiBuilder : ICoreGuiBuilder<RenderFragment>
     public static WebGuiBuilder Button(string id)
         => Create("Button", id);
 
+    /// <summary>Creates a semantic stack layout.</summary>
+    public static WebGuiBuilder Stack(string id)
+        => Create("Stack", id);
+
+    /// <summary>Creates a semantic grid layout.</summary>
+    public static WebGuiBuilder Grid(string id)
+        => Create("Grid", id);
+
     /// <summary>Creates a semantic text node.</summary>
     public static WebGuiBuilder Text(string id, string text)
         => Create("Text", id).Text(text);
@@ -70,9 +78,21 @@ public sealed class WebGuiBuilder : ICoreGuiBuilder<RenderFragment>
     public WebGuiBuilder Class(string value)
         => Property("class", value);
 
-    /// <summary>Sets a semantic style declaration.</summary>
+    /// <summary>Sets a semantic style declaration for web-only presentation details.</summary>
     public WebGuiBuilder Style(string name, string value)
         => Property($"style:{name}", value);
+
+    /// <summary>Sets a platform-neutral layout width token.</summary>
+    public WebGuiBuilder Width(string value)
+        => Property("layout:width", value);
+
+    /// <summary>Sets a platform-neutral layout height token.</summary>
+    public WebGuiBuilder Height(string value)
+        => Property("layout:height", value);
+
+    /// <summary>Sets a platform-neutral command identifier.</summary>
+    public WebGuiBuilder Command(string commandId)
+        => Property("command", commandId);
 
     /// <summary>
     /// Recursively composes another builder. The child is still represented by the
