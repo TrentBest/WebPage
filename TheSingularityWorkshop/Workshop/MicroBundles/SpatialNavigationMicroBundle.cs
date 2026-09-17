@@ -9,27 +9,20 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// The presentation layer never owns the visitor's position; it renders the
 /// coordinates exposed by this MicroBundle.
 /// </summary>
-public sealed class SpatialNavigationMicroBundle : IDisposable
+public sealed class SpatialNavigationMicroBundle(double startX = WorldCenterX, double startY = WorldCenterY) : IDisposable
 {
     public const int BundleId = 2101;
     public const double WorldCenterX = 50;
     public const double WorldCenterY = 50;
 
-    private readonly MicroBundle _lifecycle;
+    private readonly MicroBundle _lifecycle = new(BundleId, "SPATIAL NAVIGATION", new WebMicroBundleProvider());
     private bool _disposed;
-
-    public SpatialNavigationMicroBundle(double startX = WorldCenterX, double startY = WorldCenterY)
-    {
-        _lifecycle = new MicroBundle(BundleId, "SPATIAL NAVIGATION", new WebMicroBundleProvider());
-        X = ClampX(startX);
-        Y = ClampY(startY);
-    }
 
     public ulong Id => (ulong)_lifecycle.Id;
     public MicroBundleManifestation? Manifestation => _lifecycle.Manifestation;
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
-    public double X { get; private set; }
-    public double Y { get; private set; }
+    public double X { get; private set; } = ClampX(startX);
+    public double Y { get; private set; } = ClampY(startY);
 
     public void Move(double dx, double dy)
     {
