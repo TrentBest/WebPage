@@ -7,12 +7,15 @@ namespace TheSingularityWorkshop.Gui;
 /// </summary>
 public static class SingularityMansionLineworkFactory
 {
+    /// <summary>Creates the baseline mansion density.</summary>
+    public static SpatialLinework Create() => Create(1);
+
     /// <summary>
     /// Creates the mansion at the requested room-matrix density.
     /// Density 1 is the baseline architectural scene; higher values subdivide the same footprint
     /// so line counts can be increased without changing the perception-space bounds.
     /// </summary>
-    public static SpatialLinework Create(int density = 1)
+    public static SpatialLinework Create(int density)
     {
         if (density < 1)
             throw new ArgumentOutOfRangeException(nameof(density), "Mansion density must be at least one.");
