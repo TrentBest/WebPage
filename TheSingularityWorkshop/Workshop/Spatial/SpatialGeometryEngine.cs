@@ -1,21 +1,10 @@
 namespace TheSingularityWorkshop.Gui;
 
 /// <summary>Primitive families understood by the Workshop spatial geometry layer.</summary>
-public enum SpatialGeometryKind
-{
-    Line,
-    Rectangle,
-    Circle,
-    Wall
-}
+public enum SpatialGeometryKind { Line, Rectangle, Circle, Wall }
 
 /// <summary>Semantic opening cut into a wall perimeter.</summary>
-public enum SpatialOpeningKind
-{
-    Door,
-    Window,
-    Passage
-}
+public enum SpatialOpeningKind { Door, Window, Passage }
 
 /// <summary>A wall opening expressed along one edge of an axis-aligned building.</summary>
 public readonly record struct SpatialOpening(SpatialOpeningKind Kind, SpatialGeometryEdge Edge, double Start, double End)
@@ -24,13 +13,7 @@ public readonly record struct SpatialOpening(SpatialOpeningKind Kind, SpatialGeo
 }
 
 /// <summary>One of the four edges of an axis-aligned spatial rectangle.</summary>
-public enum SpatialGeometryEdge
-{
-    Top,
-    Right,
-    Bottom,
-    Left
-}
+public enum SpatialGeometryEdge { Top, Right, Bottom, Left }
 
 /// <summary>A paired-line wall with a muted fill between its high-energy edge lines.</summary>
 public readonly record struct SpatialWall(SpatialLine Outer, SpatialLine Inner, string Accent, string Fill);
@@ -48,7 +31,7 @@ public static class SpatialGeometryEngine
     public static IReadOnlyList<SpatialBuildingGeometry> FromInteractables(IReadOnlyList<SpatialInteractable> interactables)
         => interactables.Select(item => new SpatialBuildingGeometry(item.Id, item.Bounds, AccentFor(item.Id), FillFor(item.Id), item.Openings)).ToArray();
 
-    /// <summary>Returns the paired neon perimeter lines for a building.</summary>
+    /// <summary>Returns paired neon perimeter lines, split around declared openings.</summary>
     public static IReadOnlyList<SpatialWall> BuildWalls(SpatialBuildingGeometry building)
     {
         var b = building.Bounds;
@@ -71,9 +54,22 @@ public static class SpatialGeometryEngine
         var walls = new List<SpatialWall>();
         for (var edge = 0; edge < 4; edge++)
         {
-            var edgeOpenings = building.Openings.Where(opening => (int)opening.Edge == edge).Select(opening => (Start: opening.Start, End: opening.End)).ToArray();
-            foreach (var range in ClosedIntervals(0, EdgeLength(b, (SpatialGeometryEdge)edge), edgeOpenings))
-                walls.Add(new SpatialWall(Subsegment(outer[edge], range.Start, range.End), Subsegment(inner[edge], range.Start, range.End), building.Accent, building.Fill));
+            var geometryEdge = (SpatialGeometryEdge)edge;
+            var length = EdgeLength(b, geometryEdge);
+            var openings = building.Openings
+                .Where(opening => opening.Edge == geometryEdge)
+                .Select(opening => (Start: opening.Start, End: opening.End));
+
+            foreach (var range in ClosedIntervals(length, openings))
+            {
+                var start = range.Start / length;
+                var end = range.End / length;
+                walls.Add(new SpatialWall(
+                    SubsegmentByFraction(outer[edge], start, end),
+                    SubsegmentByFraction(inner[edge], start, end),
+                    building.Accent,
+                    building.Fill));
+            }
         }
         return walls;
     }
@@ -112,7 +108,6 @@ public static class SpatialGeometryEngine
         var current = start;
         var route = new List<SpatialPoint>();
         var remaining = candidates.Where(point => !InsideAny(point, obstacles, clearance)).Distinct().ToList();
-
         for (var guard = 0; guard < obstacles.Count + 2 && !IsClear(current, target, obstacles, clearance); guard++)
         {
             var next = remaining.Where(point => IsClear(current, point, obstacles, clearance)).OrderBy(point => Distance(point, target)).FirstOrDefault();
@@ -142,7 +137,7 @@ public static class SpatialGeometryEngine
     private static double EdgeLength(SpatialBounds bounds, SpatialGeometryEdge edge)
         => edge is SpatialGeometryEdge.Top or SpatialGeometryEdge.Bottom ? bounds.Width : bounds.Height;
 
-    private static IEnumerable<(double Start, double End)> ClosedIntervals(double length, double unused, IReadOnlyList<(double Start, double End)> openings)
+    private static IEnumerable<(double Start, double End)> ClosedIntervals(double length, IEnumerable<(double Start, double End)> openings)
     {
         var cursor = 0d;
         foreach (var opening in openings.OrderBy(item => item.Start))
@@ -155,15 +150,14 @@ public static class SpatialGeometryEngine
         if (cursor < length) yield return (cursor, length);
     }
 
-    private static SpatialLine Subsegment(SpatialLine line, double start, double end)
+    private static SpatialLine SubsegmentByFraction(SpatialLine line, double start, double end)
     {
-        var dx = line.End.X - line.Start.X;
-        var dy = line.End.Y - line.Start.Y;
-        var length = Math.Sqrt(dx * dx + dy * dy);
-        if (length <= double.Epsilon) return line;
-        var a = start / length;
-        var b = end / length;
-        return new SpatialLine(line.Index, new SpatialPoint(line.Start.X + dx * a, line.Start.Y + dy * a), new SpatialPoint(line.Start.X + dx * b, line.Start.Y + dy * b));
+        start = Math.Clamp(start, 0, 1);
+        end = Math.Clamp(end, 0, 1);
+        return new SpatialLine(
+            line.Index,
+            new SpatialPoint(line.Start.X + (line.End.X - line.Start.X) * start, line.Start.Y + (line.End.Y - line.Start.Y) * start),
+            new SpatialPoint(line.Start.X + (line.End.X - line.Start.X) * end, line.Start.Y + (line.End.Y - line.Start.Y) * end));
     }
 
     private static bool SegmentsIntersect(SpatialPoint a, SpatialPoint b, SpatialPoint c, SpatialPoint d)
