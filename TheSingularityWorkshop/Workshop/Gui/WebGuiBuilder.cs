@@ -91,14 +91,6 @@ public sealed class WebGuiBuilder : ICoreGuiBuilder<RenderFragment>
         return this;
     }
 
-    /// <summary>Adds a semantic child builder.</summary>
-    public WebGuiBuilder Child(WebGuiBuilder child)
-    {
-        ArgumentNullException.ThrowIfNull(child);
-        _semanticBuilder.Child(child._semanticBuilder.Build().Kind, child.GetBuilderId(), child.ConfigureSemantic);
-        return this;
-    }
-
     /// <summary>Builds the platform-neutral GUI tree.</summary>
     public GuiNode BuildNode() => _semanticBuilder.Build();
 
@@ -106,39 +98,4 @@ public sealed class WebGuiBuilder : ICoreGuiBuilder<RenderFragment>
     public RenderFragment Build()
         => BlazorGuiRenderer.Render(BuildNode());
 
-    private void ConfigureSemantic(GuiBuilder target)
-    {
-        var node = _semanticBuilder.Build();
-        foreach (var property in node.Properties)
-            target.Property(property.Key, property.Value);
-
-        if (node.Text is not null)
-            target.Text(node.Text);
-
-        if (node.Source is not null)
-            target.Image(node.Source);
-
-        foreach (var child in node.Children)
-        {
-            target.Child(
-                child.Kind,
-                child.Id,
-                nested => ConfigureNode(nested, child));
-        }
-    }
-
-    private static void ConfigureNode(GuiBuilder target, GuiNode node)
-    {
-        if (node.Text is not null)
-            target.Text(node.Text);
-
-        if (node.Source is not null)
-            target.Image(node.Source);
-
-        foreach (var property in node.Properties)
-            target.Property(property.Key, property.Value);
-
-        foreach (var child in node.Children)
-            target.Child(child.Kind, child.Id, nested => ConfigureNode(nested, child));
-    }
 }
