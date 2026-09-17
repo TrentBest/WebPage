@@ -51,7 +51,9 @@ public class ElementBuilder
     public ElementBuilder OnKeyDown(Action<KeyboardEventArgs> action) => Attribute("onkeydown", EventCallback.Factory.Create(_receiver, action));
     public ElementBuilder OnMouseEnter(Action action) => Attribute("onmouseenter", EventCallback.Factory.Create(_receiver, action));
     public ElementBuilder OnMouseLeave(Action action) => Attribute("onmouseleave", EventCallback.Factory.Create(_receiver, action));
-    public ElementBuilder OnMouseMove(Action<MouseEventArgs> action) => Attribute("onmousemove", EventCallback.Factory.Create<MouseEventArgs>(_receiver, action));
+    public ElementBuilder OnMouseMove(Action<MouseEventArgs> action) => Attribute("onmousemove", EventCallback.Factory.Create(_receiver, action));
+    public ElementBuilder OnMouseDown(Action<MouseEventArgs> action) => Attribute("onmousedown", EventCallback.Factory.Create(_receiver, action));
+    public ElementBuilder OnMouseUp(Action<MouseEventArgs> action) => Attribute("onmouseup", EventCallback.Factory.Create(_receiver, action));
 
     /// <summary>Prevents a child interaction from bubbling into a parent command surface.</summary>
     public ElementBuilder StopPropagation(string eventName) => Attribute($"{eventName}:stopPropagation", true);
