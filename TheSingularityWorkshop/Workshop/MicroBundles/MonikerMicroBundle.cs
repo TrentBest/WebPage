@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TheSingularityWorkshop.FSM_API;
 using TheSingularityWorkshop.SingularityHub;
+using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
@@ -9,7 +10,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// Reusable MicroBundle providing the Workshop moniker as a safe semantic capability.
 /// The bundle owns lifecycle through FSM_API; a host may choose any visual manifestation.
 /// </summary>
-public sealed class MonikerMicroBundle : IMicroBundle, IDisposable
+public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
 {
     public const int BundleId = 2110;
     public const string DefaultText = "THE SINGULARITY WORKSHOP";
@@ -49,13 +50,16 @@ public sealed class MonikerMicroBundle : IMicroBundle, IDisposable
         FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
     }
 
-    /// <summary>Stable Workshop identity.</summary>
-    public ulong Id => BundleId;
+    /// <summary>Stable integer identity used by compact Workshop protocols.</summary>
+    public int Id => BundleId;
+
+    /// <summary>Stable Hub identity projection.</summary>
+    ulong HubBundle.Id => checked((ulong)Id);
 
     /// <summary>Semantic moniker text supplied by this bundle.</summary>
     public string Text { get; }
 
-    /// <summary>Runtime state context, exposed for diagnostics and host integration.</summary>
+    /// <summary>Runtime context carried by this bundle's FSM.</summary>
     public IStateContext Context { get; }
 
     /// <summary>Current FSM state, suitable for lightweight state queries.</summary>
@@ -64,9 +68,14 @@ public sealed class MonikerMicroBundle : IMicroBundle, IDisposable
     /// <summary>Whether the bundle has reached its safe default state.</summary>
     public bool IsReady => Status == "Ready";
 
-    public OntologySignature Ontology => new(0, 0, 0, 0, 0, 0, 0, 0, BundleId);
-    public BundleVersion Version => new(1, 0, 0);
-    public IReadOnlyList<ulong> Dependencies => Array.Empty<ulong>();
+    /// <summary>Hub-facing ontology projection for the reusable moniker capability.</summary>
+    OntologySignature HubBundle.Ontology => new(0, 0, 0, 0, 0, 0, 0, 0, BundleId);
+
+    /// <summary>Hub-facing bundle version.</summary>
+    BundleVersion HubBundle.Version => new(1, 0, 0);
+
+    /// <summary>The moniker has no required MicroBundle dependencies.</summary>
+    IReadOnlyList<ulong> HubBundle.Dependencies => Array.Empty<ulong>();
 
     /// <summary>Requests presentation without prescribing the host's visual implementation.</summary>
     public void Present()
@@ -90,7 +99,7 @@ public sealed class MonikerMicroBundle : IMicroBundle, IDisposable
     }
 
     /// <summary>Participates in Hub arbitration without exposing implementation details.</summary>
-    public bool Arbitrate(IArbitrator arbitrator, int roundIndex)
+    bool HubBundle.Arbitrate(IArbitrator arbitrator, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(arbitrator);
         return roundIndex >= 0 && !_disposed;
@@ -120,8 +129,14 @@ public sealed class MonikerMicroBundle : IMicroBundle, IDisposable
 
     private sealed class MonikerContext : IStateContext
     {
-        public MonikerContext(string text) => Text = text;
+        public MonikerContext(string text)
+        {
+            Name = "Workshop Moniker";
+            Text = text;
+        }
 
+        public string Name { get; set; }
+        public bool IsValid { get; set; } = true;
         public string Text { get; }
         public string Phase { get; set; } = "Created";
         public bool PresentationRequested { get; set; }
