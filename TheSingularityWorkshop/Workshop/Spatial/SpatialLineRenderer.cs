@@ -1,22 +1,5 @@
 namespace TheSingularityWorkshop.Gui;
 
-/// <summary>Visual effects that can be applied to reusable spatial line styles.</summary>
-public enum SpatialLineEffect
-{
-    Solid,
-    Squiggly,
-    Dashed
-}
-
-/// <summary>Reusable visual definition for a line primitive.</summary>
-public sealed record SpatialLineStyle(
-    string Id,
-    string Stroke,
-    double Width,
-    double Opacity,
-    SpatialLineEffect Effect = SpatialLineEffect.Solid,
-    double EffectAmount = 1d);
-
 /// <summary>A renderer-neutral line ready for a perception backend.</summary>
 public readonly record struct SpatialRenderedLine(
     SpatialLine Source,
