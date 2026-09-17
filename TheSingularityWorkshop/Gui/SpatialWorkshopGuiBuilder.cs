@@ -23,7 +23,8 @@ public static class SpatialWorkshopGuiBuilder
         Func<MouseEventArgs, Task> onWorldClick,
         Func<string, Task> interact,
         double zoom = 1d,
-        Action<double>? setZoom = null)
+        Action<double>? setZoom = null,
+        Action? showMap = null)
     {
         var effectiveZoom = new SpatialCamera(avatarX, avatarY, zoom).Clamped().Zoom;
         var zoomEnabled = scene.View.ZoomEnabled && setZoom is not null;
@@ -33,7 +34,7 @@ public static class SpatialWorkshopGuiBuilder
             .Style("font-family", "Consolas, 'Courier New', monospace").Attribute("id", "workshop-spatial-experience");
         root.Content(Styles(receiver));
         root.Content(World(receiver, scene, avatarX, avatarY, detailLevel, effectiveZoom, zoomEnabled, onKeyDown, onWorldClick, interact, setZoom));
-        root.Content(ViewBar(receiver, detailLevel, setDetailLevel, effectiveZoom, zoomEnabled, setZoom));
+        root.Content(ViewBar(receiver, detailLevel, setDetailLevel, effectiveZoom, zoomEnabled, setZoom, showMap));
         root.Content(ConstructionBanner(receiver));
         return root;
     }
@@ -150,7 +151,7 @@ public static class SpatialWorkshopGuiBuilder
             .Style("border-radius", "50%").Style("box-shadow", $"0 0 12px {White}88")
             .Style("transform", "translate(-50%,-50%)").Style("z-index", "10").Style("pointer-events", "none");
 
-    private static ElementBuilder ViewBar(object receiver, int detailLevel, Action<int> setDetailLevel, double zoom, bool zoomEnabled, Action<double>? setZoom)
+    private static ElementBuilder ViewBar(object receiver, int detailLevel, Action<int> setDetailLevel, double zoom, bool zoomEnabled, Action<double>? setZoom, Action? showMap)
     {
         var bar = WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("right", "1rem").Style("top", "1rem")
             .Style("z-index", "30").Style("display", "flex").Style("gap", ".25rem").Style("align-items", "center")
@@ -164,6 +165,8 @@ public static class SpatialWorkshopGuiBuilder
             bar.Content(WorkshopGui.Element(receiver, "span").Style("margin-left", ".35rem").Style("padding", "0 .35rem").Style("font-size", ".45rem").Style("letter-spacing", ".12em").Style("color", Yellow).Text($"ZOOM {zoom:0.00}X"));
             bar.Content(ViewButton(receiver, "RESET", () => setZoom(1d)));
         }
+        if (showMap is not null)
+            bar.Content(ViewButton(receiver, "MAP", showMap));
         return bar;
     }
 
