@@ -25,7 +25,9 @@ public static class SpatialMansionGuiBuilder
         Action<MouseEventArgs> onWorldClick,
         Action<KeyboardEventArgs> onKeyDown,
         Action<int> setDensity,
-        Action exit)
+        Action exit,
+        bool showWelcome,
+        Action dismissWelcome)
     {
         var renderStart = Stopwatch.GetTimestamp();
         var rendered = new SpatialLineRenderer().Render(mansion, SpatialLineStyleCatalog.Blueprint);
@@ -67,7 +69,6 @@ public static class SpatialMansionGuiBuilder
                 .Style("pointer-events", "none"));
         }
 
-        // The avatar remains part of the spatial world rather than becoming a fixed HUD element.
         svg.Child(WorkshopGui.Element(receiver, "circle")
             .Attribute("cx", avatarX).Attribute("cy", avatarY).Attribute("r", ".8")
             .Attribute("fill", White).Attribute("stroke", Cyan).Attribute("stroke-width", ".18")
@@ -83,17 +84,34 @@ public static class SpatialMansionGuiBuilder
             .Style("font-family", "inherit").Style("font-size", ".48rem")
             .Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(exit));
 
+        if (showWelcome)
+            root.Content(Welcome(receiver, dismissWelcome));
+
         return root;
     }
 
-    private static ElementBuilder Hud(
-        object receiver,
-        string avatarName,
-        int density,
-        int lineCount,
-        double renderMicroseconds,
-        double textureMicroseconds,
-        int gpuPayloadBytes)
+    /// <summary>Temporary first-visit orientation explaining why the Mansion exists.</summary>
+    private static ElementBuilder Welcome(object receiver, Action dismiss)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "fixed").Style("left", "50%").Style("top", "50%").Style("transform", "translate(-50%,-50%)")
+            .Style("z-index", "100").Style("width", "min(680px,84vw)").Style("padding", "1.5rem")
+            .Style("box-sizing", "border-box").Style("border", $"1px solid {Cyan}aa")
+            .Style("background", "rgba(2,8,18,.97)").Style("box-shadow", $"0 0 70px {Cyan}22,inset 0 0 35px {Cyan}08")
+            .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".7rem").Style("letter-spacing", ".28em").Text("WELCOME TO THE SINGULARITY MANSION"))
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".8rem").Style("color", Yellow).Style("font-size", ".5rem").Style("letter-spacing", ".18em").Text("LINE RENDERING STRESS LAB"))
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "1rem").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".9rem").Text("This mansion is deliberately excessive. Its job is to draw lots of ornate lines — lots of them."))
+            .Content(WorkshopGui.Element(receiver, "ol").Style("margin", "1rem 0").Style("padding-left", "1.3rem").Style("color", "#b8c9d0").Style("font-family", "system-ui,sans-serif").Style("font-size", ".7rem").Style("line-height", "1.7")
+                .Content(WorkshopGui.Element(receiver, "li").Text("Walk around the line-rendered mansion and watch the world move around you."))
+                .Content(WorkshopGui.Element(receiver, "li").Text("Increase the density when you want to press the renderer harder."))
+                .Content(WorkshopGui.Element(receiver, "li").Text("Watch the line count, render conversion, RGBA texel build, and GPU payload measurements."))
+                .Content(WorkshopGui.Element(receiver, "li").Text("We are looking for the point where the current architecture reaches its practical limits."))
+                .Content(WorkshopGui.Element(receiver, "li").Text("Those measurements will tell us where to make the next jump: warmer data shelves, tighter buffers, GPU adjacency, and eventually an orthogonal 3D view.")))
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".8rem").Style("color", Magenta).Style("font-size", ".46rem").Style("letter-spacing", ".14em").Text("THIS IS A MEASURING INSTRUMENT DISGUISED AS A MANSION."))
+            .Content(WorkshopGui.Button(receiver).Label("UNDERSTOOD — LET'S STRESS THE LINES")
+                .Style("margin-top", "1.1rem").Style("padding", ".65rem 1rem").Style("border", $"1px solid {Cyan}88").Style("background", $"{Cyan}10")
+                .Style("color", Cyan).Style("font-family", "inherit").Style("font-size", ".5rem").Style("letter-spacing", ".14em").Style("cursor", "pointer").OnClick(dismiss));
+
+    private static ElementBuilder Hud(object receiver, string avatarName, int density, int lineCount, double renderMicroseconds, double textureMicroseconds, int gpuPayloadBytes)
         => WorkshopGui.Element(receiver, "div")
             .Style("position", "fixed").Style("left", "1rem").Style("top", "1rem").Style("z-index", "30")
             .Style("padding", ".55rem .7rem").Style("border", $"1px solid {Cyan}66")
