@@ -21,6 +21,9 @@
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
     private bool mansionWelcomeVisible;
+    private bool workshopMapVisible = true;
+    private double spatialZoom = 1d;
+    private double mansionZoom = 1d;
     private string? insideRoomId;
     private int detailLevel = 16;
     private int mansionDensity = 1;
@@ -61,7 +64,7 @@
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
 
         if (insideRoomId == "mansion")
-            return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome);
+            return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome, mansionZoom, SetMansionZoom);
 
         if (insideRoomId is not null)
         {
@@ -73,14 +76,38 @@
             return SpatialInteriorGuiBuilder.Build(this, title, description, Experience.User.DisplayName, ExitRoom);
         }
 
-        var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom);
-        return WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(UserNameLabel());
+        var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap);
+        var root = WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(UserNameLabel());
+        if (workshopMapVisible)
+            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap));
+        return root;
     }
 
     private ElementBuilder UserNameLabel()
         => WorkshopGui.Element(this, "span").Style("position", "fixed").Style("left", "50%").Style("top", "calc(50% - 24px)").Style("transform", "translateX(-50%)").Style("z-index", "20").Style("padding", ".12rem .35rem").Style("border", "1px solid rgba(255,255,255,.18)").Style("background", "rgba(1,4,10,.82)").Style("color", "#ffffff").Style("font-family", "Consolas, 'Courier New', monospace").Style("font-size", ".5rem").Style("letter-spacing", ".12em").Style("white-space", "nowrap").Style("pointer-events", "none").Text(Experience.User.DisplayName);
 
     private void SetDetailLevel(int level) => detailLevel = Math.Clamp(level, 1, 64);
+
+    private void SetSpatialZoom(double zoom)
+        => spatialZoom = Math.Clamp(zoom, Scene.View.MinZoom, Scene.View.MaxZoom);
+
+    private void SetMansionZoom(double zoom)
+        => mansionZoom = Math.Clamp(zoom, Scene.View.MinZoom, Scene.View.MaxZoom);
+
+    private void ShowWorkshopMap() => workshopMapVisible = true;
+    private void CloseWorkshopMap() => workshopMapVisible = false;
+
+    private async Task SelectMapDestination(string id)
+    {
+        if (insideRoomId is not null) return;
+        var interactable = Scene.Interactables.FirstOrDefault(item => item.Id == id);
+        if (interactable is null) return;
+
+        workshopMapVisible = false;
+        await InvokeAsync(StateHasChanged);
+        await NavigateTo(Center(interactable.InteractionPoint));
+    }
+
     private void SetMansionDensity(int density)
     {
         mansionDensity = Math.Max(1, density);
@@ -123,9 +150,9 @@
     /// <summary>Converts an empty-space left click into a collision-safe world destination.</summary>
     private async Task HandleWorldClick(MouseEventArgs args)
     {
-        if (insideRoomId is not null) return;
+        if (insideRoomId is not null || workshopMapVisible) return;
         spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
-        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToWorld", args.ClientX, args.ClientY, AvatarX, AvatarY);
+        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToWorld", args.ClientX, args.ClientY, AvatarX, AvatarY, spatialZoom);
         await NavigateTo(point);
     }
 
@@ -134,7 +161,7 @@
     {
         if (insideRoomId != "mansion") return;
         spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
-        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToCenteredWorld", args.ClientX, args.ClientY, AvatarX, AvatarY);
+        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToCenteredWorld", args.ClientX, args.ClientY, AvatarX, AvatarY, mansionZoom);
         await NavigateMansionTo(point);
     }
 
