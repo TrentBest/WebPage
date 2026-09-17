@@ -32,7 +32,7 @@ public sealed class SpatialWorkshopScene
                 Building("npc-studio", "npc-studio", new SpatialBounds(11, 45, 4, 3)),
                 Building("fsm-bench", "fsm-workbench", new SpatialBounds(36, 43, 4, 3)),
                 Building("storage-bins", "storage", new SpatialBounds(87, 66, 3, 3)),
-                Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(79, 60, 5, 3))
+                Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(81, 56, 5, 3))
             ],
             SpatialViewSettings.CreateDefault(),
             new SpatialConstructionSite("workshop-expansion", "WORKSHOP EXPANSION SITE", new SpatialBounds(34, 64, 24, 22), new SpatialBounds(39, 69, 14, 12)),
