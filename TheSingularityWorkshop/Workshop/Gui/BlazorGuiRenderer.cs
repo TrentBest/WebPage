@@ -28,10 +28,19 @@ public static class BlazorGuiRenderer
         {
             if (property.Key.StartsWith("style:", StringComparison.Ordinal))
             {
-                if (style.Length > 0)
-                    style.Append(';');
+                AppendStyle(style, property.Key[6..], property.Value);
+                continue;
+            }
 
-                style.Append(property.Key[6..]).Append(':').Append(property.Value);
+            if (property.Key.StartsWith("layout:", StringComparison.Ordinal))
+            {
+                AppendStyle(style, property.Key[7..], property.Value);
+                continue;
+            }
+
+            if (property.Key.Equals("command", StringComparison.Ordinal))
+            {
+                builder.AddAttribute(sequence++, "data-command", property.Value);
                 continue;
             }
 
@@ -52,6 +61,14 @@ public static class BlazorGuiRenderer
 
         builder.CloseElement();
         return sequence;
+    }
+
+    private static void AppendStyle(StringBuilder style, string name, string value)
+    {
+        if (style.Length > 0)
+            style.Append(';');
+
+        style.Append(name).Append(':').Append(value);
     }
 
     private static string ResolveTag(string kind) => kind switch
