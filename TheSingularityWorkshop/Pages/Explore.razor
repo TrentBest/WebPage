@@ -15,6 +15,7 @@
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
     private readonly WorkshopRouter Router = new("workshop");
+    private readonly SpatialLinework ForgeStructure = SpatialForgeLineworkFactory.Create();
     private readonly SpatialLinework ForgeLinework = new();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
@@ -50,7 +51,7 @@
             return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
 
         if (insideRoomId == "forge")
-            return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, EnterLineLab, ExitRoom);
+            return SpatialForgeGuiBuilder.Build(this, ForgeStructure, Experience.User.DisplayName, EnterLineLab, ExitRoom);
 
         if (insideRoomId == "line-lab")
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
@@ -230,6 +231,7 @@
     public void Dispose()
     {
         Experience.Dispose();
+        ForgeStructure.Dispose();
         ForgeLinework.Dispose();
         if (spatialModule is not null) _ = spatialModule.DisposeAsync();
     }
