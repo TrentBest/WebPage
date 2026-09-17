@@ -33,6 +33,29 @@ public sealed class SpatialSceneAndLineworkTests
         Assert.False(new SpatialSceneStack("workshop").TryPop(out _));
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 26 — WorkshopRouter owns nested spatial traversal")]
+    public void WorkshopRouterRoutesIntoAndBackOutOfNestedScenes()
+    {
+        var router = new WorkshopRouter();
+
+        router.Enter("forge", new SpatialPoint(78, 41));
+        router.Enter("line-lab", new SpatialPoint(50, 50));
+
+        Assert.Equal("line-lab", router.CurrentSceneId);
+        Assert.Equal(3, router.Depth);
+
+        Assert.True(router.TryExit(out var frame));
+        Assert.Equal("line-lab", frame.SceneId);
+        Assert.Equal("forge", router.CurrentSceneId);
+        Assert.Equal(new SpatialPoint(50, 50), frame.ReturnPosition);
+
+        Assert.True(router.TryExit(out frame));
+        Assert.Equal("forge", frame.SceneId);
+        Assert.Equal("workshop", router.CurrentSceneId);
+        Assert.Equal(new SpatialPoint(78, 41), frame.ReturnPosition);
+        Assert.False(router.TryExit(out _));
+    }
+
     [Fact(DisplayName = "Incremental Unit Test 26 — squiggly styles expand a line into reusable render geometry")]
     public void LineRendererAppliesSquigglyEffect()
     {
