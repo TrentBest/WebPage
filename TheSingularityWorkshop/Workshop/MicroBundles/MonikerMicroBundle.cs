@@ -1,0 +1,130 @@
+using System;
+using System.Collections.Generic;
+using TheSingularityWorkshop.FSM_API;
+using TheSingularityWorkshop.SingularityHub;
+
+namespace TheSingularityWorkshop.Workshop.MicroBundles;
+
+/// <summary>
+/// Reusable MicroBundle providing the Workshop moniker as a safe semantic capability.
+/// The bundle owns lifecycle through FSM_API; a host may choose any visual manifestation.
+/// </summary>
+public sealed class MonikerMicroBundle : IMicroBundle, IDisposable
+{
+    public const int BundleId = 2110;
+    public const string DefaultText = "THE SINGULARITY WORKSHOP";
+    public const string FsmName = "WorkshopMonikerFSM";
+    public const string ProcessingGroup = "WorkshopMoniker";
+
+    private readonly FSMHandle _fsm;
+    private bool _disposed;
+
+    /// <summary>Creates the default moniker manifestation with no host-specific initialization required.</summary>
+    public MonikerMicroBundle(string text = DefaultText)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            throw new ArgumentException("Moniker text cannot be empty.", nameof(text));
+
+        Text = text;
+        Context = new MonikerContext(text);
+
+        FSM_API.FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
+        FSM_API.FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
+            .State("Created", onEnter: EnterCreated, onUpdate: _ => { }, onExit: _ => { })
+            .State("Ready", onEnter: EnterReady, onUpdate: _ => { }, onExit: _ => { })
+            .State("Presenting", onEnter: EnterPresenting, onUpdate: _ => { }, onExit: _ => { })
+            .State("Removing", onEnter: EnterRemoving, onUpdate: _ => { }, onExit: _ => { })
+            .State("Destroyed", onEnter: EnterDestroyed, onUpdate: _ => { }, onExit: _ => { })
+            .Transition("Created", "Ready", _ => true)
+            .Transition("Ready", "Presenting", c => ((MonikerContext)c).PresentationRequested)
+            .Transition("Presenting", "Removing", c => ((MonikerContext)c).RemovalRequested)
+            .Transition("Removing", "Ready", c => !((MonikerContext)c).RemovalRequested)
+            .WithInitialState("Created")
+            .BuildDefinition();
+
+        _fsm = FSM_API.FSM_API.Create.CreateInstance(FsmName, Context, ProcessingGroup);
+
+        // Establish the safe default immediately. Consumers never need to know how
+        // to initialize the bundle before they can obtain its provided capability.
+        FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
+    }
+
+    /// <summary>Stable Workshop identity.</summary>
+    public ulong Id => BundleId;
+
+    /// <summary>Semantic moniker text supplied by this bundle.</summary>
+    public string Text { get; }
+
+    /// <summary>Runtime state context, exposed for diagnostics and host integration.</summary>
+    public IStateContext Context { get; }
+
+    /// <summary>Current FSM state, suitable for lightweight state queries.</summary>
+    public string Status => _fsm.CurrentState;
+
+    /// <summary>Whether the bundle has reached its safe default state.</summary>
+    public bool IsReady => Status == "Ready";
+
+    public OntologySignature Ontology => new(0, 0, 0, 0, 0, 0, 0, 0, BundleId);
+    public BundleVersion Version => new(1, 0, 0);
+    public IReadOnlyList<ulong> Dependencies => Array.Empty<ulong>();
+
+    /// <summary>Requests presentation without prescribing the host's visual implementation.</summary>
+    public void Present()
+    {
+        if (_disposed) return;
+        ((MonikerContext)Context).PresentationRequested = true;
+    }
+
+    /// <summary>Requests removal of the current presentation.</summary>
+    public void Remove()
+    {
+        if (_disposed) return;
+        ((MonikerContext)Context).RemovalRequested = true;
+    }
+
+    /// <summary>Advances the bundle's FSM lifecycle.</summary>
+    public void Update()
+    {
+        if (_disposed) return;
+        FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
+    }
+
+    /// <summary>Participates in Hub arbitration without exposing implementation details.</summary>
+    public bool Arbitrate(IArbitrator arbitrator, int roundIndex)
+    {
+        ArgumentNullException.ThrowIfNull(arbitrator);
+        return roundIndex >= 0 && !_disposed;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(FsmName, ProcessingGroup);
+        _disposed = true;
+    }
+
+    private static void EnterCreated(IStateContext context)
+        => ((MonikerContext)context).Phase = "Created";
+
+    private static void EnterReady(IStateContext context)
+        => ((MonikerContext)context).Phase = "Ready";
+
+    private static void EnterPresenting(IStateContext context)
+        => ((MonikerContext)context).Phase = "Presenting";
+
+    private static void EnterRemoving(IStateContext context)
+        => ((MonikerContext)context).Phase = "Removing";
+
+    private static void EnterDestroyed(IStateContext context)
+        => ((MonikerContext)context).Phase = "Destroyed";
+
+    private sealed class MonikerContext : IStateContext
+    {
+        public MonikerContext(string text) => Text = text;
+
+        public string Text { get; }
+        public string Phase { get; set; } = "Created";
+        public bool PresentationRequested { get; set; }
+        public bool RemovalRequested { get; set; }
+    }
+}
