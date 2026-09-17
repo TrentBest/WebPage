@@ -14,9 +14,11 @@ public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
 {
     public const int BundleId = 2110;
     public const string DefaultText = "THE SINGULARITY WORKSHOP";
-    public const string FsmName = "WorkshopMonikerFSM";
-    public const string ProcessingGroup = "WorkshopMoniker";
+    public const string FsmNamePrefix = "WorkshopMonikerFSM";
+    public const string ProcessingGroupPrefix = "WorkshopMoniker";
 
+    private readonly string _fsmName = $"{FsmNamePrefix}_{Guid.NewGuid():N}";
+    private readonly string _processingGroup = $"{ProcessingGroupPrefix}_{Guid.NewGuid():N}";
     private readonly FSMHandle _fsm;
     private bool _disposed;
 
@@ -29,8 +31,8 @@ public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
         Text = text;
         Context = new MonikerContext(text);
 
-        FSM_API.FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
+        FSM_API.FSM_API.Create.CreateProcessingGroup(_processingGroup);
+        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_fsmName, -1, _processingGroup)
             .State("Created", onEnter: EnterCreated, onUpdate: _ => { }, onExit: _ => { })
             .State("Ready", onEnter: EnterReady, onUpdate: _ => { }, onExit: _ => { })
             .State("Presenting", onEnter: EnterPresenting, onUpdate: _ => { }, onExit: _ => { })
@@ -43,11 +45,11 @@ public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
             .WithInitialState("Created")
             .BuildDefinition();
 
-        _fsm = FSM_API.FSM_API.Create.CreateInstance(FsmName, Context, ProcessingGroup);
+        _fsm = FSM_API.FSM_API.Create.CreateInstance(_fsmName, Context, _processingGroup);
 
         // Establish the safe default immediately. Consumers never need to know how
         // to initialize the bundle before they can obtain its provided capability.
-        FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
+        FSM_API.FSM_API.Interaction.Update(_processingGroup);
     }
 
     /// <summary>Stable integer identity used by compact Workshop protocols.</summary>
@@ -95,7 +97,7 @@ public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
     public void Update()
     {
         if (_disposed) return;
-        FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
+        FSM_API.FSM_API.Interaction.Update(_processingGroup);
     }
 
     /// <summary>Participates in Hub arbitration without exposing implementation details.</summary>
@@ -108,7 +110,7 @@ public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(FsmName, ProcessingGroup);
+        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_fsmName, _processingGroup);
         _disposed = true;
     }
 
