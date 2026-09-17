@@ -18,13 +18,12 @@ public sealed class SpatialWorkshopScene
     public SpatialViewSettings View { get; }
     public IReadOnlyList<ConstructionVehicle> ConstructionVehicles { get; }
 
-    /// <summary>Creates the first high-tech Workshop complex around a clear central origin.</summary>
     public static SpatialWorkshopScene CreateDefault()
         => new("center", new SpatialPoint(50, 50),
             [
                 new SpatialInteractable("forge", "The Forge", new SpatialBounds(72, 14, 20, 25), new SpatialBounds(78, 41, 4, 3), new SpatialRectangularHitRegion(0, 0, 1, 1), "forge", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Bottom, 7, 13), new SpatialOpening(SpatialOpeningKind.Window, SpatialGeometryEdge.Left, 7, 12)]),
                 new SpatialInteractable("image-tools", "Image Workshop", new SpatialBounds(8, 14, 18, 14), new SpatialBounds(17, 29, 4, 3), new SpatialRectangularHitRegion(.08, .08, .84, .84), "image-workshop", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Bottom, 7, 11), new SpatialOpening(SpatialOpeningKind.Window, SpatialGeometryEdge.Right, 4, 9)]),
-                new SpatialInteractable("npc-studio", "NPC Studio", new SpatialBounds(8, 72, 20, 14), new SpatialBounds(18, 68, 4, 3), new SpatialRectangularHitRegion(.06, .06, .88, .88), "npc-studio", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Top, 8, 12), new SpatialOpening(SpatialGeometryEdge.Top, SpatialGeometryEdge.Top, 0, 0)]),
+                new SpatialInteractable("npc-studio", "NPC Studio", new SpatialBounds(8, 72, 20, 14), new SpatialBounds(18, 68, 4, 3), new SpatialRectangularHitRegion(.06, .06, .88, .88), "npc-studio", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Top, 8, 12), new SpatialOpening(SpatialOpeningKind.Window, SpatialGeometryEdge.Right, 4, 10)]),
                 new SpatialInteractable("fsm-bench", "FSM Workbench", new SpatialBounds(68, 56, 16, 11), new SpatialBounds(75, 52, 4, 3), new SpatialRectangularHitRegion(.04, .04, .92, .92), "fsm-workbench", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Top, 6, 10)]),
                 new SpatialInteractable("storage-bins", "Storage Bins", new SpatialBounds(88, 58, 8, 17), new SpatialBounds(85, 66, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "storage", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Left, 7, 11)]),
                 new SpatialInteractable("blueprint-library", "Blueprint Library", new SpatialBounds(32, 12, 18, 14), new SpatialBounds(41, 28, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "library", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Bottom, 7, 11), new SpatialOpening(SpatialOpeningKind.Window, SpatialGeometryEdge.Top, 4, 10)])
@@ -38,22 +37,14 @@ public sealed class SpatialWorkshopScene
             ]);
 }
 
-/// <summary>Logical two-dimensional position in Workshop world coordinates.</summary>
 public readonly record struct SpatialPoint(double X, double Y);
 
-/// <summary>Maximum spatial rectangle occupied by an interactable.</summary>
 public readonly record struct SpatialBounds(double X, double Y, double Width, double Height)
 {
-    public bool Contains(SpatialPoint point)
-        => point.X >= X && point.X <= X + Width && point.Y >= Y && point.Y <= Y + Height;
-
-    public NormalizedPointer Normalize(SpatialPoint point)
-        => new(
-            Width <= 0 ? 0 : (point.X - X) / Width,
-            Height <= 0 ? 0 : (point.Y - Y) / Height);
+    public bool Contains(SpatialPoint point) => point.X >= X && point.X <= X + Width && point.Y >= Y && point.Y <= Y + Height;
+    public NormalizedPointer Normalize(SpatialPoint point) => new(Width <= 0 ? 0 : (point.X - X) / Width, Height <= 0 ? 0 : (point.Y - Y) / Height);
 }
 
-/// <summary>Normalized pointer coordinate relative to an interactable.</summary>
 public readonly record struct NormalizedPointer(double X, double Y);
 
 /// <summary>Hit-test contract for non-rectangular spatial objects.</summary>
@@ -62,7 +53,6 @@ public interface ISpatialHitRegion
     bool Contains(NormalizedPointer point);
 }
 
-/// <summary>Simple normalized rectangular hit region. More expressive regions can replace it later.</summary>
 public readonly record struct SpatialRectangularHitRegion(double X, double Y, double Width, double Height) : ISpatialHitRegion
 {
     public bool Contains(NormalizedPointer point) => point.X >= X && point.X <= X + Width && point.Y >= Y && point.Y <= Y + Height;
@@ -94,10 +84,8 @@ public sealed class SpatialPolygonHitRegion : ISpatialHitRegion
     }
 }
 
-/// <summary>Named interaction point owned by an interactable.</summary>
 public readonly record struct SpatialInteractionPoint(string Id, string Name, SpatialBounds Bounds);
 
-/// <summary>A world object that owns its spatial hover and interaction lifecycle.</summary>
 public sealed class SpatialInteractable
 {
     public SpatialInteractable(string id, string name, SpatialBounds bounds, SpatialBounds interactionPoint, ISpatialHitRegion hitRegion, string experienceId, IReadOnlyList<SpatialInteractionPoint>? interactionPoints = null, IReadOnlyList<SpatialOpening>? openings = null)
@@ -131,7 +119,7 @@ public sealed class SpatialInteractable
     public int InteractionCount { get; private set; }
     public event Action? Interaction;
 
-    /// <summary>Performs the cheap maximum-bounds test followed by the object's actual shape test.</summary>
+    /// <summary>Checks the cheap maximum bounding box before asking the object's actual shape.</summary>
     public bool HitTest(SpatialPoint point)
     {
         if (!Bounds.Contains(point)) return false;
@@ -147,17 +135,10 @@ public sealed class SpatialInteractable
     }
 
     public void OnHoverExit() => IsBreathing = false;
-
-    public void OnInteraction()
-    {
-        InteractionCount++;
-        Interaction?.Invoke();
-    }
-
+    public void OnInteraction() { InteractionCount++; Interaction?.Invoke(); }
     public bool OnClick(NormalizedPointer point) => HitRegion.Contains(point);
 }
 
-/// <summary>Presentation-independent view controls for a spatial experience.</summary>
 public sealed class SpatialViewSettings
 {
     private SpatialViewSettings(IReadOnlyList<SpatialDetailLevel> detailLevels) => DetailLevels = detailLevels;
