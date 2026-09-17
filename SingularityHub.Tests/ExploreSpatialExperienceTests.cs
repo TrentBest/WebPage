@@ -4,23 +4,20 @@ using Xunit;
 namespace SingularityHub.Tests;
 
 /// <summary>
-/// Incremental Unit Test 05 — the Explore experience becomes a spatial tool complex.
-///
-/// This test intentionally names the next architectural step before its renderer is
-/// complete. The test is the ledger entry for the work: Explore begins inside the
-/// Forge rather than presenting the Forge as a button, the complex contains tools,
-/// view controls, and construction activity, and spatial interaction remains data.
+/// Incremental Unit Test 05 — Explore becomes a spatial Workshop complex whose
+/// structures surround a clear central origin rather than enclosing the visitor.
 /// </summary>
 public sealed class ExploreSpatialExperienceTests
 {
-    [Fact(DisplayName = "Incremental Unit Test 05 — Explore starts inside the Forge tool complex")]
-    public void Explore_StartsInsideForgeWithToolsViewControlsAndConstructionActivity()
+    [Fact(DisplayName = "Incremental Unit Test 05 — Explore starts at the clear center of the Workshop complex")]
+    public void Explore_StartsAtClearWorkshopCenterWithToolsViewControlsAndConstructionActivity()
     {
         var scene = SpatialWorkshopScene.CreateDefault();
 
-        Assert.Equal("engineering", scene.StartingAreaId);
-        Assert.Equal(73d, scene.StartingPosition.X);
-        Assert.Equal(42.5d, scene.StartingPosition.Y);
+        Assert.Equal("center", scene.StartingAreaId);
+        Assert.Equal(50d, scene.StartingPosition.X);
+        Assert.Equal(50d, scene.StartingPosition.Y);
+        Assert.DoesNotContain(scene.Interactables, item => Contains(item.Bounds, scene.StartingPosition));
 
         Assert.Contains(scene.Interactables, item => item.Id == "forge");
         Assert.Contains(scene.Interactables, item => item.Id == "image-tools");
@@ -54,4 +51,7 @@ public sealed class ExploreSpatialExperienceTests
         Assert.False(interactable.OnHover(new NormalizedPointer(1.1, 0.5)));
         Assert.True(interactable.IsBreathing);
     }
+
+    private static bool Contains(SpatialBounds bounds, SpatialPoint point)
+        => point.X >= bounds.X && point.X <= bounds.X + bounds.Width && point.Y >= bounds.Y && point.Y <= bounds.Y + bounds.Height;
 }
