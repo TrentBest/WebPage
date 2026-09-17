@@ -50,5 +50,6 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 130)] [Fact(DisplayName = "V0.0.130 — DigiGroup_Movement_Weights_Individual_Position_Toward_Shared_Center")] public void V0_0_130_DigiGroupMovementWeightsIndividualPositionTowardSharedCenter() => Assert.Equal("V0.0.130", "V0.0.130");
     [ArchitectureTest(0, 0, 131)] [Fact(DisplayName = "V0.0.131 — Avatar_Remains_Centered_While_The_Spatial_World_Moves")] public void V0_0_131_AvatarRemainsCenteredWhileTheSpatialWorldMoves() => Assert.Equal("V0.0.131", "V0.0.131");
     [ArchitectureTest(0, 0, 132)] [Fact(DisplayName = "V0.0.132 — Left_Click_Moves_Through_Space_And_Buildings_Activate_On_Arrival")] public void V0_0_132_LeftClickMovesThroughSpaceAndBuildingsActivateOnArrival() => Assert.Equal("V0.0.132", "V0.0.132");
-    [ArchitectureTest(0, 0, 133)] [Fact(DisplayName = "V0.0.133 — Forge_Interactable_Enters_Its_Existing_Experience_Plan_And_Movement_Eases")] public void V0_0_133_ForgeInteractableEntersItsExistingExperiencePlanAndMovementEases() => Assert.Equal("V0.0.133", "V0.0.133");
+    [ArchitectureTest(0, 0, 133)] [Fact(DisplayName = "V0.0.133 — Forge_Interactable_Enters_Its_Existing_Experience_Plan_And_Movement_Eases")] public void V0_0_133_ForgeInteractableEntersItsExistingExperiencePlanAndMovementEases() => Assert.Equal("0.0.133", "0.0.133");
+    [ArchitectureTest(0, 0, 146)] [Fact(DisplayName = "V0.0.146 — Spatial_Zoom_Map_And_Construction_Site")] public void V0_0_146_SpatialZoomMapAndConstructionSite() => Assert.Equal("0.0.146", "0.0.146");
 }
