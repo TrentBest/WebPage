@@ -79,20 +79,20 @@
     private void MoveAvatar(double dx, double dy)
     {
         if (insideRoomId is not null) return;
-        Experience.Navigation.Move(dx, dy);
+        NavigateTo(new SpatialPoint(AvatarX + dx, AvatarY + dy));
     }
 
-    /// <summary>Converts an empty-space left click into a persistent world destination.</summary>
+    /// <summary>Converts an empty-space left click into a collision-safe world destination.</summary>
     private async Task HandleWorldClick(MouseEventArgs args)
     {
         if (insideRoomId is not null) return;
         spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
         var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToWorld", args.ClientX, args.ClientY, AvatarX, AvatarY);
-        Experience.Navigation.MoveTo(point.X, point.Y);
+        NavigateTo(point);
         await InvokeAsync(StateHasChanged);
     }
 
-    /// <summary>Approaches a spatial object, then enters its declared Experience scene.</summary>
+    /// <summary>Approaches a spatial object at the most direct available interaction position.</summary>
     private async Task InteractRoom(string id)
     {
         if (insideRoomId is not null) return;
@@ -100,12 +100,46 @@
         var interactable = Scene.Interactables.FirstOrDefault(item => item.Id == id);
         if (interactable is null) return;
 
-        var target = interactable.InteractionPoint;
-        Experience.Navigation.MoveTo(target.X + target.Width / 2, target.Y + target.Height / 2);
+        var selected = interactable.InteractionPoints
+            .Select(point => new { Point = point, Path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), Center(point.Bounds), SpatialGeometryEngine.FromInteractables(Scene.Interactables)) })
+            .Where(candidate => candidate.Path.Count > 0)
+            .OrderBy(candidate => PathLength(new SpatialPoint(AvatarX, AvatarY), candidate.Path))
+            .FirstOrDefault();
+
+        if (selected is null) return;
+
+        NavigatePath(selected.Path);
         await InvokeAsync(StateHasChanged);
         interactable.OnInteraction();
         insideRoomId = interactable.ExperienceId;
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void NavigateTo(SpatialPoint target)
+    {
+        var path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), target, SpatialGeometryEngine.FromInteractables(Scene.Interactables));
+        NavigatePath(path);
+    }
+
+    private void NavigatePath(IReadOnlyList<SpatialPoint> path)
+    {
+        foreach (var point in path)
+            Experience.Navigation.MoveTo(point.X, point.Y);
+    }
+
+    private static SpatialPoint Center(SpatialBounds bounds)
+        => new(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+
+    private static double PathLength(SpatialPoint start, IReadOnlyList<SpatialPoint> path)
+    {
+        var total = 0d;
+        var previous = start;
+        foreach (var point in path)
+        {
+            total += Math.Sqrt(Math.Pow(point.X - previous.X, 2) + Math.Pow(point.Y - previous.Y, 2));
+            previous = point;
+        }
+        return total;
     }
 
     private void ExitRoom()
