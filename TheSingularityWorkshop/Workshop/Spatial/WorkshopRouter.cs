@@ -1,10 +1,6 @@
 namespace TheSingularityWorkshop.Gui;
 
-/// <summary>
-/// Routes traversal through the Workshop's nested spatial scenes.
-/// The router owns the hierarchy and each scene's interior entry point so the
-/// presentation page does not need to know how a building is entered.
-/// </summary>
+/// <summary>Routes traversal through the Workshop's nested spatial scenes.</summary>
 public sealed class WorkshopRouter
 {
     private readonly SpatialSceneStack _sceneStack;
@@ -13,6 +9,7 @@ public sealed class WorkshopRouter
         ["forge"] = new SpatialPoint(50, 78),
         ["line-lab"] = new SpatialPoint(50, 78)
     };
+    private readonly HashSet<string> _visitedScenes = new(StringComparer.OrdinalIgnoreCase);
 
     public WorkshopRouter(string rootSceneId = "workshop")
         => _sceneStack = new SpatialSceneStack(rootSceneId);
@@ -22,23 +19,26 @@ public sealed class WorkshopRouter
     public IReadOnlyList<SpatialSceneFrame> Frames => _sceneStack.Frames;
     public SpatialSceneStack SceneStack => _sceneStack;
 
+    /// <summary>Returns true after the visitor has entered a scene at least once.</summary>
+    public bool HasVisited(string sceneId) => _visitedScenes.Contains(sceneId);
+
     /// <summary>Registers the point at which a visitor materializes inside a child scene.</summary>
     public void RegisterEntryPoint(string sceneId, SpatialPoint entryPoint)
     {
-        if (string.IsNullOrWhiteSpace(sceneId))
-            throw new ArgumentException("A scene ID is required.", nameof(sceneId));
-
+        if (string.IsNullOrWhiteSpace(sceneId)) throw new ArgumentException("A scene ID is required.", nameof(sceneId));
         _entryPoints[sceneId] = entryPoint;
     }
 
-    /// <summary>Returns the diegetic entry point for a child scene.</summary>
     public SpatialPoint GetEntryPoint(string sceneId)
         => _entryPoints.TryGetValue(sceneId, out var point) ? point : new SpatialPoint(50, 78);
 
-    /// <summary>Enters a child scene and remembers the parent's physical return position.</summary>
-    public void Enter(string sceneId, SpatialPoint returnPosition)
-        => _sceneStack.Push(sceneId, returnPosition);
+    /// <summary>Enters a child scene and reports whether this is the visitor's first visit.</summary>
+    public bool Enter(string sceneId, SpatialPoint returnPosition)
+    {
+        var firstVisit = _visitedScenes.Add(sceneId);
+        _sceneStack.Push(sceneId, returnPosition);
+        return firstVisit;
+    }
 
-    public bool TryExit(out SpatialSceneFrame frame)
-        => _sceneStack.TryPop(out frame);
+    public bool TryExit(out SpatialSceneFrame frame) => _sceneStack.TryPop(out frame);
 }
