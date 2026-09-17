@@ -73,6 +73,22 @@ public sealed class SpatialInteractable
         Openings = openings ?? [];
     }
 
+    /// <summary>Creates a vehicle-shaped interactable whose stations can be approached independently.</summary>
+    public static SpatialInteractable CreateVehicle(string id, string name, SpatialBounds bounds, IReadOnlyList<SpatialInteractionPoint> interactionPoints, string experienceId)
+    {
+        if (interactionPoints.Count == 0)
+            throw new ArgumentException("A vehicle interactable must expose at least one interaction point.", nameof(interactionPoints));
+
+        return new SpatialInteractable(
+            id,
+            name,
+            bounds,
+            interactionPoints[0].Bounds,
+            new SpatialRectangularHitRegion(0, 0, 1, 1),
+            experienceId,
+            interactionPoints);
+    }
+
     public string Id { get; }
     public string Name { get; }
     public SpatialBounds Bounds { get; }
