@@ -1,9 +1,11 @@
+using System.Diagnostics;
+
 namespace TheSingularityWorkshop.Gui;
 
 /// <summary>
 /// Builds the Forge as a spatial interior rather than replacing the Workshop
-/// with an application surface. Functional GUI capabilities are represented as
-/// stations inside the building and can open their own child scenes.
+/// with an application surface. The building itself is rendered from the same
+/// SpatialLinework substrate used by the Linework Lab.
 /// </summary>
 public static class SpatialForgeGuiBuilder
 {
@@ -15,10 +17,15 @@ public static class SpatialForgeGuiBuilder
     /// <summary>Builds the Forge interior and its first functional station.</summary>
     public static ElementBuilder Build(
         object receiver,
+        SpatialLinework structure,
         string avatarName,
         Action enterLineLab,
         Action exitForge)
     {
+        var renderStart = Stopwatch.GetTimestamp();
+        var rendered = new SpatialLineRenderer().Render(structure, SpatialLineStyleCatalog.Blueprint);
+        var renderMicroseconds = Stopwatch.GetElapsedTime(renderStart).TotalMilliseconds * 1000d;
+
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed")
             .Style("inset", "0")
@@ -39,18 +46,14 @@ public static class SpatialForgeGuiBuilder
             .Style("overflow", "hidden");
 
         floor.Content(Grid(receiver));
-        floor.Content(Wall(receiver, 8, 8, 84, 2, Cyan));
-        floor.Content(Wall(receiver, 8, 90, 84, 2, Cyan));
-        floor.Content(Wall(receiver, 8, 8, 2, 84, Cyan));
-        floor.Content(Wall(receiver, 90, 8, 2, 84, Cyan));
+        floor.Content(Structure(receiver, rendered));
         floor.Content(Station(receiver, 14, 20, 30, 23, "LINEWORK LAB", Cyan, "CREATE / EDIT / RENDER", enterLineLab));
         floor.Content(Station(receiver, 56, 20, 30, 23, "FSM BENCH", Magenta, "STATE / LIFECYCLE / EXECUTION"));
         floor.Content(Station(receiver, 14, 55, 30, 23, "MICROBUNDLE BAY", Yellow, "COMPOSE / ARBITRATE / PACKAGE"));
         floor.Content(Station(receiver, 56, 55, 30, 23, "RUNTIME CORE", White, "BOOT / EXPERIENCE / OBSERVE"));
-        floor.Content(Door(receiver));
         root.Content(floor);
 
-        root.Content(Title(receiver));
+        root.Content(Title(receiver, structure.Lines.Count, renderMicroseconds));
         root.Content(Avatar(receiver, avatarName));
         root.Content(WorkshopGui.Button(receiver)
             .Label("← EXIT FORGE")
@@ -71,7 +74,7 @@ public static class SpatialForgeGuiBuilder
         return root;
     }
 
-    private static ElementBuilder Title(object receiver)
+    private static ElementBuilder Title(object receiver, int lineCount, double renderMicroseconds)
         => WorkshopGui.Element(receiver, "div")
             .Style("position", "fixed")
             .Style("left", "50%")
@@ -90,7 +93,13 @@ public static class SpatialForgeGuiBuilder
                 .Style("color", "#7895a1")
                 .Style("font-size", ".42rem")
                 .Style("letter-spacing", ".18em")
-                .Text("FABRICATION / STATE / COMPOSITION / RUNTIME"));
+                .Text("FABRICATION / STATE / COMPOSITION / RUNTIME"))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".35rem")
+                .Style("color", Yellow)
+                .Style("font-size", ".38rem")
+                .Style("letter-spacing", ".12em")
+                .Text($"LINE RENDER // {lineCount:00} PRIMITIVES // {renderMicroseconds:0.0} μs"));
 
     private static ElementBuilder Grid(object receiver)
         => WorkshopGui.Element(receiver, "div")
@@ -101,18 +110,32 @@ public static class SpatialForgeGuiBuilder
             .Style("opacity", ".7")
             .Style("pointer-events", "none");
 
-    private static ElementBuilder Wall(object receiver, double left, double top, double width, double height, string accent)
-        => WorkshopGui.Element(receiver, "div")
+    private static ElementBuilder Structure(object receiver, IReadOnlyList<SpatialRenderedLine> rendered)
+    {
+        var svg = WorkshopGui.Element(receiver, "svg")
+            .Attribute("viewBox", "0 0 100 100")
+            .Attribute("preserveAspectRatio", "none")
             .Style("position", "absolute")
-            .Style("left", left + "%")
-            .Style("top", top + "%")
-            .Style("width", width + "%")
-            .Style("height", height + "%")
-            .Style("box-sizing", "border-box")
-            .Style("border", $"1px solid {accent}88")
-            .Style("background", $"{accent}0a")
-            .Style("box-shadow", $"0 0 24px {accent}18")
+            .Style("inset", "0")
+            .Style("width", "100vw")
+            .Style("height", "100vh")
             .Style("pointer-events", "none");
+
+        foreach (var line in rendered)
+        {
+            var points = string.Join(" ", line.Points.Select(point => $"{point.X:0.###},{point.Y:0.###}"));
+            svg.Child(WorkshopGui.Element(receiver, "polyline")
+                .Attribute("points", points)
+                .Attribute("fill", "none")
+                .Attribute("stroke", line.Style.Stroke)
+                .Attribute("stroke-width", line.Style.Width)
+                .Attribute("stroke-opacity", line.Style.Opacity)
+                .Attribute("stroke-linecap", "round")
+                .Attribute("stroke-linejoin", "round"));
+        }
+
+        return svg;
+    }
 
     private static ElementBuilder Station(object receiver, double left, double top, double width, double height, string label, string accent, string detail, Action? activate = null)
     {
@@ -171,18 +194,6 @@ public static class SpatialForgeGuiBuilder
 
         return station;
     }
-
-    private static ElementBuilder Door(object receiver)
-        => WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute")
-            .Style("left", "46%")
-            .Style("bottom", "8%")
-            .Style("width", "8%")
-            .Style("height", "12%")
-            .Style("border", $"1px solid {Cyan}aa")
-            .Style("background", "#010205")
-            .Style("box-shadow", $"0 0 22px {Cyan}22")
-            .Style("pointer-events", "none");
 
     private static ElementBuilder Avatar(object receiver, string name)
         => WorkshopGui.Element(receiver, "div")
