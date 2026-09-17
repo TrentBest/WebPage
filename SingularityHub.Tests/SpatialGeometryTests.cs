@@ -15,14 +15,15 @@ public sealed class SpatialGeometryTests
         Assert.DoesNotContain(scene.Interactables, item => Contains(item.Bounds, scene.StartingPosition));
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 25 — schematic buildings expose paired wall lines")]
+    [Fact(DisplayName = "Incremental Unit Test 25 — schematic buildings expose paired wall lines around openings")]
     public void BuildingsProducePairedWallGeometry()
     {
         var scene = SpatialWorkshopScene.CreateDefault();
         var forge = SpatialGeometryEngine.FromInteractables(scene.Interactables).Single(x => x.Id == "forge");
         var walls = SpatialGeometryEngine.BuildWalls(forge);
 
-        Assert.Equal(4, walls.Count);
+        Assert.Equal(6, walls.Count);
+        Assert.Equal(2, forge.Openings.Count);
         Assert.All(walls, wall =>
         {
             Assert.NotEqual(wall.Outer.Start, wall.Outer.End);
@@ -45,10 +46,7 @@ public sealed class SpatialGeometryTests
     public void BlockedMovementFindsDetour()
     {
         var building = new SpatialBuildingGeometry("test", new SpatialBounds(40, 40, 20, 20), "#00eaff", "#101820");
-        var path = SpatialGeometryEngine.FindPath(
-            new SpatialPoint(30, 50),
-            new SpatialPoint(70, 50),
-            [building]);
+        var path = SpatialGeometryEngine.FindPath(new SpatialPoint(30, 50), new SpatialPoint(70, 50), [building]);
 
         Assert.NotEmpty(path);
         Assert.Equal(new SpatialPoint(70, 50), path[^1]);
