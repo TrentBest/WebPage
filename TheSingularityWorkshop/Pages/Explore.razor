@@ -131,7 +131,7 @@
     {
         if (insideRoomId != "mansion") return;
         spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
-        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToWorld", args.ClientX, args.ClientY, AvatarX, AvatarY);
+        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToCenteredWorld", args.ClientX, args.ClientY, AvatarX, AvatarY);
         await NavigateMansionTo(point);
     }
 
