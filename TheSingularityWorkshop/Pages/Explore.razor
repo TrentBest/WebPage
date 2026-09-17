@@ -14,6 +14,10 @@
 
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
+    private readonly SpatialSceneStack SceneStack = new("workshop");
+    private readonly SpatialLinework ForgeLinework = new();
+    private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
+    private bool drawingLine;
     private string? insideRoomId;
     private int detailLevel = 16;
     private IJSObjectReference? spatialModule;
@@ -27,6 +31,7 @@
     ];
 
     public ExploreExperienceMicroBundle ExperienceForTests => Experience;
+    public SpatialSceneStack SceneStackForTests => SceneStack;
 
     public Explore()
     {
@@ -44,11 +49,18 @@
         if (insideRoomId == "conference")
             return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
 
-        if (insideRoomId == "engineering")
-            return SpatialInteriorGuiBuilder.Build(this, "The Forge", "The Forge is still a place, not a panel. State labs, FSM workbenches, MicroBundle stock, and runtime bays surround the visitor.", Experience.User.DisplayName, ExitRoom);
+        if (insideRoomId is not null)
+        {
+            if (insideRoomId == "forge")
+                return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, DrawForgePoint, ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
 
-        if (insideRoomId == "library")
-            return SpatialInteriorGuiBuilder.Build(this, "Blueprint Library", "A spatial archive of the definitions from which Workshop places and Experiences are composed.", Experience.User.DisplayName, ExitRoom);
+            var interactable = Scene.Interactables.FirstOrDefault(item => item.ExperienceId == insideRoomId);
+            var title = interactable?.Name ?? "Spatial Room";
+            var description = interactable is null
+                ? "A child scene in the Workshop spatial hierarchy."
+                : $"A spatial interior generated from the {interactable.Name} MicroBundle boundary.";
+            return SpatialInteriorGuiBuilder.Build(this, title, description, Experience.User.DisplayName, ExitRoom);
+        }
 
         var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom);
         return WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(UserNameLabel());
@@ -66,20 +78,20 @@
         switch (args.Key.ToLowerInvariant())
         {
             case "w":
-            case "arrowup": MoveAvatar(0, -3); break;
+            case "arrowup": _ = MoveAvatar(0, -3); break;
             case "s":
-            case "arrowdown": MoveAvatar(0, 3); break;
+            case "arrowdown": _ = MoveAvatar(0, 3); break;
             case "a":
-            case "arrowleft": MoveAvatar(-3, 0); break;
+            case "arrowleft": _ = MoveAvatar(-3, 0); break;
             case "d":
-            case "arrowright": MoveAvatar(3, 0); break;
+            case "arrowright": _ = MoveAvatar(3, 0); break;
         }
     }
 
-    private void MoveAvatar(double dx, double dy)
+    private async Task MoveAvatar(double dx, double dy)
     {
         if (insideRoomId is not null) return;
-        NavigateTo(new SpatialPoint(AvatarX + dx, AvatarY + dy));
+        await NavigateTo(new SpatialPoint(AvatarX + dx, AvatarY + dy));
     }
 
     /// <summary>Converts an empty-space left click into a collision-safe world destination.</summary>
@@ -88,11 +100,10 @@
         if (insideRoomId is not null) return;
         spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
         var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToWorld", args.ClientX, args.ClientY, AvatarX, AvatarY);
-        NavigateTo(point);
-        await InvokeAsync(StateHasChanged);
+        await NavigateTo(point);
     }
 
-    /// <summary>Approaches a spatial object at the most direct available interaction position.</summary>
+    /// <summary>Approaches a spatial object, then enters its child scene only after arrival.</summary>
     private async Task InteractRoom(string id)
     {
         if (insideRoomId is not null) return;
@@ -108,24 +119,64 @@
 
         if (selected is null) return;
 
-        NavigatePath(selected.Path);
-        await InvokeAsync(StateHasChanged);
+        await NavigatePath(selected.Path);
         interactable.OnInteraction();
+        SceneStack.Push(interactable.ExperienceId, new SpatialPoint(AvatarX, AvatarY));
         insideRoomId = interactable.ExperienceId;
         await InvokeAsync(StateHasChanged);
     }
 
-    private void NavigateTo(SpatialPoint target)
+    private async Task NavigateTo(SpatialPoint target)
     {
         var path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), target, SpatialGeometryEngine.FromInteractables(Scene.Interactables));
-        NavigatePath(path);
+        await NavigatePath(path);
     }
 
-    private void NavigatePath(IReadOnlyList<SpatialPoint> path)
+    /// <summary>Animates each navigation segment so the camera does not teleport between path nodes.</summary>
+    private async Task NavigatePath(IReadOnlyList<SpatialPoint> path)
     {
+        if (path.Count == 0) return;
+
+        var previous = new SpatialPoint(AvatarX, AvatarY);
         foreach (var point in path)
-            Experience.Navigation.MoveTo(point.X, point.Y);
+        {
+            const int frames = 8;
+            for (var frame = 1; frame <= frames; frame++)
+            {
+                var t = frame / (double)frames;
+                var eased = t * t * (3d - 2d * t);
+                Experience.Navigation.MoveTo(previous.X + (point.X - previous.X) * eased, previous.Y + (point.Y - previous.Y) * eased);
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(16);
+            }
+            previous = point;
+        }
     }
+
+    private async Task DrawForgePoint(MouseEventArgs args)
+    {
+        spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
+        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToLinePoint", args.ClientX, args.ClientY);
+        if (!drawingLine)
+        {
+            ForgeLinework.BeginLine(point);
+            drawingLine = true;
+            return;
+        }
+
+        ForgeLinework.ContinueLine(point);
+        ForgeLinework.EndLine();
+        drawingLine = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ClearForgeLines()
+    {
+        drawingLine = false;
+        ForgeLinework.Clear();
+    }
+
+    private void SetForgeStyle(SpatialLineStyle style) => forgeStyle = style;
 
     private static SpatialPoint Center(SpatialBounds bounds)
         => new(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
@@ -146,15 +197,23 @@
     {
         Forge.Reset();
         Experience.Conference.Leave();
-        var roomId = insideRoomId == "conference" ? "yup" : insideRoomId;
-        var room = Rooms.FirstOrDefault(x => x.Id == roomId);
-        if (room is not null) Experience.Navigation.MoveToExit(room);
-        insideRoomId = null;
+        if (insideRoomId == "conference")
+        {
+            var room = Rooms.FirstOrDefault(x => x.Id == "yup");
+            if (room is not null) Experience.Navigation.MoveToExit(room);
+            insideRoomId = null;
+            return;
+        }
+
+        if (SceneStack.TryPop(out var frame))
+            Experience.Navigation.MoveTo(frame.ReturnPosition.X, frame.ReturnPosition.Y);
+        insideRoomId = SceneStack.CurrentSceneId == "workshop" ? null : SceneStack.CurrentSceneId;
     }
 
     public void Dispose()
     {
         Experience.Dispose();
+        ForgeLinework.Dispose();
         if (spatialModule is not null) _ = spatialModule.DisposeAsync();
     }
 }
