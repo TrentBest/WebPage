@@ -11,3 +11,12 @@ export function screenToWorld(clientX, clientY, avatarX, avatarY) {
         y: (screenVh - offsetVh) / 1.5
     };
 }
+
+export function screenToLinePoint(clientX, clientY) {
+    const width = Math.max(window.innerWidth, 1);
+    const height = Math.max(window.innerHeight, 1);
+    return {
+        x: clientX / width * 100,
+        y: clientY / height * 100
+    };
+}
