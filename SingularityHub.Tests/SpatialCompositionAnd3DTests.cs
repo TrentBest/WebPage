@@ -33,7 +33,7 @@ public sealed class SpatialCompositionAnd3DTests
         var buffer = SpatialLine3TextureBuffer.FromLines(lines);
 
         Assert.Equal(2, buffer.Width);
-        Assert.Equal(1, buffer.Height);
+        Assert.Equal(1, SpatialLine3TextureBuffer.Height);
         Assert.Equal(1f, buffer.Records[0].Start.R);
         Assert.Equal(2f, buffer.Records[0].Start.G);
         Assert.Equal(3f, buffer.Records[0].Start.B);
