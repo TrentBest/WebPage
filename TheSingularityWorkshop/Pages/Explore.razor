@@ -49,11 +49,14 @@
         if (insideRoomId == "conference")
             return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
 
+        if (insideRoomId == "forge")
+            return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, EnterLineLab, ExitRoom);
+
+        if (insideRoomId == "line-lab")
+            return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
+
         if (insideRoomId is not null)
         {
-            if (insideRoomId == "forge")
-                return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
-
             var interactable = Scene.Interactables.FirstOrDefault(item => item.ExperienceId == insideRoomId);
             var title = interactable?.Name ?? "Spatial Room";
             var description = interactable is null
@@ -121,9 +124,22 @@
 
         await NavigatePath(selected.Path);
         interactable.OnInteraction();
-        Router.Enter(interactable.ExperienceId, new SpatialPoint(AvatarX, AvatarY));
+        var returnPosition = new SpatialPoint(AvatarX, AvatarY);
+        Router.Enter(interactable.ExperienceId, returnPosition);
+        Experience.Navigation.MoveTo(Router.GetEntryPoint(interactable.ExperienceId).X, Router.GetEntryPoint(interactable.ExperienceId).Y);
         insideRoomId = interactable.ExperienceId;
         await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>Moves from the Forge floor into its nested Linework Lab scene.</summary>
+    private void EnterLineLab()
+    {
+        if (insideRoomId != "forge") return;
+
+        Router.Enter("line-lab", new SpatialPoint(AvatarX, AvatarY));
+        var entry = Router.GetEntryPoint("line-lab");
+        Experience.Navigation.MoveTo(entry.X, entry.Y);
+        insideRoomId = "line-lab";
     }
 
     private async Task NavigateTo(SpatialPoint target)
