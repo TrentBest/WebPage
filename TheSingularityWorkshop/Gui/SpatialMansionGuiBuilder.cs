@@ -27,7 +27,9 @@ public static class SpatialMansionGuiBuilder
         Action<int> setDensity,
         Action exit,
         bool showWelcome,
-        Action dismissWelcome)
+        Action dismissWelcome,
+        double zoom = 1d,
+        Action<double>? setZoom = null)
     {
         var renderStart = Stopwatch.GetTimestamp();
         var rendered = new SpatialLineRenderer().Render(mansion, SpatialLineStyleCatalog.Blueprint);
@@ -37,6 +39,7 @@ public static class SpatialMansionGuiBuilder
         var texture = mansion.TextureBuffer;
         var textureMicroseconds = Stopwatch.GetElapsedTime(textureStart).TotalMilliseconds * 1000d;
         var gpuPayloadBytes = texture.Width * 4 * sizeof(float);
+        var effectiveZoom = new SpatialCamera(avatarX, avatarY, zoom).Clamped().Zoom;
 
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("overflow", "hidden")
@@ -45,8 +48,11 @@ public static class SpatialMansionGuiBuilder
             .TabIndex(0)
             .OnKeyDown(onKeyDown);
 
+        if (setZoom is not null)
+            root.OnWheel(args => setZoom(ZoomFromWheel(effectiveZoom, args.DeltaY))).PreventDefault("onwheel");
+
         var svg = WorkshopGui.Element(receiver, "svg")
-            .Attribute("viewBox", ViewBox(avatarX, avatarY))
+            .Attribute("viewBox", ViewBox(avatarX, avatarY, effectiveZoom))
             .Attribute("preserveAspectRatio", "xMidYMid meet")
             .Style("position", "absolute").Style("inset", "0")
             .Style("width", "100%").Style("height", "100%")
@@ -75,8 +81,10 @@ public static class SpatialMansionGuiBuilder
             .Style("filter", "drop-shadow(0 0 4px #00eaff)").Style("pointer-events", "none"));
 
         root.Content(svg);
-        root.Content(Hud(receiver, avatarName, density, mansion.Lines.Count, renderMicroseconds, textureMicroseconds, gpuPayloadBytes));
+        root.Content(Hud(receiver, avatarName, density, mansion.Lines.Count, renderMicroseconds, textureMicroseconds, gpuPayloadBytes, effectiveZoom));
         root.Content(DensityControls(receiver, density, setDensity));
+        if (setZoom is not null)
+            root.Content(ZoomControls(receiver, effectiveZoom, setZoom));
         root.Content(WorkshopGui.Button(receiver).Label("← EXIT MANSION")
             .Style("position", "fixed").Style("right", "1rem").Style("bottom", "1rem").Style("z-index", "30")
             .Style("padding", ".55rem .75rem").Style("border", $"1px solid {Magenta}66")
@@ -88,6 +96,12 @@ public static class SpatialMansionGuiBuilder
             root.Content(Welcome(receiver, dismissWelcome));
 
         return root;
+    }
+
+    private static double ZoomFromWheel(double currentZoom, double deltaY)
+    {
+        var factor = deltaY < 0 ? 1.12 : 1 / 1.12;
+        return Math.Clamp(currentZoom * factor, SpatialCamera.MinZoom, SpatialCamera.MaxZoom);
     }
 
     /// <summary>Temporary first-visit orientation explaining why the Mansion exists.</summary>
@@ -111,14 +125,14 @@ public static class SpatialMansionGuiBuilder
                 .Style("margin-top", "1.1rem").Style("padding", ".65rem 1rem").Style("border", $"1px solid {Cyan}88").Style("background", $"{Cyan}10")
                 .Style("color", Cyan).Style("font-family", "inherit").Style("font-size", ".5rem").Style("letter-spacing", ".14em").Style("cursor", "pointer").OnClick(dismiss));
 
-    private static ElementBuilder Hud(object receiver, string avatarName, int density, int lineCount, double renderMicroseconds, double textureMicroseconds, int gpuPayloadBytes)
+    private static ElementBuilder Hud(object receiver, string avatarName, int density, int lineCount, double renderMicroseconds, double textureMicroseconds, int gpuPayloadBytes, double zoom)
         => WorkshopGui.Element(receiver, "div")
             .Style("position", "fixed").Style("left", "1rem").Style("top", "1rem").Style("z-index", "30")
             .Style("padding", ".55rem .7rem").Style("border", $"1px solid {Cyan}66")
             .Style("background", "rgba(1,4,10,.84)").Style("color", White)
             .Style("font-size", ".48rem").Style("line-height", "1.65")
             .Style("letter-spacing", ".1em").Style("pointer-events", "none")
-            .Text($"SINGULARITY MANSION // LINE STRESS LAB\nAVATAR // {avatarName}\nDENSITY // {density}X\nLINES // {lineCount:N0}\nRENDER CONVERSION // {renderMicroseconds:0.0} μs\nRGBA TEXEL BUILD // {textureMicroseconds:0.0} μs\nGPU PAYLOAD // {gpuPayloadBytes:N0} BYTES");
+            .Text($"SINGULARITY MANSION // LINE STRESS LAB\nAVATAR // {avatarName}\nZOOM // {zoom:0.00}X\nDENSITY // {density}X\nLINES // {lineCount:N0}\nRENDER CONVERSION // {renderMicroseconds:0.0} μs\nRGBA TEXEL BUILD // {textureMicroseconds:0.0} μs\nGPU PAYLOAD // {gpuPayloadBytes:N0} BYTES");
 
     private static ElementBuilder DensityControls(object receiver, int density, Action<int> setDensity)
     {
@@ -148,6 +162,18 @@ public static class SpatialMansionGuiBuilder
         return panel;
     }
 
-    private static string ViewBox(double avatarX, double avatarY)
-        => $"{avatarX - 33.333:0.###} {avatarY - 33.333:0.###} 66.666 66.666";
+    private static ElementBuilder ZoomControls(object receiver, double zoom, Action<double> setZoom)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "fixed").Style("right", "1rem").Style("top", "1rem").Style("z-index", "30")
+            .Style("display", "flex").Style("gap", ".25rem").Style("align-items", "center")
+            .Style("padding", ".35rem").Style("border", $"1px solid {Cyan}55")
+            .Style("background", "rgba(1,4,10,.84)")
+            .Content(WorkshopGui.Element(receiver, "span").Style("padding", "0 .35rem").Style("color", Yellow).Style("font-size", ".42rem").Style("letter-spacing", ".1em").Text($"SCROLL ZOOM {zoom:0.00}X"))
+            .Content(WorkshopGui.Button(receiver).Label("RESET").Style("padding", ".25rem .4rem").Style("font-family", "inherit").Style("font-size", ".42rem").Style("cursor", "pointer").OnClick(() => setZoom(1d)));
+
+    private static string ViewBox(double avatarX, double avatarY, double zoom)
+    {
+        var halfView = 33.333 / Math.Max(zoom, SpatialCamera.MinZoom);
+        return $"{avatarX - halfView:0.###} {avatarY - halfView:0.###} {halfView * 2:0.###} {halfView * 2:0.###}";
+    }
 }
