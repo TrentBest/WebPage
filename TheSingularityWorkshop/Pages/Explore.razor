@@ -20,6 +20,7 @@
     private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
+    private bool mansionWelcomeVisible;
     private string? insideRoomId;
     private int detailLevel = 16;
     private int mansionDensity = 1;
@@ -60,7 +61,7 @@
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
 
         if (insideRoomId == "mansion")
-            return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom);
+            return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome);
 
         if (insideRoomId is not null)
         {
@@ -86,6 +87,8 @@
         MansionStructure.Dispose();
         MansionStructure = SingularityMansionLineworkFactory.Create(mansionDensity);
     }
+
+    private void DismissMansionWelcome() => mansionWelcomeVisible = false;
 
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
@@ -154,9 +157,10 @@
         await NavigatePath(selected.Path);
         interactable.OnInteraction();
         var returnPosition = new SpatialPoint(AvatarX, AvatarY);
-        Router.Enter(interactable.ExperienceId, returnPosition);
+        var firstVisit = Router.Enter(interactable.ExperienceId, returnPosition);
         Experience.Navigation.MoveTo(Router.GetEntryPoint(interactable.ExperienceId).X, Router.GetEntryPoint(interactable.ExperienceId).Y);
         insideRoomId = interactable.ExperienceId;
+        mansionWelcomeVisible = interactable.ExperienceId == "mansion" && firstVisit;
         await InvokeAsync(StateHasChanged);
     }
 
@@ -254,6 +258,7 @@
             return;
         }
 
+        mansionWelcomeVisible = false;
         if (Router.TryExit(out var frame))
             Experience.Navigation.MoveTo(frame.ReturnPosition.X, frame.ReturnPosition.Y);
         insideRoomId = Router.CurrentSceneId == "workshop" ? null : Router.CurrentSceneId;
