@@ -14,7 +14,7 @@
 
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
-    private readonly SpatialSceneStack SceneStack = new("workshop");
+    private readonly WorkshopRouter Router = new("workshop");
     private readonly SpatialLinework ForgeLinework = new();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
@@ -31,7 +31,7 @@
     ];
 
     public ExploreExperienceMicroBundle ExperienceForTests => Experience;
-    public SpatialSceneStack SceneStackForTests => SceneStack;
+    public SpatialSceneStack SceneStackForTests => new(Router.CurrentSceneId);
 
     public Explore()
     {
@@ -52,7 +52,7 @@
         if (insideRoomId is not null)
         {
             if (insideRoomId == "forge")
-                return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, DrawForgePoint, ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
+                return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
 
             var interactable = Scene.Interactables.FirstOrDefault(item => item.ExperienceId == insideRoomId);
             var title = interactable?.Name ?? "Spatial Room";
@@ -121,7 +121,7 @@
 
         await NavigatePath(selected.Path);
         interactable.OnInteraction();
-        SceneStack.Push(interactable.ExperienceId, new SpatialPoint(AvatarX, AvatarY));
+        Router.Enter(interactable.ExperienceId, new SpatialPoint(AvatarX, AvatarY));
         insideRoomId = interactable.ExperienceId;
         await InvokeAsync(StateHasChanged);
     }
@@ -161,6 +161,7 @@
         {
             ForgeLinework.BeginLine(point);
             drawingLine = true;
+            await InvokeAsync(StateHasChanged);
             return;
         }
 
@@ -205,9 +206,9 @@
             return;
         }
 
-        if (SceneStack.TryPop(out var frame))
+        if (Router.TryExit(out var frame))
             Experience.Navigation.MoveTo(frame.ReturnPosition.X, frame.ReturnPosition.Y);
-        insideRoomId = SceneStack.CurrentSceneId == "workshop" ? null : SceneStack.CurrentSceneId;
+        insideRoomId = Router.CurrentSceneId == "workshop" ? null : Router.CurrentSceneId;
     }
 
     public void Dispose()
