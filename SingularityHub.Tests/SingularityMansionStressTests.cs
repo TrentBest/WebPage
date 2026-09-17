@@ -17,7 +17,21 @@ public sealed class SingularityMansionStressTests
         Assert.True(mansion.Bounds.Height >= 30);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 29 — Mansion density increases line count")]
+    [Fact(DisplayName = "Incremental Unit Test 30 — Mansion entrance is reachable from the Workshop start")]
+    public void MansionEntranceIsReachable()
+    {
+        var scene = SpatialWorkshopScene.CreateDefault();
+        var mansion = Assert.Single(scene.Interactables.Where(item => item.ExperienceId == "mansion"));
+        var entrance = mansion.InteractionPoints[0].Bounds;
+        var target = new SpatialPoint(entrance.X + entrance.Width / 2, entrance.Y + entrance.Height / 2);
+
+        var path = SpatialGeometryEngine.FindPath(scene.StartingPosition, target, SpatialGeometryEngine.FromInteractables(scene.Interactables));
+
+        Assert.NotEmpty(path);
+        Assert.Equal(target, path[^1]);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 31 — Mansion density increases line count")]
     public void MansionDensityScalesLineCount()
     {
         using var baseline = SingularityMansionLineworkFactory.Create(1);
@@ -28,7 +42,7 @@ public sealed class SingularityMansionStressTests
         Assert.Equal(dense.Lines.Count, dense.TextureBuffer.Width);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 29 — Renderer consumes the Mansion line substrate")]
+    [Fact(DisplayName = "Incremental Unit Test 32 — Renderer consumes the Mansion line substrate")]
     public void RendererProducesOneRenderedLinePerMansionLine()
     {
         using var mansion = SingularityMansionLineworkFactory.Create(1);
