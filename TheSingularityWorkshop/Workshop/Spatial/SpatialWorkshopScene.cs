@@ -149,16 +149,32 @@ public sealed class SpatialInteractable
     public bool OnClick(NormalizedPointer point) => HitRegion.Contains(point);
 }
 
+/// <summary>Controls perception-layer behavior for a spatial floor plan.</summary>
 public sealed class SpatialViewSettings
 {
-    private SpatialViewSettings(IReadOnlyList<SpatialDetailLevel> detailLevels) => DetailLevels = detailLevels;
-    public IReadOnlyList<SpatialDetailLevel> DetailLevels { get; }
-    public static SpatialViewSettings CreateDefault()
+    private SpatialViewSettings(IReadOnlyList<SpatialDetailLevel> detailLevels, bool zoomEnabled, double minZoom, double maxZoom)
     {
+        DetailLevels = detailLevels;
+        ZoomEnabled = zoomEnabled;
+        MinZoom = minZoom;
+        MaxZoom = maxZoom;
+    }
+
+    public IReadOnlyList<SpatialDetailLevel> DetailLevels { get; }
+
+    /// <summary>When false, the floor plan remains fixed-size and ignores scroll zoom.</summary>
+    public bool ZoomEnabled { get; }
+
+    public double MinZoom { get; }
+    public double MaxZoom { get; }
+
+    public static SpatialViewSettings CreateDefault(bool zoomEnabled = true, double minZoom = SpatialCamera.MinZoom, double maxZoom = SpatialCamera.MaxZoom)
+    {
+        if (minZoom <= 0 || maxZoom < minZoom) throw new ArgumentOutOfRangeException(nameof(minZoom), "Zoom bounds must be positive and ordered.");
         var levels = Enumerable.Range(1, 62).Select(i => new SpatialDetailLevel($"LEVEL-{i:00}", i / 64d)).ToList();
         levels.Add(SpatialDetailLevel.Device);
         levels.Add(SpatialDetailLevel.Stud);
-        return new SpatialViewSettings(levels);
+        return new SpatialViewSettings(levels, zoomEnabled, minZoom, maxZoom);
     }
 }
 
