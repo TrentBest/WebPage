@@ -60,7 +60,7 @@
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
 
         if (insideRoomId == "mansion")
-            return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, HandleMansionWorldClick, HandleKeyDown, SetMansionDensity, ExitRoom);
+            return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom);
 
         if (insideRoomId is not null)
         {
