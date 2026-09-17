@@ -4,11 +4,7 @@ using TheSingularityWorkshop.SingularityHub;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
-/// <summary>
-/// Provides the spatial locomotion capability consumed by an Experience.
-/// The presentation layer never owns the visitor's position; it renders the
-/// coordinates exposed by this MicroBundle.
-/// </summary>
+/// <summary>Provides spatial locomotion independently of the perception layer.</summary>
 public sealed class SpatialNavigationMicroBundle(double startX = 50, double startY = 50) : IDisposable
 {
     public const int BundleId = 2101;
@@ -38,6 +34,13 @@ public sealed class SpatialNavigationMicroBundle(double startX = 50, double star
         Y = ClampY(y);
     }
 
+    /// <summary>Moves the avatar directly to a world-space entrance selected by the scene.</summary>
+    public void MoveToEntrance(SpatialPoint entrance)
+    {
+        if (_disposed) return;
+        MoveTo(entrance.X, entrance.Y);
+    }
+
     public void Approach(double x, double y, double offsetY = 6)
     {
         if (_disposed) return;
@@ -57,7 +60,6 @@ public sealed class SpatialNavigationMicroBundle(double startX = 50, double star
     }
 
     public void Update() => _lifecycle.Update();
-
     public void Invalidate() => _lifecycle.Invalidate();
 
     public void Dispose()
