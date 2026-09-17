@@ -18,16 +18,19 @@ public sealed class SpatialWorkshopScene
     public SpatialViewSettings View { get; }
     public IReadOnlyList<ConstructionVehicle> ConstructionVehicles { get; }
 
+    /// <summary>Creates the first campus composition from the declarative building catalog.</summary>
     public static SpatialWorkshopScene CreateDefault()
         => new("center", new SpatialPoint(50, 50),
             [
-                new SpatialInteractable("forge", "The Forge", new SpatialBounds(72, 14, 20, 25), new SpatialBounds(78, 41, 4, 3), new SpatialRectangularHitRegion(0, 0, 1, 1), "forge", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Bottom, 7, 13), new SpatialOpening(SpatialOpeningKind.Window, SpatialGeometryEdge.Left, 7, 12)]),
-                new SpatialInteractable("image-tools", "Image Workshop", new SpatialBounds(8, 14, 18, 14), new SpatialBounds(17, 29, 4, 3), new SpatialRectangularHitRegion(.08, .08, .84, .84), "image-workshop", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Bottom, 7, 11), new SpatialOpening(SpatialOpeningKind.Window, SpatialGeometryEdge.Right, 4, 9)]),
-                new SpatialInteractable("blueprint-library", "Blueprint Library", new SpatialBounds(32, 12, 18, 14), new SpatialBounds(41, 28, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "library", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Bottom, 7, 11), new SpatialOpening(SpatialOpeningKind.Window, SpatialGeometryEdge.Top, 4, 10)]),
-                new SpatialInteractable("singularity-mansion", "Singularity Mansion", new SpatialBounds(2, 36, 34, 32), new SpatialBounds(38, 48, 4, 3), new SpatialRectangularHitRegion(.02, .02, .96, .96), "mansion", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Right, 12, 18), new SpatialOpening(SpatialOpeningKind.Window, SpatialGeometryEdge.Bottom, 11, 23)]),
-                new SpatialInteractable("npc-studio", "NPC Studio", new SpatialBounds(8, 72, 20, 14), new SpatialBounds(18, 68, 4, 3), new SpatialRectangularHitRegion(.06, .06, .88, .88), "npc-studio", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Top, 8, 12), new SpatialOpening(SpatialOpeningKind.Window, SpatialGeometryEdge.Right, 4, 10)]),
-                new SpatialInteractable("fsm-bench", "FSM Workbench", new SpatialBounds(68, 56, 16, 11), new SpatialBounds(75, 52, 4, 3), new SpatialRectangularHitRegion(.04, .04, .92, .92), "fsm-workbench", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Top, 6, 10)]),
-                new SpatialInteractable("storage-bins", "Storage Bins", new SpatialBounds(88, 58, 8, 17), new SpatialBounds(85, 66, 3, 3), new SpatialRectangularHitRegion(.05, .05, .9, .9), "storage", openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Left, 7, 11)])
+                Building("singularity-mansion", "mansion", new SpatialBounds(34, 22, 4, 3)),
+                Building("image-tools", "image-workshop", new SpatialBounds(49, 23, 4, 3)),
+                Building("forge", "forge", new SpatialBounds(77, 29, 4, 3)),
+                Building("blueprint-library", "library", new SpatialBounds(49, 43, 3, 3)),
+                Building("singularity-transit", "singularity-transit", new SpatialBounds(78, 49, 4, 3)),
+                Building("npc-studio", "npc-studio", new SpatialBounds(11, 45, 4, 3)),
+                Building("fsm-bench", "fsm-workbench", new SpatialBounds(36, 43, 4, 3)),
+                Building("storage-bins", "storage", new SpatialBounds(87, 66, 3, 3)),
+                Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(50, 58, 5, 3))
             ],
             SpatialViewSettings.CreateDefault(),
             [
@@ -36,6 +39,12 @@ public sealed class SpatialWorkshopScene
                 new ConstructionVehicle("rover-01", "Site Rover", ConstructionVehicleKind.Rover, new SpatialPoint(31, 55)),
                 new ConstructionVehicle("lifter-01", "Material Lifter", ConstructionVehicleKind.Lifter, new SpatialPoint(89, 47))
             ]);
+
+    private static SpatialInteractable Building(string id, string experienceId, SpatialBounds interactionPoint)
+    {
+        var spec = SingularityCampusCatalog.Buildings.Single(item => item.Id == id);
+        return SpatialBuildingGenerator.CreateInteractable(spec, experienceId, interactionPoint);
+    }
 }
 
 public readonly record struct SpatialPoint(double X, double Y);
