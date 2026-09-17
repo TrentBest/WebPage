@@ -7,9 +7,16 @@ namespace TheSingularityWorkshop.Gui;
 /// </summary>
 public static class SingularityMansionLineworkFactory
 {
-    /// <summary>Creates the full mansion test structure.</summary>
-    public static SpatialLinework Create()
+    /// <summary>
+    /// Creates the mansion at the requested room-matrix density.
+    /// Density 1 is the baseline architectural scene; higher values subdivide the same footprint
+    /// so line counts can be increased without changing the perception-space bounds.
+    /// </summary>
+    public static SpatialLinework Create(int density = 1)
     {
+        if (density < 1)
+            throw new ArgumentOutOfRangeException(nameof(density), "Mansion density must be at least one.");
+
         var linework = new SpatialLinework();
 
         AddRectangle(linework, 4, 4, 92, 92);
@@ -38,15 +45,22 @@ public static class SingularityMansionLineworkFactory
             AddRectangle(linework, x + 2, y + 2, 8, 8);
         }
 
-        // 12 x 10 room matrix: deliberately repetitive geometry for scaling tests.
-        for (var row = 0; row < 10; row++)
-        for (var column = 0; column < 12; column++)
+        // Repeated room matrix. Density deliberately increases line count while preserving the same footprint.
+        var columns = 12 * density;
+        var rows = 10 * density;
+        var stepX = 90d / columns;
+        var stepY = 61d / rows;
+        var roomWidth = stepX * .72d;
+        var roomHeight = stepY * .72d;
+
+        for (var row = 0; row < rows; row++)
+        for (var column = 0; column < columns; column++)
         {
-            var x = 5 + column * 7.5;
-            var y = 33 + row * 6.1;
-            AddRectangle(linework, x, y, 5.5, 4.5);
-            AddLine(linework, x + 2.75, y, x + 2.75, y + 4.5);
-            AddLine(linework, x, y + 2.25, x + 5.5, y + 2.25);
+            var x = 5 + column * stepX;
+            var y = 33 + row * stepY;
+            AddRectangle(linework, x, y, roomWidth, roomHeight);
+            AddLine(linework, x + roomWidth / 2d, y, x + roomWidth / 2d, y + roomHeight);
+            AddLine(linework, x, y + roomHeight / 2d, x + roomWidth, y + roomHeight / 2d);
         }
 
         // Grand hall ribs.
