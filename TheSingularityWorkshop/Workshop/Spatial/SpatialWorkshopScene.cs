@@ -3,12 +3,13 @@ namespace TheSingularityWorkshop.Gui;
 /// <summary>The logical spatial scene presented by Explore.</summary>
 public sealed class SpatialWorkshopScene
 {
-    private SpatialWorkshopScene(string startingAreaId, SpatialPoint startingPosition, IReadOnlyList<SpatialInteractable> interactables, SpatialViewSettings view, IReadOnlyList<ConstructionVehicle> constructionVehicles)
+    private SpatialWorkshopScene(string startingAreaId, SpatialPoint startingPosition, IReadOnlyList<SpatialInteractable> interactables, SpatialViewSettings view, SpatialConstructionSite constructionSite, IReadOnlyList<ConstructionVehicle> constructionVehicles)
     {
         StartingAreaId = startingAreaId;
         StartingPosition = startingPosition;
         Interactables = interactables;
         View = view;
+        ConstructionSite = constructionSite;
         ConstructionVehicles = constructionVehicles;
     }
 
@@ -16,6 +17,7 @@ public sealed class SpatialWorkshopScene
     public SpatialPoint StartingPosition { get; }
     public IReadOnlyList<SpatialInteractable> Interactables { get; }
     public SpatialViewSettings View { get; }
+    public SpatialConstructionSite ConstructionSite { get; }
     public IReadOnlyList<ConstructionVehicle> ConstructionVehicles { get; }
 
     /// <summary>Creates the first campus composition from the declarative building catalog.</summary>
@@ -30,14 +32,15 @@ public sealed class SpatialWorkshopScene
                 Building("npc-studio", "npc-studio", new SpatialBounds(11, 45, 4, 3)),
                 Building("fsm-bench", "fsm-workbench", new SpatialBounds(36, 43, 4, 3)),
                 Building("storage-bins", "storage", new SpatialBounds(87, 66, 3, 3)),
-                Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(50, 58, 5, 3))
+                Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(79, 60, 5, 3))
             ],
             SpatialViewSettings.CreateDefault(),
+            new SpatialConstructionSite("workshop-expansion", "WORKSHOP EXPANSION SITE", new SpatialBounds(34, 64, 24, 22), new SpatialBounds(39, 69, 14, 12)),
             [
-                new ConstructionVehicle("crane-01", "Fabrication Crane", ConstructionVehicleKind.Crane, new SpatialPoint(64, 72)),
-                new ConstructionVehicle("backhoe-01", "Site Tractor", ConstructionVehicleKind.Backhoe, new SpatialPoint(37, 70)),
-                new ConstructionVehicle("rover-01", "Site Rover", ConstructionVehicleKind.Rover, new SpatialPoint(31, 55)),
-                new ConstructionVehicle("lifter-01", "Material Lifter", ConstructionVehicleKind.Lifter, new SpatialPoint(89, 47))
+                new ConstructionVehicle("crane-01", "Fabrication Crane", ConstructionVehicleKind.Crane, new SpatialPoint(48, 72)),
+                new ConstructionVehicle("backhoe-01", "Site Tractor", ConstructionVehicleKind.Backhoe, new SpatialPoint(38, 80)),
+                new ConstructionVehicle("rover-01", "Site Rover", ConstructionVehicleKind.Rover, new SpatialPoint(40, 70)),
+                new ConstructionVehicle("lifter-01", "Material Lifter", ConstructionVehicleKind.Lifter, new SpatialPoint(54, 84))
             ]);
 
     private static SpatialInteractable Building(string id, string experienceId, SpatialBounds interactionPoint)
@@ -148,6 +151,9 @@ public sealed class SpatialInteractable
     public void OnInteraction() { InteractionCount++; Interaction?.Invoke(); }
     public bool OnClick(NormalizedPointer point) => HitRegion.Contains(point);
 }
+
+/// <summary>Declares real estate allocated for active Workshop construction.</summary>
+public readonly record struct SpatialConstructionSite(string Id, string Name, SpatialBounds Bounds, SpatialBounds FoundationBounds);
 
 /// <summary>Controls perception-layer behavior for a spatial floor plan.</summary>
 public sealed class SpatialViewSettings
