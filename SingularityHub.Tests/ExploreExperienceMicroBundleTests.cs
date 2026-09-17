@@ -19,6 +19,31 @@ public sealed class ExploreExperienceMicroBundleTests
     }
 
     [Fact]
+    public void ExploreExperience_ReusesTheAlreadyLoadedMonikerBundle()
+    {
+        using var first = new ExploreExperienceMicroBundle();
+        using var second = new ExploreExperienceMicroBundle();
+
+        Assert.Same(first.Moniker, second.Moniker);
+        Assert.True(first.Moniker.IsReady);
+        Assert.Equal(MonikerMicroBundle.DefaultText, first.Moniker.Text);
+    }
+
+    [Fact]
+    public void Moniker_ProvidesSafeDefaultThroughFsmApi()
+    {
+        using var moniker = new MonikerMicroBundle();
+
+        Assert.True(moniker.IsReady);
+        Assert.Equal("Ready", moniker.Status);
+        Assert.Equal(MonikerMicroBundle.DefaultText, moniker.Text);
+
+        moniker.Present();
+        moniker.Update();
+        Assert.Equal("Presenting", moniker.Status);
+    }
+
+    [Fact]
     public void SpatialNavigation_DefaultsVisitorToWorldCenter()
     {
         using var navigation = new SpatialNavigationMicroBundle();
