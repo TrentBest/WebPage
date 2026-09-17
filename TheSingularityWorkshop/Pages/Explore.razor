@@ -17,10 +17,12 @@
     private readonly WorkshopRouter Router = new("workshop");
     private readonly SpatialLinework ForgeStructure = SpatialForgeLineworkFactory.Create();
     private readonly SpatialLinework ForgeLinework = new();
+    private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
     private string? insideRoomId;
     private int detailLevel = 16;
+    private int mansionDensity = 1;
     private IJSObjectReference? spatialModule;
 
     private static readonly IReadOnlyList<SpatialRoom> Rooms =
@@ -37,6 +39,7 @@
     public Explore()
     {
         Experience = new ExploreExperienceMicroBundle();
+        Router.RegisterEntryPoint("mansion", new SpatialPoint(50, 78));
         Experience.Navigation.MoveTo(Scene.StartingPosition.X, Scene.StartingPosition.Y);
     }
 
@@ -56,6 +59,9 @@
         if (insideRoomId == "line-lab")
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
 
+        if (insideRoomId == "mansion")
+            return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, HandleMansionWorldClick, HandleKeyDown, SetMansionDensity, ExitRoom);
+
         if (insideRoomId is not null)
         {
             var interactable = Scene.Interactables.FirstOrDefault(item => item.ExperienceId == insideRoomId);
@@ -74,6 +80,13 @@
         => WorkshopGui.Element(this, "span").Style("position", "fixed").Style("left", "50%").Style("top", "calc(50% - 24px)").Style("transform", "translateX(-50%)").Style("z-index", "20").Style("padding", ".12rem .35rem").Style("border", "1px solid rgba(255,255,255,.18)").Style("background", "rgba(1,4,10,.82)").Style("color", "#ffffff").Style("font-family", "Consolas, 'Courier New', monospace").Style("font-size", ".5rem").Style("letter-spacing", ".12em").Style("white-space", "nowrap").Style("pointer-events", "none").Text(Experience.User.DisplayName);
 
     private void SetDetailLevel(int level) => detailLevel = Math.Clamp(level, 1, 64);
+    private void SetMansionDensity(int density)
+    {
+        mansionDensity = Math.Max(1, density);
+        MansionStructure.Dispose();
+        MansionStructure = SingularityMansionLineworkFactory.Create(mansionDensity);
+    }
+
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
 
@@ -94,6 +107,12 @@
 
     private async Task MoveAvatar(double dx, double dy)
     {
+        if (insideRoomId == "mansion")
+        {
+            await NavigateMansionTo(new SpatialPoint(AvatarX + dx, AvatarY + dy));
+            return;
+        }
+
         if (insideRoomId is not null) return;
         await NavigateTo(new SpatialPoint(AvatarX + dx, AvatarY + dy));
     }
@@ -105,6 +124,15 @@
         spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
         var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToWorld", args.ClientX, args.ClientY, AvatarX, AvatarY);
         await NavigateTo(point);
+    }
+
+    /// <summary>Moves freely through the Mansion's line-rendered world without Workshop building collisions.</summary>
+    private async Task HandleMansionWorldClick(MouseEventArgs args)
+    {
+        if (insideRoomId != "mansion") return;
+        spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
+        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToWorld", args.ClientX, args.ClientY, AvatarX, AvatarY);
+        await NavigateMansionTo(point);
     }
 
     /// <summary>Approaches a spatial object, then enters its child scene only after arrival.</summary>
@@ -148,6 +176,9 @@
         var path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), target, SpatialGeometryEngine.FromInteractables(Scene.Interactables));
         await NavigatePath(path);
     }
+
+    private Task NavigateMansionTo(SpatialPoint target)
+        => NavigatePath([new SpatialPoint(Math.Clamp(target.X, 4, 96), Math.Clamp(target.Y, 8, 92))]);
 
     /// <summary>Animates each navigation segment so the camera does not teleport between path nodes.</summary>
     private async Task NavigatePath(IReadOnlyList<SpatialPoint> path)
@@ -233,6 +264,7 @@
         Experience.Dispose();
         ForgeStructure.Dispose();
         ForgeLinework.Dispose();
+        MansionStructure.Dispose();
         if (spatialModule is not null) _ = spatialModule.DisposeAsync();
     }
 }
