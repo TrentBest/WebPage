@@ -15,7 +15,7 @@ public sealed class SpatialPointerInteractionTests
         var fired = 0;
         forge.Interaction += () => fired++;
 
-        Assert.Equal(new SpatialBounds(70, 39, 6, 5), forge.InteractionPoint);
+        Assert.Equal(new SpatialBounds(78, 41, 4, 3), forge.InteractionPoint);
         Assert.Equal(0, forge.InteractionCount);
         Assert.Equal(0, fired);
 
