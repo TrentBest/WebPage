@@ -9,16 +9,17 @@ public static class SpatialGeometryGuiBuilder
     private const string White = "#f7f7ff";
 
     /// <summary>Builds the complete Workshop schematic from scene geometry.</summary>
-    public static ElementBuilder Build(object receiver, SpatialWorkshopScene scene, Func<string, Task> interact)
+    public static ElementBuilder Build(object receiver, SpatialWorkshopScene scene, Func<string, Task> interact, double zoom = 1d)
     {
+        var effectiveZoom = new SpatialCamera(50, 50, zoom).Clamped().Zoom;
         var svg = WorkshopGui.Element(receiver, "svg")
             .Attribute("viewBox", "0 0 100 100")
             .Attribute("preserveAspectRatio", "none")
             .Style("position", "absolute")
             .Style("left", "0")
             .Style("top", "0")
-            .Style("width", $"{SpatialCamera.WorldWidthVw:0.###}vw")
-            .Style("height", $"{SpatialCamera.WorldHeightVh:0.###}vh")
+            .Style("width", $"{SpatialCamera.WorldWidthVw * effectiveZoom:0.###}vw")
+            .Style("height", $"{SpatialCamera.WorldHeightVh * effectiveZoom:0.###}vh")
             .Style("pointer-events", "none")
             .Attribute("aria-label", "Workshop schematic geometry");
 
