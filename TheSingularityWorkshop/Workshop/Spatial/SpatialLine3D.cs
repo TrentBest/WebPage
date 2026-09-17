@@ -36,6 +36,11 @@ public readonly record struct SpatialOrthographicCamera(
     double PitchRadians = 0.5235987755982988,
     double Scale = 1d)
 {
+    /// <summary>Preserves the intended Workshop camera when the struct is created with <c>new()</c>.</summary>
+    public SpatialOrthographicCamera() : this(-0.7853981633974483, 0.5235987755982988, 1d)
+    {
+    }
+
     /// <summary>Projects a 3D point into the existing 2D line perception coordinate system.</summary>
     public SpatialPoint Project(SpatialPoint3 point)
     {
