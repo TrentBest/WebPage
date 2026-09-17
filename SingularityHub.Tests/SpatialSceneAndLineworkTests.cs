@@ -81,6 +81,28 @@ public sealed class SpatialSceneAndLineworkTests
         Assert.Equal("forge", router.Frames[^1].ParentSceneId);
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 27 — Forge structure is authored as reusable line primitives")]
+    public void ForgeLineworkFactoryBuildsStructuralPrimitives()
+    {
+        using var linework = SpatialForgeLineworkFactory.Create();
+
+        Assert.Equal(32, linework.Lines.Count);
+        Assert.Equal(32, linework.TextureBuffer.Width);
+        Assert.Equal(1, SpatialLineTextureBuffer.Height);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 27 — Forge structure passes through the shared line renderer")]
+    public void ForgeStructureRendersThroughSpatialLineRenderer()
+    {
+        using var linework = SpatialForgeLineworkFactory.Create();
+
+        var rendered = new SpatialLineRenderer().Render(linework, SpatialLineStyleCatalog.Blueprint);
+
+        Assert.Equal(linework.Lines.Count, rendered.Count);
+        Assert.All(rendered, line => Assert.Equal(SpatialLineStyleCatalog.Blueprint, line.Style));
+        Assert.All(rendered, line => Assert.Equal(2, line.Points.Count));
+    }
+
     [Fact(DisplayName = "Incremental Unit Test 26 — squiggly styles expand a line into reusable render geometry")]
     public void LineRendererAppliesSquigglyEffect()
     {
