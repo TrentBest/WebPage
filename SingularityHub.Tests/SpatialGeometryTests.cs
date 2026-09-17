@@ -41,24 +41,37 @@ public sealed class SpatialGeometryTests
         Assert.False(SpatialGeometryEngine.SegmentBlocked(new SpatialPoint(30, 30), new SpatialPoint(35, 35), building.Bounds));
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 25 — blocked movement can route around a structure")]
+    public void BlockedMovementFindsDetour()
+    {
+        var building = new SpatialBuildingGeometry("test", new SpatialBounds(40, 40, 20, 20), "#00eaff", "#101820");
+        var path = SpatialGeometryEngine.FindPath(
+            new SpatialPoint(30, 50),
+            new SpatialPoint(70, 50),
+            [building]);
+
+        Assert.NotEmpty(path);
+        Assert.Equal(new SpatialPoint(70, 50), path[^1]);
+        Assert.All(path, point => Assert.False(Contains(new SpatialBounds(38.5, 38.5, 23, 23), point)));
+    }
+
     [Fact(DisplayName = "Incremental Unit Test 25 — interaction objects can expose multiple approach positions")]
     public void InteractableSupportsMultipleInteractionPositions()
     {
-        var item = new SpatialInteractable(
+        var item = SpatialInteractable.CreateVehicle(
             "fighter",
             "Fighter Aircraft",
             new SpatialBounds(40, 40, 10, 6),
-            new SpatialBounds(38, 41, 2, 2),
-            new SpatialRectangularHitRegion(0, 0, 1, 1),
-            "fighter",
             [
                 new SpatialInteractionPoint("pilot", "Pilot Position", new SpatialBounds(38, 41, 2, 2)),
                 new SpatialInteractionPoint("systems", "Systems Position", new SpatialBounds(50, 41, 2, 2))
-            ]);
+            ],
+            "fighter");
 
         Assert.Equal(2, item.InteractionPoints.Count);
         Assert.Contains(item.InteractionPoints, point => point.Id == "pilot");
         Assert.Contains(item.InteractionPoints, point => point.Id == "systems");
+        Assert.Equal(item.InteractionPoints[0].Bounds, item.InteractionPoint);
     }
 
     private static bool Contains(SpatialBounds bounds, SpatialPoint point)
