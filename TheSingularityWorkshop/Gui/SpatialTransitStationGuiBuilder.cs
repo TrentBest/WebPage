@@ -35,7 +35,8 @@ public static class SpatialTransitStationGuiBuilder
         double avatarX,
         double avatarY,
         Action<KeyboardEventArgs> onKeyDown,
-        Func<double, double, Task> moveAvatarTo,
+        Func<MouseEventArgs, Task> onWorldClick,
+        TransitTrainSpecification trainSpecification)
         TransitTrainSpecification trainSpecification)
     {
         var root = WorkshopGui.Panel(receiver)
@@ -47,7 +48,7 @@ public static class SpatialTransitStationGuiBuilder
 
         root.Content(Styles(receiver));
         root.Content(Header(receiver, userName, manifest));
-        root.Content(Station(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, avatarX, avatarY, onKeyDown, moveAvatarTo, trainSpecification));
+        root.Content(Station(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, avatarX, avatarY, onKeyDown, onWorldClick, trainSpecification));
         root.Content(PassengerFlow(receiver, manifest));
         root.Content(OperationsKiosk(receiver, microGameActive, microGameScore, microGameRound, microGameTargetId, manifest, startMicroGame, selectMicroGamePlatform));
         root.Content(ExitButton(receiver, exit));
@@ -77,7 +78,7 @@ public static class SpatialTransitStationGuiBuilder
         double avatarX,
         double avatarY,
         Action<KeyboardEventArgs> onKeyDown,
-        Func<double, double, Task> moveAvatarTo,
+        Func<MouseEventArgs, Task> onWorldClick,
         TransitTrainSpecification trainSpecification)
     {
         var station = WorkshopGui.Element(receiver, "div")
@@ -97,19 +98,27 @@ public static class SpatialTransitStationGuiBuilder
             .Style("box-shadow", $"0 0 120px {Cyan}12,inset 0 0 100px {Cyan}08")
             .Style("overflow", "hidden");
 
-        shell.Content(Roof(receiver));
-        shell.Content(FloorPlan(receiver, manifest));
-        shell.Content(GrandHall(receiver));
-        shell.Content(TrackField(receiver, manifest));
-        shell.Content(TrainTraffic(receiver, trainSpecification));
-        shell.Content(Platforms(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, trainSpecification));
-        shell.Content(VerticalWalkways(receiver, manifest));
-        shell.Content(StationLabels(receiver, manifest));
-        shell.Content(ArchitecturalSymbols(receiver));
-        shell.Content(PassengerActors(receiver, manifest));
-        shell.Content(StaffActors(receiver));
-        shell.Content(WalkSurface(receiver, avatarX, avatarY, moveAvatarTo));
-        shell.Content(Avatar(receiver, avatarX, avatarY));
+        var worldPlane = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "0").Style("top", "0")
+            .Style("width", "100%").Style("height", "100%")
+            .Style("transform", $"translate({50d - avatarX:0.###}%, {50d - avatarY:0.###}%)")
+            .Style("transition", "transform .18s ease-out")
+            .Style("transform-origin", "50% 50%");
+
+        worldPlane.Content(Roof(receiver));
+        worldPlane.Content(FloorPlan(receiver, manifest));
+        worldPlane.Content(GrandHall(receiver));
+        worldPlane.Content(TrackField(receiver, manifest));
+        worldPlane.Content(TrainTraffic(receiver, trainSpecification));
+        worldPlane.Content(Platforms(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, trainSpecification));
+        worldPlane.Content(VerticalWalkways(receiver, manifest));
+        worldPlane.Content(StationLabels(receiver, manifest));
+        worldPlane.Content(ArchitecturalSymbols(receiver));
+        worldPlane.Content(PassengerActors(receiver, manifest));
+        worldPlane.Content(StaffActors(receiver));
+        worldPlane.Content(WalkSurface(receiver, onWorldClick));
+        shell.Content(worldPlane);
+        shell.Content(Avatar(receiver));
         shell.Content(StationFocus(receiver, onKeyDown));
 
         station.Content(shell);
@@ -309,30 +318,13 @@ public static class SpatialTransitStationGuiBuilder
                 .Style("font-size", ".34rem").Style("letter-spacing", ".11em")
                 .Style("color", accent).Text(label));
 
-    private static ElementBuilder WalkSurface(object receiver, double avatarX, double avatarY, Func<double, double, Task> moveAvatarTo)
-    {
-        const int cells = 18;
-        var surface = WorkshopGui.Element(receiver, "div")
+    private static ElementBuilder WalkSurface(object receiver, Func<MouseEventArgs, Task> onWorldClick)
+        => WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("inset", "0").Style("z-index", "2")
-            .Style("display", "grid")
-            .Style("grid-template-columns", $"repeat({cells},1fr)")
-            .Style("grid-template-rows", $"repeat({cells},1fr)")
-            .Style("pointer-events", "none");
-
-        for (var row = 0; row < cells; row++)
-        for (var column = 0; column < cells; column++)
-        {
-            var x = (column + .5) / cells * 100;
-            var y = (row + .5) / cells * 100;
-            surface.Content(WorkshopGui.Button(receiver)
-                .Style("width", "100%").Style("height", "100%").Style("padding", "0")
-                .Style("border", "0").Style("background", "transparent")
-                .Style("pointer-events", "auto").Style("cursor", "crosshair")
-                .AriaLabel($"Walk to {x:0.#}, {y:0.#}")
-                .OnClick(() => moveAvatarTo(Math.Clamp(x, 3, 97), Math.Clamp(y, 5, 95))));
-        }
-        return surface;
-    }
+            .Style("background", "transparent").Style("cursor", "crosshair")
+            .Style("pointer-events", "auto")
+            .AriaLabel("Station floor. Left click to walk.")
+            .OnClick(onWorldClick);
 
     private static ElementBuilder StationFocus(object receiver, Action<KeyboardEventArgs> onKeyDown)
         => WorkshopGui.Element(receiver, "div")
@@ -341,9 +333,9 @@ public static class SpatialTransitStationGuiBuilder
             .Attribute("tabindex", "0")
             .OnKeyDown(onKeyDown);
 
-    private static ElementBuilder Avatar(object receiver, double x, double y)
+    private static ElementBuilder Avatar(object receiver)
         => WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", $"{x}%").Style("top", $"{y}%")
+            .Style("position", "fixed").Style("left", "50%").Style("top", "50%")
             .Style("transform", "translate(-50%,-50%)").Style("z-index", "22")
             .Style("width", "18px").Style("height", "18px").Style("border-radius", "50%")
             .Style("border", $"2px solid {White}").Style("background", "#01040a")
