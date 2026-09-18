@@ -135,7 +135,7 @@
             return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
 
         if (insideRoomId == "singularity-transit")
-            return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform);
+            return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform, AvatarX, AvatarY, HandleKeyDown, MoveTransitAvatar);
 
         if (insideRoomId == "singularity-island")
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
@@ -324,13 +324,25 @@
         switch (args.Key.ToLowerInvariant())
         {
             case "w":
-            case "arrowup": _ = MoveAvatar(0, -1); break;
+            case "arrowup":
+                if (insideRoomId == "singularity-transit") _ = MoveTransitAvatar(AvatarX, AvatarY - 1.5);
+                else _ = MoveAvatar(0, -1);
+                break;
             case "s":
-            case "arrowdown": _ = MoveAvatar(0, 1); break;
+            case "arrowdown":
+                if (insideRoomId == "singularity-transit") _ = MoveTransitAvatar(AvatarX, AvatarY + 1.5);
+                else _ = MoveAvatar(0, 1);
+                break;
             case "a":
-            case "arrowleft": _ = MoveAvatar(-1, 0); break;
+            case "arrowleft":
+                if (insideRoomId == "singularity-transit") _ = MoveTransitAvatar(AvatarX - 1.5, AvatarY);
+                else _ = MoveAvatar(-1, 0);
+                break;
             case "d":
-            case "arrowright": _ = MoveAvatar(1, 0); break;
+            case "arrowright":
+                if (insideRoomId == "singularity-transit") _ = MoveTransitAvatar(AvatarX + 1.5, AvatarY);
+                else _ = MoveAvatar(1, 0);
+                break;
         }
     }
 
@@ -398,6 +410,17 @@
 
     private void SelectLeaderboardEntry(string? name)
         => selectedLeaderboardEntry = name;
+
+    private Task MoveTransitAvatar(double x, double y)
+    {
+        if (insideRoomId != "singularity-transit") return Task.CompletedTask;
+
+        // Grand Central is currently a schematic floor plan. Keep movement inside
+        // the architectural envelope; collision volumes will be derived from the
+        // same walls/rooms once the blueprint is stable.
+        Experience.Navigation.MoveTo(Math.Clamp(x, 4, 96), Math.Clamp(y, 8, 94));
+        return InvokeAsync(StateHasChanged);
+    }
 
     private void SelectTransitPlatform(string destinationId)
     {
