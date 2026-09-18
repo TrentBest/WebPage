@@ -19,6 +19,7 @@
     private readonly SpatialLinework ForgeLinework = new();
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
+    private readonly SpatialLaboratoryManifest LaboratoryManifest = SpatialLaboratoryManifest.CreateDefault();
     private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
@@ -38,6 +39,7 @@
     private string? insideRoomId;
     private string? selectedTransitDestinationId;
     private bool transitTrainVisible;
+    private string? selectedLaboratoryFloorId;
     private static readonly SpatialIslandExperience Island = SpatialIslandExperience.SingularityIsland;
     private int detailLevel = 16;
     private int mansionDensity = 1;
@@ -60,6 +62,10 @@
         Router.RegisterEntryPoint("mansion", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("construction-site", new SpatialPoint(12, 9));
         Router.RegisterEntryPoint("maze", SpatialMazeCatalog.Showcase.Start);
+        Router.RegisterEntryPoint("singularity-lab", new SpatialPoint(50, 78));
+        Router.RegisterEntryPoint("space-elevator", new SpatialPoint(50, 78));
+        Router.RegisterEntryPoint("singularity-station", new SpatialPoint(50, 78));
+        Router.RegisterEntryPoint("singularity-island", new SpatialPoint(50, 78));
         Experience.Navigation.MoveTo(Scene.StartingPosition.X, Scene.StartingPosition.Y);
     }
 
@@ -90,6 +96,9 @@
 
         if (insideRoomId == "singularity-island")
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
+
+        if (insideRoomId == "singularity-lab")
+            return SpatialLaboratoryExperienceGuiBuilder.Build(this, LaboratoryManifest, Experience.User.DisplayName, selectedLaboratoryFloorId, SelectLaboratoryFloor, ExitRoom);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome, mansionZoom, SetMansionZoom);
@@ -295,15 +304,26 @@
         if (!transitTrainVisible || selectedTransitDestinationId != destinationId)
             return;
 
-        // Destination scenes are intentionally declarative for now. The train
-        // has physically manifested; the next increment can attach a destination
-        // Experience to each platform without changing the station presentation.
-        transitTrainVisible = false;
+        var destination = TransitManifest.Destinations.FirstOrDefault(item => item.Id == destinationId);
+        if (destination == default)
+            return;
 
-        Router.Enter("singularity-island", new SpatialPoint(AvatarX, AvatarY));
-        var entry = Router.GetEntryPoint("singularity-island");
+        transitTrainVisible = false;
+        Router.Enter(destination.SceneId, new SpatialPoint(AvatarX, AvatarY));
+        var entry = Router.GetEntryPoint(destination.SceneId);
         Experience.Navigation.MoveTo(entry.X, entry.Y);
-        insideRoomId = "singularity-island";
+        insideRoomId = destination.SceneId;
+
+        if (destination.SceneId == LaboratoryManifest.Id)
+            selectedLaboratoryFloorId = LaboratoryManifest.Floors.FirstOrDefault().Id;
+    }
+
+    private void SelectLaboratoryFloor(string floorId)
+    {
+        if (!LaboratoryManifest.Floors.Any(floor => floor.Id == floorId))
+            return;
+
+        selectedLaboratoryFloorId = floorId;
     }
 
     private void EnterIslandAttraction(string experienceId)
