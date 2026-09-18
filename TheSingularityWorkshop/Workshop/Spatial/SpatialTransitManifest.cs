@@ -67,6 +67,14 @@ public sealed record SpatialTransitManifest(
                 new(2, "OVERHEAD CONCOURSE", "Expandable second-level circulation deck.")
             ]);
     }
+
+    /// <summary>Creates an expanded station manifest without changing the canonical platform definitions.</summary>
+    public SpatialTransitManifest AddPlatform(SpatialTransitPlatform platform)
+        => this with { Platforms = Platforms.Append(platform).ToArray() };
+
+    /// <summary>Creates an expanded station manifest with a new vertical circulation level.</summary>
+    public SpatialTransitManifest AddLevel(SpatialTransitLevel level)
+        => this with { Levels = Levels.Append(level).ToArray() };
 }
 
 public readonly record struct SpatialTransitPassenger(string Id, SpatialPoint WaitingPosition, int BoardingOrder);
