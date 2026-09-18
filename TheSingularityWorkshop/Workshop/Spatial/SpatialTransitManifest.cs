@@ -41,7 +41,10 @@ public sealed record SpatialTransitManifest(
                 new("air-terminal", "AIR TERMINAL", "air-terminal"),
                 new("water-terminal", "WATER TERMINAL", "water-terminal"),
                 new("rail-terminal", "RAIL TERMINAL", "rail-terminal"),
-                new("singularity-island", "SINGULARITY ISLAND", "singularity-island")
+                new("singularity-lab", "SINGULARITY LAB", "singularity-lab"),
+                new("space-elevator", "SPACE ELEVATOR", "space-elevator"),
+                new("singularity-island", "SINGULARITY ISLAND", "singularity-island"),
+                new("singularity-station", "SINGULARITY STATION", "singularity-station")
             ],
             new SpatialTransitTiming(4, 2, 4, 2));
 }
