@@ -66,4 +66,40 @@ public sealed class SpatialCivilizationExpansionTests
         Assert.Contains(aec.UseCases, x => x.Id == "behavior-package");
         Assert.Contains(aec.MonetizationHooks, x => x == "behavior-package-sale");
     }
+    [Fact(DisplayName = "Incremental Unit Test 60 — intelligent AEC drafting table exposes semantic line intent and external targets")]
+    public void IntelligentDraftingTableIsPlatformNeutral()
+    {
+        var office = SpatialAECRemoteOfficeManifest.CreateDefault();
+
+        Assert.Equal("AEC SECTOR PORTAL", office.SectorPortalName);
+        Assert.True(office.SupportsLineType("wall"));
+        Assert.True(office.SupportsLineType("equipment"));
+        Assert.Contains(office.DraftingTable.Controls, x => x == "angle");
+        Assert.Contains(office.ExternalTargets, x => x.Id == "revit");
+        Assert.Contains(office.ExternalTargets, x => x.Id == "inventor");
+        Assert.Contains(office.ExternalTargets, x => x.Id == "singularity-warehouse");
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 61 — Singularity Taxi makes the ride optional without removing the Experience")]
+    public void SingularityTaxiSupportsRideOrInstantArrival()
+    {
+        var taxi = SpatialTaxiManifest.CreateDefault();
+
+        Assert.True(taxi.Rules.RideIsOptional);
+        Assert.True(taxi.Rules.InstantDestinationAvailable);
+        Assert.True(taxi.Rules.PassengerMaySkipRide);
+        Assert.True(taxi.Rules.RideCountsAsExperience);
+        Assert.Contains(taxi.Fleet, x => x.Id == "hover-cab");
+        Assert.Contains(taxi.Fleet, x => x.Id == "orbital-shuttle");
+        Assert.NotNull(taxi.FindDestination("station"));
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 62 — Explore exposes the AEC office and taxi as spatial destinations")]
+    public void ExploreExposesAecOfficeAndTaxi()
+    {
+        var scene = SpatialWorkshopScene.CreateDefault();
+
+        Assert.Contains(scene.Interactables, x => x.ExperienceId == "aec-remote-office");
+        Assert.Contains(scene.Interactables, x => x.ExperienceId == "singularity-taxi");
+    }
 }
