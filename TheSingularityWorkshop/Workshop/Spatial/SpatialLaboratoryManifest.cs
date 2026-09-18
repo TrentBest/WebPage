@@ -46,6 +46,7 @@ public sealed record SpatialLaboratoryManifest(
                 new("material-stress", "MATERIAL STRESS CHAMBER", "MACRO", "Test material properties against controlled forces and energy.", ["materials", "gravity", "energy"]),
                 new("field-chamber", "FIELD CHAMBER", "MACRO", "Combine field sources and observe their mathematical interaction.", ["quantum", "plasma"]),
                 new("hydraulic-terrain", "HYDRAULIC TERRAIN", "TERRAIN", "Run water, pressure, erosion, drainage, and weathering experiments.", ["fluids", "energy"]),
+                new("planetary", "PLANETARY SYSTEM LAB", "PLANETARY", "Compose planetary environments and inspect their orbital and surface systems.", ["cosmic", "gravity", "materials"]),
                 new("solar-system", "SOLAR SYSTEM SIMULATOR", "SOLAR SYSTEM", "Explore orbital and multi-body behavior.", ["cosmic", "gravity"]),
                 new("galaxy", "GALAXY SIMULATOR", "GALAXY", "Study large-scale structure and gravitational emergence.", ["cosmic", "gravity"]),
                 new("fsm-physics", "FSM PHYSICS ENGINE", "ARBITRARY", "Turn a declarative physics model into ordered FSM process groups.", ["simulation", "fsm-physics", "atom-data"]),
