@@ -28,6 +28,9 @@
     private double spatialZoom = 1d;
     private double mansionZoom = 1d;
     private double constructionZoom = 1d;
+    private double mazeZoom = 1d;
+    private int mazeSteps;
+    private bool mazeFinished;
     private string? insideRoomId;
     private int detailLevel = 16;
     private int mansionDensity = 1;
@@ -49,6 +52,7 @@
         Experience = new ExploreExperienceMicroBundle();
         Router.RegisterEntryPoint("mansion", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("construction-site", new SpatialPoint(12, 9));
+        Router.RegisterEntryPoint("maze", SpatialMazeCatalog.Showcase.Start);
         Experience.Navigation.MoveTo(Scene.StartingPosition.X, Scene.StartingPosition.Y);
     }
 
@@ -70,6 +74,15 @@
 
         if (insideRoomId == "construction-site")
             return SpatialConstructionExperienceGuiBuilder.Build(this, Scene.ConstructionExperience, Experience.User.DisplayName, AvatarX, AvatarY, constructionZoom, SetConstructionZoom, HandleKeyDown, HandleConstructionWorldClick, ExitRoom);
+
+        if (insideRoomId == "maze")
+            return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
+
+        if (insideRoomId == "maze")
+        {
+            MoveMazeAvatar(dx, dy);
+            return;
+        }
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome, mansionZoom, SetMansionZoom);
@@ -104,6 +117,9 @@
 
     private void SetConstructionZoom(double zoom)
         => constructionZoom = Math.Clamp(zoom, Scene.View.MinZoom, Scene.View.MaxZoom);
+
+    private void SetMazeZoom(double zoom)
+        => mazeZoom = Math.Clamp(zoom, .6, 2.2);
 
     private void ShowWorkshopMap() => workshopMapVisible = true;
 
@@ -183,13 +199,13 @@
         switch (args.Key.ToLowerInvariant())
         {
             case "w":
-            case "arrowup": _ = MoveAvatar(0, -3); break;
+            case "arrowup": _ = MoveAvatar(0, -1); break;
             case "s":
-            case "arrowdown": _ = MoveAvatar(0, 3); break;
+            case "arrowdown": _ = MoveAvatar(0, 1); break;
             case "a":
-            case "arrowleft": _ = MoveAvatar(-3, 0); break;
+            case "arrowleft": _ = MoveAvatar(-1, 0); break;
             case "d":
-            case "arrowright": _ = MoveAvatar(3, 0); break;
+            case "arrowright": _ = MoveAvatar(1, 0); break;
         }
     }
 
@@ -217,6 +233,35 @@
     }
 
     /// <summary>Moves freely through the Mansion's line-rendered world without Workshop building collisions.</summary>
+    private async Task HandleMazeWorldClick(MouseEventArgs args)
+    {
+        if (insideRoomId != "maze") return;
+        spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
+        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToCenteredWorld", args.ClientX, args.ClientY, AvatarX, AvatarY, mazeZoom);
+        var distance = Math.Sqrt(Math.Pow(point.X - AvatarX, 2) + Math.Pow(point.Y - AvatarY, 2));
+        if (distance > 3.25) return;
+        var dx = Math.Sign(point.X - AvatarX);
+        var dy = Math.Sign(point.Y - AvatarY);
+        if (Math.Abs(point.X - AvatarX) >= Math.Abs(point.Y - AvatarY))
+            dy = 0;
+        else
+            dx = 0;
+        MoveMazeAvatar(dx, dy);
+    }
+
+    private void MoveMazeAvatar(double dx, double dy)
+    {
+        if (mazeFinished) return;
+        var maze = SpatialMazeCatalog.Showcase;
+        var nextX = (int)Math.Floor(AvatarX + dx);
+        var nextY = (int)Math.Floor(AvatarY + dy);
+        if (!maze.IsWalkable(nextX, nextY)) return;
+        Experience.Navigation.MoveTo(nextX + .5, nextY + .5);
+        mazeSteps++;
+        if ((int)Math.Floor(AvatarX) == (int)Math.Floor(maze.Exit.X) && (int)Math.Floor(AvatarY) == (int)Math.Floor(maze.Exit.Y))
+            mazeFinished = true;
+    }
+
     private async Task HandleConstructionWorldClick(MouseEventArgs args)
     {
         if (insideRoomId != "construction-site") return;
