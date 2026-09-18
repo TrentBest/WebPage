@@ -69,6 +69,25 @@ public static class SpatialLaboratoryExperienceGuiBuilder
             var simulators = laboratory.Simulators.Where(x => x.DomainIds.Contains(selectedFloor.DomainId, StringComparer.OrdinalIgnoreCase)).ToList();
             content.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".6rem").Style("font-size", ".5rem").Style("color", "#8ea7b2").Text($"{simulators.Count} COMPOSABLE RESEARCH CAPABILITIES // DOMAIN {selectedFloor.DomainId.ToUpperInvariant()}"));
 
+            if (selectedFloor.DomainId.Equals("security", StringComparison.OrdinalIgnoreCase))
+            {
+                content.Content(WorkshopGui.Panel(receiver)
+                    .Style("margin-top", "1rem").Style("padding", "1rem")
+                    .Style("border", "1px solid rgba(255,211,77,.35)").Style("background", "rgba(255,211,77,.035)")
+                    .Content(WorkshopGui.Element(receiver, "div").Style("font-size", ".62rem").Style("color", "#ffd34d").Text("ACCESS CONTROL // SIMULATED SECURITY"))
+                    .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".5rem").Style("font-size", ".48rem").Style("line-height", "1.5").Style("color", "#c9d8de").Text("Badge-in is required before descending into the research floors. Safety, data handling, and experiment permissions are explicit capabilities—not hidden assumptions."))
+                    .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".6rem").Style("font-size", ".4rem").Style("letter-spacing", ".1em").Style("color", "#ff38d1").Text("FUTURE: IDENTITY // ACCESS POLICY // SAFETY PROFILE // DATA CONSENT")));
+            }
+            else if (selectedFloor.DomainId.Equals("administration", StringComparison.OrdinalIgnoreCase))
+            {
+                content.Content(WorkshopGui.Panel(receiver)
+                    .Style("margin-top", "1rem").Style("padding", "1rem")
+                    .Style("border", "1px solid rgba(0,234,255,.2)").Style("background", "rgba(0,234,255,.025)")
+                    .Content(WorkshopGui.Element(receiver, "div").Style("font-size", ".62rem").Style("color", "#00eaff").Text("DIRECTOR'S OFFICE"))
+                    .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".5rem").Style("font-size", ".48rem").Style("line-height", "1.5").Style("color", "#c9d8de").Text("Operations, project listings, laboratory occupancy, active researchers, requisitions, and facility status belong here."))
+                    .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".6rem").Style("font-size", ".4rem").Style("letter-spacing", ".1em").Style("color", "#ffd34d").Text("FUTURE: PROJECT REGISTRY // OCCUPANCY // REQUISITIONS // OPERATIONS")));
+            }
+
             foreach (var simulator in simulators)
             {
                 content.Content(WorkshopGui.Panel(receiver)
