@@ -24,6 +24,20 @@ public sealed class SpatialLaboratoryAndUniverseExperienceTests
     }
 
     [Fact]
+    public void Laboratory_Models_Security_Director_And_Scalable_Collider()
+    {
+        var lab = SpatialLaboratoryManifest.CreateDefault();
+
+        Assert.Equal("security", lab.Floors.Single(x => x.Level == -1).DomainId);
+        Assert.Equal("administration", lab.Floors.Single(x => x.Level == 0).DomainId);
+
+        var collider = Assert.Single(lab.Simulators.Where(x => x.Id == "particle-collider"));
+        Assert.Contains("SOLAR SYSTEM", collider.Scale);
+        Assert.Contains("atomics", collider.DomainIds);
+        Assert.Contains("fsm-physics", collider.DomainIds);
+    }
+
+    [Fact]
     public void Campus_Exposes_The_Laboratory_As_A_Real_Interactable()
     {
         var scene = SpatialWorkshopScene.CreateDefault();
