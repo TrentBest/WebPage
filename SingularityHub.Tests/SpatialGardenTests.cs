@@ -24,8 +24,16 @@ public sealed class SpatialGardenTests
     {
         var garden = SpatialGardenManifest.CreateDefault();
 
-        Assert.Equal("hangout", garden.FindGate("hangout")!.DestinationId);
-        Assert.Equal("singularity-station", garden.FindGate("singularity-station")!.DestinationId);
-        Assert.Equal("exit", garden.FindGate("exit")!.DestinationId);
+        var hangout = garden.FindGate("hangout");
+        var station = garden.FindGate("singularity-station");
+        var exit = garden.FindGate("exit");
+
+        Assert.True(hangout.HasValue);
+        Assert.True(station.HasValue);
+        Assert.True(exit.HasValue);
+
+        Assert.Equal("hangout", hangout.Value.DestinationId);
+        Assert.Equal("singularity-station", station.Value.DestinationId);
+        Assert.Equal("exit", exit.Value.DestinationId);
     }
 }
