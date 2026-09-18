@@ -162,6 +162,7 @@ export function startDimensionalResearchLab(canvasId) {
         transitionTo: 0,
         transitionDuration: 850,
         transitionActive: false,
+        resizeHandler: null,
         raf: 0,
         fps: 0,
         frameMs: 0,
@@ -238,7 +239,8 @@ export function startDimensionalResearchLab(canvasId) {
         lab.raf = requestAnimationFrame(frame);
     }
 
-    window.addEventListener("resize", resize);
+    lab.resizeHandler = resize;
+    window.addEventListener("resize", lab.resizeHandler);
     frame(performance.now());
 }
 
@@ -259,7 +261,7 @@ export function getDimensionalResearchMetrics() {
 export function stopDimensionalResearchLab() {
     if (!lab) return;
     cancelAnimationFrame(lab.raf);
-    window.removeEventListener("resize", () => {});
+    if (lab.resizeHandler) window.removeEventListener("resize", lab.resizeHandler);
     lab.gl.deleteBuffer(lab.buffer);
     lab.gl.deleteProgram(lab.program);
     lab = null;
