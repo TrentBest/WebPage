@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components.Web;
+using TheSingularityWorkshop.Workshop.MicroBundles;
 
 namespace TheSingularityWorkshop.Gui;
 
@@ -438,7 +439,7 @@ public static class SpatialTransitStationGuiBuilder
                 .Style("position", "absolute").Style("left", "-18%").Style("top", $"{lanes[i]}%")
                 .Style("width", $"{Math.Clamp(specification.CarCount * 1.4, 8, 16)}%")
                 .Style("height", "1.2rem")
-                .Style("border", $"1px solid {i % 2 == 0 ? Cyan : Magenta}99")
+                .Style("border", $"1px solid {(i % 2 == 0 ? Cyan : Magenta)}99")
                 .Style("background", "rgba(4,12,18,.88)")
                 .Style("box-shadow", $"0 0 14px {(i % 2 == 0 ? Cyan : Magenta)}22")
                 .Style("animation", $"workshop-train-traffic-{direction} {14 + i * 2}s linear infinite")
