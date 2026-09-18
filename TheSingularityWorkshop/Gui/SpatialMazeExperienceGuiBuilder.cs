@@ -19,6 +19,7 @@ public static class SpatialMazeExperienceGuiBuilder
         IReadOnlyList<SpatialMazeParticipant> participants,
         LeaderboardMicroBundle leaderboard,
         Action<string?> selectLeaderboardEntry,
+        string? selectedLeaderboardEntry,
         Action<KeyboardEventArgs> onKeyDown,
         Action exit,
         double zoom,
@@ -60,7 +61,7 @@ public static class SpatialMazeExperienceGuiBuilder
             map.Content(Dot(receiver, participant.Name, participant.Position, Cyan, cell));
 
         root.Content(map);
-        root.Content(Hud(receiver, maze, userName, zoom, setZoom, exit, finished, leaderboard, selectLeaderboardEntry));
+        root.Content(Hud(receiver, maze, userName, zoom, setZoom, exit, finished, leaderboard, selectLeaderboardEntry, selectedLeaderboardEntry));
         return root;
     }
 
@@ -89,7 +90,8 @@ public static class SpatialMazeExperienceGuiBuilder
         Action exit,
         bool finished,
         LeaderboardMicroBundle leaderboard,
-        Action<string?> selectLeaderboardEntry)
+        Action<string?> selectLeaderboardEntry,
+        string? selectedLeaderboardEntry)
     {
         var hud = WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("inset", "0").Style("pointer-events", "none");
 
@@ -130,6 +132,15 @@ public static class SpatialMazeExperienceGuiBuilder
         panel.Content(WorkshopGui.Element(receiver, "div")
             .Style("margin-top", ".35rem").Style("color", Muted).Style("font-size", ".42rem")
             .Text("Click a result to inspect its current data."));
+
+        if (selectedLeaderboardEntry is not null && leaderboard.TryGet(selectedLeaderboardEntry, out var selected))
+        {
+            panel.Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".5rem").Style("padding", ".4rem")
+                .Style("border", $"1px solid {Cyan}33").Style("background", $"{Cyan}08")
+                .Style("color", White).Style("font-family", "Consolas,'Courier New',monospace").Style("font-size", ".44rem")
+                .Text($"{selected.Name} // LIVE RESULT\\nTIME {selected.DisplayTime}\\nSTEPS {selected.Steps}"));
+        }
 
         foreach (var (entry, index) in leaderboard.Entries.Select((value, index) => (value, index)))
         {
