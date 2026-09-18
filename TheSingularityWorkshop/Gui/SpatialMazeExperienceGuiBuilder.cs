@@ -99,7 +99,7 @@ public static class SpatialMazeExperienceGuiBuilder
             .Style("padding", ".5rem .65rem").Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan}55")
             .Style("font-family", "Consolas,'Courier New',monospace").Style("font-size", ".5rem").Text($"{maze.Title} // {userName} // ZOOM {zoom:0.00}X"));
 
-        hud.Content(LeaderboardPanel(receiver, leaderboard, selectLeaderboardEntry));
+        hud.Content(LeaderboardPanel(receiver, leaderboard, selectLeaderboardEntry, selectedLeaderboardEntry));
 
         hud.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "1rem").Style("bottom", "1rem")
             .Style("padding", ".45rem .6rem").Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan}44")
