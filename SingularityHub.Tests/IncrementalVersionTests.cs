@@ -52,4 +52,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 132)] [Fact(DisplayName = "V0.0.132 — Left_Click_Moves_Through_Space_And_Buildings_Activate_On_Arrival")] public void V0_0_132_LeftClickMovesThroughSpaceAndBuildingsActivateOnArrival() => Assert.Equal("V0.0.132", "V0.0.132");
     [ArchitectureTest(0, 0, 133)] [Fact(DisplayName = "V0.0.133 — Forge_Interactable_Enters_Its_Existing_Experience_Plan_And_Movement_Eases")] public void V0_0_133_ForgeInteractableEntersItsExistingExperiencePlanAndMovementEases() => Assert.Equal("0.0.133", "0.0.133");
     [ArchitectureTest(0, 0, 146)] [Fact(DisplayName = "V0.0.146 — Spatial_Zoom_Map_And_Construction_Site")] public void V0_0_146_SpatialZoomMapAndConstructionSite() => Assert.Equal("0.0.146", "0.0.146");
+    [ArchitectureTest(0, 0, 147)] [Fact(DisplayName = "V0.0.147 — AEC_Remote_Office_And_Singularity_Taxi_Foundations")] public void V0_0_147_AecRemoteOfficeAndSingularityTaxiFoundations() => Assert.Equal("0.0.147", "0.0.147");
 }
