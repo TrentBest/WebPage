@@ -23,7 +23,7 @@ public static class SpatialTransitStationGuiBuilder
         string userName,
         string? selectedDestinationId,
         bool trainVisible,
-        Action<string> selectPlatform,
+        Func<string, Task> selectPlatform,
         Action<string> boardTrain,
         Action exit,
         bool microGameActive,
@@ -448,13 +448,13 @@ public static class SpatialTransitStationGuiBuilder
         SpatialTransitManifest manifest,
         string? selectedDestinationId,
         bool trainVisible,
-        Action<string> selectPlatform,
+        Func<string, Task> selectPlatform,
         Action<string> boardTrain,
         TransitTrainSpecification trainSpecification)
     {
         var area = WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", "5%").Style("right", "5%")
-            .Style("top", "45%").Style("bottom", "5%");
+            .Style("position", "absolute").Style("inset", "0")
+            .Style("pointer-events", "none");
 
         foreach (var platform in manifest.Platforms)
         {
@@ -467,7 +467,7 @@ public static class SpatialTransitStationGuiBuilder
                 .Style("position", "absolute")
                 .Style("left", $"{left}%").Style("top", $"{top}%")
                 .Style("width", $"{platform.Width}%").Style("height", "15%")
-                .Style("box-sizing", "border-box").Style("z-index", "8")
+                .Style("box-sizing", "border-box").Style("z-index", "8").Style("cursor", "pointer").Style("pointer-events", "auto")
                 .Style("border", $"1px solid {(selected ? Yellow : platform.Level == 1 ? Cyan : Magenta)}{(selected ? "cc" : "55")}")
                 .Style("background", selected ? $"{Yellow}12" : "rgba(2,8,14,.88)")
                 .Style("box-shadow", selected ? $"0 0 28px {Yellow}18,inset 0 0 22px {Yellow}08" : "none")
@@ -488,16 +488,7 @@ public static class SpatialTransitStationGuiBuilder
                 .Style("color", Dim)
                 .Text("WALKWAY CONNECTION // BOARDING EDGE"));
 
-            card.Content(WorkshopGui.Button(receiver)
-                .Label(selected ? "REQUEST TRAIN" : "GO TO PLATFORM")
-                .Style("position", "absolute").Style("left", ".5rem").Style("right", ".5rem")
-                .Style("bottom", ".45rem").Style("padding", ".34rem .45rem")
-                .Style("border", $"1px solid {(selected ? Yellow : Cyan)}66")
-                .Style("background", "rgba(1,4,10,.92)")
-                .Style("color", selected ? Yellow : White)
-                .Style("font-family", "inherit").Style("font-size", ".38rem")
-                .Style("letter-spacing", ".08em").Style("cursor", "pointer")
-                .OnClick(() => selectPlatform(destination.Id)));
+            card.OnClick(() => selectPlatform(platform.Id)).StopPropagation("onclick");
 
             if (selected && trainVisible)
                 card.Content(Train(receiver, destination, trainSpecification, () => boardTrain(destination.Id)));
