@@ -323,7 +323,7 @@ public static class SpatialTransitStationGuiBuilder
             .Style("background", "transparent").Style("cursor", "crosshair")
             .Style("pointer-events", "auto")
             .AriaLabel("Station floor. Left click to walk.")
-            .OnClick(onWorldClick);
+            .OnClick(args => _ = onWorldClick(args));
 
     private static ElementBuilder StationFocus(object receiver, Action<KeyboardEventArgs> onKeyDown)
         => WorkshopGui.Element(receiver, "div")
