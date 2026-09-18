@@ -27,6 +27,13 @@ public sealed class GuiBuilder : ICoreGuiBuilder<GuiNode>
     /// <summary>The recursive parent builder, or <see langword="null"/> for a root.</summary>
     public GuiBuilder? Parent { get; }
 
+    /// <summary>
+    /// Explicit interface projection of the recursive parent.
+    /// The public property remains strongly typed for fluent GUI composition,
+    /// while the shared contract exposes the WPF-aligned object parent.
+    /// </summary>
+    object? ICoreGuiBuilder<GuiNode>.Parent => Parent;
+
     public static GuiBuilder Create(string kind, string id)
         => new(new NodeBuilder(kind, id));
 
