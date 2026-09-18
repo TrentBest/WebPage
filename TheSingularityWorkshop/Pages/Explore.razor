@@ -99,11 +99,12 @@
 
     private void ShowWorkshopMap() => workshopMapVisible = true;
 
-    private void EnterConstructionSite()
+    private async Task EnterConstructionSite()
     {
         if (constructionTourActive) return;
         constructionWelcomeVisible = true;
         constructionTourMessage = "Stay close. I will show you what is being built.";
+        await InvokeAsync(StateHasChanged);
     }
 
     private void RequestConstructionTour()
