@@ -75,7 +75,11 @@ public static class SpatialTransitStationGuiBuilder
         var station = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("inset", "0")
             .Style("width", "100vw").Style("height", "100vh")
-            .Style("box-sizing", "border-box").Style("overflow", "hidden");
+            .Style("box-sizing", "border-box").Style("overflow", "hidden")
+            .Attribute("tabindex", "0")
+            .AriaLabel("Singularity Grand Central. Click to walk. Use WASD or arrow keys.")
+            .OnKeyDown(onKeyDown)
+            .PreventDefault("onkeydown");
 
         var shell = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("inset", "0")
@@ -154,12 +158,12 @@ public static class SpatialTransitStationGuiBuilder
         svg.Child(WorkshopGui.Element(receiver, "rect")
             .Attribute("x", "3").Attribute("y", "3")
             .Attribute("width", "174").Attribute("height", "106")
-            .Attribute("fill", "none").Attribute("stroke", Cyan)
+            .Attribute("fill", "rgba(0,234,255,.025)").Attribute("stroke", Cyan)
             .Attribute("stroke-opacity", ".48").Attribute("stroke-width", ".45"));
         svg.Child(WorkshopGui.Element(receiver, "rect")
             .Attribute("x", "5").Attribute("y", "5")
             .Attribute("width", "170").Attribute("height", "102")
-            .Attribute("fill", "none").Attribute("stroke", White)
+            .Attribute("fill", "rgba(255,255,255,.012)").Attribute("stroke", White)
             .Attribute("stroke-opacity", ".13").Attribute("stroke-width", ".2"));
 
         // Main public concourse: deliberately oversized so the station has a civic interior.
@@ -188,7 +192,7 @@ public static class SpatialTransitStationGuiBuilder
             .Attribute("stroke", White).Attribute("stroke-opacity", ".08").Attribute("stroke-width", ".18"));
 
         // Rail corridors: several parallel tracks, with platforms between/along them.
-        for (var y = 47; y <= 101; y += 9)
+        for (var y = 45; y <= 103; y += 4.5)
         {
             svg.Child(WorkshopGui.Element(receiver, "line")
                 .Attribute("x1", "8").Attribute("y1", y)
@@ -543,7 +547,7 @@ public static class SpatialTransitStationGuiBuilder
 
         panel.Content(WorkshopGui.Element(receiver, "div")
             .Style("font-size", ".36rem").Style("letter-spacing", ".1em").Style("color", Dim)
-            .Text("EXPANDABLE PLATFORM ARCHITECTURE // WALKWAYS ABOVE TRACKS // VERTICAL STACKING"));
+            .Text("SCHEMATIC REFERENCE // 44 PLATFORM CAPACITY // 67 TRACK INFRASTRUCTURE // WALKWAYS ABOVE TRACKS // VERTICAL STACKING"));
 
         return panel;
     }
