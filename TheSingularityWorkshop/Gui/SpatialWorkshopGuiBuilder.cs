@@ -12,7 +12,7 @@ public static class SpatialWorkshopGuiBuilder
     private const string Magenta = "#ff38d1";
 
     /// <summary>Builds the avatar-centered Workshop world and its interaction surface.</summary>
-    public static ElementBuilder Build(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, int detailLevel, Action<int> setDetailLevel, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, double zoom = 1d, Action<double>? setZoom = null, Action? showMap = null)
+    public static ElementBuilder Build(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, int detailLevel, Action<int> setDetailLevel, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, double zoom = 1d, Action<double>? setZoom = null, Action? showMap = null, Func<Task>? enterConstructionSite = null, bool constructionTourActive = false, string? constructionTourMessage = null)
     {
         var effectiveZoom = new SpatialCamera(avatarX, avatarY, zoom).Clamped().Zoom;
         var zoomEnabled = scene.View.ZoomEnabled && setZoom is not null;
@@ -21,13 +21,13 @@ public static class SpatialWorkshopGuiBuilder
             .Style("overflow", "hidden").Style("background", "#020a12").Style("color", White)
             .Style("font-family", "Consolas, 'Courier New', monospace").Attribute("id", "workshop-spatial-experience");
         root.Content(Styles(receiver));
-        root.Content(World(receiver, scene, avatarX, avatarY, detailLevel, effectiveZoom, zoomEnabled, onKeyDown, onWorldClick, interact, setZoom));
+        root.Content(World(receiver, scene, avatarX, avatarY, detailLevel, effectiveZoom, zoomEnabled, onKeyDown, onWorldClick, interact, setZoom, enterConstructionSite, constructionTourActive, constructionTourMessage));
         root.Content(ViewBar(receiver, detailLevel, setDetailLevel, effectiveZoom, zoomEnabled, setZoom, showMap));
         root.Content(ConstructionBanner(receiver));
         return root;
     }
 
-    private static ElementBuilder World(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, int detailLevel, double zoom, bool zoomEnabled, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, Action<double>? setZoom)
+    private static ElementBuilder World(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, int detailLevel, double zoom, bool zoomEnabled, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, Action<double>? setZoom, Func<Task>? enterConstructionSite, bool constructionTourActive, string? constructionTourMessage)
     {
         var camera = new SpatialCamera(avatarX, avatarY, zoom).Clamped();
         var world = WorkshopGui.Panel(receiver)
@@ -48,11 +48,13 @@ public static class SpatialWorkshopGuiBuilder
         worldPlane.Content(Grid(receiver, detailLevel, zoom));
         worldPlane.Content(FloorPlan(receiver, zoom));
         worldPlane.Content(SpatialGeometryGuiBuilder.Build(receiver, scene, interact, zoom));
-        worldPlane.Content(ConstructionSite(receiver, scene.ConstructionSite, zoom));
+        worldPlane.Content(ConstructionSite(receiver, scene.ConstructionSite, zoom, enterConstructionSite));
         foreach (var vehicle in scene.ConstructionVehicles) worldPlane.Content(Vehicle(receiver, vehicle, zoom));
         foreach (var item in scene.Interactables) worldPlane.Content(Interactable(receiver, item, interact, zoom));
         world.Content(worldPlane);
         world.Content(Avatar(receiver));
+        if (constructionTourActive)
+            world.Content(Foreman(receiver, constructionTourMessage ?? "Stay close. I will show you what is being built."));
         return world;
     }
 
@@ -64,6 +66,15 @@ public static class SpatialWorkshopGuiBuilder
 
     private static ElementBuilder Grid(object receiver, int detailLevel, double zoom)
     {
+        var siteSurface = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", $"{SpatialCamera.WorldToVw(b.X, zoom):0.###}vw").Style("top", $"{SpatialCamera.WorldToVh(b.Y, zoom):0.###}vh")
+            .Style("width", $"{SpatialCamera.WorldToVw(b.Width, zoom):0.###}vw").Style("height", $"{SpatialCamera.WorldToVh(b.Height, zoom):0.###}vh")
+            .Style("z-index", "7").Style("cursor", enterConstructionSite is null ? "default" : "pointer")
+            .Style("background", $"{Yellow}05").Style("border", $"1px dashed {Yellow}22").AriaLabel("Construction site")
+            .Title("WORKSHOP EXPANSION SITE // enter construction site");
+        if (enterConstructionSite is not null)
+            siteSurface.OnClick(() => _ = enterConstructionSite()).StopPropagation("onclick");
+
         var svg = WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100").Attribute("preserveAspectRatio", "none")
             .Style("position", "absolute").Style("left", "0").Style("top", "0")
             .Style("width", $"{SpatialCamera.WorldWidthVw * zoom:0.###}vw").Style("height", $"{SpatialCamera.WorldHeightVh * zoom:0.###}vh")
@@ -88,7 +99,7 @@ public static class SpatialWorkshopGuiBuilder
                 .Style("font-size", ".48rem").Style("letter-spacing", ".2em").Style("color", $"{Cyan}99")
                 .Text("WORKSHOP COMPLEX // SPATIAL SCHEMATIC"));
 
-    private static ElementBuilder ConstructionSite(object receiver, SpatialConstructionSite site, double zoom)
+    private static ElementBuilder ConstructionSite(object receiver, SpatialConstructionSite site, double zoom, Func<Task>? enterConstructionSite)
     {
         var b = site.Bounds;
         var f = site.FoundationBounds;
@@ -112,14 +123,23 @@ public static class SpatialWorkshopGuiBuilder
 
         for (var x = b.X + 2; x < b.X + b.Width; x += 2)
             svg.Child(WorkshopGui.Element(receiver, "line").Attribute("x1", x).Attribute("y1", b.Y - .5).Attribute("x2", x).Attribute("y2", b.Y + .8).Attribute("stroke", Yellow).Attribute("stroke-opacity", ".65").Attribute("stroke-width", ".22"));
+        var frameCount = Math.Max(1, (int)Math.Round(site.Progress * 4));
+        for (var frame = 0; frame < frameCount; frame++)
+        {
+            var x = f.X + (frame + 1) * f.Width / (frameCount + 1);
+            svg.Child(WorkshopGui.Element(receiver, "line").Attribute("x1", x).Attribute("y1", f.Y).Attribute("x2", x).Attribute("y2", f.Y + f.Height).Attribute("stroke", Yellow).Attribute("stroke-opacity", ".32").Attribute("stroke-width", ".3"));
+        }
+
         for (var y = b.Y + 2; y < b.Y + b.Height; y += 2)
             svg.Child(WorkshopGui.Element(receiver, "line").Attribute("x1", b.X - .5).Attribute("y1", y).Attribute("x2", b.X + .8).Attribute("y2", y).Attribute("stroke", Yellow).Attribute("stroke-opacity", ".65").Attribute("stroke-width", ".22"));
 
         svg.Child(WorkshopGui.Element(receiver, "text")
             .Attribute("x", b.X + b.Width / 2).Attribute("y", b.Y - 1.2)
             .Attribute("fill", Yellow).Attribute("font-size", ".7").Attribute("font-family", "monospace")
-            .Attribute("text-anchor", "middle").Text(site.Name));
-        return svg;
+            .Attribute("text-anchor", "middle").Text($"{site.Name} // {site.Phase.ToString().ToUpperInvariant()} // {site.Progress:P0}"));
+        siteSurface.Content(svg);
+        siteSurface.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "50%").Style("top", "50%").Style("transform", "translate(-50%,-50%)").Style("padding", ".3rem .5rem").Style("border", $"1px solid {Yellow}66").Style("background", "rgba(1,4,10,.86)").Style("color", Yellow).Style("font-size", ".42rem").Style("letter-spacing", ".1em").Style("text-align", "center").Style("pointer-events", "none").Text($"{site.FuturePurpose} // ENTER SITE"));
+        return siteSurface;
     }
 
     private static ElementBuilder Interactable(object receiver, SpatialInteractable item, Func<string, Task> interact, double zoom)
@@ -156,6 +176,12 @@ public static class SpatialWorkshopGuiBuilder
             .Style("transform", "translate(-50%,-50%)").Style("z-index", "4")
             .Style("animation", $"workshop-vehicle-{vehicle.Kind.ToString().ToLowerInvariant()} 6s linear infinite")
             .Content(ConstructionVehicleGuiBuilder.Build(receiver, vehicle));
+
+    private static ElementBuilder Foreman(object receiver, string message)
+        => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "calc(50% + 42px)").Style("top", "50%").Style("z-index", "80").Style("transform", "translateY(-50%)").Style("max-width", "min(360px,42vw)").Style("pointer-events", "none")
+            .Content(WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("align-items", "center").Style("gap", ".45rem")
+                .Content(WorkshopGui.Element(receiver, "div").Style("width", "20px").Style("height", "24px").Style("border", $"1px solid {Yellow}aa").Style("background", $"{Yellow}18").Style("clip-path", "polygon(50% 0,90% 25%,82% 100%,18% 100%,10% 25%)"))
+                .Content(WorkshopGui.Element(receiver, "div").Style("padding", ".45rem .6rem").Style("border", $"1px solid {Yellow}66").Style("background", "rgba(1,4,10,.92)").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".68rem").Text(message)));
 
     private static ElementBuilder Avatar(object receiver)
         => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "50%").Style("top", "50%")
