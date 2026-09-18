@@ -32,10 +32,22 @@ public sealed class SpatialTabletopTests
     {
         var manifest = SpatialTabletopManifest.CreateDefault();
 
-        Assert.Equal("GAME MASTER", manifest.FindSeat("game-master")!.Name);
-        Assert.Equal("PLAYER 1", manifest.FindSeat("player-1")!.Name);
-        Assert.Equal("TABLETOP", manifest.FindSurface("tabletop")!.Name);
-        Assert.Equal("TABLE AVATAR", manifest.FindUtility("avatar")!.Name);
-        Assert.Equal("SEAT VIEW", manifest.FindUtility("seat-view")!.Name);
+        var gameMaster = manifest.FindSeat("game-master");
+        var playerOne = manifest.FindSeat("player-1");
+        var tabletop = manifest.FindSurface("tabletop");
+        var avatar = manifest.FindUtility("avatar");
+        var seatView = manifest.FindUtility("seat-view");
+
+        Assert.True(gameMaster.HasValue);
+        Assert.True(playerOne.HasValue);
+        Assert.True(tabletop.HasValue);
+        Assert.True(avatar.HasValue);
+        Assert.True(seatView.HasValue);
+
+        Assert.Equal("GAME MASTER", gameMaster.Value.Name);
+        Assert.Equal("PLAYER 1", playerOne.Value.Name);
+        Assert.Equal("TABLETOP", tabletop.Value.Name);
+        Assert.Equal("TABLE AVATAR", avatar.Value.Name);
+        Assert.Equal("SEAT VIEW", seatView.Value.Name);
     }
 }
