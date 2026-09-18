@@ -76,15 +76,16 @@ public static class SpatialTransitStationGuiBuilder
 
         var shell = WorkshopGui.Element(receiver, "div")
             .Style("position", "relative")
-            .Style("min-height", "calc(100vh - 8.5rem)")
-            .Style("min-width", "920px")
-            .Style("max-width", "1700px").Style("margin", "0 auto")
+            .Style("min-height", "1120px")
+            .Style("min-width", "1760px")
+            .Style("max-width", "1760px").Style("margin", "0 auto")
             .Style("border", $"1px solid {Cyan}44")
             .Style("background", "radial-gradient(circle at 50% 44%, rgba(0,234,255,.09), transparent 42%), linear-gradient(180deg,#07131d,#02060c)")
             .Style("box-shadow", $"0 0 120px {Cyan}12,inset 0 0 100px {Cyan}08")
             .Style("overflow", "hidden");
 
         shell.Content(Roof(receiver));
+        shell.Content(FloorPlan(receiver, manifest));
         shell.Content(GrandHall(receiver));
         shell.Content(TrackField(receiver, manifest));
         shell.Content(Platforms(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain));
@@ -125,6 +126,111 @@ public static class SpatialTransitStationGuiBuilder
                 .Attribute("stroke-width", ".14"));
 
         return group;
+    }
+
+    /// <summary>
+    /// Draws the station as a deliberately crude architectural floor plan first: a massive
+    /// outer envelope, public concourse, parallel rail corridors, vertical circulation cores,
+    /// and long boarding platforms. Detail can be added later without losing the building.
+    /// </summary>
+    private static ElementBuilder FloorPlan(object receiver, SpatialTransitManifest manifest)
+    {
+        var svg = WorkshopGui.Element(receiver, "svg")
+            .Attribute("viewBox", "0 0 180 112")
+            .Attribute("preserveAspectRatio", "none")
+            .Style("position", "absolute").Style("inset", "0")
+            .Style("width", "100%").Style("height", "100%")
+            .Style("pointer-events", "none")
+            .Style("opacity", ".9");
+
+        // Massive exterior envelope: this is the building, not a collection of cards.
+        svg.Child(WorkshopGui.Element(receiver, "rect")
+            .Attribute("x", "3").Attribute("y", "3")
+            .Attribute("width", "174").Attribute("height", "106")
+            .Attribute("fill", "none").Attribute("stroke", Cyan)
+            .Attribute("stroke-opacity", ".48").Attribute("stroke-width", ".45"));
+        svg.Child(WorkshopGui.Element(receiver, "rect")
+            .Attribute("x", "5").Attribute("y", "5")
+            .Attribute("width", "170").Attribute("height", "102")
+            .Attribute("fill", "none").Attribute("stroke", White)
+            .Attribute("stroke-opacity", ".13").Attribute("stroke-width", ".2"));
+
+        // Main public concourse: deliberately oversized so the station has a civic interior.
+        svg.Child(WorkshopGui.Element(receiver, "rect")
+            .Attribute("x", "11").Attribute("y", "10")
+            .Attribute("width", "158").Attribute("height", "28")
+            .Attribute("fill", "none").Attribute("stroke", White)
+            .Attribute("stroke-opacity", ".28").Attribute("stroke-width", ".3"));
+        svg.Child(WorkshopGui.Element(receiver, "line")
+            .Attribute("x1", "11").Attribute("y1", "32")
+            .Attribute("x2", "169").Attribute("y2", "32")
+            .Attribute("stroke", Cyan).Attribute("stroke-opacity", ".16").Attribute("stroke-width", ".2"));
+
+        // A central pedestrian spine connects the public hall to every boarding zone.
+        svg.Child(WorkshopGui.Element(receiver, "line")
+            .Attribute("x1", "90").Attribute("y1", "10")
+            .Attribute("x2", "90").Attribute("y2", "107")
+            .Attribute("stroke", Yellow).Attribute("stroke-opacity", ".22").Attribute("stroke-width", ".35"));
+        svg.Child(WorkshopGui.Element(receiver, "line")
+            .Attribute("x1", "84").Attribute("y1", "10")
+            .Attribute("x2", "84").Attribute("y2", "107")
+            .Attribute("stroke", White).Attribute("stroke-opacity", ".08").Attribute("stroke-width", ".18"));
+        svg.Child(WorkshopGui.Element(receiver, "line")
+            .Attribute("x1", "96").Attribute("y1", "10")
+            .Attribute("x2", "96").Attribute("y2", "107")
+            .Attribute("stroke", White).Attribute("stroke-opacity", ".08").Attribute("stroke-width", ".18"));
+
+        // Rail corridors: several parallel tracks, with platforms between/along them.
+        for (var y = 47; y <= 101; y += 9)
+        {
+            svg.Child(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", "8").Attribute("y1", y)
+                .Attribute("x2", "172").Attribute("y2", y)
+                .Attribute("stroke", Cyan).Attribute("stroke-opacity", ".20").Attribute("stroke-width", ".34"));
+            svg.Child(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", "8").Attribute("y1", y + 1.7)
+                .Attribute("x2", "172").Attribute("y2", y + 1.7)
+                .Attribute("stroke", White).Attribute("stroke-opacity", ".07").Attribute("stroke-width", ".16"));
+        }
+
+        // Vertical circulation cores: stairs/lifts/escalators to the stacked concourses.
+        foreach (var x in new[] { 20, 55, 90, 125, 160 })
+        {
+            svg.Child(WorkshopGui.Element(receiver, "rect")
+                .Attribute("x", x - 2.2).Attribute("y", "34")
+                .Attribute("width", "4.4").Attribute("height", "10")
+                .Attribute("fill", "none").Attribute("stroke", Magenta)
+                .Attribute("stroke-opacity", ".42").Attribute("stroke-width", ".25"));
+            svg.Child(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", x).Attribute("y1", "44")
+                .Attribute("x2", x).Attribute("y2", "105")
+                .Attribute("stroke", Magenta).Attribute("stroke-opacity", ".15").Attribute("stroke-width", ".22")
+                .Attribute("stroke-dasharray", "1.5 1.5"));
+        }
+
+        // Platform footprints come from the manifest; the floor plan remains data-driven.
+        foreach (var platform in manifest.Platforms)
+        {
+            var x = 8 + platform.X * 1.64;
+            var y = platform.Level == 1 ? 44 + platform.Y * .45 : 47 + platform.Y * .55;
+            var width = Math.Max(18, platform.Width * 2.1);
+            svg.Child(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", x).Attribute("y1", y)
+                .Attribute("x2", Math.Min(172, x + width)).Attribute("y2", y)
+                .Attribute("stroke", platform.Level == 1 ? Cyan : Magenta)
+                .Attribute("stroke-opacity", ".42").Attribute("stroke-width", ".9"));
+        }
+
+        // Main entrance / arrival plaza.
+        svg.Child(WorkshopGui.Element(receiver, "line")
+            .Attribute("x1", "70").Attribute("y1", "109")
+            .Attribute("x2", "110").Attribute("y2", "109")
+            .Attribute("stroke", Yellow).Attribute("stroke-opacity", ".65").Attribute("stroke-width", "1.2"));
+        svg.Child(WorkshopGui.Element(receiver, "line")
+            .Attribute("x1", "78").Attribute("y1", "107").Attribute("x2", "102").Attribute("y2", "107")
+            .Attribute("stroke", Yellow).Attribute("stroke-opacity", ".25").Attribute("stroke-width", ".35"));
+
+        return svg;
     }
 
     private static ElementBuilder GrandHall(object receiver)
