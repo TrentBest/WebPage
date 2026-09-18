@@ -43,6 +43,10 @@
     private string? insideRoomId;
     private string? selectedTransitDestinationId;
     private bool transitTrainVisible;
+    private bool transitMicroGameActive;
+    private int transitMicroGameScore;
+    private int transitMicroGameRound;
+    private string? transitMicroGameTargetId;
     private string? selectedLaboratoryFloorId;
     private static readonly SpatialIslandExperience Island = SpatialIslandExperience.SingularityIsland;
     private int detailLevel = 16;
@@ -120,7 +124,7 @@
             return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
 
         if (insideRoomId == "singularity-transit")
-            return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom);
+            return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform);
 
         if (insideRoomId == "singularity-island")
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
@@ -393,6 +397,33 @@
         transitTrainVisible = true;
     }
 
+    private void StartTransitMicroGame()
+    {
+        transitMicroGameActive = true;
+        transitMicroGameScore = 0;
+        transitMicroGameRound = 1;
+        transitMicroGameTargetId = TransitManifest.Destinations[0].Id;
+    }
+
+    private void SelectTransitMicroGamePlatform(string platformId)
+    {
+        if (!transitMicroGameActive || transitMicroGameTargetId is null) return;
+
+        var platform = TransitManifest.Platforms.FirstOrDefault(item => item.Id == platformId);
+        if (platform == default) return;
+
+        if (platform.DestinationId == transitMicroGameTargetId)
+        {
+            transitMicroGameScore += 10;
+            transitMicroGameRound++;
+            transitMicroGameTargetId = TransitManifest.Destinations[(transitMicroGameRound - 1) % TransitManifest.Destinations.Count].Id;
+        }
+        else
+        {
+            transitMicroGameScore = Math.Max(0, transitMicroGameScore - 2);
+        }
+    }
+
     private void BoardTransitTrain(string destinationId)
     {
         if (!transitTrainVisible || selectedTransitDestinationId != destinationId)
@@ -603,6 +634,10 @@
         {
             selectedTransitDestinationId = null;
             transitTrainVisible = false;
+            transitMicroGameActive = false;
+            transitMicroGameScore = 0;
+            transitMicroGameRound = 0;
+            transitMicroGameTargetId = null;
         }
 
         if (Router.TryExit(out var frame))
