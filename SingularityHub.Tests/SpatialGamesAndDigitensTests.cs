@@ -33,10 +33,20 @@ public sealed class SpatialGamesAndDigitensTests
     {
         var manifest = SpatialDigitenManifest.CreateDefault();
 
-        Assert.Equal("MAYOR", manifest.FindRole("mayor")!.Name);
-        Assert.Equal("CITY COUNCIL", manifest.FindRole("council-member")!.Name);
-        Assert.Equal("HVAC TECHNICIAN", manifest.FindRole("hvac-technician")!.Name);
-        Assert.Equal("POLICE OFFICER", manifest.FindRole("police-officer")!.Name);
+        var mayor = manifest.FindRole("mayor");
+        var councilMember = manifest.FindRole("council-member");
+        var hvacTechnician = manifest.FindRole("hvac-technician");
+        var policeOfficer = manifest.FindRole("police-officer");
+
+        Assert.True(mayor.HasValue);
+        Assert.True(councilMember.HasValue);
+        Assert.True(hvacTechnician.HasValue);
+        Assert.True(policeOfficer.HasValue);
+
+        Assert.Equal("MAYOR", mayor.Value.Name);
+        Assert.Equal("CITY COUNCIL", councilMember.Value.Name);
+        Assert.Equal("HVAC TECHNICIAN", hvacTechnician.Value.Name);
+        Assert.Equal("POLICE OFFICER", policeOfficer.Value.Name);
         Assert.Contains(manifest.Activities, x => x.Id == "work");
         Assert.Contains(manifest.Activities, x => x.Id == "socialize");
         Assert.Contains(manifest.Activities, x => x.Id == "maintain");
@@ -52,8 +62,9 @@ public sealed class SpatialGamesAndDigitensTests
         Assert.Contains(manifest.Services, x => x.Id == "building-maintenance");
         Assert.Contains(manifest.Services, x => x.Id == "transit");
 
-        var onCall = manifest.FindRoutine("on-call")!;
-        Assert.Contains("respond", onCall.ActivityIds);
-        Assert.Contains("maintain", onCall.ActivityIds);
+        var onCall = manifest.FindRoutine("on-call");
+        Assert.True(onCall.HasValue);
+        Assert.Contains("respond", onCall.Value.ActivityIds);
+        Assert.Contains("maintain", onCall.Value.ActivityIds);
     }
 }
