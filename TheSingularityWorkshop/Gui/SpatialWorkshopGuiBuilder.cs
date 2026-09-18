@@ -68,15 +68,6 @@ public static class SpatialWorkshopGuiBuilder
 
     private static ElementBuilder Grid(object receiver, int detailLevel, double zoom)
     {
-        var siteSurface = WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", $"{SpatialCamera.WorldToVw(b.X, zoom):0.###}vw").Style("top", $"{SpatialCamera.WorldToVh(b.Y, zoom):0.###}vh")
-            .Style("width", $"{SpatialCamera.WorldToVw(b.Width, zoom):0.###}vw").Style("height", $"{SpatialCamera.WorldToVh(b.Height, zoom):0.###}vh")
-            .Style("z-index", "7").Style("cursor", enterConstructionSite is null ? "default" : "pointer")
-            .Style("background", $"{Yellow}05").Style("border", $"1px dashed {Yellow}22").AriaLabel("Construction site")
-            .Title("WORKSHOP EXPANSION SITE // enter construction site");
-        if (enterConstructionSite is not null)
-            siteSurface.OnClick(() => _ = enterConstructionSite()).StopPropagation("onclick");
-
         var svg = WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100").Attribute("preserveAspectRatio", "none")
             .Style("position", "absolute").Style("left", "0").Style("top", "0")
             .Style("width", $"{SpatialCamera.WorldWidthVw * zoom:0.###}vw").Style("height", $"{SpatialCamera.WorldHeightVh * zoom:0.###}vh")
@@ -105,6 +96,14 @@ public static class SpatialWorkshopGuiBuilder
     {
         var b = site.Bounds;
         var f = site.FoundationBounds;
+        var siteSurface = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", $"{SpatialCamera.WorldToVw(b.X, zoom):0.###}vw").Style("top", $"{SpatialCamera.WorldToVh(b.Y, zoom):0.###}vh")
+            .Style("width", $"{SpatialCamera.WorldToVw(b.Width, zoom):0.###}vw").Style("height", $"{SpatialCamera.WorldToVh(b.Height, zoom):0.###}vh")
+            .Style("z-index", "7").Style("cursor", enterConstructionSite is null ? "default" : "pointer")
+            .Style("background", $"{Yellow}05").Style("border", $"1px dashed {Yellow}22").AriaLabel("Construction site")
+            .Title("WORKSHOP EXPANSION SITE // enter construction site");
+        if (enterConstructionSite is not null)
+            siteSurface.OnClick(() => _ = enterConstructionSite()).StopPropagation("onclick");
         var svg = WorkshopGui.Element(receiver, "svg")
             .Attribute("viewBox", "0 0 100 100")
             .Attribute("preserveAspectRatio", "none")
