@@ -59,8 +59,8 @@ public sealed record SpatialGameSystemsManifest(
     public IReadOnlyList<SpatialGameSystem> SystemsFor(SpatialGameExperience experience)
         => [.. experience.SystemIds
             .Select(FindSystem)
-            .Where(x => x is not null)
-            .Select(x => x!)];
+             .Where(x => x.HasValue)
+            .Select(x => x!.Value)];
 }
 
 /// <summary>A reusable game-system capability rather than a complete game.</summary>
