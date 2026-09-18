@@ -115,7 +115,8 @@ public static class SpatialMazeExperienceGuiBuilder
     private static ElementBuilder LeaderboardPanel(
         object receiver,
         LeaderboardMicroBundle leaderboard,
-        Action<string?> selectLeaderboardEntry)
+        Action<string?> selectLeaderboardEntry,
+        string? selectedLeaderboardEntry)
     {
         var panel = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("right", "1rem").Style("top", "1rem")
