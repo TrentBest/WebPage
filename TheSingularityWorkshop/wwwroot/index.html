@@ -73,7 +73,9 @@
                 document.body.appendChild(script);
             },
             workshopVisited:function(){ return localStorage.getItem("WorkshopVisited") === "true"; },
-            markWorkshopVisited:function(){ localStorage.setItem("WorkshopVisited","true"); }
+            markWorkshopVisited:function(){ localStorage.setItem("WorkshopVisited","true"); },
+            workshopExploreGardenVisited:function(){ return localStorage.getItem("WorkshopExploreGardenVisited") === "true"; },
+            markWorkshopExploreGardenVisited:function(){ localStorage.setItem("WorkshopExploreGardenVisited","true"); }
         };
 
         (function installWarningExperience(){
