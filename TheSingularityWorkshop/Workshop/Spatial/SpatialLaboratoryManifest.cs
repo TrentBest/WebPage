@@ -56,7 +56,9 @@ public sealed record SpatialLaboratoryManifest(
                 new("fluids", "FLUIDS", ["flow", "pressure", "weathering", "watering"]),
                 new("cosmos", "COSMOS", ["orbits", "gravity", "scale", "emergence"]),
                 new("fsm", "FSM SIMULATION", ["state", "transition", "process order", "measurement"]),
-                new("research-data", "RESEARCH DATA", ["observations", "datasets", "provenance", "permissions"])
+                new("research-data", "RESEARCH DATA", ["observations", "datasets", "provenance", "permissions"]),
+                new("administration", "LAB ADMINISTRATION", ["projects", "requisitions", "occupancy", "operations"]),
+                new("security", "LAB SECURITY", ["identity", "access", "data handling", "safety"])
             ]);
 }
 
