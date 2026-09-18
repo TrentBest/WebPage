@@ -15,6 +15,10 @@ public sealed record SpatialLaboratoryManifest(
     IReadOnlyList<SpatialLaboratorySimulator> Simulators,
     IReadOnlyList<SpatialLaboratoryLesson> Lessons)
 {
+    /// <summary>The deliberately provisional physics boundary used by laboratory simulations.</summary>
+    public static TbdPhysicsEngineManifest PhysicsEngine => TbdPhysicsEngineManifest.Default;
+
+    /// <summary>Creates the default multi-floor research tower manifest.</summary>
     public static SpatialLaboratoryManifest CreateDefault()
         => new(
             "singularity-lab",
@@ -57,6 +61,7 @@ public sealed record SpatialLaboratoryManifest(
                 new("cosmos", "COSMOS", ["orbits", "gravity", "scale", "emergence"]),
                 new("fsm", "FSM SIMULATION", ["state", "transition", "process order", "measurement"]),
                 new("research-data", "RESEARCH DATA", ["observations", "datasets", "provenance", "permissions"]),
+                new("education", "EDUCATION", ["lessons", "questions", "answers", "reuse", "assessment"]),
                 new("administration", "LAB ADMINISTRATION", ["projects", "requisitions", "occupancy", "operations"]),
                 new("security", "LAB SECURITY", ["identity", "access", "data handling", "safety"])
             ]);
