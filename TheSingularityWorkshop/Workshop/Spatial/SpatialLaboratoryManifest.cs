@@ -32,6 +32,7 @@ public sealed record SpatialLaboratoryManifest(
                 new("simulation", "FSM PHYSICS SIMULATION", 8, "simulation")
             ],
             [
+                new("particle-collider", "PARTICLE COLLIDER", "MICRO → SOLAR SYSTEM", "Compose collision experiments across scale: tiny, small, medium, large, hadron-collider, extra-large, and eventually astronomical systems.", ["atomics", "energy", "gravity", "fsm-physics"]),
                 new("gravity-well", "GRAVITY WELL", "MICRO", "Numerically explore attraction, acceleration, and field falloff.", ["gravity", "fsm-physics"]),
                 new("antigravity", "ANTI-GRAVITY WORKBENCH", "MICRO", "A speculative sandbox for testing counter-field rules.", ["gravity", "fsm-physics"]),
                 new("energy-lattice", "ENERGY LATTICE", "MOLECULAR", "Compose energy transfer experiments from reusable state machines.", ["energy", "fsm-physics"]),
@@ -41,7 +42,8 @@ public sealed record SpatialLaboratoryManifest(
                 new("hydraulic-terrain", "HYDRAULIC TERRAIN", "TERRAIN", "Run water, pressure, erosion, drainage, and weathering experiments.", ["fluids", "energy"]),
                 new("solar-system", "SOLAR SYSTEM SIMULATOR", "SOLAR SYSTEM", "Explore orbital and multi-body behavior.", ["cosmic", "gravity"]),
                 new("galaxy", "GALAXY SIMULATOR", "GALAXY", "Study large-scale structure and gravitational emergence.", ["cosmic", "gravity"]),
-                new("fsm-physics", "FSM PHYSICS ENGINE", "ARBITRARY", "Turn a declarative physics model into ordered FSM process groups.", ["simulation", "fsm-physics", "atom-data"])
+                new("fsm-physics", "FSM PHYSICS ENGINE", "ARBITRARY", "Turn a declarative physics model into ordered FSM process groups.", ["simulation", "fsm-physics", "atom-data"]),
+                new("data-chamber", "RESEARCH DATA CHAMBER", "OFFICE", "A researcher-controlled workspace for whiteboards, presentation boards, simulated computers, and experiment records.", ["simulation", "research-data"])
             ],
             [
                 new("gravity", "GRAVITY", ["mass", "acceleration", "orbits", "field strength"]),
@@ -51,7 +53,8 @@ public sealed record SpatialLaboratoryManifest(
                 new("atoms", "ATOMS", ["structure", "bonding", "energy", "interaction"]),
                 new("fluids", "FLUIDS", ["flow", "pressure", "weathering", "watering"]),
                 new("cosmos", "COSMOS", ["orbits", "gravity", "scale", "emergence"]),
-                new("fsm", "FSM SIMULATION", ["state", "transition", "process order", "measurement"])
+                new("fsm", "FSM SIMULATION", ["state", "transition", "process order", "measurement"]),
+                new("research-data", "RESEARCH DATA", ["observations", "datasets", "provenance", "permissions"])
             ]);
 }
 
