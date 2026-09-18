@@ -38,6 +38,7 @@
     private string? insideRoomId;
     private string? selectedTransitDestinationId;
     private bool transitTrainVisible;
+    private static readonly SpatialIslandExperience Island = SpatialIslandExperience.SingularityIsland;
     private int detailLevel = 16;
     private int mansionDensity = 1;
     private IJSObjectReference? spatialModule;
@@ -86,6 +87,9 @@
 
         if (insideRoomId == "singularity-transit")
             return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom);
+
+        if (insideRoomId == "singularity-island")
+            return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome, mansionZoom, SetMansionZoom);
@@ -295,6 +299,23 @@
         // has physically manifested; the next increment can attach a destination
         // Experience to each platform without changing the station presentation.
         transitTrainVisible = false;
+
+        Router.Enter("singularity-island", new SpatialPoint(AvatarX, AvatarY));
+        var entry = Router.GetEntryPoint("singularity-island");
+        Experience.Navigation.MoveTo(entry.X, entry.Y);
+        insideRoomId = "singularity-island";
+    }
+
+    private void EnterIslandAttraction(string experienceId)
+    {
+        if (insideRoomId != "singularity-island") return;
+        var attraction = Island.Attractions.FirstOrDefault(item => item.ExperienceId == experienceId);
+        if (attraction is null) return;
+
+        Router.Enter(experienceId, new SpatialPoint(AvatarX, AvatarY));
+        var entry = Router.GetEntryPoint(experienceId);
+        Experience.Navigation.MoveTo(entry.X, entry.Y);
+        insideRoomId = experienceId;
     }
 
     private static LeaderboardMicroBundle CreateMazeLeaderboard()
