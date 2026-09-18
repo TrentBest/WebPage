@@ -15,6 +15,7 @@ namespace TheSingularityWorkshop.Services;
 public sealed class WorkshopAssetLibrary(IWorkshopStorage storage)
 {
     private const string Prefix = "workshop.asset.";
+    private const string IndexKey = Prefix + "index";
 
     public async ValueTask SaveAsync(WorkshopAsset asset)
     {
@@ -22,6 +23,10 @@ public sealed class WorkshopAssetLibrary(IWorkshopStorage storage)
 
         var bytes = WorkshopAssetBinaryCodec.Serialize(asset);
         await storage.SetAsync(Key(asset.Name), Convert.ToBase64String(bytes));
+
+        var names = (await ListAsync()).ToHashSet(StringComparer.Ordinal);
+        names.Add(asset.Name);
+        await SaveIndexAsync(names);
     }
 
     public async ValueTask<WorkshopAsset?> LoadAsync(string name)
@@ -42,22 +47,28 @@ public sealed class WorkshopAssetLibrary(IWorkshopStorage storage)
             return;
 
         await storage.RemoveAsync(Key(name));
+
+        var names = (await ListAsync()).ToHashSet(StringComparer.Ordinal);
+        names.Remove(name);
+        await SaveIndexAsync(names);
     }
 
-    /// <summary>
-    /// Returns names recorded by the library index.
-    /// </summary>
+    /// <summary>Returns the names currently recorded by the library index.</summary>
     public async ValueTask<IReadOnlyList<string>> ListAsync()
     {
-        var encoded = await storage.GetAsync(Prefix + "index");
+        var encoded = await storage.GetAsync(IndexKey);
         if (string.IsNullOrWhiteSpace(encoded))
             return Array.Empty<string>();
 
-        return encoded.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        return encoded
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Distinct(StringComparer.Ordinal)
             .OrderBy(x => x, StringComparer.Ordinal)
             .ToArray();
     }
+
+    private async ValueTask SaveIndexAsync(IEnumerable<string> names)
+        => await storage.SetAsync(IndexKey, string.Join('\n', names.OrderBy(x => x, StringComparer.Ordinal)));
 
     private string Key(string name) => Prefix + name;
 }
