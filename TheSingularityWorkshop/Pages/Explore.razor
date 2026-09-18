@@ -136,7 +136,7 @@
             return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
 
         if (insideRoomId == "singularity-transit")
-            return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform, AvatarX, AvatarY, HandleKeyDown, MoveTransitAvatar, TransitTrain.Specification);
+            return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform, AvatarX, AvatarY, HandleKeyDown, HandleTransitWorldClick, TransitTrain.Specification);
 
         if (insideRoomId == "singularity-island")
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
@@ -421,6 +421,22 @@
         // same walls/rooms once the blueprint is stable.
         Experience.Navigation.MoveTo(Math.Clamp(x, 4, 96), Math.Clamp(y, 8, 94));
         return InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleTransitWorldClick(MouseEventArgs args)
+    {
+        if (insideRoomId != "singularity-transit") return;
+
+        spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
+        var point = await spatialModule.InvokeAsync<SpatialPoint>(
+            "screenToCenteredWorld",
+            args.ClientX,
+            args.ClientY,
+            AvatarX,
+            AvatarY,
+            1d);
+
+        await MoveTransitAvatar(point.X, point.Y);
     }
 
     private void SelectTransitPlatform(string destinationId)
