@@ -439,13 +439,21 @@
         await MoveTransitAvatar(point.X, point.Y);
     }
 
-    private void SelectTransitPlatform(string destinationId)
+    private async Task SelectTransitPlatform(string platformId)
     {
-        if (!TransitManifest.Destinations.Any(destination => destination.Id == destinationId))
-            return;
+        var platform = TransitManifest.Platforms.FirstOrDefault(item => item.Id == platformId);
+        if (platform == default) return;
 
-        selectedTransitDestinationId = destinationId;
+        // A platform is a physical place in the station, not a teleport button.
+        // Walk to its interaction position first; only then activate the platform.
+        var interactionPoint = new SpatialPoint(
+            platform.X + platform.Width / 2d,
+            platform.Y + 7.5d);
+        await MoveTransitAvatar(interactionPoint);
+
+        selectedTransitDestinationId = platform.DestinationId;
         transitTrainVisible = true;
+        await InvokeAsync(StateHasChanged);
     }
 
     private void StartTransitMicroGame()
