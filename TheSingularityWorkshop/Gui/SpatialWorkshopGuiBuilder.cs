@@ -187,7 +187,7 @@ public static class SpatialWorkshopGuiBuilder
                 .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".75rem").Style("padding", ".55rem").Style("border-left", $"2px solid {Yellow}88").Style("color", Yellow).Style("font-family", "system-ui,sans-serif").Style("font-size", ".68rem").Text("You can look around from the perimeter, or request a guided tour from the foreman."))
                 .Content(WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("gap", ".5rem").Style("margin-top", "1rem")
                     .Content(WorkshopGui.Button(receiver).Label("REQUEST TOUR →").Style("padding", ".55rem .8rem").Style("border", $"1px solid {Yellow}88").Style("background", $"{Yellow}10").Style("color", Yellow).Style("font-family", "inherit").Style("font-size", ".46rem").Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(requestTour ?? (() => { })))
-                    .Content(WorkshopGui.Button(receiver).Label("STAY OUTSIDE").Style("padding", ".55rem .8rem").Style("border", "1px solid #ffffff33").Style("background", "transparent").Style("color", White).Style("font-family", "inherit").Style("font-size", ".46rem").Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(exitSite ?? (() => { }))));
+                    .Content(WorkshopGui.Button(receiver).Label("STAY OUTSIDE").Style("padding", ".55rem .8rem").Style("border", "1px solid #ffffff33").Style("background", "transparent").Style("color", White).Style("font-family", "inherit").Style("font-size", ".46rem").Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(exitSite ?? (() => { })))));
 
 
     private static ElementBuilder Foreman(object receiver, string message)
