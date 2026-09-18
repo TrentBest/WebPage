@@ -56,6 +56,17 @@ public static class SpatialIslandExperienceGuiBuilder
         }
 
         root.Content(map);
+
+        var universe = SpatialUniverseManifest.SingularityUniverse;
+        var frontier = WorkshopGui.Panel(receiver)
+            .Style("position", "absolute").Style("right", "5vw").Style("top", "4vh").Style("z-index", "6")
+            .Style("width", "min(280px,30vw)").Style("padding", ".75rem")
+            .Style("border", "1px solid rgba(255,211,77,.3)").Style("background", "rgba(5,4,18,.78)")
+            .Content(WorkshopGui.Element(receiver, "div").Style("font-size", ".42rem").Style("letter-spacing", ".15em").Style("color", "#ffd34d").Text(universe.Name))
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".35rem").Style("font-size", ".48rem").Style("line-height", "1.45").Style("color", "#c7bdcf").Text("Island is the beginning. The surrounding Universe deliberately contains unclaimed space for user-authored construction, experiments, games, and Experiences."))
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".45rem").Style("font-size", ".38rem").Style("letter-spacing", ".1em").Style("color", "#00eaff").Text($"OPEN FRONTIERS // {universe.OpenParcels.Count}"));
+        root.Content(frontier);
+
         root.Content(WorkshopGui.Button(receiver).Label("← RETURN TO STATION")
             .Style("position", "fixed").Style("left", "5vw").Style("bottom", "2vh").Style("z-index", "10")
             .Style("padding", ".55rem .8rem").Style("border", "1px solid #ff38d166")
