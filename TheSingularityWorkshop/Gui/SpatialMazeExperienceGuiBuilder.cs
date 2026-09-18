@@ -1,6 +1,7 @@
 namespace TheSingularityWorkshop.Gui;
 
 using Microsoft.AspNetCore.Components.Web;
+using TheSingularityWorkshop.Workshop.MicroBundles;
 
 /// <summary>Recursive spatial presentation for the Workshop maze Experience.</summary>
 public static class SpatialMazeExperienceGuiBuilder
@@ -16,6 +17,8 @@ public static class SpatialMazeExperienceGuiBuilder
         string userName,
         SpatialPoint avatar,
         IReadOnlyList<SpatialMazeParticipant> participants,
+        LeaderboardMicroBundle leaderboard,
+        Action<string?> selectLeaderboardEntry,
         Action<KeyboardEventArgs> onKeyDown,
         Action exit,
         double zoom,
@@ -57,7 +60,7 @@ public static class SpatialMazeExperienceGuiBuilder
             map.Content(Dot(receiver, participant.Name, participant.Position, Cyan, cell));
 
         root.Content(map);
-        root.Content(Hud(receiver, maze, userName, zoom, setZoom, exit, finished));
+        root.Content(Hud(receiver, maze, userName, zoom, setZoom, exit, finished, leaderboard, selectLeaderboardEntry));
         return root;
     }
 
@@ -77,25 +80,69 @@ public static class SpatialMazeExperienceGuiBuilder
                 .Style("font-family", "Consolas,'Courier New',monospace").Style("font-size", ".42rem")
                 .Style("letter-spacing", ".08em").Text(name));
 
-    private static ElementBuilder Hud(object receiver, SpatialMazeExperience maze, string userName, double zoom, Action<double> setZoom, Action exit, bool finished)
+    private static ElementBuilder Hud(
+        object receiver,
+        SpatialMazeExperience maze,
+        string userName,
+        double zoom,
+        Action<double> setZoom,
+        Action exit,
+        bool finished,
+        LeaderboardMicroBundle leaderboard,
+        Action<string?> selectLeaderboardEntry)
     {
         var hud = WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("inset", "0").Style("pointer-events", "none");
+
         hud.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "1rem").Style("top", "1rem")
             .Style("padding", ".5rem .65rem").Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan}55")
             .Style("font-family", "Consolas,'Courier New',monospace").Style("font-size", ".5rem").Text($"{maze.Title} // {userName} // ZOOM {zoom:0.00}X"));
-        hud.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("right", "1rem").Style("top", "1rem")
-            .Style("pointer-events", "auto").Style("padding", ".6rem").Style("width", "190px")
-            .Style("background", "rgba(1,4,10,.94)").Style("border", $"1px solid {Yellow}55")
-            .Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", ".52rem").Style("letter-spacing", ".15em").Text("LEADERBOARD"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".45rem").Style("font-family", "Consolas,'Courier New',monospace").Style("font-size", ".46rem").Style("line-height", "1.65")
-                .Text(string.Join("\n", SpatialMazeCatalog.Leaderboard.Select((x, i) => $"{i + 1}. {x.Name,-8} {x.Time}  {x.Steps}")))));
+
+        hud.Content(LeaderboardPanel(receiver, leaderboard, selectLeaderboardEntry));
+
         hud.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "1rem").Style("bottom", "1rem")
             .Style("padding", ".45rem .6rem").Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan}44")
             .Style("color", Muted).Style("font-family", "system-ui,sans-serif").Style("font-size", ".58rem")
             .Text(finished ? "EXIT FOUND. You solved the authored maze." : "MAZE MODE: WASD / ARROWS. Clicks far from your avatar are ignored. Find the exit."));
+
         hud.Content(WorkshopGui.Element(receiver, "button").Style("position", "absolute").Style("right", "1rem").Style("bottom", "1rem")
             .Style("pointer-events", "auto").Style("padding", ".4rem .55rem").Style("background", "rgba(1,4,10,.9)")
             .Style("border", $"1px solid {Cyan}55").Style("color", White).Style("cursor", "pointer").OnClick(exit).Text("← EXIT"));
         return hud;
+    }
+
+    private static ElementBuilder LeaderboardPanel(
+        object receiver,
+        LeaderboardMicroBundle leaderboard,
+        Action<string?> selectLeaderboardEntry)
+    {
+        var panel = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("right", "1rem").Style("top", "1rem")
+            .Style("pointer-events", "auto").Style("padding", ".6rem").Style("width", "210px")
+            .Style("background", "rgba(1,4,10,.94)").Style("border", $"1px solid {Yellow}55");
+
+        panel.Content(WorkshopGui.Element(receiver, "button")
+            .Style("width", "100%").Style("text-align", "left").Style("padding", "0")
+            .Style("border", "0").Style("background", "transparent").Style("color", Yellow)
+            .Style("font-size", ".52rem").Style("letter-spacing", ".15em").Style("cursor", "pointer")
+            .OnClick(() => selectLeaderboardEntry(null))
+            .Text($"MICROBUNDLE // {leaderboard.Presentation.Surface}"));
+
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".35rem").Style("color", Muted).Style("font-size", ".42rem")
+            .Text("Click a result to inspect its current data."));
+
+        foreach (var (entry, index) in leaderboard.Entries.Select((value, index) => (value, index)))
+        {
+            var capturedName = entry.Name;
+            panel.Content(WorkshopGui.Element(receiver, "button")
+                .Style("display", "block").Style("width", "100%").Style("margin-top", ".25rem")
+                .Style("padding", ".2rem .1rem").Style("border", "0").Style("border-bottom", $"1px solid {Cyan}18")
+                .Style("background", "transparent").Style("color", White).Style("text-align", "left")
+                .Style("font-family", "Consolas,'Courier New',monospace").Style("font-size", ".46rem").Style("cursor", "pointer")
+                .OnClick(() => selectLeaderboardEntry(capturedName))
+                .Text($"{index + 1}. {entry.Name,-8} {entry.DisplayTime}  {entry.Steps}"));
+        }
+
+        return panel;
     }
 }
