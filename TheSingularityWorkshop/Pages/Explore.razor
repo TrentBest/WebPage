@@ -32,6 +32,7 @@
     private double mazeZoom = 1d;
     private int mazeSteps;
     private bool mazeFinished;
+    private DateTime? mazeStartedAtUtc;
     private string? selectedLeaderboardEntry;
     private string? insideRoomId;
     private int detailLevel = 16;
@@ -78,7 +79,7 @@
             return SpatialConstructionExperienceGuiBuilder.Build(this, Scene.ConstructionExperience, Experience.User.DisplayName, AvatarX, AvatarY, constructionZoom, SetConstructionZoom, HandleKeyDown, HandleConstructionWorldClick, ExitRoom);
 
         if (insideRoomId == "maze")
-            return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
+            return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome, mansionZoom, SetMansionZoom);
@@ -249,6 +250,7 @@
     {
         if (insideRoomId != "maze" || mazeFinished) return;
 
+        mazeStartedAtUtc ??= DateTime.UtcNow;
         var maze = SpatialMazeCatalog.Showcase;
         var nextX = (int)Math.Floor(AvatarX + dx);
         var nextY = (int)Math.Floor(AvatarY + dy);
@@ -262,7 +264,7 @@
             (int)Math.Floor(AvatarY) == (int)Math.Floor(maze.Exit.Y))
         {
             mazeFinished = true;
-            MazeLeaderboard.Record(Experience.User.DisplayName, 0, mazeSteps);
+            MazeLeaderboard.Record(Experience.User.DisplayName, mazeStartedAtUtc.HasValue ? (long)(DateTime.UtcNow - mazeStartedAtUtc.Value).TotalMilliseconds : 0, mazeSteps);
         }
     }
 
@@ -430,6 +432,12 @@
         mansionWelcomeVisible = false;
         constructionWelcomeVisible = false;
         constructionTourActive = false;
+        if (insideRoomId == "maze")
+        {
+            mazeStartedAtUtc = null;
+            selectedLeaderboardEntry = null;
+        }
+
         if (Router.TryExit(out var frame))
             Experience.Navigation.MoveTo(frame.ReturnPosition.X, frame.ReturnPosition.Y);
         insideRoomId = Router.CurrentSceneId == "workshop" ? null : Router.CurrentSceneId;
