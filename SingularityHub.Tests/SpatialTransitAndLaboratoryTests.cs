@@ -13,7 +13,7 @@ public sealed class SpatialTransitAndLaboratoryTests
         Assert.True(transit.TrackCenterline.Count >= 2);
         Assert.True(transit.PlatformBounds.Width > 0);
         Assert.True(transit.PlatformBounds.Height > 0);
-        Assert.Equal(6, transit.Passengers.Count);
+        Assert.Equal(10, transit.Passengers.Count);
         Assert.Contains(transit.Destinations, item => item.Id == "space-elevator");
         Assert.True(transit.Timing.CycleSeconds > transit.Timing.ArrivalSeconds);
     }
