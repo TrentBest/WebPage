@@ -180,8 +180,8 @@ public static class SpatialTransitStationGuiBuilder
         var area = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("left", "4%").Style("right", "4%")
             .Style("top", "43%").Style("bottom", "5%")
-            .Style("display", "grid").Style("grid-template-columns", "repeat(4,minmax(0,1fr))")
-            .Style("gap", ".7rem").Style("align-items", "stretch");
+            .Style("display", "grid").Style("grid-template-columns", "repeat(auto-fit,minmax(180px,1fr))")
+            .Style("gap", ".7rem").Style("align-items", "stretch").Style("overflow", "auto").Style("padding-bottom", ".5rem");
 
         foreach (var destination in manifest.Destinations)
         {
