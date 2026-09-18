@@ -44,15 +44,39 @@ public sealed record SpatialTabletopManifest(
 
     /// <summary>Finds a utility by stable identifier.</summary>
     public SpatialTabletopUtility? FindUtility(string id)
-        => Utilities.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
+    {
+        foreach (var utility in Utilities)
+        {
+            if (string.Equals(utility.Id, id, StringComparison.OrdinalIgnoreCase))
+                return utility;
+        }
+
+        return null;
+    }
 
     /// <summary>Finds a surface by stable identifier.</summary>
     public SpatialTabletopSurface? FindSurface(string id)
-        => Surfaces.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
+    {
+        foreach (var surface in Surfaces)
+        {
+            if (string.Equals(surface.Id, id, StringComparison.OrdinalIgnoreCase))
+                return surface;
+        }
+
+        return null;
+    }
 
     /// <summary>Finds a seat by stable identifier.</summary>
     public SpatialTabletopSeat? FindSeat(string id)
-        => Seats.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
+    {
+        foreach (var seat in Seats)
+        {
+            if (string.Equals(seat.Id, id, StringComparison.OrdinalIgnoreCase))
+                return seat;
+        }
+
+        return null;
+    }
 }
 
 /// <summary>A neutral capability supplied by the tabletop environment.</summary>
