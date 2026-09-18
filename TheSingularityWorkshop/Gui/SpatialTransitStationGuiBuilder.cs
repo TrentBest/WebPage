@@ -209,7 +209,7 @@ public static class SpatialTransitStationGuiBuilder
             .Attribute("stroke", White).Attribute("stroke-opacity", ".08").Attribute("stroke-width", ".18"));
 
         // Rail corridors: several parallel tracks, with platforms between/along them.
-        for (var y = 45; y <= 103; y += 4.5)
+        for (var y = 45d; y <= 103d; y += 4.5)
         {
             svg.Child(WorkshopGui.Element(receiver, "line")
                 .Attribute("x1", "8").Attribute("y1", y)
@@ -317,30 +317,13 @@ public static class SpatialTransitStationGuiBuilder
                 .Style("font-size", ".34rem").Style("letter-spacing", ".11em")
                 .Style("color", accent).Text(label));
 
-    private static ElementBuilder WalkSurface(object receiver, double avatarX, double avatarY, Func<MouseEventArgs, Task> onWorldClick)
-    {
-        const int cells = 18;
-        var surface = WorkshopGui.Element(receiver, "div")
+    private static ElementBuilder WalkSurface(object receiver, Func<MouseEventArgs, Task> onWorldClick)
+        => WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("inset", "0").Style("z-index", "2")
-            .Style("display", "grid")
-            .Style("grid-template-columns", $"repeat({cells},1fr)")
-            .Style("grid-template-rows", $"repeat({cells},1fr)")
-            .Style("pointer-events", "none");
-
-        for (var row = 0; row < cells; row++)
-        for (var column = 0; column < cells; column++)
-        {
-            var x = (column + .5) / cells * 100;
-            var y = (row + .5) / cells * 100;
-            surface.Content(WorkshopGui.Button(receiver)
-                .Style("width", "100%").Style("height", "100%").Style("padding", "0")
-                .Style("border", "0").Style("background", "transparent")
-                .Style("pointer-events", "auto").Style("cursor", "crosshair")
-                .AriaLabel($"Walk to {x:0.#}, {y:0.#}")
-                .OnClick(() => moveAvatarTo(Math.Clamp(x, 3, 97), Math.Clamp(y, 5, 95))));
-        }
-        return surface;
-    }
+            .Style("background", "transparent").Style("cursor", "crosshair")
+            .Style("pointer-events", "auto")
+            .AriaLabel("Station floor. Left click to walk.")
+            .OnClick(onWorldClick);
 
     private static ElementBuilder StationFocus(object receiver, Action<KeyboardEventArgs> onKeyDown)
         => WorkshopGui.Element(receiver, "div")
