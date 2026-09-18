@@ -44,7 +44,9 @@ public sealed class SpatialWorkshopScene
                 Building("singularity-shipyard", "singularity-shipyard", new SpatialBounds(90, 18, 4, 3)),
                 Building("singularity-capitol", "singularity-capitol", new SpatialBounds(60, 17, 4, 3)),
                 Building("ocean-shipyard", "ocean-shipyard", new SpatialBounds(11, 80, 4, 3)),
-                new SpatialInteractable("maze", "Workshop Maze", new SpatialBounds(62, 78, 8, 5), new SpatialBounds(64, 76, 4, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "maze")
+                new SpatialInteractable("maze", "Workshop Maze", new SpatialBounds(62, 78, 8, 5), new SpatialBounds(64, 76, 4, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "maze"),
+                new SpatialInteractable("aec-remote-office", "AEC Remote Office", new SpatialBounds(21, 44, 7, 4), new SpatialBounds(23, 48, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "aec-remote-office"),
+                new SpatialInteractable("singularity-taxi", "Singularity Taxi", new SpatialBounds(57, 20, 7, 4), new SpatialBounds(59, 23, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "singularity-taxi")
             ],
             SpatialViewSettings.CreateDefault(),
             new SpatialConstructionSite(
