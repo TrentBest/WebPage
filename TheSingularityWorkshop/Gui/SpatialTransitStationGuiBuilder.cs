@@ -30,7 +30,12 @@ public static class SpatialTransitStationGuiBuilder
         int microGameRound,
         string? microGameTargetId,
         Action startMicroGame,
-        Action<string> selectMicroGamePlatform)
+        Action<string> selectMicroGamePlatform,
+        double avatarX,
+        double avatarY,
+        Action<KeyboardEventArgs> onKeyDown,
+        Action<double, double> moveAvatarTo,
+        TransitTrainSpecification trainSpecification)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0")
@@ -66,6 +71,7 @@ public static class SpatialTransitStationGuiBuilder
         SpatialTransitManifest manifest,
         string? selectedDestinationId,
         bool trainVisible,
+        Action<string> selectPlatform,
         Action<string> boardTrain,
         double avatarX,
         double avatarY,
