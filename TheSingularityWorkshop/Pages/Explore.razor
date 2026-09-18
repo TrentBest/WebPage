@@ -101,7 +101,7 @@
             insideRoomId = null;
             gardenMode = true;
             gardenVisitResolved = true;
-            return;
+            return SpatialGardenGuiBuilder.Build(this, SpatialGardenManifest.CreateDefault(), Experience.User.DisplayName, EnterGardenDestination, ExitGarden);
         }
 
         if (insideRoomId == "conference")
