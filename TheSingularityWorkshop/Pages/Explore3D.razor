@@ -1,0 +1,143 @@
+@page "/explore3d"
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<PageTitle>Explore3D // Singularity Starship</PageTitle>
+
+<div class="starship-lab">
+    <canvas id="starship-line-canvas" class="starship-canvas" aria-label="Singularity Starship 3D line rendering experiment"></canvas>
+
+    <header class="lab-header">
+        <div class="lab-kicker">EXPLORE3D // EXPERIMENTAL RENDERING DECK</div>
+        <h1>SINGULARITY STARSHIP</h1>
+        <p>Our confined 3D test environment: a giant solar-system cruise ship. This deck exists to measure the Workshop's own line geometry before we commit to a larger renderer.</p>
+    </header>
+
+    <aside class="lab-console" aria-label="Starship line rendering controls">
+        <div class="console-title">LINE RENDERING BENCH</div>
+        <div class="console-row"><span>LINES</span><strong>@lineCount.ToString("N0")</strong></div>
+        <div class="console-row"><span>FPS</span><strong>@fps.ToString("0.0")</strong></div>
+        <div class="console-row"><span>FRAME</span><strong>@frameMs.ToString("0.00") MS</strong></div>
+        <div class="console-row"><span>VERTICES</span><strong>@vertices.ToString("N0")</strong></div>
+
+        <div class="console-label">LOAD THE SAME SHIP AT DIFFERENT LINE DENSITIES</div>
+        <div class="line-presets">
+            <button @onclick="() => SetLineCount(2500)">2.5K</button>
+            <button @onclick="() => SetLineCount(10000)">10K</button>
+            <button @onclick="() => SetLineCount(25000)">25K</button>
+            <button @onclick="() => SetLineCount(50000)">50K</button>
+        </div>
+
+        <div class="console-label">STARSHIP PROCEDURE</div>
+        <div class="procedure">
+            <div class="procedure-step active"><b>01</b><span>OBSERVE</span></div>
+            <div class="procedure-step"><b>02</b><span>ORIENT</span></div>
+            <div class="procedure-step"><b>03</b><span>OPERATE</span></div>
+            <div class="procedure-step"><b>04</b><span>FLY</span></div>
+        </div>
+        <p class="console-note">The future operating loop is deliberately simple: the ship highlights what needs attention, the visitor moves to it, performs the action, and the next instruction appears.</p>
+    </aside>
+
+    <div class="ship-readout">
+        <span>SHIP // SINGULARITY STARSHIP</span>
+        <span>MODE // WIREFRAME</span>
+        <span>MISSION // SOLAR SYSTEM CRUISE</span>
+    </div>
+</div>
+
+<style>
+.starship-lab{position:fixed;inset:0;overflow:hidden;background:#01040a;color:#eafcff;font-family:Consolas,'Courier New',monospace}
+.starship-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.lab-header{position:absolute;left:2rem;top:1.5rem;width:min(620px,52vw);pointer-events:none;text-shadow:0 0 18px rgba(0,234,255,.18)}
+.lab-kicker{color:#00eaff;font-size:.55rem;letter-spacing:.2em}
+.lab-header h1{margin:.35rem 0;font-size:clamp(1.6rem,3.2vw,3.4rem);letter-spacing:.12em;color:#fff}
+.lab-header p{margin:0;color:#8aa6b0;font-family:system-ui,sans-serif;font-size:.82rem;line-height:1.5}
+.lab-console{position:absolute;right:1.5rem;top:1.5rem;width:min(310px,25vw);padding:1rem;border:1px solid rgba(0,234,255,.35);background:rgba(1,6,13,.88);box-shadow:0 0 35px rgba(0,234,255,.07);backdrop-filter:blur(5px)}
+.console-title{color:#ffd34d;font-size:.55rem;letter-spacing:.17em;margin-bottom:.65rem}
+.console-row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(0,234,255,.1);padding:.38rem 0;font-size:.55rem;color:#5f7c87}
+.console-row strong{color:#fff}
+.console-label{margin-top:.75rem;color:#78909c;font-size:.43rem;letter-spacing:.11em;line-height:1.4}
+.line-presets{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-top:.45rem}
+.line-presets button{padding:.45rem;border:1px solid rgba(0,234,255,.35);background:rgba(0,234,255,.035);color:#00eaff;font:700 .55rem Consolas,'Courier New',monospace;cursor:pointer}
+.line-presets button:hover{border-color:#ff2cff;color:#ff2cff;background:rgba(255,44,255,.05)}
+.procedure{margin-top:.5rem;display:grid;grid-template-columns:1fr 1fr;gap:.35rem}
+.procedure-step{padding:.45rem;border:1px solid rgba(255,255,255,.08);color:#4f6973;font-size:.45rem}
+.procedure-step b{color:#ff38d1;margin-right:.35rem}.procedure-step.active{border-color:rgba(255,211,77,.55);color:#ffd34d;background:rgba(255,211,77,.04)}
+.console-note{margin:.65rem 0 0;color:#5d7680;font-family:system-ui,sans-serif;font-size:.7rem;line-height:1.45}
+.ship-readout{position:absolute;left:2rem;right:2rem;bottom:1.25rem;display:flex;justify-content:space-between;color:#4d6973;font-size:.43rem;letter-spacing:.13em;pointer-events:none}
+@@media(max-width:900px){.lab-header{width:60vw}.lab-console{width:270px}.ship-readout{display:none}}
+@@media(max-width:700px){.lab-header{left:1rem;top:1rem;width:calc(100vw - 2rem)}.lab-header p{display:none}.lab-console{left:1rem;right:1rem;top:auto;bottom:1rem;width:auto}.ship-readout{display:none}}
+</style>
+
+@code {
+    private IJSObjectReference? module;
+    private CancellationTokenSource? metricsCancellation;
+    private int lineCount = 2500;
+    private int vertices;
+    private double fps;
+    private double frameMs;
+    private bool started;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || started) return;
+
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/starship-line-lab.js");
+        await module.InvokeVoidAsync("startStarshipLineLab", "starship-line-canvas", lineCount);
+        started = true;
+        metricsCancellation = new CancellationTokenSource();
+        _ = RefreshMetricsAsync(metricsCancellation.Token);
+    }
+
+    private async Task SetLineCount(int count)
+    {
+        lineCount = count;
+        if (module is not null)
+            await module.InvokeVoidAsync("setStarshipLineCount", lineCount);
+    }
+
+    private async Task RefreshMetricsAsync(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                await Task.Delay(500, cancellationToken);
+                if (module is null) continue;
+
+                var metrics = await module.InvokeAsync<StarshipMetrics>("getStarshipLineMetrics");
+                await InvokeAsync(() =>
+                {
+                    lineCount = metrics.Lines;
+                    vertices = metrics.Vertices;
+                    fps = metrics.Fps;
+                    frameMs = metrics.FrameMs;
+                    StateHasChanged();
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (JSException)
+            {
+                break;
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        metricsCancellation?.Cancel();
+        metricsCancellation?.Dispose();
+        if (module is not null)
+        {
+            try { await module.InvokeVoidAsync("stopStarshipLineLab"); }
+            catch (JSException) { }
+            await module.DisposeAsync();
+        }
+    }
+
+    private sealed record StarshipMetrics(double Fps, double FrameMs, int Lines, int Vertices);
+}
