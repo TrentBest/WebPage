@@ -86,11 +86,22 @@
     {
         if (!firstRender || gardenVisitResolved) return;
 
-        var visited = await JS.InvokeAsync<bool>("workshopExploreGardenVisited");
-        gardenMode = !visited;
-        gardenVisitResolved = true;
-        if (!visited)
-            await JS.InvokeVoidAsync("markWorkshopExploreGardenVisited");
+        try
+        {
+            var visited = await JS.InvokeAsync<bool>("workshopExploreGardenVisited");
+            gardenMode = !visited;
+            gardenVisitResolved = true;
+            if (!visited)
+                await JS.InvokeVoidAsync("markWorkshopExploreGardenVisited");
+        }
+        catch (JSException)
+        {
+            // The spatial Experience must remain usable if the optional garden-visit
+            // persistence hook is unavailable (for example during a stale deployment).
+            // Do not let a browser-side storage/module problem tear down the Blazor circuit.
+            gardenMode = false;
+            gardenVisitResolved = true;
+        }
 
         await InvokeAsync(StateHasChanged);
     }
