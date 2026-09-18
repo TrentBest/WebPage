@@ -21,15 +21,17 @@ public sealed record SpatialLaboratoryManifest(
             "SINGULARITY LAB",
             new SpatialBounds(22, 60, 34, 28),
             [
-                new("gravity", "GRAVITY & SPACETIME", 0, "gravity"),
-                new("energy", "ENERGY SYSTEMS", 1, "energy"),
-                new("materials", "MATERIALS SCIENCE", 2, "materials"),
-                new("atomics", "ATOMICS & CHEMISTRY", 3, "atomics"),
-                new("quantum", "QUANTUM SYSTEMS", 4, "quantum"),
-                new("plasma", "PLASMA & FIELD STUDIES", 5, "plasma"),
-                new("fluids", "FLUIDS & HYDRAULICS", 6, "fluids"),
-                new("cosmic", "COSMIC SCALE", 7, "cosmic"),
-                new("simulation", "FSM PHYSICS SIMULATION", 8, "simulation")
+                new("security", "SECURITY GATE", -1, "security"),
+                new("director", "DIRECTOR'S OFFICE", 0, "administration"),
+                new("gravity", "GRAVITY & SPACETIME", 1, "gravity"),
+                new("energy", "ENERGY SYSTEMS", 2, "energy"),
+                new("materials", "MATERIALS SCIENCE", 3, "materials"),
+                new("atomics", "ATOMICS & CHEMISTRY", 4, "atomics"),
+                new("quantum", "QUANTUM SYSTEMS", 5, "quantum"),
+                new("plasma", "PLASMA & FIELD STUDIES", 6, "plasma"),
+                new("fluids", "FLUIDS & HYDRAULICS", 7, "fluids"),
+                new("cosmic", "COSMIC SCALE", 8, "cosmic"),
+                new("simulation", "FSM PHYSICS SIMULATION", 9, "simulation")
             ],
             [
                 new("particle-collider", "PARTICLE COLLIDER", "MICRO → SOLAR SYSTEM", "Compose collision experiments across scale: tiny, small, medium, large, hadron-collider, extra-large, and eventually astronomical systems.", ["atomics", "energy", "gravity", "fsm-physics"]),
