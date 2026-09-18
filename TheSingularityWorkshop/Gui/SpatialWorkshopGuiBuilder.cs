@@ -189,6 +189,7 @@ public static class SpatialWorkshopGuiBuilder
                     .Content(WorkshopGui.Button(receiver).Label("REQUEST TOUR →").Style("padding", ".55rem .8rem").Style("border", $"1px solid {Yellow}88").Style("background", $"{Yellow}10").Style("color", Yellow).Style("font-family", "inherit").Style("font-size", ".46rem").Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(requestTour ?? (() => { })))
                     .Content(WorkshopGui.Button(receiver).Label("STAY OUTSIDE").Style("padding", ".55rem .8rem").Style("border", "1px solid #ffffff33").Style("background", "transparent").Style("color", White).Style("font-family", "inherit").Style("font-size", ".46rem").Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(exitSite ?? (() => { }))));
 
+
     private static ElementBuilder Foreman(object receiver, string message)
         => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "calc(50% + 42px)").Style("top", "50%").Style("z-index", "80").Style("transform", "translateY(-50%)").Style("max-width", "min(360px,42vw)").Style("pointer-events", "none")
             .Content(WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("align-items", "center").Style("gap", ".45rem")
