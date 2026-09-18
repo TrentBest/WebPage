@@ -7,7 +7,7 @@ using System.Linq;
 /// <summary>The logical spatial scene presented by Explore.</summary>
 public sealed class SpatialWorkshopScene
 {
-    private SpatialWorkshopScene(string startingAreaId, SpatialPoint startingPosition, IReadOnlyList<SpatialInteractable> interactables, SpatialViewSettings view, SpatialConstructionSite constructionSite, IReadOnlyList<ConstructionVehicle> constructionVehicles)
+    private SpatialWorkshopScene(string startingAreaId, SpatialPoint startingPosition, IReadOnlyList<SpatialInteractable> interactables, SpatialViewSettings view, SpatialConstructionSite constructionSite, IReadOnlyList<ConstructionVehicle> constructionVehicles, SpatialConstructionExperience constructionExperience)
     {
         StartingAreaId = startingAreaId;
         StartingPosition = startingPosition;
@@ -15,6 +15,7 @@ public sealed class SpatialWorkshopScene
         View = view;
         ConstructionSite = constructionSite;
         ConstructionVehicles = constructionVehicles;
+        ConstructionExperience = constructionExperience;
     }
 
     public string StartingAreaId { get; }
@@ -23,6 +24,7 @@ public sealed class SpatialWorkshopScene
     public SpatialViewSettings View { get; }
     public SpatialConstructionSite ConstructionSite { get; }
     public IReadOnlyList<ConstructionVehicle> ConstructionVehicles { get; }
+    public SpatialConstructionExperience ConstructionExperience { get; }
 
     /// <summary>Creates the first campus composition from the declarative building catalog.</summary>
     public static SpatialWorkshopScene CreateDefault()
@@ -52,7 +54,8 @@ public sealed class SpatialWorkshopScene
                 new ConstructionVehicle("backhoe-01", "Site Tractor", ConstructionVehicleKind.Backhoe, new SpatialPoint(38, 80)),
                 new ConstructionVehicle("rover-01", "Site Rover", ConstructionVehicleKind.Rover, new SpatialPoint(40, 70)),
                 new ConstructionVehicle("lifter-01", "Material Lifter", ConstructionVehicleKind.Lifter, new SpatialPoint(54, 84))
-            ]);
+            ],
+            SpatialConstructionExperienceCatalog.Expansion);
 
     private static SpatialInteractable Building(string id, string experienceId, SpatialBounds interactionPoint)
     {
