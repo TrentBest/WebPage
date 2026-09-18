@@ -1,0 +1,171 @@
+@page "/research"
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<PageTitle>Research // Dimensionality Lab</PageTitle>
+
+<div class="research-lab">
+    <canvas id="dimension-research-canvas" class="research-canvas" aria-label="Dimensionality research visualization"></canvas>
+
+    <div class="blueprint-grid" aria-hidden="true"></div>
+
+    <header class="research-header">
+        <div class="kicker">RESEARCH PROJECT 01 // DIMENSIONALITY</div>
+        <h1>THE EXTRA DIMENSION</h1>
+        <p>
+            One authored object. One switch. The experiment asks a simple question:
+            what happens when the same geometry is allowed to leave the plane?
+        </p>
+    </header>
+
+    <aside class="research-readout">
+        <div class="readout-title">DIMENSIONALITY LAB</div>
+        <div class="readout-row"><span>STATE</span><strong>@(threeDimensional ? "3D VOLUME" : "2D PLANE")</strong></div>
+        <div class="readout-row"><span>Z DEPTH</span><strong>@depth.ToString("0.00")</strong></div>
+        <div class="readout-row"><span>FPS</span><strong>@fps.ToString("0.0")</strong></div>
+        <div class="readout-row"><span>FRAME</span><strong>@frameMs.ToString("0.00") MS</strong></div>
+        <div class="readout-note">
+            The switch does not replace the model. It changes the dimensional state of the same model.
+            The transition is interpolated rather than snapped.
+        </div>
+    </aside>
+
+    <div class="axis-readout">
+        <span>X // LENGTH</span>
+        <span>Y // HEIGHT</span>
+        <span>Z // EXTRA DIMENSION</span>
+    </div>
+
+    <section class="switch-console" aria-label="Dimensionality switch">
+        <div class="switch-caption">DIMENSION CONTROL</div>
+        <button id="dimension-switch"
+                class="dimension-switch @(threeDimensional ? "on" : "off")"
+                type="button"
+                @onclick="ToggleDimension"
+                aria-pressed="@threeDimensional"
+                aria-label="Toggle between two-dimensional and three-dimensional research states">
+            <span class="switch-housing">
+                <span class="switch-track">
+                    <span class="switch-lever"></span>
+                </span>
+            </span>
+            <span class="switch-label">@(threeDimensional ? "3D // EXTEND Z" : "2D // FLATTEN Z")</span>
+        </button>
+        <div class="switch-subtitle">OPERATE THE SWITCH TO EXTEND OR RETRACT THE EXTRA DIMENSION</div>
+    </section>
+
+    <div class="project-stamp">
+        <span>PROJECT // DIM-001</span>
+        <span>METHOD // LERP</span>
+        <span>OBJECT // STARSHIP TEST FORM</span>
+    </div>
+</div>
+
+<style>
+.research-lab{position:fixed;inset:0;overflow:hidden;background:#02050b;color:#eafcff;font-family:Consolas,'Courier New',monospace}
+.research-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.blueprint-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(0,234,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(0,234,255,.055) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,transparent,black 18%,black 82%,transparent)}
+.research-header{position:absolute;left:2rem;top:1.5rem;width:min(600px,52vw);pointer-events:none}
+.kicker{color:#00eaff;font-size:.55rem;letter-spacing:.2em}
+.research-header h1{margin:.35rem 0;font-size:clamp(1.7rem,3.4vw,3.5rem);letter-spacing:.12em;color:#fff;text-shadow:0 0 22px rgba(0,234,255,.18)}
+.research-header p{margin:0;color:#89a2ad;font-family:system-ui,sans-serif;font-size:.82rem;line-height:1.5}
+.research-readout{position:absolute;right:1.5rem;top:1.5rem;width:min(300px,24vw);padding:1rem;border:1px solid rgba(0,234,255,.32);background:rgba(2,7,15,.86);box-shadow:0 0 30px rgba(0,234,255,.07);backdrop-filter:blur(5px)}
+.readout-title{color:#ffd34d;font-size:.55rem;letter-spacing:.16em;margin-bottom:.55rem}
+.readout-row{display:flex;justify-content:space-between;padding:.36rem 0;border-bottom:1px solid rgba(0,234,255,.09);font-size:.54rem;color:#5f7d88}
+.readout-row strong{color:#fff}
+.readout-note{margin-top:.7rem;color:#66808a;font: .68rem/1.45 system-ui,sans-serif}
+.axis-readout{position:absolute;left:2rem;bottom:7rem;display:flex;gap:1rem;color:#526d77;font-size:.43rem;letter-spacing:.12em;pointer-events:none}
+.switch-console{position:absolute;left:50%;bottom:1.4rem;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.35rem}
+.switch-caption{color:#ffd34d;font-size:.5rem;letter-spacing:.22em}
+.dimension-switch{appearance:none;border:0;background:transparent;color:#fff;cursor:pointer;padding:.3rem 1.2rem .45rem;display:flex;flex-direction:column;align-items:center;gap:.55rem}
+.switch-housing{display:block;width:210px;height:100px;padding:12px;box-sizing:border-box;border:2px solid rgba(0,234,255,.5);background:linear-gradient(145deg,#101d27,#050a10);box-shadow:0 0 35px rgba(0,234,255,.12),inset 0 0 25px rgba(0,234,255,.06);border-radius:12px}
+.switch-track{position:relative;display:block;width:100%;height:100%;border:1px solid rgba(255,255,255,.12);border-radius:7px;background:linear-gradient(90deg,#071018,#111c25);perspective:500px}
+.switch-lever{position:absolute;left:50%;top:50%;width:28px;height:64px;transform-origin:50% 88%;transform:translate(-50%,-88%) rotate(-30deg);border:2px solid #ff38d1;border-radius:6px 6px 3px 3px;background:linear-gradient(90deg,#3a1734,#ff38d1,#531844);box-shadow:0 0 18px rgba(255,56,209,.35);transition:transform .85s cubic-bezier(.22,.75,.24,1),box-shadow .85s}
+.dimension-switch.on .switch-lever{transform:translate(-50%,-88%) rotate(30deg);box-shadow:0 0 26px rgba(0,234,255,.42)}
+.switch-label{font-size:.58rem;letter-spacing:.16em;color:#00eaff}
+.dimension-switch.on .switch-label{color:#ff38d1}
+.switch-subtitle{color:#617b85;font-size:.42rem;letter-spacing:.1em;text-align:center}
+.project-stamp{position:absolute;right:1.5rem;bottom:1.5rem;display:flex;gap:1.2rem;color:#4d6872;font-size:.4rem;letter-spacing:.12em;pointer-events:none}
+@@media(max-width:850px){
+    .research-header{width:58vw}.research-readout{width:250px}.axis-readout{display:none}
+}
+@@media(max-width:700px){
+    .research-header{left:1rem;top:1rem;width:calc(100vw - 2rem)}.research-header p{display:none}
+    .research-readout{left:1rem;right:1rem;top:auto;bottom:9.5rem;width:auto}
+    .switch-housing{width:180px;height:90px}
+    .project-stamp{display:none}
+}
+</style>
+
+@code {
+    private IJSObjectReference? module;
+    private CancellationTokenSource? cancellation;
+    private bool threeDimensional;
+    private double depth;
+    private double fps;
+    private double frameMs;
+    private bool started;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || started) return;
+
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/dimensional-research-lab.js");
+        await module.InvokeVoidAsync("startDimensionalResearchLab", "dimension-research-canvas");
+        started = true;
+        cancellation = new CancellationTokenSource();
+        _ = RefreshMetricsAsync(cancellation.Token);
+    }
+
+    private async Task ToggleDimension()
+    {
+        threeDimensional = !threeDimensional;
+        if (module is not null)
+            await module.InvokeVoidAsync("setDimensionalState", threeDimensional);
+    }
+
+    private async Task RefreshMetricsAsync(CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
+        {
+            try
+            {
+                await Task.Delay(120, token);
+                if (module is null) continue;
+
+                var metrics = await module.InvokeAsync<DimensionMetrics>("getDimensionalResearchMetrics");
+                await InvokeAsync(() =>
+                {
+                    depth = metrics.Depth;
+                    fps = metrics.Fps;
+                    frameMs = metrics.FrameMs;
+                    StateHasChanged();
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (JSException)
+            {
+                break;
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        cancellation?.Cancel();
+        cancellation?.Dispose();
+
+        if (module is not null)
+        {
+            try { await module.InvokeVoidAsync("stopDimensionalResearchLab"); }
+            catch (JSException) { }
+            await module.DisposeAsync();
+        }
+    }
+
+    private sealed record DimensionMetrics(double Depth, double TargetDepth, double Fps, double FrameMs);
+}
