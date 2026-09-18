@@ -18,6 +18,17 @@ public sealed class SpatialIslandExperienceTests
         Assert.Contains(island.Attractions, x => x.Id == "creator-archive");
     }
 
+
+    [Fact]
+    public void SingularityIsland_Leaves_A_Compositional_Frontier_Open()
+    {
+        var universe = SpatialUniverseManifest.SingularityUniverse;
+
+        Assert.Contains(universe.OpenParcels, x => x.Id == "north-expanse");
+        Assert.Contains(universe.OpenParcels, x => x.Id == "south-expanse");
+        Assert.Contains(universe.OpenParcels, x => x.Id == "deep-space");
+    }
+
     [Fact]
     public void GrandCentral_Contains_SingularityIsland_Destination()
     {
