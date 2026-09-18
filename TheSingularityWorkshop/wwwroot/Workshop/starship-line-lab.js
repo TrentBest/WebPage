@@ -223,3 +223,8 @@ export function stopStarshipLineLab() {
         lab=null;
     }
 }
+
+export function getStarshipLineMetrics() {
+    if (!lab) return { fps: 0, frameMs: 0, lines: 0, vertices: 0 };
+    return { fps: lab.fps, frameMs: lab.frameMs, lines: lab.lineCount, vertices: lab.vertexCount };
+}
