@@ -1,5 +1,9 @@
 namespace TheSingularityWorkshop.Gui;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 /// <summary>The logical spatial scene presented by Explore.</summary>
 public sealed class SpatialWorkshopScene
 {
@@ -35,7 +39,14 @@ public sealed class SpatialWorkshopScene
                 Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(81, 56, 5, 3))
             ],
             SpatialViewSettings.CreateDefault(),
-            new SpatialConstructionSite("workshop-expansion", "WORKSHOP EXPANSION SITE", new SpatialBounds(34, 64, 24, 22), new SpatialBounds(39, 69, 14, 12)),
+            new SpatialConstructionSite(
+                "workshop-expansion",
+                "WORKSHOP EXPANSION SITE",
+                new SpatialBounds(34, 64, 24, 22),
+                new SpatialBounds(39, 69, 14, 12),
+                SpatialConstructionPhase.Foundation,
+                0.22,
+                "Creation and production facilities are being established here."),
             [
                 new ConstructionVehicle("crane-01", "Fabrication Crane", ConstructionVehicleKind.Crane, new SpatialPoint(48, 72)),
                 new ConstructionVehicle("backhoe-01", "Site Tractor", ConstructionVehicleKind.Backhoe, new SpatialPoint(38, 80)),
@@ -132,7 +143,6 @@ public sealed class SpatialInteractable
     public int InteractionCount { get; private set; }
     public event Action? Interaction;
 
-    /// <summary>Checks the cheap maximum bounding box before asking the object's actual shape.</summary>
     public bool HitTest(SpatialPoint point)
     {
         if (!Bounds.Contains(point)) return false;
@@ -153,9 +163,26 @@ public sealed class SpatialInteractable
 }
 
 /// <summary>Declares real estate allocated for active Workshop construction.</summary>
-public readonly record struct SpatialConstructionSite(string Id, string Name, SpatialBounds Bounds, SpatialBounds FoundationBounds);
+public readonly record struct SpatialConstructionSite(
+    string Id,
+    string Name,
+    SpatialBounds Bounds,
+    SpatialBounds FoundationBounds,
+    SpatialConstructionPhase Phase = SpatialConstructionPhase.SitePreparation,
+    double Progress = 0,
+    string FuturePurpose = "Future Workshop facility.");
 
-/// <summary>Controls perception-layer behavior for a spatial floor plan.</summary>
+/// <summary>Describes how much of a future facility has become real in the spatial Experience.</summary>
+public enum SpatialConstructionPhase
+{
+    SitePreparation,
+    Foundation,
+    Structure,
+    Enclosure,
+    InteriorSystems,
+    Commissioning
+}
+
 public sealed class SpatialViewSettings
 {
     private SpatialViewSettings(IReadOnlyList<SpatialDetailLevel> detailLevels, bool zoomEnabled, double minZoom, double maxZoom)
@@ -167,10 +194,7 @@ public sealed class SpatialViewSettings
     }
 
     public IReadOnlyList<SpatialDetailLevel> DetailLevels { get; }
-
-    /// <summary>When false, the floor plan remains fixed-size and ignores scroll zoom.</summary>
     public bool ZoomEnabled { get; }
-
     public double MinZoom { get; }
     public double MaxZoom { get; }
 
