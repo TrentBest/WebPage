@@ -27,6 +27,7 @@ internal class Program
         builder.Services.AddScoped<BlazorFSMIntegration>();
         builder.Services.AddScoped<WorkshopExperienceService>();
         builder.Services.AddScoped<IWorkshopStorage, BrowserWorkshopStorage>();
+        builder.Services.AddScoped<WorkshopAssetLibrary>();
 
         // The WebPage hosts the concrete Hub but owns no Hub mechanics.
         builder.Services.AddSingleton<SingularityHub>();
