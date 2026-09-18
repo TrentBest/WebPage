@@ -1,0 +1,152 @@
+@page "/education"
+@using TheSingularityWorkshop.Gui
+@using TheSingularityWorkshop.Workshop.Education
+
+<PageTitle>Education // The Singularity Workshop</PageTitle>
+
+@BuildGui().Build()
+
+@code {
+    private readonly EducationExperience Experience = new(
+        new SharedLesson(
+            1,
+            "Forces and Motion",
+            "Physics",
+            [
+                new LessonBlock(1, "Newton's First Law", "Objects resist a change in motion.", ["inertia", "motion"]),
+                new LessonBlock(2, "Observe", "Watch the construction vehicles and describe what changes.", ["observation", "evidence"]),
+                new LessonBlock(3, "Apply", "Connect the shared principle to something in the world.", ["application"])
+            ]));
+
+    private string _teacherStatus = "TEACHER // READY";
+    private string _questionStatus = "QUESTION CHANNEL // QUIET";
+
+    private ElementBuilder BuildGui()
+    {
+        var root = WorkshopGui.MultiPanel(this)
+            .Style("min-height", "100vh")
+            .Style("padding", "1.5rem")
+            .Style("box-sizing", "border-box")
+            .Style("gap", "1rem")
+            .Style("background", "#020711")
+            .Style("color", "#eafcff")
+            .Style("font-family", "Consolas, 'Courier New', monospace");
+
+        root.Content(WorkshopGui.Element(this, "div")
+            .Style("color", "#00eaff")
+            .Style("font-size", ".6rem")
+            .Style("letter-spacing", ".2em")
+            .Text("THE WORKSHOP // EDUCATION"));
+
+        root.Content(WorkshopGui.Element(this, "h1")
+            .Style("margin", "0")
+            .Style("font-size", "clamp(2rem,6vw,5rem)")
+            .Text("THE CLASSROOM IS A WORLD"));
+
+        root.Content(WorkshopGui.Element(this, "p")
+            .Style("max-width", "950px")
+            .Style("color", "#8eaab4")
+            .Text("One shared lesson. Many teachers. Many students. Teacher choices become overlays, not forks, while every student remains a visible participant with a place to work."));
+
+        var grid = WorkshopGui.MultiPanel(this)
+            .Style("display", "grid")
+            .Style("grid-template-columns", "minmax(0,1.4fr) minmax(260px,.8fr)")
+            .Style("gap", "1rem");
+
+        grid.Content(WorkshopGui.Panel(this)
+            .Style("padding", "1rem")
+            .Style("border", "1px solid #00eaff44")
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#00eaff").Text("SHARED LESSON // NORMALIZED"))
+            .Content(WorkshopGui.Element(this, "h2").Style("margin", ".5rem 0").Text(Experience.Lesson.Title))
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#718e99").Text(Experience.Lesson.Subject))
+            .Content(WorkshopGui.MultiPanel(this)
+                .Style("gap", ".5rem")
+                .Content(Experience.TeacherView.VisibleBlocks().Select(block =>
+                    WorkshopGui.Panel(this)
+                        .Style("padding", ".7rem")
+                        .Style("border", "1px solid #ffffff12")
+                        .Content(WorkshopGui.Element(this, "strong").Text(block.Heading))
+                        .Content(WorkshopGui.Element(this, "p").Style("margin", ".35rem 0 0").Style("color", "#8eaab4").Text(block.Content))))));
+
+        var teacher = WorkshopGui.Panel(this)
+            .Style("padding", "1rem")
+            .Style("border", "1px solid #ff2cff44")
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#ff2cff").Text("TEACHER CONTROL"))
+            .Content(WorkshopGui.Element(this, "div").Style("margin", ".7rem 0").Text(_teacherStatus))
+            .Content(WorkshopGui.Button(this).Label("USE BLUEPRINT THEME").Style("color", "#ff2cff").OnClick(ApplyTheme))
+            .Content(WorkshopGui.Button(this).Label("PERSONALIZE THE OBSERVATION").Style("margin-top", ".5rem").Style("color", "#ff2cff").OnClick(Personalize))
+            .Content(WorkshopGui.Button(this).Label("RECOGNIZE NEXT QUESTION").Style("margin-top", ".5rem").Style("color", "#ffd34d").OnClick(RecognizeNext))
+            .Content(WorkshopGui.Element(this, "div").Style("margin-top", "1rem").Style("color", "#718e99").Text(_questionStatus)));
+
+        grid.Content(teacher);
+        root.Content(grid);
+
+        var students = WorkshopGui.MultiPanel(this)
+            .Style("display", "grid")
+            .Style("grid-template-columns", "repeat(auto-fit,minmax(190px,1fr))")
+            .Style("gap", ".6rem");
+
+        students.Content(StudentCard(1, "Alex", "North Table"));
+        students.Content(StudentCard(2, "Riley", "South Table"));
+        students.Content(StudentCard(3, "Jordan", "Observation Rail"));
+        root.Content(students);
+
+        return root;
+    }
+
+    private ElementBuilder StudentCard(int id, string name, string zone)
+    {
+        var student = Experience.Coordinator.Students.FirstOrDefault(x => x.Id == id);
+        if (student is null)
+            student = Experience.Coordinator.AddStudent(new StudentWorkspace(id, name, zone));
+
+        return WorkshopGui.Panel(this)
+            .Style("padding", ".8rem")
+            .Style("border", $"1px solid {(student.Activity == StudentActivity.WaitingForTeacher ? "#ffd34d" : "#52e05a")}44")
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#00eaff").Text($"STUDENT // {student.Name}"))
+            .Content(WorkshopGui.Element(this, "div").Style("margin-top", ".35rem").Text($"ZONE // {student.Zone}"))
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#718e99").Text($"ACTIVITY // {student.Activity}"))
+            .Content(WorkshopGui.Button(this).Label("ASK QUESTION").Style("margin-top", ".6rem").Style("color", "#ffd34d").OnClick(() => AskQuestion(id)))
+            .Content(WorkshopGui.Button(this).Label("OBSERVE").Style("margin-top", ".35rem").Style("color", "#52e05a").OnClick(() => AssignObservation(id)));
+    }
+
+    private void AskQuestion(int studentId)
+    {
+        var response = Experience.Coordinator.Ask(
+            new StudentQuestion(studentId, "How does this apply to the machine we are watching?", DateTimeOffset.UtcNow),
+            StudentActivity.Observing);
+
+        _questionStatus = response.AnsweredImmediately
+            ? $"ANSWERED // {response.Answer}"
+            : $"ACKNOWLEDGED // RECOGNITION WINDOW {response.Waiting!.RecognitionWindow.TotalMinutes:0} MINUTES // ASSIGNED {response.Waiting.AssignedActivity}";
+    }
+
+    private void AssignObservation(int studentId)
+    {
+        var student = Experience.Coordinator.Students.First(x => x.Id == studentId);
+        student.Assign(StudentActivity.Observing);
+        _teacherStatus = $"ASSIGNED // {student.Name} // OBSERVATION // {student.Zone}";
+    }
+
+    private void ApplyTheme()
+    {
+        Experience.TeacherView.SetTheme(new LessonTheme("Blueprint", "orange", "dense"));
+        _teacherStatus = "THEME // BLUEPRINT // APPLIED WITHOUT FORKING THE LESSON";
+    }
+
+    private void Personalize()
+    {
+        Experience.TeacherView.OverrideBlock(
+            2,
+            "Observe the construction vehicle, identify one force you can see, and record what evidence supports your answer.");
+        _teacherStatus = "TEACHER OVERLAY // OBSERVATION BLOCK PERSONALIZED";
+    }
+
+    private void RecognizeNext()
+    {
+        var waiting = Experience.Coordinator.RecognizeNext();
+        _questionStatus = waiting is null
+            ? "QUESTION CHANNEL // NO WAITING STUDENTS"
+            : $"TEACHER NOW RECOGNIZING // STUDENT {waiting.Question.StudentId} // {waiting.Question.Text}";
+    }
+}
