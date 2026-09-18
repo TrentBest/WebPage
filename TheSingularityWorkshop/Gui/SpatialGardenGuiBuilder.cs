@@ -30,13 +30,16 @@ public static class SpatialGardenGuiBuilder
         root.Content(Title(receiver, garden, visitorName));
         root.Content(Gazebo(receiver, garden.Gazebo, () => enterDestination("hangout")));
         root.Content(SettingsShed(receiver, garden.SettingsShed, () => enterDestination("settings")));
-        root.Content(Gate(receiver, garden.FindGate("hangout")!, "left", () => enterDestination("hangout")));
-        root.Content(Gate(receiver, garden.FindGate("exit")!, "center", exit));
-        root.Content(Gate(receiver, garden.FindGate("singularity-station")!, "right", () => enterDestination("singularity-station")));
+        root.Content(Gate(receiver, GetGate(garden, "hangout"), "left", () => enterDestination("hangout")));
+        root.Content(Gate(receiver, GetGate(garden, "exit"), "center", exit));
+        root.Content(Gate(receiver, GetGate(garden, "singularity-station"), "right", () => enterDestination("singularity-station")));
         root.Content(LearningMarkers(receiver));
 
         return root;
     }
+
+    private static SpatialGardenGate GetGate(SpatialGardenManifest garden, string id)
+        => garden.FindGate(id) ?? throw new InvalidOperationException($"Garden gate '{id}' is required by the default presentation.");
 
     private static ElementBuilder Ground(object receiver)
         => WorkshopGui.Element(receiver, "div")
@@ -61,7 +64,7 @@ public static class SpatialGardenGuiBuilder
                 .Style("text-shadow", "0 0 18px rgba(255,211,77,.45)")
                 .Text(garden.Name))
             .Content(WorkshopGui.Element(receiver, "div")
-                .Style("margin:1rem auto 0").Style("max-width", "620px")
+                 .Style("margin", "1rem auto 0").Style("max-width", "620px")
                 .Style("color", "#d7e8dd").Style("font-family", "system-ui,sans-serif")
                 .Style("font-size", ".9rem").Style("line-height", "1.6")
                 .Text($"Welcome, {visitorName}. {garden.Purpose}"));
@@ -84,7 +87,7 @@ public static class SpatialGardenGuiBuilder
         Action enter)
     {
         var shell = WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style(position)
+             .Style("position", "absolute").Style("inset", position)
             .Style("z-index", "12").Style("cursor", "pointer")
             .Style("display", "flex").Style("flex-direction", "column")
             .Style("align-items", "center").Style("justify-content", "center")
