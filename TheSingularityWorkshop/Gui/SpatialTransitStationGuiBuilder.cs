@@ -100,6 +100,7 @@ public static class SpatialTransitStationGuiBuilder
         shell.Content(FloorPlan(receiver, manifest));
         shell.Content(GrandHall(receiver));
         shell.Content(TrackField(receiver, manifest));
+        shell.Content(TrainTraffic(receiver, trainSpecification));
         shell.Content(Platforms(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, trainSpecification));
         shell.Content(VerticalWalkways(receiver, manifest));
         shell.Content(StationLabels(receiver, manifest));
@@ -423,6 +424,33 @@ public static class SpatialTransitStationGuiBuilder
         return svg;
     }
 
+    private static ElementBuilder TrainTraffic(object receiver, TransitTrainSpecification specification)
+    {
+        var layer = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0").Style("z-index", "6")
+            .Style("pointer-events", "none");
+
+        var lanes = new[] { 55d, 66d, 78d, 89d };
+        for (var i = 0; i < lanes.Length; i++)
+        {
+            var direction = i % 2 == 0 ? "normal" : "reverse";
+            layer.Content(WorkshopGui.Element(receiver, "div")
+                .Style("position", "absolute").Style("left", "-18%").Style("top", $"{lanes[i]}%")
+                .Style("width", $"{Math.Clamp(specification.CarCount * 1.4, 8, 16)}%")
+                .Style("height", "1.2rem")
+                .Style("border", $"1px solid {i % 2 == 0 ? Cyan : Magenta}99")
+                .Style("background", "rgba(4,12,18,.88)")
+                .Style("box-shadow", $"0 0 14px {(i % 2 == 0 ? Cyan : Magenta)}22")
+                .Style("animation", $"workshop-train-traffic-{direction} {14 + i * 2}s linear infinite")
+                .Content(WorkshopGui.Element(receiver, "span")
+                    .Style("display", "block").Style("padding", ".25rem .35rem")
+                    .Style("font-size", ".3rem").Style("letter-spacing", ".08em")
+                    .Style("color", i % 2 == 0 ? Cyan : Magenta)
+                    .Text($"TRAIN {i + 1:00} // {specification.CarCount}-CAR")));
+        }
+        return layer;
+    }
+
     private static ElementBuilder Platforms(
         object receiver,
         SpatialTransitManifest manifest,
@@ -677,5 +705,7 @@ public static class SpatialTransitStationGuiBuilder
             "@keyframes workshop-digiten-flow-0{0%,100%{transform:translate(0,0)}50%{transform:translate(8vw,-1.5vh)}}" +
             "@keyframes workshop-digiten-flow-1{0%,100%{transform:translate(0,0)}50%{transform:translate(-7vw,2vh)}}" +
             "@keyframes workshop-digiten-flow-2{0%,100%{transform:translate(0,0)}50%{transform:translate(4vw,3vh)}}" +
-            "@keyframes workshop-digiten-flow-3{0%,100%{transform:translate(0,0)}50%{transform:translate(-5vw,-2vh)}}");
+            "@keyframes workshop-digiten-flow-3{0%,100%{transform:translate(0,0)}50%{transform:translate(-5vw,-2vh)}}" +
+            "@keyframes workshop-train-traffic-normal{0%{transform:translateX(0)}100%{transform:translateX(850%)}}" +
+            "@keyframes workshop-train-traffic-reverse{0%{transform:translateX(850%)}100%{transform:translateX(0)}}");
 }
