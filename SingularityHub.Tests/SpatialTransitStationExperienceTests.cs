@@ -12,8 +12,10 @@ public sealed class SpatialTransitStationExperienceTests
         var manifest = SpatialTransitManifest.CreateDefault();
 
         Assert.Equal("workshop-tram", manifest.Id);
-        Assert.Equal(4, manifest.Destinations.Count);
+        Assert.Equal(7, manifest.Destinations.Count);
         Assert.Equal(manifest.Destinations.Count, manifest.Destinations.Select(x => x.Id).Distinct().Count());
+        Assert.Contains(manifest.Destinations, x => x.Id == "space-elevator");
+        Assert.Contains(manifest.Destinations, x => x.Id == "singularity-station");
         Assert.All(manifest.Destinations, destination =>
         {
             Assert.False(string.IsNullOrWhiteSpace(destination.Label));
