@@ -167,7 +167,7 @@ public sealed class EducationCoordinator
         var waiting = new WaitingQuestion(question, RecognitionWindow, waitingActivity);
         _waitingQuestions.Enqueue(waiting);
         FindStudent(question.StudentId).Assign(StudentActivity.WaitingForTeacher);
-        return QuestionResponse.Waiting(waiting);
+        return QuestionResponse.FromWaiting(waiting);
     }
 
     public WaitingQuestion? RecognizeNext()
@@ -194,7 +194,7 @@ public sealed record QuestionResponse(
     WaitingQuestion? Waiting)
 {
     public static QuestionResponse Answered(string answer) => new(true, answer, null);
-    public static QuestionResponse Waiting(WaitingQuestion waiting) => new(false, null, waiting);
+    public static QuestionResponse FromWaiting(WaitingQuestion waiting) => new(false, null, waiting);
 }
 
 /// <summary>
