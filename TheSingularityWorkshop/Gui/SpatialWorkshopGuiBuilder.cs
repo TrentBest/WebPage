@@ -12,7 +12,7 @@ public static class SpatialWorkshopGuiBuilder
     private const string Magenta = "#ff38d1";
 
     /// <summary>Builds the avatar-centered Workshop world and its interaction surface.</summary>
-    public static ElementBuilder Build(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, int detailLevel, Action<int> setDetailLevel, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, double zoom = 1d, Action<double>? setZoom = null, Action? showMap = null, Func<Task>? enterConstructionSite = null, bool constructionTourActive = false, string? constructionTourMessage = null)
+    public static ElementBuilder Build(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, int detailLevel, Action<int> setDetailLevel, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, double zoom = 1d, Action<double>? setZoom = null, Action? showMap = null, Func<Task>? enterConstructionSite = null, bool constructionTourActive = false, string? constructionTourMessage = null, bool constructionWelcomeVisible = false, Action? requestConstructionTour = null, Action? exitConstructionSite = null)
     {
         var effectiveZoom = new SpatialCamera(avatarX, avatarY, zoom).Clamped().Zoom;
         var zoomEnabled = scene.View.ZoomEnabled && setZoom is not null;
@@ -24,6 +24,8 @@ public static class SpatialWorkshopGuiBuilder
         root.Content(World(receiver, scene, avatarX, avatarY, detailLevel, effectiveZoom, zoomEnabled, onKeyDown, onWorldClick, interact, setZoom, enterConstructionSite, constructionTourActive, constructionTourMessage));
         root.Content(ViewBar(receiver, detailLevel, setDetailLevel, effectiveZoom, zoomEnabled, setZoom, showMap));
         root.Content(ConstructionBanner(receiver));
+        if (constructionWelcomeVisible)
+            root.Content(ConstructionHandover(receiver, scene.ConstructionSite, requestConstructionTour, exitConstructionSite));
         return root;
     }
 
@@ -176,6 +178,17 @@ public static class SpatialWorkshopGuiBuilder
             .Style("transform", "translate(-50%,-50%)").Style("z-index", "4")
             .Style("animation", $"workshop-vehicle-{vehicle.Kind.ToString().ToLowerInvariant()} 6s linear infinite")
             .Content(ConstructionVehicleGuiBuilder.Build(receiver, vehicle));
+
+    private static ElementBuilder ConstructionHandover(object receiver, SpatialConstructionSite site, Action? requestTour, Action? exitSite)
+        => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("inset", "0").Style("z-index", "100").Style("display", "flex").Style("align-items", "center").Style("justify-content", "center").Style("background", "rgba(0,0,0,.58)")
+            .Content(WorkshopGui.Element(receiver, "div").Style("width", "min(620px,84vw)").Style("padding", "1.3rem").Style("box-sizing", "border-box").Style("border", $"1px solid {Yellow}aa").Style("background", "rgba(2,8,18,.97)").Style("box-shadow", $"0 0 60px {Yellow}18")
+                .Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", ".58rem").Style("letter-spacing", ".22em").Text("CONSTRUCTION SITE // FOREMAN"))
+                .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".9rem").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", "1rem").Text("Hold up. This site is currently under construction."))
+                .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".6rem").Style("color", "#b8c9d0").Style("font-family", "system-ui,sans-serif").Style("font-size", ".72rem").Style("line-height", "1.55").Text($"Once complete, it will be {site.FuturePurpose.ToLowerInvariant()} The site is currently at {site.Progress:P0} of its planned build."))
+                .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".75rem").Style("padding", ".55rem").Style("border-left", $"2px solid {Yellow}88").Style("color", Yellow).Style("font-family", "system-ui,sans-serif").Style("font-size", ".68rem").Text("You can look around from the perimeter, or request a guided tour from the foreman."))
+                .Content(WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("gap", ".5rem").Style("margin-top", "1rem")
+                    .Content(WorkshopGui.Button(receiver).Label("REQUEST TOUR →").Style("padding", ".55rem .8rem").Style("border", $"1px solid {Yellow}88").Style("background", $"{Yellow}10").Style("color", Yellow).Style("font-family", "inherit").Style("font-size", ".46rem").Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(requestTour ?? (() => { })))
+                    .Content(WorkshopGui.Button(receiver).Label("STAY OUTSIDE").Style("padding", ".55rem .8rem").Style("border", "1px solid #ffffff33").Style("background", "transparent").Style("color", White).Style("font-family", "inherit").Style("font-size", ".46rem").Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(exitSite ?? (() => { }))));
 
     private static ElementBuilder Foreman(object receiver, string message)
         => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "calc(50% + 42px)").Style("top", "50%").Style("z-index", "80").Style("transform", "translateY(-50%)").Style("max-width", "min(360px,42vw)").Style("pointer-events", "none")
