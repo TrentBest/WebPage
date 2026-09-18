@@ -5,6 +5,29 @@ namespace SingularityHub.Tests;
 
 public sealed class SpatialCivilizationExpansionTests
 {
+    [Fact(DisplayName = "Incremental Unit Test 58 — ship drives change interaction modes without changing the environment")]
+    public void ShipDriveSelectionChangesInteractionModes()
+    {
+        var design = SpatialShipDesignManifest.CreateDefault();
+
+        Assert.Contains(design.ModesForDrive("warp"), x => x.Id == "warp-flight");
+        Assert.Contains(design.ModesForDrive("hyperspace"), x => x.Id == "hyperspace-flight");
+        Assert.Contains(design.ModesForDrive("chemical"), x => x.Id == "orbital-flight");
+        Assert.DoesNotContain(design.ModesForDrive("warp"), x => x.Id == "hyperspace-flight");
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 59 — orbital shipyard requires shuttle transit")]
+    public void OrbitalShipyardIsIndependentFromStation()
+    {
+        var orbital = SpatialOrbitalShipyardManifest.CreateDefault();
+        var route = Assert.Single(orbital.ShuttleRoutes);
+
+        Assert.Equal("singularity-station", route.OriginId);
+        Assert.Equal("singularity-shipyard", route.DestinationId);
+        Assert.Equal("SHUTTLE", route.VehicleType);
+        Assert.NotEqual(orbital.StationPosition, orbital.ShipyardPosition);
+    }
+
     [Fact(DisplayName = "Incremental Unit Test 55 — civilization expansion has space, city, ocean, and island domains")]
     public void CivilizationExpansionIsComposable()
     {
