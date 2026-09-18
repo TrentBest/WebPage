@@ -142,14 +142,38 @@
         }
 
         var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap, EnterConstructionSite, constructionTourActive, constructionTourMessage, constructionWelcomeVisible, RequestConstructionTour, ExitConstructionSite);
-        var root = WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(UserNameLabel());
+        var root = WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(WorkshopAdBanner());
         if (workshopMapVisible)
             root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap));
         return root;
     }
 
-    private ElementBuilder UserNameLabel()
-        => WorkshopGui.Element(this, "span").Style("position", "fixed").Style("left", "50%").Style("top", "calc(50% - 24px)").Style("transform", "translateX(-50%)").Style("z-index", "20").Style("padding", ".12rem .35rem").Style("border", "1px solid rgba(255,255,255,.18)").Style("background", "rgba(1,4,10,.82)").Style("color", "#ffffff").Style("font-family", "Consolas, 'Courier New', monospace").Style("font-size", ".5rem").Style("letter-spacing", ".12em").Style("white-space", "nowrap").Style("pointer-events", "none").Text(Experience.User.DisplayName);
+    /// <summary>Renders the Workshop's first self-advertisement as spatial scenery rather than intrusive chrome.</summary>
+    private ElementBuilder WorkshopAdBanner()
+        => WorkshopGui.Element(this, "div")
+            .Style("position", "fixed")
+            .Style("left", "50%")
+            .Style("top", "1.25rem")
+            .Style("transform", "translateX(-50%)")
+            .Style("z-index", "40")
+            .Style("min-width", "min(520px,82vw)")
+            .Style("padding", ".55rem 1.1rem .6rem")
+            .Style("border", "1px solid rgba(255,211,77,.72)")
+            .Style("background", "linear-gradient(90deg,rgba(1,4,10,.94),rgba(35,18,3,.9),rgba(1,4,10,.94))")
+            .Style("box-shadow", "0 0 24px rgba(255,211,77,.14),inset 0 0 18px rgba(255,211,77,.06)")
+            .Style("color", "#ffd34d")
+            .Style("font-family", "Consolas, 'Courier New', monospace")
+            .Style("text-align", "center")
+            .Style("letter-spacing", ".12em")
+            .Style("pointer-events", "none")
+            .Content(WorkshopGui.Element(this, "div")
+                .Style("font-size", ".68rem")
+                .Text("THE SINGULARITY WORKSHOP"))
+            .Content(WorkshopGui.Element(this, "div")
+                .Style("margin-top", ".18rem")
+                .Style("font-size", ".48rem")
+                .Style("color", "#d7e8dd")
+                .Text("YOUR AD COULD BE HERE"));
 
     private void SetDetailLevel(int level) => detailLevel = Math.Clamp(level, 1, 64);
 
