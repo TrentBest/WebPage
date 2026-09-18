@@ -311,7 +311,7 @@ public static class SpatialTransitStationGuiBuilder
     {
         const int cells = 18;
         var surface = WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("inset", "0").Style("z-index", "18")
+            .Style("position", "absolute").Style("inset", "0").Style("z-index", "2")
             .Style("display", "grid")
             .Style("grid-template-columns", $"repeat({cells},1fr)")
             .Style("grid-template-rows", $"repeat({cells},1fr)")
@@ -447,7 +447,7 @@ public static class SpatialTransitStationGuiBuilder
                 .Style("position", "absolute")
                 .Style("left", $"{left}%").Style("top", $"{top}%")
                 .Style("width", $"{platform.Width}%").Style("height", "15%")
-                .Style("box-sizing", "border-box")
+                .Style("box-sizing", "border-box").Style("z-index", "8")
                 .Style("border", $"1px solid {(selected ? Yellow : platform.Level == 1 ? Cyan : Magenta)}{(selected ? "cc" : "55")}")
                 .Style("background", selected ? $"{Yellow}12" : "rgba(2,8,14,.88)")
                 .Style("box-shadow", selected ? $"0 0 28px {Yellow}18,inset 0 0 22px {Yellow}08" : "none")
