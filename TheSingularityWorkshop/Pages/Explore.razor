@@ -18,6 +18,7 @@
     private readonly SpatialLinework ForgeStructure = SpatialForgeLineworkFactory.Create();
     private readonly SpatialLinework ForgeLinework = new();
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
+    private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
     private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
@@ -35,6 +36,8 @@
     private DateTime? mazeStartedAtUtc;
     private string? selectedLeaderboardEntry;
     private string? insideRoomId;
+    private string? selectedTransitDestinationId;
+    private bool transitTrainVisible;
     private int detailLevel = 16;
     private int mansionDensity = 1;
     private IJSObjectReference? spatialModule;
@@ -80,6 +83,9 @@
 
         if (insideRoomId == "maze")
             return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
+
+        if (insideRoomId == "singularity-transit")
+            return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome, mansionZoom, SetMansionZoom);
@@ -271,6 +277,26 @@
     private void SelectLeaderboardEntry(string? name)
         => selectedLeaderboardEntry = name;
 
+    private void SelectTransitPlatform(string destinationId)
+    {
+        if (!TransitManifest.Destinations.Any(destination => destination.Id == destinationId))
+            return;
+
+        selectedTransitDestinationId = destinationId;
+        transitTrainVisible = true;
+    }
+
+    private void BoardTransitTrain(string destinationId)
+    {
+        if (!transitTrainVisible || selectedTransitDestinationId != destinationId)
+            return;
+
+        // Destination scenes are intentionally declarative for now. The train
+        // has physically manifested; the next increment can attach a destination
+        // Experience to each platform without changing the station presentation.
+        transitTrainVisible = false;
+    }
+
     private static LeaderboardMicroBundle CreateMazeLeaderboard()
         => new(
             "Workshop Maze Leaderboard",
@@ -436,6 +462,12 @@
         {
             mazeStartedAtUtc = null;
             selectedLeaderboardEntry = null;
+        }
+
+        if (insideRoomId == "singularity-transit")
+        {
+            selectedTransitDestinationId = null;
+            transitTrainVisible = false;
         }
 
         if (Router.TryExit(out var frame))
