@@ -1,5 +1,6 @@
 @page "/explore"
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.JSInterop
 @using TheSingularityWorkshop.Gui
 @using TheSingularityWorkshop.Workshop.MicroBundles
@@ -11,6 +12,7 @@
 
 @code {
     [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
@@ -28,6 +30,8 @@
     private bool constructionTourActive;
     private string constructionTourMessage = "Stay close. I will show you what is being built.";
     private bool workshopMapVisible = true;
+    private bool gardenMode = true;
+    private bool gardenVisitResolved;
     private double spatialZoom = 1d;
     private double mansionZoom = 1d;
     private double constructionZoom = 1d;
@@ -74,8 +78,32 @@
     private bool ConferenceJoined => Experience.Conference.Joined;
     private FsmForgeMicroBundle Forge => Experience.Forge;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || gardenVisitResolved) return;
+
+        var visited = await JS.InvokeAsync<bool>("workshopExploreGardenVisited");
+        gardenMode = !visited;
+        gardenVisitResolved = true;
+        if (!visited)
+            await JS.InvokeVoidAsync("markWorkshopExploreGardenVisited");
+
+        await InvokeAsync(StateHasChanged);
+    }
+
     private ElementBuilder BuildGui()
     {
+        if (!gardenVisitResolved || gardenMode)
+            return SpatialGardenGuiBuilder.Build(this, SpatialGardenManifest.CreateDefault(), Experience.User.DisplayName, EnterGardenDestination, ExitGarden);
+
+        if (insideRoomId is "hangout" or "settings")
+        {
+            insideRoomId = null;
+            gardenMode = true;
+            gardenVisitResolved = true;
+            return;
+        }
+
         if (insideRoomId == "conference")
             return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
 
@@ -138,6 +166,48 @@
         => mazeZoom = Math.Clamp(zoom, .6, 2.2);
 
     private void ShowWorkshopMap() => workshopMapVisible = true;
+
+    private void EnterGardenDestination(string destinationId)
+    {
+        if (destinationId == "exit")
+        {
+            ExitGarden();
+            return;
+        }
+
+        if (destinationId == "settings")
+        {
+            gardenMode = false;
+            gardenVisitResolved = true;
+            insideRoomId = "settings";
+            return;
+        }
+
+        if (destinationId == "hangout")
+        {
+            gardenMode = false;
+            gardenVisitResolved = true;
+            insideRoomId = "hangout";
+            return;
+        }
+
+        if (destinationId == "singularity-station")
+        {
+            gardenMode = false;
+            gardenVisitResolved = true;
+            Router.Enter("singularity-station", new SpatialPoint(AvatarX, AvatarY));
+            var entry = Router.GetEntryPoint("singularity-station");
+            Experience.Navigation.MoveTo(entry.X, entry.Y);
+            insideRoomId = "singularity-station";
+        }
+    }
+
+    private void ExitGarden()
+    {
+        gardenMode = false;
+        gardenVisitResolved = true;
+        NavigationManager.NavigateTo("/", replace: false);
+    }
 
     private async Task EnterConstructionSite()
     {
