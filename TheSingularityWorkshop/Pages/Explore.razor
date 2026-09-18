@@ -17,6 +17,7 @@
     private readonly WorkshopRouter Router = new("workshop");
     private readonly SpatialLinework ForgeStructure = SpatialForgeLineworkFactory.Create();
     private readonly SpatialLinework ForgeLinework = new();
+    private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
@@ -31,6 +32,7 @@
     private double mazeZoom = 1d;
     private int mazeSteps;
     private bool mazeFinished;
+    private string? selectedLeaderboardEntry;
     private string? insideRoomId;
     private int detailLevel = 16;
     private int mansionDensity = 1;
@@ -76,13 +78,7 @@
             return SpatialConstructionExperienceGuiBuilder.Build(this, Scene.ConstructionExperience, Experience.User.DisplayName, AvatarX, AvatarY, constructionZoom, SetConstructionZoom, HandleKeyDown, HandleConstructionWorldClick, ExitRoom);
 
         if (insideRoomId == "maze")
-            return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
-
-        if (insideRoomId == "maze")
-        {
-            MoveMazeAvatar(dx, dy);
-            return;
-        }
+            return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome, mansionZoom, SetMansionZoom);
@@ -251,15 +247,44 @@
 
     private void MoveMazeAvatar(double dx, double dy)
     {
-        if (mazeFinished) return;
+        if (insideRoomId != "maze" || mazeFinished) return;
+
         var maze = SpatialMazeCatalog.Showcase;
         var nextX = (int)Math.Floor(AvatarX + dx);
         var nextY = (int)Math.Floor(AvatarY + dy);
         if (!maze.IsWalkable(nextX, nextY)) return;
+
         Experience.Navigation.MoveTo(nextX + .5, nextY + .5);
         mazeSteps++;
-        if ((int)Math.Floor(AvatarX) == (int)Math.Floor(maze.Exit.X) && (int)Math.Floor(AvatarY) == (int)Math.Floor(maze.Exit.Y))
+        MazeLeaderboard.Update();
+
+        if ((int)Math.Floor(AvatarX) == (int)Math.Floor(maze.Exit.X) &&
+            (int)Math.Floor(AvatarY) == (int)Math.Floor(maze.Exit.Y))
+        {
             mazeFinished = true;
+            MazeLeaderboard.Record(Experience.User.DisplayName, 0, mazeSteps);
+        }
+    }
+
+    private void SelectLeaderboardEntry(string? name)
+        => selectedLeaderboardEntry = name;
+
+    private static LeaderboardMicroBundle CreateMazeLeaderboard()
+        => new(
+            "Workshop Maze Leaderboard",
+            SpatialMazeCatalog.Leaderboard.Select(x =>
+                new LeaderboardEntry(x.Name, ParseLeaderboardTime(x.Time), x.Steps)));
+
+    private static long ParseLeaderboardTime(string value)
+    {
+        var parts = value.Split(':', '.');
+        if (parts.Length != 3 ||
+            !int.TryParse(parts[0], out var minutes) ||
+            !int.TryParse(parts[1], out var seconds) ||
+            !int.TryParse(parts[2], out var centiseconds))
+            return 0;
+
+        return (minutes * 60_000L) + (seconds * 1_000L) + (centiseconds * 10L);
     }
 
     private async Task HandleConstructionWorldClick(MouseEventArgs args)
@@ -416,6 +441,7 @@
         ForgeStructure.Dispose();
         ForgeLinework.Dispose();
         MansionStructure.Dispose();
-        if (spatialModule is not null) _ = spatialModule.DisposeAsync();
+        MazeLeaderboard.Dispose();
+        if (spatialModule is not null _ = spatialModule.DisposeAsync();
     }
 }
