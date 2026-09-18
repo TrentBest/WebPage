@@ -21,6 +21,9 @@
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
     private bool mansionWelcomeVisible;
+    private bool constructionWelcomeVisible;
+    private bool constructionTourActive;
+    private string constructionTourMessage = "Stay close. I will show you what is being built.";
     private bool workshopMapVisible = true;
     private double spatialZoom = 1d;
     private double mansionZoom = 1d;
@@ -76,7 +79,7 @@
             return SpatialInteriorGuiBuilder.Build(this, title, description, Experience.User.DisplayName, ExitRoom);
         }
 
-        var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap);
+        var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap, EnterConstructionSite, constructionTourActive, constructionTourMessage, constructionWelcomeVisible, RequestConstructionTour, ExitConstructionSite);
         var root = WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(UserNameLabel());
         if (workshopMapVisible)
             root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap));
@@ -95,6 +98,43 @@
         => mansionZoom = Math.Clamp(zoom, Scene.View.MinZoom, Scene.View.MaxZoom);
 
     private void ShowWorkshopMap() => workshopMapVisible = true;
+
+    private void EnterConstructionSite()
+    {
+        if (constructionTourActive) return;
+        constructionWelcomeVisible = true;
+        constructionTourMessage = "Stay close. I will show you what is being built.";
+    }
+
+    private void RequestConstructionTour()
+    {
+        constructionWelcomeVisible = false;
+        constructionTourActive = true;
+        UpdateConstructionTour(AvatarX, AvatarY);
+    }
+
+    private void ExitConstructionSite()
+    {
+        constructionWelcomeVisible = false;
+        constructionTourActive = false;
+        constructionTourMessage = "Stay close. I will show you what is being built.";
+    }
+
+    private void UpdateConstructionTour(double x, double y)
+    {
+        if (!constructionTourActive) return;
+
+        var site = Scene.ConstructionSite;
+        var relativeX = (x - site.Bounds.X) / site.Bounds.Width;
+        var relativeY = (y - site.Bounds.Y) / site.Bounds.Height;
+        constructionTourMessage = relativeY < .35
+            ? "This is the public-facing edge. We are establishing the structure before we open the facility."
+            : relativeX < .45
+                ? "This side will support the creative production spaces. The exact studios will emerge as their definitions become real."
+                : relativeX > .7
+                    ? "This is the service side: equipment, materials, and the systems that let the visible creation spaces work."
+                    : "Here is the heart of the expansion. When the definitions are ready, this becomes a place where creators can build, rehearse, record, and sell what they make.";
+    }
     private void CloseWorkshopMap() => workshopMapVisible = false;
 
     private async Task SelectMapDestination(string id)
@@ -145,6 +185,7 @@
 
         if (insideRoomId is not null) return;
         await NavigateTo(new SpatialPoint(AvatarX + dx, AvatarY + dy));
+        UpdateConstructionTour(AvatarX, AvatarY);
     }
 
     /// <summary>Converts an empty-space left click into a collision-safe world destination.</summary>
@@ -154,6 +195,7 @@
         spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
         var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToWorld", args.ClientX, args.ClientY, AvatarX, AvatarY, spatialZoom);
         await NavigateTo(point);
+        UpdateConstructionTour(AvatarX, AvatarY);
     }
 
     /// <summary>Moves freely through the Mansion's line-rendered world without Workshop building collisions.</summary>
@@ -182,6 +224,7 @@
         if (selected is null) return;
 
         await NavigatePath(selected.Path);
+        UpdateConstructionTour(AvatarX, AvatarY);
         interactable.OnInteraction();
         var returnPosition = new SpatialPoint(AvatarX, AvatarY);
         var firstVisit = Router.Enter(interactable.ExperienceId, returnPosition);
@@ -286,6 +329,8 @@
         }
 
         mansionWelcomeVisible = false;
+        constructionWelcomeVisible = false;
+        constructionTourActive = false;
         if (Router.TryExit(out var frame))
             Experience.Navigation.MoveTo(frame.ReturnPosition.X, frame.ReturnPosition.Y);
         insideRoomId = Router.CurrentSceneId == "workshop" ? null : Router.CurrentSceneId;
