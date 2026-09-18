@@ -41,7 +41,7 @@ public static class SpatialTransitStationGuiBuilder
 
         root.Content(Styles(receiver));
         root.Content(Header(receiver, userName, manifest));
-        root.Content(Station(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, avatarX, avatarY, onKeyDown, moveAvatarTo));
+        root.Content(Station(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, avatarX, avatarY, onKeyDown, moveAvatarTo, trainSpecification));
         root.Content(PassengerFlow(receiver, manifest));
         root.Content(OperationsKiosk(receiver, microGameActive, microGameScore, microGameRound, microGameTargetId, manifest, startMicroGame, selectMicroGamePlatform));
         root.Content(ExitButton(receiver, exit));
@@ -70,7 +70,8 @@ public static class SpatialTransitStationGuiBuilder
         double avatarX,
         double avatarY,
         Action<KeyboardEventArgs> onKeyDown,
-        Action<double, double> moveAvatarTo)
+        Action<double, double> moveAvatarTo,
+        TransitTrainSpecification trainSpecification)
     {
         var station = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("inset", "0")
@@ -93,7 +94,7 @@ public static class SpatialTransitStationGuiBuilder
         shell.Content(FloorPlan(receiver, manifest));
         shell.Content(GrandHall(receiver));
         shell.Content(TrackField(receiver, manifest));
-        shell.Content(Platforms(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain));
+        shell.Content(Platforms(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, trainSpecification));
         shell.Content(VerticalWalkways(receiver, manifest));
         shell.Content(StationLabels(receiver, manifest));
         shell.Content(ArchitecturalSymbols(receiver));
@@ -422,7 +423,8 @@ public static class SpatialTransitStationGuiBuilder
         string? selectedDestinationId,
         bool trainVisible,
         Action<string> selectPlatform,
-        Action<string> boardTrain)
+        Action<string> boardTrain,
+        TransitTrainSpecification trainSpecification)
     {
         var area = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("left", "5%").Style("right", "5%")
@@ -472,7 +474,7 @@ public static class SpatialTransitStationGuiBuilder
                 .OnClick(() => selectPlatform(destination.Id)));
 
             if (selected && trainVisible)
-                card.Content(Train(receiver, destination, () => boardTrain(destination.Id)));
+                card.Content(Train(receiver, destination, trainSpecification, () => boardTrain(destination.Id)));
 
             area.Content(card);
         }
@@ -480,7 +482,7 @@ public static class SpatialTransitStationGuiBuilder
         return area;
     }
 
-    private static ElementBuilder Train(object receiver, SpatialTransitDestination destination, Action board)
+    private static ElementBuilder Train(object receiver, SpatialTransitDestination destination, TransitTrainSpecification specification, Action board)
         => WorkshopGui.Panel(receiver)
             .Style("position", "absolute").Style("left", "4%").Style("right", "4%")
             .Style("top", "-5%").Style("height", "48%")
@@ -492,6 +494,9 @@ public static class SpatialTransitStationGuiBuilder
             .Content(WorkshopGui.Element(receiver, "div")
                 .Style("font-size", ".36rem").Style("letter-spacing", ".12em").Style("color", Yellow)
                 .Text($"ARRIVAL // {destination.Label}"))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".3rem").Style("font-size", ".32rem").Style("color", Dim)
+                .Text($"HO SANDBOX // {specification.CarCount} CARS // 1:{TransitTrainSpecification.HoScaleRatio:0.0} // MODEL CAR {specification.ModelCarLengthMillimeters:0.0} MM"))
             .Content(WorkshopGui.Element(receiver, "div")
                 .Style("position", "absolute").Style("left", ".5rem").Style("right", ".5rem")
                 .Style("bottom", ".4rem").Style("display", "flex")
