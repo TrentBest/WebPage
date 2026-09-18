@@ -73,7 +73,7 @@ public static class SpatialConstructionExperienceGuiBuilder
             .Style("width", $"{SpatialCamera.WorldToVw(b.Width, zoom):0.###}vw")
             .Style("height", $"{SpatialCamera.WorldToVh(b.Height, zoom):0.###}vh")
             .Style("box-sizing", "border-box")
-            .Style("border", $"{border} {feature.Active ? Cyan : Yellow}")
+            .Style("border", $"{border} {(feature.Active ? Cyan : Yellow)}")
             .Style("background", feature.Active ? $"{Cyan}10" : $"{Yellow}04")
             .Style("opacity", opacity)
             .Style("animation", feature.Active ? "none" : "construction-ghost 2.2s ease-in-out infinite")
