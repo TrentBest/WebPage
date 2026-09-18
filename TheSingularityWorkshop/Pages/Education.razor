@@ -53,20 +53,26 @@
             .Style("grid-template-columns", "minmax(0,1.4fr) minmax(260px,.8fr)")
             .Style("gap", "1rem");
 
-        grid.Content(WorkshopGui.Panel(this)
+        var lessonPanel = WorkshopGui.Panel(this)
             .Style("padding", "1rem")
             .Style("border", "1px solid #00eaff44")
             .Content(WorkshopGui.Element(this, "div").Style("color", "#00eaff").Text("SHARED LESSON // NORMALIZED"))
             .Content(WorkshopGui.Element(this, "h2").Style("margin", ".5rem 0").Text(Experience.Lesson.Title))
-            .Content(WorkshopGui.Element(this, "div").Style("color", "#718e99").Text(Experience.Lesson.Subject))
-            .Content(WorkshopGui.MultiPanel(this)
-                .Style("gap", ".5rem")
-                .Content(Experience.TeacherView.VisibleBlocks().Select(block =>
-                    WorkshopGui.Panel(this)
-                        .Style("padding", ".7rem")
-                        .Style("border", "1px solid #ffffff12")
-                        .Content(WorkshopGui.Element(this, "strong").Text(block.Heading))
-                        .Content(WorkshopGui.Element(this, "p").Style("margin", ".35rem 0 0").Style("color", "#8eaab4").Text(block.Content))))));
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#718e99").Text(Experience.Lesson.Subject));
+
+        var lessonBlocks = WorkshopGui.MultiPanel(this).Style("gap", ".5rem");
+        foreach (var block in Experience.TeacherView.VisibleBlocks())
+        {
+            lessonBlocks.Content(
+                WorkshopGui.Panel(this)
+                    .Style("padding", ".7rem")
+                    .Style("border", "1px solid #ffffff12")
+                    .Content(WorkshopGui.Element(this, "strong").Text(block.Heading))
+                    .Content(WorkshopGui.Element(this, "p").Style("margin", ".35rem 0 0").Style("color", "#8eaab4").Text(block.Content)));
+        }
+
+        lessonPanel.Content(lessonBlocks);
+        grid.Content(lessonPanel);
 
         var teacher = WorkshopGui.Panel(this)
             .Style("padding", "1rem")
