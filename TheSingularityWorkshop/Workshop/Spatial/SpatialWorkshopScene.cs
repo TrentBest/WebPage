@@ -40,6 +40,10 @@ public sealed class SpatialWorkshopScene
                 Building("storage-bins", "storage", new SpatialBounds(87, 66, 3, 3)),
                 Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(81, 56, 5, 3)),
                 Building("singularity-lab", "singularity-lab", new SpatialBounds(27, 61, 5, 3)),
+                Building("singularity-station", "singularity-station", new SpatialBounds(76, 17, 4, 3)),
+                Building("singularity-shipyard", "singularity-shipyard", new SpatialBounds(90, 18, 4, 3)),
+                Building("singularity-capitol", "singularity-capitol", new SpatialBounds(60, 17, 4, 3)),
+                Building("ocean-shipyard", "ocean-shipyard", new SpatialBounds(11, 80, 4, 3)),
                 new SpatialInteractable("maze", "Workshop Maze", new SpatialBounds(62, 78, 8, 5), new SpatialBounds(64, 76, 4, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "maze")
             ],
             SpatialViewSettings.CreateDefault(),
