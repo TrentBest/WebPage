@@ -37,7 +37,6 @@ public static class SpatialTransitStationGuiBuilder
         Action<KeyboardEventArgs> onKeyDown,
         Func<MouseEventArgs, Task> onWorldClick,
         TransitTrainSpecification trainSpecification)
-        TransitTrainSpecification trainSpecification)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0")
