@@ -72,7 +72,7 @@ public static class SpatialTransitStationGuiBuilder
         SpatialTransitManifest manifest,
         string? selectedDestinationId,
         bool trainVisible,
-        Action<string> selectPlatform,
+        Func<string, Task> selectPlatform,
         Action<string> boardTrain,
         double avatarX,
         double avatarY,
@@ -209,7 +209,7 @@ public static class SpatialTransitStationGuiBuilder
             .Attribute("stroke", White).Attribute("stroke-opacity", ".08").Attribute("stroke-width", ".18"));
 
         // Rail corridors: several parallel tracks, with platforms between/along them.
-        for (var y = 45d; y <= 103d; y += 4.5)
+        for (var y = 45; y <= 103; y += 4.5)
         {
             svg.Child(WorkshopGui.Element(receiver, "line")
                 .Attribute("x1", "8").Attribute("y1", y)
@@ -317,13 +317,30 @@ public static class SpatialTransitStationGuiBuilder
                 .Style("font-size", ".34rem").Style("letter-spacing", ".11em")
                 .Style("color", accent).Text(label));
 
-    private static ElementBuilder WalkSurface(object receiver, Func<MouseEventArgs, Task> onWorldClick)
-        => WorkshopGui.Element(receiver, "div")
+    private static ElementBuilder WalkSurface(object receiver, double avatarX, double avatarY, Func<MouseEventArgs, Task> onWorldClick)
+    {
+        const int cells = 18;
+        var surface = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("inset", "0").Style("z-index", "2")
-            .Style("background", "transparent").Style("cursor", "crosshair")
-            .Style("pointer-events", "auto")
-            .AriaLabel("Station floor. Left click to walk.")
-            .OnClick(onWorldClick);
+            .Style("display", "grid")
+            .Style("grid-template-columns", $"repeat({cells},1fr)")
+            .Style("grid-template-rows", $"repeat({cells},1fr)")
+            .Style("pointer-events", "none");
+
+        for (var row = 0; row < cells; row++)
+        for (var column = 0; column < cells; column++)
+        {
+            var x = (column + .5) / cells * 100;
+            var y = (row + .5) / cells * 100;
+            surface.Content(WorkshopGui.Button(receiver)
+                .Style("width", "100%").Style("height", "100%").Style("padding", "0")
+                .Style("border", "0").Style("background", "transparent")
+                .Style("pointer-events", "auto").Style("cursor", "crosshair")
+                .AriaLabel($"Walk to {x:0.#}, {y:0.#}")
+                .OnClick(() => moveAvatarTo(Math.Clamp(x, 3, 97), Math.Clamp(y, 5, 95))));
+        }
+        return surface;
+    }
 
     private static ElementBuilder StationFocus(object receiver, Action<KeyboardEventArgs> onKeyDown)
         => WorkshopGui.Element(receiver, "div")
@@ -520,3 +537,175 @@ public static class SpatialTransitStationGuiBuilder
                 .Style("justify-content", "space-between").Style("align-items", "center")
                 .Content(WorkshopGui.Element(receiver, "span")
                     .Style("font-size", ".34rem").Style("color", White)
+                    .Text("DOORS OPEN // BOARDING FLOW ACTIVE"))
+                .Content(WorkshopGui.Button(receiver).Label("BOARD")
+                    .Style("padding", ".28rem .42rem").Style("border", $"1px solid {Green}88")
+                    .Style("background", $"{Green}10").Style("color", Green)
+                    .Style("font-family", "inherit").Style("font-size", ".34rem")
+                    .Style("cursor", "pointer").OnClick(board)));
+
+    private static ElementBuilder VerticalWalkways(object receiver, SpatialTransitManifest manifest)
+    {
+        var svg = WorkshopGui.Element(receiver, "svg")
+            .Attribute("viewBox", "0 0 100 100")
+            .Attribute("preserveAspectRatio", "none")
+            .Style("position", "absolute").Style("inset", "0")
+            .Style("width", "100%").Style("height", "100%")
+            .Style("pointer-events", "none");
+
+        foreach (var platform in manifest.Platforms)
+        {
+            var centerX = platform.X + platform.Width / 2;
+            var concourseY = platform.Level == 1 ? 44 : 44;
+            var platformY = platform.Y;
+
+            svg.Child(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", centerX).Attribute("y1", concourseY)
+                .Attribute("x2", centerX).Attribute("y2", platformY)
+                .Attribute("stroke", platform.Level == 1 ? Cyan : Magenta)
+                .Attribute("stroke-opacity", ".32")
+                .Attribute("stroke-width", ".22")
+                .Attribute("stroke-dasharray", "1 1"));
+        }
+
+        return svg;
+    }
+
+    private static ElementBuilder StationLabels(object receiver, SpatialTransitManifest manifest)
+    {
+        var panel = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "1.5%").Style("right", "1.5%")
+            .Style("bottom", "1.2%").Style("display", "flex")
+            .Style("justify-content", "space-between").Style("pointer-events", "none");
+
+        foreach (var level in manifest.Levels)
+            panel.Content(WorkshopGui.Element(receiver, "div")
+                .Style("font-size", ".38rem").Style("letter-spacing", ".13em")
+                .Style("color", level.Number == 1 ? Cyan : Magenta)
+                .Text($"LEVEL {level.Number:00} // {level.Name}"));
+
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("font-size", ".36rem").Style("letter-spacing", ".1em").Style("color", Dim)
+            .Text("SCHEMATIC REFERENCE // 44 PLATFORM CAPACITY // 67 TRACK INFRASTRUCTURE // WALKWAYS ABOVE TRACKS // VERTICAL STACKING"));
+
+        return panel;
+    }
+
+    private static ElementBuilder PassengerFlow(object receiver, SpatialTransitManifest manifest)
+    {
+        var panel = WorkshopGui.Element(receiver, "div")
+            .Style("position", "fixed").Style("left", "1.4rem").Style("bottom", "4.1rem")
+            .Style("z-index", "25").Style("padding", ".55rem .7rem")
+            .Style("border", $"1px solid {Cyan}44")
+            .Style("background", "rgba(1,4,10,.9)")
+            .Style("pointer-events", "none");
+
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("font-size", ".4rem").Style("letter-spacing", ".15em").Style("color", Cyan)
+            .Text($"DIGITEN FLOW // {manifest.Passengers.Count:00} IN MOTION"));
+
+        foreach (var passenger in manifest.Passengers.Take(8))
+            panel.Content(WorkshopGui.Element(receiver, "div")
+                .Style("display", "inline-block").Style("margin", ".35rem .3rem 0 0")
+                .Style("width", "8px").Style("height", "8px").Style("border-radius", "50%")
+                .Style("background", passenger.BoardingOrder % 2 == 0 ? Cyan : Yellow)
+                .Style("box-shadow", $"0 0 9px {(passenger.BoardingOrder % 2 == 0 ? Cyan : Yellow)}")
+                .Attribute("title", passenger.Id));
+
+        return panel;
+    }
+
+    private static ElementBuilder OperationsKiosk(
+        object receiver,
+        bool active,
+        int score,
+        int round,
+        string? targetId,
+        SpatialTransitManifest manifest,
+        Action start,
+        Func<string, Task> selectPlatform)
+    {
+        var target = manifest.Destinations.FirstOrDefault(x => x.Id == targetId);
+        var targetLabel = targetId is null ? "STATION OBSERVER" : target.Label;
+
+        var kiosk = WorkshopGui.Panel(receiver)
+            .Style("position", "fixed").Style("right", "1.4rem").Style("top", "5.2rem")
+            .Style("z-index", "35").Style("width", "245px")
+            .Style("padding", ".7rem").Style("border", $"1px solid {Yellow}55")
+            .Style("background", "rgba(1,4,10,.93)")
+            .Style("box-shadow", $"0 0 25px {Yellow}08");
+
+        kiosk.Content(WorkshopGui.Element(receiver, "div")
+            .Style("font-size", ".42rem").Style("letter-spacing", ".16em").Style("color", Yellow)
+            .Text("STATION OPERATIONS"));
+
+        if (!active)
+        {
+            kiosk.Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".45rem").Style("font-size", ".43rem").Style("line-height", "1.5").Style("color", Dim)
+                .Text("Something small is hidden in the station. Can you route Digitens to their platforms before the next departure?"));
+
+            kiosk.Content(WorkshopGui.Button(receiver).Label("OPEN THE OPERATIONS CHALLENGE")
+                .Style("margin-top", ".6rem").Style("width", "100%").Style("padding", ".45rem")
+                .Style("border", $"1px solid {Yellow}88").Style("background", $"{Yellow}0c")
+                .Style("color", Yellow).Style("font-family", "inherit").Style("font-size", ".38rem")
+                .Style("letter-spacing", ".08em").Style("cursor", "pointer").OnClick(start));
+
+            return kiosk;
+        }
+
+        kiosk.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".45rem").Style("font-size", ".4rem").Style("color", Green)
+            .Text($"ROUND {round:00} // SCORE {score:000}"));
+
+        kiosk.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".45rem").Style("font-size", ".43rem").Style("line-height", "1.5").Style("color", White)
+            .Text($"ROUTE THIS PASSENGER TO: {targetLabel}"));
+
+        kiosk.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".45rem").Style("font-size", ".34rem").Style("line-height", "1.45").Style("color", Dim)
+            .Text("Click the matching physical platform. A correct route earns 10 points; a wrong platform costs 2."));
+
+        foreach (var platform in manifest.Platforms)
+        {
+            var destination = manifest.Destinations.FirstOrDefault(x => x.Id == platform.DestinationId);
+            kiosk.Content(WorkshopGui.Button(receiver).Label(destination.Label)
+                .Style("display", "block").Style("width", "100%").Style("margin-top", ".25rem")
+                .Style("padding", ".28rem .35rem").Style("border", $"1px solid {Cyan}33")
+                .Style("background", "rgba(0,234,255,.025)").Style("color", White)
+                .Style("font-family", "inherit").Style("font-size", ".34rem")
+                .Style("text-align", "left").Style("cursor", "pointer")
+                .OnClick(() => selectPlatform(platform.Id)));
+        }
+
+        return kiosk;
+    }
+
+    private static ElementBuilder ExitButton(object receiver, Action exit)
+        => WorkshopGui.Button(receiver).Label("← RETURN TO GARDEN")
+            .Style("position", "fixed").Style("left", "1.4rem").Style("bottom", "1rem")
+            .Style("z-index", "40").Style("padding", ".5rem .7rem")
+            .Style("border", $"1px solid {Magenta}66").Style("background", "rgba(20,4,18,.9)")
+            .Style("color", Magenta).Style("font-family", "inherit")
+            .Style("font-size", ".42rem").Style("letter-spacing", ".1em").Style("cursor", "pointer")
+            .OnClick(exit);
+
+    private static int PlatformNumber(SpatialTransitManifest manifest, string id)
+    {
+        for (var i = 0; i < manifest.Platforms.Count; i++)
+            if (manifest.Platforms[i].Id == id) return i + 1;
+        return 0;
+    }
+
+    private static ElementBuilder Styles(object receiver)
+        => WorkshopGui.Element(receiver, "style").Text(
+            "@keyframes workshop-train-arrive{0%{transform:translateX(45%);opacity:0}100%{transform:translateX(0);opacity:1}}" +
+            "@keyframes workshop-passenger-breathe{0%,100%{opacity:.55}50%{opacity:1}}" +
+            "@keyframes workshop-platform-breathe{0%,100%{opacity:.7}50%{opacity:1}}" +
+            "@keyframes workshop-digiten-flow-0{0%,100%{transform:translate(0,0)}50%{transform:translate(8vw,-1.5vh)}}" +
+            "@keyframes workshop-digiten-flow-1{0%,100%{transform:translate(0,0)}50%{transform:translate(-7vw,2vh)}}" +
+            "@keyframes workshop-digiten-flow-2{0%,100%{transform:translate(0,0)}50%{transform:translate(4vw,3vh)}}" +
+            "@keyframes workshop-digiten-flow-3{0%,100%{transform:translate(0,0)}50%{transform:translate(-5vw,-2vh)}}" +
+            "@keyframes workshop-train-traffic-normal{0%{transform:translateX(0)}100%{transform:translateX(850%)}}" +
+            "@keyframes workshop-train-traffic-reverse{0%{transform:translateX(850%)}100%{transform:translateX(0)}}");
+}
