@@ -41,7 +41,7 @@ public static class SpatialTransitStationGuiBuilder
 
         root.Content(Styles(receiver));
         root.Content(Header(receiver, userName, manifest));
-        root.Content(Station(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain));
+        root.Content(Station(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, avatarX, avatarY, onKeyDown, moveAvatarTo));
         root.Content(PassengerFlow(receiver, manifest));
         root.Content(OperationsKiosk(receiver, microGameActive, microGameScore, microGameRound, microGameTargetId, manifest, startMicroGame, selectMicroGamePlatform));
         root.Content(ExitButton(receiver, exit));
@@ -66,19 +66,20 @@ public static class SpatialTransitStationGuiBuilder
         SpatialTransitManifest manifest,
         string? selectedDestinationId,
         bool trainVisible,
-        Action<string> selectPlatform,
-        Action<string> boardTrain)
+        Action<string> boardTrain,
+        double avatarX,
+        double avatarY,
+        Action<KeyboardEventArgs> onKeyDown,
+        Action<double, double> moveAvatarTo)
     {
         var station = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("inset", "0")
-            .Style("padding", "6rem 2rem 2.5rem")
-            .Style("box-sizing", "border-box").Style("overflow", "auto");
+            .Style("width", "100vw").Style("height", "100vh")
+            .Style("box-sizing", "border-box").Style("overflow", "hidden");
 
         var shell = WorkshopGui.Element(receiver, "div")
-            .Style("position", "relative")
-            .Style("min-height", "1120px")
-            .Style("min-width", "1760px")
-            .Style("max-width", "1760px").Style("margin", "0 auto")
+            .Style("position", "absolute").Style("inset", "0")
+            .Style("width", "100%").Style("height", "100%")
             .Style("border", $"1px solid {Cyan}44")
             .Style("background", "radial-gradient(circle at 50% 44%, rgba(0,234,255,.09), transparent 42%), linear-gradient(180deg,#07131d,#02060c)")
             .Style("box-shadow", $"0 0 120px {Cyan}12,inset 0 0 100px {Cyan}08")
@@ -91,6 +92,12 @@ public static class SpatialTransitStationGuiBuilder
         shell.Content(Platforms(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain));
         shell.Content(VerticalWalkways(receiver, manifest));
         shell.Content(StationLabels(receiver, manifest));
+        shell.Content(ArchitecturalSymbols(receiver));
+        shell.Content(PassengerActors(receiver, manifest));
+        shell.Content(StaffActors(receiver));
+        shell.Content(WalkSurface(receiver, avatarX, avatarY, moveAvatarTo));
+        shell.Content(Avatar(receiver, avatarX, avatarY));
+        shell.Content(StationFocus(receiver, onKeyDown));
 
         station.Content(shell);
         return station;
@@ -257,6 +264,123 @@ public static class SpatialTransitStationGuiBuilder
                     .Style("margin-top", "1rem").Style("font-size", ".42rem")
                     .Style("letter-spacing", ".18em").Style("color", Yellow)
                     .Text("THE STATION IS A LIVING EXPERIENCE — NOT A MENU")));
+
+    private static ElementBuilder ArchitecturalSymbols(object receiver)
+    {
+        var layer = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0")
+            .Style("pointer-events", "none").Style("color", White);
+
+        layer.Content(Symbol(receiver, 12, 12, 20, 6, "VANDERBILT HALL", Cyan));
+        layer.Content(Symbol(receiver, 35, 12, 22, 6, "TICKET COUNTERS", Yellow));
+        layer.Content(Symbol(receiver, 60, 12, 18, 6, "INFORMATION", Yellow));
+        layer.Content(Symbol(receiver, 80, 12, 18, 6, "WAITING / MEET", Cyan));
+        layer.Content(Symbol(receiver, 82, 30, 8, 5, "CLOCK", Yellow));
+        layer.Content(Symbol(receiver, 11, 39, 15, 7, "BILTMORE", Magenta));
+        layer.Content(Symbol(receiver, 74, 39, 15, 7, "DINING", Green));
+        layer.Content(Symbol(receiver, 90, 39, 8, 7, "STAFF", Green));
+        layer.Content(Symbol(receiver, 2, 48, 8, 45, "NORTH / SERVICE", Dim));
+        layer.Content(Symbol(receiver, 90, 48, 8, 45, "SOUTH / SERVICE", Dim));
+        return layer;
+    }
+
+    private static ElementBuilder Symbol(object receiver, double left, double top, double width, double height, string label, string accent)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", $"{left}%").Style("top", $"{top}%")
+            .Style("width", $"{width}%").Style("height", $"{height}%")
+            .Style("box-sizing", "border-box")
+            .Style("border", $"1px solid {accent}55")
+            .Style("background", $"{accent}08")
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("position", "absolute").Style("left", ".3rem").Style("top", ".25rem")
+                .Style("font-size", ".34rem").Style("letter-spacing", ".11em")
+                .Style("color", accent).Text(label));
+
+    private static ElementBuilder WalkSurface(object receiver, double avatarX, double avatarY, Action<double, double> moveAvatarTo)
+    {
+        const int cells = 18;
+        var surface = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0").Style("z-index", "18")
+            .Style("display", "grid")
+            .Style("grid-template-columns", $"repeat({cells},1fr)")
+            .Style("grid-template-rows", $"repeat({cells},1fr)")
+            .Style("pointer-events", "none");
+
+        for (var row = 0; row < cells; row++)
+        for (var column = 0; column < cells; column++)
+        {
+            var x = (column + .5) / cells * 100;
+            var y = (row + .5) / cells * 100;
+            surface.Content(WorkshopGui.Button(receiver)
+                .Style("width", "100%").Style("height", "100%").Style("padding", "0")
+                .Style("border", "0").Style("background", "transparent")
+                .Style("pointer-events", "auto").Style("cursor", "crosshair")
+                .AriaLabel($"Walk to {x:0.#}, {y:0.#}")
+                .OnClick(() => moveAvatarTo(Math.Clamp(x, 3, 97), Math.Clamp(y, 5, 95))));
+        }
+        return surface;
+    }
+
+    private static ElementBuilder StationFocus(object receiver, Action<KeyboardEventArgs> onKeyDown)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0").Style("z-index", "17")
+            .Style("pointer-events", "none")
+            .Attribute("tabindex", "0")
+            .OnKeyDown(onKeyDown);
+
+    private static ElementBuilder Avatar(object receiver, double x, double y)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", $"{x}%").Style("top", $"{y}%")
+            .Style("transform", "translate(-50%,-50%)").Style("z-index", "22")
+            .Style("width", "18px").Style("height", "18px").Style("border-radius", "50%")
+            .Style("border", $"2px solid {White}").Style("background", "#01040a")
+            .Style("box-shadow", $"0 0 18px {White}88")
+            .Attribute("title", "YOUR POSITION");
+
+    private static ElementBuilder PassengerActors(object receiver, SpatialTransitManifest manifest)
+    {
+        var layer = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0").Style("z-index", "12")
+            .Style("pointer-events", "none");
+        var index = 0;
+        foreach (var passenger in manifest.Passengers)
+        {
+            var left = Math.Clamp(passenger.WaitingPosition.X, 5, 95);
+            var top = Math.Clamp(passenger.WaitingPosition.Y, 5, 95);
+            var duration = 7 + (index % 5);
+            layer.Content(WorkshopGui.Element(receiver, "div")
+                .Style("position", "absolute").Style("left", $"{left}%").Style("top", $"{top}%")
+                .Style("width", "7px").Style("height", "7px").Style("border-radius", "50%")
+                .Style("background", index % 2 == 0 ? Cyan : Yellow)
+                .Style("box-shadow", $"0 0 10px {(index % 2 == 0 ? Cyan : Yellow)}")
+                .Style("animation", $"workshop-digiten-flow-{index % 4} {duration}s ease-in-out infinite")
+                .Attribute("title", passenger.Id));
+            index++;
+        }
+        return layer;
+    }
+
+    private static ElementBuilder StaffActors(object receiver)
+    {
+        var layer = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0").Style("z-index", "13")
+            .Style("pointer-events", "none");
+        var staff = new[]
+        {
+            ("STATION MASTER", 91d, 15d), ("TICKET AGENT", 46d, 15d),
+            ("INFORMATION", 68d, 15d), ("CONDUCTOR", 32d, 56d),
+            ("CONDUCTOR", 63d, 74d), ("SECURITY", 12d, 43d),
+            ("CLEANING", 84d, 43d), ("ENGINEER", 50d, 91d)
+        };
+        foreach (var person in staff)
+            layer.Content(WorkshopGui.Element(receiver, "div")
+                .Style("position", "absolute").Style("left", $"{person.Item2}%").Style("top", $"{person.Item3}%")
+                .Style("padding", ".12rem .2rem").Style("border", $"1px solid {Green}55")
+                .Style("background", "rgba(1,4,10,.7)").Style("color", Green)
+                .Style("font-size", ".3rem").Style("letter-spacing", ".06em")
+                .Text("● " + person.Item1));
+        return layer;
+    }
 
     private static ElementBuilder TrackField(object receiver, SpatialTransitManifest manifest)
     {
@@ -534,5 +658,9 @@ public static class SpatialTransitStationGuiBuilder
         => WorkshopGui.Element(receiver, "style").Text(
             "@keyframes workshop-train-arrive{0%{transform:translateX(45%);opacity:0}100%{transform:translateX(0);opacity:1}}" +
             "@keyframes workshop-passenger-breathe{0%,100%{opacity:.55}50%{opacity:1}}" +
-            "@keyframes workshop-platform-breathe{0%,100%{opacity:.7}50%{opacity:1}}");
+            "@keyframes workshop-platform-breathe{0%,100%{opacity:.7}50%{opacity:1}}" +
+            "@keyframes workshop-digiten-flow-0{0%,100%{transform:translate(0,0)}50%{transform:translate(8vw,-1.5vh)}}" +
+            "@keyframes workshop-digiten-flow-1{0%,100%{transform:translate(0,0)}50%{transform:translate(-7vw,2vh)}}" +
+            "@keyframes workshop-digiten-flow-2{0%,100%{transform:translate(0,0)}50%{transform:translate(4vw,3vh)}}" +
+            "@keyframes workshop-digiten-flow-3{0%,100%{transform:translate(0,0)}50%{transform:translate(-5vw,-2vh)}}");
 }
