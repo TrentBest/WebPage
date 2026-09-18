@@ -97,16 +97,19 @@ public enum AdvertisingFormat
     SponsoredExperience
 }
 
-public sealed record AdvertisingClient(int Id, string Name)
+public sealed record AdvertisingClient
 {
-    public AdvertisingClient(int id, string name) : this(
-        id,
-        string.IsNullOrWhiteSpace(name)
-            ? throw new ArgumentException("Client name is required.", nameof(name))
-            : name.Trim())
+    public AdvertisingClient(int id, string name)
     {
         if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id));
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Client name is required.", nameof(name));
+
+        Id = id;
+        Name = name.Trim();
     }
+
+    public int Id { get; }
+    public string Name { get; }
 }
 
 public sealed class AdvertisingSpace
