@@ -412,15 +412,15 @@
     private void SelectLeaderboardEntry(string? name)
         => selectedLeaderboardEntry = name;
 
-    private Task MoveTransitAvatar(double x, double y)
+    private async Task MoveTransitAvatar(double x, double y)
     {
-        if (insideRoomId != "singularity-transit") return Task.CompletedTask;
+        if (insideRoomId != "singularity-transit") return;
 
         // Grand Central is currently a schematic floor plan. Keep movement inside
         // the architectural envelope; collision volumes will be derived from the
         // same walls/rooms once the blueprint is stable.
-        Experience.Navigation.MoveTo(Math.Clamp(x, 4, 96), Math.Clamp(y, 8, 94));
-        return InvokeAsync(StateHasChanged);
+        var target = new SpatialPoint(Math.Clamp(x, 4, 96), Math.Clamp(y, 8, 94));
+        await NavigatePath([target]);
     }
 
     private async Task HandleTransitWorldClick(MouseEventArgs args)
