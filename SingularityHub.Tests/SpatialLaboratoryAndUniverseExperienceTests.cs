@@ -24,6 +24,17 @@ public sealed class SpatialLaboratoryAndUniverseExperienceTests
     }
 
     [Fact]
+    public void Campus_Exposes_The_Laboratory_As_A_Real_Interactable()
+    {
+        var scene = SpatialWorkshopScene.CreateDefault();
+
+        var lab = Assert.Single(scene.Interactables.Where(x => x.Id == "singularity-lab"));
+        Assert.Equal("singularity-lab", lab.ExperienceId);
+        Assert.True(lab.Bounds.Width > 0);
+        Assert.True(lab.Bounds.Height > 0);
+    }
+
+    [Fact]
     public void SingularityUniverse_Reserves_Empty_Space_For_Creation()
     {
         var universe = SpatialUniverseManifest.SingularityUniverse;
