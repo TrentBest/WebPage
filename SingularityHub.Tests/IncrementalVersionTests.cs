@@ -132,4 +132,8 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 118)]
     [Fact(DisplayName = "V0.0.118 — Explore_Spatial_Placement_Probe_Is_350x200_And_Offset_From_Player_Origin")]
     public void V0_0_118_ExploreSpatialPlacementProbeIs350x200AndOffsetFromPlayerOrigin() => Assert.Equal("0.0.118", "0.0.118");
+
+    [ArchitectureTest(0, 0, 119)]
+    [Fact(DisplayName = "V0.0.119 — Explore_MicroBundle_Experience_Identity_And_Deliberate_Walking_Pace")]
+    public void V0_0_119_ExploreMicroBundleExperienceIdentityAndDeliberateWalkingPace() => Assert.Equal("0.0.119", "0.0.119");
 }

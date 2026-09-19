@@ -16,6 +16,7 @@ public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
 {
     private readonly FSMHandle _fsm;
     private readonly IMicroBundleProvider _provider;
+    private bool _arbitrated;
     private bool _disposed;
 
     public MicroBundle(int id, string name, IMicroBundleProvider provider, int parentId = -1, int generation = 0)
@@ -71,11 +72,19 @@ public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
     /// <summary>Workshop Elements currently declare no Hub-level dependencies.</summary>
     IReadOnlyList<ulong> HubBundle.Dependencies => Array.Empty<ulong>();
 
-    /// <summary>Lifecycle participation is represented as a successful Hub arbitration pass.</summary>
+    /// <summary>
+    /// Performs the bundle's one-time Hub arbitration contribution. Returning true
+    /// forever would force the Hub's ten-round convergence guard to exhaust on a
+    /// bundle that has made no further mutation.
+    /// </summary>
     bool HubBundle.Arbitrate(IArbitrator arbitrator, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(arbitrator);
-        return roundIndex >= 0;
+        if (roundIndex < 0 || _arbitrated)
+            return false;
+
+        _arbitrated = true;
+        return true;
     }
 
     public void Update()

@@ -9,6 +9,8 @@
 @BuildGui().Build()
 
 @code {
+    private const double WalkStep = 1.5;
+
     private readonly ExploreExperienceMicroBundle Experience = new();
     private string? insideRoomId;
     private bool unknownUnlocked;
@@ -34,6 +36,38 @@
     private bool ConferenceJoined => Experience.Conference.Joined;
     private FsmForgeMicroBundle Forge => Experience.Forge;
 
+    private string TourKicker => insideRoomId is not null
+        ? "YOU FOUND A DOOR"
+        : "THE WORKSHOP IS A PLACE YOU CAN ENTER";
+
+    private string TourMessage
+    {
+        get
+        {
+            if (insideRoomId is not null)
+                return "You did not open a menu. You walked here. That distinction matters. Experiences should feel inhabited, not merely displayed.";
+
+            var nearest = Rooms
+                .Where(room => room.Id != "unknown" || unknownUnlocked)
+                .OrderBy(room => DistanceSquared(room.X, room.Y))
+                .FirstOrDefault();
+
+            if (nearest is null || DistanceSquared(nearest.X, nearest.Y) > 24 * 24)
+                return "Start anywhere. Walk the blueprint. Follow your curiosity. Every building is an idea made tangible.";
+
+            return nearest.Id switch
+            {
+                "engineering" => "THE FORGE — behavior becomes machinery here. State, lifecycle, transitions, and reusable capability are forged into something an Experience can use.",
+                "creation" => "CREATION BAY — small capabilities become MicroBundles. Compose enough of them and you stop writing a page and start building an Experience.",
+                "experience" => "EXPERIENCE DECK — this is the destination: technology becomes an environment someone can enter, explore, and remember.",
+                _ => nearest.Description
+            };
+        }
+    }
+
+    private double DistanceSquared(double x, double y)
+        => Math.Pow(AvatarX - x, 2) + Math.Pow(AvatarY - y, 2);
+
     private ElementBuilder BuildGui()
     {
         if (insideRoomId == "conference")
@@ -57,6 +91,8 @@
             unknownUnlocked,
             AvatarX,
             AvatarY,
+            TourKicker,
+            TourMessage,
             HandleKeyDown,
             MoveAvatar,
             MoveAvatarTo,
@@ -99,19 +135,19 @@
         {
             case "w":
             case "arrowup":
-                MoveAvatar(0, -3);
+                MoveAvatar(0, -WalkStep);
                 break;
             case "s":
             case "arrowdown":
-                MoveAvatar(0, 3);
+                MoveAvatar(0, WalkStep);
                 break;
             case "a":
             case "arrowleft":
-                MoveAvatar(-3, 0);
+                MoveAvatar(-WalkStep, 0);
                 break;
             case "d":
             case "arrowright":
-                MoveAvatar(3, 0);
+                MoveAvatar(WalkStep, 0);
                 break;
         }
     }
@@ -154,7 +190,7 @@
         await InvokeAsync(StateHasChanged);
         await Task.Delay(300);
 
-        insideRoomId = room.Id == "unknown" ? "unknown" : room.Id;
+        insideRoomId = room.Id;
     }
 
     private void ExitRoom()
@@ -162,8 +198,7 @@
         Forge.Reset();
         Experience.Conference.Leave();
 
-        var roomId = insideRoomId == "conference" ? "yup" : insideRoomId;
-        var room = Rooms.FirstOrDefault(x => x.Id == roomId);
+        var room = Rooms.FirstOrDefault(x => x.Id == insideRoomId);
         if (room is not null)
             Experience.Navigation.MoveToExit(room);
 

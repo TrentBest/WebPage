@@ -23,6 +23,8 @@ public static class SpatialWorldGuiBuilder
         bool unknownUnlocked,
         double avatarX,
         double avatarY,
+        string tourKicker,
+        string tourMessage,
         Action<KeyboardEventArgs> onKeyDown,
         Action<double, double> moveAvatar,
         Action<double, double> moveAvatarTo,
@@ -37,7 +39,8 @@ public static class SpatialWorldGuiBuilder
             .Style("background", Ink)
             .Style("color", White)
             .Style("font-family", "Consolas, 'Courier New', monospace")
-            .Style("box-sizing", "border-box");
+            .Style("box-sizing", "border-box")
+            .Attribute("class", "workshop-spatial-experience");
 
         root.Content(World(
             receiver,
@@ -45,6 +48,8 @@ public static class SpatialWorldGuiBuilder
             unknownUnlocked,
             avatarX,
             avatarY,
+            tourKicker,
+            tourMessage,
             onKeyDown,
             moveAvatar,
             moveAvatarTo,
@@ -59,6 +64,8 @@ public static class SpatialWorldGuiBuilder
         bool unknownUnlocked,
         double avatarX,
         double avatarY,
+        string tourKicker,
+        string tourMessage,
         Action<KeyboardEventArgs> onKeyDown,
         Action<double, double> moveAvatar,
         Action<double, double> moveAvatarTo,
@@ -99,11 +106,42 @@ public static class SpatialWorldGuiBuilder
         world.Content(camera);
         world.Content(WalkSurface(receiver, avatarX, avatarY, moveAvatarTo));
         world.Content(Avatar(receiver));
+        world.Content(TourCard(receiver, tourKicker, tourMessage));
         return world;
     }
 
     private static string CameraTransform(double avatarX, double avatarY)
         => $"translate(calc(50vw - {avatarX:0.##}vw), calc(50vh - {avatarY:0.##}vh))";
+
+    private static ElementBuilder TourCard(object receiver, string kicker, string message)
+        => WorkshopGui.Element(receiver, "section")
+            .Attribute("class", "workshop-tour-card")
+            .Style("position", "fixed")
+            .Style("left", "50%")
+            .Style("bottom", "1.2rem")
+            .Style("transform", "translateX(-50%)")
+            .Style("z-index", "30")
+            .Style("width", "min(680px, calc(100vw - 2rem))")
+            .Style("padding", ".8rem 1rem")
+            .Style("box-sizing", "border-box")
+            .Style("border", "1px solid rgba(0,234,255,.34)")
+            .Style("border-left", "3px solid rgba(0,234,255,.78)")
+            .Style("background", "rgba(1,4,10,.84)")
+            .Style("backdrop-filter", "blur(8px)")
+            .Style("box-shadow", "0 0 32px rgba(0,234,255,.08)")
+            .Style("pointer-events", "none")
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("font-size", ".48rem")
+                .Style("letter-spacing", ".22em")
+                .Style("color", Cyan)
+                .Style("margin-bottom", ".35rem")
+                .Text(kicker))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("font-size", "clamp(.58rem, 1.15vw, .78rem)")
+                .Style("line-height", "1.55")
+                .Style("letter-spacing", ".04em")
+                .Style("color", White)
+                .Text(message));
 
     private static ElementBuilder WalkSurface(
         object receiver,

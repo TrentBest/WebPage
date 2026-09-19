@@ -14,6 +14,7 @@ public sealed class SpatialNavigationMicroBundle : IDisposable
     public const int BundleId = 2101;
     public const double WorldCenterX = 50;
     public const double WorldCenterY = 50;
+    public const double DefaultMovementStep = 1.5;
 
     private readonly MicroBundle _lifecycle;
     private bool _disposed;
