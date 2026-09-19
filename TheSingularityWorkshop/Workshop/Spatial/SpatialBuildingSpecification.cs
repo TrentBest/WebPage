@@ -6,6 +6,7 @@ using System.Linq;
 
 public enum SpatialBuildingPurpose
 {
+    Unknown,
     ResidentialMultifamily,
     ResidentialLuxury,
     Office,
