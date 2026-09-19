@@ -15,6 +15,21 @@ public sealed record SpatialLaboratoryManifest(
     IReadOnlyList<SpatialLaboratorySimulator> Simulators,
     IReadOnlyList<SpatialLaboratoryLesson> Lessons)
 {
+    /// <summary>Diegetic security state for the laboratory entrance.</summary>
+    public SpatialLaboratorySecurity Security { get; init; } = SpatialLaboratorySecurity.CreateDefault();
+
+    /// <summary>Administrative services offered by the laboratory director's office.</summary>
+    public SpatialLaboratoryAdministration Administration { get; init; } = SpatialLaboratoryAdministration.CreateDefault();
+
+    /// <summary>Physical inventory that can be composed into an experiment instead of written on a lab sheet.</summary>
+    public IReadOnlyList<SpatialLaboratoryInventoryItem> Inventory { get; init; } = SpatialLaboratoryInventoryCatalog.CreateDefault();
+
+    /// <summary>Canonical gravity-body specimens available to the gravity laboratory.</summary>
+    public SpatialGravityBodyCatalog GravityBodies { get; init; } = SpatialGravityBodyCatalog.CreateDefault();
+
+    /// <summary>Three-dimensional rendering experiment exposed by the simulation floor.</summary>
+    public SpatialLaboratory3DManifest ThreeDimensionalLab { get; init; } = SpatialLaboratory3DManifest.CreateDefault();
+
     /// <summary>The deliberately provisional physics boundary used by laboratory simulations.</summary>
     public static TbdPhysicsEngineManifest PhysicsEngine => TbdPhysicsEngineManifest.Default;
 

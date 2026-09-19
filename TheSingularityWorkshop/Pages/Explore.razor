@@ -59,6 +59,10 @@
     private int transitMicroGameRound;
     private string? transitMicroGameTargetId;
     private string? selectedLaboratoryFloorId;
+    private string? preparedLaboratoryExperimentId;
+    private string? gravityBodyAId = "earth";
+    private string? gravityBodyBId = "moon";
+    private bool threeDimensionalLabActive;
     private static readonly SpatialIslandExperience Island = SpatialIslandExperience.SingularityIsland;
     private int detailLevel = 16;
     private int mansionDensity = 1;
@@ -164,7 +168,21 @@
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
 
         if (insideRoomId == "singularity-lab")
-            return SpatialLaboratoryExperienceGuiBuilder.Build(this, LaboratoryManifest, Experience.User.DisplayName, selectedLaboratoryFloorId, SelectLaboratoryFloor, ExitRoom);
+            return SpatialLaboratoryExperienceGuiBuilder.Build(
+                this,
+                LaboratoryManifest,
+                Experience.User.DisplayName,
+                selectedLaboratoryFloorId,
+                SelectLaboratoryFloor,
+                ExitRoom,
+                ScanLaboratoryBadge,
+                PrepareLaboratoryExperiment,
+                preparedLaboratoryExperimentId,
+                gravityBodyAId,
+                gravityBodyBId,
+                SelectGravityBodies,
+                threeDimensionalLabActive,
+                ToggleThreeDimensionalLab);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(
@@ -435,6 +453,28 @@
                 .Content(WorkshopGui.Button(this).Label("NO, THANK YOU").Style("margin-left", ".5rem").Style("padding", ".55rem .8rem").Style("cursor", "pointer").OnClick(() => mayorOfficeOfferVisible = false));
 
         return WorkshopGui.Element(this, "span");
+    }
+
+    private void ScanLaboratoryBadge()
+    {
+        LaboratoryManifest.Security.ScanBadge();
+    }
+
+    private void PrepareLaboratoryExperiment(string experimentId)
+    {
+        preparedLaboratoryExperimentId = experimentId;
+    }
+
+    private void SelectGravityBodies(string bodyAId, string bodyBId)
+    {
+        if (bodyAId == bodyBId) return;
+        gravityBodyAId = bodyAId;
+        gravityBodyBId = bodyBId;
+    }
+
+    private void ToggleThreeDimensionalLab()
+    {
+        threeDimensionalLabActive = !threeDimensionalLabActive;
     }
 
     private void JoinConference() => Experience.Conference.Join();
