@@ -9,8 +9,8 @@ At a minimum, every meaningful code change must include a visible incremental un
 
 1. Make the requested code change.
 2. Add or update a concrete incremental unit test that proves the change exists.
-3. Advance `SingularityHub.Tests/IncrementalVersionTests.CurrentVersion` for the change.
-4. Make the corresponding incremental version test assert the new version value rather than using a meaningless always-green assertion.
+3. Append the next sequential versioned test to `SingularityHub.Tests/IncrementalVersionTests.cs`.
+4. Make the corresponding incremental version test assert the new version value and describe the actual change rather than using a meaningless always-green assertion.
 5. Report the resulting commit SHA and the incremental test/version in the response.
 
 ### Why this exists
