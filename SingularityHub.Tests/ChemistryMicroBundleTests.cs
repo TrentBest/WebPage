@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using HubArbitrator = TheSingularityWorkshop.SingularityHub.IArbitrator;
+using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Chemistry;
 using TheSingularityWorkshop.Workshop.MicroBundles;
@@ -61,6 +63,15 @@ public sealed class ChemistryMicroBundleTests
         Assert.Equal("weapon-frame", chemistry.ResolvedMaterials.Single().MaterialId);
     }
 
+    [Fact]
+    public void ChemistryMicroBundle_Implements_The_Workshop_And_Hub_Contracts()
+    {
+        using var chemistry = new ChemistryMicroBundle();
+
+        Assert.IsAssignableFrom<TheSingularityWorkshop.Workshop.MicroBundles.IMicroBundle>(chemistry);
+        Assert.IsAssignableFrom<HubBundle>(chemistry);
+    }
+
     private sealed class MaterialSourceBundle : HubBundle, IElementalMaterialSource
     {
         public MaterialSourceBundle(MaterialComposition material) => Materials = [material];
@@ -69,10 +80,10 @@ public sealed class ChemistryMicroBundleTests
         public BundleVersion Version => new(1, 0, 0);
         public IReadOnlyList<ulong> Dependencies => [];
         public IReadOnlyList<MaterialComposition> Materials { get; }
-        public bool Arbitrate(IArbitrator arbitrator, int roundIndex) => false;
+        public bool Arbitrate(HubArbitrator arbitrator, int roundIndex) => false;
     }
 
-    private sealed class TestArbitrator : IArbitrator
+    private sealed class TestArbitrator : HubArbitrator
     {
         public TestArbitrator(params HubBundle[] bundles) => LoadedBundles = bundles;
         public IReadOnlyCollection<HubBundle> LoadedBundles { get; }

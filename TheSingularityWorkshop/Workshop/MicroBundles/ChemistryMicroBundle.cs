@@ -12,7 +12,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// arbitration service that evaluates material-bearing bundles after install.
 /// Presentation is intentionally delegated to a future ChemistryLabGuiBuilder.
 /// </summary>
-public sealed class ChemistryMicroBundle : IMicroBundle, IDisposable
+public sealed class ChemistryMicroBundle : IMicroBundle, HubBundle, IDisposable
 {
     public const int BundleId = 2215;
 

@@ -35,15 +35,19 @@ public sealed class PathfindingMicroBundle : IDisposable
     public MicroBundleManifestation? Manifestation => _lifecycle.Manifestation;
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
 
-    /// <summary>The currently planned route, including the destination.</summary>
+    /// <summary>The currently planned route, including the resolved destination.</summary>
     public IReadOnlyList<SpatialWaypoint> CurrentPath => _path;
+
+    /// <summary>The walkable world-space destination actually selected by pathfinding.</summary>
+    public SpatialWaypoint ResolvedTarget { get; private set; }
 
     /// <summary>True while the route still contains waypoints to consume.</summary>
     public bool IsWalking => _pathIndex < _path.Count;
 
     /// <summary>
     /// Plans a route through the current Workshop suite footprints.
-    /// Returns false when the requested destination cannot be reached.
+    /// If the requested interaction point is not itself walkable, the nearest
+    /// walkable point becomes the resolved interaction destination.
     /// </summary>
     public bool TryPlan(
         double startX,
@@ -63,6 +67,8 @@ public sealed class PathfindingMicroBundle : IDisposable
 
         if (!IsWalkable(goal, obstacles))
             goal = FindNearestWalkable(goal, obstacles);
+
+        ResolvedTarget = FromCell(goal);
 
         var cells = FindPath(start, goal, obstacles);
         if (cells.Count == 0)

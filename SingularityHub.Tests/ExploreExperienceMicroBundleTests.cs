@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.Gui;
+using TheSingularityWorkshop.Workshop.Experience;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
@@ -42,24 +43,24 @@ public sealed class ExploreExperienceMicroBundleTests
     }
 
     [Fact]
-    public void SpatialNavigation_ApproachUsesDefinedRoomEntrance()
+    public void SpatialNavigation_ApproachUsesDefinedExperienceEntrance()
     {
         using var navigation = new SpatialNavigationMicroBundle();
-        var room = new SpatialRoom(
+        var experienceSpace = new ExperienceSpace(
             "forge", "The Forge", "FSM WORKSHOP",
             73, 30,
             73, 46,
             73, 46,
             "", "FORGE", null);
 
-        navigation.ApproachEntrance(room);
+        navigation.ApproachEntrance(experienceSpace);
 
-        Assert.Equal(room.EntranceX, navigation.X);
-        Assert.Equal(room.EntranceY, navigation.Y);
+        Assert.Equal(experienceSpace.EntranceX, navigation.X);
+        Assert.Equal(experienceSpace.EntranceY, navigation.Y);
 
-        navigation.MoveToExit(room);
-        Assert.Equal(room.ExitX, navigation.X);
-        Assert.Equal(room.ExitY, navigation.Y);
+        navigation.MoveToExit(experienceSpace);
+        Assert.Equal(experienceSpace.ExitX, navigation.X);
+        Assert.Equal(experienceSpace.ExitY, navigation.Y);
     }
 
     [Fact]
