@@ -198,3 +198,14 @@ The road is fluid. Update this document and `CURRENT_VERTICAL_SLICE.md` when a b
 *The bundle is small. The idea is not.*
 
 *This way leads to the Singularity.*
+
+
+## Authored applicability and composition
+
+A published MicroBundle may declare explicit applicability metadata and references to other MicroBundles. This allows an Experience to compose compatible actors, props, media, and supporting capabilities from independently authored bundles.
+
+The system matches **content to context**, not people to hidden identity categories. "Typical audience" is an authored compatibility signal, not a rule about what a person may consume.
+
+Composition should be inspectable and previewable: the runtime can derive a proposal, explain which bundles contributed to it, and let a human accept or edit the result before a consequential change is committed.
+
+See `WORLD_COMPOSITION_AND_HUMAN_AGENCY.md` for the full world-composition model.
