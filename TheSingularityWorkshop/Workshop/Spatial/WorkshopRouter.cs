@@ -1,6 +1,10 @@
 namespace TheSingularityWorkshop.Gui;
 
-/// <summary>Routes traversal through the Workshop's nested spatial scenes.</summary>
+/// <summary>
+/// Routes traversal through nested spatial scenes. Root-world destinations are
+/// entered through <see cref="SpatialPlace"/> so presentation code cannot silently
+/// substitute a different scene ID or interior entry point.
+/// </summary>
 public sealed class WorkshopRouter
 {
     private readonly SpatialSceneStack _sceneStack;
@@ -19,20 +23,31 @@ public sealed class WorkshopRouter
     public IReadOnlyList<SpatialSceneFrame> Frames => _sceneStack.Frames;
     public SpatialSceneStack SceneStack => _sceneStack;
 
-    /// <summary>Returns true after the visitor has entered a scene at least once.</summary>
     public bool HasVisited(string sceneId) => _visitedScenes.Contains(sceneId);
 
-    /// <summary>Registers the point at which a visitor materializes inside a child scene.</summary>
     public void RegisterEntryPoint(string sceneId, SpatialPoint entryPoint)
     {
         if (string.IsNullOrWhiteSpace(sceneId)) throw new ArgumentException("A scene ID is required.", nameof(sceneId));
         _entryPoints[sceneId] = entryPoint;
     }
 
+    /// <summary>Registers a complete place boundary: identity plus its interior materialization point.</summary>
+    public void RegisterPlace(SpatialPlace place)
+    {
+        ArgumentNullException.ThrowIfNull(place);
+        RegisterEntryPoint(place.SceneId, place.EntryPoint);
+    }
+
     public SpatialPoint GetEntryPoint(string sceneId)
         => _entryPoints.TryGetValue(sceneId, out var point) ? point : new SpatialPoint(50, 78);
 
-    /// <summary>Enters a child scene and reports whether this is the visitor's first visit.</summary>
+    public bool Enter(SpatialPlace place, SpatialPoint returnPosition)
+    {
+        ArgumentNullException.ThrowIfNull(place);
+        return Enter(place.SceneId, returnPosition);
+    }
+
+    /// <summary>Enters a child scene by scene ID. Use the place overload for root-world destinations.</summary>
     public bool Enter(string sceneId, SpatialPoint returnPosition)
     {
         var firstVisit = _visitedScenes.Add(sceneId);
