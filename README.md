@@ -518,3 +518,22 @@ That's the point of a workshop.
 *This way leads to the Singularity.*
 
 *Built by The Singularity Workshop.*
+
+
+## Opening experience: perception before explanation
+
+The landing page is a **perception boundary**, not merely a signpost.
+
+The current gateway now expresses its semantic structure through `WorkshopGatewayGuiBuilder`. The next evolution is an authored opening sequence that demonstrates the Workshop before asking the visitor to understand it intellectually.
+
+The design principle is:
+
+> **Show me why. Don't make me read why.**
+
+The intended progression is:
+
+`ARRIVAL → IDENTITY → TENSION → SHOW → INVITATION → WORKSHOP`
+
+Visual intensity may be paired with original audio and timed presentation beats. This is presentation intensity, not autonomous persuasion: the visitor remains the decision-maker, and every demonstrated capability must correspond to real Workshop behavior or be clearly identified as experimental.
+
+See `WORKSHOP_OPENING_EXPERIENCE.md` for the current contract.
