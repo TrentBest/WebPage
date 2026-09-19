@@ -1,5 +1,11 @@
 # The Singularity Workshop — WebPage
 
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![FSM_API](https://img.shields.io/badge/FSM_API-1.0.13-00A98F?style=flat-square)](https://github.com/TrentBest/FSM_API)
+[![Repository](https://img.shields.io/badge/repository-private-6e7781?style=flat-square&logo=github)](https://github.com/TrentBest/WebPage)
+[![Tests](https://img.shields.io/badge/tests-manual%20CI-f39c12?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/TrentBest/WebPage/actions)
+
+
 ## What this repository actually is
 
 This is the **ephemeral WebPage project** for The Singularity Workshop.
@@ -453,8 +459,10 @@ dotnet run
 
 The HTTPS/HTTP port is determined by the project's launch settings.
 
-For active development, use the feature branch appropriate to the experiment and
-keep `master` untouched unless promotion is intentional.
+For active development, work on `development`. The repository is deliberately consolidated
+to two branches: `master` is the stable promotion target and `development` is the active
+engineering branch. Do not create a new feature branch merely to avoid reconciling an
+architectural problem; consolidate the work on `development` instead.
 
 Do not introduce OneDrive-specific assumptions into the project or documentation.
 The repository should remain portable to an ordinary local development workspace
