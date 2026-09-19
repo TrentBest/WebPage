@@ -1,0 +1,123 @@
+@page "/madmen"
+@using TheSingularityWorkshop.Gui
+@using TheSingularityWorkshop.Workshop.Advertising
+
+<PageTitle>Madmen // The Singularity Workshop</PageTitle>
+
+@BuildGui().Build()
+
+@code {
+    private readonly MadmenExperience Experience = new();
+    private AdvertisingCampaign? _campaign;
+    private string _status = "AGENCY READY // INVENTORY CAN BE CREATED BY THE USER";
+
+    private ElementBuilder BuildGui()
+    {
+        var agency = Experience.Agency;
+
+        var root = WorkshopGui.MultiPanel(this)
+            .Style("min-height", "100vh")
+            .Style("padding", "2rem")
+            .Style("box-sizing", "border-box")
+            .Style("gap", "1rem")
+            .Style("background", "#020711")
+            .Style("color", "#eafcff")
+            .Style("font-family", "Consolas, 'Courier New', monospace");
+
+        root.Content(WorkshopGui.Element(this, "div")
+            .Style("color", "#00eaff")
+            .Style("font-size", ".6rem")
+            .Style("letter-spacing", ".2em")
+            .Text("THE WORKSHOP // MADMEN"));
+
+        root.Content(WorkshopGui.Element(this, "h1")
+            .Style("margin", "0")
+            .Style("font-size", "clamp(2rem,6vw,5rem)")
+            .Text("ADVERTISING AGENCY"));
+
+        root.Content(WorkshopGui.Element(this, "p")
+            .Style("max-width", "900px")
+            .Style("color", "#8eaab4")
+            .Text("Enter the agency. Represent virtual companies, find or create advertising space, and procure placements without making interruption the product."));
+
+        var controls = WorkshopGui.MultiPanel(this)
+            .Style("display", "grid")
+            .Style("grid-template-columns", "repeat(auto-fit,minmax(220px,1fr))")
+            .Style("gap", ".75rem");
+
+        controls.Content(WorkshopGui.Panel(this)
+            .Style("padding", "1rem")
+            .Style("border", "1px solid #00eaff44")
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#00eaff").Text("VIRTUAL CLIENT"))
+            .Content(WorkshopGui.Element(this, "strong").Style("display", "block").Style("margin", ".5rem 0").Text("Virtual Tractor Company"))
+            .Content(WorkshopGui.Element(this, "p").Style("color", "#718e99").Text("A client is data, not a special case."))
+            .Content(WorkshopGui.Button(this).Label("PROCURE SPACE").Style("color", "#00eaff").OnClick(Procure)));
+
+        controls.Content(WorkshopGui.Panel(this)
+            .Style("padding", "1rem")
+            .Style("border", "1px solid #ff2cff44")
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#ff2cff").Text("CREATE INVENTORY"))
+            .Content(WorkshopGui.Element(this, "strong").Style("display", "block").Style("margin", ".5rem 0").Text("Make a new place to advertise"))
+            .Content(WorkshopGui.Element(this, "p").Style("color", "#718e99").Text("The agency can become a market participant by discovering or creating new inventory."))
+            .Content(WorkshopGui.Button(this).Label("CREATE SPACE").Style("color", "#ff2cff").OnClick(CreateSpace)));
+
+        root.Content(controls);
+
+        root.Content(WorkshopGui.Panel(this)
+            .Style("padding", "1rem")
+            .Style("border", "1px solid #ffd34d44")
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#ffd34d").Text("AGENCY TELEMETRY"))
+            .Content(WorkshopGui.Element(this, "div").Style("margin-top", ".5rem").Text(_status))
+            .Content(WorkshopGui.Element(this, "div").Style("margin-top", ".5rem").Style("color", "#718e99").Text($"INVENTORY // {agency.Inventory.Count}"))
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#718e99").Text($"CLIENTS // {agency.Clients.Count}"))
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#718e99").Text($"CAMPAIGNS // {agency.Campaigns.Count}")));
+
+        if (_campaign is not null)
+        {
+            root.Content(WorkshopGui.Panel(this)
+                .Style("padding", "1rem")
+                .Style("border", "1px solid #52e05a55")
+                .Content(WorkshopGui.Element(this, "div").Style("color", "#52e05a").Text("PLACEMENT PROCURED"))
+                .Content(WorkshopGui.Element(this, "strong").Style("display", "block").Style("margin-top", ".5rem").Text(_campaign.Space.Location))
+                .Content(WorkshopGui.Element(this, "div").Style("color", "#718e99").Text(_campaign.Message)));
+        }
+
+        return root;
+    }
+
+    private void CreateSpace()
+    {
+        var id = 100 + Experience.Agency.Inventory.Count;
+        Experience.Agency.CreateSpace(
+            id,
+            $"Explore / Advertising District / Space {id}",
+            AdvertisingFormat.EnvironmentObject,
+            "Visitors naturally present in the environment",
+            attentionCost: 0,
+            isInterruptive: false);
+
+        _status = $"SPACE {id} CREATED // LOW-ATTENTION INVENTORY AVAILABLE FOR PROCUREMENT";
+    }
+
+    private void Procure()
+    {
+        var client = Experience.Agency.Clients.FirstOrDefault()
+            ?? Experience.Agency.AddClient(1, "Virtual Tractor Company");
+
+        var space = Experience.Agency.Inventory.FirstOrDefault(x => x.IsAvailable)
+            ?? Experience.Agency.CreateSpace(
+                200 + Experience.Agency.Inventory.Count,
+                "Explore / Construction District / Tractor Depot",
+                AdvertisingFormat.EnvironmentObject,
+                "Visitors exploring construction technology",
+                attentionCost: 1,
+                isInterruptive: false);
+
+        _campaign = Experience.Agency.Procure(
+            client,
+            space,
+            "See how this machine is built.");
+
+        _status = "CLIENT PLACED // PROCUREMENT COMPLETE";
+    }
+}
