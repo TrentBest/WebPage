@@ -78,7 +78,7 @@
         Router.RegisterEntryPoint("singularity-station", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("singularity-island", new SpatialPoint(50, 78));
         foreach (var interactable in Scene.Interactables)
-            Router.RegisterEntryPoint(interactable.Place.SceneId, interactable.Place.EntryPoint);
+            Router.RegisterPlace(interactable.Place);
 
         Experience.Navigation.MoveTo(Scene.StartingPosition.X, Scene.StartingPosition.Y);
     }
@@ -588,7 +588,7 @@
         interactable.OnInteraction();
         var returnPosition = new SpatialPoint(AvatarX, AvatarY);
         var place = interactable.Place;
-        var firstVisit = Router.Enter(place.SceneId, returnPosition);
+        var firstVisit = Router.Enter(place, returnPosition);
         var entry = place.EntryPoint;
         Experience.Navigation.MoveTo(entry.X, entry.Y);
         insideRoomId = place.SceneId;
