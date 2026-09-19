@@ -38,13 +38,13 @@ public static class SpatialPlaceCatalog
         new("city.mansion", "Singularity Mansion", SpatialDomain.SingularityCity, "mansion", "building-authoring", new SpatialPoint(50, 78), "A full architectural residence and its nested spaces."),
         new("city.transit", "Singularity Transit", SpatialDomain.SingularityCity, "singularity-transit", "transit-authoring", new SpatialPoint(50, 78), "The city's transportation interchange."),
         new("city.ontology-mall", "Singularity Ontology Mall", SpatialDomain.SingularityCity, "singularity-ontology-mall", "ontology-authoring", new SpatialPoint(50, 78), "A navigable physical manifestation of the ontology."),
-        new("city.laboratory", "Singularity Laboratory", SpatialDomain.SingularityCity, "singularity-lab", "laboratory-authoring", new SpatialPoint(50, 78), "Research facilities and their departments."),
+        new("workshop.laboratory", "Singularity Laboratory", SpatialDomain.Workshop, "singularity-lab", "laboratory-authoring", new SpatialPoint(50, 78), "Research facilities and their departments."),
         new("city.station", "Singularity Station", SpatialDomain.SingularityCity, "singularity-station", "station-authoring", new SpatialPoint(50, 78), "A major civic and transportation station."),
         new("city.shipyard", "Singularity Shipyard", SpatialDomain.SingularityCity, "singularity-shipyard", "vehicle-builder", new SpatialPoint(50, 72), "A working dockyard where vessel definitions become visible things."),
         new("city.capitol", "Singularity Capitol", SpatialDomain.SingularityCity, "singularity-capitol", "civic-authoring", new SpatialPoint(50, 78), "Civic and administrative facilities."),
         new("city.ocean-shipyard", "Ocean Shipyard", SpatialDomain.SingularityCity, "ocean-shipyard", "vehicle-builder", new SpatialPoint(50, 72), "A waterfront yard for boats and marine construction."),
         new("city.maze", "Workshop Maze", SpatialDomain.SingularityCity, "maze", "maze-authoring", new SpatialPoint(50, 78), "A playable spatial environment."),
-        new("city.aec-office", "AEC Remote Office", SpatialDomain.SingularityCity, "aec-remote-office", "aec-authoring", new SpatialPoint(50, 78), "A remote architectural, engineering, and construction office."),
+        new("workshop.aec-office", "AEC Remote Office", SpatialDomain.Workshop, "aec-remote-office", "aec-authoring", new SpatialPoint(50, 78), "A remote architectural, engineering, and construction office."),
         new("city.taxi", "Singularity Taxi", SpatialDomain.SingularityCity, "singularity-taxi", "taxi-authoring", new SpatialPoint(50, 78), "A local transport service and vehicle experience.")
     ];
 
