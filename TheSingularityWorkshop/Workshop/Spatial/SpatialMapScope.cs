@@ -5,5 +5,6 @@ public enum SpatialMapScope
 {
     Workshop,
     City,
-    World
+    World,
+    SolarSystem
 }
