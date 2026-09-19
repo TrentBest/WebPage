@@ -102,6 +102,21 @@ public sealed class SingularityGovernmentArchitectureTests
     }
 
     [Fact]
+    public void EveryCityStructureHasAPurposeDrivenBuildingProgram()
+    {
+        Assert.Equal(SingularityCityCatalog.Structures.Count, SpatialCityBuildingProgramCatalog.All.Count);
+
+        foreach (var structure in SingularityCityCatalog.Structures)
+        {
+            var program = SpatialCityBuildingProgramCatalog.Resolve(structure.Id);
+            var specification = SpatialBuildingSpecificationCatalog.Resolve(program.SpecificationId);
+
+            Assert.False(string.IsNullOrWhiteSpace(program.PurposeStatement));
+            Assert.NotEqual(default, specification.Purpose);
+        }
+    }
+
+    [Fact]
     public void BuildingSpecificationCalculatesCapacityFromPurposeAndFloors()
     {
         var lowEnd = SpatialBuildingSpecificationCatalog.Resolve("residential.multifamily.low");
