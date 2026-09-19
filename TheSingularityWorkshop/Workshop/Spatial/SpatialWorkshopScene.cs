@@ -35,7 +35,7 @@ public sealed class SpatialWorkshopScene
             [
                 Building("singularity-mansion", "mansion", new SpatialBounds(33, 20, 3, 2)),
                 Building("image-tools", "image-workshop", new SpatialBounds(48, 11, 5, 3)),
-                Building("forge", "forge", new SpatialBounds(79, 37, 5, 4)),
+                Building("forge", "forge", new SpatialBounds(78, 41, 4, 3)),
                 Building("blueprint-library", "library", new SpatialBounds(45, 34, 4, 4)),
                 Building("singularity-transit", "singularity-transit", new SpatialBounds(88, 46, 5, 4)),
                 Building("npc-studio", "npc-studio", new SpatialBounds(10, 51, 5, 4)),
