@@ -37,6 +37,16 @@ public static class WorkshopGatewayGuiBuilder
         stage.Child(WorkshopGui.Element(receiver, "div").Class("ambient-signal signal-two").Attribute("aria-hidden", "true"));
         stage.Child(WorkshopGui.Element(receiver, "div").Class("ambient-signal signal-three").Attribute("aria-hidden", "true"));
 
+        var narrative = WorkshopGui.Panel(receiver)
+            .Class("workshop-narrative")
+            .Attribute("aria-label", "Why the Workshop exists")
+            .Attribute("data-workshop-rumble", "true")
+            .Content(WorkshopGui.Element(receiver, "div").Class("workshop-narrative-kicker").Text("WHY BUILD IT?"))
+            .Content(WorkshopGui.Element(receiver, "div").Class("workshop-narrative-line").Text("If a picture is worth a thousand words..."))
+            .Content(WorkshopGui.Element(receiver, "div").Class("workshop-narrative-question").Text("Then how many words is a living image?"))
+            .Content(WorkshopGui.Element(receiver, "div").Class("workshop-narrative-body").Text("I could have written the explanation. I could have shown you the picture. Instead, I built something that can explain itself by being alive."));
+        stage.Content(narrative);
+
         var gateway = WorkshopGui.Button(receiver)
             .Class("monolith-btn")
             .AriaLabel("Enter The Singularity Workshop")
