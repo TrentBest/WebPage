@@ -117,6 +117,32 @@ public sealed class SingularityGovernmentArchitectureTests
     }
 
     [Fact]
+    public void EveryGovernmentOfficeHasADigitenOccupant()
+    {
+        foreach (var office in SingularityGovernmentCatalog.Offices)
+            Assert.Contains(SingularityCivicDigitenCatalog.Officials, official => official.OfficeId == office.Id);
+    }
+
+    [Fact]
+    public void MayorIsADigitenAndMansionHasInteractiveAlcoves()
+    {
+        Assert.Equal("government.mayor", SingularityCivicDigitenCatalog.Mayor.OfficeId);
+        Assert.Contains(SingularityMansionArchitecture.Alcoves, feature => feature.Id == "west-alcove");
+        Assert.Contains(SingularityMansionArchitecture.Alcoves, feature => feature.Id == "south-alcove");
+        Assert.Equal(
+            "MAYOR'S MANSION // FRONT ELEVATION",
+            SingularityMansionElevation.Title);
+    }
+
+    [Fact]
+    public void DigitenPresenceSeparatesLiveAvatarFromPersistentCivicState()
+    {
+        Assert.Contains("VISIBLE AVATAR", SingularityDigitenPresenceRules.PresenceContract);
+        Assert.Contains("REMOVE LIVE AVATAR", SingularityDigitenPresenceRules.PresenceContract);
+        Assert.Contains("PERSISTED WORLD STATE", SingularityDigitenPresenceRules.PresenceContract);
+    }
+
+    [Fact]
     public void BuildingSpecificationCalculatesCapacityFromPurposeAndFloors()
     {
         var lowEnd = SpatialBuildingSpecificationCatalog.Resolve("residential.multifamily.low");
