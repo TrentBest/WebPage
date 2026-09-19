@@ -71,6 +71,12 @@ public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
     /// <summary>Workshop Elements currently declare no Hub-level dependencies.</summary>
     IReadOnlyList<ulong> HubBundle.Dependencies => Array.Empty<ulong>();
 
+    /// <summary>Receives the Hub once during installation. Workshop lifecycle has no Hub dependencies yet.</summary>
+    void HubBundle.LoadBundle(IArbitrator arbitrator)
+    {
+        ArgumentNullException.ThrowIfNull(arbitrator);
+    }
+
     /// <summary>Lifecycle participation is represented as a successful Hub arbitration pass.</summary>
     bool HubBundle.Arbitrate(IArbitrator arbitrator, int roundIndex)
     {
