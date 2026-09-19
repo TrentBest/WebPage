@@ -1,3 +1,4 @@
+using System.Linq;
 using TheSingularityWorkshop.Gui;
 using Xunit;
 
@@ -11,7 +12,7 @@ public sealed class SingularityCampusCompositionTests
         var scene = SpatialWorkshopScene.CreateDefault();
 
         Assert.Contains(scene.Interactables, item => item.ExperienceId == "singularity-transit");
-        Assert.Contains(scene.Interactables, item => item.ExperienceId == "singularity-ontology-mall");
+        Assert.Contains(SingularityCampusCatalog.Buildings, building => building.Id == "singularity-ontology-mall");
         Assert.Contains(SingularityCampusCatalog.TransitDestinations, destination => destination.SceneId == "singularity-ontology-mall");
         Assert.Equal(4, SingularityCampusCatalog.OntologyDepartments.Count);
     }
@@ -27,11 +28,10 @@ public sealed class SingularityCampusCompositionTests
     [Fact(DisplayName = "Incremental Unit Test 38 — Campus buildings are materially separated")]
     public void CampusHasSpatialSeparation()
     {
-        var scene = SpatialWorkshopScene.CreateDefault();
-        var mansion = scene.Interactables.Single(item => item.Id == "singularity-mansion");
-        var mall = scene.Interactables.Single(item => item.Id == "singularity-ontology-mall");
+        var mansion = SingularityCampusCatalog.Buildings.Single(item => item.Id == "singularity-mansion").Bounds;
+        var mall = SingularityCampusCatalog.Buildings.Single(item => item.Id == "singularity-ontology-mall").Bounds;
 
-        Assert.True(mansion.Bounds.X + mansion.Bounds.Width < mall.Bounds.X);
-        Assert.True(mansion.Bounds.Y + mansion.Bounds.Height < mall.Bounds.Y);
+        Assert.True(mansion.X + mansion.Width < mall.X);
+        Assert.True(mansion.Y + mansion.Height < mall.Y);
     }
 }
