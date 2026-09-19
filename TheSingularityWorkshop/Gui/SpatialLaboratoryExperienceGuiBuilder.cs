@@ -24,7 +24,8 @@ public static class SpatialLaboratoryExperienceGuiBuilder
         string? gravityBodyBId = null,
         Action<string, string>? selectGravityBodies = null,
         bool threeDimensionalActive = false,
-        Action? enterThreeDimensionalLab = null)
+        Action? enterThreeDimensionalLab = null,
+        SpatialLaboratoryPerformanceSnapshot? performanceSnapshot = null)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("overflow", "hidden")
@@ -33,6 +34,7 @@ public static class SpatialLaboratoryExperienceGuiBuilder
 
         root.Content(Backdrop(receiver));
         root.Content(Header(receiver, laboratory, userName));
+        root.Content(PerformanceDashboard(receiver, laboratory.Performance, performanceSnapshot ?? SpatialLaboratoryPerformanceSnapshot.Empty));
 
         // The entrance is part of the building, not a modal. The guards and scanner are
         // visible before the visitor is allowed into the research tower.
@@ -195,6 +197,79 @@ public static class SpatialLaboratoryExperienceGuiBuilder
                 .Style("color", "#ffd34d").Style("font-family", "inherit").Style("font-size", ".4rem").OnClick(scanBadge));
 
         return panel;
+    }
+
+    private static ElementBuilder PerformanceDashboard(
+        object receiver,
+        SpatialLaboratoryPerformanceManifest performance,
+        SpatialLaboratoryPerformanceSnapshot snapshot)
+    {
+        var status = snapshot.HasTelemetry ? "LIVE TELEMETRY" : "TELEMETRY STANDBY";
+        var statusColor = snapshot.HasTelemetry ? "#52e05a" : "#ffd34d";
+
+        var panel = WorkshopGui.Panel(receiver)
+            .Style("position", "absolute").Style("left", "4vw").Style("right", "4vw")
+            .Style("top", "13.5vh").Style("z-index", "8")
+            .Style("padding", ".55rem .7rem")
+            .Style("border", $"1px solid {statusColor}55")
+            .Style("background", "rgba(1,4,10,.88)")
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("display", "flex").Style("justify-content", "space-between")
+                .Style("gap", ".8rem").Style("flex-wrap", "wrap")
+                .Content(WorkshopGui.Element(receiver, "span")
+                    .Style("font-size", ".42rem").Style("letter-spacing", ".16em")
+                    .Style("color", "#00eaff").Text(performance.Name))
+                .Content(WorkshopGui.Element(receiver, "span")
+                    .Style("font-size", ".36rem").Style("letter-spacing", ".1em")
+                    .Style("color", statusColor).Text(status)));
+
+        var metrics = WorkshopGui.Element(receiver, "div")
+            .Style("display", "grid")
+            .Style("grid-template-columns", "repeat(7,minmax(90px,1fr))")
+            .Style("gap", ".35rem").Style("margin-top", ".45rem");
+
+        AddPerformanceMetric(receiver, metrics, "FPS", snapshot.FramesPerSecond, "fps", "60 target");
+        AddPerformanceMetric(receiver, metrics, "FRAME", snapshot.FrameTimeMilliseconds, "ms", "≤ 16.67");
+        AddPerformanceMetric(receiver, metrics, "LINES", snapshot.RenderedLines, null, "20K ceiling");
+        AddPerformanceMetric(receiver, metrics, "PAYLOAD", snapshot.GpuPayloadBytes, "bytes", "4 MB ceiling");
+        AddPerformanceMetric(receiver, metrics, "TICKS", snapshot.SimulationTicksPerSecond, "ticks/s", "60 target");
+        AddPerformanceMetric(receiver, metrics, "AGENTS", snapshot.ActiveAgents, null, "robots + drones");
+        AddPerformanceMetric(receiver, metrics, "MEMORY", snapshot.WorkingSetMegabytes, "MB", "runtime");
+
+        panel.Content(metrics);
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".4rem").Style("font-size", ".29rem")
+            .Style("color", "#8ea7b2")
+            .Text("DIEGETIC INSTRUMENT // measured values enter here; budgets remain explicit; no synthetic runtime numbers are presented as observations."));
+
+        return panel;
+    }
+
+    private static void AddPerformanceMetric(
+        object receiver,
+        ElementBuilder parent,
+        string label,
+        double? value,
+        string? unit,
+        string budget)
+    {
+        var display = value.HasValue
+            ? $"{value.Value:0.##}{(unit is null ? "" : " " + unit)}"
+            : "—";
+
+        parent.Content(WorkshopGui.Element(receiver, "div")
+            .Style("padding", ".35rem .4rem")
+            .Style("border", "1px solid rgba(0,234,255,.14)")
+            .Style("background", "rgba(0,234,255,.025)")
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("font-size", ".27rem").Style("letter-spacing", ".08em")
+                .Style("color", "#8ea7b2").Text(label))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".12rem").Style("font-size", ".5rem")
+                .Style("color", value.HasValue ? "#52e05a" : "#52616a").Text(display))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".1rem").Style("font-size", ".23rem")
+                .Style("color", "#ffd34d").Text(budget)));
     }
 
     private static ElementBuilder SecurityFloor(object receiver, SpatialLaboratorySecurity security)
