@@ -1,7 +1,8 @@
-namespace TheSingularityWorkshop.Gui;
-
 using System;
 using System.Collections.Generic;
+
+namespace TheSingularityWorkshop.Gui
+{
 
 /// <summary>Small deterministic simulation substrate for living non-player citizens.</summary>
 /// <remarks>
@@ -68,4 +69,5 @@ public static class SpatialDigitenCatalog
         new("digiten-03", "Nia", new SpatialPoint(47.5, 54.5), new SpatialDigitenGoal("market", "Visit the future public market", new SpatialPoint(34.5, 12.5))),
         new("digiten-04", "Sol", new SpatialPoint(53.5, 53.5), new SpatialDigitenGoal("research", "Reach the science district", new SpatialPoint(14.5, 74.5)))
     ];
+
 }
