@@ -31,40 +31,30 @@ public sealed class SpatialWorkshopScene
 
     /// <summary>Creates the first campus composition from the declarative building catalog.</summary>
     public static SpatialWorkshopScene CreateDefault()
-        => new("center", new SpatialPoint(50, 50),
+        => new("center", new SpatialPoint(50, 58),
             [
-                Building("singularity-mansion", "mansion", new SpatialBounds(33, 20, 3, 2)),
-                Building("image-tools", "image-workshop", new SpatialBounds(48, 11, 5, 3)),
                 Building("forge", "forge", new SpatialBounds(78, 41, 4, 3)),
                 Building("blueprint-library", "library", new SpatialBounds(45, 34, 4, 4)),
                 Building("singularity-transit", "singularity-transit", new SpatialBounds(88, 46, 5, 4)),
                 Building("npc-studio", "npc-studio", new SpatialBounds(10, 51, 5, 4)),
                 Building("fsm-bench", "fsm-workbench", new SpatialBounds(21, 59, 5, 3)),
-                Building("storage-bins", "storage", new SpatialBounds(94, 68, 4, 4)),
-                Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(76, 62, 6, 4)),
-                Building("singularity-lab", "singularity-lab", new SpatialBounds(10, 77, 7, 5)),
-                Building("singularity-station", "singularity-station", new SpatialBounds(82, 8, 5, 3)),
-                Building("singularity-shipyard", "singularity-shipyard", new SpatialBounds(90, 24, 5, 4)),
-                Building("singularity-capitol", "singularity-capitol", new SpatialBounds(64, 9, 5, 3)),
-                Building("ocean-shipyard", "ocean-shipyard", new SpatialBounds(61, 88, 5, 3)),
-                new SpatialInteractable("maze", "Workshop Maze", new SpatialBounds(45, 53, 13, 8), new SpatialBounds(50, 61, 4, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "maze"),
-                new SpatialInteractable("aec-remote-office", "AEC Remote Office", new SpatialBounds(14, 40, 13, 8), new SpatialBounds(20, 46, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "aec-remote-office"),
-                new SpatialInteractable("singularity-taxi", "Singularity Taxi", new SpatialBounds(54, 21, 8, 4), new SpatialBounds(60, 21, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "singularity-taxi")
-            ],
+                Building("singularity-lab", "singularity-lab", new SpatialBounds(18, 88, 6, 3)),
+                new SpatialInteractable("aec-remote-office", "AEC Remote Office", new SpatialBounds(31, 76, 13, 8), new SpatialBounds(35, 84, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "aec-remote-office"),
+                new SpatialInteractable("ocean-shipyard", "Ocean Shipyard", new SpatialBounds(44, 87, 14, 7), new SpatialBounds(50, 85, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "ocean-shipyard")            ],
             SpatialViewSettings.CreateDefault(),
             new SpatialConstructionSite(
                 "workshop-expansion",
                 "WORKSHOP EXPANSION SITE",
-                new SpatialBounds(34, 64, 24, 22),
-                new SpatialBounds(39, 69, 14, 12),
+                new SpatialBounds(60, 64, 24, 22),
+                new SpatialBounds(65, 69, 14, 12),
                 SpatialConstructionPhase.Foundation,
                 0.22,
                 "Creation and production facilities are being established here."),
             [
-                new ConstructionVehicle("crane-01", "Fabrication Crane", ConstructionVehicleKind.Crane, new SpatialPoint(48, 72)),
-                new ConstructionVehicle("backhoe-01", "Site Tractor", ConstructionVehicleKind.Backhoe, new SpatialPoint(38, 80)),
-                new ConstructionVehicle("rover-01", "Site Rover", ConstructionVehicleKind.Rover, new SpatialPoint(40, 70)),
-                new ConstructionVehicle("lifter-01", "Material Lifter", ConstructionVehicleKind.Lifter, new SpatialPoint(54, 84))
+                new ConstructionVehicle("crane-01", "Fabrication Crane", ConstructionVehicleKind.Crane, new SpatialPoint(72, 72)),
+                new ConstructionVehicle("backhoe-01", "Site Tractor", ConstructionVehicleKind.Backhoe, new SpatialPoint(64, 80)),
+                new ConstructionVehicle("rover-01", "Site Rover", ConstructionVehicleKind.Rover, new SpatialPoint(68, 70)),
+                new ConstructionVehicle("lifter-01", "Material Lifter", ConstructionVehicleKind.Lifter, new SpatialPoint(78, 82))
             ],
             SpatialConstructionExperienceCatalog.Expansion);
 
