@@ -17,7 +17,7 @@ public static class WorkshopGatewayGuiBuilder
     /// </summary>
     public static RenderFragment Build(
         object receiver,
-        Action enterWorkshop,
+        Func<Task> enterWorkshop,
         string warningHeader,
         string warningBody,
         string warningFinal)
