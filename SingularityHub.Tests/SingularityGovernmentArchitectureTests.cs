@@ -81,4 +81,33 @@ public sealed class SingularityGovernmentArchitectureTests
         Assert.True(specification.AcceptsFootprint(30, 20));
         Assert.True(specification.MaximumFootprint > specification.MinimumFootprint);
     }
+
+    [Fact]
+    public void ElectionSimulatorAcceptsCandidateRegistrationAndOneVotePerCitizen()
+    {
+        var election = SingularityElectionCatalog.Create(
+            "mayor-002",
+            "government.mayor",
+            DateTimeOffset.Parse("2030-01-01T00:00:00+00:00"),
+            ["citizen-a", "citizen-b"]);
+        var simulator = new SingularityElectionSimulator(election);
+
+        simulator.RegisterCandidate(new SingularityCandidate("citizen-a", "A", "government.mayor"));
+        simulator.RegisterCandidate(new SingularityCandidate("citizen-b", "B", "government.mayor"));
+        simulator.CastVote("voter-1", "citizen-a");
+        simulator.CastVote("voter-1", "citizen-b");
+
+        Assert.Equal(1, simulator.VoteCount);
+        Assert.Equal("citizen-b", simulator.DetermineWinner());
+    }
+
+    [Fact]
+    public void BuildingSpecificationCalculatesCapacityFromPurposeAndFloors()
+    {
+        var lowEnd = SpatialBuildingSpecificationCatalog.Resolve("residential.multifamily.low");
+
+        Assert.True(lowEnd.AcceptsFootprint(10, 10));
+        Assert.False(lowEnd.AcceptsFootprint(9, 10));
+        Assert.Equal(32, lowEnd.EstimateOccupancy(4));
+    }
 }
