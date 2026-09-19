@@ -26,6 +26,14 @@ public sealed class WorkshopGatewayGuiBuilderTests
         Assert.DoesNotContain("<button", source, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("<img", source, StringComparison.OrdinalIgnoreCase);
 
-        var home = File.ReadAllText(Path.Combine(\n            AppContext.BaseDirectory,\n            "..", "..", "..", "..",\n            "TheSingularityWorkshop",\n            "Pages",\n            "Home.razor"));\n\n        Assert.DoesNotContain("<button", home, StringComparison.OrdinalIgnoreCase);\n        Assert.DoesNotContain("<img", home, StringComparison.OrdinalIgnoreCase);
+        var home = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop",
+            "Pages",
+            "Home.razor"));
+
+        Assert.DoesNotContain("<button", home, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<img", home, StringComparison.OrdinalIgnoreCase);
     }
 }
