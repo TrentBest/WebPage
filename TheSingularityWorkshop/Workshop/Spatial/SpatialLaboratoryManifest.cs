@@ -35,6 +35,24 @@ public sealed record SpatialLaboratoryManifest(
     /// <summary>Destruction and launcher sandboxes exposed as physics demonstrations.</summary>
     public SpatialLaboratoryDestructionCatalog DestructionSandboxes { get; init; } = SpatialLaboratoryDestructionCatalog.CreateDefault();
 
+    /// <summary>Selectable astronomical, fictional-story, and game-homage spatial models.</summary>
+    public SpatialSolarSystemScenarioCatalog SolarSystemModels { get; init; } = SpatialSolarSystemScenarioCatalog.CreateDefault();
+
+    /// <summary>Collider demonstrations ranging from bench experiments to hadron-scale concepts.</summary>
+    public SpatialLaboratoryColliderCatalog Colliders { get; init; } = SpatialLaboratoryColliderCatalog.CreateDefault();
+
+    /// <summary>Robots and drones used as laboratory instruments and autonomous specimens.</summary>
+    public SpatialLaboratoryRoboticsCatalog Robotics { get; init; } = SpatialLaboratoryRoboticsCatalog.CreateDefault();
+
+    /// <summary>Restricted AI floors that remain outside ordinary visitor access.</summary>
+    public SpatialLaboratoryAiSecurity AiSecurity { get; init; } = SpatialLaboratoryAiSecurity.CreateDefault();
+
+    /// <summary>Language grammar and vocalization manifests shared by the speech pipeline.</summary>
+    public LanguageVocalizationManifest Vocalization { get; init; } = LanguageVocalizationManifest.CreateDefault();
+
+    /// <summary>Structural grammars spanning natural language and machine protocols.</summary>
+    public LanguageGrammarManifest Grammars { get; init; } = LanguageGrammarManifest.CreateDefault();
+
     /// <summary>The deliberately provisional physics boundary used by laboratory simulations.</summary>
     public static TbdPhysicsEngineManifest PhysicsEngine => TbdPhysicsEngineManifest.Default;
 
@@ -53,6 +71,7 @@ public sealed record SpatialLaboratoryManifest(
             "SINGULARITY LAB",
             new SpatialBounds(22, 60, 34, 28),
             [
+                new("ai-core-low", "AI CORE — RESTRICTED", -2, "ai-core"),
                 new("security", "SECURITY GATE", -1, "security"),
                 new("director", "DIRECTOR'S OFFICE", 0, "administration"),
                 new("gravity", "GRAVITY & SPACETIME", 1, "gravity"),
@@ -63,7 +82,8 @@ public sealed record SpatialLaboratoryManifest(
                 new("plasma", "PLASMA & FIELD STUDIES", 6, "plasma"),
                 new("fluids", "FLUIDS & HYDRAULICS", 7, "fluids"),
                 new("cosmic", "COSMIC SCALE", 8, "cosmic"),
-                new("simulation", "FSM PHYSICS SIMULATION", 9, "simulation")
+                new("simulation", "FSM PHYSICS SIMULATION", 9, "simulation"),
+                new("ai-core-high", "AI CORE — RESTRICTED", 10, "ai-core")
             ],
             [
                 new("particle-collider", "PARTICLE COLLIDER", "MICRO → SOLAR SYSTEM", "Compose collision experiments across scale: tiny, small, medium, large, hadron-collider, extra-large, and eventually astronomical systems.", ["atomics", "energy", "gravity", "fsm-physics"]),
