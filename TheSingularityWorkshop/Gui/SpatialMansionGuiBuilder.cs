@@ -126,9 +126,9 @@ public static class SpatialMansionGuiBuilder
             .Style("z-index", "100").Style("width", "min(680px,84vw)").Style("padding", "1.5rem")
             .Style("box-sizing", "border-box").Style("border", $"1px solid {Cyan}aa")
             .Style("background", "rgba(2,8,18,.97)").Style("box-shadow", $"0 0 70px {Cyan}22,inset 0 0 35px {Cyan}08")
-            .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".7rem").Style("letter-spacing", ".28em").Text("WELCOME TO THE SINGULARITY MANSION"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".8rem").Style("color", Yellow).Style("font-size", ".5rem").Style("letter-spacing", ".18em").Text("LINE RENDERING STRESS LAB"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "1rem").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".9rem").Text("This mansion is deliberately excessive. Its job is to draw lots of ornate lines — lots of them."))
+            .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".7rem").Style("letter-spacing", ".28em").Text("WELCOME TO THE MAYOR'S MANSION"))
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".8rem").Style("color", Yellow).Style("font-size", ".5rem").Style("letter-spacing", ".18em").Text("MAYOR'S RESIDENCE // ARCHITECTURAL BLUEPRINT"))
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "1rem").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".9rem").Text("This is a real architectural place in the civic world. Its plan is rendered through the Workshop linework machinery and describes rooms, walls, stairs, landings, alcoves, art, and circulation."))
             .Content(WorkshopGui.Element(receiver, "ol").Style("margin", "1rem 0").Style("padding-left", "1.3rem").Style("color", "#b8c9d0").Style("font-family", "system-ui,sans-serif").Style("font-size", ".7rem").Style("line-height", "1.7")
                 .Content(WorkshopGui.Element(receiver, "li").Text("Walk around the line-rendered mansion and watch the world move around you."))
                 .Content(WorkshopGui.Element(receiver, "li").Text("Increase the density when you want to press the renderer harder."))
@@ -147,7 +147,7 @@ public static class SpatialMansionGuiBuilder
             .Style("background", "rgba(1,4,10,.84)").Style("color", White)
             .Style("font-size", ".48rem").Style("line-height", "1.65")
             .Style("letter-spacing", ".1em").Style("pointer-events", "none")
-            .Text($"SINGULARITY MANSION // {ModeLabel(mode)}\nAVATAR // {avatarName}\nZOOM // {zoom:0.00}X\nDENSITY // {density}X\nLINES // {lineCount:N0}\nFEATURE // {selectedFeatureId ?? \"PLAN\"}\nRENDER CONVERSION // {renderMicroseconds:0.0} μs\nRGBA TEXEL BUILD // {textureMicroseconds:0.0} μs\nGPU PAYLOAD // {gpuPayloadBytes:N0} BYTES");
+            .Text($"MAYOR'S MANSION // {ModeLabel(mode)}\nAVATAR // {avatarName}\nZOOM // {zoom:0.00}X\nDENSITY // {density}X\nLINES // {lineCount:N0}\nFEATURE // {selectedFeatureId ?? \"PLAN\"}\nRENDER CONVERSION // {renderMicroseconds:0.0} μs\nRGBA TEXEL BUILD // {textureMicroseconds:0.0} μs\nGPU PAYLOAD // {gpuPayloadBytes:N0} BYTES");
 
     private static ElementBuilder FeatureControls(object receiver, Action<string> selectFeature, string? selectedFeatureId)
     {
@@ -156,7 +156,14 @@ public static class SpatialMansionGuiBuilder
             .Style("width", "min(290px,42vw)").Style("padding", ".45rem")
             .Style("border", $"1px solid {Cyan}55").Style("background", "rgba(1,4,10,.9)");
 
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", ".42rem").Style("letter-spacing", ".12em").Text("PLAN FEATURES // SELECT AN ALCOVE TO VIEW IN ELEVATION"));
+        panel.Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", ".42rem").Style("letter-spacing", ".12em").Text("PLAN FEATURES // ALCOVES OPEN IN ELEVATION"));
+        panel.Content(WorkshopGui.Button(receiver).Label("RETURN TO BLUEPRINT PLAN")
+            .Style("display", "block").Style("width", "100%").Style("margin-top", ".2rem")
+            .Style("padding", ".3rem").Style("border", $"1px solid {Yellow}44")
+            .Style("background", "rgba(1,4,10,.72)").Style("color", Yellow)
+            .Style("font-family", "inherit").Style("font-size", ".38rem").Style("cursor", "pointer")
+            .OnClick(() => selectFeature("__plan__")));
+
         foreach (var feature in SingularityMansionArchitecture.Features)
         {
             var label = feature.Kind == "Alcove" ? $"{feature.Name} → ELEVATION" : feature.Name;
@@ -198,7 +205,7 @@ public static class SpatialMansionGuiBuilder
         panel.Child(WorkshopGui.Element(receiver, "span")
             .Style("padding", ".3rem .35rem").Style("color", Yellow)
             .Style("font-size", ".42rem").Style("letter-spacing", ".1em")
-            .Text("PRESS THE RENDERER"));
+            .Text("LINEWORK DETAIL"));
 
         foreach (var level in new[] { 1, 2, 4, 8, 16 })
         {
