@@ -99,6 +99,36 @@ public static class SpatialLaboratoryExperienceGuiBuilder
             }
         }
 
+        // The rendering laboratory is itself an instrument: the 3D model is projected
+        // into the same FSM-backed linework/render/texture lifecycle used by the Mansion.
+        if (selectedFloor.DomainId.Equals("simulation", StringComparison.OrdinalIgnoreCase))
+        {
+            var experiment = SpatialLineRenderingExperiment.CreateDefault();
+            content.Content(WorkshopGui.Panel(receiver)
+                .Style("margin-top", "1rem").Style("padding", "1rem")
+                .Style("border", "1px solid rgba(255,56,209,.32)")
+                .Style("background", "rgba(255,56,209,.035)")
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("font-size", ".62rem").Style("color", "#ff38d1")
+                    .Text(experiment.Name))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("margin-top", ".5rem").Style("font-size", ".48rem")
+                    .Style("line-height", "1.5").Style("color", "#c9d8de")
+                    .Text(experiment.Description))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("margin-top", ".7rem").Style("font-size", ".42rem")
+                    .Style("line-height", "1.7").Style("color", "#ffd34d")
+                    .Text($"3D SOURCE LINES // {experiment.Stats.Source3DLines:N0}    PROJECTED // {experiment.Stats.ProjectedLines:N0}    RENDERED // {experiment.Stats.RenderedLines:N0}"))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("margin-top", ".2rem").Style("font-size", ".42rem")
+                    .Style("line-height", "1.7").Style("color", "#8ea7b2")
+                    .Text($"TEXTURE // {experiment.Stats.TextureWidth:N0} TEXELS    GPU-SHAPED PAYLOAD // {experiment.Stats.GpuPayloadBytes:N0} BYTES"))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("margin-top", ".55rem").Style("font-size", ".38rem")
+                    .Style("letter-spacing", ".08em").Style("color", "#00eaff")
+                    .Text("3D GEOMETRY → PROJECTION → FSM LINEWORK → SPATIAL LINE RENDERER → RGBA FLOAT TEXTURE")));
+        }
+
         tower.Content(floors).Content(content);
         root.Content(tower);
 
