@@ -82,7 +82,7 @@
             .Content(WorkshopGui.Button(this).Label("USE BLUEPRINT THEME").Style("color", "#ff2cff").OnClick(ApplyTheme))
             .Content(WorkshopGui.Button(this).Label("PERSONALIZE THE OBSERVATION").Style("margin-top", ".5rem").Style("color", "#ff2cff").OnClick(Personalize))
             .Content(WorkshopGui.Button(this).Label("RECOGNIZE NEXT QUESTION").Style("margin-top", ".5rem").Style("color", "#ffd34d").OnClick(RecognizeNext))
-            .Content(WorkshopGui.Element(this, "div").Style("margin-top", "1rem").Style("color", "#718e99").Text(_questionStatus)));
+            .Content(WorkshopGui.Element(this, "div").Style("margin-top", "1rem").Style("color", "#718e99").Text(_questionStatus));
 
         grid.Content(teacher);
         root.Content(grid);
