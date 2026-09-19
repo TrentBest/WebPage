@@ -160,6 +160,7 @@ public static class SpatialMansionGuiBuilder
             .Style("font-size", ".48rem").Style("line-height", "1.65")
             .Style("letter-spacing", ".1em").Style("pointer-events", "none")
             .Text(text);
+    }
 
     private static ElementBuilder FeatureControls(object receiver, Action<string> selectFeature, string? selectedFeatureId)
     {
