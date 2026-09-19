@@ -19,9 +19,9 @@ public sealed class SpatialConstructionAndMapTests
     public void ConstructionSiteAndMallAreSeparate()
     {
         var scene = SpatialWorkshopScene.CreateDefault();
-        var mall = scene.Interactables.Single(item => item.Id == "singularity-ontology-mall");
+        var lab = scene.Interactables.Single(item => item.Id == "singularity-lab");
         var site = scene.ConstructionSite.Bounds;
 
-        Assert.True(site.X + site.Width < mall.Bounds.X);
+        Assert.True(site.X > lab.Bounds.X + lab.Bounds.Width);
     }
 }
