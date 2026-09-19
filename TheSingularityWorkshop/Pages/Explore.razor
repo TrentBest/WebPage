@@ -449,7 +449,7 @@
         var interactionPoint = new SpatialPoint(
             platform.X + platform.Width / 2d,
             platform.Y + 7.5d);
-        await MoveTransitAvatar(interactionPoint);
+        await MoveTransitAvatar(interactionPoint.X, interactionPoint.Y);
 
         selectedTransitDestinationId = platform.DestinationId;
         transitTrainVisible = true;
