@@ -54,7 +54,7 @@ public static class SpatialShipyardGuiBuilder
             .Style("pointer-events", "none");
 
         // Water and quay.
-        svg.Child(Rect(receiver, 0, 0, 120, 80, Water, "none", Cyan, .15));
+        svg.Child(Rect(receiver, 0, 0, 120, 80, Water, Cyan, 1, .15));
         svg.Child(Rect(receiver, 4, 5, 72, 70, "none", Cyan, .7, .45));
         svg.Child(Line(receiver, 4, 22, 76, 22, Cyan, .65, .55));
         svg.Child(Line(receiver, 4, 53, 76, 53, Cyan, .65, .55));
@@ -174,8 +174,8 @@ public static class SpatialShipyardGuiBuilder
     private static ElementBuilder Building(object receiver, double x, double y, double width, double height, string label)
     {
         var g = WorkshopGui.Element(receiver, "g");
-        g.Child(Rect(receiver, x, y, width, height, "rgba(10,24,30,.9)", "none", Cyan, .5));
-        g.Child(Rect(receiver, x + 1.5, y + 1.5, width - 3, height - 3, "none", Cyan, .35));
+        g.Child(Rect(receiver, x, y, width, height, "rgba(10,24,30,.9)", Cyan, .5, 1));
+        g.Child(Rect(receiver, x + 1.5, y + 1.5, width - 3, height - 3, "none", Cyan, .35, 1));
         g.Child(WorkshopGui.Element(receiver, "text")
             .Attribute("x", x + width / 2)
             .Attribute("y", y + height / 2 + 1)
@@ -190,7 +190,7 @@ public static class SpatialShipyardGuiBuilder
     private static ElementBuilder Slip(object receiver, double x, double y, double width, double height, string label)
     {
         var g = WorkshopGui.Element(receiver, "g");
-        g.Child(Rect(receiver, x, y, width, height, "rgba(1,4,10,.4)", Yellow, .45));
+        g.Child(Rect(receiver, x, y, width, height, "rgba(1,4,10,.4)", Yellow, .45, 1));
         g.Child(Line(receiver, x + 2, y + 2, x + 2, y + height - 2, Yellow, .35, .4));
         g.Child(Line(receiver, x + width - 2, y + 2, x + width - 2, y + height - 2, Yellow, .35, .4));
         g.Child(WorkshopGui.Element(receiver, "text")
@@ -206,7 +206,7 @@ public static class SpatialShipyardGuiBuilder
     private static ElementBuilder Quay(object receiver, double x, double y, double width, double height)
     {
         var g = WorkshopGui.Element(receiver, "g");
-        g.Child(Rect(receiver, x, y, width, height, "rgba(30,30,18,.75)", Yellow, .5));
+        g.Child(Rect(receiver, x, y, width, height, "rgba(30,30,18,.75)", Yellow, .5, 1));
         for (var i = 1; i < 8; i++)
             g.Child(Line(receiver, x + i * width / 8, y + 1, x + i * width / 8, y + height - 1, Yellow, .18, .5));
         g.Child(WorkshopGui.Element(receiver, "text")
@@ -239,7 +239,7 @@ public static class SpatialShipyardGuiBuilder
     private static ElementBuilder DockMarker(object receiver, double x, double y, string label)
     {
         var g = WorkshopGui.Element(receiver, "g");
-        g.Child(Rect(receiver, x, y, 28, 8, "rgba(1,4,10,.65)", Cyan, .35));
+        g.Child(Rect(receiver, x, y, 28, 8, "rgba(1,4,10,.65)", Cyan, .35, 1));
         g.Child(WorkshopGui.Element(receiver, "text")
             .Attribute("x", x + 14).Attribute("y", y + 5)
             .Attribute("text-anchor", "middle")
@@ -290,8 +290,8 @@ public static class SpatialShipyardGuiBuilder
             .Attribute("values", $"{-direction * 12} 0;{direction * 10} 0;{-direction * 12} 0")
             .Attribute("dur", $"{duration}s")
             .Attribute("repeatCount", "indefinite"));
-        g.Child(Rect(receiver, x - 7, y, 14, 4, "none", Magenta, .7));
-        g.Child(Rect(receiver, x - 5, y - 3, 10, 3, "none", Magenta, .45));
+        g.Child(Rect(receiver, x - 7, y, 14, 4, "none", Magenta, .7, 1));
+        g.Child(Rect(receiver, x - 5, y - 3, 10, 3, "none", Magenta, .45, 1));
         g.Child(Line(receiver, x - 10, y + 7, x + 10, y + 7, Cyan, .55, .8));
         g.Child(WorkshopGui.Element(receiver, "text")
             .Attribute("x", x).Attribute("y", y + 2.7)
@@ -301,13 +301,14 @@ public static class SpatialShipyardGuiBuilder
         return g;
     }
 
-    private static ElementBuilder Rect(object receiver, double x, double y, double width, double height, string fill, string unusedStroke = "none", string stroke = "none", double opacity = 1)
+    private static ElementBuilder Rect(object receiver, double x, double y, double width, double height, string fill, string stroke = "none", double strokeWidth = 1, double opacity = 1)
         => WorkshopGui.Element(receiver, "rect")
             .Attribute("x", x).Attribute("y", y)
             .Attribute("width", width).Attribute("height", height)
             .Attribute("fill", fill)
             .Attribute("stroke", stroke)
-            .Attribute("stroke-width", opacity);
+            .Attribute("stroke-width", strokeWidth)
+            .Attribute("fill-opacity", opacity);
 
     private static ElementBuilder Line(object receiver, double x1, double y1, double x2, double y2, string stroke, double width, double opacity, string? dash = null)
     {
