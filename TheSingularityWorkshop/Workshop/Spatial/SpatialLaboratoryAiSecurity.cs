@@ -8,14 +8,16 @@ using System.Collections.Generic;
 /// </summary>
 public sealed record SpatialLaboratoryAiSecurity(
     int LowestRestrictedLevel,
+    int HighestRestrictedLevel,
     string RestrictedAreaId,
     IReadOnlyList<string> RestrictedResearchDomains)
 {
     public static SpatialLaboratoryAiSecurity CreateDefault()
         => new(
             -2,
+            10,
             "ai-core",
             ["artificial-intelligence", "agent-architecture", "model-training", "grammar", "protocol"]);
 
-    public bool IsRestricted(int level) => level <= LowestRestrictedLevel;
+    public bool IsRestricted(int level) => level <= LowestRestrictedLevel || level >= HighestRestrictedLevel;
 }
