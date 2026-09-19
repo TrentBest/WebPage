@@ -1,3 +1,4 @@
+using System.Linq;
 using TheSingularityWorkshop.Gui;
 using Xunit;
 
@@ -16,13 +17,20 @@ public sealed class ExploreSpatialExperienceTests
 
         Assert.Equal("center", scene.StartingAreaId);
         Assert.Equal(50d, scene.StartingPosition.X);
-        Assert.Equal(50d, scene.StartingPosition.Y);
+        Assert.Equal(58d, scene.StartingPosition.Y);
         Assert.DoesNotContain(scene.Interactables, item => Contains(item.Bounds, scene.StartingPosition));
 
-        Assert.Contains(scene.Interactables, item => item.Id == "forge");
-        Assert.Contains(scene.Interactables, item => item.Id == "image-tools");
-        Assert.Contains(scene.Interactables, item => item.Id == "npc-studio");
-        Assert.Contains(scene.Interactables, item => item.Id == "fsm-bench");
+        Assert.Equal(
+            [
+                "aec-remote-office",
+                "blueprint-library",
+                "forge",
+                "fsm-bench",
+                "npc-studio",
+                "singularity-lab",
+                "singularity-transit"
+            ],
+            scene.Interactables.Select(item => item.Id).OrderBy(id => id));
 
         Assert.Equal(64, scene.View.DetailLevels.Count);
         Assert.Contains(scene.View.DetailLevels, level => level == SpatialDetailLevel.Device);
