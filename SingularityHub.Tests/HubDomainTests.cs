@@ -49,6 +49,17 @@ public sealed class HubDomainTests
     }
 
     [ArchitectureTest(6, 1, 5)]
+    [Fact(DisplayName = "6.01.005a — Bundle_Load_Hook_Runs_Exactly_Once")]
+    public void Bundle_Load_Hook_Runs_Exactly_Once()
+    {
+        var hub = new HubKernel();
+        var bundle = new TestBundle(6004);
+        Assert.True(hub.LoadBundle(bundle));
+        Assert.False(hub.LoadBundle(bundle));
+        Assert.Equal(1, bundle.LoadCount);
+    }
+
+    [ArchitectureTest(6, 1, 5)]
     [Fact(DisplayName = "6.01.005 — Hub_Registers_But_Does_Not_Install_Available_Bundle")]
     public void Hub_Registers_But_Does_Not_Install_Available_Bundle()
     {
