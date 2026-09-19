@@ -178,3 +178,20 @@ The Workshop is intended to be self-describing and self-teaching, not self-gover
 The persistent-world model distinguishes the author-controlled Workshop from user-extensible Singularity City. City users can create buildings, Experiences, and content within the permissions of the world.
 
 See `WORLD_COMPOSITION_AND_HUMAN_AGENCY.md` for the composition, authorship, applicability, provenance, and human-approval contract.
+
+
+## Rule 14 — Perception precedes explanation
+
+> **The opening should demonstrate the Workshop before asking the visitor to understand it in prose.**
+
+The public landing page is a perception boundary. Its job is to reduce cognitive friction by giving the visitor evidence of the system's character through a short authored sequence of visual, spatial, and eventually auditory manifestations.
+
+The sequence is:
+
+`ARRIVAL → IDENTITY → TENSION → SHOW → INVITATION → WORKSHOP`.
+
+The semantic structure belongs to recursive GUI Builders. FSM_API should own meaningful presentation lifecycle as the sequence becomes stateful. CSS and browser audio APIs remain manifestation mechanisms rather than architectural owners.
+
+"Shock and awe" means presentation intensity, not manipulation. The system must not hide consequential behavior, invent capabilities, or make consequential decisions for the visitor.
+
+See `WORKSHOP_OPENING_EXPERIENCE.md`.
