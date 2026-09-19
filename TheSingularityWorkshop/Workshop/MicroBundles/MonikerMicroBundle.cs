@@ -101,6 +101,11 @@ public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
     }
 
     /// <summary>Participates in Hub arbitration without exposing implementation details.</summary>
+    void HubBundle.LoadBundle(IArbitrator arbitrator)
+    {
+        ArgumentNullException.ThrowIfNull(arbitrator);
+    }
+
     bool HubBundle.Arbitrate(IArbitrator arbitrator, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(arbitrator);
