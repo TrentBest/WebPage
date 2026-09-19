@@ -144,3 +144,33 @@ For every refactor toward this model:
 The implementation may change dramatically. Functionality must not disappear accidentally.
 
 *The page opens the door. The Hub runs the Workshop.*
+
+
+## Installation and arbitration contract
+
+MicroBundle installation is deliberately two-phase.
+
+```
+Available bundle catalog
+        |
+        v
+LoadBundle(IArbitrator)     <-- exactly once
+        |
+        +--> inspect installed bundles
+        +--> inspect available bundles
+        +--> request dependency loads
+        |
+        v
+installation complete
+        |
+        v
+Arbitrate(IArbitrator, round)
+        |
+        +--> inspect installed composition
+        +--> apply conditional mutations
+        +--> converge for at most 10 rounds
+```
+
+Installation completion order is the default arbitration order. A dependency loaded by a dependent bundle's load hook therefore precedes the dependent. A future Experience manifest can replace that ordering.
+
+A missing dependency is never fabricated. It may become available later and participate in later arbitration.
