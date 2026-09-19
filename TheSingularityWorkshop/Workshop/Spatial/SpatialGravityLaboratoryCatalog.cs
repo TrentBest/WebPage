@@ -46,8 +46,12 @@ public sealed record SpatialGravityBodyCatalog(IReadOnlyList<SpatialGravityBody>
             var influenceA = a.MassKg / (distanceA * distanceA);
             var influenceB = b.MassKg / (distanceB * distanceB);
             var total = influenceA + influenceB;
-            var dominance = total <= 0 ? 0 : Math.Max(influenceA, influenceB) / total;
-            result[i] = new SpatialGravityFieldSample(t, dominance, total > 0, Math.Abs(influenceA - influenceB) / total);
+            var dominanceDelta = total <= 0 ? 1 : Math.Abs(influenceA - influenceB) / total;
+            var intensity = Math.Clamp(1 - dominanceDelta, 0, 1);
+            // This is a presentation-level interaction threshold. The eventual SRPS
+            // integrator will replace it with a validated influence/Hill-sphere calculation.
+            var interactionActive = intensity >= .65;
+            result[i] = new SpatialGravityFieldSample(t, intensity, interactionActive, dominanceDelta);
         }
 
         return result;
