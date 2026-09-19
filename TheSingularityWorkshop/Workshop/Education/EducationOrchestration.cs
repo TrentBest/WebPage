@@ -219,9 +219,16 @@ public static class EducationalContentNormalizer
         return lesson with
         {
             Title = NormalizeText(lesson.Title),
-            Subject = NormalizeText(lesson.Subject),
+            Subject = NormalizeSubject(lesson.Subject),
             Blocks = blocks
         };
+    }
+
+    private static string NormalizeSubject(string value)
+    {
+        var normalized = NormalizeText(value);
+        if (normalized.Length == 0) return normalized;
+        return char.ToUpperInvariant(normalized[0]) + normalized[1..];
     }
 
     private static string NormalizeText(string value)
