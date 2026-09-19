@@ -66,6 +66,7 @@ public sealed class SpatialCivilizationExpansionTests
         Assert.Contains(aec.UseCases, x => x.Id == "behavior-package");
         Assert.Contains(aec.MonetizationHooks, x => x == "behavior-package-sale");
     }
+
     [Fact(DisplayName = "Incremental Unit Test 60 — intelligent AEC drafting table exposes semantic line intent and external targets")]
     public void IntelligentDraftingTableIsPlatformNeutral()
     {
@@ -94,12 +95,12 @@ public sealed class SpatialCivilizationExpansionTests
         Assert.NotNull(taxi.FindDestination("station"));
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 62 — Explore exposes the AEC office and taxi as spatial destinations")]
+    [Fact(DisplayName = "Incremental Unit Test 62 — Explore exposes the AEC office while taxi remains a city destination")]
     public void ExploreExposesAecOfficeAndTaxi()
     {
         var scene = SpatialWorkshopScene.CreateDefault();
 
         Assert.Contains(scene.Interactables, x => x.ExperienceId == "aec-remote-office");
-        Assert.Contains(scene.Interactables, x => x.ExperienceId == "singularity-taxi");
+        Assert.Contains(SpatialPlaceCatalog.CityPlaces, x => x.SceneId == "singularity-taxi");
     }
 }
