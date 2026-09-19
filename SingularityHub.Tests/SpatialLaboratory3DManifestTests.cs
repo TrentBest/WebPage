@@ -13,5 +13,6 @@ public sealed class SpatialLaboratory3DManifestTests
         Assert.Equal(SpatialLaboratoryRenderPath.SpatialLineRendererThenGpu, lab.RenderPath);
         Assert.Contains(lab.Experiments, x => x.Id == "tower" && x.Dimensions == 3);
         Assert.Contains(lab.Experiments, x => x.Id == "gravity-bodies");
+        Assert.Contains(lab.Experiments, x => x.Id == "launcher-track" && x.Dimensions == 3);
     }
 }
