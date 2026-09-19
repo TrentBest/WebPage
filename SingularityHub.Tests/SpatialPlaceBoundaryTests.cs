@@ -48,6 +48,21 @@ public sealed class SpatialPlaceBoundaryTests
     }
 
     [Fact]
+    public void RouterMaterializesThePlaceAtItsDeclaredInteriorEntry()
+    {
+        var place = SpatialPlaceCatalog.Resolve("singularity-shipyard");
+        var router = new WorkshopRouter();
+
+        router.RegisterPlace(place);
+        Assert.Equal(place.EntryPoint, router.GetEntryPoint(place.SceneId));
+
+        var firstVisit = router.Enter(place, new SpatialPoint(90, 18));
+
+        Assert.True(firstVisit);
+        Assert.Equal(place.SceneId, router.CurrentSceneId);
+    }
+
+    [Fact]
     public void ShipyardManifestRepresentsAWorkingYard()
     {
         var manifest = SpatialShipyardManifest.CreateDefault();
