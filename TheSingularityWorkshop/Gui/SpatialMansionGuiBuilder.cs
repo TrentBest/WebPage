@@ -141,13 +141,25 @@ public static class SpatialMansionGuiBuilder
                 .Style("color", Cyan).Style("font-family", "inherit").Style("font-size", ".5rem").Style("letter-spacing", ".14em").Style("cursor", "pointer").OnClick(dismiss));
 
     private static ElementBuilder Hud(object receiver, string avatarName, int density, int lineCount, double renderMicroseconds, double textureMicroseconds, int gpuPayloadBytes, double zoom, PresentationMode mode, string? selectedFeatureId)
-        => WorkshopGui.Element(receiver, "div")
+    {
+        var featureLabel = selectedFeatureId ?? "PLAN";
+        var text = $"MAYOR'S MANSION // {ModeLabel(mode)}\n" +
+                   $"AVATAR // {avatarName}\n" +
+                   $"ZOOM // {zoom:0.00}X\n" +
+                   $"DENSITY // {density}X\n" +
+                   $"LINES // {lineCount:N0}\n" +
+                   $"FEATURE // {featureLabel}\n" +
+                   $"RENDER CONVERSION // {renderMicroseconds:0.0} μs\n" +
+                   $"RGBA TEXEL BUILD // {textureMicroseconds:0.0} μs\n" +
+                   $"GPU PAYLOAD // {gpuPayloadBytes:N0} BYTES";
+
+        return WorkshopGui.Element(receiver, "div")
             .Style("position", "fixed").Style("left", "1rem").Style("top", "1rem").Style("z-index", "30")
             .Style("padding", ".55rem .7rem").Style("border", $"1px solid {Cyan}66")
             .Style("background", "rgba(1,4,10,.84)").Style("color", White)
             .Style("font-size", ".48rem").Style("line-height", "1.65")
             .Style("letter-spacing", ".1em").Style("pointer-events", "none")
-            .Text($"MAYOR'S MANSION // {ModeLabel(mode)}\nAVATAR // {avatarName}\nZOOM // {zoom:0.00}X\nDENSITY // {density}X\nLINES // {lineCount:N0}\nFEATURE // {selectedFeatureId ?? "PLAN"}\nRENDER CONVERSION // {renderMicroseconds:0.0} μs\nRGBA TEXEL BUILD // {textureMicroseconds:0.0} μs\nGPU PAYLOAD // {gpuPayloadBytes:N0} BYTES");
+            .Text(text);
 
     private static ElementBuilder FeatureControls(object receiver, Action<string> selectFeature, string? selectedFeatureId)
     {
