@@ -8,9 +8,10 @@ user-approved behavior take precedence.
 
 Active branch:
 
-`feature/pong-microbundle-vertical-slice`
+`development`
 
-**Do not modify `master` for this work.**
+**Do not modify `master` during ordinary development.** The repository is intentionally
+being consolidated to `master` plus `development`; this contract follows the active branch.
 
 ## Exact presentation sequence
 
