@@ -49,36 +49,41 @@ public sealed class HubDomainTests
     }
 
     [ArchitectureTest(6, 1, 5)]
-    [Fact(DisplayName = "6.01.005 — Hub_Rejects_Missing_Dependency")]
-    public void Hub_Rejects_Missing_Dependency()
+    [Fact(DisplayName = "6.01.005 — Hub_Registers_But_Does_Not_Install_Available_Bundle")]
+    public void Hub_Registers_But_Does_Not_Install_Available_Bundle()
     {
         var hub = new HubKernel();
-        var dependent = new TestBundle(6005, 99999);
-        Assert.False(hub.LoadBundle(dependent));
+        var bundle = new TestBundle(6005);
+        Assert.True(hub.RegisterBundle(bundle));
+        Assert.Contains(bundle, hub.AvailableBundles);
         Assert.Empty(hub.LoadedBundles);
+        Assert.Equal(0, bundle.LoadCount);
     }
 
     [ArchitectureTest(6, 1, 6)]
-    [Fact(DisplayName = "6.01.006 — Hub_Loads_Dependency_Before_Dependent")]
-    public void Hub_Loads_Dependency_Before_Dependent()
+    [Fact(DisplayName = "6.01.006 — Bundle_Load_Hook_Can_Load_Dependency")]
+    public void Bundle_Load_Hook_Can_Load_Dependency()
     {
         var hub = new HubKernel();
         var dependency = new TestBundle(6006);
         var dependent = new TestBundle(6007, 6006);
-        Assert.True(hub.LoadBundle(dependency));
+        Assert.True(hub.RegisterBundle(dependency));
+        Assert.True(hub.RegisterBundle(dependent));
         Assert.True(hub.LoadBundle(dependent));
-        Assert.Equal(2, hub.LoadedBundles.Count);
+        Assert.Equal(new ulong[] { 6006, 6007 }, hub.LoadedBundles.Select(x => x.Id));
+        Assert.Equal(1, dependency.LoadCount);
+        Assert.Equal(1, dependent.LoadCount);
     }
 
     [ArchitectureTest(6, 1, 7)]
-    [Fact(DisplayName = "6.01.007 — Arbitration_Orders_By_Identity")]
-    public void Arbitration_Orders_By_Identity()
+    [Fact(DisplayName = "6.01.007 — Arbitration_Uses_Installation_Order")]
+    public void Arbitration_Uses_Installation_Order()
     {
         var hub = new HubKernel();
         Assert.True(hub.LoadBundle(new TestBundle(6010)));
         Assert.True(hub.LoadBundle(new TestBundle(6009)));
         Assert.Equal(2, hub.ExecuteArbitrationPipeline());
-        Assert.Equal(new ulong[] { 6009, 6010 }, hub.Audit.Events.Select(e => e.ActorId));
+        Assert.Equal(new ulong[] { 6010, 6009 }, hub.Audit.Events.Select(e => e.ActorId));
     }
 
     [ArchitectureTest(6, 1, 8)]
@@ -155,6 +160,12 @@ public sealed class HubDomainTests
         public OntologySignature Ontology => new((int)Id, 0, 0, 0, 0, 0, 0, 0, 0);
         public BundleVersion Version => new(1, 0, 0);
         public IReadOnlyList<ulong> Dependencies { get; }
+        public int LoadCount { get; private set; }
+        public virtual void LoadBundle(IArbitrator arbitrator)
+        {
+            LoadCount++;
+            foreach (var dependency in Dependencies) arbitrator.TryLoadBundle(dependency);
+        }
         public virtual bool Arbitrate(IArbitrator arbitrator, int roundIndex) => !_changed && MarkChanged();
         private bool MarkChanged() { _changed = true; return true; }
     }
