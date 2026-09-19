@@ -22,6 +22,7 @@ public sealed record SpatialLaboratory3DManifest(
             [
                 new("tower", "3D TEST TOWER", 3, 1_000, "Projection and line density."),
                 new("gravity-bodies", "3D GRAVITY BODIES", 3, 5_000, "Orbital paths and field volumes."),
+                new("launcher-track", "3D LAUNCHER TRACK", 3, 12_000, "A movable launcher traverses a spatial track and fires measured projectiles through a three-dimensional volume."),
                 new("laboratory", "3D LAB MODEL", 3, 20_000, "Building-scale geometry and camera movement.")
             ],
             SpatialLaboratoryRenderPath.SpatialLineRendererThenGpu);
