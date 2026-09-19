@@ -136,6 +136,10 @@ public class ElementBuilder
     public ElementBuilder OnKeyDown(Action<KeyboardEventArgs> action)
         => Attribute("onkeydown", EventCallback.Factory.Create(_receiver, action));
 
+    /// <summary>Supports asynchronous keyboard interaction without leaving the builder vocabulary.</summary>
+    public ElementBuilder OnKeyDown(Func<KeyboardEventArgs, Task> action)
+        => Attribute("onkeydown", EventCallback.Factory.Create<KeyboardEventArgs>(_receiver, action));
+
     public ElementBuilder OnMouseEnter(Action action)
         => Attribute("onmouseenter", EventCallback.Factory.Create(_receiver, action));
 

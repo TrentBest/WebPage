@@ -6,7 +6,7 @@ namespace TheSingularityWorkshop.Gui;
 /// <summary>
 /// Viewport-first Workshop world builder.
 /// The visitor is the camera anchor: the avatar remains centered while the
-/// world moves beneath it. Spatial objects expose interaction points rather
+/// world moves beneath it. Spatial suites expose interaction points rather
 /// than asking the visitor to navigate through a secondary GUI.
 /// </summary>
 public static class SpatialWorldGuiBuilder
@@ -25,9 +25,8 @@ public static class SpatialWorldGuiBuilder
         double avatarY,
         string tourKicker,
         string tourMessage,
-        Action<KeyboardEventArgs> onKeyDown,
-        Action<double, double> moveAvatar,
-        Action<double, double> moveAvatarTo,
+        Func<KeyboardEventArgs, Task> onKeyDown,
+        Func<double, double, Task> moveAvatarTo,
         Func<string, Task> interactRoom)
     {
         var root = WorkshopGui.Panel(receiver)
@@ -39,8 +38,7 @@ public static class SpatialWorldGuiBuilder
             .Style("background", Ink)
             .Style("color", White)
             .Style("font-family", "Consolas, 'Courier New', monospace")
-            .Style("box-sizing", "border-box")
-            .Attribute("class", "workshop-spatial-experience");
+            .Style("box-sizing", "border-box");
 
         root.Content(World(
             receiver,
@@ -51,7 +49,6 @@ public static class SpatialWorldGuiBuilder
             tourKicker,
             tourMessage,
             onKeyDown,
-            moveAvatar,
             moveAvatarTo,
             interactRoom));
 
@@ -66,9 +63,8 @@ public static class SpatialWorldGuiBuilder
         double avatarY,
         string tourKicker,
         string tourMessage,
-        Action<KeyboardEventArgs> onKeyDown,
-        Action<double, double> moveAvatar,
-        Action<double, double> moveAvatarTo,
+        Func<KeyboardEventArgs, Task> onKeyDown,
+        Func<double, double, Task> moveAvatarTo,
         Func<string, Task> interactRoom)
     {
         var world = WorkshopGui.Panel(receiver)
@@ -78,6 +74,7 @@ public static class SpatialWorldGuiBuilder
             .Style("background", "#020a12")
             .Style("border", "0")
             .Style("box-sizing", "border-box")
+            .Style("touch-action", "manipulation")
             .Attribute("id", "workshop-spatial-map")
             .Attribute("tabindex", "0")
             .AriaLabel("Workshop world. Click a place to walk. Use WASD or arrow keys.")
@@ -115,14 +112,13 @@ public static class SpatialWorldGuiBuilder
 
     private static ElementBuilder TourCard(object receiver, string kicker, string message)
         => WorkshopGui.Element(receiver, "section")
-            .Attribute("class", "workshop-tour-card")
             .Style("position", "fixed")
             .Style("left", "50%")
-            .Style("bottom", "1.2rem")
+            .Style("top", ".7rem")
             .Style("transform", "translateX(-50%)")
             .Style("z-index", "30")
-            .Style("width", "min(680px, calc(100vw - 2rem))")
-            .Style("padding", ".8rem 1rem")
+            .Style("width", "min(680px, calc(100vw - 1rem))")
+            .Style("padding", ".65rem .8rem")
             .Style("box-sizing", "border-box")
             .Style("border", "1px solid rgba(0,234,255,.34)")
             .Style("border-left", "3px solid rgba(0,234,255,.78)")
@@ -137,17 +133,18 @@ public static class SpatialWorldGuiBuilder
                 .Style("margin-bottom", ".35rem")
                 .Text(kicker))
             .Content(WorkshopGui.Element(receiver, "div")
-                .Style("font-size", "clamp(.58rem, 1.15vw, .78rem)")
-                .Style("line-height", "1.55")
+                .Style("font-size", "clamp(.56rem, 1.15vw, .78rem)")
+                .Style("line-height", "1.45")
                 .Style("letter-spacing", ".04em")
                 .Style("color", White)
+                .Style("max-width", "100%")
                 .Text(message));
 
     private static ElementBuilder WalkSurface(
         object receiver,
         double avatarX,
         double avatarY,
-        Action<double, double> moveAvatarTo)
+        Func<double, double, Task> moveAvatarTo)
     {
         const int cells = 24;
         var surface = WorkshopGui.Element(receiver, "div")
@@ -230,19 +227,11 @@ public static class SpatialWorldGuiBuilder
             ? Yellow
             : room.Id == "engineering" ? Cyan : Green;
 
-        var size = room.Id switch
-        {
-            "engineering" => (30d, 25d),
-            "experience" => (27d, 22d),
-            "creation" => (31d, 23d),
-            _ => (24d, 20d)
-        };
-
         return WorkshopGui.Button(receiver)
             .PositionAt(room.X, room.Y)
             .Style("z-index", "5")
-            .Style("width", $"{size.Item1}%")
-            .Style("height", $"{size.Item2}%")
+            .Style("width", $"{room.Width}%")
+            .Style("height", $"{room.Height}%")
             .Style("padding", "0")
             .Style("border", $"2px solid {accent}99")
             .Style("border-radius", "0")
@@ -262,9 +251,11 @@ public static class SpatialWorldGuiBuilder
                 .Style("padding", ".2rem .4rem")
                 .Style("background", "rgba(1,4,10,.85)")
                 .Style("border", $"1px solid {accent}55")
-                .Style("font-size", room.Id == "engineering" ? ".75rem" : ".55rem")
-                .Style("letter-spacing", ".1em")
-                .Style("white-space", "nowrap")
+                .Style("font-size", "clamp(.42rem, 1vw, .75rem)")
+                .Style("letter-spacing", ".06em")
+                .Style("max-width", "90%")
+                .Style("white-space", "normal")
+                .Style("text-align", "center")
                 .Style("pointer-events", "none")
                 .Text(room.Name))
             .Content(WorkshopGui.Element(receiver, "div")
@@ -275,33 +266,25 @@ public static class SpatialWorldGuiBuilder
     }
 
     private static ElementBuilder Avatar(object receiver)
-        => WorkshopGui.Element(receiver, "svg")
-            .Attribute("viewBox", "0 0 40 40")
+        => WorkshopGui.Element(receiver, "div")
             .Attribute("aria-label", "Your position")
             .Style("position", "absolute")
             .Style("left", "50%")
             .Style("top", "50%")
-            .Style("width", "34px")
-            .Style("height", "34px")
+            .Style("width", "42px")
+            .Style("height", "42px")
             .Style("transform", "translate(-50%,-50%)")
             .Style("z-index", "7")
             .Style("pointer-events", "none")
-            .Style("overflow", "visible")
-            .Content(WorkshopGui.Element(receiver, "circle")
-                .Attribute("cx", "20")
-                .Attribute("cy", "20")
-                .Attribute("r", "8")
-                .Attribute("fill", "none")
-                .Attribute("stroke", White)
-                .Attribute("stroke-opacity", ".4")
-                .Child(WorkshopGui.Element(receiver, "animate")
-                    .Attribute("attributeName", "r")
-                    .Attribute("values", "6;13;6")
-                    .Attribute("dur", "1.8s")
-                    .Attribute("repeatCount", "indefinite")))
-            .Content(WorkshopGui.Element(receiver, "circle")
-                .Attribute("cx", "20")
-                .Attribute("cy", "20")
-                .Attribute("r", "4")
-                .Attribute("fill", White));
+            .Style("border", $"1px solid {White}")
+            .Style("border-radius", "50%")
+            .Style("box-sizing", "border-box")
+            .Style("overflow", "hidden")
+            .Content(WorkshopGui.Image(receiver)
+                .Attribute("src", "https://avatars.githubusercontent.com/u/16405167?v=4")
+                .Attribute("alt", "Workshop visitor")
+                .Style("width", "100%")
+                .Style("height", "100%")
+                .Style("object-fit", "cover")
+                .Style("border-radius", "50%"));
 }

@@ -9,26 +9,27 @@
 @BuildGui().Build()
 
 @code {
-    private const double WalkStep = 1.5;
+    private const double WalkStep = SpatialNavigationMicroBundle.DefaultMovementStep;
+    private const bool UnknownUnlocked = false;
 
     private readonly ExploreExperienceMicroBundle Experience = new();
     private string? insideRoomId;
-    private bool unknownUnlocked;
+    private int walkGeneration;
 
     private static readonly IReadOnlyList<SpatialRoom> Rooms =
     [
         new("experience", "Experience Deck", "LIVING SPACE", 25, 28, 25, 42, 25, 42,
             "The sensory side of the Workshop. This is where an Experience becomes something a visitor can actually inhabit.",
-            "EXPERIENCE", "Living GUI / presentation"),
+            "EXPERIENCE", "Living GUI / presentation", 25, 42),
         new("engineering", "The Forge", "FSM WORKSHOP", 73, 30, 73, 46, 73, 46,
             "The Workshop's first real building: a place for shaping state, lifecycle, reusable substrates, and executable machinery.",
-            "FORGE", "FSM / lifecycle / composition"),
+            "FORGE", "FSM / lifecycle / composition", 30, 25),
         new("creation", "Creation Bay", "BUILDER SPACE", 34, 72, 34, 88, 34, 88,
             "The composition boundary. Focused capabilities become MicroBundles, then recipes, then executable Experiences.",
-            "CREATION", "MicroBundles / composition"),
+            "CREATION", "MicroBundles / composition", 31, 23),
         new("unknown", "Unknown Annex", "UNMAPPED", 79, 76, 79, 90, 79, 90,
             "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.",
-            "UNKNOWN", "Undisclosed")
+            "UNKNOWN", "Undisclosed", 24, 20)
     ];
 
     private double AvatarX => Experience.Navigation.X;
@@ -48,7 +49,7 @@
                 return "You did not open a menu. You walked here. That distinction matters. Experiences should feel inhabited, not merely displayed.";
 
             var nearest = Rooms
-                .Where(room => room.Id != "unknown" || unknownUnlocked)
+                .Where(room => room.Id != "unknown" || UnknownUnlocked)
                 .OrderBy(room => DistanceSquared(room.X, room.Y))
                 .FirstOrDefault();
 
@@ -88,13 +89,12 @@
         var world = SpatialWorldGuiBuilder.Build(
             this,
             Rooms,
-            unknownUnlocked,
+            UnknownUnlocked,
             AvatarX,
             AvatarY,
             TourKicker,
             TourMessage,
             HandleKeyDown,
-            MoveAvatar,
             MoveAvatarTo,
             InteractRoom);
 
@@ -112,7 +112,7 @@
         => WorkshopGui.Element(this, "span")
             .Style("position", "fixed")
             .Style("left", "50%")
-            .Style("top", "calc(50% - 24px)")
+            .Style("top", "calc(50% - 30px)")
             .Style("transform", "translateX(-50%)")
             .Style("z-index", "20")
             .Style("padding", ".12rem .35rem")
@@ -129,50 +129,63 @@
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
 
-    private void HandleKeyDown(KeyboardEventArgs args)
+    private async Task HandleKeyDown(KeyboardEventArgs args)
     {
-        switch (args.Key.ToLowerInvariant())
+        if (insideRoomId is not null)
+            return;
+
+        var dx = args.Key.ToLowerInvariant() switch
         {
-            case "w":
-            case "arrowup":
-                MoveAvatar(0, -WalkStep);
-                break;
-            case "s":
-            case "arrowdown":
-                MoveAvatar(0, WalkStep);
-                break;
-            case "a":
-            case "arrowleft":
-                MoveAvatar(-WalkStep, 0);
-                break;
-            case "d":
-            case "arrowright":
-                MoveAvatar(WalkStep, 0);
-                break;
+            "a" or "arrowleft" => -WalkStep,
+            "d" or "arrowright" => WalkStep,
+            _ => 0
+        };
+        var dy = args.Key.ToLowerInvariant() switch
+        {
+            "w" or "arrowup" => -WalkStep,
+            "s" or "arrowdown" => WalkStep,
+            _ => 0
+        };
+
+        if (dx == 0 && dy == 0)
+            return;
+
+        await MoveAvatarTo(Experience.Navigation.X + dx, Experience.Navigation.Y + dy);
+    }
+
+    private async Task MoveAvatarTo(double x, double y)
+    {
+        if (insideRoomId is not null)
+            return;
+
+        var generation = ++walkGeneration;
+        var obstacles = Rooms.Select(room => room.Footprint).ToArray();
+
+        if (!Experience.Pathfinding.TryPlan(
+                Experience.Navigation.X,
+                Experience.Navigation.Y,
+                x,
+                y,
+                obstacles))
+            return;
+
+        while (generation == walkGeneration && Experience.Pathfinding.TryTakeNext(out var waypoint))
+        {
+            Experience.Navigation.MoveTo(waypoint.X, waypoint.Y);
+            Experience.Update();
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(65);
         }
-    }
 
-    private void MoveAvatar(double dx, double dy)
-    {
-        if (insideRoomId is not null)
-            return;
-
-        Experience.Navigation.Move(dx, dy);
-    }
-
-    private void MoveAvatarTo(double x, double y)
-    {
-        if (insideRoomId is not null)
-            return;
-
-        Experience.Navigation.MoveTo(x, y);
+        if (generation == walkGeneration)
+            Experience.Pathfinding.ClearPath();
     }
 
     /// <summary>
     /// Spatial interaction is direct: clicking an enterable structure is the
-    /// interaction request. The visitor is first moved to the object's defined
-    /// interaction point, the camera visibly follows, and only then is the
-    /// object's experience activated.
+    /// interaction request. The visitor is first pathfound to the object's
+    /// defined interaction point, the camera visibly follows, and only then
+    /// is the object's Experience activated.
     /// </summary>
     private async Task InteractRoom(string id)
     {
@@ -183,13 +196,18 @@
         if (room is null)
             return;
 
-        if (room.Id == "unknown" && !unknownUnlocked)
+        if (room.Id == "unknown" && !UnknownUnlocked)
             return;
 
-        Experience.Navigation.ApproachEntrance(room);
-        await InvokeAsync(StateHasChanged);
-        await Task.Delay(300);
+        var targetX = room.EntranceX;
+        var targetY = room.EntranceY;
+        await MoveAvatarTo(targetX, targetY);
 
+        if (Math.Abs(Experience.Navigation.X - targetX) > 0.5 ||
+            Math.Abs(Experience.Navigation.Y - targetY) > 0.5)
+            return;
+
+        await Task.Delay(300);
         insideRoomId = room.Id;
     }
 

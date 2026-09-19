@@ -72,6 +72,7 @@ public static class HubCapabilityIds
     public const ulong Conference = 0x434F4E4645520101UL;
     public const ulong FsmForge = 0x464F524745000001UL;
     public const ulong SoftwarePatterns = 0x5041545445524E01UL;
+    public const ulong Pathfinding = 0x5041544846494E01UL;
 }
 
 /// <summary>

@@ -10,7 +10,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// Humans remain in the loop by choosing where to go, what to enter, and which
 /// capabilities to activate.
 /// </summary>
-public sealed class ExploreExperienceMicroBundle : IDisposable
+public sealed class ExploreExperienceMicroBundle : IDisposable, IExperience
 {
     public const int BundleId = 2100;
     public const ulong ExperienceId = 3002;
@@ -22,6 +22,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     {
         _lifecycle = new MicroBundle(BundleId, "WORKSHOP EXPLORE EXPERIENCE", new WebMicroBundleProvider());
         Navigation = new SpatialNavigationMicroBundle();
+        Pathfinding = new PathfindingMicroBundle();
         User = new UserMicroBundle();
         Conference = new ConferenceMicroBundle();
         Forge = new FsmForgeMicroBundle();
@@ -34,24 +35,30 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
 
     public SpatialNavigationMicroBundle Navigation { get; }
+    public PathfindingMicroBundle Pathfinding { get; }
     public UserMicroBundle User { get; }
     public ConferenceMicroBundle Conference { get; }
     public FsmForgeMicroBundle Forge { get; }
     public SoftwarePatternsMicroBundle SoftwarePatterns { get; }
     public SoftwarePatternsAnnotationMicroBundle SoftwarePatternsAnnotation { get; }
 
-    /// <summary>Experience identity is distinct from the MicroBundle that owns the composition lifecycle.</summary>
+    /// <inheritdoc />
     ulong IExperience.Id => ExperienceId;
 
+    /// <inheritdoc />
     string IExperience.Name => "WORKSHOP EXPLORE";
 
+    /// <inheritdoc />
     BundleVersion IExperience.Version => new(1, 0, 0);
 
+    /// <inheritdoc />
     OntologySignature IExperience.Ontology => new(1, 1, 1, 1, 1, 1, 1, 1, checked((int)ExperienceId));
 
+    /// <inheritdoc />
     IReadOnlyList<ulong> IExperience.MicroBundleIds =>
     [
         Navigation.Id,
+        Pathfinding.Id,
         User.Id,
         Conference.Id,
         Forge.Id,
@@ -59,21 +66,26 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         SoftwarePatternsAnnotation.Id
     ];
 
+    /// <inheritdoc />
     IReadOnlyList<ulong> IExperience.Capabilities =>
     [
         HubCapabilityIds.SpatialNavigation,
+        HubCapabilityIds.Pathfinding,
         HubCapabilityIds.VisitorIdentity,
         HubCapabilityIds.Conference,
         HubCapabilityIds.FsmForge,
         HubCapabilityIds.SoftwarePatterns
     ];
 
+    /// <inheritdoc />
     IReadOnlyList<ulong> IExperience.SensorySystems => [1];
 
+    /// <inheritdoc />
     IReadOnlyList<string> IExperience.ProcessingGroups =>
     [
         "MicroBundle_2100",
         "MicroBundle_2101",
+        "MicroBundle_2105",
         "MicroBundle_2102",
         "MicroBundle_2104",
         "MicroBundle_2103",
@@ -87,6 +99,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         if (_disposed) return;
         _lifecycle.Update();
         Navigation.Update();
+        Pathfinding.Update();
         User.Update();
         Conference.Update();
         Forge.Update();
@@ -104,6 +117,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         Forge.Dispose();
         Conference.Dispose();
         User.Dispose();
+        Pathfinding.Dispose();
         Navigation.Dispose();
         _lifecycle.Dispose();
         _disposed = true;
