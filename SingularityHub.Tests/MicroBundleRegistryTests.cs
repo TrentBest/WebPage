@@ -98,6 +98,7 @@ public sealed class MicroBundleRegistryTests
         public OntologySignature Ontology => MicroBundleRegistryTests.Ontology;
         public BundleVersion Version => new(1, 0, 0);
         public IReadOnlyList<ulong> Dependencies => Array.Empty<ulong>();
+        public void LoadBundle(IArbitrator arbitrator) { }
         public bool Arbitrate(IArbitrator arbitrator, int roundIndex) => false;
     }
 }
