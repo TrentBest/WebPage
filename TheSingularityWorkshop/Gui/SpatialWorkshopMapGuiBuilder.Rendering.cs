@@ -255,7 +255,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Style("z-index", "3")
                 .Title(reference is null
                     ? body.Name
-                    : $"{body.Name} // {reference.DiameterKm:N0} km // {reference.MassKg:E2} kg")
+                    : $"{body.Name} // {reference.Value.DiameterKm:N0} km // {reference.Value.MassKg:E2} kg")
                 .Content(WorkshopGui.Element(receiver, "span")
                     .Style("position", "absolute").Style("left", "50%").Style("top", "50%")
                     .Style("transform", "translate(-50%,-50%)")
