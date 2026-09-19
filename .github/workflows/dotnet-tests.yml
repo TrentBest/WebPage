@@ -3,12 +3,13 @@ name: .NET Tests
 on:
   push:
     branches:
-      - '**'
+      - master
+      - development
   pull_request:
     branches:
       - master
-      - feature/public-facing-workshop
-      - feature/experience-core-architecture
+      - development
+  workflow_dispatch:
 
 jobs:
   test:
