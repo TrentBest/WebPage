@@ -60,6 +60,54 @@
                 if(type==='dotnetwasm'||defaultUri.endsWith('.wasm')) return (async function(){ const response=await fetch(defaultUri,{cache:'no-store'}); if(!response.ok) throw new Error("Failed to load: "+name); const buffer=await response.arrayBuffer(); return new Response(buffer,{headers:{"content-type":"application/wasm"}}); })();
             }
         });
+        let workshopRumbleContext=null, workshopRumbleMaster=null, workshopRumbleSources=[];
+        function startWorkshopRumble(){
+            try{
+                const AudioContext=window.AudioContext||window.webkitAudioContext;
+                if(!AudioContext)return;
+                if(workshopRumbleContext){
+                    if(workshopRumbleContext.state==='suspended') workshopRumbleContext.resume().catch(()=>{});
+                    return;
+                }
+                const context=new AudioContext();
+                workshopRumbleContext=context;
+                workshopRumbleMaster=context.createGain();
+                workshopRumbleMaster.gain.setValueAtTime(0.0001,context.currentTime);
+                workshopRumbleMaster.connect(context.destination);
+                const low=context.createOscillator();
+                const sub=context.createOscillator();
+                const lowGain=context.createGain();
+                const subGain=context.createGain();
+                low.type='sine'; low.frequency.value=38;
+                sub.type='sine'; sub.frequency.value=57;
+                lowGain.gain.value=.55; subGain.gain.value=.24;
+                low.connect(lowGain).connect(workshopRumbleMaster);
+                sub.connect(subGain).connect(workshopRumbleMaster);
+                const buffer=context.createBuffer(1,context.sampleRate*2,context.sampleRate);
+                const data=buffer.getChannelData(0);
+                for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*.32;
+                const noise=context.createBufferSource();
+                const filter=context.createBiquadFilter();
+                const noiseGain=context.createGain();
+                noise.buffer=buffer; noise.loop=true; filter.type='lowpass'; filter.frequency.value=115; filter.Q.value=.7; noiseGain.gain.value=.12;
+                noise.connect(filter).connect(noiseGain).connect(workshopRumbleMaster);
+                low.start(); sub.start(); noise.start();
+                workshopRumbleSources=[low,sub,noise];
+                const now=context.currentTime;
+                workshopRumbleMaster.gain.exponentialRampToValueAtTime(.018,now+2);
+                workshopRumbleMaster.gain.exponentialRampToValueAtTime(.045,now+8);
+                context.resume().catch(()=>{});
+            }catch(error){ console.debug('[Workshop Rumble] audio unavailable:',error); }
+        }
+        function stopWorkshopRumble(){
+            if(!workshopRumbleContext||!workshopRumbleMaster)return;
+            const context=workshopRumbleContext;
+            const now=context.currentTime;
+            workshopRumbleMaster.gain.cancelScheduledValues(now);
+            workshopRumbleMaster.gain.setValueAtTime(Math.max(.0001,workshopRumbleMaster.gain.value),now);
+            workshopRumbleMaster.gain.exponentialRampToValueAtTime(.0001,now+1.2);
+            window.setTimeout(()=>{for(const source of workshopRumbleSources){try{source.stop();}catch{}}try{context.close();}catch{}workshopRumbleContext=null;workshopRumbleMaster=null;workshopRumbleSources=[];},1300);
+        }
         window.interop = {
             initUnity:function(canvasId){
                 console.log("[Interop] 1. initUnity called for canvas:",canvasId);
@@ -77,6 +125,23 @@
             workshopExploreGardenVisited:function(){ return localStorage.getItem("WorkshopExploreGardenVisited") === "true"; },
             markWorkshopExploreGardenVisited:function(){ localStorage.setItem("WorkshopExploreGardenVisited","true"); }
         };
+
+        document.addEventListener('pointerenter',event=>{
+            const target=event.target instanceof Element?event.target:null;
+            if(target?.closest('[data-workshop-rumble],.monolith-btn')){
+                startWorkshopRumble();
+                const narrative=target.closest('[data-workshop-rumble]');
+                if(narrative) narrative.dataset.rumbleActive='true';
+            }
+        },true);
+        document.addEventListener('pointerdown',event=>{
+            const target=event.target instanceof Element?event.target:null;
+            if(target?.closest('[data-workshop-rumble],.monolith-btn')){
+                startWorkshopRumble();
+                const narrative=document.querySelector('[data-workshop-rumble]');
+                if(narrative) narrative.dataset.rumbleActive='true';
+            }
+        },{passive:true});
 
         (function installWarningExperience(){
             let activeOverlay=null,animationFrame=0,pauseUntil=0,tinyHeader=null;
