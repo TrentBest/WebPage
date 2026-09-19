@@ -193,10 +193,6 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("min-height", "0").Style("overflow", "hidden")
             .Style("border", $"1px solid {Cyan}55").Style("background", "#01060d");
 
-        var transform = $"scale({Math.Clamp(zoom, .75, 2.5):0.###})";
-        frame.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("inset", "0")
-            .Style("transform", transform).Style("transform-origin", "center center"));
-
         frame.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("right", ".5rem").Style("bottom", ".5rem")
             .Style("z-index", "10").Style("display", "flex").Style("gap", ".25rem")
             .Content(WorkshopGui.Button(receiver).Label("−").Style("width", "2rem").Style("height", "2rem").Style("cursor", "pointer").OnClick(() => setZoom?.Invoke(Math.Max(.75, zoom - .15))))
