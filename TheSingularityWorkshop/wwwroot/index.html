@@ -142,6 +142,10 @@
                 if(narrative) narrative.dataset.rumbleActive='true';
             }
         },{passive:true});
+        document.addEventListener('click',event=>{
+            const target=event.target instanceof Element?event.target:null;
+            if(target?.closest('.monolith-btn')) stopWorkshopRumble();
+        },true);
 
         (function installWarningExperience(){
             let activeOverlay=null,animationFrame=0,pauseUntil=0,tinyHeader=null;
