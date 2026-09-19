@@ -6,12 +6,12 @@ namespace SingularityHub.Tests;
 /// <summary>Incremental Unit Test 25 — spatial geometry is explicit data shared by rendering and navigation.</summary>
 public sealed class SpatialGeometryTests
 {
-    [Fact(DisplayName = "Incremental Unit Test 25 — Workshop begins at the clear world origin")]
+    [Fact(DisplayName = "Incremental Unit Test 25 — Workshop begins at the clear Workshop center")]
     public void WorkshopStartsAtWorldCenter()
     {
         var scene = SpatialWorkshopScene.CreateDefault();
 
-        Assert.Equal(new SpatialPoint(50, 50), scene.StartingPosition);
+        Assert.Equal(new SpatialPoint(50, 58), scene.StartingPosition);
         Assert.DoesNotContain(scene.Interactables, item => Contains(item.Bounds, scene.StartingPosition));
     }
 
