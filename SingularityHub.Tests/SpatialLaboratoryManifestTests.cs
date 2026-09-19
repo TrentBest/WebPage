@@ -31,6 +31,7 @@ public sealed class SpatialLaboratoryManifestTests
         Assert.Equal("simulation", lab.FindFloorById("simulation")!.Value.DomainId);
         Assert.Contains(lab.Floors, x => x.Name == "MATERIALS SCIENCE");
         Assert.Contains(lab.Simulators, x => x.Id == "solar-system");
-        Assert.Equal("PROVISIONAL", SpatialLaboratoryManifest.PhysicsEngine.Status);
+        Assert.Equal("tbd-physics-engine", SpatialLaboratoryManifest.PhysicsEngine.Id);
+        Assert.Equal("TBD PHYSICS ENGINE", SpatialLaboratoryManifest.PhysicsEngine.Name);
     }
 }
