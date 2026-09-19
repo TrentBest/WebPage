@@ -1,5 +1,6 @@
 namespace TheSingularityWorkshop.Gui;
 
+using System;
 using System.Collections.Generic;
 
 /// <summary>Small deterministic simulation substrate for living non-player citizens.</summary>
