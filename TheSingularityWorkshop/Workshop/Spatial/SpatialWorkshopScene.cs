@@ -133,7 +133,9 @@ public sealed class SpatialInteractable
         InteractionPoint = interactionPoint;
         HitRegion = hitRegion;
         ExperienceId = experienceId;
-        Place = SpatialPlaceCatalog.Resolve(experienceId);
+        // Generic geometry/interactions may exist before they are attached to an Explore place.
+        // Root-world scenes are validated by SpatialWorkshopScene through SpatialPlaceCatalog.Validate.
+        Place = SpatialPlaceCatalog.TryResolve(experienceId, out var place) ? place : null;
         InteractionPoints = interactionPoints is { Count: > 0 } ? interactionPoints : [new SpatialInteractionPoint("default", "Primary", interactionPoint)];
         Openings = openings ?? [];
     }
@@ -150,7 +152,7 @@ public sealed class SpatialInteractable
     public SpatialBounds InteractionPoint { get; }
     public ISpatialHitRegion HitRegion { get; }
     public string ExperienceId { get; }
-    public SpatialPlace Place { get; }
+    public SpatialPlace? Place { get; }
     public IReadOnlyList<SpatialInteractionPoint> InteractionPoints { get; }
     public IReadOnlyList<SpatialOpening> Openings { get; }
     public bool IsBreathing { get; private set; }
