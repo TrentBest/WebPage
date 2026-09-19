@@ -71,7 +71,7 @@ public static class WorkshopGatewayGuiBuilder
         warning.Content(
             WorkshopGui.Element(receiver, "div")
                 .Class("warning-body")
-                .Text(warningBody)
+                .Text(warningBody + " ")
                 .Content(WorkshopGui.Element(receiver, "span").Class("warning-final").Text(warningFinal)));
         stage.Content(warning);
 
