@@ -1,3 +1,4 @@
+using System.Linq;
 using TheSingularityWorkshop.Gui;
 using Xunit;
 
@@ -5,12 +6,10 @@ namespace SingularityHub.Tests;
 
 public sealed class SingularityMansionStressTests
 {
-    [Fact(DisplayName = "Incremental Unit Test 29 — Workshop contains the Singularity Mansion")]
-    public void WorkshopContainsMansionInteractable()
+    [Fact(DisplayName = "Incremental Unit Test 29 — Campus catalog contains the Singularity Mansion")]
+    public void CampusCatalogContainsMansion()
     {
-        var scene = SpatialWorkshopScene.CreateDefault();
-
-        var mansion = Assert.Single(scene.Interactables.Where(item => item.ExperienceId == "mansion"));
+        var mansion = Assert.Single(SingularityCampusCatalog.Buildings.Where(item => item.Id == "singularity-mansion"));
 
         Assert.Equal("Singularity Mansion", mansion.Name);
         Assert.True(mansion.Bounds.Width >= 30);
@@ -21,9 +20,11 @@ public sealed class SingularityMansionStressTests
     public void MansionEntranceIsReachable()
     {
         var scene = SpatialWorkshopScene.CreateDefault();
-        var mansion = Assert.Single(scene.Interactables.Where(item => item.ExperienceId == "mansion"));
-        var entrance = mansion.InteractionPoints[0].Bounds;
-        var target = new SpatialPoint(entrance.X + entrance.Width / 2, entrance.Y + entrance.Height / 2);
+        var mansion = Assert.Single(SingularityCampusCatalog.Buildings.Where(item => item.Id == "singularity-mansion"));
+        var entrance = mansion.Openings[0];
+        var target = new SpatialPoint(
+            mansion.Bounds.X + entrance.Offset,
+            mansion.Bounds.Y + entrance.SecondaryOffset);
 
         var path = SpatialGeometryEngine.FindPath(scene.StartingPosition, target, SpatialGeometryEngine.FromInteractables(scene.Interactables));
 
