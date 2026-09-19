@@ -99,6 +99,28 @@
                 context.resume().catch(()=>{});
             }catch(error){ console.debug('[Workshop Rumble] audio unavailable:',error); }
         }
+        function forgeLatchCue(){
+            try{
+                const AudioContext=window.AudioContext||window.webkitAudioContext;
+                if(!AudioContext)return;
+                const context=workshopRumbleContext||new AudioContext();
+                const gain=context.createGain();
+                const oscillator=context.createOscillator();
+                const filter=context.createBiquadFilter();
+                oscillator.type='sine';
+                oscillator.frequency.setValueAtTime(82,context.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(38,context.currentTime+.22);
+                filter.type='lowpass';
+                filter.frequency.value=180;
+                gain.gain.setValueAtTime(.0001,context.currentTime);
+                gain.gain.exponentialRampToValueAtTime(.16,context.currentTime+.025);
+                gain.gain.exponentialRampToValueAtTime(.0001,context.currentTime+.32);
+                oscillator.connect(filter).connect(gain).connect(context.destination);
+                oscillator.start();
+                oscillator.stop(context.currentTime+.34);
+                context.resume().catch(()=>{});
+            }catch(error){ console.debug('[Forge Latch] audio unavailable:',error); }
+        }
         function stopWorkshopRumble(){
             if(!workshopRumbleContext||!workshopRumbleMaster)return;
             const context=workshopRumbleContext;
@@ -217,7 +239,11 @@
                 animationFrame=requestAnimationFrame(runAutoScroll);
             }
             document.addEventListener("click",event=>{const target=event.target instanceof Element?event.target:null;const warning=target?.closest(".workshop-warning");if(warning){event.preventDefault();openExperience();}});
-            document.addEventListener("keydown",event=>{if(event.key==="Escape"&&activeOverlay)closeExperience();});
+            document.addEventListener("click",event=>{
+            const target=event.target instanceof Element?event.target:null;
+            if(target?.closest('[data-forge-unlock="true"]')) forgeLatchCue();
+        });
+        document.addEventListener("keydown",event=>{if(event.key==="Escape"&&activeOverlay)closeExperience();});
         })();
     </script>
 </body>
