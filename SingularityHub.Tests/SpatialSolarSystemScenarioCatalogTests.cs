@@ -10,9 +10,9 @@ public sealed class SpatialSolarSystemScenarioCatalogTests
     {
         var catalog = SpatialSolarSystemScenarioCatalog.CreateDefault();
 
-        Assert.Equal(SpatialSolarSystemModelKind.Astronomical, catalog.Find("solar-system")!.Kind);
-        Assert.Equal(SpatialSolarSystemModelKind.FictionalStory, catalog.Find("avatar-story-system")!.Kind);
-        Assert.Equal(SpatialSolarSystemModelKind.GameHomage, catalog.Find("asteroids-2d")!.Kind);
-        Assert.Equal(SpatialSolarSystemModelKind.Experimental, catalog.Find("asteroids-3d")!.Kind);
+        Assert.Equal(SpatialSolarSystemModelKind.Astronomical, catalog.Find("solar-system")!.Value.Kind);
+        Assert.Equal(SpatialSolarSystemModelKind.FictionalStory, catalog.Find("avatar-story-system")!.Value.Kind);
+        Assert.Equal(SpatialSolarSystemModelKind.GameHomage, catalog.Find("asteroids-2d")!.Value.Kind);
+        Assert.Equal(SpatialSolarSystemModelKind.Experimental, catalog.Find("asteroids-3d")!.Value.Kind);
     }
 }
