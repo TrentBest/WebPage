@@ -104,6 +104,11 @@ public static class SingularityMansionLineworkFactory
             AddDoor(linework, x, 30, 3, horizontal: true);
             AddDoor(linework, x, 67, 3, horizontal: true);
         }
+
+        AddAlcove(linework, 8, 36, 18, 12, "east");
+        AddAlcove(linework, 74, 36, 18, 12, "west");
+        AddAlcove(linework, 40, 10, 20, 12, "south");
+        AddAlcove(linework, 40, 74, 20, 12, "north");
     }
 
     private static void AddCourtyards(SpatialLinework linework)
@@ -150,6 +155,12 @@ public static class SingularityMansionLineworkFactory
     {
         AddStairs(linework, 27, 42, 7, 18, 18);
         AddStairs(linework, 66, 42, 7, 18, 18);
+
+        AddRectangle(linework, 25.5, 48, 10, 6);
+        AddRectangle(linework, 64.5, 48, 10, 6);
+        AddRectangle(linework, 43, 50, 14, 6);
+        AddRectangle(linework, 43, 44, 14, 6);
+
         AddStairs(linework, 42, 25, 16, 5, 16);
         AddStairs(linework, 42, 70, 16, 5, 16);
 
@@ -158,6 +169,11 @@ public static class SingularityMansionLineworkFactory
         AddLine(linework, 66, 41, 73, 41);
         AddLine(linework, 42, 24, 58, 24);
         AddLine(linework, 42, 76, 58, 76);
+
+        // Ceremonial front approach and landing.
+        AddStairs(linework, 44, 84, 12, 8, 10);
+        AddRectangle(linework, 42, 90, 16, 5);
+        AddDoor(linework, 50, 84, 4, horizontal: true);
     }
 
     private static void AddTowers(SpatialLinework linework)
@@ -246,6 +262,38 @@ public static class SingularityMansionLineworkFactory
             AddLine(linework, x, 20, x, 80);
             AddLine(linework, x + .35, 20, x + .35, 80);
         }
+    }
+
+    private static void AddAlcove(SpatialLinework linework, double x, double y, double width, double height, string openingSide)
+    {
+        AddRectangle(linework, x, y, width, height);
+        AddRectangle(linework, x + 1.25, y + 1.25, width - 2.5, height - 2.5);
+
+        switch (openingSide)
+        {
+            case "east":
+                AddLine(linework, x + width - 1.25, y + 2, x + width - 1.25, y + height - 2);
+                AddLine(linework, x + width - 1.25, y + height / 2 - 2, x + width + 1, y + height / 2 - 2);
+                AddLine(linework, x + width - 1.25, y + height / 2 + 2, x + width + 1, y + height / 2 + 2);
+                break;
+            case "west":
+                AddLine(linework, x + 1.25, y + 2, x + 1.25, y + height - 2);
+                AddLine(linework, x + 1.25, y + height / 2 - 2, x - 1, y + height / 2 - 2);
+                AddLine(linework, x + 1.25, y + height / 2 + 2, x - 1, y + height / 2 + 2);
+                break;
+            case "south":
+                AddLine(linework, x + 2, y + height - 1.25, x + width - 2, y + height - 1.25);
+                AddLine(linework, x + width / 2 - 2, y + height - 1.25, x + width / 2 - 2, y + height + 1);
+                AddLine(linework, x + width / 2 + 2, y + height - 1.25, x + width / 2 + 2, y + height + 1);
+                break;
+            case "north":
+                AddLine(linework, x + 2, y + 1.25, x + width - 2, y + 1.25);
+                AddLine(linework, x + width / 2 - 2, y + 1.25, x + width / 2 - 2, y - 1);
+                AddLine(linework, x + width / 2 + 2, y + 1.25, x + width / 2 + 2, y - 1);
+                break;
+        }
+
+        AddCircle(linework, x + width / 2, y + height / 2, Math.Min(width, height) * .18, 16);
     }
 
     private static void AddFurnitureCluster(SpatialLinework linework, double cx, double cy, double size)
