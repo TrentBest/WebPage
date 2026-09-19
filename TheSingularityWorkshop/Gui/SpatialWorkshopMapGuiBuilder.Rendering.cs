@@ -23,7 +23,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("font-family", "Consolas, 'Courier New', monospace");
 
         root.Content(WorkshopGui.Element(receiver, "style").Text(
-            "@keyframes workshop-map-pulse{0%,100%{opacity:.62;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}"));
+            "@keyframes workshop-map-pulse{0%,100%{opacity:.62;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}@keyframes workshop-map-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.42);transform:scale(1.035)}}.workshop-map-interactable:hover,.workshop-map-structure:hover{animation:workshop-map-breathe 1.35s ease-in-out infinite;transform-origin:center center}.workshop-map-interactable:focus-visible,.workshop-map-structure:focus-visible{outline:1px solid #ffd34d;outline-offset:2px}@media(prefers-reduced-motion:reduce){.workshop-map-interactable:hover,.workshop-map-structure:hover{animation:none;filter:brightness(1.2);transform:scale(1.01)}}"));
 
         var panel = WorkshopGui.Panel(receiver)
             .Style("width", "min(1280px,98vw)").Style("height", "min(92vh,900px)")
@@ -121,6 +121,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             var b = item.Bounds;
             var accent = Accent(item.ExperienceId);
             map.Content(WorkshopGui.Button(receiver)
+                .Class("workshop-map-interactable")
                 .Style("position", "absolute").Style("left", $"{b.X:0.##}%").Style("top", $"{b.Y:0.##}%")
                 .Style("width", $"{Math.Max(b.Width, 1.5d):0.##}%").Style("height", $"{Math.Max(b.Height, 1.5d):0.##}%")
                 .Style("box-sizing", "border-box").Style("padding", "0")
@@ -150,6 +151,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             var b = structure.Bounds;
             var accent = CityAccent(structure.Kind);
             map.Content(WorkshopGui.Element(receiver, "div")
+                .Class("workshop-map-structure")
                 .Style("position", "absolute").Style("left", $"{b.X:0.##}%").Style("top", $"{b.Y:0.##}%")
                 .Style("width", $"{b.Width:0.##}%").Style("height", $"{b.Height:0.##}%")
                 .Style("box-sizing", "border-box").Style("border", $"1px dashed {accent}aa")
@@ -162,6 +164,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
 
         var workshop = SingularityCityCatalog.WorkshopDistrict;
         map.Content(WorkshopGui.Button(receiver)
+            .Class("workshop-map-interactable")
             .Style("position", "absolute").Style("left", $"{workshop.X}%").Style("top", $"{workshop.Y}%")
             .Style("width", $"{workshop.Width}%").Style("height", $"{workshop.Height}%")
             .Style("box-sizing", "border-box").Style("border", $"2px solid {Yellow}dd")
@@ -187,6 +190,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
         foreach (var region in SpatialWorldRegionCatalog.Regions)
         {
             map.Content(WorkshopGui.Element(receiver, "div")
+                .Class("workshop-map-structure")
                 .Style("position", "absolute").Style("left", $"{region.Bounds.X}%").Style("top", $"{region.Bounds.Y}%")
                 .Style("width", $"{region.Bounds.Width}%").Style("height", $"{region.Bounds.Height}%")
                 .Style("border", $"1px dashed {Cyan}55").Style("background", $"{Cyan}06")
