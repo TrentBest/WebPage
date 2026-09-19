@@ -54,4 +54,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 146)] [Fact(DisplayName = "V0.0.146 — Spatial_Zoom_Map_And_Construction_Site")] public void V0_0_146_SpatialZoomMapAndConstructionSite() => Assert.Equal("0.0.146", "0.0.146");
     [ArchitectureTest(0, 0, 147)] [Fact(DisplayName = "V0.0.147 — AEC_Remote_Office_And_Singularity_Taxi_Foundations")] public void V0_0_147_AecRemoteOfficeAndSingularityTaxiFoundations() => Assert.Equal("0.0.147", "0.0.147");    [ArchitectureTest(0, 0, 148)] [Fact(DisplayName = "V0.0.148 — First_Visit_Explore_Begins_In_The_Spatial_Garden")] public void V0_0_148_FirstVisitExploreBeginsInTheSpatialGarden() => Assert.Equal("0.0.148", "0.0.148");
 
+    [ArchitectureTest(0, 0, 149)] [Fact(DisplayName = "V0.0.149 — Documentation_And_Engineering_Standards_Catch_Up_To_FSM_API")] public void V0_0_149_DocumentationAndEngineeringStandardsCatchUpToFsmApi() => Assert.Equal("0.0.149", "0.0.149");
 }
