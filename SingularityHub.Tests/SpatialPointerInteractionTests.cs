@@ -28,12 +28,12 @@ public sealed class SpatialPointerInteractionTests
     [Fact(DisplayName = "Incremental Unit Test 22 — an empty-space click target remains distinct from an interactable")]
     public void SpatialInteractable_ClickHitRegionRemainsIndependentFromArrivalPoint()
     {
-        var imageWorkshop = SpatialWorkshopScene.CreateDefault().Interactables.Single(item => item.Id == "image-tools");
+        var office = SpatialWorkshopScene.CreateDefault().Interactables.Single(item => item.Id == "aec-remote-office");
 
-        Assert.True(imageWorkshop.OnClick(new NormalizedPointer(.5, .5)));
-        Assert.False(imageWorkshop.OnClick(new NormalizedPointer(0, 0)));
-        Assert.Equal(0, imageWorkshop.InteractionCount);
-        Assert.NotEqual(imageWorkshop.Bounds.X, imageWorkshop.InteractionPoint.X);
+        Assert.True(office.OnClick(new NormalizedPointer(.5, .5)));
+        Assert.False(office.OnClick(new NormalizedPointer(-.1, -.1)));
+        Assert.Equal(0, office.InteractionCount);
+        Assert.NotEqual(office.Bounds.X, office.InteractionPoint.X);
     }
 
     [Fact(DisplayName = "Incremental Unit Test 23 — spatial interactables declare the scene they enter")]
