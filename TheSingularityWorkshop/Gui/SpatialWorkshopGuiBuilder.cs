@@ -147,6 +147,7 @@ public static class SpatialWorkshopGuiBuilder
     {
         var b = item.Bounds;
         var surface = WorkshopGui.Element(receiver, "div")
+            .Class("workshop-interactable")
             .Style("position", "absolute")
             .Style("left", $"{SpatialCamera.WorldToVw(b.X, zoom):0.###}vw")
             .Style("top", $"{SpatialCamera.WorldToVh(b.Y, zoom):0.###}vh")
@@ -248,5 +249,5 @@ public static class SpatialWorkshopGuiBuilder
             .Style("letter-spacing", ".18em").Text("⚠ UNDER CONSTRUCTION // SCHEMATIC MODE");
 
     private static ElementBuilder Styles(object receiver)
-        => WorkshopGui.Element(receiver, "style").Text("@keyframes workshop-interactable-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.8);transform:scale(1.025)}}@keyframes workshop-vehicle-crane{0%,100%{translate:0 0}50%{translate:8vw 2vh}}@keyframes workshop-vehicle-rover{0%,100%{translate:0 0}50%{translate:-7vw 1vh}}@keyframes workshop-vehicle-lifter{0%,100%{translate:0 0}50%{translate:5vw -2vh}}@keyframes workshop-vehicle-backhoe{0%,100%{translate:0 0}50%{translate:6vw -1vh}}");
+        => WorkshopGui.Element(receiver, "style").Text("@keyframes workshop-interactable-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.8);transform:scale(1.025)}}.workshop-interactable:hover{animation:workshop-interactable-breathe 1.25s ease-in-out infinite}.workshop-interactable:focus-visible{outline:1px solid #ffd34d;outline-offset:2px}@media(prefers-reduced-motion:reduce){.workshop-interactable:hover{animation:none;filter:brightness(1.2);transform:scale(1.01)}}@keyframes workshop-vehicle-crane{0%,100%{translate:0 0}50%{translate:8vw 2vh}}@keyframes workshop-vehicle-rover{0%,100%{translate:0 0}50%{translate:-7vw 1vh}}@keyframes workshop-vehicle-lifter{0%,100%{translate:0 0}50%{translate:5vw -2vh}}@keyframes workshop-vehicle-backhoe{0%,100%{translate:0 0}50%{translate:6vw -1vh}}");
 }
