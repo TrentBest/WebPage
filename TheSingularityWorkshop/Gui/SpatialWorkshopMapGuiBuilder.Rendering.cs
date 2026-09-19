@@ -42,7 +42,14 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Style("letter-spacing", ".22em").Text(moniker.ToUpperInvariant()))
             .Content(WorkshopGui.Element(receiver, "div")
                 .Style("color", Yellow).Style("font-size", ".5rem").Style("letter-spacing", ".18em")
-                .Text(scope == SpatialMapScope.Workshop ? "WORKSHOP CAMPUS // COMPLETE MAP" : "SINGULARITY CITY // DEVELOPMENT MAP")));
+                .Text(scope switch
+            {
+                SpatialMapScope.Workshop => "WORKSHOP CAMPUS // COMPLETE MAP",
+                SpatialMapScope.City => "SINGULARITY CITY // DEVELOPMENT MAP",
+                SpatialMapScope.World => "WORLD // DEVELOPMENT MAP",
+                SpatialMapScope.SolarSystem => "SOLAR SYSTEM // NASA REFERENCE DATA",
+                _ => "SPATIAL MAP"
+            })));
 
         var scopeBar = WorkshopGui.Element(receiver, "div")
             .Style("display", "flex").Style("gap", ".35rem").Style("flex-wrap", "wrap")
@@ -50,6 +57,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Content(ScopeButton(receiver, "WORKSHOP", SpatialMapScope.Workshop, scope, setScope))
             .Content(ScopeButton(receiver, "SINGULARITY CITY", SpatialMapScope.City, scope, setScope))
             .Content(ScopeButton(receiver, "WORLD // UNDER CONSTRUCTION", SpatialMapScope.World, scope, setScope))
+            .Content(ScopeButton(receiver, "SOLAR SYSTEM", SpatialMapScope.SolarSystem, scope, setScope))
             .Content(WorkshopGui.Element(receiver, "span").Style("margin-left", "auto").Style("color", "#8fa7b2").Style("font-size", ".43rem")
                 .Text("SCROLL THE MAP LIST • SCALE WITH + / −"));
 
@@ -70,7 +78,9 @@ public static partial class SpatialWorkshopMapGuiBuilder
             ? Directory(receiver, scene, selectDestination)
             : scope == SpatialMapScope.City
                 ? CityDirectory(receiver, selectDestination)
-                : WorldDirectory(receiver));
+                : scope == SpatialMapScope.World
+                    ? WorldDirectory(receiver)
+                    : SolarSystemDirectory(receiver));
 
         panel.Content(layout);
         panel.Content(WorkshopGui.Element(receiver, "div")
@@ -185,6 +195,107 @@ public static partial class SpatialWorkshopMapGuiBuilder
         }
 
         return AddYouAreHere(receiver, map, 50, 30);
+    }
+
+    private static ElementBuilder SolarSystemMap(object receiver, double zoom, Action<double>? setZoom)
+    {
+        var manifest = SpatialSolarSystemManifest.CreateDefault();
+        var data = SpatialSolarSystemDataManifest.Nasa;
+        var map = MapFrame(receiver, zoom, setZoom);
+
+        map.Content(WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 70")
+            .Style("position", "absolute").Style("inset", "0").Style("width", "100%").Style("height", "100%")
+            .Style("pointer-events", "none").Content(Grid(receiver)));
+
+        // Schematic orbit bands: distances are represented for legibility, while the
+        // NASA/JPL values remain attached to the semantic objects in the data panel.
+        foreach (var body in manifest.Bodies.Where(x => x.Kind is SpatialCelestialBodyKind.Planet))
+        {
+            var orbitRadius = body.Id switch
+            {
+                "mercury" => 9d,
+                "venus" => 15d,
+                "earth" => 22d,
+                "mars" => 29d,
+                "jupiter" => 39d,
+                "saturn" => 49d,
+                "uranus" => 58d,
+                "neptune" => 67d,
+                _ => 0d
+            };
+
+            if (orbitRadius <= 0) continue;
+
+            map.Content(WorkshopGui.Element(receiver, "div")
+                .Style("position", "absolute").Style("left", "50%").Style("top", "50%")
+                .Style("width", $"{orbitRadius * 2}%").Style("height", $"{orbitRadius * 2}%")
+                .Style("transform", "translate(-50%,-50%)")
+                .Style("border", "1px dashed rgba(0,234,255,.22)")
+                .Style("border-radius", "50%").Style("pointer-events", "none"));
+        }
+
+        foreach (var body in manifest.Bodies)
+        {
+            var point = body.Position;
+            var reference = data.Find(body.Id);
+            var accent = body.Kind == SpatialCelestialBodyKind.Star ? Yellow : Cyan;
+            var size = body.Kind == SpatialCelestialBodyKind.Star ? 8d : Math.Clamp(body.DisplayRadius * 1.7d, 2d, 8d);
+
+            map.Content(WorkshopGui.Element(receiver, "div")
+                .Style("position", "absolute")
+                .Style("left", $"{point.X}%").Style("top", $"{point.Y * .70}%")
+                .Style("width", $"{size}%").Style("aspect-ratio", "1")
+                .Style("transform", "translate(-50%,-50%)")
+                .Style("border", $"1px solid {accent}")
+                .Style("border-radius", "50%")
+                .Style("background", $"{accent}22")
+                .Style("box-shadow", $"0 0 18px {accent}55")
+                .Style("z-index", "3")
+                .Title(reference is null
+                    ? body.Name
+                    : $"{body.Name} // {reference.DiameterKm:N0} km // {reference.MassKg:E2} kg")
+                .Content(WorkshopGui.Element(receiver, "span")
+                    .Style("position", "absolute").Style("left", "50%").Style("top", "50%")
+                    .Style("transform", "translate(-50%,-50%)")
+                    .Style("font-size", ".36rem").Style("font-weight", "700")
+                    .Style("color", White).Style("white-space", "nowrap")
+                    .Text(body.Name)));
+        }
+
+        return map;
+    }
+
+    private static ElementBuilder SolarSystemDirectory(object receiver)
+    {
+        var directory = DirectoryFrame(receiver, "SOLAR SYSTEM // REPRESENTATIONAL DATA");
+        var data = SpatialSolarSystemDataManifest.Nasa;
+
+        directory.Content(WorkshopGui.Element(receiver, "div")
+            .Style("padding", ".45rem").Style("margin-bottom", ".45rem")
+            .Style("border", $"1px solid {Yellow}44").Style("color", Yellow)
+            .Style("font-size", ".42rem").Style("line-height", "1.5")
+            .Text("SCHEMATIC MAP • PHYSICAL VALUES FROM NASA • DYNAMIC EPHEMERIDES RESERVED FOR JPL HORIZONS"));
+
+        foreach (var body in data.Bodies)
+        {
+            directory.Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin", ".2rem 0").Style("padding", ".35rem")
+                .Style("border-left", $"3px solid {Cyan}")
+                .Style("background", "rgba(255,255,255,.02)")
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("color", White).Style("font-size", ".43rem").Text(body.Name))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("color", "#8299a4").Style("font-size", ".36rem")
+                    .Text($"{body.DiameterKm:N0} km • {body.MassKg:E2} kg • {body.SurfaceGravityMS2:0.0} m/s² • {body.MeanDistanceFromSunMillionKm:0.0} Mkm")));
+        }
+
+        directory.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".5rem").Style("padding", ".4rem")
+            .Style("border", $"1px solid {Cyan}33").Style("color", "#8fa7b2")
+            .Style("font-size", ".35rem").Style("line-height", "1.5")
+            .Text("NASA SOURCE: nssdc.gsfc.nasa.gov/planetary/factsheet/ • JPL HORIZONS: ssd.jpl.nasa.gov/horizons/"));
+
+        return directory;
     }
 
     private static ElementBuilder MapFrame(object receiver, double zoom, Action<double>? setZoom)
