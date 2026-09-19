@@ -332,7 +332,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
 
     private static string CityAccent(SpatialCityStructureKind kind) => kind switch
     {
-        SpatialCityStructureKind.Civic or SpatialCityStructureKind.Government => Magenta,
+        SpatialCityStructureKind.Civic => Magenta,
         SpatialCityStructureKind.Transport or SpatialCityStructureKind.Port => Cyan,
         SpatialCityStructureKind.Education or SpatialCityStructureKind.Science or SpatialCityStructureKind.Technology => Yellow,
         SpatialCityStructureKind.Park => Green,
