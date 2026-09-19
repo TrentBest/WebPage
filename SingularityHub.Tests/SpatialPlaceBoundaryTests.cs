@@ -59,11 +59,10 @@ public sealed class SpatialPlaceBoundaryTests
     {
         var place = SpatialPlaceCatalog.Resolve("singularity-shipyard");
         var scene = SpatialWorkshopScene.CreateDefault();
-        var interactable = scene.Interactables.Single(x => x.Id == "singularity-shipyard");
 
-        Assert.Same(place, interactable.Place);
+        Assert.DoesNotContain(scene.Interactables, x => x.Id == "singularity-shipyard");
         Assert.Equal(new SpatialPoint(50, 72), place.EntryPoint);
-        Assert.Equal("singularity-shipyard", interactable.ExperienceId);
+        Assert.Equal("singularity-shipyard", place.SceneId);
     }
 
     [Fact]
