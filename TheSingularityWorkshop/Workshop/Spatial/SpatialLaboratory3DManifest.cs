@@ -1,6 +1,7 @@
 namespace TheSingularityWorkshop.Gui;
 
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// The laboratory's explicit third-dimensional instrument. It is intentionally a lab experiment:
