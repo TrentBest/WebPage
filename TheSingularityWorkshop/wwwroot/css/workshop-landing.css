@@ -164,8 +164,10 @@ body,
 }
 
 .hypervisor-shell .monolith-text {
-    font-size: clamp(1.1rem, 3.25vw, 3.3rem) !important;
-    letter-spacing: .2em !important;
+    width: calc(100% - 2rem) !important;
+    box-sizing: border-box;
+    font-size: clamp(1rem, 2.5vw, 2.6rem) !important;
+    letter-spacing: .1em !important;
     text-shadow: 0 0 8px #fff,
                  0 0 22px rgba(0,234,255,.9),
                  0 0 46px rgba(255,44,255,.5) !important;
