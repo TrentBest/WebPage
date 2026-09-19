@@ -21,6 +21,25 @@ public sealed class SpatialPlaceBoundaryTests
     }
 
     [Fact]
+    public void WorkshopFootprintsDoNotStructurallyOverlap()
+    {
+        var scene = SpatialWorkshopScene.CreateDefault();
+
+        for (var i = 0; i < scene.Interactables.Count; i++)
+        {
+            for (var j = i + 1; j < scene.Interactables.Count; j++)
+            {
+                var a = scene.Interactables[i].Bounds;
+                var b = scene.Interactables[j].Bounds;
+                Assert.False(
+                    a.X < b.X + b.Width && b.X < a.X + a.Width &&
+                    a.Y < b.Y + b.Height && b.Y < a.Y + a.Height,
+                    $"'{scene.Interactables[i].Name}' overlaps '{scene.Interactables[j].Name}'.");
+            }
+        }
+    }
+
+    [Fact]
     public void WorkshopAndCityPlacesRemainExplicitlySeparated()
     {
         Assert.All(SpatialPlaceCatalog.WorkshopPlaces, place =>
