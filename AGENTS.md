@@ -4,9 +4,11 @@ This repository is an active engineering experiment, not a conventional marketin
 
 ## Branch safety
 
-- The active vertical-slice landing work is on `feature/pong-microbundle-vertical-slice`.
-- **Do not modify `master`.**
-- Keep changes narrowly scoped to the current experiment.
+- The repository is intentionally consolidated to two branches:
+- `development` is the active engineering branch.
+- `master` is the stable promotion target.
+- **Do not create another feature branch merely to avoid integration work.** Reconcile the work on `development`.
+- Keep changes coherent and preserve existing behavior before replacing it.
 - Before replacing an existing behavior, inspect its Git history. Strange code may be carrying intentional behavior from an earlier experiment.
 
 ## What we are building
@@ -280,6 +282,19 @@ The AI tab exists and should remain.
 
 Be careful when editing `NavMenu.razor`: earlier navigation included important links such as Booking and Unity Asset Store/package destinations. Do not silently remove existing useful navigation while adding AI. Inspect the current file before rewriting it.
 
+## Engineering/documentation standards
+
+WebPage follows the engineering discipline of FSM_API without pretending to be a NuGet library. In particular:
+
+- FSM_API is the authoritative state-machine implementation; WebPage must not grow a competing FSM.
+- Nullable reference types stay enabled in production projects.
+- Production projects generate XML documentation for public API inspection.
+- Tests and architecture tests are evidence, not decoration.
+- TRX/coverage output is generated data and must not be committed.
+- Documentation must state what is implemented, what is transitional, and what is future design.
+- A meaningful architectural change should update both executable proof and the nearest documentation.
+- README badges describe the engineering environment; do not add NuGet/package badges to WebPage unless the repository actually becomes a package.
+
 ## Documentation style
 
 Documentation should be:
@@ -302,4 +317,4 @@ Do not rebuild the site from scratch because a component looks unusual.
 
 Do not optimize away the behavior that makes the Workshop interesting.
 
-Do not modify `master` during this experimental phase.
+Do not modify `master` during ordinary development. Promote to `master` deliberately after the `development` branch has been reconciled, documented, and validated.
