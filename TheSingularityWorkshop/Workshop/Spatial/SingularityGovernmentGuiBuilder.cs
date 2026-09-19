@@ -21,7 +21,9 @@ public static class SingularityGovernmentGuiBuilder
         object receiver,
         string citizenName,
         DateTimeOffset now,
-        Action exitRoom)
+        Action exitRoom,
+        Action<string>? takeOffice = null,
+        string? occupiedOfficeId = null)
     {
         var rules = SingularityElectionCatalog.DefaultRules;
         var offices = SingularityGovernmentCatalog.Offices;
@@ -50,6 +52,13 @@ public static class SingularityGovernmentGuiBuilder
             .Style("font-size", ".55rem")
             .Style("line-height", "1.6")
             .Text($"CIVIC CORE // CITIZEN {citizenName} // NEXT ELECTION {nextElection:yyyy-MM-dd}"));
+
+        if (occupiedOfficeId is not null)
+        {
+            var occupied = SingularityGovernmentCatalog.Resolve(occupiedOfficeId);
+            root.Content(Section(receiver, "CURRENT CIVIC ROLE", Cyan,
+                $"You are currently serving as {occupied.Title}. Civic decisions become inputs to planning, zoning, permitting, funding, and public works rather than direct construction edits."));
+        }
 
         root.Content(Section(receiver, "THE FIRST POWER", Magenta,
             "Singularity Mayor — elected city executive. The Mayor administers the city builder, proposes civic priorities, and coordinates the city's departments."));
@@ -85,6 +94,25 @@ public static class SingularityGovernmentGuiBuilder
                 .Style("color", "#91aeb8")
                 .Style("font-size", ".34rem")
                 .Text($"{office.Branch.ToString().ToUpperInvariant()} // {(office.Elected ? "ELECTED" : "ADMINISTRATIVE")}"));
+
+            if (office.Elected && takeOffice is not null)
+            {
+                var official = SingularityCivicDigitenCatalog.Officials.FirstOrDefault(x => x.OfficeId == office.Id);
+                if (official is not null)
+                {
+                    card.Content(WorkshopGui.Element(receiver, "div")
+                        .Style("margin-top", ".55rem").Style("color", Yellow).Style("font-size", ".34rem")
+                        .Text($"CURRENT HOLDER // {official.Name} // {official.Role}"));
+                    card.Content(WorkshopGui.Element(receiver, "div")
+                        .Style("margin-top", ".35rem").Style("color", "#91aeb8").Style("font-size", ".32rem")
+                        .Text($"COMMITTEES // {string.Join(" · ", official.CommitteeAssignments)}"));
+                    card.Content(WorkshopGui.Button(receiver).Label($"SERVE AS {office.Title.ToUpperInvariant()}")
+                        .Style("margin-top", ".55rem").Style("padding", ".4rem .55rem")
+                        .Style("border", $"1px solid {Yellow}55").Style("background", "rgba(255,224,74,.04)")
+                        .Style("color", Yellow).Style("font-family", "inherit").Style("font-size", ".34rem")
+                        .Style("cursor", "pointer").OnClick(() => takeOffice(office.Id)));
+                }
+            }
 
             grid.Child(card);
         }
