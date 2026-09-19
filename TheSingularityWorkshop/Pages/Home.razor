@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using System.Timers
 @using TheSingularityWorkshop.FSM_API
+@using TheSingularityWorkshop.Gui
 @inject IJSRuntime JS
 @inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 @implements IDisposable
@@ -10,10 +11,12 @@
 @if(Experience.CurrentState is "Intro" or "Living" or "FlexHello"){
 <div class="experience-layer">
 @if(Experience.CurrentState=="Intro"){
-<section class="monolith-stage"><div class="ambient-grid" aria-hidden="true"></div><div class="ambient-scan" aria-hidden="true"></div><div class="ambient-orbit ambient-orbit-one" aria-hidden="true"></div><div class="ambient-orbit ambient-orbit-two" aria-hidden="true"></div><div class="ambient-signal signal-one" aria-hidden="true"></div><div class="ambient-signal signal-two" aria-hidden="true"></div><div class="ambient-signal signal-three" aria-hidden="true"></div>
-<button class="monolith-btn" @onclick="EnterWorkshop" aria-label="Enter The Singularity Workshop"><span class="hero-corner hero-corner-tl" aria-hidden="true"></span><span class="hero-corner hero-corner-tr" aria-hidden="true"></span><span class="hero-corner hero-corner-bl" aria-hidden="true"></span><span class="hero-corner hero-corner-br" aria-hidden="true"></span><span class="hero-energy" aria-hidden="true"></span><span class="avatar-portal" aria-hidden="true"><img class="monolith-image" src="/Images/TheSingularityWorkshopLogo.png" alt="The Singularity Workshop" /></span><span class="monolith-text">ENTER THE WORKSHOP</span></button>
-<div class="workshop-warning" role="note"><div class="warning-header"><span class="warning-mark">⚠</span><span>SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE</span><span class="warning-mark">⚠</span></div><div class="warning-body">You are transitioning from Blazor WASM UI logic straight into a WebGL Unity engine build.<br />Both domains are aggressively driven by the same featherweight, pure C# <strong>50kb FSM_API</strong> —<br />fully agnostic and backwards-compatible down to legacy frameworks.<br /><span class="warning-final">Viewer discretion and spare RAM advised.</span></div></div>
-</section>}
+@WorkshopGatewayGuiBuilder.Build(
+    this,
+    EnterWorkshop,
+    "WHAT YOU ARE ABOUT TO SEE",
+    "The Workshop is not a brochure. It is a living demonstration of software built as a place: experiences, recursive GUI builders, FSM-driven behavior, MicroBundles, spatial exploration, and a bridge into a WebGL world.",
+    "Click when you are ready to see it in motion.")}
 @if(Experience.CurrentState=="FlexHello"){
 <section class="flex-hello" aria-live="polite"><div class="flex-hello-orbit" aria-hidden="true"></div><div class="hello-moniker" aria-label="The Singularity Workshop"><div class="hello-line">@RenderMonikerLine("THE",0)</div><div class="hello-line">@RenderMonikerLine("SINGULARITY",3)</div><div class="hello-line">@RenderMonikerLine("WORKSHOP",14)</div></div><div class="flex-hello-state">STATE: @Experience.CurrentState</div></section>}
 @foreach(var node in Nodes){<div class="living-node @(node.IsSeed?"seed":"")" style="left:@(node.X)%;top:@(node.Y)%;transform:translate(-50%,-50%) rotate(@(node.Rotation)deg) scale(@(node.Scale));"><div class="node-core"></div><div class="node-ring"></div><span>GEN @node.Generation</span></div>}
