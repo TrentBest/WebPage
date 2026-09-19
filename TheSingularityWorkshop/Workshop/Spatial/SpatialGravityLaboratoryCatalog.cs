@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// Physical specimens presented by the gravity laboratory. The catalog is intentionally
-/// dimensionless at the presentation boundary; SRPS/physics providers supply the actual
-/// units and numerical integration when an experiment is executed.
+/// Physical specimens presented by the gravity laboratory.
+/// Presentation uses an explicit influence radius; the radius is a visualization boundary,
+/// not a claim that gravity becomes zero outside it.
 /// </summary>
 public sealed record SpatialGravityBodyCatalog(IReadOnlyList<SpatialGravityBody> Bodies)
 {
@@ -30,7 +30,11 @@ public sealed record SpatialGravityBodyCatalog(IReadOnlyList<SpatialGravityBody>
     public SpatialGravityBody? Find(string id)
         => Bodies.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
 
-    /// <summary>Builds a compact field strip between two bodies for the diegetic heatmap.</summary>
+    /// <summary>
+    /// Returns samples between two bodies. Each body's contribution is represented by its
+    /// inverse-square influence; the direct-interaction band is the region where neither
+    /// contribution has fallen below the configured ignore fraction.
+    /// </summary>
     public IReadOnlyList<SpatialGravityFieldSample> Heatmap(string bodyAId, string bodyBId, int samples = 64)
     {
         var a = Find(bodyAId) ?? throw new KeyNotFoundException(bodyAId);
@@ -46,19 +50,23 @@ public sealed record SpatialGravityBodyCatalog(IReadOnlyList<SpatialGravityBody>
             var influenceA = a.MassKg / (distanceA * distanceA);
             var influenceB = b.MassKg / (distanceB * distanceB);
             var total = influenceA + influenceB;
-            var dominanceDelta = total <= 0 ? 1 : Math.Abs(influenceA - influenceB) / total;
-            var intensity = Math.Clamp(1 - dominanceDelta, 0, 1);
-            // This is a presentation-level interaction threshold. The eventual SRPS
-            // integrator will replace it with a validated influence/Hill-sphere calculation.
-            var interactionActive = intensity >= .65;
-            result[i] = new SpatialGravityFieldSample(t, intensity, interactionActive, dominanceDelta);
+            var normalizedA = total <= 0 ? 0 : influenceA / total;
+            var normalizedB = total <= 0 ? 0 : influenceB / total;
+            var dominanceDelta = Math.Abs(normalizedA - normalizedB);
+            var interaction = Math.Min(normalizedA, normalizedB);
+            var active = interaction >= SpatialGravityFieldSample.IgnoreFraction;
+
+            result[i] = new SpatialGravityFieldSample(
+                t,
+                interaction,
+                active,
+                dominanceDelta);
         }
 
         return result;
     }
 }
 
-/// <summary>A drawable celestial specimen and its simplified orbital presentation.</summary>
 public readonly record struct SpatialGravityBody(
     string Id,
     string Name,
@@ -69,9 +77,16 @@ public readonly record struct SpatialGravityBody(
     double OrbitDistance,
     double OrbitPhase);
 
-/// <summary>One normalized point in the gravity-field presentation.</summary>
+/// <summary>One normalized point in the pairwise gravity presentation.</summary>
 public readonly record struct SpatialGravityFieldSample(
     double PathPosition,
     double Intensity,
     bool GravityInteractionActive,
-    double DominanceDelta);
+    double DominanceDelta)
+{
+    /// <summary>
+    /// Presentation cutoff: below half of the pair's normalized contribution, the weaker
+    /// contribution is treated as visually negligible. The SRPS integrator remains authoritative.
+    /// </summary>
+    public const double IgnoreFraction = 0.5;
+}
