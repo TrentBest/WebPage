@@ -21,16 +21,26 @@
     private readonly SpatialLinework ForgeLinework = new();
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
+    private readonly SpatialShipyardManifest ShipyardManifest = SpatialShipyardManifest.CreateDefault();
+    private readonly SpatialShipDesignManifest ShipDesignManifest = SpatialShipDesignManifest.CreateDefault();
     private readonly TransitTrainMicroBundle TransitTrain = new(7301, TransitTrainSpecification.WorkshopHoEmu());
     private readonly SpatialLaboratoryManifest LaboratoryManifest = SpatialLaboratoryManifest.CreateDefault();
     private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
     private bool mansionWelcomeVisible;
+    private SpatialMansionGuiBuilder.PresentationMode mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
+    private string? selectedMansionFeatureId;
+    private bool mayorButlerVisible;
+    private bool mayorMeetingCancelled;
+    private bool mayorOfficeOfferVisible;
+    private string? occupiedCivicOfficeId;
     private bool constructionWelcomeVisible;
     private bool constructionTourActive;
     private string constructionTourMessage = "Stay close. I will show you what is being built.";
     private bool workshopMapVisible = true;
+    private SpatialMapScope workshopMapScope = SpatialMapScope.Workshop;
+    private double workshopMapZoom = 1d;
     private bool gardenMode = true;
     private bool gardenVisitResolved;
     private double spatialZoom = 1d;
@@ -49,6 +59,10 @@
     private int transitMicroGameRound;
     private string? transitMicroGameTargetId;
     private string? selectedLaboratoryFloorId;
+    private string? preparedLaboratoryExperimentId;
+    private string? gravityBodyAId = "earth";
+    private string? gravityBodyBId = "moon";
+    private bool threeDimensionalLabActive;
     private static readonly SpatialIslandExperience Island = SpatialIslandExperience.SingularityIsland;
     private int detailLevel = 16;
     private int mansionDensity = 1;
@@ -75,6 +89,12 @@
         Router.RegisterEntryPoint("space-elevator", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("singularity-station", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("singularity-island", new SpatialPoint(50, 78));
+        foreach (var interactable in Scene.Interactables)
+        {
+            if (interactable.Place is not null)
+                Router.RegisterPlace(interactable.Place);
+        }
+
         Experience.Navigation.MoveTo(Scene.StartingPosition.X, Scene.StartingPosition.Y);
     }
 
@@ -135,6 +155,12 @@
         if (insideRoomId == "maze")
             return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
 
+        if (insideRoomId == "singularity-shipyard")
+            return SpatialShipyardGuiBuilder.Build(this, ShipyardManifest, ShipDesignManifest, Experience.User.DisplayName, ExitRoom);
+
+        if (insideRoomId == "singularity-capitol")
+            return SingularityGovernmentGuiBuilder.Build(this, Experience.User.DisplayName, DateTimeOffset.UtcNow, ExitRoom, TakeCivicOffice, occupiedCivicOfficeId);
+
         if (insideRoomId == "singularity-transit")
             return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform, AvatarX, AvatarY, HandleKeyDown, HandleTransitWorldClick, TransitTrain.Specification);
 
@@ -142,10 +168,42 @@
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
 
         if (insideRoomId == "singularity-lab")
-            return SpatialLaboratoryExperienceGuiBuilder.Build(this, LaboratoryManifest, Experience.User.DisplayName, selectedLaboratoryFloorId, SelectLaboratoryFloor, ExitRoom);
+            return SpatialLaboratoryExperienceGuiBuilder.Build(
+                this,
+                LaboratoryManifest,
+                Experience.User.DisplayName,
+                selectedLaboratoryFloorId,
+                SelectLaboratoryFloor,
+                ExitRoom,
+                ScanLaboratoryBadge,
+                PrepareLaboratoryExperiment,
+                preparedLaboratoryExperimentId,
+                gravityBodyAId,
+                gravityBodyBId,
+                SelectGravityBodies,
+                threeDimensionalLabActive,
+                ToggleThreeDimensionalLab);
 
         if (insideRoomId == "mansion")
-            return SpatialMansionGuiBuilder.Build(this, MansionStructure, Experience.User.DisplayName, AvatarX, AvatarY, mansionDensity, args => _ = HandleMansionWorldClick(args), HandleKeyDown, SetMansionDensity, ExitRoom, mansionWelcomeVisible, DismissMansionWelcome, mansionZoom, SetMansionZoom);
+            return SpatialMansionGuiBuilder.Build(
+                this,
+                MansionStructure,
+                Experience.User.DisplayName,
+                AvatarX,
+                AvatarY,
+                mansionDensity,
+                args => _ = HandleMansionWorldClick(args),
+                HandleKeyDown,
+                SetMansionDensity,
+                ExitRoom,
+                mansionWelcomeVisible,
+                DismissMansionWelcome,
+                mansionZoom,
+                SetMansionZoom,
+                mansionPresentation,
+                SelectMansionFeature,
+                selectedMansionFeatureId)
+                .Content(MansionMayorOverlay());
 
         if (insideRoomId is not null)
         {
@@ -160,7 +218,7 @@
         var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap, EnterConstructionSite, constructionTourActive, constructionTourMessage, constructionWelcomeVisible, RequestConstructionTour, ExitConstructionSite);
         var root = WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(WorkshopAdBanner());
         if (workshopMapVisible)
-            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap));
+            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope));
         return root;
     }
 
@@ -206,6 +264,10 @@
         => mazeZoom = Math.Clamp(zoom, .6, 2.2);
 
     private void ShowWorkshopMap() => workshopMapVisible = true;
+
+    private void SetWorkshopMapScope(SpatialMapScope scope) => workshopMapScope = scope;
+
+    private void SetWorkshopMapZoom(double zoom) => workshopMapZoom = Math.Clamp(zoom, .75, 2.5);
 
     private void EnterGardenDestination(string destinationId)
     {
@@ -316,6 +378,104 @@
     }
 
     private void DismissMansionWelcome() => mansionWelcomeVisible = false;
+
+    private void SelectMansionFeature(string featureId)
+    {
+        if (featureId == "__plan__")
+        {
+            selectedMansionFeatureId = null;
+            mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
+            return;
+        }
+
+        var feature = SingularityMansionArchitecture.Resolve(featureId);
+        selectedMansionFeatureId = feature.Id;
+
+        if (string.Equals(feature.Kind, "Alcove", StringComparison.OrdinalIgnoreCase))
+            mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.AlcoveElevation;
+        else
+            mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
+    }
+
+    private void MeetMayor()
+    {
+        mayorButlerVisible = false;
+        mayorMeetingCancelled = false;
+        mayorOfficeOfferVisible = false;
+        mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
+        mansionWelcomeVisible = false;
+    }
+
+    private void CancelMayorMeeting()
+    {
+        mayorButlerVisible = false;
+        mayorMeetingCancelled = true;
+        mayorOfficeOfferVisible = true;
+    }
+
+    private void TakeMayorOffice()
+    {
+        mayorOfficeOfferVisible = false;
+        TakeCivicOffice("government.mayor");
+        mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
+        selectedMansionFeatureId = "map-room";
+    }
+
+    private void TakeCivicOffice(string officeId)
+    {
+        _ = SingularityGovernmentCatalog.Resolve(officeId);
+        occupiedCivicOfficeId = officeId;
+        mayorOfficeOfferVisible = false;
+        mayorButlerVisible = false;
+    }
+
+    private ElementBuilder MansionMayorOverlay()
+    {
+        if (mayorButlerVisible)
+            return WorkshopGui.Element(this, "div")
+                .Style("position", "fixed").Style("left", "50%").Style("bottom", "8%").Style("transform", "translateX(-50%)")
+                .Style("z-index", "120").Style("width", "min(700px,86vw)").Style("padding", "1rem")
+                .Style("border", "1px solid #00eaff88").Style("background", "rgba(1,5,11,.96)")
+                .Content(WorkshopGui.Element(this, "div").Style("color", "#00eaff").Style("font-size", ".5rem").Style("letter-spacing", ".16em").Text("MAYOR'S MANSION // BUTLER"))
+                .Content(WorkshopGui.Element(this, "div").Style("margin-top", ".7rem").Style("color", "#fff").Style("font-family", "system-ui,sans-serif").Style("font-size", ".9rem").Text(SingularityMansionElevation.ButlerGreeting))
+                .Content(WorkshopGui.Element(this, "div").Style("display", "flex").Style("gap", ".5rem").Style("margin-top", ".9rem")
+                    .Content(WorkshopGui.Button(this).Label("FOLLOW TO MEET THE MAYOR").Style("padding", ".5rem .7rem").Style("cursor", "pointer").OnClick(MeetMayor))
+                    .Content(WorkshopGui.Button(this).Label("CANCEL").Style("padding", ".5rem .7rem").Style("cursor", "pointer").OnClick(CancelMayorMeeting)));
+
+        if (mayorOfficeOfferVisible)
+            return WorkshopGui.Element(this, "div")
+                .Style("position", "fixed").Style("left", "50%").Style("bottom", "8%").Style("transform", "translateX(-50%)")
+                .Style("z-index", "120").Style("width", "min(700px,86vw)").Style("padding", "1rem")
+                .Style("border", "1px solid #ffd34d88").Style("background", "rgba(1,5,11,.97)")
+                .Content(WorkshopGui.Element(this, "div").Style("color", "#ffd34d").Style("font-size", ".5rem").Style("letter-spacing", ".16em").Text("CIVIC OPPORTUNITY"))
+                .Content(WorkshopGui.Element(this, "div").Style("margin-top", ".7rem").Style("color", "#fff").Style("font-family", "system-ui,sans-serif").Style("font-size", ".9rem").Text(SingularityMansionElevation.MeetingCancelledPrompt))
+                .Content(WorkshopGui.Button(this).Label("TAKE OVER THE MAYOR'S OFFICE").Style("margin-top", ".9rem").Style("padding", ".55rem .8rem").Style("cursor", "pointer").OnClick(TakeMayorOffice))
+                .Content(WorkshopGui.Button(this).Label("NO, THANK YOU").Style("margin-left", ".5rem").Style("padding", ".55rem .8rem").Style("cursor", "pointer").OnClick(() => mayorOfficeOfferVisible = false));
+
+        return WorkshopGui.Element(this, "span");
+    }
+
+    private void ScanLaboratoryBadge()
+    {
+        LaboratoryManifest.Security.ScanBadge();
+    }
+
+    private void PrepareLaboratoryExperiment(string experimentId)
+    {
+        preparedLaboratoryExperimentId = experimentId;
+    }
+
+    private void SelectGravityBodies(string bodyAId, string bodyBId)
+    {
+        if (bodyAId == bodyBId) return;
+        gravityBodyAId = bodyAId;
+        gravityBodyBId = bodyBId;
+    }
+
+    private void ToggleThreeDimensionalLab()
+    {
+        threeDimensionalLabActive = !threeDimensionalLabActive;
+    }
 
     private void JoinConference() => Experience.Conference.Join();
     private void LeaveConference() => Experience.Conference.Leave();
@@ -579,10 +739,20 @@
         UpdateConstructionTour(AvatarX, AvatarY);
         interactable.OnInteraction();
         var returnPosition = new SpatialPoint(AvatarX, AvatarY);
-        var firstVisit = Router.Enter(interactable.ExperienceId, returnPosition);
-        Experience.Navigation.MoveTo(Router.GetEntryPoint(interactable.ExperienceId).X, Router.GetEntryPoint(interactable.ExperienceId).Y);
-        insideRoomId = interactable.ExperienceId;
-        mansionWelcomeVisible = interactable.ExperienceId == "mansion" && firstVisit;
+        var place = interactable.Place;
+        var firstVisit = Router.Enter(place, returnPosition);
+        var entry = place.EntryPoint;
+        Experience.Navigation.MoveTo(entry.X, entry.Y);
+        insideRoomId = place.SceneId;
+        mansionWelcomeVisible = false;
+        if (place.SceneId == "mansion" && firstVisit)
+        {
+            mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.ExteriorElevation;
+            selectedMansionFeatureId = null;
+            mayorButlerVisible = true;
+            mayorMeetingCancelled = false;
+            mayorOfficeOfferVisible = false;
+        }
         await InvokeAsync(StateHasChanged);
     }
 
@@ -681,6 +851,11 @@
         }
 
         mansionWelcomeVisible = false;
+        mayorButlerVisible = false;
+        mayorMeetingCancelled = false;
+        mayorOfficeOfferVisible = false;
+        selectedMansionFeatureId = null;
+        mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
         constructionWelcomeVisible = false;
         constructionTourActive = false;
         if (insideRoomId == "maze")

@@ -9,6 +9,9 @@ public sealed class SpatialWorkshopScene
 {
     private SpatialWorkshopScene(string startingAreaId, SpatialPoint startingPosition, IReadOnlyList<SpatialInteractable> interactables, SpatialViewSettings view, SpatialConstructionSite constructionSite, IReadOnlyList<ConstructionVehicle> constructionVehicles, SpatialConstructionExperience constructionExperience)
     {
+        SpatialPlaceCatalog.Validate(interactables);
+        ValidateNoStructuralOverlap(interactables);
+
         StartingAreaId = startingAreaId;
         StartingPosition = startingPosition;
         Interactables = interactables;
@@ -31,22 +34,22 @@ public sealed class SpatialWorkshopScene
         => new("center", new SpatialPoint(50, 50),
             [
                 Building("singularity-mansion", "mansion", new SpatialBounds(34, 22, 4, 3)),
-                Building("image-tools", "image-workshop", new SpatialBounds(49, 23, 4, 3)),
+                Building("image-tools", "image-workshop", new SpatialBounds(51, 17, 4, 2)),
                 Building("forge", "forge", new SpatialBounds(78, 41, 4, 3)),
                 Building("blueprint-library", "library", new SpatialBounds(49, 43, 3, 3)),
-                Building("singularity-transit", "singularity-transit", new SpatialBounds(78, 49, 4, 3)),
-                Building("npc-studio", "npc-studio", new SpatialBounds(11, 45, 4, 3)),
-                Building("fsm-bench", "fsm-workbench", new SpatialBounds(36, 43, 4, 3)),
-                Building("storage-bins", "storage", new SpatialBounds(87, 66, 3, 3)),
-                Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(81, 56, 5, 3)),
-                Building("singularity-lab", "singularity-lab", new SpatialBounds(27, 61, 5, 3)),
-                Building("singularity-station", "singularity-station", new SpatialBounds(76, 17, 4, 3)),
-                Building("singularity-shipyard", "singularity-shipyard", new SpatialBounds(90, 18, 4, 3)),
-                Building("singularity-capitol", "singularity-capitol", new SpatialBounds(60, 17, 4, 3)),
-                Building("ocean-shipyard", "ocean-shipyard", new SpatialBounds(11, 80, 4, 3)),
-                new SpatialInteractable("maze", "Workshop Maze", new SpatialBounds(62, 78, 8, 5), new SpatialBounds(64, 76, 4, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "maze"),
-                new SpatialInteractable("aec-remote-office", "AEC Remote Office", new SpatialBounds(21, 44, 7, 4), new SpatialBounds(23, 48, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "aec-remote-office"),
-                new SpatialInteractable("singularity-taxi", "Singularity Taxi", new SpatialBounds(57, 20, 7, 4), new SpatialBounds(59, 23, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "singularity-taxi")
+                Building("singularity-transit", "singularity-transit", new SpatialBounds(90, 47, 4, 3)),
+                Building("npc-studio", "npc-studio", new SpatialBounds(11, 58, 4, 3)),
+                Building("fsm-bench", "fsm-workbench", new SpatialBounds(36, 54, 4, 2)),
+                Building("storage-bins", "storage", new SpatialBounds(98, 63, 2, 3)),
+                Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(79, 64, 5, 3)),
+                Building("singularity-lab", "singularity-lab", new SpatialBounds(16, 89, 5, 3)),
+                Building("singularity-station", "singularity-station", new SpatialBounds(84, 14, 4, 2)),
+                Building("singularity-shipyard", "singularity-shipyard", new SpatialBounds(89, 24, 4, 3)),
+                Building("singularity-capitol", "singularity-capitol", new SpatialBounds(68, 14, 4, 2)),
+                Building("ocean-shipyard", "ocean-shipyard", new SpatialBounds(57, 90, 4, 2)),
+                new SpatialInteractable("maze", "Workshop Maze", new SpatialBounds(46, 57, 12, 7), new SpatialBounds(50, 58, 4, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "maze"),
+                new SpatialInteractable("aec-remote-office", "AEC Remote Office", new SpatialBounds(32, 58, 12, 8), new SpatialBounds(34, 59, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "aec-remote-office"),
+                new SpatialInteractable("singularity-taxi", "Singularity Taxi", new SpatialBounds(62, 16, 7, 4), new SpatialBounds(64, 17, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "singularity-taxi")
             ],
             SpatialViewSettings.CreateDefault(),
             new SpatialConstructionSite(
@@ -64,6 +67,22 @@ public sealed class SpatialWorkshopScene
                 new ConstructionVehicle("lifter-01", "Material Lifter", ConstructionVehicleKind.Lifter, new SpatialPoint(54, 84))
             ],
             SpatialConstructionExperienceCatalog.Expansion);
+
+    private static void ValidateNoStructuralOverlap(IReadOnlyList<SpatialInteractable> interactables)
+    {
+        for (var i = 0; i < interactables.Count; i++)
+        {
+            for (var j = i + 1; j < interactables.Count; j++)
+            {
+                if (Overlaps(interactables[i].Bounds, interactables[j].Bounds))
+                    throw new InvalidOperationException($"Spatial structures '{interactables[i].Name}' and '{interactables[j].Name}' overlap.");
+            }
+        }
+    }
+
+    private static bool Overlaps(SpatialBounds a, SpatialBounds b)
+        => a.X < b.X + b.Width && b.X < a.X + a.Width &&
+           a.Y < b.Y + b.Height && b.Y < a.Y + a.Height;
 
     private static SpatialInteractable Building(string id, string experienceId, SpatialBounds interactionPoint)
     {
@@ -131,6 +150,9 @@ public sealed class SpatialInteractable
         InteractionPoint = interactionPoint;
         HitRegion = hitRegion;
         ExperienceId = experienceId;
+        // Generic geometry/interactions may exist before they are attached to an Explore place.
+        // Root-world scenes are validated by SpatialWorkshopScene through SpatialPlaceCatalog.Validate.
+        Place = SpatialPlaceCatalog.TryResolve(experienceId, out var place) ? place : null;
         InteractionPoints = interactionPoints is { Count: > 0 } ? interactionPoints : [new SpatialInteractionPoint("default", "Primary", interactionPoint)];
         Openings = openings ?? [];
     }
@@ -147,6 +169,7 @@ public sealed class SpatialInteractable
     public SpatialBounds InteractionPoint { get; }
     public ISpatialHitRegion HitRegion { get; }
     public string ExperienceId { get; }
+    public SpatialPlace? Place { get; }
     public IReadOnlyList<SpatialInteractionPoint> InteractionPoints { get; }
     public IReadOnlyList<SpatialOpening> Openings { get; }
     public bool IsBreathing { get; private set; }
