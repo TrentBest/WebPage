@@ -23,7 +23,18 @@ public readonly struct OntologySignature : IEquatable<OntologySignature>
 public readonly record struct BundleVersion(int Major, int Minor, int Patch);
 public enum MutationType { StructuralMutation, PropertyInjection, DependencyResolution }
 
-public interface IMicroBundle { ulong Id { get; } OntologySignature Ontology { get; } BundleVersion Version { get; } IReadOnlyList<ulong> Dependencies { get; } bool Arbitrate(IArbitrator arbitrator, int roundIndex); }
+/// <summary>Reusable capability with a once-only load phase followed by bounded arbitration.</summary>
+public interface IMicroBundle
+{
+    ulong Id { get; }
+    OntologySignature Ontology { get; }
+    BundleVersion Version { get; }
+    IReadOnlyList<ulong> Dependencies { get; }
+    /// <summary>Receives its arbitrator exactly once during installation.</summary>
+    void LoadBundle(IArbitrator arbitrator);
+    /// <summary>Performs one logical arbitration round after installation.</summary>
+    bool Arbitrate(IArbitrator arbitrator, int roundIndex);
+}
 public interface IExperience
 {
     ulong Id { get; }
@@ -38,7 +49,17 @@ public interface IExperience
 }
 public readonly record struct ArbitrationEvent(int RoundIndex, ulong ActorId, ulong TargetCoordinates, MutationType MutationType, ulong CausalParentId);
 public interface IArbitrationAudit { IReadOnlyList<ArbitrationEvent> Events { get; } void Record(ArbitrationEvent arbitrationEvent); }
-public interface IArbitrator { IReadOnlyCollection<IMicroBundle> LoadedBundles { get; } bool LoadBundle(IMicroBundle bundle); int ExecuteArbitrationPipeline(); }
+/// <summary>Coordinates MicroBundle discovery, installation, and bounded arbitration.</summary>
+public interface IArbitrator
+{
+    IReadOnlyCollection<IMicroBundle> LoadedBundles { get; }
+    IReadOnlyCollection<IMicroBundle> AvailableBundles { get; }
+    bool RegisterBundle(IMicroBundle bundle);
+    bool LoadBundle(IMicroBundle bundle);
+    bool TryLoadBundle(ulong bundleId);
+    bool TryGetLoadedBundle(ulong bundleId, out IMicroBundle? bundle);
+    int ExecuteArbitrationPipeline();
+}
 public readonly record struct WarehouseAddress(ulong Identity);
 public interface IDataWarehouseLiaison { bool TryResolve(ulong identity, out WarehouseAddress address); }
 public readonly record struct WorkDescriptor(ulong ProcessGroupId, ulong WorkId, int PathIndex);
