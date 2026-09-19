@@ -8,9 +8,12 @@ This file exists so a new engineering/AI session can begin with the current stat
 
 Active branch:
 
-`feature/living-workshop-landing`
+`development`
 
-**Master is not the working branch and must remain untouched.**
+**Master is the stable promotion target and remains untouched during ordinary development.**
+
+The repository is intentionally being consolidated to two branches only: `master` and
+`development`. Historical feature-branch names in older notes are no longer the working model.
 
 ## What just happened
 
