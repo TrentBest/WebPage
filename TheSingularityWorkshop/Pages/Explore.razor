@@ -363,6 +363,13 @@
 
     private void SelectMansionFeature(string featureId)
     {
+        if (featureId == "__plan__")
+        {
+            selectedMansionFeatureId = null;
+            mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
+            return;
+        }
+
         var feature = SingularityMansionArchitecture.Resolve(featureId);
         selectedMansionFeatureId = feature.Id;
 
@@ -697,7 +704,7 @@
         var entry = place.EntryPoint;
         Experience.Navigation.MoveTo(entry.X, entry.Y);
         insideRoomId = place.SceneId;
-        mansionWelcomeVisible = place.SceneId == "mansion" && firstVisit;
+        mansionWelcomeVisible = false;
         if (place.SceneId == "mansion" && firstVisit)
         {
             mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.ExteriorElevation;
