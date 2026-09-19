@@ -14,9 +14,13 @@ function makeProgram(gl) {
         attribute vec3 aPosition;
         uniform mat4 uViewProjection;
         uniform float uTime;
+            uniform float uMode;
         void main() {
-            float c = cos(uTime * 0.08);
-            float s = sin(uTime * 0.08);
+            float motion = uMode == 1.0 ? 0.22 : (uMode == 2.0 ? 0.12 : 0.08);
+            float c = cos(uTime * motion);
+            float s = sin(uTime * motion);
+            if (uMode == 1.0) p.y += sin(uTime * 1.8) * 2.5;
+            if (uMode == 2.0) p.y += sin(uTime * 1.15 + p.x * 0.025) * 0.8;
             vec3 p = aPosition;
             p = vec3(p.x * c - p.z * s, p.y, p.x * s + p.z * c);
             gl_Position = uViewProjection * vec4(p, 1.0);
@@ -25,7 +29,13 @@ function makeProgram(gl) {
     const fragment = makeShader(gl, gl.FRAGMENT_SHADER, `
         precision mediump float;
         void main() {
-            gl_FragColor = vec4(0.05, 0.91, 1.0, 0.9);
+            uniform float uMode;
+        void main() {
+            vec3 color = vec3(0.05, 0.91, 1.0);
+            if (uMode == 0.0) color = vec3(1.0, 0.48, 0.12);
+            else if (uMode == 1.0) color = vec3(1.0, 0.25, 0.82);
+            else if (uMode == 2.0) color = vec3(0.25, 1.0, 0.72);
+            gl_FragColor = vec4(color, 0.9);
         }
     `);
     const program = gl.createProgram();
@@ -143,7 +153,7 @@ function starshipLines(lineCount) {
     return new Float32Array(vertices.slice(0,maxSegments*6));
 }
 
-export function startStarshipLineLab(canvasId, lineCount) {
+export function startStarshipLineLab(canvasId, lineCount, renderingMode = "hybrid") {
     stopStarshipLineLab();
     const canvas=document.getElementById(canvasId);
     if(!canvas) throw new Error("Starship line lab canvas not found.");
@@ -155,8 +165,9 @@ export function startStarshipLineLab(canvasId, lineCount) {
     const position=gl.getAttribLocation(program,"aPosition");
     const viewProjection=gl.getUniformLocation(program,"uViewProjection");
     const timeUniform=gl.getUniformLocation(program,"uTime");
+    const modeUniform=gl.getUniformLocation(program,"uMode");
 
-    lab={gl,program,buffer,position,viewProjection,timeUniform,lineCount:Math.max(100,Math.floor(lineCount||2500)),frames:0,start:performance.now(),last:performance.now(),fps:0,frameMs:0,raf:0};
+    lab={gl,program,buffer,position,viewProjection,timeUniform,modeUniform,renderingMode,Math.max(100,Math.floor(lineCount||2500)),frames:0,start:performance.now(),last:performance.now(),fps:0,frameMs:0,raf:0};
 
     function resize(){
         const dpr=Math.min(window.devicePixelRatio||1,2);
@@ -174,6 +185,7 @@ export function startStarshipLineLab(canvasId, lineCount) {
     }
 
     lab.setLineCount=(count)=>{lab.lineCount=Math.max(100,Math.floor(count));rebuild();};
+    lab.setRenderingMode=(mode)=>{lab.renderingMode=mode;};
     rebuild();
 
     function frame(now){
@@ -203,12 +215,17 @@ export function startStarshipLineLab(canvasId, lineCount) {
         const view=lookAt([115,72,115],[0,0,0],[0,1,0]);
         gl.uniformMatrix4fv(viewProjection,false,multiply(projection,view));
         gl.uniform1f(timeUniform,now*0.001);
+        gl.uniform1f(modeUniform, ({toon:0,tween:1,hybrid:2,reality:3}[lab.renderingMode] ?? 2));
         gl.drawArrays(gl.LINES,0,lab.vertexCount);
 
         lab.raf=requestAnimationFrame(frame);
     }
     window.addEventListener("resize",resize);
     frame(performance.now());
+}
+
+export function setStarshipRenderingMode(mode) {
+    if(lab?.setRenderingMode) lab.setRenderingMode(mode);
 }
 
 export function setStarshipLineCount(lineCount) {
