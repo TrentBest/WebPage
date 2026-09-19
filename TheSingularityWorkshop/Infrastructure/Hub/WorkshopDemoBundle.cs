@@ -11,6 +11,9 @@ public sealed class WorkshopDemoBundle : IMicroBundle
     public BundleVersion Version => new(0, 1, 0);
     public IReadOnlyList<ulong> Dependencies => Array.Empty<ulong>();
 
+    public void LoadBundle(IArbitrator arbitrator)
+        => ArgumentNullException.ThrowIfNull(arbitrator);
+
     public bool Arbitrate(IArbitrator arbitrator, int roundIndex)
     {
         if (_arbitrated) return false;
