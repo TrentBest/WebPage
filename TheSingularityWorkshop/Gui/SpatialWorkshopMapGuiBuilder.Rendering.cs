@@ -170,7 +170,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("box-sizing", "border-box").Style("border", $"2px solid {Yellow}dd")
             .Style("background", $"{Yellow}14").Style("color", Yellow).Style("z-index", "4")
             .Style("font-family", "inherit").Style("font-size", ".58rem").Style("font-weight", "700")
-            .Style("cursor", "pointer").Label("WORKSHOP // CENTER OF SINGULARITY CITY")
+            .Style("cursor", "pointer").Text("WORKSHOP // CENTER OF SINGULARITY CITY")
             .OnClick(() => selectDestination("forge")));
 
         return AddYouAreHere(receiver, map, avatarX, avatarY);
