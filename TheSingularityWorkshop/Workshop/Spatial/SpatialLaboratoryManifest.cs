@@ -30,6 +30,9 @@ public sealed record SpatialLaboratoryManifest(
     /// <summary>Three-dimensional rendering experiment exposed by the simulation floor.</summary>
     public SpatialLaboratory3DManifest ThreeDimensionalLab { get; init; } = SpatialLaboratory3DManifest.CreateDefault();
 
+    /// <summary>Destruction and launcher sandboxes exposed as physics demonstrations.</summary>
+    public SpatialLaboratoryDestructionCatalog DestructionSandboxes { get; init; } = SpatialLaboratoryDestructionCatalog.CreateDefault();
+
     /// <summary>The deliberately provisional physics boundary used by laboratory simulations.</summary>
     public static TbdPhysicsEngineManifest PhysicsEngine => TbdPhysicsEngineManifest.Default;
 
