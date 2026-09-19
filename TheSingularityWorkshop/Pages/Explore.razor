@@ -148,6 +148,9 @@
         if (insideRoomId == "singularity-shipyard")
             return SpatialShipyardGuiBuilder.Build(this, ShipyardManifest, ShipDesignManifest, Experience.User.DisplayName, ExitRoom);
 
+        if (insideRoomId == "singularity-capitol")
+            return SingularityGovernmentGuiBuilder.Build(this, Experience.User.DisplayName, DateTimeOffset.UtcNow, ExitRoom);
+
         if (insideRoomId == "singularity-transit")
             return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform, AvatarX, AvatarY, HandleKeyDown, HandleTransitWorldClick, TransitTrain.Specification);
 
