@@ -41,8 +41,15 @@ public sealed record SingularityRolePlayingSystem(
             ]);
 
     public SrpsPhysicsRuleSet ResolveRuleSet(string id)
-        => PhysicsRuleSets.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase))
-           ?? throw new KeyNotFoundException($"No SRPS rule set '{id}' is registered.");
+    {
+        foreach (var ruleSet in PhysicsRuleSets)
+        {
+            if (string.Equals(ruleSet.Id, id, StringComparison.OrdinalIgnoreCase))
+                return ruleSet;
+        }
+
+        throw new KeyNotFoundException($"No SRPS rule set '{id}' is registered.");
+    }
 }
 
 /// <summary>Named physical quantity exposed to MicroBundles.</summary>
