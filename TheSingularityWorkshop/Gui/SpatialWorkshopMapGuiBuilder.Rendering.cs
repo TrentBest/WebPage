@@ -72,7 +72,9 @@ public static partial class SpatialWorkshopMapGuiBuilder
             ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom)
             : scope == SpatialMapScope.City
                 ? CityMap(receiver, avatarX, avatarY, selectDestination, zoom, setZoom)
-                : WorldMap(receiver, avatarX, avatarY, zoom, setZoom));
+                : scope == SpatialMapScope.World
+                    ? WorldMap(receiver, avatarX, avatarY, zoom, setZoom)
+                    : SolarSystemMap(receiver, zoom, setZoom));
 
         layout.Content(scope == SpatialMapScope.Workshop
             ? Directory(receiver, scene, selectDestination)
