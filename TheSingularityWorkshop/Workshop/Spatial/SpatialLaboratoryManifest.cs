@@ -1,6 +1,6 @@
 namespace TheSingularityWorkshop.Gui;
 
-using System.Collections.Generic;
+using System;\nusing System.Collections.Generic;\nusing System.Linq;
 
 /// <summary>Declarative manifest for the Singularity Laboratory.</summary>
 /// <remarks>
@@ -32,6 +32,14 @@ public sealed record SpatialLaboratoryManifest(
 
     /// <summary>The deliberately provisional physics boundary used by laboratory simulations.</summary>
     public static TbdPhysicsEngineManifest PhysicsEngine => TbdPhysicsEngineManifest.Default;
+
+    /// <summary>Finds a laboratory floor by its stable identifier.</summary>
+    public SpatialLaboratoryFloor? FindFloorById(string id)
+        => Floors.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Compatibility lookup for callers that address floors by numeric level.</summary>
+    public SpatialLaboratoryFloor? FindFloor(int level)
+        => Floors.FirstOrDefault(x => x.Level == level);
 
     /// <summary>Creates the default multi-floor research tower manifest.</summary>
     public static SpatialLaboratoryManifest CreateDefault()
