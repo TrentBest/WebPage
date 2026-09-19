@@ -34,6 +34,7 @@
     private bool mayorButlerVisible;
     private bool mayorMeetingCancelled;
     private bool mayorOfficeOfferVisible;
+    private string? occupiedCivicOfficeId;
     private bool constructionWelcomeVisible;
     private bool constructionTourActive;
     private string constructionTourMessage = "Stay close. I will show you what is being built.";
@@ -154,7 +155,7 @@
             return SpatialShipyardGuiBuilder.Build(this, ShipyardManifest, ShipDesignManifest, Experience.User.DisplayName, ExitRoom);
 
         if (insideRoomId == "singularity-capitol")
-            return SingularityGovernmentGuiBuilder.Build(this, Experience.User.DisplayName, DateTimeOffset.UtcNow, ExitRoom);
+            return SingularityGovernmentGuiBuilder.Build(this, Experience.User.DisplayName, DateTimeOffset.UtcNow, ExitRoom, TakeCivicOffice, occupiedCivicOfficeId);
 
         if (insideRoomId == "singularity-transit")
             return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform, AvatarX, AvatarY, HandleKeyDown, HandleTransitWorldClick, TransitTrain.Specification);
@@ -390,8 +391,17 @@
     private void TakeMayorOffice()
     {
         mayorOfficeOfferVisible = false;
+        TakeCivicOffice("government.mayor");
         mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
         selectedMansionFeatureId = "map-room";
+    }
+
+    private void TakeCivicOffice(string officeId)
+    {
+        _ = SingularityGovernmentCatalog.Resolve(officeId);
+        occupiedCivicOfficeId = officeId;
+        mayorOfficeOfferVisible = false;
+        mayorButlerVisible = false;
     }
 
     private ElementBuilder MansionMayorOverlay()
