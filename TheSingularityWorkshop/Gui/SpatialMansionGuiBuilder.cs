@@ -147,7 +147,7 @@ public static class SpatialMansionGuiBuilder
             .Style("background", "rgba(1,4,10,.84)").Style("color", White)
             .Style("font-size", ".48rem").Style("line-height", "1.65")
             .Style("letter-spacing", ".1em").Style("pointer-events", "none")
-            .Text($"MAYOR'S MANSION // {ModeLabel(mode)}\nAVATAR // {avatarName}\nZOOM // {zoom:0.00}X\nDENSITY // {density}X\nLINES // {lineCount:N0}\nFEATURE // {selectedFeatureId ?? \"PLAN\"}\nRENDER CONVERSION // {renderMicroseconds:0.0} μs\nRGBA TEXEL BUILD // {textureMicroseconds:0.0} μs\nGPU PAYLOAD // {gpuPayloadBytes:N0} BYTES");
+            .Text($"MAYOR'S MANSION // {ModeLabel(mode)}\nAVATAR // {avatarName}\nZOOM // {zoom:0.00}X\nDENSITY // {density}X\nLINES // {lineCount:N0}\nFEATURE // {selectedFeatureId ?? "PLAN"}\nRENDER CONVERSION // {renderMicroseconds:0.0} μs\nRGBA TEXEL BUILD // {textureMicroseconds:0.0} μs\nGPU PAYLOAD // {gpuPayloadBytes:N0} BYTES");
 
     private static ElementBuilder FeatureControls(object receiver, Action<string> selectFeature, string? selectedFeatureId)
     {
