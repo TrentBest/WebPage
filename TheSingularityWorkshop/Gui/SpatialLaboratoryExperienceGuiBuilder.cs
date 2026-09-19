@@ -53,16 +53,21 @@ public static class SpatialLaboratoryExperienceGuiBuilder
         foreach (var floor in laboratory.Floors)
         {
             var selected = floor.Id == selectedFloorId;
-            floors.Content(WorkshopGui.Button(receiver)
-                .Label($"{(floor.Level + 1):00} // {floor.Name}")
+            var locked = !laboratory.Security.BadgeAccepted && !floor.DomainId.Equals("security", StringComparison.OrdinalIgnoreCase);
+            var accent = locked ? "#52616a" : selected ? "#ffd34d" : "#00eaff";
+            var button = WorkshopGui.Button(receiver)
+                .Label($"{(locked ? "🔒 " : "")}{(floor.Level + 1):00} // {floor.Name}")
                 .Style("display", "block").Style("width", "100%").Style("margin-bottom", ".45rem")
                 .Style("padding", ".55rem").Style("text-align", "left")
-                .Style("border", $"1px solid {(selected ? "#ffd34d" : "#00eaff")}{(selected ? "aa" : "35")}")
+                .Style("border", $"1px solid {accent}{(selected ? "aa" : "35")}")
                 .Style("background", selected ? "rgba(255,211,77,.08)" : "rgba(0,234,255,.025)")
-                .Style("color", selected ? "#ffd34d" : "#d9eef4")
+                .Style("color", locked ? "#52616a" : selected ? "#ffd34d" : "#d9eef4")
                 .Style("font-family", "inherit").Style("font-size", ".43rem")
-                .Style("letter-spacing", ".08em").Style("cursor", "pointer")
-                .OnClick(() => selectFloor(floor.Id)));
+                .Style("letter-spacing", ".08em").Style("cursor", locked ? "not-allowed" : "pointer")
+                .Style("pointer-events", locked ? "none" : "auto");
+            if (!locked)
+                button.OnClick(() => selectFloor(floor.Id));
+            floors.Content(button);
         }
 
         var selectedFloor = laboratory.Floors.FirstOrDefault(x => x.Id == selectedFloorId);
@@ -169,8 +174,14 @@ public static class SpatialLaboratoryExperienceGuiBuilder
         foreach (var guard in security.Guards)
         {
             panel.Content(WorkshopGui.Element(receiver, "div")
+                .Style("display", "flex").Style("align-items", "center").Style("gap", ".45rem")
                 .Style("margin-top", ".4rem").Style("font-size", ".36rem").Style("color", "#8ea7b2")
-                .Text($"{guard.Name} // {guard.Greeting}"));
+                .Content(WorkshopGui.Element(receiver, "span")
+                    .Style("width", "8px").Style("height", "8px").Style("border-radius", "50%")
+                    .Style("display", "inline-block").Style("background", security.BadgeAccepted ? "#52e05a" : "#ffd34d")
+                    .Style("box-shadow", security.BadgeAccepted ? "0 0 8px #52e05a" : "0 0 8px #ffd34d"))
+                .Content(WorkshopGui.Element(receiver, "span").Text($"{guard.Name}"))
+                .Content(WorkshopGui.Element(receiver, "span").Style("color", "#52616a").Text($"// {guard.Greeting}")));
         }
 
         if (!security.BadgeAccepted && scanBadge is not null)
