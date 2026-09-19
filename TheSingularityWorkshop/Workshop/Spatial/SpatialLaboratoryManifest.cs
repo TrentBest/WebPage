@@ -53,6 +53,9 @@ public sealed record SpatialLaboratoryManifest(
     /// <summary>Structural grammars spanning natural language and machine protocols.</summary>
     public LanguageGrammarManifest Grammars { get; init; } = LanguageGrammarManifest.CreateDefault();
 
+    /// <summary>Diegetic performance instrumentation for the active laboratory experience.</summary>
+    public SpatialLaboratoryPerformanceManifest Performance { get; init; } = SpatialLaboratoryPerformanceManifest.CreateDefault();
+
     /// <summary>The deliberately provisional physics boundary used by laboratory simulations.</summary>
     public static TbdPhysicsEngineManifest PhysicsEngine => TbdPhysicsEngineManifest.Default;
 
