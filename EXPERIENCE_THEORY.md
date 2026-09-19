@@ -154,3 +154,16 @@ The canonical persistent-world demonstration is the **Space Elevator → Space S
 ## Version proof convention
 
 Repository progress continues to use incremental unit tests as architectural breadcrumbs. Each meaningful implementation increment gets a named test before the next architectural layer is added.
+
+
+## Rule 11 — Installation precedes arbitration
+
+A MicroBundle is loaded once, then arbitrated repeatedly until stable or the ten-round limit is reached.
+
+`LoadBundle(IArbitrator)` is the installation/configuration boundary. `Arbitrate(IArbitrator, roundIndex)` is the logical convergence boundary.
+
+No bundle fabricates a missing dependency. If that dependency arrives later, its presence becomes visible to later arbitration.
+
+## Rule 12 — Installation order is policy
+
+The Hub preserves installation completion order for its default arbitration pass. A future Experience manifest may replace that ordering policy without changing the bundle contract.
