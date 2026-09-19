@@ -40,7 +40,7 @@ public sealed class SpatialWorkshopScene
                 Building("singularity-transit", "singularity-transit", new SpatialBounds(90, 47, 4, 3)),
                 Building("npc-studio", "npc-studio", new SpatialBounds(11, 58, 4, 3)),
                 Building("fsm-bench", "fsm-workbench", new SpatialBounds(36, 54, 4, 2)),
-                Building("storage-bins", "storage", new SpatialBounds(95, 71, 2, 3)),
+                Building("storage-bins", "storage", new SpatialBounds(98, 63, 2, 3)),
                 Building("singularity-ontology-mall", "singularity-ontology-mall", new SpatialBounds(79, 64, 5, 3)),
                 Building("singularity-lab", "singularity-lab", new SpatialBounds(16, 89, 5, 3)),
                 Building("singularity-station", "singularity-station", new SpatialBounds(84, 14, 4, 2)),
