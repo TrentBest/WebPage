@@ -4,60 +4,48 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Defines the authoritative boundary between the Workshop tool domain and the
-/// places presented in Singularity City. A place may expose a Workshop tool
-/// without becoming part of the Workshop itself.
-/// </summary>
 public enum SpatialDomain
 {
     Workshop,
     SingularityCity
 }
 
-/// <summary>
-/// Authoritative identity for a spatial destination.
-/// SceneId is the runtime scene key; ToolId identifies the Workshop capability
-/// that owns the editable definition, when one exists.
-/// </summary>
 public sealed record SpatialPlace(
     string Id,
     string Name,
     SpatialDomain Domain,
     string SceneId,
     string? ToolId,
+    SpatialPoint EntryPoint,
     string Description);
 
 /// <summary>
-/// Single source of truth for spatial destinations exposed by Explore.
-/// Interactables point at these records rather than inventing destination names
-/// in presentation code.
+/// Authoritative destination catalog for Explore. A place belongs either to the
+/// Workshop tool domain or to Singularity City; a city place may expose a
+/// Workshop tool without becoming part of the Workshop.
 /// </summary>
 public static class SpatialPlaceCatalog
 {
     private static readonly IReadOnlyList<SpatialPlace> Places =
     [
-        // Workshop-owned authoring tools.
-        new("workshop.forge", "The Forge", SpatialDomain.Workshop, "forge", "fsm-forge", "FSM state, lifecycle, composition, and executable machinery."),
-        new("workshop.image", "Image Workshop", SpatialDomain.Workshop, "image-workshop", "image-workshop", "Image creation and visual asset tooling."),
-        new("workshop.blueprints", "Blueprint Library", SpatialDomain.Workshop, "library", "blueprint-library", "Architectural and spatial blueprint authoring."),
-        new("workshop.fsm-bench", "FSM Workbench", SpatialDomain.Workshop, "fsm-workbench", "fsm-workbench", "Focused FSM construction and inspection."),
-        new("workshop.npc-studio", "NPC Studio", SpatialDomain.Workshop, "npc-studio", "npc-studio", "NPC authoring and behavioral composition."),
-        new("workshop.storage", "Storage Bins", SpatialDomain.Workshop, "storage", "data-storage", "Persistent Workshop assets and generated artifacts."),
+        new("workshop.forge", "The Forge", SpatialDomain.Workshop, "forge", "fsm-forge", new SpatialPoint(50, 78), "FSM state, lifecycle, composition, and executable machinery."),
+        new("workshop.image", "Image Workshop", SpatialDomain.Workshop, "image-workshop", "image-workshop", new SpatialPoint(50, 78), "Image creation and visual asset tooling."),
+        new("workshop.blueprints", "Blueprint Library", SpatialDomain.Workshop, "library", "blueprint-library", new SpatialPoint(50, 78), "Architectural and spatial blueprint authoring."),
+        new("workshop.fsm-bench", "FSM Workbench", SpatialDomain.Workshop, "fsm-workbench", "fsm-workbench", new SpatialPoint(50, 78), "Focused FSM construction and inspection."),
+        new("workshop.npc-studio", "NPC Studio", SpatialDomain.Workshop, "npc-studio", "npc-studio", new SpatialPoint(50, 78), "NPC authoring and behavioral composition."),
+        new("workshop.storage", "Storage Bins", SpatialDomain.Workshop, "storage", "data-storage", new SpatialPoint(50, 78), "Persistent Workshop assets and generated artifacts."),
 
-        // City places. These may expose Workshop capabilities, but the place itself
-        // belongs to the world the visitor is exploring.
-        new("city.mansion", "Singularity Mansion", SpatialDomain.SingularityCity, "mansion", "building-authoring", "A full architectural residence and its nested spaces."),
-        new("city.transit", "Singularity Transit", SpatialDomain.SingularityCity, "singularity-transit", "transit-authoring", "The city's transportation interchange."),
-        new("city.ontology-mall", "Singularity Ontology Mall", SpatialDomain.SingularityCity, "singularity-ontology-mall", "ontology-authoring", "A navigable physical manifestation of the ontology."),
-        new("city.laboratory", "Singularity Laboratory", SpatialDomain.SingularityCity, "singularity-lab", "laboratory-authoring", "Research facilities and their departments."),
-        new("city.station", "Singularity Station", SpatialDomain.SingularityCity, "singularity-station", "station-authoring", "A major civic and transportation station."),
-        new("city.shipyard", "Singularity Shipyard", SpatialDomain.SingularityCity, "singularity-shipyard", "vehicle-builder", "A working dockyard where vessel definitions become visible things."),
-        new("city.capitol", "Singularity Capitol", SpatialDomain.SingularityCity, "singularity-capitol", "civic-authoring", "Civic and administrative facilities."),
-        new("city.ocean-shipyard", "Ocean Shipyard", SpatialDomain.SingularityCity, "ocean-shipyard", "vehicle-builder", "A waterfront yard for boats and marine construction."),
-        new("city.maze", "Workshop Maze", SpatialDomain.SingularityCity, "maze", "maze-authoring", "A playable spatial environment."),
-        new("city.aec-office", "AEC Remote Office", SpatialDomain.SingularityCity, "aec-remote-office", "aec-authoring", "A remote architectural, engineering, and construction office."),
-        new("city.taxi", "Singularity Taxi", SpatialDomain.SingularityCity, "singularity-taxi", "taxi-authoring", "A local transport service and vehicle experience.")
+        new("city.mansion", "Singularity Mansion", SpatialDomain.SingularityCity, "mansion", "building-authoring", new SpatialPoint(50, 78), "A full architectural residence and its nested spaces."),
+        new("city.transit", "Singularity Transit", SpatialDomain.SingularityCity, "singularity-transit", "transit-authoring", new SpatialPoint(50, 78), "The city's transportation interchange."),
+        new("city.ontology-mall", "Singularity Ontology Mall", SpatialDomain.SingularityCity, "singularity-ontology-mall", "ontology-authoring", new SpatialPoint(50, 78), "A navigable physical manifestation of the ontology."),
+        new("city.laboratory", "Singularity Laboratory", SpatialDomain.SingularityCity, "singularity-lab", "laboratory-authoring", new SpatialPoint(50, 78), "Research facilities and their departments."),
+        new("city.station", "Singularity Station", SpatialDomain.SingularityCity, "singularity-station", "station-authoring", new SpatialPoint(50, 78), "A major civic and transportation station."),
+        new("city.shipyard", "Singularity Shipyard", SpatialDomain.SingularityCity, "singularity-shipyard", "vehicle-builder", new SpatialPoint(50, 72), "A working dockyard where vessel definitions become visible things."),
+        new("city.capitol", "Singularity Capitol", SpatialDomain.SingularityCity, "singularity-capitol", "civic-authoring", new SpatialPoint(50, 78), "Civic and administrative facilities."),
+        new("city.ocean-shipyard", "Ocean Shipyard", SpatialDomain.SingularityCity, "ocean-shipyard", "vehicle-builder", new SpatialPoint(50, 72), "A waterfront yard for boats and marine construction."),
+        new("city.maze", "Workshop Maze", SpatialDomain.SingularityCity, "maze", "maze-authoring", new SpatialPoint(50, 78), "A playable spatial environment."),
+        new("city.aec-office", "AEC Remote Office", SpatialDomain.SingularityCity, "aec-remote-office", "aec-authoring", new SpatialPoint(50, 78), "A remote architectural, engineering, and construction office."),
+        new("city.taxi", "Singularity Taxi", SpatialDomain.SingularityCity, "singularity-taxi", "taxi-authoring", new SpatialPoint(50, 78), "A local transport service and vehicle experience.")
     ];
 
     public static IReadOnlyList<SpatialPlace> All => Places;
@@ -78,10 +66,6 @@ public static class SpatialPlaceCatalog
         return place is not null;
     }
 
-    /// <summary>
-    /// Validates that every interactable has an explicit place and that its
-    /// runtime destination is exactly the registered scene.
-    /// </summary>
     public static void Validate(IEnumerable<SpatialInteractable> interactables)
     {
         ArgumentNullException.ThrowIfNull(interactables);
