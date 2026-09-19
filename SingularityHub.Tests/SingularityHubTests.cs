@@ -184,26 +184,43 @@ public sealed class SingularityHubTests
         Assert.Single(hub.LoadedBundles);
     }
 
-    [Fact(DisplayName = "Bundle dependencies must already be loaded")]
-    public void BundleDependenciesMustAlreadyBeLoaded()
+    [Fact(DisplayName = "Bundle can resolve an available dependency during load")]
+    public void BundleCanResolveAvailableDependencyDuringLoad()
     {
         var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub(_ => { });
-        Assert.False(hub.LoadBundle(new TestBundle(20, 10)));
-        Assert.True(hub.LoadBundle(new TestBundle(10)));
-        Assert.True(hub.LoadBundle(new TestBundle(20, 10)));
+        var dependency = new TestBundle(10);
+        var dependent = new TestBundle(20, 10);
+        Assert.True(hub.RegisterBundle(dependency));
+        Assert.True(hub.RegisterBundle(dependent));
+        Assert.True(hub.LoadBundle(dependent));
+        Assert.Equal(new ulong[] { 10, 20 }, hub.LoadedBundles.Select(x => x.Id));
+        Assert.Equal(1, dependency.LoadCount);
+        Assert.Equal(1, dependent.LoadCount);
     }
 
-    [Fact(DisplayName = "Loaded bundles are kept in stable id order")]
-    public void LoadedBundlesAreSortedById()
+    [Fact(DisplayName = "Missing dependency does not fabricate a bundle")]
+    public void MissingDependencyDoesNotFabricateBundle()
+    {
+        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub(_ => { });
+        var dependent = new TestBundle(20, 999);
+        Assert.True(hub.LoadBundle(dependent));
+        Assert.Single(hub.LoadedBundles);
+        Assert.DoesNotContain(hub.LoadedBundles, bundle => bundle.Id == 999);
+        Assert.Equal(1, dependent.LoadCount);
+    }
+
+    [Fact(DisplayName = "Loaded bundles preserve installation order")]
+    public void LoadedBundlesPreserveInstallationOrder()
     {
         var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub(_ => { });
         hub.LoadBundle(new TestBundle(30));
         hub.LoadBundle(new TestBundle(10));
         hub.LoadBundle(new TestBundle(20));
-        Assert.Equal(new ulong[] { 10, 20, 30 }, hub.LoadedBundles.Select(x => x.Id));
+        Assert.Equal(new ulong[] { 30, 10, 20 }, hub.LoadedBundles.Select(x => x.Id));
     }
 
     [Fact(DisplayName = "Arbitration stops when no bundle mutates")]
+
     public void ArbitrationStopsWhenNoBundleMutates()
     {
         var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub(_ => { });
@@ -246,6 +263,12 @@ public sealed class SingularityHubTests
         public OntologySignature Ontology => new(1, 2, 3, 4, 5, 6, 7, 8, 9);
         public BundleVersion Version => new(1, 0, 0);
         public IReadOnlyList<ulong> Dependencies => _dependencies;
+        public int LoadCount { get; private set; }
+        public void LoadBundle(IArbitrator arbitrator)
+        {
+            LoadCount++;
+            foreach (var dependency in Dependencies) arbitrator.TryLoadBundle(dependency);
+        }
         public bool Arbitrate(IArbitrator arbitrator, int roundIndex) => roundIndex < _mutateRounds;
     }
 }
