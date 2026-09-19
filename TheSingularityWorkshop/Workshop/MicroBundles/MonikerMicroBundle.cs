@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using TheSingularityWorkshop.FSM_API;
 using TheSingularityWorkshop.SingularityHub;
-using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
@@ -10,7 +9,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// Reusable MicroBundle providing the Workshop moniker as a safe semantic capability.
 /// The bundle owns lifecycle through FSM_API; a host may choose any visual manifestation.
 /// </summary>
-public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
+public sealed class MonikerMicroBundle : IMicroBundle, TheSingularityWorkshop.SingularityHub.IMicroBundle, IDisposable
 {
     public const int BundleId = 2110;
     public const string DefaultText = "THE SINGULARITY WORKSHOP";
@@ -56,7 +55,7 @@ public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
     public int Id => BundleId;
 
     /// <summary>Stable Hub identity projection.</summary>
-    ulong HubBundle.Id => checked((ulong)Id);
+    ulong TheSingularityWorkshop.SingularityHub.IMicroBundle.Id => checked((ulong)Id);
 
     /// <summary>Semantic moniker text supplied by this bundle.</summary>
     public string Text { get; }
@@ -71,13 +70,13 @@ public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
     public bool IsReady => Status == "Ready";
 
     /// <summary>Hub-facing ontology projection for the reusable moniker capability.</summary>
-    OntologySignature HubBundle.Ontology => new(0, 0, 0, 0, 0, 0, 0, 0, BundleId);
+    OntologySignature TheSingularityWorkshop.SingularityHub.IMicroBundle.Ontology => new(0, 0, 0, 0, 0, 0, 0, 0, BundleId);
 
     /// <summary>Hub-facing bundle version.</summary>
-    BundleVersion HubBundle.Version => new(1, 0, 0);
+    BundleVersion TheSingularityWorkshop.SingularityHub.IMicroBundle.Version => new(1, 0, 0);
 
     /// <summary>The moniker has no required MicroBundle dependencies.</summary>
-    IReadOnlyList<ulong> HubBundle.Dependencies => Array.Empty<ulong>();
+    IReadOnlyList<ulong> TheSingularityWorkshop.SingularityHub.IMicroBundle.Dependencies => Array.Empty<ulong>();
 
     /// <summary>Requests presentation without prescribing the host's visual implementation.</summary>
     public void Present()
@@ -101,12 +100,12 @@ public sealed class MonikerMicroBundle : IMicroBundle, HubBundle, IDisposable
     }
 
     /// <summary>Participates in Hub arbitration without exposing implementation details.</summary>
-    void HubBundle.LoadBundle(IArbitrator arbitrator)
+    void TheSingularityWorkshop.SingularityHub.IMicroBundle.LoadBundle(TheSingularityWorkshop.SingularityHub.IArbitrator arbitrator)
     {
         ArgumentNullException.ThrowIfNull(arbitrator);
     }
 
-    bool HubBundle.Arbitrate(IArbitrator arbitrator, int roundIndex)
+    bool TheSingularityWorkshop.SingularityHub.IMicroBundle.Arbitrate(TheSingularityWorkshop.SingularityHub.IArbitrator arbitrator, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(arbitrator);
         return roundIndex >= 0 && !_disposed;
