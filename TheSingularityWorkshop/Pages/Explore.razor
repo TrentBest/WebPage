@@ -21,6 +21,8 @@
     private readonly SpatialLinework ForgeLinework = new();
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
+    private readonly SpatialShipyardManifest ShipyardManifest = SpatialShipyardManifest.CreateDefault();
+    private readonly SpatialShipDesignManifest ShipDesignManifest = SpatialShipDesignManifest.CreateDefault();
     private readonly TransitTrainMicroBundle TransitTrain = new(7301, TransitTrainSpecification.WorkshopHoEmu());
     private readonly SpatialLaboratoryManifest LaboratoryManifest = SpatialLaboratoryManifest.CreateDefault();
     private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
@@ -75,6 +77,9 @@
         Router.RegisterEntryPoint("space-elevator", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("singularity-station", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("singularity-island", new SpatialPoint(50, 78));
+        foreach (var interactable in Scene.Interactables)
+            Router.RegisterEntryPoint(interactable.Place.SceneId, interactable.Place.EntryPoint);
+
         Experience.Navigation.MoveTo(Scene.StartingPosition.X, Scene.StartingPosition.Y);
     }
 
@@ -134,6 +139,9 @@
 
         if (insideRoomId == "maze")
             return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
+
+        if (insideRoomId == "singularity-shipyard")
+            return SpatialShipyardGuiBuilder.Build(this, ShipyardManifest, ShipDesignManifest, Experience.User.DisplayName, ExitRoom);
 
         if (insideRoomId == "singularity-transit")
             return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform, AvatarX, AvatarY, HandleKeyDown, HandleTransitWorldClick, TransitTrain.Specification);
@@ -579,10 +587,12 @@
         UpdateConstructionTour(AvatarX, AvatarY);
         interactable.OnInteraction();
         var returnPosition = new SpatialPoint(AvatarX, AvatarY);
-        var firstVisit = Router.Enter(interactable.ExperienceId, returnPosition);
-        Experience.Navigation.MoveTo(Router.GetEntryPoint(interactable.ExperienceId).X, Router.GetEntryPoint(interactable.ExperienceId).Y);
-        insideRoomId = interactable.ExperienceId;
-        mansionWelcomeVisible = interactable.ExperienceId == "mansion" && firstVisit;
+        var place = interactable.Place;
+        var firstVisit = Router.Enter(place.SceneId, returnPosition);
+        var entry = place.EntryPoint;
+        Experience.Navigation.MoveTo(entry.X, entry.Y);
+        insideRoomId = place.SceneId;
+        mansionWelcomeVisible = place.SceneId == "mansion" && firstVisit;
         await InvokeAsync(StateHasChanged);
     }
 
