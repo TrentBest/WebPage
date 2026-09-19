@@ -54,7 +54,7 @@ public sealed record SpatialGravityBodyCatalog(IReadOnlyList<SpatialGravityBody>
             var normalizedB = total <= 0 ? 0 : influenceB / total;
             var dominanceDelta = Math.Abs(normalizedA - normalizedB);
             var interaction = Math.Min(normalizedA, normalizedB);
-            var active = interaction >= SpatialGravityFieldSample.IgnoreFraction;
+            var active = dominanceDelta <= SpatialGravityFieldSample.IgnoreFraction;
 
             result[i] = new SpatialGravityFieldSample(
                 t,
