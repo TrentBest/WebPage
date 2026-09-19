@@ -24,7 +24,7 @@ public static class SpatialForgeGuiBuilder
             .Style("overflow", "hidden").Style("background", "#020812").Style("color", White)
             .Style("font-family", "Consolas, 'Courier New', monospace");
 
-        root.Content(WorkshopGui.Element(receiver, "style").Text("@keyframes forge-breathe{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}@keyframes ingot-pulse{0%,100%{opacity:.65}50%{opacity:1}}"));
+        root.Content(WorkshopGui.Element(receiver, "style").Text("@keyframes forge-breathe{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}@keyframes forge-unlock-pulse{0%,100%{box-shadow:0 0 10px rgba(0,234,255,.12)}50%{box-shadow:0 0 24px rgba(0,234,255,.42),0 0 42px rgba(255,56,209,.12);transform:scale(1.025)}}@keyframes ingot-pulse{0%,100%{opacity:.65}50%{opacity:1}}"));
 
         var floor = WorkshopGui.Panel(receiver)
             .Style("position", "absolute").Style("inset", "0")
@@ -44,7 +44,7 @@ public static class SpatialForgeGuiBuilder
         root.Content(Avatar(receiver, avatarName));
         root.Content(WorkshopGui.Button(receiver).Label("← EXIT FORGE")
             .Style("position", "fixed").Style("right", "1rem").Style("bottom", "1rem").Style("z-index", "30")
-            .Style("padding", ".55rem .75rem").Style("border", $"1px solid {Magenta}66").Style("background", "rgba(1,4,10,.88)")
+            .Style("padding", ".65rem .9rem").Style("border", $"2px solid {Magenta}aa").Style("background", "rgba(20,2,16,.94)").Style("box-shadow", $"0 0 18px {Magenta}22, inset 0 0 12px {Magenta}10").Style("text-shadow", $"0 0 8px {Magenta}88")
             .Style("color", Magenta).Style("font-family", "inherit").Style("font-size", ".48rem")
             .Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(exitForge));
 
@@ -69,8 +69,8 @@ public static class SpatialForgeGuiBuilder
                 .Content(WorkshopGui.Element(receiver, "li").Text("Add ingots for OnEnter, OnUpdate, OnExit, and transitions."))
                 .Content(WorkshopGui.Element(receiver, "li").Text("Name your states and transitions so the machine becomes yours."))
                 .Content(WorkshopGui.Element(receiver, "li").Text("Preview the FSM before moving on to scaffolded behavior code.")))
-            .Content(WorkshopGui.Button(receiver).Label("UNDERSTOOD — ENTER THE FORGE")
-                .Style("padding", ".65rem 1rem").Style("border", $"1px solid {Cyan}88").Style("background", $"{Cyan}10")
+            .Content(WorkshopGui.Button(receiver).Label("UNDERSTOOD — ENTER THE FORGE").Attribute("data-forge-unlock", "true")
+                .Style("padding", ".65rem 1rem").Style("animation", "forge-unlock-pulse 1.8s ease-in-out infinite").Style("border", $"1px solid {Cyan}88").Style("background", $"{Cyan}10")
                 .Style("color", Cyan).Style("font-family", "inherit").Style("font-size", ".5rem").Style("letter-spacing", ".14em").Style("cursor", "pointer").OnClick(dismiss));
 
     private sealed class WelcomeState { public bool Dismissed { get; set; } }
