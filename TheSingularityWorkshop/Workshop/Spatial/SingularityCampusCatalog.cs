@@ -23,7 +23,7 @@ public static class SingularityCampusCatalog
         new("singularity-station", "Singularity Station", new SpatialBounds(78, 5, 12, 9), Columns: 4, Rows: 3, Detail: 2, Accent: "#00eaff", Fill: "#08151d", Openings: [new SpatialOpening(SpatialOpeningKind.Passage, SpatialGeometryEdge.Right, 4, 5)]),
         new("singularity-shipyard", "Singularity Shipyard", new SpatialBounds(87, 17, 11, 8), Columns: 4, Rows: 2, Detail: 2, Accent: "#ffe04a", Fill: "#17150a", Openings: [new SpatialOpening(SpatialOpeningKind.Passage, SpatialGeometryEdge.Left, 3, 5)]),
         new("singularity-capitol", "Singularity Capitol", new SpatialBounds(62, 5, 12, 9), Columns: 3, Rows: 3, Detail: 2, Accent: "#ff3b8d", Fill: "#21101a", Openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Bottom, 5, 7)]),
-        new("ocean-shipyard", "Ocean Shipyard", new SpatialBounds(50, 87, 14, 7), Columns: 4, Rows: 2, Detail: 1, Accent: "#00eaff", Fill: "#07151d", Openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Top, 5, 9)])
+        new("ocean-shipyard", "Ocean Shipyard", new SpatialBounds(44, 87, 14, 7), Columns: 4, Rows: 2, Detail: 1, Accent: "#00eaff", Fill: "#07151d", Openings: [new SpatialOpening(SpatialOpeningKind.Door, SpatialGeometryEdge.Top, 5, 9)])
     ];
 
     /// <summary>Departments exposed by the inverted ontology floor plan.</summary>
