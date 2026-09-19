@@ -1,6 +1,8 @@
 namespace TheSingularityWorkshop.Gui;
 
-using System;\nusing System.Collections.Generic;\nusing System.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>Declarative manifest for the Singularity Laboratory.</summary>
 /// <remarks>
