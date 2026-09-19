@@ -606,7 +606,7 @@ public static class SpatialTransitStationGuiBuilder
         string? targetId,
         SpatialTransitManifest manifest,
         Action start,
-        Func<string, Task> selectPlatform)
+        Action<string> selectPlatform)
     {
         var target = manifest.Destinations.FirstOrDefault(x => x.Id == targetId);
         var targetLabel = targetId is null ? "STATION OBSERVER" : target.Label;
