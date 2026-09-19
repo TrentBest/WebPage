@@ -161,7 +161,7 @@ Every meaningful repository change must:
 
 1. make the actual requested change;
 2. add/update an incremental visible unit-test/version proof;
-3. advance `IncrementalVersionTests.CurrentVersion`;
+3. append the next sequential versioned proof to `IncrementalVersionTests.cs`;
 4. keep the assertion meaningful;
 5. report the commit SHA and version;
 6. verify the current CI/test result before claiming success.
