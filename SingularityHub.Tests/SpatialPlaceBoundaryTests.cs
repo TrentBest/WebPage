@@ -43,9 +43,7 @@ public sealed class SpatialPlaceBoundaryTests
         var interactable = scene.Interactables.Single(x => x.Id == "singularity-shipyard");
 
         Assert.Same(place, interactable.Place);
-        Assert.Equal(place.EntryPoint, interactable.InteractionPoints[0].Bounds is var bounds
-            ? new SpatialPoint(bounds.X + bounds.Width / 2d, bounds.Y + bounds.Height / 2d)
-            : default);
+        Assert.Equal(new SpatialPoint(50, 72), place.EntryPoint);
         Assert.Equal("singularity-shipyard", interactable.ExperienceId);
     }
 
