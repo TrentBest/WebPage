@@ -26,11 +26,11 @@ public sealed class SpatialLaboratoryManifestTests
     {
         var lab = SpatialLaboratoryManifest.CreateDefault();
 
-        Assert.Equal("security", lab.FindFloorById("security")!.DomainId);
-        Assert.Equal("gravity", lab.FindFloorById("gravity")!.DomainId);
-        Assert.Equal("simulation", lab.FindFloorById("simulation")!.DomainId);
+        Assert.Equal("security", lab.FindFloorById("security")!.Value.DomainId);
+        Assert.Equal("gravity", lab.FindFloorById("gravity")!.Value.DomainId);
+        Assert.Equal("simulation", lab.FindFloorById("simulation")!.Value.DomainId);
         Assert.Contains(lab.Floors, x => x.Name == "MATERIALS SCIENCE");
         Assert.Contains(lab.Simulators, x => x.Id == "solar-system");
-        Assert.Equal("PROVISIONAL", lab.PhysicsEngine.Status);
+        Assert.Equal("PROVISIONAL", SpatialLaboratoryManifest.PhysicsEngine.Status);
     }
 }
