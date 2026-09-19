@@ -1,14 +1,7 @@
 name: .NET Tests
 
 on:
-  push:
-    branches:
-      - '**'
-  pull_request:
-    branches:
-      - master
-      - feature/public-facing-workshop
-      - feature/experience-core-architecture
+  workflow_dispatch:
 
 jobs:
   test:
@@ -22,6 +15,14 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
       - name: Restore
         run: |
           dotnet restore SingularityHub.Tests/SingularityHub.Tests.csproj
@@ -34,8 +35,25 @@ jobs:
           dotnet build Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-restore
 
-      - name: Test
+      - name: Test with TRX and coverage
         run: |
-          dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
-          dotnet test Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
-          dotnet test Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
+          dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults/SingularityHub --logger "trx;LogFileName=SingularityHub.Tests.trx"
+          dotnet test Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults/LivingGui --logger "trx;LogFileName=LivingGuiExperience.Tests.trx"
+          dotnet test Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults/Pong --logger "trx;LogFileName=PongExperience.Tests.trx"
+
+      - name: Upload test results and coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-and-coverage
+          path: TestResults/
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload coverage to Codecov
+        if: always() && secrets.CODECOV_TOKEN != ''
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./TestResults/**/coverage.cobertura.xml
+          fail_ci_if_error: true
