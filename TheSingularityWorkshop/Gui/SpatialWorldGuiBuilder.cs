@@ -200,15 +200,17 @@ public static class SpatialWorldGuiBuilder
             _ => (24d, 20d)
         };
 
+        var plan = SchematicPlanGuiBuilder.ForBuilding(room, 100, 100);
+
         return WorkshopGui.Button(receiver)
             .PositionAt(room.X, room.Y)
             .Style("z-index", "5")
             .Style("width", $"{size.Item1}%")
             .Style("height", $"{size.Item2}%")
             .Style("padding", "0")
-            .Style("border", $"2px solid {accent}99")
+            .Style("border", "0")
             .Style("border-radius", "0")
-            .Style("background", locked ? "rgba(30,24,3,.35)" : "rgba(0,20,30,.3)")
+            .Style("background", "transparent")
             .Style("color", White)
             .Style("font-family", "inherit")
             .Style("cursor", locked ? "default" : "pointer")
@@ -216,24 +218,7 @@ public static class SpatialWorldGuiBuilder
             .Style("pointer-events", locked ? "none" : "auto")
             .AriaLabel(locked ? "Unmapped structure" : $"Interact with {room.Name}")
             .OnClick(() => interactRoom(room.Id))
-            .Content(WorkshopGui.Element(receiver, "span")
-                .Style("position", "absolute")
-                .Style("left", "50%")
-                .Style("top", "10%")
-                .Style("transform", "translateX(-50%)")
-                .Style("padding", ".2rem .4rem")
-                .Style("background", "rgba(1,4,10,.85)")
-                .Style("border", $"1px solid {accent}55")
-                .Style("font-size", room.Id == "engineering" ? ".75rem" : ".55rem")
-                .Style("letter-spacing", ".1em")
-                .Style("white-space", "nowrap")
-                .Style("pointer-events", "none")
-                .Text(room.Name))
-            .Content(WorkshopGui.Element(receiver, "div")
-                .Style("position", "absolute")
-                .Style("inset", "8%")
-                .Style("border", $"1px solid {accent}55")
-                .Style("pointer-events", "none"));
+            .Content(SchematicPlanGuiBuilder.Build(receiver, plan, accent));
     }
 
     private static ElementBuilder Avatar(object receiver)
