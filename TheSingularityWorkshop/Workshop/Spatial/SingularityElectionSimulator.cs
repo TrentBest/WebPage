@@ -52,7 +52,11 @@ public sealed class SingularityElectionSimulator
     }
 
     public string? DetermineWinner()
-        => _candidateIds
+    {
+        if (_votesByCitizen.Count == 0)
+            return null;
+
+        return _candidateIds
             .Select(candidateId => new
             {
                 CandidateId = candidateId,
@@ -62,4 +66,5 @@ public sealed class SingularityElectionSimulator
             .ThenBy(x => x.CandidateId, StringComparer.OrdinalIgnoreCase)
             .Select(x => x.CandidateId)
             .FirstOrDefault();
+    }
 }
