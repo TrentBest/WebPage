@@ -167,3 +167,14 @@ No bundle fabricates a missing dependency. If that dependency arrives later, its
 ## Rule 12 — Installation order is policy
 
 The Hub preserves installation completion order for its default arbitration pass. A future Experience manifest may replace that ordering policy without changing the bundle contract.
+
+
+## Rule 13 — Human agency is a runtime boundary
+
+> **Automation reduces cognitive friction; it does not remove human responsibility.**
+
+The Workshop is intended to be self-describing and self-teaching, not self-governing. Procedural composition, recommendation, AI, and arbitration may produce inspectable proposals. Consequential world changes require an explicit human-controlled commit boundary.
+
+The persistent-world model distinguishes the author-controlled Workshop from user-extensible Singularity City. City users can create buildings, Experiences, and content within the permissions of the world.
+
+See `WORLD_COMPOSITION_AND_HUMAN_AGENCY.md` for the composition, authorship, applicability, provenance, and human-approval contract.
