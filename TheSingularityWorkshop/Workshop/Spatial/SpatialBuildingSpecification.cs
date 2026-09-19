@@ -139,6 +139,14 @@ public static class SpatialBuildingSpecificationCatalog
             1, 5, 30,
             "Educational facility sized to its student and staff population."),
         new(
+            "industrial.fabrication",
+            "Fabrication Facility",
+            SpatialBuildingPurpose.Industrial,
+            SpatialBuildingTier.Premium,
+            40, 30, 160, 120,
+            1, 8, 35,
+            "Industrial building sized to fabrication lines, logistics, robotics, and service capacity."),
+        new(
             "medical.hospital",
             "Hospital",
             SpatialBuildingPurpose.Medical,
