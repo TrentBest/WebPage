@@ -61,3 +61,23 @@ The Workshop itself should become a composition participant. Buildings, tools, G
 ## Migration rule
 
 For every transitional subsystem: locate behavior → identify its MicroBundle/Experience boundary → cover it → migrate it → remove obsolete host code.
+
+## Opening perception boundary
+
+The landing gateway has now been moved from hand-authored Razor structure into `WorkshopGatewayGuiBuilder`. This establishes the intended semantic boundary for the public opening.
+
+The remaining inline CSS is treated as manifestation rather than GUI architecture. The next migration should move the landing presentation lifecycle onto FSM_API.
+
+### Confirmed divergence
+
+`PageFSM` is the stronger architectural implementation: it already uses FSM_API to model Gateway → GatewayExit → Living GUI → Moniker → Gravity → Navigation → Running.
+
+`WorkshopExperienceService`, by contrast, still exposes string states such as `Intro`, `FlexHello`, and `Living`, while `Home.razor` also owns a timer and local FSM-backed node population. This is duplicate lifecycle ownership.
+
+Therefore the audit decision is:
+
+> **PageFSM/FSM_API is the target authority. WorkshopExperienceService and the Home-local lifecycle are transitional compatibility surfaces.**
+
+The migration rule is to preserve observable presentation while moving ownership into PageFSM/FSM_API, then remove the duplicate state/timer path rather than maintaining two competing models.
+
+See `WORKSHOP_OPENING_EXPERIENCE.md` for the perception contract.
