@@ -116,6 +116,10 @@ public static class SpatialLaboratoryExperienceGuiBuilder
                 prepareExperiment,
                 preparedExperimentId));
 
+            if (selectedFloor.DomainId.Equals("materials", StringComparison.OrdinalIgnoreCase)
+                || selectedFloor.DomainId.Equals("simulation", StringComparison.OrdinalIgnoreCase))
+                content.Content(DestructionSandboxes(receiver, laboratory.DestructionSandboxes));
+
             foreach (var simulator in simulators)
             {
                 content.Content(WorkshopGui.Panel(receiver)
@@ -314,6 +318,43 @@ public static class SpatialLaboratoryExperienceGuiBuilder
                 .OnClick(() => prepareExperiment?.Invoke(template.Id))
                 .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".25rem").Style("font-size", ".32rem").Style("color", "#8ea7b2")
                     .Text($"APPARATUS // {string.Join(" + ", template.RequiredInventoryIds.Select(id => inventory.FirstOrDefault(x => x.Id == id).Name))}")));
+        }
+
+        return panel;
+    }
+
+    private static ElementBuilder DestructionSandboxes(object receiver, SpatialLaboratoryDestructionCatalog catalog)
+    {
+        var panel = WorkshopGui.Panel(receiver)
+            .Style("margin-top", "1rem").Style("padding", "1rem")
+            .Style("border", "1px solid rgba(255,59,48,.35)")
+            .Style("background", "rgba(255,59,48,.035)")
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("font-size", ".55rem").Style("color", "#ff3b30")
+                .Text("DESTRUCTIVE PHYSICS // SANDBOX CHAMBERS"))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".35rem").Style("font-size", ".38rem")
+                .Style("line-height", "1.5").Style("color", "#aebfc8")
+                .Text("This is not a castle game. Structures, launchers, masses, materials, and trajectories are the instruments; collapse and impact are the measurements."));
+
+        foreach (var sandbox in catalog.Sandboxes)
+        {
+            panel.Content(
+                WorkshopGui.Element(receiver, "div")
+                    .Style("margin-top", ".55rem").Style("padding", ".55rem")
+                    .Style("border", "1px solid rgba(255,56,209,.18)")
+                    .Style("background", "rgba(255,56,209,.025)")
+                    .Content(WorkshopGui.Element(receiver, "div")
+                        .Style("font-size", ".4rem").Style("color", "#ffd34d")
+                        .Text(sandbox.Name))
+                    .Content(WorkshopGui.Element(receiver, "div")
+                        .Style("margin-top", ".2rem").Style("font-size", ".32rem")
+                        .Style("line-height", "1.45").Style("color", "#c9d8de")
+                        .Text(sandbox.Description))
+                    .Content(WorkshopGui.Element(receiver, "div")
+                        .Style("margin-top", ".25rem").Style("font-size", ".29rem")
+                        .Style("color", "#00eaff")
+                        .Text($"APPARATUS // {string.Join(" + ", sandbox.ApparatusIds)}")));
         }
 
         return panel;

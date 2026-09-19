@@ -22,13 +22,15 @@ public sealed class SpatialLaboratoryManifestTests
     }
 
     [Fact]
-    public void Laboratory_DescendsIntoPhysicsDomains()
+    public void Laboratory_ExposesTheDiegeticResearchFloors()
     {
         var lab = SpatialLaboratoryManifest.CreateDefault();
 
-        Assert.Equal("Mechanics", lab.FindFloor(1)!.Name);
-        Assert.Equal("Thermodynamics", lab.FindFloor(3)!.Name);
-        Assert.Equal("Hydrodynamics", lab.FindFloor(4)!.Name);
-        Assert.Equal("Simulation Baking", lab.FindFloor(8)!.Name);
+        Assert.Equal("security", lab.FindFloorById("security")!.DomainId);
+        Assert.Equal("gravity", lab.FindFloorById("gravity")!.DomainId);
+        Assert.Equal("simulation", lab.FindFloorById("simulation")!.DomainId);
+        Assert.Contains(lab.Floors, x => x.Name == "MATERIALS SCIENCE");
+        Assert.Contains(lab.Simulators, x => x.Id == "solar-system");
+        Assert.Equal("PROVISIONAL", lab.PhysicsEngine.Status);
     }
 }
