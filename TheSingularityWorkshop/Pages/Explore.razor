@@ -33,6 +33,8 @@
     private bool constructionTourActive;
     private string constructionTourMessage = "Stay close. I will show you what is being built.";
     private bool workshopMapVisible = true;
+    private SpatialMapScope workshopMapScope = SpatialMapScope.Workshop;
+    private double workshopMapZoom = 1d;
     private bool gardenMode = true;
     private bool gardenVisitResolved;
     private double spatialZoom = 1d;
@@ -78,7 +80,10 @@
         Router.RegisterEntryPoint("singularity-station", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("singularity-island", new SpatialPoint(50, 78));
         foreach (var interactable in Scene.Interactables)
-            Router.RegisterPlace(interactable.Place);
+        {
+            if (interactable.Place is not null)
+                Router.RegisterPlace(interactable.Place);
+        }
 
         Experience.Navigation.MoveTo(Scene.StartingPosition.X, Scene.StartingPosition.Y);
     }
@@ -168,7 +173,7 @@
         var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap, EnterConstructionSite, constructionTourActive, constructionTourMessage, constructionWelcomeVisible, RequestConstructionTour, ExitConstructionSite);
         var root = WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(WorkshopAdBanner());
         if (workshopMapVisible)
-            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap));
+            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope));
         return root;
     }
 
@@ -214,6 +219,10 @@
         => mazeZoom = Math.Clamp(zoom, .6, 2.2);
 
     private void ShowWorkshopMap() => workshopMapVisible = true;
+
+    private void SetWorkshopMapScope(SpatialMapScope scope) => workshopMapScope = scope;
+
+    private void SetWorkshopMapZoom(double zoom) => workshopMapZoom = Math.Clamp(zoom, .75, 2.5);
 
     private void EnterGardenDestination(string destinationId)
     {
