@@ -9,6 +9,8 @@ public sealed class SpatialWorkshopScene
 {
     private SpatialWorkshopScene(string startingAreaId, SpatialPoint startingPosition, IReadOnlyList<SpatialInteractable> interactables, SpatialViewSettings view, SpatialConstructionSite constructionSite, IReadOnlyList<ConstructionVehicle> constructionVehicles, SpatialConstructionExperience constructionExperience)
     {
+        SpatialPlaceCatalog.Validate(interactables);
+
         StartingAreaId = startingAreaId;
         StartingPosition = startingPosition;
         Interactables = interactables;
@@ -131,6 +133,7 @@ public sealed class SpatialInteractable
         InteractionPoint = interactionPoint;
         HitRegion = hitRegion;
         ExperienceId = experienceId;
+        Place = SpatialPlaceCatalog.Resolve(experienceId);
         InteractionPoints = interactionPoints is { Count: > 0 } ? interactionPoints : [new SpatialInteractionPoint("default", "Primary", interactionPoint)];
         Openings = openings ?? [];
     }
@@ -147,6 +150,7 @@ public sealed class SpatialInteractable
     public SpatialBounds InteractionPoint { get; }
     public ISpatialHitRegion HitRegion { get; }
     public string ExperienceId { get; }
+    public SpatialPlace Place { get; }
     public IReadOnlyList<SpatialInteractionPoint> InteractionPoints { get; }
     public IReadOnlyList<SpatialOpening> Openings { get; }
     public bool IsBreathing { get; private set; }
