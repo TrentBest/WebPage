@@ -13,6 +13,7 @@ public static class SpatialAECRemoteOfficeGuiBuilder
         object receiver,
         SpatialBuildingProgram program,
         SpatialModelSourcingManifest sourcing,
+        SpatialOntologyInterrogation interrogation,
         SpatialViewpoint viewpoint,
         string userName,
         Action<string> focus,
@@ -32,7 +33,7 @@ public static class SpatialAECRemoteOfficeGuiBuilder
         if (viewpoint.Mode == SpatialPresentationMode.Elevation && viewpoint.FocusId is not null)
             root.Content(Elevation(receiver, program, viewpoint, focus, returnToPlan));
         else
-            root.Content(Plan(receiver, program, viewpoint, focus));
+            root.Content(Plan(receiver, program, sourcing, interrogation, viewpoint, focus));
 
         root.Content(ProgramPanel(receiver, program, scaleAll, resizeRoom));
         root.Content(WorkshopGui.Button(receiver).Label("← EXIT AEC OFFICE")
@@ -55,7 +56,7 @@ public static class SpatialAECRemoteOfficeGuiBuilder
             .Content(WorkshopGui.Element(receiver,"div").Style("margin-top",".35rem").Style("color","#aebfc8").Style("font-family","system-ui,sans-serif").Style("font-size",".65rem").Text($"VISITOR // {userName}"))
             .Content(WorkshopGui.Element(receiver,"div").Style("margin-top",".4rem").Style("color","#52e05a").Style("font-size",".36rem").Style("letter-spacing",".08em").Text($"{sourcing.Candidates.Count(x => x.Viable)} MODEL CANDIDATES READY // CREW {sourcing.Scouts.Count}"));
 
-    private static ElementBuilder Plan(object receiver, SpatialBuildingProgram program, SpatialViewpoint viewpoint, Action<string> focus)
+    private static ElementBuilder Plan(object receiver, SpatialBuildingProgram program, SpatialModelSourcingManifest sourcing, SpatialOntologyInterrogation interrogation, SpatialViewpoint viewpoint, Action<string> focus)
     {
         var svg = WorkshopGui.Element(receiver,"svg")
             .Attribute("viewBox","0 0 120 80").Attribute("preserveAspectRatio","xMidYMid meet")
@@ -73,6 +74,13 @@ public static class SpatialAECRemoteOfficeGuiBuilder
         svg.Child(Label(receiver,18,20,"RECEPTION"));
 
         svg.Child(Room(receiver,40,14,34,20,"CONFERENCE","conference-table",focus));
+        svg.Child(WorkshopGui.Element(receiver,"rect").Attribute("x","47").Attribute("y","20").Attribute("width","20").Attribute("height","7")
+            .Attribute("rx","1").Attribute("fill","#ffd34d10").Attribute("stroke","#ffd34d").Attribute("stroke-width",".35")
+            .Style("cursor","pointer").OnClick(()=>focus("conference-table")));
+        svg.Child(Label(receiver,49,24,"ONTOLOGY TABLE"));
+        svg.Child(WorkshopGui.Element(receiver,"text").Attribute("x","49").Attribute("y","27").Attribute("fill","#52616a").Attribute("font-size","1.5")
+            .Text($"{interrogation.TablePresentation.Count} ONTOLOGY LAYERS // {sourcing.Candidates.Count(x => x.Viable)} MODELS READY"));
+
         svg.Child(Room(receiver,77,14,25,16,"DIRECTOR","director-desk",focus));
         svg.Child(Room(receiver,16,27,20,15,"MODEL LIBRARY","trophy-case",focus));
         svg.Child(Room(receiver,40,37,28,25,"OPEN OFFICE","chair",focus));
@@ -102,6 +110,11 @@ public static class SpatialAECRemoteOfficeGuiBuilder
     private static ElementBuilder Elevation(object receiver, SpatialBuildingProgram program, SpatialViewpoint viewpoint, Action<string> focus, Action returnToPlan)
     {
         var subject = viewpoint.FocusId!;
+        if (subject == "conference-table")
+        {
+            return ConferenceElevation(receiver, interrogation, sourcing, returnToPlan);
+        }
+
         var room = program.ResolveRoom(subject switch
         {
             "conference-table" => "conference",
@@ -168,6 +181,57 @@ public static class SpatialAECRemoteOfficeGuiBuilder
                 .Style("padding",".45rem .7rem").Style("border","1px solid #ffd34d66")
                 .Style("background","rgba(1,4,10,.92)").Style("color","#ffd34d")
                 .Style("font-family","inherit").Style("font-size",".42rem").Style("cursor","pointer").OnClick(()=>focus(subject)));
+    }
+
+    private static ElementBuilder ConferenceElevation(object receiver, SpatialOntologyInterrogation interrogation, SpatialModelSourcingManifest sourcing, Action returnToPlan)
+    {
+        var panel = WorkshopGui.MultiPanel(receiver)
+            .Style("position","absolute").Style("inset","0")
+            .Content(WorkshopGui.Element(receiver,"div")
+                .Style("position","absolute").Style("left","50%").Style("top","52%")
+                .Style("transform","translate(-50%,-50%)").Style("width","min(720px,70vw)")
+                .Style("height","min(420px,48vh)").Style("border","1px solid #00eaff88")
+                .Style("background","linear-gradient(180deg,#0b1b25,#02050a)")
+                .Content(WorkshopGui.Element(receiver,"div").Style("position","absolute").Style("left","8%").Style("right","8%").Style("top","18%").Style("height","64%")
+                    .Style("border","1px solid #ffd34d66").Style("background","rgba(255,211,77,.03)"))
+                .Content(WorkshopGui.Element(receiver,"div").Style("position","absolute").Style("left","10%").Style("top","23%").Style("color","#ffd34d").Style("font-size",".45rem").Style("letter-spacing",".14em").Text("CONFERENCE TABLE // ONTOLOGY INTERROGATION"))
+                .Content(WorkshopGui.Element(receiver,"div").Style("position","absolute").Style("left","10%").Style("right","10%").Style("top","34%").Style("display","grid").Style("grid-template-columns","repeat(3,1fr)").Style("gap",".3rem")
+                    .Content(WorkshopGui.Element(receiver,"div").Style("grid-column","1 / -1").Style("color","#00eaff").Style("font-size",".38rem").Text("DEFAULT ONTOLOGY // PHYSICALIZED ON THE TABLE")))
+                .Content(OntologyTable(receiver, interrogation))
+                .Content(ModelCrew(receiver, sourcing))
+                .Content(WorkshopGui.Element(receiver,"div").Style("position","absolute").Style("left","50%").Style("bottom","6%").Style("transform","translateX(-50%)").Style("color","#fff").Style("font-size",".38rem").Style("letter-spacing",".08em").Text("ASK QUESTIONS // REFINE MEANING // THEN GENERATE GEOMETRY")))
+            .Content(WorkshopGui.Button(receiver).Label("← RETURN TO FLOOR PLAN")
+                .Style("position","fixed").Style("left","1rem").Style("bottom","1rem").Style("z-index","50")
+                .Style("padding",".45rem .7rem").Style("border","1px solid #00eaff66")
+                .Style("background","rgba(1,4,10,.92)").Style("color","#00eaff")
+                .Style("font-family","inherit").Style("font-size",".42rem").Style("cursor","pointer").OnClick(returnToPlan));
+        return panel;
+    }
+
+    private static ElementBuilder OntologyTable(object receiver, SpatialOntologyInterrogation interrogation)
+    {
+        var panel = WorkshopGui.Element(receiver,"div")
+            .Style("position","absolute").Style("left","10%").Style("right","10%").Style("top","41%")
+            .Style("display","grid").Style("grid-template-columns","repeat(3,1fr)").Style("gap",".25rem");
+
+        foreach (var layer in interrogation.TablePresentation)
+            panel.Content(WorkshopGui.Element(receiver,"div").Style("padding",".28rem").Style("border","1px solid #00eaff33")
+                .Style("background","rgba(0,234,255,.025)")
+                .Content(WorkshopGui.Element(receiver,"div").Style("color","#00eaff").Style("font-size",".31rem").Text($"L{layer.Index} // {layer.Name}"))
+                .Content(WorkshopGui.Element(receiver,"div").Style("color","#ffd34d").Style("font-size",".42rem").Text(layer.Value.ToString())));
+        return panel;
+    }
+
+    private static ElementBuilder ModelCrew(object receiver, SpatialModelSourcingManifest sourcing)
+    {
+        var panel = WorkshopGui.Element(receiver,"div")
+            .Style("position","absolute").Style("left","10%").Style("right","10%").Style("bottom","18%")
+            .Style("display","flex").Style("gap",".3rem").Style("flex-wrap","wrap");
+
+        foreach (var scout in sourcing.Scouts)
+            panel.Content(WorkshopGui.Element(receiver,"div").Style("padding",".3rem .4rem").Style("border","1px solid #52e05a33")
+                .Style("color","#52e05a").Style("font-size",".3rem").Text($"{scout.Name} // {scout.Specialty}"));
+        return panel;
     }
 
     private static ElementBuilder ProgramPanel(object receiver, SpatialBuildingProgram program, Action<double> scaleAll, Action<string,double,double> resizeRoom)
