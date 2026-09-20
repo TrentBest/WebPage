@@ -74,7 +74,6 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
             this,
             _processingGroup);
 
-        // FSM_API enters the initial state on the first explicit step.
         _handle.Update();
     }
 
@@ -128,6 +127,36 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
     public IReadOnlyList<string> OptionsForCurrentLayer
         => SpatialAECOntologyCatalog.OptionsForLayer(CurrentLayer, _answers);
 
+    /// <summary>
+    /// Returns the concrete catalog item selected by the completed interrogation.
+    /// Null means the interrogation has not resolved to a building yet.
+    /// </summary>
+    public SpatialAECBuildingType? SelectedBuildingType
+        => IsComplete ? SpatialAECOntologyCatalog.Resolve(_answers) : null;
+
+    /// <summary>
+    /// Returns the pre-established code basis for the selected building.
+    /// Fictional selections receive an explicitly fictional derivative profile.
+    /// </summary>
+    public SpatialAECCodeProfile? SelectedCodeProfile
+        => SelectedBuildingType is null
+            ? null
+            : SpatialAECPlanExperienceFactory.Create(SelectedBuildingType).CodeProfile;
+
+    /// <summary>
+    /// Creates the default plan-view experience for the selected building.
+    /// The renderer can walk this data without inventing geometry or capabilities.
+    /// </summary>
+    public SpatialAECPlanExperience CreatePlanExperience()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+        var buildingType = SelectedBuildingType
+            ?? throw new InvalidOperationException(
+                "The AEC intent must resolve to a concrete building before a plan experience can be created.");
+
+        return SpatialAECPlanExperienceFactory.Create(buildingType);
+    }
 
     public void Answer(string value)
     {
@@ -148,19 +177,8 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
 
         _answers[layerBeingAnswered] = value.ToUpperInvariant();
         _advanceRequested = true;
-
-        // This is an event-driven FSM. The semantic operation advances exactly one
-        // ontology layer; it does not tick a process group shared by unrelated actors.
         _handle.Update();
 
-        // FSM_API 1.0.x can evaluate the transition condition without synchronizing
-        // the handle's CurrentState in some package builds. The transition itself is
-        // still owned by FSM_API; this fallback asks the handle to perform the same
-        // declared transition explicitly when the normal step did not advance it.
-        // FSM_API advances the handle's state during Step, while the target state's
-        // Enter action is performed on the following update cycle. This model exposes
-        // the semantic layer immediately, so explicitly enter the declared target when
-        // the state name has advanced but the semantic context has not.
         var expectedNextLayer = layerBeingAnswered + 1;
         if (CurrentLayer != expectedNextLayer)
             _handle.TransitionTo(expectedNextState);
