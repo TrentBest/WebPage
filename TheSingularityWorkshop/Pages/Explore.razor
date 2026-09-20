@@ -480,7 +480,7 @@
     private void PlaceLabBelongings() => SingularityLab.PlaceBelongings();
     private void CompleteLabScreening() => SingularityLab.CompleteScreening();
     private void EnterLabElevator() => SingularityLab.EnterElevator();
-    private void ScanLabId() => SingularityLab.ScanId();
+    private void ScanLabId() => SingularityLab.ScanId(Experience.User.DisplayName);
     private void ScanLabFingerprint() => SingularityLab.ScanFingerprint();
     private void ScanLabRetina() => SingularityLab.ScanRetina();
     private void SelectLabFloor(int floor) => SingularityLab.SelectFloor(floor);
