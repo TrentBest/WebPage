@@ -50,18 +50,7 @@ public static class SpatialAECCodeCatalog
             ? value
             : Profiles[SpatialBuildingPurpose.Unknown];
 
-        if (specification.Purpose != SpatialBuildingPurpose.Research)
-            return profile;
-
-        return profile with
-        {
-            Id = "research-sci-fi-derived",
-            Name = "Sci-Fi Research Facility Code Basis",
-            Basis = "Fictional structural code derived from IBC laboratory principles",
-            Edition = "SCI-FI-IBC-DERIVED-1.0",
-            StructuralSystem = "Reinforced structural frame + protected laboratory core",
-            SafetyNote = "Fictional technology may alter materials and systems, but the simulation retains explicit load paths, protected egress, fire/life-safety zones and service access."
-        };
+        return profile;
     }
 
     private static SpatialAECCodeProfile Create(string id, string name, string basis, int occupancyLoad, int liveLoad, int floorToFloor, string safetyNote)
