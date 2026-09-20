@@ -61,7 +61,7 @@ public static class SpatialSoftwareOfficeArrivalGuiBuilder
         if (arrival.Stage is SpatialSoftwareOfficeArrivalStage.Rampway or SpatialSoftwareOfficeArrivalStage.TowerHelipad)
             root.Content(Avatar(receiver, avatarName));
 
-        if (arrival.Stage != SpatialSoftwareOfficeArrivalStage.FacilityAccess)
+        if (arrival.Stage is not (SpatialSoftwareOfficeArrivalStage.TowerHelipad or SpatialSoftwareOfficeArrivalStage.FacilityAccess))
             root.Content(WorkshopGui.Button(receiver).Label("← LEAVE").Style("position", "fixed").Style("right", "1rem").Style("bottom", "1rem").Style("z-index", "30").OnClick(exitScene));
 
         return root;
