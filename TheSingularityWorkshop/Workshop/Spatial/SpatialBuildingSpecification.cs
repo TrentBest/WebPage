@@ -154,7 +154,15 @@ public static class SpatialBuildingSpecificationCatalog
             SpatialBuildingTier.Premium,
             50, 40, 160, 120,
             3, 15, 40,
-            "Medical campus building sized by clinical departments and patient capacity.")
+            "Medical campus building sized by clinical departments and patient capacity."),
+        new(
+            "research.laboratory",
+            "Research Laboratory",
+            SpatialBuildingPurpose.Research,
+            SpatialBuildingTier.Premium,
+            30, 24, 90, 70,
+            3, 18, 24,
+            "Research facility sized for laboratories, controlled environments, engineering work, and technical support.")
     ];
 
     public static IReadOnlyList<SpatialBuildingSpecification> All => Specifications;
