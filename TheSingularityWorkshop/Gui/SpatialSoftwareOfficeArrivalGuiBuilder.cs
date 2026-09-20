@@ -18,7 +18,8 @@ public static class SpatialSoftwareOfficeArrivalGuiBuilder
         Action ding,
         Action completeBriefing,
         Action openBehavior,
-        Action exitScene)
+        Action exitScene,
+        bool behaviorReady)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("overflow", "hidden")
@@ -73,8 +74,9 @@ public static class SpatialSoftwareOfficeArrivalGuiBuilder
                 break;
 
             case SpatialSoftwareOfficeArrivalStage.FacilityAccess:
-                root.Content(Briefing(receiver));
-                root.Content(ActionButton(receiver, "OPEN BEHAVIOR WORKBENCH", openBehavior));
+                root.Content(Briefing(receiver, behaviorReady));
+                if (behaviorReady)
+                    root.Content(ActionButton(receiver, "OPEN BEHAVIOR WORKBENCH", openBehavior));
                 break;
         }
 
@@ -256,11 +258,18 @@ public static class SpatialSoftwareOfficeArrivalGuiBuilder
                     .Content(WorkshopGui.Element(r, "div").Style("text-align", "center").Content(WorkshopGui.Element(r, "div").Style("font-size", "1rem").Style("color", "#fff").Text("CEO // SINGULARITY SOFTWARE INC.")).Content(WorkshopGui.Element(r, "div").Style("margin-top", ".8rem").Style("color", "#8ba8b2").Style("font-family", "system-ui,sans-serif").Style("font-size", ".75rem").Text("We're going a long way down. This building is enormous. While we descend, we'll prepare your identity, access, and workspace. We will give you room and put our teams at your discretion while we work out what you're creating.")))
                 .Content(WorkshopGui.Element(r, "div").Style("padding", "1rem 1.2rem").Style("color", "#00eaff").Style("font-size", ".55rem").Text($"ELEVATOR STOPS // {arrival.ElevatorStops:0000}"))));
 
-    private static ElementBuilder Briefing(object r)
-        => WorkshopGui.Element(r, "div").Style("position", "absolute").Style("left", "50%").Style("top", "50%").Style("transform", "translate(-50%,-50%)").Style("width", "min(760px,84vw)").Style("padding", "2rem").Style("border", "1px solid #00eaff66").Style("background", "rgba(1,5,9,.94)")
+    private static ElementBuilder Briefing(object r, bool behaviorReady)
+    {
+        var message = behaviorReady
+            ? "The FSM Forge scaffold is waiting for the company to define its behavior. The lifecycle is yours to shape here without forcing you to type the implementation syntax."
+            : "No FSM scaffold has been handed to the company yet. The Forge remains available; once you define an FSM there, Singularity Software Inc. will take the lifecycle scaffold from here.";
+
+        return WorkshopGui.Element(r, "div").Style("position", "absolute").Style("left", "50%").Style("top", "50%").Style("transform", "translate(-50%,-50%)").Style("width", "min(760px,84vw)").Style("padding", "2rem").Style("border", "1px solid #00eaff66").Style("background", "rgba(1,5,9,.94)")
             .Content(WorkshopGui.Element(r, "div").Style("color", "#00eaff").Style("font-size", ".6rem").Style("letter-spacing", ".18em").Text("FACILITY ACCESS GRANTED"))
             .Content(WorkshopGui.Element(r, "h1").Style("font-size", "clamp(1.5rem,3vw,2.4rem)").Text("We will figure out what you're creating."))
-            .Content(WorkshopGui.Element(r, "p").Style("font-family", "system-ui,sans-serif").Style("color", "#b8c9ce").Text("Your identity badge is being prepared. Our architecture, structure, behavior, visualization, play-test, documentation, and publishing teams are available to you. If you have already visited the FSM Forge, the next step is to turn its lifecycle scaffold into behavior."));
+            .Content(WorkshopGui.Element(r, "p").Style("font-family", "system-ui,sans-serif").Style("color", "#b8c9ce").Text("Your identity badge is being prepared. Our architecture, structure, behavior, visualization, play-test, documentation, and publishing teams are available to you."))
+            .Content(WorkshopGui.Element(r, "p").Style("margin-top", "1rem").Style("font-family", "system-ui,sans-serif").Style("color", behaviorReady ? "#ffd34d" : "#8ba8b2").Text(message));
+    }
 
     private static ElementBuilder Avatar(object r, string name)
         => WorkshopGui.Element(r, "div").Style("position", "absolute").Style("left", "50%").Style("bottom", "14%").Style("transform", "translateX(-50%)").Style("z-index", "20")
