@@ -38,7 +38,7 @@ public static class SpatialAECPlanExperienceGuiBuilder
         root.Content(Plan(receiver, experience, view, selectedInteractableId, avatarX, avatarY, approachInteractable, walkTo));
         root.Content(Header(receiver, experience, avatarName, view));
         root.Content(FloorRail(receiver, experience, view.Floor, selectFloor));
-        root.Content(Inspector(receiver, experience, view, selectedInteractableId, approachInteractable, enterAuthoring));
+        root.Content(Inspector(receiver, experience, view, selectedInteractableId, approachInteractable, walkTo, enterAuthoring));
         root.Content(Exit(receiver, exit));
 
         return root;
@@ -217,6 +217,7 @@ public static class SpatialAECPlanExperienceGuiBuilder
         SpatialAECPlanView view,
         string? selectedInteractableId,
         Action<string> approachInteractable,
+        Action<double, double> walkTo,
         Action enterAuthoring)
     {
         var selected = view.Interactables.FirstOrDefault(x =>
@@ -272,7 +273,11 @@ public static class SpatialAECPlanExperienceGuiBuilder
                 .Style("background", "rgba(0,234,255,.05)")
                 .Style("color", Cyan).Style("font-family", "inherit")
                 .Style("cursor", "pointer")
-                .OnClick(() => approachInteractable(selected.Id)));
+                .OnClick(() =>
+                {
+                    walkTo(selected.X, selected.Y);
+                    approachInteractable(selected.Id);
+                }));
         }
 
         panel.Content(WorkshopGui.Element(receiver, "div")
