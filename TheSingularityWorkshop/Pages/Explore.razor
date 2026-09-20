@@ -1,6 +1,5 @@
 @page "/explore"
 @using Microsoft.AspNetCore.Components.Web
-@using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.JSInterop
 @using TheSingularityWorkshop.Gui
 @using TheSingularityWorkshop.Workshop.MicroBundles
@@ -845,6 +844,8 @@
         interactable.OnInteraction();
         var returnPosition = new SpatialPoint(AvatarX, AvatarY);
         var place = interactable.Place;
+        if (place is null) return;
+
         var firstVisit = Router.Enter(place, returnPosition);
         var entry = place.EntryPoint;
         Experience.Navigation.MoveTo(entry.X, entry.Y);
