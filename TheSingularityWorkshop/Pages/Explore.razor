@@ -143,7 +143,7 @@
             return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
 
         if (insideRoomId == "forge")
-            return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, MoveForgeTo, ExitRoom);
+            return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitRoom);
 
         if (insideRoomId == "line-lab")
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
