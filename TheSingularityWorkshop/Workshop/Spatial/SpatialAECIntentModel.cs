@@ -148,12 +148,24 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
                 $"'{value}' is not a valid answer for {LayerNames[CurrentLayer]}.",
                 nameof(value));
 
-        _answers[CurrentLayer] = value.ToUpperInvariant();
+        var layerBeingAnswered = CurrentLayer;
+        var expectedNextState = layerBeingAnswered == LayerNames.Count - 1
+            ? "Complete"
+            : LayerNames[layerBeingAnswered + 1];
+
+        _answers[layerBeingAnswered] = value.ToUpperInvariant();
         _advanceRequested = true;
 
         // This is an event-driven FSM. The semantic operation advances exactly one
         // ontology layer; it does not tick a process group shared by unrelated actors.
         _handle.Update();
+
+        // FSM_API 1.0.x can evaluate the transition condition without synchronizing
+        // the handle's CurrentState in some package builds. The transition itself is
+        // still owned by FSM_API; this fallback asks the handle to perform the same
+        // declared transition explicitly when the normal step did not advance it.
+        if (!string.Equals(_handle.CurrentState, expectedNextState, StringComparison.Ordinal))
+            _handle.TransitionTo(expectedNextState);
 
         _advanceRequested = false;
     }
