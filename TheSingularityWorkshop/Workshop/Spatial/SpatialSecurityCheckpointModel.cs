@@ -160,6 +160,22 @@ public sealed class SpatialSecurityCheckpointModel
     {
         if (Stage != SpatialSecurityCheckpointStage.Queue) return;
 
+        // The checkpoint service point consumes the person at the front,
+        // then everyone behind them advances into the vacated spaces.
+        if (_agents.Any(agent => agent.QueueSlot == 0))
+        {
+            _agents.RemoveAll(agent => agent.QueueSlot == 0);
+            for (var index = 0; index < _agents.Count; index++)
+            {
+                var agent = _agents[index];
+                if (agent.QueueSlot > 0)
+                    _agents[index] = agent with { QueueSlot = agent.QueueSlot - 1 };
+            }
+
+            LastMessage = "SECURITY CALLED THE NEXT PERSON. A SPACE JUST OPENED IN THE LINE.";
+            return;
+        }
+
         for (var index = 0; index < _agents.Count; index++)
         {
             var agent = _agents[index];
