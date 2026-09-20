@@ -87,11 +87,11 @@ public sealed class SpatialSingularityLabModel
         LastMessage = "Scan your ID card at the security console.";
     }
 
-    public void ScanId()
+    public void ScanId(string userName = "USER")
     {
         if (Stage != SpatialSingularityLabStage.ElevatorElevation) return;
         Stage = SpatialSingularityLabStage.Fingerprint;
-        LastMessage = $"Welcome, Trent. Please touch the terminal for a fingerprint scan.";
+        LastMessage = $"Welcome, {userName}. Please touch the terminal for a fingerprint scan.";
     }
 
     public void ScanFingerprint()
