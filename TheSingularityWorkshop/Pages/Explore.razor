@@ -22,6 +22,7 @@
     private readonly SpatialAECDraftModel AECDraft = new();
     private readonly SpatialAECIntentModel AECIntent = new();
     private SpatialAECGeneratedStructure? AECGeneratedStructure;
+    private readonly SpatialSingularityLabModel SingularityLab = new();
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
     private readonly SpatialShipyardManifest ShipyardManifest = SpatialShipyardManifest.CreateDefault();
@@ -183,21 +184,21 @@
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
 
         if (insideRoomId == "singularity-lab")
-            return SpatialLaboratoryExperienceGuiBuilder.Build(
+            return SpatialSingularityLabGuiBuilder.Build(
                 this,
-                LaboratoryManifest,
+                SingularityLab,
                 Experience.User.DisplayName,
-                selectedLaboratoryFloorId,
-                SelectLaboratoryFloor,
                 ExitRoom,
-                ScanLaboratoryBadge,
-                PrepareLaboratoryExperiment,
-                preparedLaboratoryExperimentId,
-                gravityBodyAId,
-                gravityBodyBId,
-                SelectGravityBodies,
-                threeDimensionalLabActive,
-                ToggleThreeDimensionalLab);
+                EnterLabSecurity,
+                PlaceLabBelongings,
+                CompleteLabScreening,
+                EnterLabElevator,
+                ScanLabId,
+                ScanLabFingerprint,
+                ScanLabRetina,
+                SelectLabFloor,
+                ResolveLabFloorChallenge,
+                ReturnToLabElevator);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(
@@ -474,6 +475,17 @@
     {
         LaboratoryManifest.Security.ScanBadge();
     }
+
+    private void EnterLabSecurity() => SingularityLab.EnterSecurityLine();
+    private void PlaceLabBelongings() => SingularityLab.PlaceBelongings();
+    private void CompleteLabScreening() => SingularityLab.CompleteScreening();
+    private void EnterLabElevator() => SingularityLab.EnterElevator();
+    private void ScanLabId() => SingularityLab.ScanId();
+    private void ScanLabFingerprint() => SingularityLab.ScanFingerprint();
+    private void ScanLabRetina() => SingularityLab.ScanRetina();
+    private void SelectLabFloor(int floor) => SingularityLab.SelectFloor(floor);
+    private void ResolveLabFloorChallenge() => SingularityLab.ResolveFloorChallenge();
+    private void ReturnToLabElevator() => SingularityLab.ReturnToElevator();
 
     private void PrepareLaboratoryExperiment(string experimentId)
     {
@@ -785,6 +797,22 @@
             await InvokeAsync(StateHasChanged);
             return;
         }
+        if (id == "singularity-lab")
+        {
+            var selectedLabPoint = interactable.InteractionPoints
+                .Select(point => new { Point = point, Path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), Center(point.Bounds), SpatialGeometryEngine.FromInteractables(Scene.Interactables)) })
+                .Where(candidate => candidate.Path.Count > 0)
+                .OrderBy(candidate => PathLength(new SpatialPoint(AvatarX, AvatarY), candidate.Path))
+                .FirstOrDefault();
+
+            if (selectedLabPoint is null) return;
+            await NavigatePath(selectedLabPoint.Path);
+            SingularityLab.Reset();
+            insideRoomId = "singularity-lab";
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
 
         var selected = interactable.InteractionPoints
             .Select(point => new { Point = point, Path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), Center(point.Bounds), SpatialGeometryEngine.FromInteractables(Scene.Interactables)) })
@@ -975,6 +1003,9 @@
             mazeStartedAtUtc = null;
             selectedLeaderboardEntry = null;
         }
+
+        if (insideRoomId == "singularity-lab")
+            SingularityLab.Reset();
 
         if (insideRoomId == "singularity-transit")
         {
