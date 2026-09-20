@@ -145,8 +145,19 @@ public static class SpatialAECOntologyCatalog
                 "DEVELOPMENT", "CUSTOM FACILITY")
         };
 
+        var aliases = new[]
+        {
+            new SpatialAECBuildingType(
+                "office.building",
+                "Office Building",
+                "REALITY", "BUILT ENVIRONMENT", "FACILITY", "OFFICE",
+                "OFFICE BUILDING", "SINGLE BUILDING", "ENGINEERING",
+                "DEVELOPMENT", "SMALL OFFICE")
+        };
+
         return canonical
             .Concat(scenarios)
+            .Concat(aliases)
             .GroupBy(x => x.Id, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())
             .ToArray();
@@ -169,7 +180,7 @@ public static class SpatialAECOntologyCatalog
             return new SpatialAECBuildingOntologyProfile(
                 specification.Id,
                 "REALITY",
-                "BUILT ENVIRONMENT",
+                "RESEARCH",
                 "FACILITY",
                 "LABORATORY",
                 "RESEARCH FACILITY",
