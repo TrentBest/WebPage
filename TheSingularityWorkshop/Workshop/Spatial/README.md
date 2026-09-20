@@ -205,6 +205,61 @@ The implementation already has guards, reception, a director's office, conferenc
 
 The intended visual direction is a realistic science-fiction facility: security should feel like part of the building, not a modal; the visitor should understand where they are in the facility; the elevator should feel physically secure; and the research floors should become increasingly rich manifestations of actual data and experiments.
 
+
+### Laboratory exterior, reusable security, and the first holodeck
+
+The laboratory now begins as a physical exterior elevation rather than dropping the visitor directly into an interior plan.
+
+The entrance has three distinct capabilities:
+
+- a physical main door;
+- a reusable, ontology-addressable card-reader MicroBundle boundary;
+- a reusable voice intercom boundary.
+
+The visitor is intentionally required to use the voice call box before the badge reader will accept the badge. Clearance is a property of the badge and reader, not a hard-coded laboratory permission. That means the same substrate can later be embedded in a starship, secure office, simulation game, or theft/caper scenario where the player must earn or steal a higher-clearance credential.
+
+The entrance also exposes live facility traffic. Employees such as **Research #13** and **Administrator #2** have shifts, destinations, and clearance. Guards have posts and shifts covering security, the elevator, and the facility-head approach. This is the beginning of the laboratory behaving like a place inhabited by people rather than a static menu.
+
+The laboratory's first holodeck experience is the existing authored maze. `SpatialHolodeckMazeModel` separates the maze data from its presentation and provides:
+
+- 2D maze navigation as the initial mode;
+- a toggle into a first-person presentation using the same maze state;
+- a thirty-second player head start;
+- a left-wall hunter;
+- a right-wall hunter;
+- capture and exit terminal states.
+
+The hunters are deliberately data-driven wall-following agents rather than special-case animation. They can therefore become reusable pursuit MicroBundles later.
+
+The intended progression is:
+
+```text
+LABORATORY EXTERIOR ELEVATION
+        |
+        +--> INTERCOM --> VOICE ACCESS
+        |
+        +--> CARD READER --> CLEARANCE CHECK
+        |
+        v
+SECURITY / RECEPTION
+        |
+        +--> FACILITY HEAD
+        |
+        +--> SECURE ELEVATOR
+        |       |
+        |       +--> RESEARCH FLOORS
+        |
+        +--> HOLODECK
+                |
+                +--> 2D MAZE
+                |
+                +--> FIRST-PERSON MAZE
+                |
+                +--> 30 SECOND HEAD START
+                |
+                +--> LEFT-WALL HUNTER + RIGHT-WALL HUNTER
+```
+
 ### Physics-first release discipline
 
 The first useful laboratory floor is physics. FSMs, physics rules, measurements, reusable experiment data, image/mesh generation, and eventually 3D rendering can then become visible consequences of the laboratory's actual data model.
