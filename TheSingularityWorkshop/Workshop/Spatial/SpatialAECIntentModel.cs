@@ -79,7 +79,7 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
 
     public string Name { get; set; } = "AEC Intent Interrogation";
 
-    public bool IsValid => !_disposed;
+    public bool IsValid { get; set; } = true;
 
     /// <summary>The ontology layer currently being interrogated. Nine means complete.</summary>
     public int CurrentLayer { get; private set; }
@@ -220,6 +220,7 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
             _processingGroup);
 
         _disposed = true;
+        IsValid = false;
     }
 
     private void EnterLayer(int layer)
