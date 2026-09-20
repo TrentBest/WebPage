@@ -91,7 +91,7 @@ public static class SpatialForgeGuiBuilder
     {
         const int cells = 24;
         var surface = WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("inset", "0").Style("z-index", "35")
+            .Style("position", "absolute").Style("inset", "0").Style("z-index", "5")
             .Style("display", "grid")
             .Style("grid-template-columns", $"repeat({cells},1fr)")
             .Style("grid-template-rows", $"repeat({cells},1fr)")
