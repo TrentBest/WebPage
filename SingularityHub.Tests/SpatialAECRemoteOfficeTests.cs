@@ -55,7 +55,27 @@ public sealed class SpatialAECRemoteOfficeTests
         Assert.Equal(0, element.AngleDegrees);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 39 — AEC drafting undo preserves remaining semantic geometry")]
+    [Fact(DisplayName = "Incremental Unit Test 39 — AEC drafting records selected floor as spatial Z")]
+    public void DraftingCarriesFloorElevation()
+    {
+        using var draft = new SpatialAECDraftModel
+        {
+            SelectedFloor = 3,
+            SelectedTrade = "structural",
+            ElementKind = SpatialAECElementKind.Beam
+        };
+
+        draft.Begin(new SpatialPoint(10, 10));
+        var element = draft.End(new SpatialPoint(20, 10));
+
+        Assert.Equal(3, element.Floor);
+        Assert.Equal(36, element.StartZ);
+        Assert.Equal(36, element.EndZ);
+        Assert.Equal(SpatialAECElementKind.Beam, element.Kind);
+        Assert.Equal("structural", draft.SelectedTrade);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 40 — AEC drafting undo preserves remaining semantic geometry")]
     public void UndoRemovesOnlyLastElement()
     {
         using var draft = new SpatialAECDraftModel();
