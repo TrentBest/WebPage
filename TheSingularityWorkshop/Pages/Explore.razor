@@ -30,6 +30,7 @@
     private readonly SpatialSingularityLabModel SingularityLab = new();
     private readonly SpatialLaboratoryAccessModel LaboratoryAccess = new();
     private readonly SpatialLaboratoryTrafficModel LaboratoryTraffic = new();
+    private readonly SpatialSecurityCheckpointModel SecurityCheckpoint = new();
     private readonly SpatialHolodeckMazeModel HolodeckMaze = new();
     private CancellationTokenSource? holodeckCts;
     private readonly SpatialSoftwareOfficeModel SoftwareOffice = new("Singularity Software Inc.");
@@ -227,15 +228,19 @@
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
 
         if (insideRoomId == "singularity-lab-entrance")
-            return SpatialSingularityLabEntranceGuiBuilder.Build(
+            return SpatialSecurityCheckpointGuiBuilder.Build(
                 this,
-                LaboratoryAccess,
+                SecurityCheckpoint,
                 LaboratoryTraffic,
                 Experience.User.DisplayName,
-                CallLaboratoryIntercom,
-                PresentLaboratoryBadge,
-                EnterLaboratoryFacility,
-                ExitRoom);
+                EnterSecurityCheckpoint,
+                MoveSecurityQueue,
+                PlaceSecurityTray,
+                LoadSecurityBelongings,
+                WalkSecurityScanner,
+                CollectSecurityTray,
+                ExitRoom,
+                EnterClearedLaboratory);
 
         if (insideRoomId == "lab-holodeck")
             return SpatialMazeExperienceGuiBuilder.Build(
@@ -803,19 +808,39 @@
         selectedLeaderboardEntry = null;
     }
 
-    private void CallLaboratoryIntercom()
+    private void EnterSecurityCheckpoint()
     {
-        LaboratoryAccess.CallIntercom();
+        SecurityCheckpoint.EnterQueue();
     }
 
-    private void PresentLaboratoryBadge()
+    private void MoveSecurityQueue(int slot)
     {
-        LaboratoryAccess.TryBadge();
+        SecurityCheckpoint.TryMoveToQueueSlot(slot);
     }
 
-    private void EnterLaboratoryFacility()
+    private void PlaceSecurityTray()
     {
-        if (!LaboratoryAccess.DoorOpen) return;
+        SecurityCheckpoint.PlaceTray();
+    }
+
+    private void LoadSecurityBelongings()
+    {
+        SecurityCheckpoint.LoadBelongings();
+    }
+
+    private void WalkSecurityScanner()
+    {
+        SecurityCheckpoint.WalkThroughScanner();
+    }
+
+    private void CollectSecurityTray()
+    {
+        SecurityCheckpoint.CollectTray();
+    }
+
+    private void EnterClearedLaboratory()
+    {
+        if (!SecurityCheckpoint.HasClearedCheckpoint) return;
         insideRoomId = "singularity-lab";
         SingularityLab.Reset();
     }
@@ -1081,6 +1106,7 @@
             await NavigatePath(selectedLabPoint.Path);
             SingularityLab.Reset();
             LaboratoryAccess.Reset();
+            SecurityCheckpoint.Reset();
             insideRoomId = "singularity-lab-entrance";
             await InvokeAsync(StateHasChanged);
             return;
@@ -1491,7 +1517,10 @@
         }
 
         if (insideRoomId == "singularity-lab-entrance")
+        {
+            SecurityCheckpoint.Reset();
             LaboratoryAccess.Reset();
+        }
 
         if (insideRoomId == "singularity-lab")
             SingularityLab.Reset();
