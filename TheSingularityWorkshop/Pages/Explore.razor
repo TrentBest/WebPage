@@ -28,6 +28,7 @@
     private readonly SpatialLaboratoryAccessControl LaboratoryAccess = new();
     private SpatialBuildingProgram AECProgram = SpatialBuildingProgramCatalog.RemoteOffice;
     private readonly SpatialModelSourcingManifest AECModelSourcing = SpatialModelSourcingManifest.CreateDefault();
+    private readonly SpatialOntologyInterrogation AECInterrogation;
     private SpatialViewpoint AECViewpoint = SpatialViewpoint.Plan(new SpatialPoint(50, 78));
     private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
@@ -86,6 +87,7 @@
     public Explore()
     {
         Experience = new ExploreExperienceMicroBundle();
+        AECInterrogation = new(((TheSingularityWorkshop.SingularityHub.IExperience)Experience).Ontology);
         Router.RegisterEntryPoint("mansion", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("construction-site", new SpatialPoint(12, 9));
         Router.RegisterEntryPoint("maze", SpatialMazeCatalog.Showcase.Start);
@@ -176,6 +178,7 @@
                 this,
                 AECProgram,
                 AECModelSourcing,
+                AECInterrogation,
                 AECViewpoint,
                 Experience.User.DisplayName,
                 FocusAECObject,
