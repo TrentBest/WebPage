@@ -28,6 +28,10 @@
     private double AECPlanAvatarX = 3;
     private double AECPlanAvatarY = 3;
     private readonly SpatialSingularityLabModel SingularityLab = new();
+    private readonly SpatialLaboratoryAccessModel LaboratoryAccess = new();
+    private readonly SpatialLaboratoryTrafficModel LaboratoryTraffic = new();
+    private readonly SpatialHolodeckMazeModel HolodeckMaze = new();
+    private CancellationTokenSource? holodeckCts;
     private readonly SpatialSoftwareOfficeModel SoftwareOffice = new("Singularity Software Inc.");
     private readonly SpatialSoftwareOfficeArrivalModel SoftwareOfficeArrival = new();
     private readonly SpatialBehaviorBuilderModel BehaviorBuilder = new("OnUpdate");
@@ -222,6 +226,31 @@
         if (insideRoomId == "singularity-island")
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
 
+        if (insideRoomId == "singularity-lab-entrance")
+            return SpatialSingularityLabEntranceGuiBuilder.Build(
+                this,
+                LaboratoryAccess,
+                LaboratoryTraffic,
+                Experience.User.DisplayName,
+                CallLaboratoryIntercom,
+                PresentLaboratoryBadge,
+                EnterLaboratoryFacility,
+                ExitRoom);
+
+        if (insideRoomId == "lab-holodeck")
+            return SpatialMazeExperienceGuiBuilder.Build(
+                this,
+                HolodeckMaze,
+                Experience.User.DisplayName,
+                MazeLeaderboard,
+                SelectLeaderboardEntry,
+                selectedLeaderboardEntry,
+                HandleKeyDown,
+                ExitRoom,
+                ToggleHolodeckMode,
+                mazeZoom,
+                SetMazeZoom);
+
         if (insideRoomId == "singularity-lab")
             return SpatialSingularityLabGuiBuilder.Build(
                 this,
@@ -237,7 +266,8 @@
                 ScanLabRetina,
                 SelectLabFloor,
                 ResolveLabFloorChallenge,
-                ReturnToLabElevator);
+                ReturnToLabElevator,
+                OpenLaboratoryHolodeck);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(
@@ -574,6 +604,12 @@
 
     private void HandleKeyDown(KeyboardEventArgs args)
     {
+        if (insideRoomId == "lab-holodeck")
+        {
+            HandleHolodeckKey(args);
+            return;
+        }
+
         switch (args.Key.ToLowerInvariant())
         {
             case "w":
@@ -686,6 +722,153 @@
             MazeLeaderboard.Record(Experience.User.DisplayName, mazeStartedAtUtc.HasValue ? (long)(DateTime.UtcNow - mazeStartedAtUtc.Value).TotalMilliseconds : 0, mazeSteps);
         }
     }
+
+    private void HandleHolodeckKey(KeyboardEventArgs args)
+    {
+        switch (args.Key.ToLowerInvariant())
+        {
+            case "w":
+            case "arrowup":
+                if (HolodeckMaze.Mode == SpatialHolodeckMazeMode.FirstPerson)
+                    MoveHolodeckForward();
+                else
+                    MoveHolodeckDirection(0, -1);
+                break;
+            case "s":
+            case "arrowdown":
+                if (HolodeckMaze.Mode == SpatialHolodeckMazeMode.FirstPerson)
+                    MoveHolodeckBackward();
+                else
+                    MoveHolodeckDirection(0, 1);
+                break;
+            case "a":
+            case "arrowleft":
+                if (HolodeckMaze.Mode == SpatialHolodeckMazeMode.FirstPerson)
+                    TurnHolodeckLeft();
+                else
+                    MoveHolodeckDirection(-1, 0);
+                break;
+            case "d":
+            case "arrowright":
+                if (HolodeckMaze.Mode == SpatialHolodeckMazeMode.FirstPerson)
+                    TurnHolodeckRight();
+                else
+                    MoveHolodeckDirection(1, 0);
+                break;
+        }
+    }
+
+    private void MoveHolodeckDirection(int dx, int dy)
+    {
+        if (HolodeckMaze.TryMovePlayer(dx, dy, DateTime.UtcNow))
+            MazeLeaderboard.Update();
+
+        StartHolodeckLoopIfNeeded();
+        RecordHolodeckFinishIfNeeded();
+    }
+
+    private void MoveHolodeckForward()
+    {
+        var (dx, dy) = HolodeckDelta(HolodeckMaze.PlayerHeading);
+        MoveHolodeckDirection(dx, dy);
+    }
+
+    private void MoveHolodeckBackward()
+    {
+        var (dx, dy) = HolodeckDelta(HolodeckMaze.PlayerHeading);
+        MoveHolodeckDirection(-dx, -dy);
+    }
+
+    private void TurnHolodeckLeft()
+    {
+        HolodeckMaze.TurnLeft(DateTime.UtcNow);
+        StartHolodeckLoopIfNeeded();
+    }
+
+    private void TurnHolodeckRight()
+    {
+        HolodeckMaze.TurnRight(DateTime.UtcNow);
+        StartHolodeckLoopIfNeeded();
+    }
+
+    private void ToggleHolodeckMode()
+    {
+        HolodeckMaze.ToggleMode();
+    }
+
+    private void OpenLaboratoryHolodeck()
+    {
+        HolodeckMaze.Reset();
+        insideRoomId = "lab-holodeck";
+        selectedLeaderboardEntry = null;
+    }
+
+    private void CallLaboratoryIntercom()
+    {
+        LaboratoryAccess.CallIntercom();
+    }
+
+    private void PresentLaboratoryBadge()
+    {
+        LaboratoryAccess.TryBadge();
+    }
+
+    private void EnterLaboratoryFacility()
+    {
+        if (!LaboratoryAccess.DoorOpen) return;
+        insideRoomId = "singularity-lab";
+        SingularityLab.Reset();
+    }
+
+    private void StartHolodeckLoopIfNeeded()
+    {
+        if (insideRoomId != "lab-holodeck" || holodeckCts is not null)
+            return;
+
+        HolodeckMaze.Start(DateTime.UtcNow);
+        holodeckCts = new CancellationTokenSource();
+        _ = RunHolodeckLoop(holodeckCts.Token);
+    }
+
+    private async Task RunHolodeckLoop(CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(120));
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                if (insideRoomId != "lab-holodeck") return;
+                HolodeckMaze.Advance(DateTime.UtcNow);
+                await InvokeAsync(StateHasChanged);
+
+                if (HolodeckMaze.Captured || HolodeckMaze.Finished)
+                    return;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void RecordHolodeckFinishIfNeeded()
+    {
+        if (HolodeckMaze.Finished)
+        {
+            MazeLeaderboard.Record(
+                Experience.User.DisplayName,
+                (long)(DateTime.UtcNow - HolodeckMaze.StartedUtc).TotalMilliseconds,
+                HolodeckMaze.Steps);
+        }
+    }
+
+    private static (int X, int Y) HolodeckDelta(SpatialMazeHeading heading)
+        => heading switch
+        {
+            SpatialMazeHeading.North => (0, -1),
+            SpatialMazeHeading.East => (1, 0),
+            SpatialMazeHeading.South => (0, 1),
+            _ => (-1, 0)
+        };
 
     private void SelectLeaderboardEntry(string? name)
         => selectedLeaderboardEntry = name;
@@ -897,7 +1080,8 @@
             if (selectedLabPoint is null) return;
             await NavigatePath(selectedLabPoint.Path);
             SingularityLab.Reset();
-            insideRoomId = "singularity-lab";
+            LaboratoryAccess.Reset();
+            insideRoomId = "singularity-lab-entrance";
             await InvokeAsync(StateHasChanged);
             return;
         }
@@ -1297,6 +1481,18 @@
             selectedLeaderboardEntry = null;
         }
 
+        if (insideRoomId == "lab-holodeck")
+        {
+            holodeckCts?.Cancel();
+            holodeckCts?.Dispose();
+            holodeckCts = null;
+            HolodeckMaze.Reset();
+            selectedLeaderboardEntry = null;
+        }
+
+        if (insideRoomId == "singularity-lab-entrance")
+            LaboratoryAccess.Reset();
+
         if (insideRoomId == "singularity-lab")
             SingularityLab.Reset();
 
@@ -1319,6 +1515,8 @@
     {
         softwareOfficeCinematicCts?.Cancel();
         softwareOfficeCinematicCts?.Dispose();
+        holodeckCts?.Cancel();
+        holodeckCts?.Dispose();
         Experience.Dispose();
         AECIntent.Dispose();
         SingularityLab.Dispose();
