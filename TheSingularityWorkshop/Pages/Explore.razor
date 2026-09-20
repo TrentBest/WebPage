@@ -160,6 +160,9 @@
         if (insideRoomId == "forge")
             return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitRoom);
 
+        if (behaviorBuilderVisible)
+            return SpatialBehaviorBuilderGuiBuilder.Build(this, BehaviorBuilder, AddBehaviorElseIf, CloseBehaviorBuilder);
+
         if (insideRoomId == "singularity-software-office")
             return SpatialSoftwareOfficeArrivalGuiBuilder.Build(
                 this,
@@ -173,14 +176,6 @@
                 OpenSoftwareOfficeBehaviorBuilder,
                 ExitRoom);
 
-        if (behaviorBuilderVisible)
-            return SpatialBehaviorBuilderGuiBuilder.Build(this, BehaviorBuilder, AddBehaviorElseIf, CloseBehaviorBuilder);
-
-        if (insideRoomId == "singularity-software-office")
-        {
-            SoftwareOfficeArrival.Reset();
-            behaviorBuilderVisible = false;
-        }
 
         if (insideRoomId == "aec-lobby")
             return SpatialAECRemoteOfficeLobbyGuiBuilder.Build(
