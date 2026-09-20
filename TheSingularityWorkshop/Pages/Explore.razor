@@ -118,6 +118,7 @@
     private double AvatarY => Experience.Navigation.Y;
     private bool ConferenceJoined => Experience.Conference.Joined;
     private FsmForgeMicroBundle Forge => Experience.Forge;
+    private bool FsmScaffoldReady => fsmForgeVisited && Forge.Events.Count > 0;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -177,7 +178,7 @@
                 CompleteSoftwareOfficeBriefing,
                 OpenSoftwareOfficeBehaviorBuilder,
                 ExitRoom,
-                fsmForgeVisited);
+                FsmScaffoldReady);
 
 
         if (insideRoomId == "aec-lobby")
@@ -272,10 +273,26 @@
 
         var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap, EnterConstructionSite, constructionTourActive, constructionTourMessage, constructionWelcomeVisible, RequestConstructionTour, ExitConstructionSite);
         var root = WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(WorkshopAdBanner());
+        if (FsmScaffoldReady)
+            root.Content(FsmScaffoldNotice());
         if (workshopMapVisible)
             root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope));
         return root;
     }
+
+    private ElementBuilder FsmScaffoldNotice()
+        => WorkshopGui.Element(this, "div")
+            .Style("position", "fixed").Style("left", "50%").Style("bottom", "1rem")
+            .Style("transform", "translateX(-50%)").Style("z-index", "35")
+            .Style("padding", ".55rem .8rem")
+            .Style("border", "1px solid #ffd34d99")
+            .Style("background", "rgba(1,4,10,.94)")
+            .Style("color", "#ffd34d")
+            .Style("font-size", ".48rem")
+            .Style("letter-spacing", ".12em")
+            .Style("text-align", "center")
+            .Style("box-shadow", "0 0 24px #ffd34d12")
+            .Text("FSM SCAFFOLD READY // SINGULARITY SOFTWARE INC. HAS BEEN NOTIFIED // FOLLOW THE HELIPAD ROUTE");
 
     /// <summary>Renders the Workshop's first self-advertisement as spatial scenery rather than intrusive chrome.</summary>
     private ElementBuilder WorkshopAdBanner()
@@ -1134,7 +1151,7 @@
         SoftwareOffice.Artifact.Methods.Clear();
         if (fsmForgeVisited)
             SoftwareOffice.Artifact.Methods.AddRange(["OnEnter", "OnUpdate", "OnExit", "Condition"]);
-        SoftwareOffice.Artifact.IsExecutable = fsmForgeVisited;
+        SoftwareOffice.Artifact.IsExecutable = FsmScaffoldReady;
         SoftwareOffice.SynchronizeFromArtifact();
 
         await InvokeAsync(StateHasChanged);
@@ -1171,7 +1188,7 @@
 
     private void OpenSoftwareOfficeBehaviorBuilder()
     {
-        if (!fsmForgeVisited)
+        if (!FsmScaffoldReady)
             return;
 
         behaviorBuilderVisible = true;
@@ -1183,7 +1200,7 @@
 
     private void AddBehaviorElseIf()
     {
-        if (!fsmForgeVisited) return;
+        if (!FsmScaffoldReady) return;
         var index = BehaviorBuilder.ContextBranches.Count + 1;
         BehaviorBuilder.AddElseIf($"ContextType{index}", $"context{index}");
     }
