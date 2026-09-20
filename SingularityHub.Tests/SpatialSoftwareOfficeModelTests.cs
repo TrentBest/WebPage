@@ -42,7 +42,7 @@ public sealed class SpatialSoftwareOfficeModelTests
         Assert.Equal("124", elevator.Display);
 
         elevator.ShowDirectoryPage(2, 12);
-        Assert.Equal(13, elevator.VisibleFloorDirectory.Count);
+        Assert.Equal(12, elevator.VisibleFloorDirectory.Count);
         Assert.Equal(25, elevator.VisibleFloorDirectory[0].Number);
         Assert.Equal(36, elevator.VisibleFloorDirectory[^1].Number);
     }
