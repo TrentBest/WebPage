@@ -83,7 +83,7 @@ public static class SpatialAECGeneratedStructureGuiBuilder
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", ".38rem").Style("margin-top", ".5rem").Text($"ONTOLOGY // {structure.OntologySummary}"))
             .Content(WorkshopGui.Button(receiver).Label("ENTER GENERATED STRUCTURE / AUTHOR")
                 .Style("margin-top", ".7rem").Style("width", "100%").Style("padding", ".65rem")
-                .Style("border", $"{Cyan}88").Style("background", "rgba(0,234,255,.05)")
+                .Style("border", $"1px solid {Cyan}88").Style("background", "rgba(0,234,255,.05)")
                 .Style("color", Cyan).Style("font-family", "inherit").Style("cursor", "pointer").OnClick(enterOffice))
             .Content(WorkshopGui.Button(receiver).Label("REGENERATE FROM INTENT")
                 .Style("margin-top", ".35rem").Style("width", "100%").Style("padding", ".45rem")
