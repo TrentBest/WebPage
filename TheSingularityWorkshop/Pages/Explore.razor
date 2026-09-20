@@ -148,7 +148,7 @@
             return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitRoom);
 
         if (insideRoomId == "aec-remote-office")
-            return SpatialAECRemoteOfficeGuiBuilder.Build(this, AECManifest, AECDraft, Experience.User.DisplayName, args => _ = DrawAECPoint(args), ClearAECDraft, UndoAECDraft, SetAECElementKind, SetAECSnap, SetAECOrthogonal, SetAECFloor, SetAECTrade, ExitRoom);
+            return SpatialAECRemoteOfficeGuiBuilder.Build(this, AECManifest, AECDraft, Experience.User.DisplayName, AvatarX, AvatarY, args => _ = DrawAECPoint(args), ClearAECDraft, UndoAECDraft, SetAECElementKind, SetAECSnap, SetAECOrthogonal, SetAECFloor, SetAECTrade, ExitRoom);
 
         if (insideRoomId == "line-lab")
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
