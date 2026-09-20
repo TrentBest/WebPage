@@ -114,6 +114,12 @@ public static class SpatialAECPlanExperienceFactory
             "aec.scenario.industrial.warehouse"
                 => SpatialBuildingSpecificationCatalog.Resolve("industrial.fabrication"),
 
+            "office.building"
+                => SpatialBuildingSpecificationCatalog.Resolve("office.small"),
+
+            "aec.research.vertical.engineering-development"
+                => SpatialBuildingSpecificationCatalog.Resolve("research.laboratory"),
+
             _ => throw new KeyNotFoundException(
                 $"Catalog building '{buildingType.Id}' has no physical building specification.")
         };
