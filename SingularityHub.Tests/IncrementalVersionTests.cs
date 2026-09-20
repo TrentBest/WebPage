@@ -62,4 +62,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 154)] [Fact(DisplayName = "V0.0.154 — Software_Office_Helipad_Arrival_And_Typed_Behavior_Cards")] public void V0_0_154_SoftwareOfficeHelipadArrivalAndTypedBehaviorCards() => Assert.Equal("0.0.154", "0.0.154");
     [ArchitectureTest(0, 0, 155)] [Fact(DisplayName = "V0.0.155 — LUT_Driven_Helipad_Cinematic_And_FSM_Scaffold_Handoff")] public void V0_0_155_LutDrivenHelipadCinematicAndFsmScaffoldHandoff() => Assert.Equal("0.0.155", "0.0.155");
     [ArchitectureTest(0, 0, 156)] [Fact(DisplayName = "V0.0.156 — Spatial_Scene_Inventory_Includes_The_Software_Office_Without_Removing_The_Forge")] public void V0_0_156_SpatialSceneInventoryIncludesTheSoftwareOfficeWithoutRemovingTheForge() => Assert.Equal("0.0.156", "0.0.156");
+    [ArchitectureTest(0, 0, 157)] [Fact(DisplayName = "V0.0.157 — Workshop_Helipad_Is_Explicitly_Under_Construction_And_Deferred_From_The_Release_Path")] public void V0_0_157_WorkshopHelipadIsExplicitlyUnderConstructionAndDeferredFromTheReleasePath() => Assert.Equal("0.0.157", "0.0.157");
 }
