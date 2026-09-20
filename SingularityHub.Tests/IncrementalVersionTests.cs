@@ -60,4 +60,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 152)] [Fact(DisplayName = "V0.0.152 — Spatial_Software_Office_Grows_From_Pure_Data_With_ConflictFree_Names_And_Scalable_Elevator")] public void V0_0_152_SpatialSoftwareOfficeGrowsFromPureDataWithConflictFreeNamesAndScalableElevator() => Assert.Equal("0.0.152", "0.0.152");
     [ArchitectureTest(0, 0, 153)] [Fact(DisplayName = "V0.0.153 — Semantic_Code_Diagram_And_Office_Traffic_Are_Pure_Data")] public void V0_0_153_SemanticCodeDiagramAndOfficeTrafficArePureData() => Assert.Equal("0.0.153", "0.0.153");
     [ArchitectureTest(0, 0, 154)] [Fact(DisplayName = "V0.0.154 — Software_Office_Helipad_Arrival_And_Typed_Behavior_Cards")] public void V0_0_154_SoftwareOfficeHelipadArrivalAndTypedBehaviorCards() => Assert.Equal("0.0.154", "0.0.154");
+    [ArchitectureTest(0, 0, 155)] [Fact(DisplayName = "V0.0.155 — LUT_Driven_Helipad_Cinematic_And_FSM_Scaffold_Handoff")] public void V0_0_155_LutDrivenHelipadCinematicAndFsmScaffoldHandoff() => Assert.Equal("0.0.155", "0.0.155");
 }
