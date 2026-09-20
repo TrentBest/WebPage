@@ -59,4 +59,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 151)] [Fact(DisplayName = "V0.0.151 — AEC_Ontology_Mall_Is_Derived_From_Canonical_Building_Specifications")] public void V0_0_151_AecOntologyMallIsDerivedFromCanonicalBuildingSpecifications() => Assert.Equal("0.0.151", "0.0.151");
     [ArchitectureTest(0, 0, 152)] [Fact(DisplayName = "V0.0.152 — Spatial_Software_Office_Grows_From_Pure_Data_With_ConflictFree_Names_And_Scalable_Elevator")] public void V0_0_152_SpatialSoftwareOfficeGrowsFromPureDataWithConflictFreeNamesAndScalableElevator() => Assert.Equal("0.0.152", "0.0.152");
     [ArchitectureTest(0, 0, 153)] [Fact(DisplayName = "V0.0.153 — Semantic_Code_Diagram_And_Office_Traffic_Are_Pure_Data")] public void V0_0_153_SemanticCodeDiagramAndOfficeTrafficArePureData() => Assert.Equal("0.0.153", "0.0.153");
+    [ArchitectureTest(0, 0, 154)] [Fact(DisplayName = "V0.0.154 — Software_Office_Helipad_Arrival_And_Typed_Behavior_Cards")] public void V0_0_154_SoftwareOfficeHelipadArrivalAndTypedBehaviorCards() => Assert.Equal("0.0.154", "0.0.154");
 }
