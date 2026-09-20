@@ -91,9 +91,7 @@ public sealed class SpatialSoftwareOfficeModelTests
         Assert.Contains("TheSingularityWorkshop.FSM_API", office.Artifact.ExternalDependencies);
         Assert.Contains(office.Floors, floor => floor.Name == "Architecture");
     }
-}
 
-    
     [Fact]
     public void CodeDiagramKeepsSelectedFileAtTheCenterAndOnlyAddsUsedEdges()
     {
@@ -131,3 +129,4 @@ public sealed class SpatialSoftwareOfficeModelTests
         Assert.Equal(9, traffic.SmokeBreakGroup.Count);
         Assert.Equal(9, traffic.ExpectedSmokeBreakPopulation);
     }
+}
