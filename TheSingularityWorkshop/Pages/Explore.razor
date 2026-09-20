@@ -20,6 +20,8 @@
     private readonly SpatialLinework ForgeLinework = new();
     private readonly SpatialAECRemoteOfficeManifest AECManifest = SpatialAECRemoteOfficeManifest.CreateDefault();
     private readonly SpatialAECDraftModel AECDraft = new();
+    private readonly SpatialAECIntentModel AECIntent = new();
+    private SpatialAECGeneratedStructure? AECGeneratedStructure;
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
     private readonly SpatialShipyardManifest ShipyardManifest = SpatialShipyardManifest.CreateDefault();
@@ -146,6 +148,15 @@
 
         if (insideRoomId == "forge")
             return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitRoom);
+
+        if (insideRoomId == "aec-lobby")
+            return SpatialAECRemoteOfficeLobbyGuiBuilder.Build(this, Experience.User.DisplayName, EnterAECConsultation, ExitRoom);
+
+        if (insideRoomId == "aec-consultation")
+            return SpatialAECConsultationGuiBuilder.Build(this, AECIntent, Experience.User.DisplayName, AnswerAECIntent, GenerateAECStructure, ExitAECConsultation);
+
+        if (insideRoomId == "aec-generated-structure" && AECGeneratedStructure is not null)
+            return SpatialAECGeneratedStructureGuiBuilder.Build(this, AECGeneratedStructure, Experience.User.DisplayName, EnterGeneratedAECStructure, RegenerateAECStructure, ExitRoom); 
 
         if (insideRoomId == "aec-remote-office")
             return SpatialAECRemoteOfficeGuiBuilder.Build(this, AECManifest, AECDraft, Experience.User.DisplayName, AvatarX, AvatarY, args => _ = DrawAECPoint(args), ClearAECDraft, UndoAECDraft, SetAECElementKind, SetAECSnap, SetAECOrthogonal, SetAECFloor, SetAECTrade, ExitRoom);
@@ -757,6 +768,24 @@
         var interactable = Scene.Interactables.FirstOrDefault(item => item.Id == id);
         if (interactable is null) return;
 
+        // The AEC Remote Office is a compound Experience: arriving at the building
+        // first places the visitor in its lobby. The receptionist then leads them to
+        // the intent conference before the drafting office is exposed.
+        if (id == "aec-remote-office")
+        {
+            var selectedLobbyPoint = interactable.InteractionPoints
+                .Select(point => new { Point = point, Path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), Center(point.Bounds), SpatialGeometryEngine.FromInteractables(Scene.Interactables)) })
+                .Where(candidate => candidate.Path.Count > 0)
+                .OrderBy(candidate => PathLength(new SpatialPoint(AvatarX, AvatarY), candidate.Path))
+                .FirstOrDefault();
+
+            if (selectedLobbyPoint is null) return;
+            await NavigatePath(selectedLobbyPoint.Path);
+            insideRoomId = "aec-lobby";
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
         var selected = interactable.InteractionPoints
             .Select(point => new { Point = point, Path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), Center(point.Bounds), SpatialGeometryEngine.FromInteractables(Scene.Interactables)) })
             .Where(candidate => candidate.Path.Count > 0)
@@ -839,6 +868,46 @@
     private void SetAECOrthogonal(bool enabled) => AECDraft.Orthogonal = enabled;
     private void SetAECFloor(int floor) => AECDraft.SelectedFloor = Math.Clamp(floor, 1, 5);
     private void SetAECTrade(string trade) => AECDraft.SelectedTrade = trade;
+
+    private void EnterAECConsultation()
+    {
+        AECIntent.Reset();
+        AECGeneratedStructure = null;
+        insideRoomId = "aec-consultation";
+    }
+
+    private void AnswerAECIntent(string answer)
+    {
+        AECIntent.Answer(answer);
+    }
+
+    private void GenerateAECStructure()
+    {
+        AECGeneratedStructure = AECIntent.Generate();
+        insideRoomId = "aec-generated-structure";
+    }
+
+    private void RegenerateAECStructure()
+    {
+        AECGeneratedStructure = AECIntent.Generate();
+    }
+
+    private void EnterGeneratedAECStructure()
+    {
+        if (AECGeneratedStructure is null) return;
+
+        // Seed the conventional AEC office with the generated concept. The authoring
+        // surface remains available, but the first pass now begins from captured intent.
+        AECDraft.Clear();
+        AECDraft.SelectedFloor = 1;
+        AECDraft.SelectedTrade = "architecture";
+        insideRoomId = "aec-remote-office";
+    }
+
+    private void ExitAECConsultation()
+    {
+        insideRoomId = "aec-lobby";
+    }
 
     private async Task DrawForgePoint(MouseEventArgs args)
     {
