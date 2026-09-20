@@ -16,10 +16,6 @@ public static class SpatialForgeGuiBuilder
     /// <summary>Builds the Forge interior, centered on the FSM creation workbench.</summary>
     public static ElementBuilder Build(object receiver, SpatialLinework structure, string avatarName, Action enterLineLab, Action exitForge)
     {
-        var renderStart = Stopwatch.GetTimestamp();
-        var rendered = new SpatialLineRenderer().Render(structure, SpatialLineStyleCatalog.Blueprint);
-        var renderMicroseconds = Stopwatch.GetElapsedTime(renderStart).TotalMilliseconds * 1000d;
-
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh")
             .Style("overflow", "hidden").Style("background", "#020812").Style("color", White)
@@ -32,7 +28,6 @@ public static class SpatialForgeGuiBuilder
             .Style("background", "radial-gradient(circle at 50% 48%,#0a1c2a 0%,#030911 48%,#010308 100%)").Style("overflow", "auto");
 
         floor.Content(Grid(receiver));
-        floor.Content(Structure(receiver, rendered));
         // The Forge is a fabrication plan, not a room full of tools.
         // Keep the footprint sparse and let the FSM assembly occupy the site.
         floor.Content(Ingots(receiver));
@@ -41,7 +36,7 @@ public static class SpatialForgeGuiBuilder
         floor.Content(TransitionBay(receiver));
 
         root.Content(floor);
-        root.Content(Title(receiver, structure.Lines.Count, renderMicroseconds));
+        root.Content(Title(receiver));
         root.Content(Avatar(receiver, avatarName));
         root.Content(WorkshopGui.Button(receiver).Label("← EXIT FORGE")
             .Style("position", "fixed").Style("left", "50%").Style("bottom", "1rem").Style("transform", "translateX(-50%)").Style("z-index", "30")
@@ -64,12 +59,11 @@ public static class SpatialForgeGuiBuilder
             .Style("box-sizing", "border-box").Style("border", $"1px solid {Cyan}aa")
             .Style("background", "rgba(2,8,18,.96)").Style("box-shadow", $"0 0 60px {Cyan}22,inset 0 0 30px {Cyan}08")
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".7rem").Style("letter-spacing", ".28em").Text("WELCOME TO THE FSM FORGE"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "1rem").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".9rem").Text("This is a fabrication floor for creating a finite state machine."))
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "1rem").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".9rem").Text("This is an assembly plan for creating the structure of a finite state machine."))
             .Content(WorkshopGui.Element(receiver, "ol").Style("margin", "1rem 0").Style("padding-left", "1.3rem").Style("color", "#b8c9d0").Style("font-family", "system-ui,sans-serif").Style("font-size", ".7rem").Style("line-height", "1.7")
-                .Content(WorkshopGui.Element(receiver, "li").Text("Assemble empty states on the central workbench."))
-                .Content(WorkshopGui.Element(receiver, "li").Text("Add ingots for OnEnter, OnUpdate, OnExit, and transitions."))
-                .Content(WorkshopGui.Element(receiver, "li").Text("Name your states and transitions so the machine becomes yours."))
-                .Content(WorkshopGui.Element(receiver, "li").Text("Preview the FSM before moving on to scaffolded behavior code.")))
+                .Content(WorkshopGui.Element(receiver, "li").Text("Place states on the assembly plan."))
+                .Content(WorkshopGui.Element(receiver, "li").Text("Connect states to establish the machine's transition structure."))
+                .Content(WorkshopGui.Element(receiver, "li").Text("The Forge shows structure; behavior is scaffolded elsewhere.")))
             .Content(WorkshopGui.Button(receiver).Label("UNDERSTOOD — ENTER THE FORGE").Attribute("data-forge-unlock", "true")
                 .Style("padding", ".65rem 1rem").Style("animation", "forge-unlock-pulse 1.8s ease-in-out infinite").Style("border", $"1px solid {Cyan}88").Style("background", $"{Cyan}10")
                 .Style("color", Cyan).Style("font-family", "inherit").Style("font-size", ".5rem").Style("letter-spacing", ".14em").Style("cursor", "pointer").OnClick(dismiss));
@@ -85,7 +79,7 @@ public static class SpatialForgeGuiBuilder
     {
         var assembly = AssemblyStates.GetOrCreateValue(receiver);
         var panel = WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", "5%").Style("top", "30%").Style("width", "90%").Style("height", "43%")
+            .Style("position", "absolute").Style("left", "5%").Style("top", "30%").Style("width", "140vw").Style("height", "43vh")
             .Style("box-sizing", "border-box").Style("z-index", "25").Style("padding", ".8rem")
             .Style("border", $"1px solid {Magenta}88")
             .Style("background", "rgba(3,7,13,.72)")
@@ -131,7 +125,7 @@ public static class SpatialForgeGuiBuilder
     {
         var assembly = AssemblyStates.GetOrCreateValue(receiver);
         return WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", "5%").Style("top", "9%").Style("width", "90%").Style("height", "12%")
+            .Style("position", "absolute").Style("left", "5%").Style("top", "9%").Style("width", "140vw").Style("height", "12%")
             .Style("z-index", "24").Style("box-sizing", "border-box").Style("padding", ".65rem")
             .Style("border", $"1px solid {Cyan}66").Style("background", "rgba(2,8,18,.92)")
             .Style("box-shadow", $"0 0 24px {Cyan}12,inset 0 0 18px {Cyan}08")
@@ -147,7 +141,7 @@ public static class SpatialForgeGuiBuilder
 
     private static ElementBuilder TransitionBay(object receiver)
         => WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", "5%").Style("top", "78%").Style("width", "90%").Style("height", "14%")
+            .Style("position", "absolute").Style("left", "5%").Style("top", "78%").Style("width", "140vw").Style("height", "14%")
             .Style("z-index", "24").Style("box-sizing", "border-box").Style("padding", ".7rem")
             .Style("border", $"1px solid {Yellow}77").Style("background", "rgba(18,14,2,.94)")
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", ".55rem").Style("letter-spacing", ".18em").Text("TRANSITIONS // FROM → TO"))
@@ -179,11 +173,11 @@ public static class SpatialForgeGuiBuilder
         return rack;
     }
 
-    private static ElementBuilder Title(object receiver, int lineCount, double renderMicroseconds)
+    private static ElementBuilder Title(object receiver)
         => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "50%").Style("top", "1.2rem").Style("transform", "translateX(-50%)")
             .Style("z-index", "40").Style("text-align", "center").Style("pointer-events", "none")
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".65rem").Style("letter-spacing", ".3em").Text("FSM FORGE"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".2rem").Style("color", "#7895a1").Style("font-size", ".38rem").Style("letter-spacing", ".16em").Text("ASSEMBLY PLAN // STRUCTURE ONLY"));
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".2rem").Style("color", "#7895a1").Style("font-size", ".38rem").Style("letter-spacing", ".16em").Text("LARGE-SCALE FSM ASSEMBLY PLAN"));
 
     private static ElementBuilder Grid(object receiver)
         => WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "0").Style("top", "0").Style("width", "180vw").Style("height", "160vh").Style("z-index", "0").Style("background-size", "5vw 5vh")
