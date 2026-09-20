@@ -21,6 +21,30 @@ public sealed class SpatialAECIntentModel
 
     public string? CurrentAnswer => _answers[CurrentLayer];
 
+    /// <summary>Default spatial model the team places on the conference table for the active ontology layer.</summary>
+    public string CurrentDefault
+        => CurrentLayer >= LayerNames.Count
+            ? BuildingType
+            : OptionsForCurrentLayer.FirstOrDefault() ?? "NO DEFAULT";
+
+    /// <summary>Diegetic artifact name used while the team retrieves a matching model.</summary>
+    public string CurrentDefaultArtifact
+        => CurrentLayer >= LayerNames.Count
+            ? $"BUILDING MODEL // {BuildingType}"
+            : CurrentLayer switch
+            {
+                0 => $"ONTOLOGY TOKEN // {CurrentDefault}",
+                1 => $"CITY MASSING // {CurrentDefault}",
+                2 => $"FACILITY MASSING // {CurrentDefault}",
+                3 => $"FLOOR PLAN // {CurrentDefault}",
+                4 => $"BUILDING KIT // {CurrentDefault}",
+                5 => $"STACKING MODEL // {CurrentDefault}",
+                6 => $"DISCIPLINE KIT // {CurrentDefault}",
+                7 => $"PROGRAM MODEL // {CurrentDefault}",
+                8 => $"BUILDING MODEL // {CurrentDefault}",
+                _ => "MODEL"
+            };
+
     public bool IsComplete => CurrentLayer >= LayerNames.Count;
 
     public string BuildingType { get; private set; } = "UNRESOLVED STRUCTURE";
