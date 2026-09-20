@@ -101,7 +101,7 @@ public sealed class SpatialSingularityLabModel : IStateContext, IDisposable
 
     public string Name { get; set; } = "Singularity Laboratory";
 
-    public bool IsValid => !_disposed;
+    public bool IsValid { get; set; } = true;
 
     public SpatialSingularityLabStage Stage
         => Enum.Parse<SpatialSingularityLabStage>(_handle.CurrentState);
@@ -228,6 +228,7 @@ public sealed class SpatialSingularityLabModel : IStateContext, IDisposable
             _processingGroup);
 
         _disposed = true;
+        IsValid = false;
     }
 
     private void Command(SpatialSingularityLabCommand command)
