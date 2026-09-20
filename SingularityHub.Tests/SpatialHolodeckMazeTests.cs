@@ -1,3 +1,4 @@
+using SingularityHub.Abstractions;
 using TheSingularityWorkshop.Gui;
 using Xunit;
 
@@ -62,8 +63,8 @@ public sealed class SpatialHolodeckMazeTests
     {
         var access = new SpatialLaboratoryAccessModel();
 
-        Assert.Equal(9, access.CardReader.Ontology.GetLayers().Count);
-        Assert.Equal(101, access.CardReader.Ontology.GetLayers()[8]);
+        Assert.Equal(OntologySignature.LayerCount, 9);
+        Assert.Equal(101, access.CardReader.Ontology[8]);
         Assert.NotEqual(access.CardReader.Ontology, access.Intercom.Ontology);
     }
 }
