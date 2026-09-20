@@ -58,7 +58,8 @@ public sealed record SpatialAECPlanExperience(
 
 /// <summary>
 /// Creates a conservative default plan from the selected catalog building.
-/// Visual detail can grow as the user explores without changing the semantic model.
+/// Scenario concepts borrow a canonical physical specification while retaining
+/// their own fictional/semantic identity.
 /// </summary>
 public static class SpatialAECPlanExperienceFactory
 {
@@ -67,8 +68,19 @@ public static class SpatialAECPlanExperienceFactory
     {
         ArgumentNullException.ThrowIfNull(buildingType);
 
-        var specification = SpatialBuildingSpecificationCatalog.Resolve(buildingType.Id);
+        var specification = ResolvePhysicalSpecification(buildingType);
         var code = SpatialAECCodeCatalog.For(specification);
+
+        if (buildingType.Paradigm.Equals("FICTION", StringComparison.OrdinalIgnoreCase))
+        {
+            code = code with
+            {
+                Id = $"{code.Id}-fictional",
+                Name = $"{buildingType.Name} // Fictional Structural Code",
+                Basis = $"Fictional structural code derived from {code.Basis}",
+                Edition = "SCI-FI-DERIVED-1.0"
+            };
+        }
 
         var floorCount = Math.Clamp(
             specification.MinimumFloors,
@@ -80,6 +92,31 @@ public static class SpatialAECPlanExperienceFactory
             .ToArray();
 
         return new SpatialAECPlanExperience(buildingType, specification, code, floors);
+    }
+
+    private static SpatialBuildingSpecification ResolvePhysicalSpecification(
+        SpatialAECBuildingType buildingType)
+    {
+        if (SpatialBuildingSpecificationCatalog.TryResolve(buildingType.Id, out var specification))
+            return specification;
+
+        return buildingType.Id switch
+        {
+            "aec.scenario.fiction.civic-future"
+                => SpatialBuildingSpecificationCatalog.Resolve("civic.government"),
+
+            "aec.scenario.fiction.high-tech-research"
+                => SpatialBuildingSpecificationCatalog.Resolve("research.laboratory"),
+
+            "aec.scenario.industrial.energy-production"
+                => SpatialBuildingSpecificationCatalog.Resolve("industrial.fabrication"),
+
+            "aec.scenario.industrial.warehouse"
+                => SpatialBuildingSpecificationCatalog.Resolve("industrial.fabrication"),
+
+            _ => throw new KeyNotFoundException(
+                $"Catalog building '{buildingType.Id}' has no physical building specification.")
+        };
     }
 
     private static SpatialAECPlanView CreateFloor(
