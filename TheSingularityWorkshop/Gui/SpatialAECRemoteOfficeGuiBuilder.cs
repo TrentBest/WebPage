@@ -135,6 +135,8 @@ public static class SpatialAECRemoteOfficeGuiBuilder
         SpatialAECRemoteOfficeManifest manifest,
         SpatialAECDraftModel draft,
         string avatarName,
+        double avatarX,
+        double avatarY,
         Action<MouseEventArgs> drawPoint,
         Action clear,
         Action undo,
@@ -206,7 +208,7 @@ public static class SpatialAECRemoteOfficeGuiBuilder
         }
 
         root.Content(canvas);
-        root.Content(Avatar(receiver, avatarName, draft));
+        root.Content(Avatar(receiver, avatarName, draft, avatarX, avatarY));
         root.Content(TradeContext(receiver, manifest, draft, setElementKind, setSnap, setOrthogonal, clear, undo, exitOffice));
         root.Content(FloorNavigator(receiver, draft, setFloor, setTrade, manifest));
         root.Content(Status(receiver, draft));
@@ -474,15 +476,15 @@ public static class SpatialAECRemoteOfficeGuiBuilder
             _ => White
         };
 
-    private static ElementBuilder Avatar(object receiver, string name, SpatialAECDraftModel draft)
+    private static ElementBuilder Avatar(object receiver, string name, SpatialAECDraftModel draft, double avatarX, double avatarY)
     {
-        var p = Project(50, 50, draft.CurrentElevation);
+        var p = Project(avatarX, avatarY, draft.CurrentElevation);
         return WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("left", $"{p.X}%").Style("top", $"{p.Y}%").Style("z-index", "20")
             .Style("transform", "translate(-50%,-50%)").Style("pointer-events", "none")
             .Style("text-align", "center").Style("color", White).Style("font-size", ".38rem")
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", "1rem").Style("text-shadow", $"0 0 12px {Cyan}").Text("◉"))
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Text($"YOU ARE HERE // {name}"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("color", Muted).Style("font-size", ".3rem").Text($"X 50.0  Y 50.0  Z {draft.CurrentElevation:0.#}"));
+            .Content(WorkshopGui.Element(receiver, "div").Style("color", Muted).Style("font-size", ".3rem").Text($"X {avatarX:0.#}  Y {avatarY:0.#}  Z {draft.CurrentElevation:0.#}"));
     }
 }
