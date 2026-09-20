@@ -438,6 +438,18 @@
 
         workshopMapVisible = false;
         await InvokeAsync(StateHasChanged);
+
+        // The laboratory is a real child Experience, not merely a map destination.
+        // Selecting it from the campus directory should therefore complete the same
+        // physical arrival path as clicking the laboratory itself. This removes the
+        // easy-to-miss intermediate state where the avatar arrives at the door but
+        // the visitor still has to rediscover the building interaction.
+        if (id == "singularity-lab")
+        {
+            await InteractRoom(id);
+            return;
+        }
+
         await NavigateTo(Center(interactable.InteractionPoint));
     }
 
