@@ -60,6 +60,29 @@ public sealed class SpatialAECBuildingTypeFactoryTests
         Assert.All(types, type => Assert.Equal(9, type.Layers.Count));
     }
 
+    [Fact(DisplayName = "AEC ontology mall resolves the canonical research laboratory path")]
+    public void Catalog_ResolvesCanonicalResearchLaboratory()
+    {
+        var answers = new string?[]
+        {
+            "REALITY",
+            "BUILT ENVIRONMENT",
+            "FACILITY",
+            "LABORATORY",
+            "RESEARCH FACILITY",
+            "VERTICAL FACILITY",
+            "ENGINEERING",
+            "DEVELOPMENT",
+            "RESEARCH LABORATORY"
+        };
+
+        var buildingType = SpatialAECOntologyCatalog.Resolve(answers);
+
+        Assert.NotNull(buildingType);
+        Assert.Equal("research.laboratory", buildingType.Id);
+        Assert.Equal("Research Laboratory", buildingType.Name);
+    }
+
     [Fact(DisplayName = "AEC ontology mall shopping only exposes concrete inventory")]
     public void Catalog_OptionsAreBackedByConcreteInventory()
     {
