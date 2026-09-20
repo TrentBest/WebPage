@@ -8,6 +8,7 @@ public static class SpatialMazeExperienceGuiBuilder
 {
     private const string Cyan = "#00eaff";
     private const string Yellow = "#ffd34d";
+    private const string Magenta = "#ff38d1";
     private const string White = "#ffffff";
     private const string Muted = "#9fb2bd";
 
