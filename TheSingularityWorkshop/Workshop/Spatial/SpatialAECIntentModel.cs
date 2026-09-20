@@ -93,7 +93,30 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
     public string CurrentDefault
         => IsComplete
             ? BuildingType
-            : OptionsForCurrentLayer.FirstOrDefault() ?? "NO DEFAULT";
+            : EstablishedDefaultForCurrentLayer();
+
+    private string EstablishedDefaultForCurrentLayer()
+    {
+        var options = OptionsForCurrentLayer;
+
+        var preferred = CurrentLayer switch
+        {
+            0 => "REALITY",
+            1 => "BUILT ENVIRONMENT",
+            2 => "FACILITY",
+            3 => "OFFICE",
+            4 => "OFFICE BUILDING",
+            5 => "SINGLE BUILDING",
+            6 => "ENGINEERING",
+            7 => "DEVELOPMENT",
+            8 => "CUSTOM FACILITY",
+            _ => "NO DEFAULT"
+        };
+
+        return options.Contains(preferred, StringComparer.OrdinalIgnoreCase)
+            ? preferred
+            : options.FirstOrDefault() ?? "NO DEFAULT";
+    }
 
     /// <summary>Diegetic artifact name used while the team retrieves a matching model.</summary>
     public string CurrentDefaultArtifact
