@@ -17,7 +17,6 @@
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
     private readonly WorkshopRouter Router = new("workshop");
-    private readonly SpatialLinework ForgeStructure = SpatialForgeLineworkFactory.Create();
     private readonly SpatialLinework ForgeLinework = new();
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
@@ -144,7 +143,7 @@
             return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
 
         if (insideRoomId == "forge")
-            return SpatialForgeGuiBuilder.Build(this, ForgeStructure, Experience.User.DisplayName, EnterLineLab, ExitRoom);
+            return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, MoveForgeTo, ExitRoom);
 
         if (insideRoomId == "line-lab")
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
@@ -507,8 +506,34 @@
         }
     }
 
+    private async Task MoveForgeTo(double x, double y)
+    {
+        if (insideRoomId != "forge") return;
+
+        var target = new SpatialPoint(Math.Clamp(x, 4, 96), Math.Clamp(y, 8, 92));
+        var previous = new SpatialPoint(AvatarX, AvatarY);
+
+        const int frames = 8;
+        for (var frame = 1; frame <= frames; frame++)
+        {
+            var t = frame / (double)frames;
+            var eased = t * t * (3d - 2d * t);
+            Experience.Navigation.MoveTo(
+                previous.X + (target.X - previous.X) * eased,
+                previous.Y + (target.Y - previous.Y) * eased);
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(16);
+        }
+    }
+
     private async Task MoveAvatar(double dx, double dy)
     {
+        if (insideRoomId == "forge")
+        {
+            await MoveForgeTo(AvatarX + dx, AvatarY + dy);
+            return;
+        }
+
         if (insideRoomId == "mansion")
         {
             await NavigateMansionTo(new SpatialPoint(AvatarX + dx, AvatarY + dy));
@@ -756,17 +781,6 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    /// <summary>Moves from the Forge floor into its nested Linework Lab scene.</summary>
-    private void EnterLineLab()
-    {
-        if (insideRoomId != "forge") return;
-
-        Router.Enter("line-lab", new SpatialPoint(AvatarX, AvatarY));
-        var entry = Router.GetEntryPoint("line-lab");
-        Experience.Navigation.MoveTo(entry.X, entry.Y);
-        insideRoomId = "line-lab";
-    }
-
     private async Task NavigateTo(SpatialPoint target)
     {
         var path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), target, SpatialGeometryEngine.FromInteractables(Scene.Interactables));
@@ -883,7 +897,6 @@
     {
         Experience.Dispose();
         TransitTrain.Dispose();
-        ForgeStructure.Dispose();
         ForgeLinework.Dispose();
         MansionStructure.Dispose();
         MazeLeaderboard.Dispose();
