@@ -1,11 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using TheSingularityWorkshop.FSM_API;
+
 namespace TheSingularityWorkshop.Gui;
 
 /// <summary>
 /// Captures the user's intended AEC structure before conventional drafting begins.
 /// The interrogation walks the nine ontology layers from broad reality/fiction context
 /// down to the concrete building type, then assembles a navigable spatial concept.
+/// FSM_API owns the interrogation lifecycle; this class owns only the semantic data
+/// carried by the FSM context.
 /// </summary>
-public sealed class SpatialAECIntentModel
+public sealed class SpatialAECIntentModel : IStateContext, IDisposable
 {
     public static readonly IReadOnlyList<string> LayerNames =
     [
@@ -13,23 +20,84 @@ public sealed class SpatialAECIntentModel
         "Order", "Family", "Genus", "Species"
     ];
 
-    private readonly List<string?> _answers = new(new string?[9]);
+    private readonly List<string?> _answers = new(new string?[LayerNames.Count]);
+    private readonly FSMHandle _handle;
+    private readonly string _processingGroup;
+    private bool _advanceRequested;
+    private bool _disposed;
 
+    public SpatialAECIntentModel()
+    {
+        _processingGroup = $"SpatialAECIntent:{Guid.NewGuid():N}";
+        FSM_API.Create.CreateProcessingGroup(_processingGroup);
+
+        var builder = FSM_API.Create.CreateFiniteStateMachine(
+            "SpatialAECIntent",
+            processRate: -1,
+            processingGroup: _processingGroup);
+
+        for (var i = 0; i < LayerNames.Count; i++)
+        {
+            var layer = i;
+            builder.State(
+                LayerNames[layer],
+                onEnter: _ => EnterLayer(layer),
+                onUpdate: _ => { },
+                onExit: _ => { });
+        }
+
+        builder
+            .State(
+                "Complete",
+                onEnter: _ => CompleteInterrogation(),
+                onUpdate: _ => { },
+                onExit: _ => { })
+            .WithInitialState(LayerNames[0]);
+
+        for (var i = 0; i < LayerNames.Count - 1; i++)
+        {
+            var from = LayerNames[i];
+            var to = LayerNames[i + 1];
+            builder.Transition(from, to, _ => _advanceRequested);
+        }
+
+        builder.Transition(
+            LayerNames[^1],
+            "Complete",
+            _ => _advanceRequested);
+
+        builder.BuildDefinition();
+
+        _handle = FSM_API.Create.CreateInstance(
+            "SpatialAECIntent",
+            this,
+            _processingGroup);
+
+        // FSM_API enters the initial state on the first explicit step.
+        _handle.Update();
+    }
+
+    public string Name { get; set; } = "AEC Intent Interrogation";
+
+    public bool IsValid => !_disposed;
+
+    /// <summary>The ontology layer currently being interrogated. Nine means complete.</summary>
     public int CurrentLayer { get; private set; }
 
     public IReadOnlyList<string?> Answers => _answers;
 
-    public string? CurrentAnswer => _answers[CurrentLayer];
+    public string? CurrentAnswer
+        => IsComplete ? null : _answers[CurrentLayer];
 
     /// <summary>Default spatial model the team places on the conference table for the active ontology layer.</summary>
     public string CurrentDefault
-        => CurrentLayer >= LayerNames.Count
+        => IsComplete
             ? BuildingType
             : OptionsForCurrentLayer.FirstOrDefault() ?? "NO DEFAULT";
 
     /// <summary>Diegetic artifact name used while the team retrieves a matching model.</summary>
     public string CurrentDefaultArtifact
-        => CurrentLayer >= LayerNames.Count
+        => IsComplete
             ? $"BUILDING MODEL // {BuildingType}"
             : CurrentLayer switch
             {
@@ -69,28 +137,49 @@ public sealed class SpatialAECIntentModel
 
     public void Answer(string value)
     {
-        if (IsComplete) return;
-        if (!OptionsForCurrentLayer.Contains(value, StringComparer.OrdinalIgnoreCase))
-            throw new ArgumentException($"'{value}' is not a valid answer for {LayerNames[CurrentLayer]}.", nameof(value));
-
-        _answers[CurrentLayer] = value.ToUpperInvariant();
-        CurrentLayer++;
+        ObjectDisposedException.ThrowIf(_disposed, this);
 
         if (IsComplete)
-            BuildingType = ResolveBuildingType();
+            return;
+
+        if (!OptionsForCurrentLayer.Contains(value, StringComparer.OrdinalIgnoreCase))
+            throw new ArgumentException(
+                $"'{value}' is not a valid answer for {LayerNames[CurrentLayer]}.",
+                nameof(value));
+
+        _answers[CurrentLayer] = value.ToUpperInvariant();
+        _advanceRequested = true;
+
+        // This is an event-driven FSM. The semantic operation advances exactly one
+        // ontology layer; it does not tick a process group shared by unrelated actors.
+        _handle.Update();
+
+        _advanceRequested = false;
     }
 
     public void Reset()
     {
-        for (var i = 0; i < _answers.Count; i++) _answers[i] = null;
-        CurrentLayer = 0;
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+        for (var i = 0; i < _answers.Count; i++)
+            _answers[i] = null;
+
         BuildingType = "UNRESOLVED STRUCTURE";
+        _advanceRequested = false;
+
+        if (!string.Equals(_handle.CurrentState, LayerNames[0], StringComparison.Ordinal))
+            _handle.TransitionTo(LayerNames[0]);
+        else
+            EnterLayer(0);
     }
 
     public SpatialAECGeneratedStructure Generate(double squareUnits = 2400)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         if (!IsComplete)
-            throw new InvalidOperationException("The AEC intent must reach the concrete building type before generation.");
+            throw new InvalidOperationException(
+                "The AEC intent must reach the concrete building type before generation.");
 
         var normalized = Math.Max(400, squareUnits);
         var footprint = Math.Sqrt(normalized);
@@ -121,13 +210,40 @@ public sealed class SpatialAECIntentModel
             Summary);
     }
 
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+
+        FSM_API.Interaction.DestroyFiniteStateMachine(
+            "SpatialAECIntent",
+            _processingGroup);
+
+        _disposed = true;
+    }
+
+    private void EnterLayer(int layer)
+    {
+        CurrentLayer = layer;
+        _advanceRequested = false;
+    }
+
+    private void CompleteInterrogation()
+    {
+        CurrentLayer = LayerNames.Count;
+        BuildingType = ResolveBuildingType();
+        _advanceRequested = false;
+    }
+
     private string ResolveBuildingType()
     {
         if (_answers[0] == "FICTION" &&
             _answers[4] == "HIGH-TECH LABORATORY" &&
             _answers[6] == "SCIENCE" &&
             _answers[7] == "ADVANCED RESEARCH")
+        {
             return "SCI-FI HIGH-TECH RESEARCH LABORATORY";
+        }
 
         return _answers[8] ?? "CUSTOM FACILITY";
     }
@@ -142,6 +258,7 @@ public sealed record SpatialAECGeneratedStructure(
     IReadOnlyList<SpatialAECGeneratedRoom> Rooms,
     string OntologySummary);
 
+/// <summary>A room-sized semantic region in a generated AEC concept.</summary>
 public sealed record SpatialAECGeneratedRoom(
     string Id,
     string Name,
