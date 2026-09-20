@@ -25,6 +25,9 @@
     private readonly SpatialShipDesignManifest ShipDesignManifest = SpatialShipDesignManifest.CreateDefault();
     private readonly TransitTrainMicroBundle TransitTrain = new(7301, TransitTrainSpecification.WorkshopHoEmu());
     private readonly SpatialLaboratoryManifest LaboratoryManifest = SpatialLaboratoryManifest.CreateDefault();
+    private SpatialBuildingProgram AECProgram = SpatialBuildingProgramCatalog.RemoteOffice;
+    private readonly SpatialModelSourcingManifest AECModelSourcing = SpatialModelSourcingManifest.CreateDefault();
+    private SpatialViewpoint AECViewpoint = SpatialViewpoint.Plan(new SpatialPoint(50, 78));
     private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
@@ -166,6 +169,19 @@
 
         if (insideRoomId == "singularity-island")
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
+
+        if (insideRoomId == "aec-remote-office")
+            return SpatialAECRemoteOfficeGuiBuilder.Build(
+                this,
+                AECProgram,
+                AECModelSourcing,
+                AECViewpoint,
+                Experience.User.DisplayName,
+                FocusAECObject,
+                ReturnAECToPlan,
+                ScaleAECProgram,
+                ResizeAECProgramRoom,
+                ExitRoom);
 
         if (insideRoomId == "singularity-lab")
             return SpatialLaboratoryExperienceGuiBuilder.Build(
@@ -662,6 +678,29 @@
             selectedLaboratoryFloorId = LaboratoryManifest.Floors.FirstOrDefault().Id;
     }
 
+    private void FocusAECObject(string focusId)
+    {
+        AECViewpoint = SpatialViewpoint.Elevation(new SpatialPoint(AvatarX, AvatarY), focusId);
+    }
+
+    private void ReturnAECToPlan()
+    {
+        AECViewpoint = SpatialViewpoint.Plan(new SpatialPoint(AvatarX, AvatarY));
+    }
+
+    private void ScaleAECProgram(double factor)
+    {
+        // The UI exposes relative proposals; each click applies the requested
+        // factor to the current program just as an authoring tool would.
+        AECProgram = AECProgram.ScaleAll(factor);
+        AECViewpoint = AECViewpoint with { Anchor = new SpatialPoint(AvatarX, AvatarY) };
+    }
+
+    private void ResizeAECProgramRoom(string roomId, double widthFeet, double depthFeet)
+    {
+        AECProgram = AECProgram.ResizeRoom(roomId, widthFeet, depthFeet);
+    }
+
     private void SelectLaboratoryFloor(string floorId)
     {
         if (!LaboratoryManifest.Floors.Any(floor => floor.Id == floorId))
@@ -881,6 +920,7 @@
 
     public void Dispose()
     {
+        AECViewpoint = SpatialViewpoint.Plan(new SpatialPoint(AvatarX, AvatarY));
         Experience.Dispose();
         TransitTrain.Dispose();
         ForgeStructure.Dispose();
