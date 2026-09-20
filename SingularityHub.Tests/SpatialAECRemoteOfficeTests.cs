@@ -210,4 +210,18 @@ public sealed class SpatialAECRemoteOfficeTests
         Assert.Contains("CHEMISTRY", lab.LastMessage);
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 48 — AEC consultation exposes a default model for the active ontology layer")]
+    public void IntentProvidesDefaultTableModel()
+    {
+        var intent = new SpatialAECIntentModel();
+
+        Assert.Equal("REALITY", intent.CurrentDefault);
+        Assert.Contains("ONTOLOGY TOKEN", intent.CurrentDefaultArtifact);
+
+        intent.Answer("FICTION");
+
+        Assert.Equal("BUILT ENVIRONMENT", intent.CurrentDefault);
+        Assert.Contains("CITY MASSING", intent.CurrentDefaultArtifact);
+    }
+
 }
