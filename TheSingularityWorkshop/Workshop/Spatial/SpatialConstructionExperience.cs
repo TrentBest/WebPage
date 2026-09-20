@@ -69,6 +69,7 @@ public static class SpatialConstructionExperienceCatalog
                 new("creation-bay", "CREATION BAY", "Assemble resources, GUIs, FSMs, code, and other focused capabilities into MicroBundles.", new(52, 50, 18, 11), Kind: SpatialPlannedFeatureKind.Laboratory),
                 new("creator-market", "CREATOR MARKET", "A future place where creators can present and sell their finished digital creations.", new(8, 68, 24, 10), Kind: SpatialPlannedFeatureKind.Shop),
                 new("services", "PRODUCTION SERVICES", "Storage, materials, infrastructure, and shared systems supporting the studios.", new(36, 68, 18, 10), Kind: SpatialPlannedFeatureKind.Service),
-                new("performance-center", "SINGULARITY PERFORMING ARTS CENTER", "A larger future venue for rehearsal, performance, recording, and audio experimentation.", new(58, 66, 24, 12), Kind: SpatialPlannedFeatureKind.Theater, Detail: "Music, theater, sound design, and performance all meet here.")
+                new("performance-center", "SINGULARITY PERFORMING ARTS CENTER", "A larger future venue for rehearsal, performance, recording, and audio experimentation.", new(58, 66, 24, 12), Kind: SpatialPlannedFeatureKind.Theater, Detail: "Music, theater, sound design, and performance all meet here."),
+                new("workshop-helipad", "WORKSHOP HELIPAD // UNDER CONSTRUCTION", "Future air-transit connection from the Workshop to the Singularity Software Inc. rooftop.", new(68, 78, 12, 8), Kind: SpatialPlannedFeatureKind.Service, Detail: "Future landing pad with H marking, circular/octagonal geometry, helicopter departure, and eventual 3D city flight transition.")
             ]);
 }
