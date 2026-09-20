@@ -823,7 +823,9 @@
                 .FirstOrDefault();
 
             if (officePoint is null) return;
+            var returnPosition = new SpatialPoint(AvatarX, AvatarY);
             await NavigatePath(officePoint.Path);
+            Router.Enter("singularity-software-office", returnPosition);
             insideRoomId = "singularity-software-office";
             SoftwareOfficeArrival.Reset();
             behaviorBuilderVisible = false;
@@ -1198,6 +1200,12 @@
             if (room is not null) Experience.Navigation.MoveToExit(room);
             insideRoomId = null;
             return;
+        }
+
+        if (insideRoomId == "singularity-software-office")
+        {
+            SoftwareOfficeArrival.Reset();
+            behaviorBuilderVisible = false;
         }
 
         if (insideRoomId == "aec-lobby")
