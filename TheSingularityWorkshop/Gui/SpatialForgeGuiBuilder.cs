@@ -35,8 +35,9 @@ public static class SpatialForgeGuiBuilder
             .Style("will-change", "transform");
 
         floor.Content(Grid(receiver));
-        // The Forge is a fabrication plan, not a room full of tools.
-        // Keep the footprint sparse and let the FSM assembly occupy the site.
+        // Readable RPG landmark: stone/iron shell, furnace, anvil, racks, and a work yard.
+        // The FSM assembly remains the semantic purpose of the building inside that silhouette.
+        floor.Content(ForgeYard(receiver));
         floor.Content(Ingots(receiver));
         floor.Content(StateShelf(receiver));
         floor.Content(Workbench(receiver));
@@ -67,10 +68,10 @@ public static class SpatialForgeGuiBuilder
             .Style("box-sizing", "border-box").Style("border", $"1px solid {Cyan}aa")
             .Style("background", "rgba(2,8,18,.96)").Style("box-shadow", $"0 0 60px {Cyan}22,inset 0 0 30px {Cyan}08")
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".7rem").Style("letter-spacing", ".28em").Text("WELCOME TO THE FSM FORGE"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "1rem").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".9rem").Text("This is an assembly plan for creating the structure of a finite state machine."))
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", "1rem").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".9rem").Text("A blacksmith-like fabrication floor for assembling the structure of a finite state machine."))
             .Content(WorkshopGui.Element(receiver, "ol").Style("margin", "1rem 0").Style("padding-left", "1.3rem").Style("color", "#b8c9d0").Style("font-family", "system-ui,sans-serif").Style("font-size", ".7rem").Style("line-height", "1.7")
-                .Content(WorkshopGui.Element(receiver, "li").Text("Place states on the assembly plan."))
-                .Content(WorkshopGui.Element(receiver, "li").Text("Connect states to establish the machine's transition structure."))
+                .Content(WorkshopGui.Element(receiver, "li").Text("Walk the forge floor and read the building as a place, not a menu."))
+                .Content(WorkshopGui.Element(receiver, "li").Text("States are raw material; transitions are the joins between pieces."))
                 .Content(WorkshopGui.Element(receiver, "li").Text("The Forge shows structure; behavior is scaffolded elsewhere.")))
             .Content(WorkshopGui.Button(receiver).Label("UNDERSTOOD — ENTER THE FORGE").Attribute("data-forge-unlock", "true")
                 .Style("padding", ".65rem 1rem").Style("animation", "forge-unlock-pulse 1.8s ease-in-out infinite").Style("border", $"1px solid {Cyan}88").Style("background", $"{Cyan}10")
@@ -198,6 +199,49 @@ public static class SpatialForgeGuiBuilder
             .Style("width", "32%").Style("height", "2.2rem").Style("display", "flex").Style("align-items", "center").Style("justify-content", "center")
             .Style("border", $"1px dashed {Yellow}88").Style("background", $"{Yellow}08").Style("color", Yellow).Style("font-size", ".4rem").Style("letter-spacing", ".08em").Text(label);
 
+    private static ElementBuilder ForgeYard(object receiver)
+    {
+        var yard = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "2%").Style("top", "1%").Style("width", "170vw").Style("height", "150vh")
+            .Style("z-index", "3").Style("pointer-events", "none");
+
+        yard.Content(WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "3%").Style("top", "4%").Style("width", "150vw").Style("height", "142vh")
+            .Style("border", "2px solid rgba(112,88,66,.75)")
+            .Style("box-shadow", "inset 0 0 70px rgba(255,104,32,.06),0 0 30px rgba(0,0,0,.5)")
+            .Style("background", "linear-gradient(135deg,rgba(42,28,20,.18),rgba(5,8,12,.04) 45%,rgba(255,104,32,.04))"));
+
+        yard.Content(WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "9%").Style("top", "9%").Style("width", "13rem").Style("height", "10rem")
+            .Style("border", "2px solid #8d6045")
+            .Style("background", "radial-gradient(circle at 50% 68%,#ff8a3d 0,#9b3515 18%,#1a0e09 44%,#07090b 72%)")
+            .Style("box-shadow", "0 0 28px rgba(255,86,24,.24),inset 0 0 28px rgba(255,138,61,.12)")
+            .Content(WorkshopGui.Element(receiver, "div").Style("position","absolute").Style("left","38%").Style("top","-3.8rem").Style("width","24%").Style("height","4rem").Style("border","2px solid #6f5142").Style("background","#090b0d"))
+            .Content(WorkshopGui.Element(receiver, "div").Style("position","absolute").Style("left","18%").Style("right","18%").Style("bottom","12%").Style("height","18%").Style("border","1px solid #ff8a3d99").Style("background","#ff8a3d22")));
+
+        yard.Content(ForgeProp(receiver, 28, 23, "ANVIL", "#c7d0d5"));
+        yard.Content(ForgeProp(receiver, 38, 23, "TROUGH", "#00eaff"));
+        yard.Content(ForgeProp(receiver, 54, 10, "IRON RACK", "#ffd34d"));
+        yard.Content(ForgeProp(receiver, 68, 18, "COAL", "#ff8a3d"));
+        yard.Content(ForgeProp(receiver, 78, 8, "TOOLS", "#c7d0d5"));
+
+        yard.Content(WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "25%").Style("top", "28%").Style("width", "105vw").Style("height", "42vh")
+            .Style("border", "1px dashed rgba(255,138,61,.24)")
+            .Style("background", "radial-gradient(ellipse at center,rgba(255,138,61,.04),transparent 68%)"));
+
+        return yard;
+    }
+
+    private static ElementBuilder ForgeProp(object receiver, double left, double top, string label, string accent)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", left + "%").Style("top", top + "%").Style("width", "8rem").Style("height", "4rem")
+            .Style("border", $"1px solid {accent}66").Style("background", "rgba(8,10,13,.82)")
+            .Style("box-shadow", $"inset 0 0 14px {accent}08").Style("display", "flex")
+            .Style("align-items", "center").Style("justify-content", "center")
+            .Style("color", accent).Style("font-size", ".38rem").Style("letter-spacing", ".12em")
+            .Text(label);
+
     private static ElementBuilder Ingots(object receiver)
     {
         var rack = WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "5%").Style("top", "2%").Style("width", "28rem").Style("height", "5rem").Style("z-index", "26")
@@ -220,7 +264,7 @@ public static class SpatialForgeGuiBuilder
         => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "50%").Style("top", "1.2rem").Style("transform", "translateX(-50%)")
             .Style("z-index", "40").Style("text-align", "center").Style("pointer-events", "none")
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".65rem").Style("letter-spacing", ".3em").Text("FSM FORGE"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".2rem").Style("color", "#7895a1").Style("font-size", ".38rem").Style("letter-spacing", ".16em").Text("LARGE-SCALE FSM ASSEMBLY PLAN"));
+            .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".2rem").Style("color", "#7895a1").Style("font-size", ".38rem").Style("letter-spacing", ".16em").Text("BLACKSMITH FLOOR // FSM ASSEMBLY"));
 
     private static ElementBuilder Grid(object receiver)
         => WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "0").Style("top", "0").Style("width", "180vw").Style("height", "160vh").Style("z-index", "0").Style("background-size", "5vw 5vh")
