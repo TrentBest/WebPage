@@ -50,7 +50,7 @@ public static class SpatialMazeExperienceGuiBuilder
         var offsetX = 50d - (avatar.X * cell / 10d);
         var offsetY = 50d - (avatar.Y * cell / 10d);
         var map = WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", $"{offsetX:0.###\}vw").Style("top", $"{offsetY:0.###\}vh")
+            .Style("position", "absolute").Style("left", $"{offsetX:0.###}vw").Style("top", $"{offsetY:0.###}vh")
             .Style("transform-origin", "0 0");
 
         for (var y = 0; y < maze.Height; y++)
@@ -60,11 +60,11 @@ public static class SpatialMazeExperienceGuiBuilder
                 var ch = maze.Rows[y][x];
                 map.Content(WorkshopGui.Element(receiver, "div")
                     .Style("position", "absolute")
-                    .Style("left", $"{x * cell:0.###\}px").Style("top", $"{y * cell:0.###\}px")
-                    .Style("width", $"{cell:0.###\}px").Style("height", $"{cell:0.###\}px")
+                    .Style("left", $"{x * cell:0.###}px").Style("top", $"{y * cell:0.###}px")
+                    .Style("width", $"{cell:0.###}px").Style("height", $"{cell:0.###}px")
                     .Style("box-sizing", "border-box")
-                    .Style("border", ch == '#' ? $"1px solid {Cyan\}55" : $"1px solid {Cyan\}0d")
-                    .Style("background", ch == '#' ? $"{Cyan\}12" : "transparent")
+                    .Style("border", ch == '#' ? $"1px solid {Cyan}55" : $"1px solid {Cyan}0d")
+                    .Style("background", ch == '#' ? $"{Cyan}12" : "transparent")
                     .Style("pointer-events", "none"));
             }
 
@@ -88,7 +88,7 @@ public static class SpatialMazeExperienceGuiBuilder
             root.Content(WorkshopGui.Element(receiver, "div")
                 .Style("position", "absolute").Style("left", $"{inset}%").Style("right", $"{inset}%")
                 .Style("top", $"{inset * .65}%").Style("bottom", $"{inset * .45}%")
-                .Style("border", $"1px solid {Cyan\}{Math.Max(12, 72 - depth * 9):X2}")
+                .Style("border", $"1px solid {Cyan}{Math.Max(12, 72 - depth * 9):X2}")
                 .Style("transform", $"translateZ(-{depth * 70}px)")
                 .Style("pointer-events", "none"));
         }
@@ -121,15 +121,15 @@ public static class SpatialMazeExperienceGuiBuilder
     private static ElementBuilder Dot(object receiver, string name, SpatialPoint position, string glyph, double cell)
         => WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute")
-            .Style("left", $"{position.X * cell:0.###\}px").Style("top", $"{position.Y * cell:0.###\}px")
+            .Style("left", $"{position.X * cell:0.###}px").Style("top", $"{position.Y * cell:0.###}px")
             .Style("transform", "translate(-50%,-50%)")
             .Style("width", "11px").Style("height", "11px").Style("border-radius", "50%")
-            .Style("background", glyph).Style("box-shadow", $"0 0 16px {glyph\}aa")
+            .Style("background", glyph).Style("box-shadow", $"0 0 16px {glyph}aa")
             .Style("z-index", "50")
             .Content(WorkshopGui.Element(receiver, "span")
                 .Style("position", "absolute").Style("left", "50%").Style("bottom", "14px")
                 .Style("transform", "translateX(-50%)").Style("white-space", "nowrap")
-                .Style("padding", ".12rem .28rem").Style("border", $"1px solid {glyph\}55")
+                .Style("padding", ".12rem .28rem").Style("border", $"1px solid {glyph}55")
                 .Style("background", "rgba(1,4,10,.9)").Style("color", glyph)
                 .Style("font-family", "Consolas,'Courier New',monospace").Style("font-size", ".42rem")
                 .Style("letter-spacing", ".08em").Text(name));
@@ -157,32 +157,32 @@ public static class SpatialMazeExperienceGuiBuilder
                     : $"HEAD START // {Math.Max(0, (int)Math.Ceiling((SpatialHolodeckMazeModel.AgentDelaySeconds - (DateTime.UtcNow - holodeck.StartedUtc).TotalSeconds))):00}s";
 
         hud.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "1rem").Style("top", "1rem")
-            .Style("padding", ".5rem .65rem").Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan\}55")
+            .Style("padding", ".5rem .65rem").Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan}55")
             .Style("font-family", "Consolas,'Courier New',monospace").Style("font-size", ".5rem")
             .Text($"HOLODECK // {holodeck.Maze.Title} // {userName} // {holodeck.Mode}"));
 
         hud.Content(WorkshopGui.Button(receiver).Label(holodeck.Mode == SpatialHolodeckMazeMode.TwoDimensional ? "SWITCH TO FPS NAVIGATION" : "SWITCH TO 2D MAZE")
             .Style("position", "absolute").Style("left", "1rem").Style("top", "4.2rem")
             .Style("pointer-events", "auto").Style("padding", ".45rem .6rem")
-            .Style("border", $"1px solid {Magenta\}66").Style("background", "rgba(1,4,10,.92)")
+            .Style("border", $"1px solid {Magenta}66").Style("background", "rgba(1,4,10,.92)")
             .Style("color", Magenta).Style("font-family", "inherit").Style("font-size", ".38rem")
             .Style("cursor", "pointer").OnClick(toggleMode));
 
         hud.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "1rem").Style("bottom", "1rem")
-            .Style("padding", ".45rem .6rem").Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan\}44")
+            .Style("padding", ".45rem .6rem").Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan}44")
             .Style("color", holodeck.Captured ? Magenta : holodeck.AgentsReleased ? Yellow : Muted)
             .Style("font-family", "system-ui,sans-serif").Style("font-size", ".58rem")
             .Text(holodeck.Started ? status : "MAZE READY // YOU HAVE 30 SECONDS BEFORE THE HUNTERS ENTER"));
 
         hud.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("right", "1rem").Style("bottom", "1rem")
             .Style("padding", ".4rem .55rem").Style("background", "rgba(1,4,10,.9)")
-            .Style("border", $"1px solid {Cyan\}55").Style("color", White).Style("font-size", ".38rem")
+            .Style("border", $"1px solid {Cyan}55").Style("color", White).Style("font-size", ".38rem")
             .Text("2D: WASD / ARROWS // FPS: W/S MOVE, A/D TURN"));
 
         hud.Content(WorkshopGui.Button(receiver).Label("← EXIT HOLODECK")
             .Style("position", "absolute").Style("right", "1rem").Style("top", "1rem")
             .Style("pointer-events", "auto").Style("padding", ".4rem .55rem")
-            .Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan\}55")
+            .Style("background", "rgba(1,4,10,.9)").Style("border", $"1px solid {Cyan}55")
             .Style("color", White).Style("cursor", "pointer").OnClick(exit));
 
         hud.Content(LeaderboardPanel(receiver, leaderboard, selectLeaderboardEntry, selectedLeaderboardEntry));
