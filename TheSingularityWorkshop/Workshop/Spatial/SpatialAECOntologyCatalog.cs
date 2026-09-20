@@ -50,6 +50,12 @@ public static class SpatialAECOntologyCatalog
             "VERTICAL FACILITY", "ENGINEERING", "DEVELOPMENT", "RESEARCH LABORATORY"),
 
         new(
+            "aec.fiction.built.civic-future",
+            "Futuristic Civic Research Center",
+            "FICTION", "BUILT ENVIRONMENT", "FACILITY", "LABORATORY", "RESEARCH FACILITY",
+            "SINGLE BUILDING", "SCIENCE", "APPLIED RESEARCH", "CUSTOM FACILITY"),
+
+        new(
             "aec.research.single.science-advanced",
             "High-Tech Research Laboratory",
             "FICTION", "RESEARCH", "FACILITY", "LABORATORY", "HIGH-TECH LABORATORY",
@@ -109,11 +115,6 @@ public static class SpatialAECOntologyCatalog
             "REALITY", "INDUSTRIAL", "INFRASTRUCTURE", "WAREHOUSE", "PRODUCTION LABORATORY",
             "MULTI-BUILDING", "ENGINEERING", "DEVELOPMENT", "CUSTOM FACILITY"),
 
-        new(
-            "aec.fiction.built.civic-future",
-            "Futuristic Civic Research Center",
-            "FICTION", "BUILT ENVIRONMENT", "FACILITY", "LABORATORY", "RESEARCH FACILITY",
-            "SINGLE BUILDING", "SCIENCE", "APPLIED RESEARCH", "CUSTOM FACILITY")
     ];
 
     /// <summary>Returns the complete immutable catalog inventory.</summary>
