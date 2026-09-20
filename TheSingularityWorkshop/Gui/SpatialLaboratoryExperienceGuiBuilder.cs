@@ -28,7 +28,8 @@ public static class SpatialLaboratoryExperienceGuiBuilder
         SpatialLaboratoryAccessControl? accessControl = null,
         Action? scanFingerprint = null,
         Action? scanRetina = null,
-        Action<string>? requestFloor = null)
+        Action<string>? requestFloor = null,
+        Action? returnToElevator = null)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("overflow", "hidden")
@@ -219,9 +220,17 @@ public static class SpatialLaboratoryExperienceGuiBuilder
                     .Style("color", "#ffd34d").Style("font-family", "inherit").Style("font-size", ".4rem").OnClick(scanRetina));
 
             if (stage == SpatialLaboratoryAccessStage.Challenged)
+            {
                 panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".55rem").Style("padding", ".5rem")
                     .Style("border", "1px solid #ff38d166").Style("color", "#ff38d1").Style("font-size", ".38rem")
                     .Text("CLEARANCE REQUIRED // SECURITY ESCORTS VISITOR BACK TO THE ELEVATOR"));
+                if (returnToElevator is not null)
+                    panel.Content(WorkshopGui.Button(receiver).Label("[ RETURN TO ELEVATOR ]")
+                        .Style("margin-top", ".4rem").Style("padding", ".4rem .6rem")
+                        .Style("border", "1px solid #00eaff66").Style("background", "rgba(0,234,255,.05)")
+                        .Style("color", "#00eaff").Style("font-family", "inherit").Style("font-size", ".38rem")
+                        .OnClick(returnToElevator));
+            }
         }
         else
         {
