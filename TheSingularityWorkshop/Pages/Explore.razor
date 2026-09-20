@@ -3,6 +3,7 @@
 @using Microsoft.JSInterop
 @using TheSingularityWorkshop.Gui
 @using TheSingularityWorkshop.Workshop.MicroBundles
+@using TheSingularityWorkshop.Workshop.Spatial
 @implements IDisposable
 
 <PageTitle>Explore // The Singularity Workshop</PageTitle>
@@ -27,6 +28,9 @@
     private double AECPlanAvatarX = 3;
     private double AECPlanAvatarY = 3;
     private readonly SpatialSingularityLabModel SingularityLab = new();
+    private readonly SpatialSoftwareOfficeModel SoftwareOffice = new("Singularity Software Inc.");
+    private readonly SpatialSoftwareOfficeArrivalModel SoftwareOfficeArrival = new();
+    private readonly SpatialBehaviorBuilderModel BehaviorBuilder = new("OnUpdate");
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
     private readonly SpatialShipyardManifest ShipyardManifest = SpatialShipyardManifest.CreateDefault();
@@ -60,6 +64,7 @@
     private DateTime? mazeStartedAtUtc;
     private string? selectedLeaderboardEntry;
     private string? insideRoomId;
+    private bool behaviorBuilderVisible;
     private SpatialAECRemoteOfficeLobbyGuiBuilder.Stage AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Arrival;
     private string? selectedTransitDestinationId;
     private bool transitTrainVisible;
@@ -154,6 +159,28 @@
 
         if (insideRoomId == "forge")
             return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitRoom);
+
+        if (insideRoomId == "singularity-software-office")
+            return SpatialSoftwareOfficeArrivalGuiBuilder.Build(
+                this,
+                SoftwareOfficeArrival,
+                Experience.User.DisplayName,
+                BeginSoftwareOfficeHelicopterArrival,
+                EnterSoftwareOfficeHelicopter,
+                EnterSoftwareOfficeElevator,
+                SoftwareOfficeElevatorDing,
+                CompleteSoftwareOfficeBriefing,
+                OpenSoftwareOfficeBehaviorBuilder,
+                ExitRoom);
+
+        if (behaviorBuilderVisible)
+            return SpatialBehaviorBuilderGuiBuilder.Build(this, BehaviorBuilder, AddBehaviorElseIf, CloseBehaviorBuilder);
+
+        if (insideRoomId == "singularity-software-office")
+        {
+            SoftwareOfficeArrival.Reset();
+            behaviorBuilderVisible = false;
+        }
 
         if (insideRoomId == "aec-lobby")
             return SpatialAECRemoteOfficeLobbyGuiBuilder.Build(
@@ -792,6 +819,23 @@
         var interactable = Scene.Interactables.FirstOrDefault(item => item.Id == id);
         if (interactable is null) return;
 
+        if (id == "singularity-software-office")
+        {
+            var officePoint = interactable.InteractionPoints
+                .Select(point => new { Point = point, Path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), Center(point.Bounds), SpatialGeometryEngine.FromInteractables(Scene.Interactables)) })
+                .Where(candidate => candidate.Path.Count > 0)
+                .OrderBy(candidate => PathLength(new SpatialPoint(AvatarX, AvatarY), candidate.Path))
+                .FirstOrDefault();
+
+            if (officePoint is null) return;
+            await NavigatePath(officePoint.Path);
+            insideRoomId = "singularity-software-office";
+            SoftwareOfficeArrival.Reset();
+            behaviorBuilderVisible = false;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
         // The AEC Remote Office is a compound Experience: arriving at the building
         // first places the visitor in its lobby. The receptionist then leads them to
         // the intent conference before the drafting office is exposed.
@@ -1025,6 +1069,84 @@
         if (interactable is not null)
             AECPlanInteractableId = interactable.Id;
     }
+
+    private async Task BeginSoftwareOfficeHelicopterArrival()
+    {
+        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.Rampway) return;
+        SoftwareOfficeArrival.BeginHelipadArrival();
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(2600);
+        if (insideRoomId != "singularity-software-office") return;
+        SoftwareOfficeArrival.EnterHelicopter();
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(2200);
+        if (insideRoomId != "singularity-software-office") return;
+        SoftwareOfficeArrival.ArriveAtTowerHelipad();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task EnterSoftwareOfficeHelicopter()
+    {
+        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.HelicopterApproach) return;
+        SoftwareOfficeArrival.EnterHelicopter();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task EnterSoftwareOfficeElevator()
+    {
+        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.TowerHelipad) return;
+        SoftwareOfficeArrival.EnterElevator();
+        SoftwareOffice.Artifact.Methods.Clear();
+        SoftwareOffice.Artifact.Methods.AddRange(["OnEnter", "OnUpdate", "OnExit", "Condition"]);
+        SoftwareOffice.Artifact.IsExecutable = true;
+        SoftwareOffice.SynchronizeFromArtifact();
+        await InvokeAsync(StateHasChanged);
+        _ = RunSoftwareOfficeElevatorDescent();
+    }
+
+    private async Task RunSoftwareOfficeElevatorDescent()
+    {
+        for (var i = 0; i < 7; i++)
+        {
+            await Task.Delay(650);
+            if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.ElevatorDescending) return;
+            SoftwareOfficeArrival.Ding();
+            await InvokeAsync(StateHasChanged);
+        }
+
+        await Task.Delay(650);
+        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.ElevatorDescending) return;
+        SoftwareOfficeArrival.CompleteBriefing();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void SoftwareOfficeElevatorDing()
+    {
+        if (SoftwareOfficeArrival.Stage == SpatialSoftwareOfficeArrivalStage.ElevatorDescending)
+            SoftwareOfficeArrival.Ding();
+    }
+
+    private void CompleteSoftwareOfficeBriefing()
+    {
+        if (SoftwareOfficeArrival.Stage == SpatialSoftwareOfficeArrivalStage.ElevatorDescending)
+            SoftwareOfficeArrival.CompleteBriefing();
+    }
+
+    private void OpenSoftwareOfficeBehaviorBuilder()
+    {
+        behaviorBuilderVisible = true;
+        SoftwareOffice.Artifact.Methods.Clear();
+        SoftwareOffice.Artifact.Methods.AddRange(["OnEnter", "OnUpdate", "OnExit", "Condition"]);
+        SoftwareOffice.SynchronizeFromArtifact();
+    }
+
+    private void AddBehaviorElseIf()
+    {
+        var index = BehaviorBuilder.ContextBranches.Count + 1;
+        BehaviorBuilder.AddElseIf($"ContextType{index}", $"context{index}");
+    }
+
+    private void CloseBehaviorBuilder() => behaviorBuilderVisible = false;
 
     private void ExitAECConsultation()
     {
