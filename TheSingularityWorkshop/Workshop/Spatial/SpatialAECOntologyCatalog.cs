@@ -6,8 +6,8 @@ using TheSingularityWorkshop.SingularityHub;
 namespace TheSingularityWorkshop.Gui;
 
 /// <summary>
-/// A concrete authored AEC building-type record that can be discovered through the
-/// ontology catalog. The record is semantic inventory; a renderer decides how it is shown.
+/// A concrete building type in the AEC ontology mall. The record is semantic inventory;
+/// renderers consume it rather than inventing their own building taxonomy.
 /// </summary>
 public sealed record SpatialAECBuildingType(
     string Id,
@@ -29,100 +29,30 @@ public sealed record SpatialAECBuildingType(
         Order, Family, Genus, Species
     ];
 
-    /// <summary>Converts this authored record to the compact runtime ontology coordinate.</summary>
+    /// <summary>Converts this catalog record to the compact runtime ontology coordinate.</summary>
     public OntologySignature ToOntologySignature()
         => SpatialAECOntologyCatalog.ToSignature(this);
 }
 
 /// <summary>
-/// The AEC ontology mall: a deterministic inventory of concrete building types.
-/// Shopping the mall means narrowing real catalog inventory as intent becomes specific,
-/// rather than presenting an unrelated list of pseudo-options at every layer.
+/// The AEC ontology mall: a searchable inventory of concrete building types.
+/// The primary inventory is derived from <see cref="SpatialBuildingSpecificationCatalog"/>;
+/// scenario-only fictional records are explicitly appended rather than masquerading as
+/// ordinary building specifications.
 /// </summary>
 public static class SpatialAECOntologyCatalog
 {
     private static readonly IReadOnlyList<SpatialAECBuildingType> Inventory =
-    [
-        new(
-            "aec.research.vertical.engineering-development",
-            "Research Laboratory",
-            "REALITY", "RESEARCH", "FACILITY", "LABORATORY", "RESEARCH FACILITY",
-            "VERTICAL FACILITY", "ENGINEERING", "DEVELOPMENT", "RESEARCH LABORATORY"),
+        BuildInventory();
 
-        new(
-            "aec.fiction.built.civic-future",
-            "Futuristic Civic Research Center",
-            "FICTION", "BUILT ENVIRONMENT", "FACILITY", "LABORATORY", "RESEARCH FACILITY",
-            "SINGLE BUILDING", "SCIENCE", "APPLIED RESEARCH", "CUSTOM FACILITY"),
-
-        new(
-            "aec.research.single.science-advanced",
-            "High-Tech Research Laboratory",
-            "FICTION", "RESEARCH", "FACILITY", "LABORATORY", "HIGH-TECH LABORATORY",
-            "SINGLE BUILDING", "SCIENCE", "ADVANCED RESEARCH", "SCI-FI HIGH-TECH LABORATORY"),
-
-        new(
-            "aec.built.single.architecture-office",
-            "Office Building",
-            "REALITY", "BUILT ENVIRONMENT", "FACILITY", "OFFICE", "OFFICE BUILDING",
-            "SINGLE BUILDING", "ENGINEERING", "DEVELOPMENT", "CUSTOM FACILITY"),
-
-        new(
-            "aec.built.vertical.science-research",
-            "Research Facility",
-            "REALITY", "BUILT ENVIRONMENT", "FACILITY", "LABORATORY", "RESEARCH FACILITY",
-            "VERTICAL FACILITY", "SCIENCE", "APPLIED RESEARCH", "RESEARCH LABORATORY"),
-
-        new(
-            "aec.industrial.single.engineering-manufacturing",
-            "Manufacturing Plant",
-            "REALITY", "INDUSTRIAL", "FACILITY", "FACTORY", "PRODUCTION LABORATORY",
-            "SINGLE BUILDING", "ENGINEERING", "DEVELOPMENT", "CUSTOM FACILITY"),
-
-        new(
-            "aec.industrial.multi.energy-production",
-            "Energy Production Facility",
-            "REALITY", "INDUSTRIAL", "INFRASTRUCTURE", "FACTORY", "PRODUCTION LABORATORY",
-            "MULTI-BUILDING", "ENERGY", "DEVELOPMENT", "CUSTOM FACILITY"),
-
-        new(
-            "aec.civic.single.medical-hospital",
-            "Hospital",
-            "REALITY", "CIVIC", "FACILITY", "HOSPITAL", "RESEARCH FACILITY",
-            "VERTICAL FACILITY", "MEDICAL", "APPLIED RESEARCH", "CUSTOM FACILITY"),
-
-        new(
-            "aec.civic.single.public-library",
-            "Public Library",
-            "REALITY", "CIVIC", "WORKPLACE", "OFFICE", "RESEARCH FACILITY",
-            "SINGLE BUILDING", "SCIENCE", "APPLIED RESEARCH", "CUSTOM FACILITY"),
-
-        new(
-            "aec.residential.vertical.apartment",
-            "Apartment Building",
-            "REALITY", "RESIDENTIAL", "FACILITY", "OFFICE", "RESEARCH FACILITY",
-            "VERTICAL FACILITY", "ENGINEERING", "DEVELOPMENT", "CUSTOM FACILITY"),
-
-        new(
-            "aec.built.campus.education",
-            "University Campus",
-            "REALITY", "BUILT ENVIRONMENT", "CAMPUS", "OFFICE", "RESEARCH FACILITY",
-            "CAMPUS FACILITY", "SCIENCE", "APPLIED RESEARCH", "CUSTOM FACILITY"),
-
-        new(
-            "aec.industrial.multi.warehouse",
-            "Distribution Warehouse",
-            "REALITY", "INDUSTRIAL", "INFRASTRUCTURE", "WAREHOUSE", "PRODUCTION LABORATORY",
-            "MULTI-BUILDING", "ENGINEERING", "DEVELOPMENT", "CUSTOM FACILITY"),
-
-    ];
-
-    /// <summary>Returns the complete immutable catalog inventory.</summary>
+    /// <summary>Returns the complete building-type inventory.</summary>
     public static IReadOnlyList<SpatialAECBuildingType> ListBuildingTypes()
         => Inventory;
 
     /// <summary>Returns a concrete building type by stable catalog identity.</summary>
-    public static bool TryGetBuildingType(string id, out SpatialAECBuildingType? buildingType)
+    public static bool TryGetBuildingType(
+        string id,
+        out SpatialAECBuildingType? buildingType)
     {
         buildingType = Inventory.FirstOrDefault(x =>
             string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
@@ -130,8 +60,8 @@ public static class SpatialAECOntologyCatalog
     }
 
     /// <summary>
-    /// Shops the catalog using the answers already supplied. Each returned option exists
-    /// on at least one concrete catalog record compatible with the selected path.
+    /// Shops the inventory using the answers already supplied. Every option is backed by
+    /// at least one concrete inventory record compatible with the selected path.
     /// </summary>
     public static IReadOnlyList<string> OptionsForLayer(
         int layer,
@@ -144,25 +74,33 @@ public static class SpatialAECOntologyCatalog
             .Where(x => MatchesPriorLayers(x, layer, answers))
             .Select(x => x.Layers[layer])
             .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(x => x, StringComparer.Ordinal)
             .ToList();
     }
 
-    /// <summary>Finds the most specific catalog item matching a completed ontology path.</summary>
+    /// <summary>Finds a concrete catalog item matching a completed ontology path.</summary>
     public static SpatialAECBuildingType? Resolve(
         IReadOnlyList<string?> answers)
     {
         return Inventory
             .Where(x => answers.Count >= OntologySignature.LayerCount)
-            .Where(x => x.Layers.Zip(answers, (catalogValue, answer) =>
-                string.Equals(catalogValue, answer, StringComparison.OrdinalIgnoreCase))
+            .Where(x => x.Layers.Zip(
+                answers,
+                (catalogValue, answer) =>
+                    string.Equals(
+                        catalogValue,
+                        answer,
+                        StringComparison.OrdinalIgnoreCase))
                 .All(match => match))
             .OrderBy(x => x.Id, StringComparer.Ordinal)
             .FirstOrDefault();
     }
 
-    /// <summary>Creates the nine-integer runtime coordinate for an authored catalog item.</summary>
+    /// <summary>Creates the nine-integer runtime coordinate for a catalog item.</summary>
     public static OntologySignature ToSignature(SpatialAECBuildingType buildingType)
     {
+        ArgumentNullException.ThrowIfNull(buildingType);
+
         var values = buildingType.Layers
             .Select(SpatialOntologyToken.For)
             .ToArray();
@@ -170,6 +108,121 @@ public static class SpatialAECOntologyCatalog
         return new OntologySignature(
             values[0], values[1], values[2], values[3], values[4],
             values[5], values[6], values[7], values[8]);
+    }
+
+    private static IReadOnlyList<SpatialAECBuildingType> BuildInventory()
+    {
+        var canonical = BuildCanonicalBuildingTypes();
+
+        var scenarios = new[]
+        {
+            new SpatialAECBuildingType(
+                "aec.scenario.fiction.civic-future",
+                "Futuristic Civic Research Center",
+                "FICTION", "BUILT ENVIRONMENT", "FACILITY", "LABORATORY",
+                "RESEARCH FACILITY", "SINGLE BUILDING", "SCIENCE",
+                "APPLIED RESEARCH", "CUSTOM FACILITY"),
+
+            new SpatialAECBuildingType(
+                "aec.scenario.fiction.high-tech-research",
+                "High-Tech Research Laboratory",
+                "FICTION", "RESEARCH", "FACILITY", "LABORATORY",
+                "HIGH-TECH LABORATORY", "SINGLE BUILDING", "SCIENCE",
+                "ADVANCED RESEARCH", "SCI-FI HIGH-TECH LABORATORY"),
+
+            new SpatialAECBuildingType(
+                "aec.scenario.industrial.energy-production",
+                "Energy Production Facility",
+                "REALITY", "INDUSTRIAL", "INFRASTRUCTURE", "FACTORY",
+                "PRODUCTION LABORATORY", "MULTI-BUILDING", "ENERGY",
+                "DEVELOPMENT", "CUSTOM FACILITY"),
+
+            new SpatialAECBuildingType(
+                "aec.scenario.industrial.warehouse",
+                "Distribution Warehouse",
+                "REALITY", "INDUSTRIAL", "INFRASTRUCTURE", "WAREHOUSE",
+                "PRODUCTION LABORATORY", "MULTI-BUILDING", "ENGINEERING",
+                "DEVELOPMENT", "CUSTOM FACILITY")
+        };
+
+        return canonical
+            .Concat(scenarios)
+            .GroupBy(x => x.Id, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .ToArray();
+    }
+
+    private static IReadOnlyList<SpatialAECBuildingType> BuildCanonicalBuildingTypes()
+    {
+        var specifications = SpatialBuildingSpecificationCatalog.All;
+
+        var profiles = specifications.Select(CreateProfile);
+
+        return SpatialAECBuildingTypeFactory.Create(specifications, profiles);
+    }
+
+    private static SpatialAECBuildingOntologyProfile CreateProfile(
+        SpatialBuildingSpecification specification)
+    {
+        if (specification.Purpose == SpatialBuildingPurpose.Research)
+        {
+            return new SpatialAECBuildingOntologyProfile(
+                specification.Id,
+                "REALITY",
+                "BUILT ENVIRONMENT",
+                "FACILITY",
+                "LABORATORY",
+                "RESEARCH FACILITY",
+                "VERTICAL FACILITY",
+                "ENGINEERING",
+                "DEVELOPMENT",
+                "RESEARCH LABORATORY");
+        }
+
+        var domain = specification.Purpose switch
+        {
+            SpatialBuildingPurpose.CivicGovernment => "CIVIC",
+            SpatialBuildingPurpose.Education => "BUILT ENVIRONMENT",
+            SpatialBuildingPurpose.Industrial => "INDUSTRIAL",
+            SpatialBuildingPurpose.Medical => "CIVIC",
+            SpatialBuildingPurpose.Office => "BUILT ENVIRONMENT",
+            SpatialBuildingPurpose.Retail => "BUILT ENVIRONMENT",
+            SpatialBuildingPurpose.ResidentialMultifamily => "RESIDENTIAL",
+            SpatialBuildingPurpose.ResidentialLuxury => "RESIDENTIAL",
+            _ => "BUILT ENVIRONMENT"
+        };
+
+        var phylum = specification.Purpose switch
+        {
+            SpatialBuildingPurpose.CivicGovernment => "GOVERNMENT",
+            SpatialBuildingPurpose.Education => "EDUCATION",
+            SpatialBuildingPurpose.Industrial => "FACTORY",
+            SpatialBuildingPurpose.Medical => "HOSPITAL",
+            SpatialBuildingPurpose.Office => "OFFICE",
+            SpatialBuildingPurpose.Retail => "RETAIL",
+            SpatialBuildingPurpose.ResidentialMultifamily => "RESIDENTIAL",
+            SpatialBuildingPurpose.ResidentialLuxury => "RESIDENTIAL",
+            _ => "FACILITY"
+        };
+
+        var family = specification.Purpose switch
+        {
+            SpatialBuildingPurpose.CivicGovernment => "CIVIC",
+            SpatialBuildingPurpose.Education => "SCIENCE",
+            SpatialBuildingPurpose.Industrial => "ENGINEERING",
+            SpatialBuildingPurpose.Medical => "MEDICAL",
+            SpatialBuildingPurpose.Office => "ENGINEERING",
+            SpatialBuildingPurpose.Retail => "COMMERCE",
+            SpatialBuildingPurpose.ResidentialMultifamily => "RESIDENTIAL",
+            SpatialBuildingPurpose.ResidentialLuxury => "RESIDENTIAL",
+            _ => "ENGINEERING"
+        };
+
+        return SpatialAECBuildingTypeFactory.StandardProfile(
+            specification,
+            domain,
+            phylum,
+            family);
     }
 
     private static bool MatchesPriorLayers(
@@ -195,8 +248,7 @@ public static class SpatialAECOntologyCatalog
 
 /// <summary>
 /// Deterministic authoring-time token registry used to flatten catalog values into
-/// integer ontology coordinates. The catalog remains human-readable; runtime identity
-/// is the integer signature.
+/// integer ontology coordinates. Human-readable catalog data stays at the authoring edge.
 /// </summary>
 public static class SpatialOntologyToken
 {
