@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.Workshop.Spatial;
+using Xunit;
 
 namespace SingularityHub.Tests;
 
