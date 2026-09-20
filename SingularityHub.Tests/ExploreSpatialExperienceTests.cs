@@ -28,6 +28,7 @@ public sealed class ExploreSpatialExperienceTests
                 "fsm-bench",
                 "npc-studio",
                 "singularity-lab",
+                "singularity-software-office",
                 "singularity-transit"
             ],
             scene.Interactables.Select(item => item.Id).OrderBy(id => id));
