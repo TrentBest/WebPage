@@ -92,4 +92,50 @@ public sealed class SpatialAECRemoteOfficeTests
         Assert.Equal(SpatialAECElementKind.Wall, draft.Elements[0].Kind);
         Assert.Single(draft.Linework.Lines);
     }
+    [Fact(DisplayName = "Incremental Unit Test 41 — AEC intent begins with reality versus fiction")]
+    public void IntentStartsAtParadigmLayer()
+    {
+        var intent = new SpatialAECIntentModel();
+
+        Assert.Equal("Paradigm", SpatialAECIntentModel.LayerNames[intent.CurrentLayer]);
+        Assert.Contains("REALITY", intent.OptionsForCurrentLayer);
+        Assert.Contains("FICTION", intent.OptionsForCurrentLayer);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 42 — AEC intent resolves a fictional high-tech laboratory")]
+    public void IntentResolvesSciFiLaboratory()
+    {
+        var intent = new SpatialAECIntentModel();
+        var answers = new[]
+        {
+            "FICTION", "RESEARCH", "FACILITY", "LABORATORY", "HIGH-TECH LABORATORY",
+            "SINGLE BUILDING", "SCIENCE", "ADVANCED RESEARCH", "SCI-FI HIGH-TECH LABORATORY"
+        };
+
+        foreach (var answer in answers) intent.Answer(answer);
+
+        Assert.True(intent.IsComplete);
+        Assert.Equal("SCI-FI HIGH-TECH RESEARCH LABORATORY", intent.BuildingType);
+        var structure = intent.Generate();
+        Assert.Equal(1, structure.Floors);
+        Assert.Contains(structure.Rooms, room => room.Name == "Research Core");
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 43 — AEC generation produces a spatial concept from captured intent")]
+    public void IntentGeneratesSpatialConcept()
+    {
+        var intent = new SpatialAECIntentModel();
+        foreach (var answer in new[]
+        {
+            "REALITY", "BUILT ENVIRONMENT", "FACILITY", "LABORATORY", "RESEARCH FACILITY",
+            "VERTICAL FACILITY", "ENGINEERING", "DEVELOPMENT", "RESEARCH LABORATORY"
+        }) intent.Answer(answer);
+
+        var structure = intent.Generate(3600);
+
+        Assert.Equal(6, structure.Floors);
+        Assert.Equal(3600, structure.SquareUnits);
+        Assert.Equal(6, structure.Rooms.Count);
+        Assert.All(structure.Rooms, room => Assert.True(room.Width > 0 && room.Depth > 0));
+    }
 }
