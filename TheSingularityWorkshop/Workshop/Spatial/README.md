@@ -155,3 +155,58 @@ The plan is therefore not a drawing generated after the fact. It is the first na
 As the system grows, these interactables can become richer MicroBundle/provider boundaries: a laboratory door can expose its containment system, a mechanical room can expose its MEP systems, a structural bay can expose its load path, and a conference room can expose its actual program.
 
 The GUI remains a manifestation of those capabilities rather than their source of truth.
+
+## Singularity Laboratory
+
+The Singularity Laboratory is the next active spatial vertical slice. The city, world, and solar-system layers are deliberately retained as future construction so the Workshop can first demonstrate a believable research facility and the machinery inside it.
+
+The laboratory is a research tower whose floors represent fields rather than one-off rooms:
+
+- Gravity & Spacetime
+- Energy Systems
+- Materials Science
+- Atomics & Chemistry
+- Quantum Systems
+- Plasma & Field Studies
+- Fluids & Hydraulics
+- Cosmic Scale
+- FSM Physics Simulation
+
+The entrance is intentionally secure and diegetic. The current FSM_API-backed visitor progression is:
+
+```
+CAMPUS ARRIVAL
+    |
+    v
+SECURITY LINE
+    |
+    v
+BELONGINGS / SCREENING
+    |
+    v
+SECURITY CLEARANCE
+    |
+    v
+SECURE ELEVATOR
+    |
+    +--> ID CARD
+    +--> FINGERPRINT
+    +--> RETINAL SCAN
+    |
+    v
+FLOOR SELECTION
+    |
+    +--> authorized floor -> research floor
+    |
+    +--> restricted floor -> access denied -> elevator
+```
+
+The implementation already has guards, reception, a director's office, conference space, screening, a secure vertical core, badge/identity concepts, floor authorization, research inventory, gravity bodies, 3D-rendering experiments, destruction sandboxes, robotics, research data, and restricted AI/security domains. These are architectural foundations, not permission to turn every future subsystem on at once.
+
+The intended visual direction is a realistic science-fiction facility: security should feel like part of the building, not a modal; the visitor should understand where they are in the facility; the elevator should feel physically secure; and the research floors should become increasingly rich manifestations of actual data and experiments.
+
+### Physics-first release discipline
+
+The first useful laboratory floor is physics. FSMs, physics rules, measurements, reusable experiment data, image/mesh generation, and eventually 3D rendering can then become visible consequences of the laboratory's actual data model.
+
+The city and solar-system presentations remain **UNDER CONSTRUCTION**. Their current maps are reference/blueprint manifestations only and are not the active release path.
