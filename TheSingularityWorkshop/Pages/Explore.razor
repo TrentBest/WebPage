@@ -25,6 +25,7 @@
     private readonly SpatialShipDesignManifest ShipDesignManifest = SpatialShipDesignManifest.CreateDefault();
     private readonly TransitTrainMicroBundle TransitTrain = new(7301, TransitTrainSpecification.WorkshopHoEmu());
     private readonly SpatialLaboratoryManifest LaboratoryManifest = SpatialLaboratoryManifest.CreateDefault();
+    private readonly SpatialLaboratoryAccessControl LaboratoryAccess = new();
     private SpatialBuildingProgram AECProgram = SpatialBuildingProgramCatalog.RemoteOffice;
     private readonly SpatialModelSourcingManifest AECModelSourcing = SpatialModelSourcingManifest.CreateDefault();
     private SpatialViewpoint AECViewpoint = SpatialViewpoint.Plan(new SpatialPoint(50, 78));
@@ -198,7 +199,11 @@
                 gravityBodyBId,
                 SelectGravityBodies,
                 threeDimensionalLabActive,
-                ToggleThreeDimensionalLab);
+                ToggleThreeDimensionalLab,
+                LaboratoryAccess,
+                ScanLaboratoryFingerprint,
+                ScanLaboratoryRetina,
+                RequestLaboratoryFloor);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(
@@ -474,6 +479,24 @@
     private void ScanLaboratoryBadge()
     {
         LaboratoryManifest.Security.ScanBadge();
+        LaboratoryAccess.ScanBadge();
+    }
+
+    private void ScanLaboratoryFingerprint()
+    {
+        LaboratoryAccess.ScanFingerprint();
+    }
+
+    private void ScanLaboratoryRetina()
+    {
+        LaboratoryAccess.ScanRetina();
+    }
+
+    private void RequestLaboratoryFloor(string floorId)
+    {
+        var decision = LaboratoryAccess.RequestFloor(floorId);
+        if (decision.Allowed)
+            selectedLaboratoryFloorId = floorId;
     }
 
     private void PrepareLaboratoryExperiment(string experimentId)
