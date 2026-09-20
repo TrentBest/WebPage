@@ -171,9 +171,9 @@
                 this,
                 SoftwareOfficeArrival,
                 Experience.User.DisplayName,
-                BeginSoftwareOfficeHelicopterArrival,
-                EnterSoftwareOfficeHelicopter,
-                EnterSoftwareOfficeElevator,
+                () => _ = BeginSoftwareOfficeHelicopterArrival(),
+                () => _ = EnterSoftwareOfficeHelicopter(),
+                () => _ = EnterSoftwareOfficeElevator(),
                 SoftwareOfficeElevatorDing,
                 CompleteSoftwareOfficeBriefing,
                 OpenSoftwareOfficeBehaviorBuilder,
@@ -903,11 +903,11 @@
         await NavigatePath(selected.Path);
         UpdateConstructionTour(AvatarX, AvatarY);
         interactable.OnInteraction();
-        var returnPosition = new SpatialPoint(AvatarX, AvatarY);
+        var sceneReturnPosition = new SpatialPoint(AvatarX, AvatarY);
         var place = interactable.Place;
         if (place is null) return;
 
-        var firstVisit = Router.Enter(place, returnPosition);
+        var firstVisit = Router.Enter(place, sceneReturnPosition);
         var entry = place.EntryPoint;
         Experience.Navigation.MoveTo(entry.X, entry.Y);
         insideRoomId = place.SceneId;
