@@ -83,10 +83,18 @@ public static class SpatialAECGeneratedStructureGuiBuilder
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", ".38rem").Style("margin-top", ".5rem").Text($"ONTOLOGY // {structure.OntologySummary}"))
             .Content(WorkshopGui.Button(receiver).Label("ENTER GENERATED STRUCTURE / AUTHOR")
                 .Style("margin-top", ".7rem").Style("width", "100%").Style("padding", ".65rem")
-                .Style("border", $"1px solid {Cyan}88").Style("background", "rgba(0,234,255,.05)")
+                .Style("border", $"{Cyan}88").Style("background", "rgba(0,234,255,.05)")
                 .Style("color", Cyan).Style("font-family", "inherit").Style("cursor", "pointer").OnClick(enterOffice))
             .Content(WorkshopGui.Button(receiver).Label("REGENERATE FROM INTENT")
                 .Style("margin-top", ".35rem").Style("width", "100%").Style("padding", ".45rem")
                 .Style("border", "1px solid rgba(255,211,77,.35)").Style("background", "transparent")
                 .Style("color", Yellow).Style("font-family", "inherit").Style("cursor", "pointer").OnClick(regenerate));
+
+    private static ElementBuilder Exit(object receiver, Action exit)
+        => WorkshopGui.Button(receiver).Label("← RETURN TO CAMPUS")
+            .Style("position", "absolute").Style("left", "2rem").Style("bottom", "1.5rem").Style("z-index", "100")
+            .Style("padding", ".5rem .7rem").Style("border", $"1px solid {Magenta}66")
+            .Style("background", "rgba(1,4,10,.9)").Style("color", Magenta)
+            .Style("font-family", "inherit").Style("font-size", ".38rem").Style("cursor", "pointer")
+            .OnClick(exit);
 }
