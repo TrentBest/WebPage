@@ -61,6 +61,7 @@
     private DateTime? mazeStartedAtUtc;
     private string? selectedLeaderboardEntry;
     private string? insideRoomId;
+    private SpatialAECRemoteOfficeLobbyGuiBuilder.Stage AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Arrival;
     private string? selectedTransitDestinationId;
     private bool transitTrainVisible;
     private bool transitMicroGameActive;
@@ -156,7 +157,13 @@
             return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitRoom);
 
         if (insideRoomId == "aec-lobby")
-            return SpatialAECRemoteOfficeLobbyGuiBuilder.Build(this, Experience.User.DisplayName, EnterAECConsultation, ExitRoom);
+            return SpatialAECRemoteOfficeLobbyGuiBuilder.Build(
+                this,
+                Experience.User.DisplayName,
+                AECOfficeStage,
+                () => _ = LeadAECOfficeToConference(),
+                EnterAECConsultation,
+                ExitRoom);
 
         if (insideRoomId == "aec-consultation")
             return SpatialAECConsultationGuiBuilder.Build(this, AECIntent, Experience.User.DisplayName, AnswerAECIntent, GenerateAECStructure, ExitAECConsultation);
@@ -798,9 +805,14 @@
                 .FirstOrDefault();
 
             if (selectedLobbyPoint is null) return;
+
+            // The exterior arrival is still physical. Once the visitor reaches the
+            // building, the office becomes its own floor-plan Experience.
             await NavigatePath(selectedLobbyPoint.Path);
             insideRoomId = "aec-lobby";
+            AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Arrival;
             await InvokeAsync(StateHasChanged);
+            _ = BeginAECOfficeArrival();
             return;
         }
         if (id == "singularity-lab")
@@ -907,7 +919,40 @@
     {
         AECIntent.Reset();
         AECGeneratedStructure = null;
+        AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Conference;
         insideRoomId = "aec-consultation";
+    }
+
+    /// <summary>
+    /// Lets the visitor see the avatar physically arrive at the reception desk
+    /// before the receptionist becomes an available interaction.
+    /// </summary>
+    private async Task BeginAECOfficeArrival()
+    {
+        if (insideRoomId != "aec-lobby") return;
+
+        AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Arrival;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(950);
+
+        if (insideRoomId != "aec-lobby") return;
+
+        AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Reception;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// The receptionist is a spatial handoff. The visitor is visibly led
+    /// from reception to the conference room before the presentation appears.
+    /// </summary>
+    private async Task LeadAECOfficeToConference()
+    {
+        if (insideRoomId != "aec-lobby" ||
+            AECOfficeStage != SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Reception)
+            return;
+
+        AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Conference;
+        await InvokeAsync(StateHasChanged);
     }
 
     private void AnswerAECIntent(string answer)
@@ -1037,6 +1082,9 @@
             insideRoomId = null;
             return;
         }
+
+        if (insideRoomId == "aec-lobby")
+            AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Arrival;
 
         mansionWelcomeVisible = false;
         mayorButlerVisible = false;
