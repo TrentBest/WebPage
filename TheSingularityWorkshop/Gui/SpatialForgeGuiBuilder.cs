@@ -46,7 +46,6 @@ public static class SpatialForgeGuiBuilder
         root.Content(WalkSurface(receiver, avatarX, avatarY, moveAvatarTo));
         root.Content(Avatar(receiver, avatarName));
         root.Content(Title(receiver));
-        root.Content(Avatar(receiver, avatarName));
         root.Content(WorkshopGui.Button(receiver).Label("← EXIT FORGE")
             .Style("position", "fixed").Style("left", "50%").Style("bottom", "1rem").Style("transform", "translateX(-50%)").Style("z-index", "30")
             .Style("padding", ".65rem .9rem").Style("border", $"2px solid {Magenta}aa").Style("background", "rgba(20,2,16,.94)").Style("box-shadow", $"0 0 18px {Magenta}22, inset 0 0 12px {Magenta}10").Style("text-shadow", $"0 0 8px {Magenta}88")
@@ -130,7 +129,7 @@ public static class SpatialForgeGuiBuilder
         panel.Content(WorkshopGui.Element(receiver, "div").Style("color", Magenta).Style("font-size", ".6rem").Style("letter-spacing", ".2em").Text("FSM ASSEMBLY PLAN"));
         panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".25rem").Style("color", "#7895a1").Style("font-size", ".4rem").Text($"{assembly.StateCount:00} STATES // STRUCTURE ONLY"));
 
-        var states = WorkshopGui.MultiPanel(receiver).Style("margin-top", ".8rem").Style("display", "flex").Style("flex-wrap", "wrap").Style("align-content", "flex-start").Style("gap", "1rem").Style("overflow", "auto").Style("height", "calc(100% - 2rem)");
+        var states = WorkshopGui.MultiPanel(receiver).Style("margin-top", ".8rem").Style("display", "flex").Style("flex-wrap", "wrap").Style("align-content", "flex-start").Style("gap", "1rem").Style("overflow", "visible").Style("height", "calc(100% - 2rem)");
         if (assembly.StateCount == 0)
             states.Content(WorkshopGui.Element(receiver, "div").Style("min-width", "12rem").Style("min-height", "5rem").Style("display", "flex").Style("align-items", "center").Style("justify-content", "center")
                 .Style("border", $"1px dashed {Cyan}55").Style("background", $"{Cyan}06").Style("color", "#58747e").Style("font-size", ".42rem").Style("letter-spacing", ".08em").Text("ADD STATES FROM THE MATERIAL SHELF"));
