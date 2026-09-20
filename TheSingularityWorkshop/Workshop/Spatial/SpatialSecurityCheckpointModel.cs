@@ -81,18 +81,25 @@ public sealed class SpatialSecurityCheckpointModel
             slot == PlayerQueueSlot)
             return false;
 
-        if (_agents.Any(agent => agent.QueueSlot == slot))
+        var occupiedAgentIndex = _agents.FindIndex(agent => agent.QueueSlot == slot);
+        var distanceForward = PlayerQueueSlot - slot;
+
+        if (occupiedAgentIndex >= 0 && distanceForward <= 1)
         {
             LastMessage = "That position is occupied. Please wait for the line to move.";
             return false;
         }
 
-        var distanceForward = PlayerQueueSlot - slot;
         if (distanceForward > 1)
         {
             CutAttempts++;
             Agitated = true;
-            LastMessage = "HEY! NO CUTTING! The line moves one space at a time.";
+            LastMessage = "HEY! NO CUTTING! The line moves one space at a time. Fine. Go ahead.";
+
+            // The visitor is allowed to cut, but the physical model preserves
+            // unique positions by moving the displaced person into the vacated slot.
+            if (occupiedAgentIndex >= 0)
+                _agents[occupiedAgentIndex] = _agents[occupiedAgentIndex] with { QueueSlot = PlayerQueueSlot };
         }
         else
         {
