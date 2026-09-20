@@ -33,6 +33,7 @@
     private readonly SpatialSecurityCheckpointModel SecurityCheckpoint = new();
     private readonly SpatialHolodeckMazeModel HolodeckMaze = new();
     private CancellationTokenSource? holodeckCts;
+    private CancellationTokenSource? securityCheckpointCts;
     private readonly SpatialSoftwareOfficeModel SoftwareOffice = new("Singularity Software Inc.");
     private readonly SpatialSoftwareOfficeArrivalModel SoftwareOfficeArrival = new();
     private readonly SpatialBehaviorBuilderModel BehaviorBuilder = new("OnUpdate");
@@ -811,11 +812,41 @@
     private void EnterSecurityCheckpoint()
     {
         SecurityCheckpoint.EnterQueue();
+        StartSecurityCheckpointTraffic();
     }
 
     private void MoveSecurityQueue(int slot)
     {
         SecurityCheckpoint.TryMoveToQueueSlot(slot);
+    }
+
+    private void StartSecurityCheckpointTraffic()
+    {
+        if (securityCheckpointCts is not null)
+            return;
+
+        securityCheckpointCts = new CancellationTokenSource();
+        _ = RunSecurityCheckpointTraffic(securityCheckpointCts.Token);
+    }
+
+    private async Task RunSecurityCheckpointTraffic(CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2.2));
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                if (insideRoomId != "singularity-lab-entrance" ||
+                    SecurityCheckpoint.Stage != SpatialSecurityCheckpointStage.Queue)
+                    return;
+
+                SecurityCheckpoint.AdvanceQueueTraffic();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     private void PlaceSecurityTray()
@@ -1518,6 +1549,9 @@
 
         if (insideRoomId == "singularity-lab-entrance")
         {
+            securityCheckpointCts?.Cancel();
+            securityCheckpointCts?.Dispose();
+            securityCheckpointCts = null;
             SecurityCheckpoint.Reset();
             LaboratoryAccess.Reset();
         }
@@ -1546,6 +1580,8 @@
         softwareOfficeCinematicCts?.Dispose();
         holodeckCts?.Cancel();
         holodeckCts?.Dispose();
+        securityCheckpointCts?.Cancel();
+        securityCheckpointCts?.Dispose();
         Experience.Dispose();
         AECIntent.Dispose();
         SingularityLab.Dispose();
