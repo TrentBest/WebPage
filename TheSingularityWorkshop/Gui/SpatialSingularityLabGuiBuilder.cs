@@ -31,7 +31,8 @@ public static class SpatialSingularityLabGuiBuilder
         Action scanRetina,
         Action<int> selectFloor,
         Action resolveFloorChallenge,
-        Action returnToElevator)
+        Action returnToElevator,
+        Action openHolodeck)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0")
@@ -44,7 +45,7 @@ public static class SpatialSingularityLabGuiBuilder
         if (lab.IsElevation)
             root.Content(ElevatorElevation(receiver, lab, userName, scanId, scanFingerprint, scanRetina, selectFloor, returnToElevator));
         else
-            root.Content(TopDown(receiver, lab, userName, enterSecurity, placeBelongings, completeScreening, enterElevator, resolveFloorChallenge, returnToElevator));
+            root.Content(TopDown(receiver, lab, userName, enterSecurity, placeBelongings, completeScreening, enterElevator, resolveFloorChallenge, returnToElevator, openHolodeck));
 
         root.Content(Status(receiver, lab));
         root.Content(Exit(receiver, exit));
@@ -60,7 +61,8 @@ public static class SpatialSingularityLabGuiBuilder
         Action completeScreening,
         Action enterElevator,
         Action resolveFloorChallenge,
-        Action returnToElevator)
+        Action returnToElevator,
+        Action openHolodeck)
     {
         var canvas = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("inset", "0")
@@ -108,7 +110,10 @@ public static class SpatialSingularityLabGuiBuilder
         panel.Content(action);
 
         if (lab.Stage == SpatialSingularityLabStage.FloorOpen && lab.SelectedFloor is int floor)
+        {
             panel.Content(FloorPreview(receiver, lab, floor));
+            panel.Content(ActionButton(receiver, "ENTER HOLODECK // MAZE EXPERIENCE", openHolodeck, Magenta));
+        }
 
         if (lab.Stage == SpatialSingularityLabStage.AccessDenied)
             panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".6rem").Style("padding", ".55rem")
