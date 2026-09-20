@@ -45,6 +45,7 @@ public static class SpatialPlaceCatalog
         new("city.ocean-shipyard", "Ocean Shipyard", SpatialDomain.SingularityCity, "ocean-shipyard", "vehicle-builder", new SpatialPoint(50, 72), "A waterfront yard for boats and marine construction."),
         new("city.maze", "Workshop Maze", SpatialDomain.SingularityCity, "maze", "maze-authoring", new SpatialPoint(50, 78), "A playable spatial environment."),
         new("workshop.aec-office", "AEC Remote Office", SpatialDomain.Workshop, "aec-remote-office", "aec-authoring", new SpatialPoint(50, 78), "A remote architectural, engineering, and construction office."),
+        new("workshop.software-office", "Singularity Software Inc.", SpatialDomain.Workshop, "singularity-software-office", "software-authoring", new SpatialPoint(50, 78), "A living software company where semantic artifacts become spatial workspaces."),
         new("city.taxi", "Singularity Taxi", SpatialDomain.SingularityCity, "singularity-taxi", "taxi-authoring", new SpatialPoint(50, 78), "A local transport service and vehicle experience.")
     ];
 
