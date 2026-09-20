@@ -39,7 +39,8 @@ public sealed class SpatialWorkshopScene
                 Building("npc-studio", "npc-studio", new SpatialBounds(10, 51, 5, 4)),
                 Building("fsm-bench", "fsm-workbench", new SpatialBounds(21, 59, 5, 3)),
                 Building("singularity-lab", "singularity-lab", new SpatialBounds(13, 60, 6, 3)),
-                new SpatialInteractable("aec-remote-office", "AEC Remote Office", new SpatialBounds(31, 76, 13, 8), new SpatialBounds(35, 87, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "aec-remote-office")            ],
+                new SpatialInteractable("aec-remote-office", "AEC Remote Office", new SpatialBounds(31, 76, 13, 8), new SpatialBounds(35, 87, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "aec-remote-office"),
+                new SpatialInteractable("singularity-software-office", "Singularity Software Inc.", new SpatialBounds(45, 15, 18, 10), new SpatialBounds(51, 27, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "singularity-software-office")            ],
             SpatialViewSettings.CreateDefault(),
             new SpatialConstructionSite(
                 "workshop-expansion",
