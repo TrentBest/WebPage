@@ -29,7 +29,7 @@ public sealed record SpatialAECRemoteOfficeManifest(
             new SpatialDraftingTableManifest(
                 "intelligent-drafting-table",
                 "INTELLIGENT DRAFTING TABLE",
-                ["wall", "concrete", "steel", "equipment", "duct", "pipe", "electrical", "annotation"],
+                ["wall", "door", "window", "column", "beam", "concrete", "steel", "equipment", "duct", "pipe", "conduit", "electrical", "annotation"],
                 ["arm-position", "angle", "start-point", "end-point", "semantic-type"],
                 "semantic-line"),
             [
