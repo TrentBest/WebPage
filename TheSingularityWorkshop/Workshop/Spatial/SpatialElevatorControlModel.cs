@@ -14,7 +14,7 @@ public sealed class SpatialElevatorControlModel
         ArgumentNullException.ThrowIfNull(floors);
         Floors = floors.OrderBy(floor => floor.Number).ToArray();
 
-        if (Floors.Length == 0)
+        if (Floors.Count == 0)
             throw new ArgumentException("An elevator must expose at least one floor.", nameof(floors));
 
         SelectedFloor = Floors[0].Number;
