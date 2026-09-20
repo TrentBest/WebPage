@@ -203,7 +203,8 @@
                 LaboratoryAccess,
                 ScanLaboratoryFingerprint,
                 ScanLaboratoryRetina,
-                RequestLaboratoryFloor);
+                RequestLaboratoryFloor,
+                ReturnToLaboratoryElevator);
 
         if (insideRoomId == "mansion")
             return SpatialMansionGuiBuilder.Build(
@@ -497,6 +498,12 @@
         var decision = LaboratoryAccess.RequestFloor(floorId);
         if (decision.Allowed)
             selectedLaboratoryFloorId = floorId;
+    }
+
+    private void ReturnToLaboratoryElevator()
+    {
+        LaboratoryAccess.ReturnToElevator();
+        selectedLaboratoryFloorId = LaboratoryManifest.Floors.FirstOrDefault().Id;
     }
 
     private void PrepareLaboratoryExperiment(string experimentId)
