@@ -2,34 +2,21 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace TheSingularityWorkshop.Gui;
 
-/// <summary>Semantic AEC element bundles exposed by the remote office drafting table.</summary>
 public enum SpatialAECElementKind
 {
-    Wall,
-    Door,
-    Window,
-    Column,
-    Beam,
-    Equipment,
-    Duct,
-    Pipe,
-    Conduit,
-    Electrical,
-    Annotation
+    Wall, Door, Window, Column, Beam, Equipment, Duct, Pipe, Conduit, Electrical, Annotation
 }
 
-/// <summary>A semantic element captured by the AEC drafting surface.</summary>
 public readonly record struct SpatialAECDraftElement(
     int Index,
     SpatialAECElementKind Kind,
     SpatialLine Line,
     double Length,
-    double AngleDegrees);
+    double AngleDegrees,
+    int Floor,
+    double StartZ,
+    double EndZ);
 
-/// <summary>
-/// Mutable drawing state for the remote AEC office. Geometry remains platform-neutral;
-/// the GUI is only a perception and authoring surface over the semantic substrate.
-/// </summary>
 public sealed class SpatialAECDraftModel : IDisposable
 {
     private readonly SpatialLinework _linework = new();
@@ -42,7 +29,9 @@ public sealed class SpatialAECDraftModel : IDisposable
     public double Snap { get; set; } = 1d;
     public bool Orthogonal { get; set; } = true;
     public bool Drawing { get; private set; }
-
+    public int SelectedFloor { get; set; } = 1;
+    public string SelectedTrade { get; set; } = "architecture";
+    public double CurrentElevation => SelectedFloor * 12d;
     public SpatialPoint? StartPoint { get; private set; }
 
     public void Begin(SpatialPoint point)
@@ -58,11 +47,10 @@ public sealed class SpatialAECDraftModel : IDisposable
     {
         ThrowIfDisposed();
         if (!Drawing || StartPoint is null)
-            throw new InvalidOperationException("The AEC drafting table is not currently drawing.");
+            throw new InvalidOperationException("The AEC spatial console is not currently drawing.");
 
         var end = SnapPoint(point);
-        if (Orthogonal)
-            end = Orthogonalize(StartPoint.Value, end);
+        if (Orthogonal) end = Orthogonalize(StartPoint.Value, end);
 
         _linework.ContinueLine(end);
         var line = _linework.EndLine();
@@ -70,7 +58,11 @@ public sealed class SpatialAECDraftModel : IDisposable
         var dy = line.End.Y - line.Start.Y;
         var length = Math.Sqrt(dx * dx + dy * dy);
         var angle = Math.Atan2(dy, dx) * 180d / Math.PI;
-        var element = new SpatialAECDraftElement(_elements.Count + 1, ElementKind, line, length, angle);
+
+        var element = new SpatialAECDraftElement(
+            _elements.Count + 1, ElementKind, line, length, angle,
+            SelectedFloor, CurrentElevation, CurrentElevation);
+
         _elements.Add(element);
         Drawing = false;
         StartPoint = null;
@@ -90,13 +82,13 @@ public sealed class SpatialAECDraftModel : IDisposable
     {
         ThrowIfDisposed();
         if (_elements.Count == 0) return;
+
         _elements.RemoveAt(_elements.Count - 1);
         _linework.Clear();
-        for (var i = 0; i < _elements.Count; i++)
+        foreach (var element in _elements)
         {
-            var line = _elements[i].Line;
-            _linework.BeginLine(line.Start);
-            _linework.ContinueLine(line.End);
+            _linework.BeginLine(element.Line.Start);
+            _linework.ContinueLine(element.Line.End);
             _linework.EndLine();
         }
 
@@ -114,13 +106,9 @@ public sealed class SpatialAECDraftModel : IDisposable
     }
 
     private static SpatialPoint Orthogonalize(SpatialPoint start, SpatialPoint end)
-    {
-        var dx = Math.Abs(end.X - start.X);
-        var dy = Math.Abs(end.Y - start.Y);
-        return dx >= dy
+        => Math.Abs(end.X - start.X) >= Math.Abs(end.Y - start.Y)
             ? new SpatialPoint(end.X, start.Y)
             : new SpatialPoint(start.X, end.Y);
-    }
 
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 
@@ -133,7 +121,6 @@ public sealed class SpatialAECDraftModel : IDisposable
     }
 }
 
-/// <summary>Builds the remote AEC office as a lightweight RPG-like blueprint workspace.</summary>
 public static class SpatialAECRemoteOfficeGuiBuilder
 {
     private const string Cyan = "#00eaff";
@@ -141,6 +128,7 @@ public static class SpatialAECRemoteOfficeGuiBuilder
     private const string Magenta = "#ff38d1";
     private const string White = "#ffffff";
     private const string Muted = "#7895a1";
+    private const string Void = "#061018";
 
     public static ElementBuilder Build(
         object receiver,
@@ -153,79 +141,110 @@ public static class SpatialAECRemoteOfficeGuiBuilder
         Action<SpatialAECElementKind> setElementKind,
         Action<double> setSnap,
         Action<bool> setOrthogonal,
+        Action<int> setFloor,
+        Action<string> setTrade,
         Action exitOffice)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0")
             .Style("width", "100vw").Style("height", "100vh")
             .Style("overflow", "hidden")
-            .Style("background", "#061018")
-            .Style("color", White)
+            .Style("background", Void).Style("color", White)
             .Style("font-family", "Consolas, 'Courier New', monospace");
 
         root.Content(WorkshopGui.Element(receiver, "style").Text(
-            "@keyframes blueprint-breathe{0%,100%{opacity:.72}50%{opacity:1}}" +
-            "@keyframes forge-glow{0%,100%{filter:brightness(.9)}50%{filter:brightness(1.25)}}"));
+            "@keyframes spatial-breathe{0%,100%{opacity:.55}50%{opacity:1}}" +
+            "@keyframes spatial-pulse{0%,100%{transform:scale(.9);opacity:.55}50%{transform:scale(1.15);opacity:1}}" +
+            ".aec-floor{transition:all .2s ease}.aec-floor:hover{filter:brightness(1.7)}"));
 
         var canvas = WorkshopGui.Element(receiver, "svg")
             .Attribute("viewBox", "0 0 100 100")
             .Attribute("preserveAspectRatio", "none")
             .Style("position", "absolute").Style("inset", "0")
             .Style("width", "100vw").Style("height", "100vh")
-            .Style("cursor", draft.Drawing ? "crosshair" : "cell")
-            .Style("background", "linear-gradient(rgba(0,234,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,234,255,.035) 1px,transparent 1px)")
-            .Style("background-size", "5% 5%")
-            .AriaLabel("AEC blueprint drafting surface. Click two points to create a semantic element.")
-            .OnClick(drawPoint)
-            .StopPropagation("onclick");
+            .Style("cursor", draft.Drawing ? "crosshair" : "crosshair")
+            .Style("background", "#061018")
+            .AriaLabel("Three dimensional axonometric AEC authoring workspace. Click two points to place an element on the selected floor.")
+            .OnClick(drawPoint).StopPropagation("onclick");
 
-        for (var i = 0; i <= 100; i += 10)
-        {
-            canvas.Child(WorkshopGui.Element(receiver, "line")
-                .Attribute("x1", i).Attribute("y1", 0).Attribute("x2", i).Attribute("y2", 100)
-                .Attribute("stroke", Cyan).Attribute("stroke-opacity", ".09").Attribute("stroke-width", ".12"));
-            canvas.Child(WorkshopGui.Element(receiver, "line")
-                .Attribute("x1", 0).Attribute("y1", i).Attribute("x2", 100).Attribute("y2", i)
-                .Attribute("stroke", Cyan).Attribute("stroke-opacity", ".09").Attribute("stroke-width", ".12"));
-        }
+        DrawAxonometricGrid(canvas, receiver);
 
         foreach (var element in draft.Elements)
         {
+            var a = Project(element.Line.Start.X, element.Line.Start.Y, element.StartZ);
+            var b = Project(element.Line.End.X, element.Line.End.Y, element.EndZ);
             var stroke = ColorFor(element.Kind);
+
             canvas.Child(WorkshopGui.Element(receiver, "line")
-                .Attribute("x1", element.Line.Start.X).Attribute("y1", element.Line.Start.Y)
-                .Attribute("x2", element.Line.End.X).Attribute("y2", element.Line.End.Y)
-                .Attribute("stroke", stroke).Attribute("stroke-width", element.Kind == SpatialAECElementKind.Wall ? ".7" : ".38")
+                .Attribute("x1", a.X).Attribute("y1", a.Y)
+                .Attribute("x2", b.X).Attribute("y2", b.Y)
+                .Attribute("stroke", stroke)
+                .Attribute("stroke-width", element.Kind == SpatialAECElementKind.Wall ? "0.72" : "0.38")
                 .Attribute("stroke-opacity", ".95"));
-            AddDimension(canvas, receiver, element);
+
+            AddDimension(canvas, receiver, element, a, b);
         }
 
-        // Dots are topology markers, not continuous decorations:
-        // only show vertices where authored elements actually intersect.
         foreach (var point in IntersectionPoints(draft.Elements))
-            AddIntersectionDot(canvas, receiver, point, Cyan);
+        {
+            var p = Project(point.X, point.Y, draft.CurrentElevation);
+            canvas.Child(WorkshopGui.Element(receiver, "circle")
+                .Attribute("cx", p.X).Attribute("cy", p.Y).Attribute("r", ".34")
+                .Attribute("fill", Cyan).Attribute("stroke", Void).Attribute("stroke-width", ".12"));
+        }
 
-        // While drawing, show one highlighted intended endpoint.
         if (draft.Drawing && draft.StartPoint is { } start)
         {
+            var p = Project(start.X, start.Y, draft.CurrentElevation);
             canvas.Child(WorkshopGui.Element(receiver, "circle")
-                .Attribute("cx", start.X).Attribute("cy", start.Y).Attribute("r", ".28")
-                .Attribute("fill", Cyan).Attribute("fill-opacity", ".8"));
-
+                .Attribute("cx", p.X).Attribute("cy", p.Y).Attribute("r", ".35")
+                .Attribute("fill", Cyan).Attribute("fill-opacity", ".85"));
             canvas.Child(WorkshopGui.Element(receiver, "circle")
-                .Attribute("cx", start.X).Attribute("cy", start.Y).Attribute("r", ".62")
-                .Attribute("fill", "none").Attribute("stroke", Yellow).Attribute("stroke-width", ".18")
-                .Attribute("stroke-dasharray", ".3 .3"));
+                .Attribute("cx", p.X).Attribute("cy", p.Y).Attribute("r", ".85")
+                .Attribute("fill", "none").Attribute("stroke", Yellow)
+                .Attribute("stroke-width", ".18").Attribute("stroke-dasharray", ".3 .3"));
         }
 
         root.Content(canvas);
-        root.Content(Avatar(receiver, avatarName));
-        root.Content(LeftPanel(receiver, manifest, draft, setElementKind, setSnap, setOrthogonal, clear, undo, exitOffice));
-        root.Content(RightPanel(receiver, manifest, draft));
+        root.Content(Avatar(receiver, avatarName, draft));
+        root.Content(TradeContext(receiver, manifest, draft, setElementKind, setSnap, setOrthogonal, clear, undo, exitOffice));
+        root.Content(FloorNavigator(receiver, draft, setFloor, setTrade, manifest));
+        root.Content(Status(receiver, draft));
+
         return root;
     }
 
-    private static ElementBuilder LeftPanel(
+    private static void DrawAxonometricGrid(ElementBuilder canvas, object receiver)
+    {
+        for (var i = 0d; i <= 100d; i += 5d)
+        {
+            var x0 = Project(i, 0, 0);
+            var x1 = Project(i, 100, 0);
+            var y0 = Project(0, i, 0);
+            var y1 = Project(100, i, 0);
+
+            canvas.Child(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", x0.X).Attribute("y1", x0.Y)
+                .Attribute("x2", x1.X).Attribute("y2", x1.Y)
+                .Attribute("stroke", Cyan).Attribute("stroke-opacity", i % 10 == 0 ? ".16" : ".055").Attribute("stroke-width", ".12"));
+            canvas.Child(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", y0.X).Attribute("y1", y0.Y)
+                .Attribute("x2", y1.X).Attribute("y2", y1.Y)
+                .Attribute("stroke", Cyan).Attribute("stroke-opacity", i % 10 == 0 ? ".16" : ".055").Attribute("stroke-width", ".12"));
+        }
+
+        for (var floor = 1; floor <= 5; floor++)
+        {
+            var left = Project(0, 0, floor * 12);
+            var right = Project(100, 0, floor * 12);
+            canvas.Child(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", left.X).Attribute("y1", left.Y)
+                .Attribute("x2", right.X).Attribute("y2", right.Y)
+                .Attribute("stroke", Yellow).Attribute("stroke-opacity", ".06").Attribute("stroke-width", ".18"));
+        }
+    }
+
+    private static ElementBuilder TradeContext(
         object receiver,
         SpatialAECRemoteOfficeManifest manifest,
         SpatialAECDraftModel draft,
@@ -236,138 +255,186 @@ public static class SpatialAECRemoteOfficeGuiBuilder
         Action undo,
         Action exitOffice)
     {
+        var trade = manifest.FindDiscipline(draft.SelectedTrade);
         var panel = WorkshopGui.Element(receiver, "div")
             .Style("position", "fixed").Style("left", "1rem").Style("top", "1rem").Style("z-index", "30")
-            .Style("width", "min(23rem,calc(100vw - 2rem))").Style("max-height", "calc(100vh - 2rem)")
-            .Style("overflow", "auto").Style("padding", ".8rem")
+            .Style("width", "min(25rem,calc(100vw - 2rem))")
+            .Style("padding", ".75rem")
             .Style("border", $"1px solid {Cyan}66")
-            .Style("background", "rgba(2,10,17,.93)")
-            .Style("box-shadow", $"0 0 30px {Cyan}10,inset 0 0 22px {Cyan}07");
+            .Style("background", "rgba(2,10,17,.86)")
+            .Style("backdrop-filter", "blur(8px)")
+            .Style("box-shadow", $"0 0 28px {Cyan}12");
 
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".58rem").Style("letter-spacing", ".2em").Text(manifest.Name));
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".35rem").Style("color", Muted).Style("font-size", ".4rem").Text("SINGULARITYBIM // AUTHORING SURFACE"));
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("color", Cyan).Style("font-size", ".62rem").Style("letter-spacing", ".18em")
+            .Text($"{draft.SelectedTrade.ToUpperInvariant()} // FLOOR {draft.SelectedFloor}"));
 
-        var disciplines = WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("flex-wrap", "wrap").Style("gap", ".3rem").Style("margin-top", ".7rem");
-        foreach (var discipline in manifest.Disciplines)
-            disciplines.Content(WorkshopGui.Button(receiver).Label(discipline.Name).Style("padding", ".3rem .42rem").Style("font-family", "inherit").Style("font-size", ".38rem").Style("cursor", "pointer").OnClick(() => { }));
-        panel.Content(disciplines);
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".22rem").Style("color", Muted).Style("font-size", ".38rem")
+            .Text($"ACTIVE CONSTRUCTION ZONE // ELEVATION {draft.CurrentElevation:0.#}"));
 
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".75rem").Style("color", Yellow).Style("font-size", ".45rem").Style("letter-spacing", ".15em").Text("ELEMENT BUNDLES"));
+        if (trade is not null)
+            panel.Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".42rem").Style("color", White).Style("font-size", ".39rem")
+                .Text(string.Join("  /  ", trade.Value.Concepts.Select(x => x.ToUpperInvariant()))));
 
-        var tools = WorkshopGui.Element(receiver, "div").Style("display", "grid").Style("grid-template-columns", "repeat(3,1fr)").Style("gap", ".3rem").Style("margin-top", ".35rem");
-        foreach (var kind in Enum.GetValues<SpatialAECElementKind>())
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".62rem").Style("color", Yellow).Style("font-size", ".4rem")
+            .Style("letter-spacing", ".12em").Text("ACTIVE ELEMENT BUNDLES"));
+
+        var tools = WorkshopGui.Element(receiver, "div")
+            .Style("display", "flex").Style("flex-wrap", "wrap").Style("gap", ".28rem").Style("margin-top", ".3rem");
+
+        foreach (var kind in TradeKinds(draft.SelectedTrade))
         {
             var active = draft.ElementKind == kind;
             tools.Content(WorkshopGui.Button(receiver).Label(kind.ToString().ToUpperInvariant())
-                .Style("padding", ".38rem .2rem").Style("border", $"1px solid {(active ? Cyan : "#ffffff")}55")
-                .Style("background", active ? $"{Cyan}16" : "transparent")
+                .Style("padding", ".32rem .42rem")
+                .Style("border", $"1px solid {(active ? Cyan : "#ffffff")}55")
+                .Style("background", active ? $"{Cyan}18" : "transparent")
                 .Style("color", active ? Cyan : White).Style("font-family", "inherit").Style("font-size", ".36rem")
                 .Style("cursor", "pointer").OnClick(() => setElementKind(kind)));
         }
+
         panel.Content(tools);
 
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".75rem").Style("color", Yellow).Style("font-size", ".45rem").Text("DRAFTING CONTROLS"));
-        var snap = WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("gap", ".3rem").Style("margin-top", ".3rem");
+        var controls = WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("gap", ".25rem").Style("margin-top", ".5rem");
         foreach (var value in new[] { .5d, 1d, 2d, 5d })
-            snap.Content(WorkshopGui.Button(receiver).Label($"SNAP {value:0.0}")
-                .Style("padding", ".3rem .4rem").Style("font-family", "inherit").Style("font-size", ".36rem").Style("cursor", "pointer")
+            controls.Content(WorkshopGui.Button(receiver).Label($"SNAP {value:0.0}")
+                .Style("padding", ".25rem .35rem").Style("font-size", ".34rem").Style("cursor", "pointer")
                 .OnClick(() => setSnap(value)));
-        panel.Content(snap);
 
-        panel.Content(WorkshopGui.Button(receiver).Label(draft.Orthogonal ? "ORTHO ON" : "ORTHO OFF")
-            .Style("margin-top", ".35rem").Style("padding", ".35rem .5rem")
-            .Style("border", $"1px solid {Cyan}55").Style("background", draft.Orthogonal ? $"{Cyan}12" : "transparent")
-            .Style("color", draft.Orthogonal ? Cyan : White).Style("font-family", "inherit").Style("font-size", ".38rem")
-            .Style("cursor", "pointer").OnClick(() => setOrthogonal(!draft.Orthogonal)));
+        controls.Content(WorkshopGui.Button(receiver).Label(draft.Orthogonal ? "ORTHO" : "FREE")
+            .Style("padding", ".25rem .35rem").Style("font-size", ".34rem").Style("cursor", "pointer")
+            .OnClick(() => setOrthogonal(!draft.Orthogonal)));
 
-        panel.Content(WorkshopGui.Button(receiver).Label("UNDO LAST")
-            .Style("margin-top", ".55rem").Style("padding", ".4rem .55rem").Style("cursor", "pointer")
-            .OnClick(undo));
-        panel.Content(WorkshopGui.Button(receiver).Label("CLEAR PLAN")
-            .Style("margin-left", ".35rem").Style("padding", ".4rem .55rem").Style("cursor", "pointer")
-            .OnClick(clear));
+        panel.Content(controls);
 
+        panel.Content(WorkshopGui.Button(receiver).Label("UNDO")
+            .Style("margin-top", ".4rem").Style("padding", ".32rem .45rem").Style("font-size", ".35rem").Style("cursor", "pointer").OnClick(undo));
+        panel.Content(WorkshopGui.Button(receiver).Label("CLEAR")
+            .Style("margin-left", ".25rem").Style("padding", ".32rem .45rem").Style("font-size", ".35rem").Style("cursor", "pointer").OnClick(clear));
         panel.Content(WorkshopGui.Button(receiver).Label("← LEAVE AEC OFFICE")
-            .Style("display", "block").Style("margin-top", ".75rem").Style("padding", ".45rem .6rem")
-            .Style("border", $"1px solid {Magenta}66").Style("background", "transparent")
-            .Style("color", Magenta).Style("font-family", "inherit").Style("font-size", ".4rem")
-            .Style("cursor", "pointer").OnClick(exitOffice));
+            .Style("margin-left", ".25rem").Style("padding", ".32rem .45rem").Style("font-size", ".35rem")
+            .Style("color", Magenta).Style("cursor", "pointer").OnClick(exitOffice));
 
         return panel;
     }
 
-    private static ElementBuilder RightPanel(object receiver, SpatialAECRemoteOfficeManifest manifest, SpatialAECDraftModel draft)
+    private static IReadOnlyList<SpatialAECElementKind> TradeKinds(string trade)
+        => trade.ToLowerInvariant() switch
+        {
+            "structural" => [SpatialAECElementKind.Column, SpatialAECElementKind.Beam, SpatialAECElementKind.Wall],
+            "mechanical" => [SpatialAECElementKind.Duct, SpatialAECElementKind.Equipment, SpatialAECElementKind.Pipe],
+            "electrical" => [SpatialAECElementKind.Conduit, SpatialAECElementKind.Electrical, SpatialAECElementKind.Equipment],
+            "plumbing" => [SpatialAECElementKind.Pipe, SpatialAECElementKind.Equipment, SpatialAECElementKind.Wall],
+            "procurement" => [SpatialAECElementKind.Equipment, SpatialAECElementKind.Annotation],
+            _ => [SpatialAECElementKind.Wall, SpatialAECElementKind.Door, SpatialAECElementKind.Window, SpatialAECElementKind.Column]
+        };
+
+    private static ElementBuilder FloorNavigator(
+        object receiver,
+        SpatialAECDraftModel draft,
+        Action<int> setFloor,
+        Action<string> setTrade,
+        SpatialAECRemoteOfficeManifest manifest)
     {
-        var panel = WorkshopGui.Element(receiver, "div")
-            .Style("position", "fixed").Style("right", "1rem").Style("top", "1rem").Style("z-index", "30")
-            .Style("width", "min(20rem,calc(100vw - 2rem))").Style("max-height", "calc(100vh - 2rem)")
-            .Style("overflow", "auto").Style("padding", ".7rem")
-            .Style("border", $"1px solid {Yellow}55").Style("background", "rgba(2,10,17,.9)");
+        var nav = WorkshopGui.Element(receiver, "div")
+            .Style("position", "fixed").Style("right", "1rem").Style("top", "1rem").Style("z-index", "31")
+            .Style("width", "min(24rem,34vw)").Style("min-width", "15rem")
+            .Style("padding", ".65rem")
+            .Style("border", $"1px solid {Yellow}55")
+            .Style("background", "rgba(2,10,17,.55)")
+            .Style("backdrop-filter", "blur(6px)")
+            .Style("perspective", "800px");
 
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", ".5rem").Style("letter-spacing", ".15em").Text("AUTO DIMENSIONS"));
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".3rem").Style("color", Muted).Style("font-size", ".37rem").Text($"{draft.Elements.Count:00} SEMANTIC ELEMENTS"));
+        nav.Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", ".42rem").Style("letter-spacing", ".15em")
+            .Text("SPATIAL NAVIGATOR // BUILDING SECTION"));
 
-        if (draft.Elements.Count == 0)
-            panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".7rem").Style("color", Muted).Style("font-size", ".42rem").Text("Draw two points. The office will snap, classify, and dimension the element."));
-        else
-            foreach (var element in draft.Elements.TakeLast(12))
-                panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".45rem").Style("padding", ".4rem").Style("border-left", $"2px solid {ColorFor(element.Kind)}")
-                    .Content(WorkshopGui.Element(receiver, "div").Style("color", White).Style("font-size", ".42rem").Text($"#{element.Index:00} {element.Kind.ToString().ToUpperInvariant()}"))
-                    .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".2rem").Style("color", Yellow).Style("font-size", ".38rem").Text($"{element.Length:0.##}u @ {element.AngleDegrees:0.#}°"))
-                    .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".15rem").Style("color", Muted).Style("font-size", ".34rem").Text($"{element.Line.Start.X:0.##},{element.Line.Start.Y:0.##} → {element.Line.End.X:0.##},{element.Line.End.Y:0.##}")));
+        var building = WorkshopGui.Element(receiver, "div")
+            .Style("position", "relative").Style("height", "16rem").Style("margin-top", ".25rem")
+            .Style("transform", "rotateX(8deg) rotateY(-18deg)")
+            .Style("transform-style", "preserve-3d");
 
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".7rem").Style("color", Cyan).Style("font-size", ".42rem").Style("letter-spacing", ".12em").Text("OUTPUT BOUNDARIES"));
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".25rem").Style("color", Muted).Style("font-size", ".35rem").Text(string.Join(" // ", manifest.ExternalTargets.Select(x => x.Name))));
-        return panel;
+        for (var floor = 5; floor >= 1; floor--)
+        {
+            var y = 5 + (5 - floor) * 18;
+            var selected = draft.SelectedFloor == floor;
+            var level = WorkshopGui.Button(receiver).Label($"FLOOR {floor}")
+                .Style("position", "absolute").Style("left", "8%").Style("top", $"{y}%")
+                .Style("width", "84%").Style("height", "15%")
+                .Style("border", $"1px solid {(selected ? Cyan : "#ffffff")}88")
+                .Style("background", selected ? $"{Cyan}18" : "rgba(0,234,255,.025)")
+                .Style("color", selected ? Cyan : Muted)
+                .Style("font-family", "inherit").Style("font-size", ".4rem").Style("text-align", "left")
+                .Style("padding-left", ".55rem").Style("cursor", "pointer")
+                .Style("transform", $"translateZ({(5 - floor) * 3}px)")
+                .Style("box-shadow", selected ? $"0 0 16px {Cyan}22" : "none")
+                .OnClick(() => setFloor(floor));
+            building.Content(level);
+        }
+
+        nav.Content(building);
+
+        var trades = WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("flex-wrap", "wrap").Style("gap", ".25rem");
+        foreach (var discipline in manifest.Disciplines)
+        {
+            var selected = string.Equals(draft.SelectedTrade, discipline.Id, StringComparison.OrdinalIgnoreCase);
+            trades.Content(WorkshopGui.Button(receiver).Label(discipline.Name)
+                .Style("padding", ".25rem .35rem").Style("font-size", ".32rem")
+                .Style("border", $"1px solid {(selected ? Yellow : "#ffffff")}44")
+                .Style("color", selected ? Yellow : Muted).Style("cursor", "pointer")
+                .OnClick(() => setTrade(discipline.Id)));
+        }
+        nav.Content(trades);
+
+        nav.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".25rem").Style("color", Muted).Style("font-size", ".32rem")
+            .Text($"SELECTED FLOOR {draft.SelectedFloor} // {draft.SelectedTrade.ToUpperInvariant()} CONTEXT"));
+        return nav;
     }
 
-    private static void AddDimension(ElementBuilder canvas, object receiver, SpatialAECDraftElement element)
+    private static ElementBuilder Status(object receiver, SpatialAECDraftModel draft)
+        => WorkshopGui.Element(receiver, "div")
+            .Style("position", "fixed").Style("left", "50%").Style("bottom", "1rem").Style("z-index", "25")
+            .Style("transform", "translateX(-50%)")
+            .Style("padding", ".38rem .65rem").Style("border", $"1px solid {Cyan}33")
+            .Style("background", "rgba(2,10,17,.72)").Style("color", Muted)
+            .Style("font-size", ".34rem").Style("letter-spacing", ".1em").Style("pointer-events", "none")
+            .Text(draft.Drawing
+                ? $"PLACING {draft.ElementKind.ToString().ToUpperInvariant()} // CLICK ENDPOINT // X Y Z"
+                : $"FLOOR {draft.SelectedFloor} // Z {draft.CurrentElevation:0.#} // CLICK TWO POINTS TO AUTHOR");
+
+    private static void AddDimension(ElementBuilder canvas, object receiver, SpatialAECDraftElement element, (double X, double Y) a, (double X, double Y) b)
     {
-        var midpointX = (element.Line.Start.X + element.Line.End.X) / 2d;
-        var midpointY = (element.Line.Start.Y + element.Line.End.Y) / 2d;
+        var x = (a.X + b.X) / 2d;
+        var y = (a.Y + b.Y) / 2d - 1.1d;
         canvas.Child(WorkshopGui.Element(receiver, "text")
-            .Attribute("x", midpointX).Attribute("y", midpointY - 1.1)
-            .Attribute("fill", Yellow).Attribute("font-size", "1.5")
+            .Attribute("x", x).Attribute("y", y)
+            .Attribute("fill", Yellow).Attribute("font-size", "1.4")
             .Attribute("text-anchor", "middle")
-            .Attribute("paint-order", "stroke").Attribute("stroke", "#061018").Attribute("stroke-width", ".45")
+            .Attribute("paint-order", "stroke").Attribute("stroke", Void).Attribute("stroke-width", ".45")
             .Text($"{element.Length:0.##}"));
     }
 
     private static IEnumerable<SpatialPoint> IntersectionPoints(IReadOnlyList<SpatialAECDraftElement> elements)
     {
         var points = new List<SpatialPoint>();
-
         for (var i = 0; i < elements.Count; i++)
         for (var j = i + 1; j < elements.Count; j++)
-        {
-            if (TryIntersect(elements[i].Line, elements[j].Line, out var point))
+            if (elements[i].Floor == elements[j].Floor && TryIntersect(elements[i].Line, elements[j].Line, out var point))
                 points.Add(point);
-        }
 
-        return points
-            .GroupBy(p => $"{p.X:R}|{p.Y:R}")
-            .Select(g => g.First());
-    }
-
-    private static void AddIntersectionDot(ElementBuilder canvas, object receiver, SpatialPoint point, string color)
-    {
-        canvas.Child(WorkshopGui.Element(receiver, "circle")
-            .Attribute("cx", point.X).Attribute("cy", point.Y).Attribute("r", ".32")
-            .Attribute("fill", color).Attribute("stroke", "#061018").Attribute("stroke-width", ".12"));
+        return points.GroupBy(p => $"{p.X:R}|{p.Y:R}").Select(g => g.First());
     }
 
     private static bool TryIntersect(SpatialLine first, SpatialLine second, out SpatialPoint point)
     {
-        var x1 = first.Start.X;
-        var y1 = first.Start.Y;
-        var x2 = first.End.X;
-        var y2 = first.End.Y;
-        var x3 = second.Start.X;
-        var y3 = second.Start.Y;
-        var x4 = second.End.X;
-        var y4 = second.End.Y;
-
+        var x1 = first.Start.X; var y1 = first.Start.Y;
+        var x2 = first.End.X; var y2 = first.End.Y;
+        var x3 = second.Start.X; var y3 = second.Start.Y;
+        var x4 = second.End.X; var y4 = second.End.Y;
         var denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
         if (Math.Abs(denominator) < 1e-9)
         {
             point = default;
@@ -387,6 +454,9 @@ public static class SpatialAECRemoteOfficeGuiBuilder
         return true;
     }
 
+    private static (double X, double Y) Project(double x, double y, double z)
+        => (50d + (x - y) * .55d, 50d + (x + y) * .24d - z * .08d);
+
     private static string ColorFor(SpatialAECElementKind kind)
         => kind switch
         {
@@ -399,15 +469,20 @@ public static class SpatialAECRemoteOfficeGuiBuilder
             SpatialAECElementKind.Duct => "#7df9ff",
             SpatialAECElementKind.Pipe => "#4dff88",
             SpatialAECElementKind.Conduit => "#c084fc",
-            SpatialAECElementKind.Electrical => "#ffd34d",
+            SpatialAECElementKind.Electrical => Yellow,
             SpatialAECElementKind.Annotation => White,
             _ => White
         };
 
-    private static ElementBuilder Avatar(object receiver, string name)
-        => WorkshopGui.Element(receiver, "div")
-            .Style("position", "fixed").Style("left", "50%").Style("bottom", "1rem").Style("z-index", "25")
-            .Style("pointer-events", "none").Style("color", White).Style("font-size", ".4rem")
-            .Content(WorkshopGui.Element(receiver, "span").Style("margin-right", ".35rem").Text(name))
-            .Content(WorkshopGui.Element(receiver, "span").Style("color", Cyan).Style("animation", "blueprint-breathe 2s infinite").Text("●"));
+    private static ElementBuilder Avatar(object receiver, string name, SpatialAECDraftModel draft)
+    {
+        var p = Project(50, 50, draft.CurrentElevation);
+        return WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", $"{p.X}%").Style("top", $"{p.Y}%").Style("z-index", "20")
+            .Style("transform", "translate(-50%,-50%)").Style("pointer-events", "none")
+            .Style("text-align", "center").Style("color", White).Style("font-size", ".38rem")
+            .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", "1rem").Style("text-shadow", $"0 0 12px {Cyan}").Text("◉"))
+            .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Text($"YOU ARE HERE // {name}"))
+            .Content(WorkshopGui.Element(receiver, "div").Style("color", Muted).Style("font-size", ".3rem").Text($"X 50.0  Y 50.0  Z {draft.CurrentElevation:0.#}"));
+    }
 }
