@@ -17,7 +17,25 @@ public sealed class SpatialAECRemoteOfficeTests
         Assert.True(manifest.SupportsLineType("electrical"));
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 37 — AEC drafting snaps and auto-dimensions a wall")]
+    [Fact(DisplayName = "Incremental Unit Test 37 — AEC office has a reachable exterior entry point")]
+    public void AECOfficeEntryPointIsReachable()
+    {
+        var scene = SpatialWorkshopScene.CreateDefault();
+        var office = scene.Interactables.Single(x => x.Id == "aec-remote-office");
+        var target = new SpatialPoint(
+            office.InteractionPoint.X + office.InteractionPoint.Width / 2d,
+            office.InteractionPoint.Y + office.InteractionPoint.Height / 2d);
+
+        var path = SpatialGeometryEngine.FindPath(
+            scene.StartingPosition,
+            target,
+            SpatialGeometryEngine.FromInteractables(scene.Interactables));
+
+        Assert.NotEmpty(path);
+        Assert.Equal(target, path[^1]);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 38 — AEC drafting snaps and auto-dimensions a wall")]
     public void DraftingCreatesDimensionedSemanticElement()
     {
         using var draft = new SpatialAECDraftModel
@@ -37,7 +55,7 @@ public sealed class SpatialAECRemoteOfficeTests
         Assert.Equal(0, element.AngleDegrees);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 38 — AEC drafting undo preserves remaining semantic geometry")]
+    [Fact(DisplayName = "Incremental Unit Test 39 — AEC drafting undo preserves remaining semantic geometry")]
     public void UndoRemovesOnlyLastElement()
     {
         using var draft = new SpatialAECDraftModel();
