@@ -148,7 +148,7 @@
             return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitRoom);
 
         if (insideRoomId == "aec-remote-office")
-            return SpatialAECRemoteOfficeGuiBuilder.Build(this, AECManifest, AECDraft, Experience.User.DisplayName, args => _ = DrawAECPoint(args), ClearAECDraft, UndoAECDraft, SetAECElementKind, SetAECSnap, SetAECOrthogonal, ExitRoom);
+            return SpatialAECRemoteOfficeGuiBuilder.Build(this, AECManifest, AECDraft, Experience.User.DisplayName, args => _ = DrawAECPoint(args), ClearAECDraft, UndoAECDraft, SetAECElementKind, SetAECSnap, SetAECOrthogonal, SetAECFloor, SetAECTrade, ExitRoom);
 
         if (insideRoomId == "line-lab")
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
@@ -837,6 +837,8 @@
     private void SetAECElementKind(SpatialAECElementKind kind) => AECDraft.ElementKind = kind;
     private void SetAECSnap(double snap) => AECDraft.Snap = snap;
     private void SetAECOrthogonal(bool enabled) => AECDraft.Orthogonal = enabled;
+    private void SetAECFloor(int floor) => AECDraft.SelectedFloor = Math.Clamp(floor, 1, 5);
+    private void SetAECTrade(string trade) => AECDraft.SelectedTrade = trade;
 
     private async Task DrawForgePoint(MouseEventArgs args)
     {
