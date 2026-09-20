@@ -1,6 +1,6 @@
 namespace TheSingularityWorkshop.Gui;
 
-using SingularityHub.Abstractions;
+using TheSingularityWorkshop.SingularityHub;
 
 /// <summary>
 /// Reusable physical access-control substrate. A card reader is a capability,
