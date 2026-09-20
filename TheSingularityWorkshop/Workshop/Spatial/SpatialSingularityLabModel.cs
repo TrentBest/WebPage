@@ -239,8 +239,19 @@ public sealed class SpatialSingularityLabModel : IStateContext, IDisposable
         if (!CanAccept(command))
             return;
 
+        var stageBeforeCommand = Stage;
+        var expectedNextStage = GetExpectedStage(command, stageBeforeCommand);
+
         _pendingCommand = command;
         _handle.Update();
+
+        // Keep the FSM_API transition as the authoritative state change. A few
+        // 1.0.x package builds can evaluate the condition but leave the handle's
+        // CurrentState unchanged; in that case explicitly perform the same
+        // declared transition so the semantic model and FSM remain synchronized.
+        if (expectedNextStage.HasValue && Stage == stageBeforeCommand)
+            _handle.TransitionTo(expectedNextStage.Value.ToString());
+
         _pendingCommand = SpatialSingularityLabCommand.None;
     }
 
@@ -273,6 +284,46 @@ public sealed class SpatialSingularityLabModel : IStateContext, IDisposable
     private bool IsSelectedFloorAuthorized()
         => SelectedFloor is int floor &&
            Floors.FirstOrDefault(x => x.Level == floor) is { Authorized: true };
+
+    private SpatialSingularityLabStage? GetExpectedStage(
+        SpatialSingularityLabCommand command,
+        SpatialSingularityLabStage stage)
+        => command switch
+        {
+            SpatialSingularityLabCommand.EnterSecurityLine
+                when stage == SpatialSingularityLabStage.ApproachSecurity
+                => SpatialSingularityLabStage.SecurityQueue,
+            SpatialSingularityLabCommand.PlaceBelongings
+                when stage == SpatialSingularityLabStage.SecurityQueue
+                => SpatialSingularityLabStage.SecurityScreening,
+            SpatialSingularityLabCommand.CompleteScreening
+                when stage == SpatialSingularityLabStage.SecurityScreening
+                => SpatialSingularityLabStage.SecurityComplete,
+            SpatialSingularityLabCommand.EnterElevator
+                when stage == SpatialSingularityLabStage.SecurityComplete
+                => SpatialSingularityLabStage.ElevatorElevation,
+            SpatialSingularityLabCommand.ScanId
+                when stage == SpatialSingularityLabStage.ElevatorElevation
+                => SpatialSingularityLabStage.Fingerprint,
+            SpatialSingularityLabCommand.ScanFingerprint
+                when stage == SpatialSingularityLabStage.Fingerprint
+                => SpatialSingularityLabStage.RetinalScan,
+            SpatialSingularityLabCommand.ScanRetina
+                when stage == SpatialSingularityLabStage.RetinalScan
+                => SpatialSingularityLabStage.FloorSelection,
+            SpatialSingularityLabCommand.SelectFloor
+                when stage == SpatialSingularityLabStage.FloorSelection
+                => SpatialSingularityLabStage.FloorChallenge,
+            SpatialSingularityLabCommand.ResolveFloorChallenge
+                when stage == SpatialSingularityLabStage.FloorChallenge
+                => IsSelectedFloorAuthorized()
+                    ? SpatialSingularityLabStage.FloorOpen
+                    : SpatialSingularityLabStage.AccessDenied,
+            SpatialSingularityLabCommand.ReturnToElevator
+                when stage is SpatialSingularityLabStage.AccessDenied or SpatialSingularityLabStage.FloorOpen
+                => SpatialSingularityLabStage.ElevatorElevation,
+            _ => null
+        };
 
     private void EnterStage(SpatialSingularityLabStage stage)
     {
