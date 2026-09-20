@@ -76,8 +76,24 @@ public static class SpatialGeometryEngine
 
     /// <summary>Tests whether a movement segment intersects a building collision volume.</summary>
     public static bool SegmentBlocked(SpatialPoint start, SpatialPoint end, SpatialBounds bounds, double clearance = 0.75)
+        => SegmentBlocked(start, end, bounds, [], clearance);
+
+    /// <summary>Tests a movement segment while honoring declared door and passage thresholds.</summary>
+    public static bool SegmentBlocked(
+        SpatialPoint start,
+        SpatialPoint end,
+        SpatialBounds bounds,
+        IReadOnlyList<SpatialOpening> openings,
+        double clearance = 0.75)
     {
         var expanded = Expand(bounds, clearance);
+
+        // Interaction targets can intentionally sit just inside a declared entrance.
+        // In that case the final segment is allowed only when it enters through the
+        // building's actual door/passage rather than through a wall.
+        if (Contains(bounds, end) && IsReachableThroughOpening(start, end, bounds, openings))
+            return false;
+
         if (Contains(expanded, start) || Contains(expanded, end)) return true;
         var corners = new[]
         {
@@ -122,11 +138,58 @@ public static class SpatialGeometryEngine
         return route;
     }
 
+    private static bool IsReachableThroughOpening(
+        SpatialPoint start,
+        SpatialPoint end,
+        SpatialBounds bounds,
+        IReadOnlyList<SpatialOpening> openings)
+    {
+        if (openings.Count == 0) return false;
+
+        var dx = end.X - start.X;
+        var dy = end.Y - start.Y;
+        var candidates = new List<(double T, SpatialGeometryEdge Edge, double Position)>();
+
+        if (Math.Abs(dx) > double.Epsilon)
+        {
+            var tLeft = (bounds.X - start.X) / dx;
+            var yLeft = start.Y + dy * tLeft;
+            if (tLeft > 0 && tLeft < 1 && yLeft >= bounds.Y && yLeft <= bounds.Y + bounds.Height)
+                candidates.Add((tLeft, SpatialGeometryEdge.Left, yLeft - bounds.Y));
+
+            var tRight = (bounds.X + bounds.Width - start.X) / dx;
+            var yRight = start.Y + dy * tRight;
+            if (tRight > 0 && tRight < 1 && yRight >= bounds.Y && yRight <= bounds.Y + bounds.Height)
+                candidates.Add((tRight, SpatialGeometryEdge.Right, yRight - bounds.Y));
+        }
+
+        if (Math.Abs(dy) > double.Epsilon)
+        {
+            var tTop = (bounds.Y - start.Y) / dy;
+            var xTop = start.X + dx * tTop;
+            if (tTop > 0 && tTop < 1 && xTop >= bounds.X && xTop <= bounds.X + bounds.Width)
+                candidates.Add((tTop, SpatialGeometryEdge.Top, xTop - bounds.X));
+
+            var tBottom = (bounds.Y + bounds.Height - start.Y) / dy;
+            var xBottom = start.X + dx * tBottom;
+            if (tBottom > 0 && tBottom < 1 && xBottom >= bounds.X && xBottom <= bounds.X + bounds.Width)
+                candidates.Add((tBottom, SpatialGeometryEdge.Bottom, xBottom - bounds.X));
+        }
+
+        var entry = candidates.OrderByDescending(candidate => candidate.T).FirstOrDefault();
+        if (entry == default) return false;
+
+        return openings.Any(opening =>
+            opening.Edge == entry.Edge &&
+            entry.Position >= opening.Start &&
+            entry.Position <= opening.End);
+    }
+
     private static SpatialBounds Expand(SpatialBounds bounds, double amount)
         => new(bounds.X - amount, bounds.Y - amount, bounds.Width + amount * 2, bounds.Height + amount * 2);
 
     private static bool IsClear(SpatialPoint start, SpatialPoint end, IReadOnlyList<SpatialBuildingGeometry> obstacles, double clearance)
-        => obstacles.All(obstacle => !SegmentBlocked(start, end, obstacle.Bounds, clearance));
+        => obstacles.All(obstacle => !SegmentBlocked(start, end, obstacle.Bounds, obstacle.Openings, clearance));
 
     private static bool InsideAny(SpatialPoint point, IReadOnlyList<SpatialBuildingGeometry> obstacles, double clearance)
         => obstacles.Any(obstacle => Contains(Expand(obstacle.Bounds, clearance), point));
