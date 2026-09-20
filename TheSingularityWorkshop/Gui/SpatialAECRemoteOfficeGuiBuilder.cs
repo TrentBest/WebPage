@@ -197,14 +197,25 @@ public static class SpatialAECRemoteOfficeGuiBuilder
                 .Attribute("x2", element.Line.End.X).Attribute("y2", element.Line.End.Y)
                 .Attribute("stroke", stroke).Attribute("stroke-width", element.Kind == SpatialAECElementKind.Wall ? ".7" : ".38")
                 .Attribute("stroke-opacity", ".95"));
-            AddDimension(canvas, receiver, element, stroke);
+            AddDimension(canvas, receiver, element);
         }
 
+        // Dots are topology markers, not continuous decorations:
+        // only show vertices where authored elements actually intersect.
+        foreach (var point in IntersectionPoints(draft.Elements))
+            AddIntersectionDot(canvas, receiver, point, Cyan);
+
+        // While drawing, show one highlighted intended endpoint.
         if (draft.Drawing && draft.StartPoint is { } start)
         {
             canvas.Child(WorkshopGui.Element(receiver, "circle")
-                .Attribute("cx", start.X).Attribute("cy", start.Y).Attribute("r", ".65")
-                .Attribute("fill", "none").Attribute("stroke", Yellow).Attribute("stroke-width", ".25"));
+                .Attribute("cx", start.X).Attribute("cy", start.Y).Attribute("r", ".28")
+                .Attribute("fill", Cyan).Attribute("fill-opacity", ".8"));
+
+            canvas.Child(WorkshopGui.Element(receiver, "circle")
+                .Attribute("cx", start.X).Attribute("cy", start.Y).Attribute("r", ".62")
+                .Attribute("fill", "none").Attribute("stroke", Yellow).Attribute("stroke-width", ".18")
+                .Attribute("stroke-dasharray", ".3 .3"));
         }
 
         root.Content(canvas);
@@ -310,7 +321,7 @@ public static class SpatialAECRemoteOfficeGuiBuilder
         return panel;
     }
 
-    private static void AddDimension(ElementBuilder canvas, object receiver, SpatialAECDraftElement element, string color)
+    private static void AddDimension(ElementBuilder canvas, object receiver, SpatialAECDraftElement element)
     {
         var midpointX = (element.Line.Start.X + element.Line.End.X) / 2d;
         var midpointY = (element.Line.Start.Y + element.Line.End.Y) / 2d;
@@ -320,6 +331,60 @@ public static class SpatialAECRemoteOfficeGuiBuilder
             .Attribute("text-anchor", "middle")
             .Attribute("paint-order", "stroke").Attribute("stroke", "#061018").Attribute("stroke-width", ".45")
             .Text($"{element.Length:0.##}"));
+    }
+
+    private static IEnumerable<SpatialPoint> IntersectionPoints(IReadOnlyList<SpatialAECDraftElement> elements)
+    {
+        var points = new List<SpatialPoint>();
+
+        for (var i = 0; i < elements.Count; i++)
+        for (var j = i + 1; j < elements.Count; j++)
+        {
+            if (TryIntersect(elements[i].Line, elements[j].Line, out var point))
+                points.Add(point);
+        }
+
+        return points
+            .GroupBy(p => $"{p.X:R}|{p.Y:R}")
+            .Select(g => g.First());
+    }
+
+    private static void AddIntersectionDot(ElementBuilder canvas, object receiver, SpatialPoint point, string color)
+    {
+        canvas.Child(WorkshopGui.Element(receiver, "circle")
+            .Attribute("cx", point.X).Attribute("cy", point.Y).Attribute("r", ".32")
+            .Attribute("fill", color).Attribute("stroke", "#061018").Attribute("stroke-width", ".12"));
+    }
+
+    private static bool TryIntersect(SpatialLine first, SpatialLine second, out SpatialPoint point)
+    {
+        var x1 = first.Start.X;
+        var y1 = first.Start.Y;
+        var x2 = first.End.X;
+        var y2 = first.End.Y;
+        var x3 = second.Start.X;
+        var y3 = second.Start.Y;
+        var x4 = second.End.X;
+        var y4 = second.End.Y;
+
+        var denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if (Math.Abs(denominator) < 1e-9)
+        {
+            point = default;
+            return false;
+        }
+
+        var t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denominator;
+        var u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator;
+
+        if (t is < 0d or > 1d || u is < 0d or > 1d)
+        {
+            point = default;
+            return false;
+        }
+
+        point = new SpatialPoint(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+        return true;
     }
 
     private static string ColorFor(SpatialAECElementKind kind)
