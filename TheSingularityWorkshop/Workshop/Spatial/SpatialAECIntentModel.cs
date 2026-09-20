@@ -1,3 +1,4 @@
+using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +30,9 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
     public SpatialAECIntentModel()
     {
         _processingGroup = $"SpatialAECIntent:{Guid.NewGuid():N}";
-        FSM_API.Create.CreateProcessingGroup(_processingGroup);
+        fsm_API.Create.CreateProcessingGroup(_processingGroup);
 
-        var builder = FSM_API.Create.CreateFiniteStateMachine(
+        var builder = fsm_API.Create.CreateFiniteStateMachine(
             "SpatialAECIntent",
             processRate: -1,
             processingGroup: _processingGroup);
@@ -68,7 +69,7 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
 
         builder.BuildDefinition();
 
-        _handle = FSM_API.Create.CreateInstance(
+        _handle = fsm_API.Create.CreateInstance(
             "SpatialAECIntent",
             this,
             _processingGroup);
@@ -215,7 +216,7 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
         if (_disposed)
             return;
 
-        FSM_API.Interaction.DestroyFiniteStateMachine(
+        fsm_API.Interaction.DestroyFiniteStateMachine(
             "SpatialAECIntent",
             _processingGroup);
 
