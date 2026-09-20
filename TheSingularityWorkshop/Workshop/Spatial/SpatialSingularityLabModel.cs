@@ -1,3 +1,4 @@
+using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,9 @@ public sealed class SpatialSingularityLabModel : IStateContext, IDisposable
     public SpatialSingularityLabModel()
     {
         _processingGroup = $"SpatialSingularityLab:{Guid.NewGuid():N}";
-        FSM_API.Create.CreateProcessingGroup(_processingGroup);
+        fsm_API.Create.CreateProcessingGroup(_processingGroup);
 
-        var builder = FSM_API.Create.CreateFiniteStateMachine(
+        var builder = fsm_API.Create.CreateFiniteStateMachine(
             "SpatialSingularityLab",
             processRate: -1,
             processingGroup: _processingGroup);
@@ -91,7 +92,7 @@ public sealed class SpatialSingularityLabModel : IStateContext, IDisposable
                 _ => _pendingCommand == SpatialSingularityLabCommand.ReturnToElevator)
             .BuildDefinition();
 
-        _handle = FSM_API.Create.CreateInstance(
+        _handle = fsm_API.Create.CreateInstance(
             "SpatialSingularityLab",
             this,
             _processingGroup);
@@ -223,7 +224,7 @@ public sealed class SpatialSingularityLabModel : IStateContext, IDisposable
         if (_disposed)
             return;
 
-        FSM_API.Interaction.DestroyFiniteStateMachine(
+        fsm_API.Interaction.DestroyFiniteStateMachine(
             "SpatialSingularityLab",
             _processingGroup);
 
