@@ -164,7 +164,12 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
         // the handle's CurrentState in some package builds. The transition itself is
         // still owned by FSM_API; this fallback asks the handle to perform the same
         // declared transition explicitly when the normal step did not advance it.
-        if (!string.Equals(_handle.CurrentState, expectedNextState, StringComparison.Ordinal))
+        // FSM_API advances the handle's state during Step, while the target state's
+        // Enter action is performed on the following update cycle. This model exposes
+        // the semantic layer immediately, so explicitly enter the declared target when
+        // the state name has advanced but the semantic context has not.
+        var expectedNextLayer = layerBeingAnswered + 1;
+        if (CurrentLayer != expectedNextLayer)
             _handle.TransitionTo(expectedNextState);
 
         _advanceRequested = false;
