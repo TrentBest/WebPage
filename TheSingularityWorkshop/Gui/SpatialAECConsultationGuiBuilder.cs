@@ -67,6 +67,7 @@ public static class SpatialAECConsultationGuiBuilder
         foreach (var lead in leads)
             leadRow.Content(WorkshopGui.Element(receiver, "span").Style("padding", ".25rem .35rem").Style("border", "1px solid rgba(0,234,255,.22)").Style("color", "#9ab0b8").Style("font-size", ".33rem").Text(lead));
         panel.Content(leadRow);
+        panel.Content(TableModel(receiver, intent));
 
         if (!intent.IsComplete)
         {
@@ -94,6 +95,38 @@ public static class SpatialAECConsultationGuiBuilder
         }
 
         return panel;
+    }
+
+    
+    private static ElementBuilder TableModel(object receiver, SpatialAECIntentModel intent)
+    {
+        var table = WorkshopGui.Panel(receiver)
+            .Style("margin-top", ".7rem").Style("padding", ".6rem")
+            .Style("border", "1px solid rgba(255,211,77,.28)")
+            .Style("background", "linear-gradient(135deg,rgba(255,211,77,.045),rgba(0,234,255,.025))");
+
+        table.Content(WorkshopGui.Element(receiver, "div")
+            .Style("font-size", ".35rem").Style("letter-spacing", ".14em")
+            .Style("color", Yellow)
+            .Text("CONFERENCE TABLE // DEFAULT ONTOLOGY MODEL"));
+
+        table.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".4rem").Style("font-family", "system-ui,sans-serif")
+            .Style("font-size", ".85rem").Style("color", White)
+            .Text(intent.CurrentDefaultArtifact));
+
+        table.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".25rem").Style("font-size", ".33rem")
+            .Style("color", "#9ab0b8")
+            .Text($"DEFAULT FOR {SpatialAECIntentModel.LayerNames[Math.Min(intent.CurrentLayer, 8)].ToUpperInvariant()} // {intent.CurrentDefault}"));
+
+        var motion = intent.IsComplete ? "MODEL READY // TEAM IS STANDING BY" : "TEAM LEADS // RETRIEVING VIABLE MATCHING MODEL";
+        table.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".35rem").Style("font-size", ".3rem")
+            .Style("color", Cyan)
+            .Text(motion));
+
+        return table;
     }
 
     private static string Question(SpatialAECIntentModel intent)
