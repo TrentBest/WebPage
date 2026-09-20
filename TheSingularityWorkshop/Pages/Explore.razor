@@ -1075,13 +1075,8 @@
         if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.Rampway) return;
         SoftwareOfficeArrival.BeginHelipadArrival();
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(2600);
+        await Task.Delay(1800);
         if (insideRoomId != "singularity-software-office") return;
-        SoftwareOfficeArrival.EnterHelicopter();
-        await InvokeAsync(StateHasChanged);
-        await Task.Delay(2200);
-        if (insideRoomId != "singularity-software-office") return;
-        SoftwareOfficeArrival.ArriveAtTowerHelipad();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -1089,6 +1084,10 @@
     {
         if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.HelicopterApproach) return;
         SoftwareOfficeArrival.EnterHelicopter();
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(2200);
+        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.HelicopterDeparting) return;
+        SoftwareOfficeArrival.ArriveAtTowerHelipad();
         await InvokeAsync(StateHasChanged);
     }
 
