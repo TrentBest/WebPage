@@ -92,3 +92,42 @@ public sealed class SpatialSoftwareOfficeModelTests
         Assert.Contains(office.Floors, floor => floor.Name == "Architecture");
     }
 }
+
+    
+    [Fact]
+    public void CodeDiagramKeepsSelectedFileAtTheCenterAndOnlyAddsUsedEdges()
+    {
+        var diagram = new SpatialCodeDiagramModel("Example.cs", "Example");
+        diagram.ClassCard.Name = "Example";
+        diagram.ClassCard.PublicProperties.Add("DisplayName");
+        diagram.AddCoreType("string")
+            .AddCoreType("bool")
+            .AddDependency("TheSingularityWorkshop.FSM_API")
+            .AddMethodSequence("Update", ["Read", "Transition", "Render"], "O(n)");
+
+        Assert.Equal("Example.cs", diagram.SourcePath);
+        Assert.Equal("Example", diagram.ClassCard.Name);
+        Assert.Equal(2, diagram.CoreTypeCards.Count);
+        Assert.Single(diagram.DependencyCards);
+        Assert.Single(diagram.Sequence);
+        Assert.Equal("O(n)", diagram.Complexity[0].BigO);
+    }
+
+    [Fact]
+    public void OfficeTrafficCanModelAHighGameTesterSmokeBreakPopulation()
+    {
+        var traffic = new SpatialOfficeTrafficModel();
+
+        for (var index = 0; index < 10; index++)
+        {
+            traffic.AddEmployee(new SpatialOfficeEmployee(
+                $"tester-{index}",
+                $"Tester {index}",
+                "Game Tester",
+                "Play Test",
+                TakesSmokeBreaks: index < 9));
+        }
+
+        Assert.Equal(9, traffic.SmokeBreakGroup.Count);
+        Assert.Equal(9, traffic.ExpectedSmokeBreakPopulation);
+    }
