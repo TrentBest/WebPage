@@ -32,11 +32,11 @@ public static class SpatialForgeGuiBuilder
 
         floor.Content(Grid(receiver));
         floor.Content(Structure(receiver, rendered));
-        floor.Content(Station(receiver, 12, 17, 28, 18, "LINEWORK LAB", Cyan, "DRAW / SHAPE / VISUALIZE", enterLineLab));
-        floor.Content(Station(receiver, 60, 17, 28, 18, "FSM INGOTS", Magenta, "ON ENTER / ON UPDATE / ON EXIT / TRANSITION"));
+        floor.Content(Station(receiver, 10, 20, 27, 15, "LINEWORK LAB", Cyan, "DRAW / SHAPE / VISUALIZE", enterLineLab));
+        floor.Content(Station(receiver, 63, 20, 27, 15, "FSM INGOTS", Magenta, "ON ENTER / ON UPDATE / ON EXIT / TRANSITION"));
         floor.Content(Workbench(receiver));
-        floor.Content(Station(receiver, 12, 69, 28, 14, "BLUEPRINT LIBRARY", Yellow, "SAVE / REUSE / SCAFFOLD"));
-        floor.Content(Station(receiver, 60, 69, 28, 14, "PREVIEW BAY", White, "ASSEMBLE / PREVIEW / VERIFY"));
+        floor.Content(Station(receiver, 10, 67, 27, 15, "BLUEPRINT LIBRARY", Yellow, "SAVE / REUSE / SCAFFOLD"));
+        floor.Content(Station(receiver, 63, 67, 27, 15, "PREVIEW BAY", White, "ASSEMBLE / PREVIEW / VERIFY"));
         floor.Content(Ingots(receiver));
 
         root.Content(floor);
@@ -77,14 +77,14 @@ public static class SpatialForgeGuiBuilder
 
     private static ElementBuilder Workbench(object receiver)
         => WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", "25%").Style("top", "39%").Style("width", "50%").Style("height", "25%")
-            .Style("box-sizing", "border-box").Style("border", $"2px solid {Magenta}bb")
-            .Style("background", "linear-gradient(180deg,#ff38d116,#03070d 80%)")
+            .Style("position", "absolute").Style("left", "28%").Style("top", "39%").Style("width", "44%").Style("height", "20%")
+            .Style("box-sizing", "border-box").Style("z-index", "25").Style("border", $"2px solid {Magenta}bb")
+            .Style("background", "linear-gradient(180deg,rgba(255,56,209,.20),rgba(3,7,13,.96) 82%)")
             .Style("box-shadow", $"0 0 45px {Magenta}25,inset 0 0 30px {Magenta}10").Style("animation", "forge-breathe 4s ease-in-out infinite")
             .Content(WorkshopGui.Element(receiver, "div").Style("padding", ".65rem").Style("color", Magenta).Style("font-size", ".65rem").Style("letter-spacing", ".22em").Text("FSM FABRICATION WORKBENCH"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("justify-content", "center").Style("gap", "1rem").Style("margin-top", "2rem")
+            .Content(WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("justify-content", "center").Style("gap", ".8rem").Style("margin-top", "1.1rem")
                 .Content(WorkbenchSlot(receiver, "EMPTY STATE", Cyan)).Content(WorkbenchSlot(receiver, "EMPTY STATE", Cyan)).Content(WorkbenchSlot(receiver, "TRANSITION", Yellow)))
-            .Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("bottom", ".7rem").Style("left", "0").Style("right", "0").Style("text-align", "center")
+            .Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("bottom", ".45rem").Style("left", "0").Style("right", "0").Style("text-align", "center")
                 .Style("color", "#7895a1").Style("font-family", "system-ui,sans-serif").Style("font-size", ".5rem").Text("ASSEMBLE STATES → LOAD INGOTS → NAME → PREVIEW"));
 
     private static ElementBuilder WorkbenchSlot(object receiver, string label, string accent)
@@ -94,29 +94,29 @@ public static class SpatialForgeGuiBuilder
 
     private static ElementBuilder Ingots(object receiver)
     {
-        var rack = WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "43%").Style("top", "12%").Style("width", "14%").Style("height", "20%")
+        var rack = WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "43%").Style("top", "8%").Style("width", "14%").Style("height", "10%").Style("z-index", "18")
             .Style("display", "flex").Style("justify-content", "space-around").Style("align-items", "flex-end");
         foreach (var item in new[] { ("ON ENTER", Cyan), ("ON UPDATE", Yellow), ("ON EXIT", Magenta), ("TRANSITION", White) })
-            rack.Content(WorkshopGui.Element(receiver, "div").Style("width", "19%").Style("height", "70%").Style("border-radius", "35% 35% 12% 12%").Style("border", $"1px solid {item.Item2}bb")
+            rack.Content(WorkshopGui.Element(receiver, "div").Style("width", "17%").Style("height", "72%").Style("border-radius", "35% 35% 12% 12%").Style("border", $"1px solid {item.Item2}bb")
                 .Style("background", $"linear-gradient(180deg,{item.Item2}44,#05080d)").Style("box-shadow", $"0 0 14px {item.Item2}33").Style("animation", "ingot-pulse 2.4s ease-in-out infinite").Attribute("title", item.Item1));
         return rack;
     }
 
     private static ElementBuilder Title(object receiver, int lineCount, double renderMicroseconds)
-        => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "50%").Style("top", "1rem").Style("transform", "translateX(-50%)")
-            .Style("z-index", "30").Style("text-align", "center").Style("pointer-events", "none")
+        => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "50%").Style("top", "4.5rem").Style("transform", "translateX(-50%)")
+            .Style("z-index", "40").Style("text-align", "center").Style("pointer-events", "none").Style("padding", ".35rem 1rem").Style("background", "rgba(2,8,18,.88)").Style("border", "1px solid rgba(0,234,255,.18)")
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".65rem").Style("letter-spacing", ".3em").Text("THE FORGE"))
             .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".25rem").Style("color", "#7895a1").Style("font-size", ".42rem").Style("letter-spacing", ".18em").Text("FSM FABRICATION FACILITY"))
             .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".35rem").Style("color", Yellow).Style("font-size", ".38rem").Style("letter-spacing", ".12em").Text($"LINE RENDER // {lineCount:00} PRIMITIVES // {renderMicroseconds:0.0} μs"));
 
     private static ElementBuilder Grid(object receiver)
-        => WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("inset", "0").Style("background-size", "5vw 5vh")
+        => WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("inset", "0").Style("z-index", "0").Style("background-size", "5vw 5vh")
             .Style("background-image", "linear-gradient(rgba(0,234,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,234,255,.07) 1px,transparent 1px)").Style("opacity", ".7").Style("pointer-events", "none");
 
     private static ElementBuilder Structure(object receiver, IReadOnlyList<SpatialRenderedLine> rendered)
     {
         var svg = WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100").Attribute("preserveAspectRatio", "none")
-            .Style("position", "absolute").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("pointer-events", "none");
+            .Style("position", "absolute").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("z-index", "1").Style("pointer-events", "none");
         foreach (var line in rendered)
         {
             var points = string.Join(" ", line.Points.Select(point => $"{point.X:0.###},{point.Y:0.###}"));
@@ -128,9 +128,9 @@ public static class SpatialForgeGuiBuilder
 
     private static ElementBuilder Station(object receiver, double left, double top, double width, double height, string label, string accent, string detail, Action? activate = null)
     {
-        var station = WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", left + "%").Style("top", top + "%").Style("width", width + "%").Style("height", height + "%")
-            .Style("box-sizing", "border-box").Style("border", $"1px solid {accent}88").Style("background", $"linear-gradient(180deg,{accent}14,#03070d 75%)")
-            .Style("box-shadow", $"0 0 22px {accent}18,inset 0 0 20px {accent}08").Style("animation", "forge-breathe 3.2s ease-in-out infinite").Style("cursor", activate is null ? "default" : "pointer");
+        var station = WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", left + "%").Style("top", top + "%").Style("width", width + "%").Style("height", height + "%").Style("z-index", "20")
+            .Style("box-sizing", "border-box").Style("border", $"1px solid {accent}aa").Style("background", $"linear-gradient(180deg,{accent}22,rgba(3,7,13,.96) 78%)")
+            .Style("box-shadow", $"0 0 22px {accent}22,inset 0 0 20px {accent}10").Style("animation", "forge-breathe 3.2s ease-in-out infinite").Style("cursor", activate is null ? "default" : "pointer");
         station.Content(WorkshopGui.Element(receiver, "div").Style("padding", ".6rem").Style("color", accent).Style("font-size", ".55rem").Style("letter-spacing", ".18em").Text(label));
         station.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "8%").Style("right", "8%").Style("top", "38%").Style("height", "30%").Style("border", $"1px solid {accent}44").Style("background", $"{accent}08")
             .Content(WorkshopGui.Element(receiver, "div").Style("padding", ".5rem").Style("color", "#7895a1").Style("font-family", "system-ui,sans-serif").Style("font-size", ".55rem").Text(detail)));
