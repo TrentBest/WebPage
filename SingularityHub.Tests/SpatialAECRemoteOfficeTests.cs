@@ -224,4 +224,65 @@ public sealed class SpatialAECRemoteOfficeTests
         Assert.Contains("CITY MASSING", intent.CurrentDefaultArtifact);
     }
 
+    [Fact(DisplayName = "Incremental Unit Test 49 — AEC ontology mall lists concrete building inventory")]
+    public void OntologyMallListsConcreteBuildingTypes()
+    {
+        var inventory = SpatialAECOntologyCatalog.ListBuildingTypes();
+
+        Assert.True(inventory.Count >= 10);
+        Assert.Contains(inventory, x => x.Name == "Office Building");
+        Assert.Contains(inventory, x => x.Name == "Hospital");
+        Assert.Contains(inventory, x => x.Name == "Research Laboratory");
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 50 — AEC intent shops only compatible ontology inventory")]
+    public void OntologyMallNarrowsOptionsFromSelectedPath()
+    {
+        var intent = new SpatialAECIntentModel();
+
+        intent.Answer("REALITY");
+
+        Assert.Contains("BUILT ENVIRONMENT", intent.OptionsForCurrentLayer);
+        Assert.Contains("INDUSTRIAL", intent.OptionsForCurrentLayer);
+
+        intent.Answer("RESEARCH");
+
+        Assert.Contains("FACILITY", intent.OptionsForCurrentLayer);
+        Assert.DoesNotContain("CAMPUS", intent.OptionsForCurrentLayer);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 51 — AEC ontology inventory flattens to integer runtime coordinates")]
+    public void OntologyMallProducesRuntimeSignature()
+    {
+        var inventory = SpatialAECOntologyCatalog.ListBuildingTypes();
+        var research = inventory.Single(x => x.Id == "aec.research.vertical.engineering-development");
+
+        var signature = research.ToOntologySignature();
+
+        Assert.Equal(9, TheSingularityWorkshop.SingularityHub.OntologySignature.LayerCount);
+        Assert.NotEqual(0UL, signature.StructuralId);
+        Assert.All(Enumerable.Range(0, 9), layer => Assert.NotEqual(0, signature[layer]));
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 52 — AEC fiction path still shops the ontology mall")]
+    public void FictionPathUsesConcreteCatalogInventory()
+    {
+        var intent = new SpatialAECIntentModel();
+
+        intent.Answer("FICTION");
+
+        Assert.Equal("BUILT ENVIRONMENT", intent.CurrentDefault);
+        Assert.Contains("RESEARCH", intent.OptionsForCurrentLayer);
+
+        intent.Answer("RESEARCH");
+        intent.Answer("FACILITY");
+        intent.Answer("LABORATORY");
+        intent.Answer("HIGH-TECH LABORATORY");
+
+        Assert.Contains("SINGLE BUILDING", intent.OptionsForCurrentLayer);
+        Assert.Contains("SCIENCE", SpatialAECOntologyCatalog.ListBuildingTypes()
+            .Where(x => x.Paradigm == "FICTION" && x.Domain == "RESEARCH")
+            .Select(x => x.Family));
+    }
+
 }
