@@ -1,6 +1,6 @@
 namespace TheSingularityWorkshop.Gui;
 
-/// <summary>Conference-room interrogation that captures intent before any drafting begins.</summary>
+ /// <summary>Conference-room interrogation that captures intent before any drafting begins.</summary>
 public static class SpatialAECConsultationGuiBuilder
 {
     private const string Cyan = "#00eaff";
@@ -53,14 +53,41 @@ public static class SpatialAECConsultationGuiBuilder
     private static ElementBuilder Team(object receiver, SpatialAECIntentModel intent, string avatarName, Action<string> answer, Action generate)
     {
         var panel = WorkshopGui.Panel(receiver)
-            .Style("position", "absolute").Style("left", "4%").Style("top", "5%")
-            .Style("width", "min(38rem,92vw)").Style("padding", "1rem")
+            .Style("position", "absolute").Style("left", "4%").Style("top", "7%")
+            .Style("width", "min(38rem,92vw)")
+            .Style("padding", "1.35rem 1rem 1rem")
+            .Style("box-sizing", "border-box")
             .Style("border", $"1px solid {Cyan}66")
             .Style("background", "rgba(1,6,12,.92)");
 
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("color", Cyan).Style("font-size", ".48rem").Style("letter-spacing", ".18em").Text("AEC CONSULTATION // TEAM LEADS"));
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".35rem").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".72rem").Text("You are not here to operate a CAD tool. You are here to describe the structure you mean."));
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".65rem").Style("color", Yellow).Style("font-size", ".42rem").Style("letter-spacing", ".15em").Text($"CURRENT LAYER {Math.Min(intent.CurrentLayer + 1, 9)} / 9 // {SpatialAECIntentModel.LayerNames[Math.Min(intent.CurrentLayer, 8)].ToUpperInvariant()}"));
+        // Keep the title inside the frame's safe area. The consultation panel sits
+        // over the room's upper cyan geometry, so its own top inset must be explicit.
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("color", Cyan)
+            .Style("font-size", ".48rem")
+            .Style("line-height", "1.4")
+            .Style("letter-spacing", ".18em")
+            .Text("AEC CONSULTATION // TEAM LEADS"));
+
+        // Treat the intent statement and layer tracker as separate semantic bands;
+        // do not let the tracker visually collapse into the description.
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".7rem")
+            .Style("padding-bottom", ".65rem")
+            .Style("border-bottom", "1px solid rgba(0,234,255,.14)")
+            .Style("color", White)
+            .Style("font-family", "system-ui,sans-serif")
+            .Style("font-size", ".72rem")
+            .Style("line-height", "1.45")
+            .Text("You are not here to operate a CAD tool. You are here to describe the structure you mean."));
+
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".7rem")
+            .Style("color", Yellow)
+            .Style("font-size", ".42rem")
+            .Style("line-height", "1.35")
+            .Style("letter-spacing", ".15em")
+            .Text($"CURRENT LAYER {Math.Min(intent.CurrentLayer + 1, 9)} / 9 // {SpatialAECIntentModel.LayerNames[Math.Min(intent.CurrentLayer, 8)].ToUpperInvariant()}"));
 
         var leads = new[] { "RECEPTION / MAYA", "ARCHITECTURE / ARI", "STRUCTURAL / SAM", "SYSTEMS / NOOR", "PROGRAM / KAI" };
         var leadRow = WorkshopGui.Element(receiver, "div").Style("display", "flex").Style("gap", ".3rem").Style("flex-wrap", "wrap").Style("margin-top", ".55rem");
@@ -97,7 +124,6 @@ public static class SpatialAECConsultationGuiBuilder
         return panel;
     }
 
-    
     private static ElementBuilder TableModel(object receiver, SpatialAECIntentModel intent)
     {
         var table = WorkshopGui.Panel(receiver)
