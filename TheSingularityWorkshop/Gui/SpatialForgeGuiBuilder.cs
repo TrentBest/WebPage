@@ -43,7 +43,7 @@ public static class SpatialForgeGuiBuilder
         root.Content(Title(receiver, structure.Lines.Count, renderMicroseconds));
         root.Content(Avatar(receiver, avatarName));
         root.Content(WorkshopGui.Button(receiver).Label("← EXIT FORGE")
-            .Style("position", "fixed").Style("right", "1rem").Style("bottom", "1rem").Style("z-index", "30")
+            .Style("position", "fixed").Style("left", "50%").Style("bottom", "1rem").Style("transform", "translateX(-50%)").Style("z-index", "30")
             .Style("padding", ".65rem .9rem").Style("border", $"2px solid {Magenta}aa").Style("background", "rgba(20,2,16,.94)").Style("box-shadow", $"0 0 18px {Magenta}22, inset 0 0 12px {Magenta}10").Style("text-shadow", $"0 0 8px {Magenta}88")
             .Style("color", Magenta).Style("font-family", "inherit").Style("font-size", ".48rem")
             .Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(exitForge));
