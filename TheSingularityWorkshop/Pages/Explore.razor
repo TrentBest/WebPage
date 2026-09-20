@@ -65,6 +65,8 @@
     private string? selectedLeaderboardEntry;
     private string? insideRoomId;
     private bool behaviorBuilderVisible;
+    private bool fsmForgeVisited;
+    private CancellationTokenSource? softwareOfficeCinematicCts;
     private SpatialAECRemoteOfficeLobbyGuiBuilder.Stage AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Arrival;
     private string? selectedTransitDestinationId;
     private bool transitTrainVisible;
@@ -891,6 +893,8 @@
         var entry = place.EntryPoint;
         Experience.Navigation.MoveTo(entry.X, entry.Y);
         insideRoomId = place.SceneId;
+        if (place.SceneId == "forge")
+            fsmForgeVisited = true;
         mansionWelcomeVisible = false;
         if (place.SceneId == "mansion" && firstVisit)
         {
@@ -1070,32 +1074,68 @@
     private async Task BeginSoftwareOfficeHelicopterArrival()
     {
         if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.Rampway) return;
+
         SoftwareOfficeArrival.BeginHelipadArrival();
         await InvokeAsync(StateHasChanged);
+
+        // The ramp is the cinematic transition: the Workshop disappears behind the
+        // visitor as the climb reveals only the route and the waiting aircraft.
         await Task.Delay(1800);
-        if (insideRoomId != "singularity-software-office") return;
+        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.HelipadReady) return;
         await InvokeAsync(StateHasChanged);
     }
 
     private async Task EnterSoftwareOfficeHelicopter()
     {
-        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.HelicopterApproach) return;
+        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.HelipadReady) return;
+
         SoftwareOfficeArrival.EnterHelicopter();
+        softwareOfficeCinematicCts?.Cancel();
+        softwareOfficeCinematicCts = new CancellationTokenSource();
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(2200);
-        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.HelicopterDeparting) return;
-        SoftwareOfficeArrival.ArriveAtTowerHelipad();
-        await InvokeAsync(StateHasChanged);
+
+        _ = RunSoftwareOfficeArrivalCinematic(softwareOfficeCinematicCts.Token);
+    }
+
+    private async Task RunSoftwareOfficeArrivalCinematic(CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (insideRoomId == "singularity-software-office" &&
+                   SoftwareOfficeArrival.Stage is SpatialSoftwareOfficeArrivalStage.HelicopterTakeoff
+                       or SpatialSoftwareOfficeArrivalStage.TowerReveal
+                       or SpatialSoftwareOfficeArrivalStage.HelicopterLanding)
+            {
+                await Task.Delay(80, cancellationToken);
+                if (cancellationToken.IsCancellationRequested) return;
+
+                var finished = SoftwareOfficeArrival.AdvanceCinematic(.08);
+                await InvokeAsync(StateHasChanged);
+
+                if (finished)
+                    return;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Leaving the scene or restarting the cinematic cancels the presentation loop.
+        }
     }
 
     private async Task EnterSoftwareOfficeElevator()
     {
-        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.TowerHelipad) return;
+        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.TowerFloorPlan) return;
+
         SoftwareOfficeArrival.EnterElevator();
+
+        // The company owns the implementation of the lifecycle scaffold. The Forge
+        // only proves that the FSM exists and supplies the contract to be completed.
         SoftwareOffice.Artifact.Methods.Clear();
-        SoftwareOffice.Artifact.Methods.AddRange(["OnEnter", "OnUpdate", "OnExit", "Condition"]);
-        SoftwareOffice.Artifact.IsExecutable = true;
+        if (fsmForgeVisited)
+            SoftwareOffice.Artifact.Methods.AddRange(["OnEnter", "OnUpdate", "OnExit", "Condition"]);
+        SoftwareOffice.Artifact.IsExecutable = fsmForgeVisited;
         SoftwareOffice.SynchronizeFromArtifact();
+
         await InvokeAsync(StateHasChanged);
         _ = RunSoftwareOfficeElevatorDescent();
     }
@@ -1118,26 +1158,31 @@
 
     private void SoftwareOfficeElevatorDing()
     {
-        if (SoftwareOfficeArrival.Stage == SpatialSoftwareOfficeArrivalStage.ElevatorDescending)
+        if (insideRoomId == "singularity-software-office" && SoftwareOfficeArrival.Stage == SpatialSoftwareOfficeArrivalStage.ElevatorDescending)
             SoftwareOfficeArrival.Ding();
     }
 
     private void CompleteSoftwareOfficeBriefing()
     {
-        if (SoftwareOfficeArrival.Stage == SpatialSoftwareOfficeArrivalStage.ElevatorDescending)
-            SoftwareOfficeArrival.CompleteBriefing();
+        if (insideRoomId != "singularity-software-office" || SoftwareOfficeArrival.Stage != SpatialSoftwareOfficeArrivalStage.ElevatorDescending) return;
+        SoftwareOfficeArrival.CompleteBriefing();
     }
 
     private void OpenSoftwareOfficeBehaviorBuilder()
     {
+        if (!fsmForgeVisited)
+            return;
+
         behaviorBuilderVisible = true;
         SoftwareOffice.Artifact.Methods.Clear();
         SoftwareOffice.Artifact.Methods.AddRange(["OnEnter", "OnUpdate", "OnExit", "Condition"]);
+        SoftwareOffice.Artifact.IsExecutable = true;
         SoftwareOffice.SynchronizeFromArtifact();
     }
 
     private void AddBehaviorElseIf()
     {
+        if (!fsmForgeVisited) return;
         var index = BehaviorBuilder.ContextBranches.Count + 1;
         BehaviorBuilder.AddElseIf($"ContextType{index}", $"context{index}");
     }
@@ -1245,6 +1290,8 @@
 
     public void Dispose()
     {
+        softwareOfficeCinematicCts?.Cancel();
+        softwareOfficeCinematicCts?.Dispose();
         Experience.Dispose();
         AECIntent.Dispose();
         SingularityLab.Dispose();
