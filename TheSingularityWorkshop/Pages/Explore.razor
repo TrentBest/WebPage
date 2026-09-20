@@ -18,6 +18,8 @@
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
     private readonly WorkshopRouter Router = new("workshop");
     private readonly SpatialLinework ForgeLinework = new();
+    private readonly SpatialAECRemoteOfficeManifest AECManifest = SpatialAECRemoteOfficeManifest.CreateDefault();
+    private readonly SpatialAECDraftModel AECDraft = new();
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
     private readonly SpatialShipyardManifest ShipyardManifest = SpatialShipyardManifest.CreateDefault();
@@ -144,6 +146,9 @@
 
         if (insideRoomId == "forge")
             return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitRoom);
+
+        if (insideRoomId == "aec-remote-office")
+            return SpatialAECRemoteOfficeGuiBuilder.Build(this, AECManifest, AECDraft, Experience.User.DisplayName, args => _ = DrawAECPoint(args), ClearAECDraft, UndoAECDraft, SetAECElementKind, SetAECSnap, SetAECOrthogonal, ExitRoom);
 
         if (insideRoomId == "line-lab")
             return SpatialLineWorkshopGuiBuilder.Build(this, ForgeLinework, forgeStyle, drawingLine, args => _ = DrawForgePoint(args), ClearForgeLines, SetForgeStyle, ExitRoom, Experience.User.DisplayName);
@@ -811,6 +816,28 @@
         }
     }
 
+    private async Task DrawAECPoint(MouseEventArgs args)
+    {
+        if (insideRoomId != "aec-remote-office") return;
+        spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
+        var point = await spatialModule.InvokeAsync<SpatialPoint>("screenToLinePoint", args.ClientX, args.ClientY);
+        if (!AECDraft.Drawing)
+        {
+            AECDraft.Begin(point);
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        AECDraft.End(point);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ClearAECDraft() => AECDraft.Clear();
+    private void UndoAECDraft() => AECDraft.Undo();
+    private void SetAECElementKind(SpatialAECElementKind kind) => AECDraft.ElementKind = kind;
+    private void SetAECSnap(double snap) => AECDraft.Snap = snap;
+    private void SetAECOrthogonal(bool enabled) => AECDraft.Orthogonal = enabled;
+
     private async Task DrawForgePoint(MouseEventArgs args)
     {
         spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
@@ -898,6 +925,7 @@
         Experience.Dispose();
         TransitTrain.Dispose();
         ForgeLinework.Dispose();
+        AECDraft.Dispose();
         MansionStructure.Dispose();
         MazeLeaderboard.Dispose();
         if (spatialModule is not null) _ = spatialModule.DisposeAsync();
