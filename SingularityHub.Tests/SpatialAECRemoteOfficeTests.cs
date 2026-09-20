@@ -138,4 +138,76 @@ public sealed class SpatialAECRemoteOfficeTests
         Assert.Equal(6, structure.Rooms.Count);
         Assert.All(structure.Rooms, room => Assert.True(room.Width > 0 && room.Depth > 0));
     }
+    [Fact(DisplayName = "Incremental Unit Test 44 — Singularity Lab forces the visitor through physical security")]
+    public void SingularityLabSecurityIsSequential()
+    {
+        var lab = new SpatialSingularityLabModel();
+
+        Assert.Equal(SpatialSingularityLabStage.ApproachSecurity, lab.Stage);
+        lab.EnterSecurityLine();
+        Assert.Equal(SpatialSingularityLabStage.SecurityQueue, lab.Stage);
+        lab.PlaceBelongings();
+        Assert.Equal(SpatialSingularityLabStage.SecurityScreening, lab.Stage);
+        lab.CompleteScreening();
+
+        Assert.True(lab.HasPassedSecurity);
+        Assert.Equal(SpatialSingularityLabStage.SecurityComplete, lab.Stage);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 45 — Singularity Lab elevator requires ID, fingerprint, and retina")]
+    public void SingularityLabElevatorAuthenticationIsSequential()
+    {
+        var lab = new SpatialSingularityLabModel();
+        lab.EnterSecurityLine();
+        lab.PlaceBelongings();
+        lab.CompleteScreening();
+        lab.EnterElevator();
+
+        Assert.Equal(SpatialSingularityLabStage.ElevatorElevation, lab.Stage);
+        lab.ScanId();
+        lab.ScanFingerprint();
+        lab.ScanRetina();
+
+        Assert.Equal(SpatialSingularityLabStage.FloorSelection, lab.Stage);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 46 — Singularity Lab denies unauthorized lower floors")]
+    public void SingularityLabDeniesRestrictedFloor()
+    {
+        var lab = new SpatialSingularityLabModel();
+        lab.EnterSecurityLine();
+        lab.PlaceBelongings();
+        lab.CompleteScreening();
+        lab.EnterElevator();
+        lab.ScanId();
+        lab.ScanFingerprint();
+        lab.ScanRetina();
+        lab.SelectFloor(5);
+
+        Assert.Equal(SpatialSingularityLabStage.FloorChallenge, lab.Stage);
+        lab.ResolveFloorChallenge();
+
+        Assert.Equal(SpatialSingularityLabStage.AccessDenied, lab.Stage);
+        Assert.Contains("not cleared", lab.LastMessage, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact(DisplayName = "Incremental Unit Test 47 — Singularity Lab exposes authorized science floors")]
+    public void SingularityLabAllowsAuthorizedScienceFloor()
+    {
+        var lab = new SpatialSingularityLabModel();
+        lab.EnterSecurityLine();
+        lab.PlaceBelongings();
+        lab.CompleteScreening();
+        lab.EnterElevator();
+        lab.ScanId();
+        lab.ScanFingerprint();
+        lab.ScanRetina();
+        lab.SelectFloor(3);
+        lab.ResolveFloorChallenge();
+
+        Assert.Equal(SpatialSingularityLabStage.FloorOpen, lab.Stage);
+        Assert.Equal(3, lab.SelectedFloor);
+        Assert.Contains("CHEMISTRY", lab.LastMessage);
+    }
+
 }
