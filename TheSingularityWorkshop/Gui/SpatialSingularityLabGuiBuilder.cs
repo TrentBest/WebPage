@@ -277,7 +277,6 @@ public static class SpatialSingularityLabGuiBuilder
 
         return WorkshopGui.Panel(receiver)
             .Style("position", "absolute").Style("inset", "0")
-            .Style("pointer-events", "none")
             .Content(svg)
             .Content(panel);
     }
