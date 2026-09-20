@@ -121,20 +121,13 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
     public string Summary
         => string.Join(" / ", _answers.Where(x => !string.IsNullOrWhiteSpace(x)));
 
+    /// <summary>
+    /// Shops the concrete AEC ontology catalog using the answers already selected.
+    /// Every option shown here exists on at least one compatible catalog record.
+    /// </summary>
     public IReadOnlyList<string> OptionsForCurrentLayer
-        => CurrentLayer switch
-        {
-            0 => ["REALITY", "FICTION"],
-            1 => ["BUILT ENVIRONMENT", "INDUSTRIAL", "CIVIC", "RESIDENTIAL", "RESEARCH"],
-            2 => ["FACILITY", "CAMPUS", "INFRASTRUCTURE", "WORKPLACE"],
-            3 => ["LABORATORY", "OFFICE", "FACTORY", "HOSPITAL", "WAREHOUSE"],
-            4 => ["RESEARCH FACILITY", "HIGH-TECH LABORATORY", "PRODUCTION LABORATORY", "FIELD LAB"],
-            5 => ["SINGLE BUILDING", "MULTI-BUILDING", "VERTICAL FACILITY", "CAMPUS FACILITY"],
-            6 => ["SCIENCE", "ENGINEERING", "MEDICAL", "ENERGY", "AEROSPACE"],
-            7 => ["ADVANCED RESEARCH", "APPLIED RESEARCH", "DEVELOPMENT", "TESTING"],
-            8 => ["SCI-FI HIGH-TECH LABORATORY", "RESEARCH LABORATORY", "ENGINEERING LABORATORY", "CUSTOM FACILITY"],
-            _ => []
-        };
+        => SpatialAECOntologyCatalog.OptionsForLayer(CurrentLayer, _answers);
+
 
     public void Answer(string value)
     {
@@ -256,13 +249,11 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
 
     private string ResolveBuildingType()
     {
-        if (_answers[0] == "FICTION" &&
-            _answers[4] == "HIGH-TECH LABORATORY" &&
-            _answers[6] == "SCIENCE" &&
-            _answers[7] == "ADVANCED RESEARCH")
-        {
-            return "SCI-FI HIGH-TECH RESEARCH LABORATORY";
-        }
+        var catalogMatch = SpatialAECOntologyCatalog.Resolve(_answers);
+        if (catalogMatch is not null)
+            return catalogMatch.Name == "High-Tech Research Laboratory"
+                ? "SCI-FI HIGH-TECH RESEARCH LABORATORY"
+                : catalogMatch.Name;
 
         return _answers[8] ?? "CUSTOM FACILITY";
     }
