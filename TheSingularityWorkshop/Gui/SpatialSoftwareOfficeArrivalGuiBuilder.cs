@@ -14,6 +14,7 @@ public static class SpatialSoftwareOfficeArrivalGuiBuilder
         Action enterElevator,
         Action ding,
         Action completeBriefing,
+        Action openBehavior,
         Action exitScene)
     {
         var root = WorkshopGui.Panel(receiver)
@@ -37,6 +38,7 @@ public static class SpatialSoftwareOfficeArrivalGuiBuilder
                 break;
             case SpatialSoftwareOfficeArrivalStage.HelicopterApproach:
                 root.Content(Helicopter(receiver, false));
+                root.Content(ActionButton(receiver, "ENTER HELICOPTER", enterHelicopter));
                 break;
             case SpatialSoftwareOfficeArrivalStage.HelicopterDeparting:
                 root.Content(Helicopter(receiver, true));
@@ -52,6 +54,7 @@ public static class SpatialSoftwareOfficeArrivalGuiBuilder
                 break;
             case SpatialSoftwareOfficeArrivalStage.FacilityAccess:
                 root.Content(Briefing(receiver));
+                root.Content(ActionButton(receiver, "OPEN BEHAVIOR WORKBENCH", openBehavior));
                 break;
         }
 
