@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace TheSingularityWorkshop.Gui;
@@ -14,18 +13,26 @@ public static class SpatialForgeGuiBuilder
     private static readonly ConditionalWeakTable<object, ForgeAssemblyState> AssemblyStates = new();
 
     /// <summary>Builds the Forge interior, centered on the FSM creation workbench.</summary>
-    public static ElementBuilder Build(object receiver, SpatialLinework structure, string avatarName, Action enterLineLab, Action exitForge)
+    public static ElementBuilder Build(object receiver, string avatarName, double avatarX, double avatarY, Action<Microsoft.AspNetCore.Components.Web.KeyboardEventArgs> onKeyDown, Action<double, double> moveAvatarTo, Action exitForge)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh")
             .Style("overflow", "hidden").Style("background", "#020812").Style("color", White)
-            .Style("font-family", "Consolas, 'Courier New', monospace");
+            .Style("font-family", "Consolas, 'Courier New', monospace")
+            .Attribute("tabindex", "0")
+            .AriaLabel("FSM Forge floor plan. Click to walk. Use WASD or arrow keys.")
+            .OnKeyDown(onKeyDown)
+            .PreventDefault("onkeydown");
 
         root.Content(WorkshopGui.Element(receiver, "style").Text("@keyframes forge-breathe{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}@keyframes forge-unlock-pulse{0%,100%{box-shadow:0 0 10px rgba(0,234,255,.12)}50%{box-shadow:0 0 24px rgba(0,234,255,.42),0 0 42px rgba(255,56,209,.12);transform:scale(1.025)}}@keyframes ingot-pulse{0%,100%{opacity:.65}50%{opacity:1}}"));
 
         var floor = WorkshopGui.Panel(receiver)
             .Style("position", "absolute").Style("inset", "0")
-            .Style("background", "radial-gradient(circle at 50% 48%,#0a1c2a 0%,#030911 48%,#010308 100%)").Style("overflow", "auto");
+            .Style("background", "radial-gradient(circle at 50% 48%,#0a1c2a 0%,#030911 48%,#010308 100%)")
+            .Style("overflow", "visible")
+            .Style("transform", CameraTransform(avatarX, avatarY))
+            .Style("transition", "transform .28s linear")
+            .Style("will-change", "transform");
 
         floor.Content(Grid(receiver));
         // The Forge is a fabrication plan, not a room full of tools.
@@ -36,6 +43,8 @@ public static class SpatialForgeGuiBuilder
         floor.Content(TransitionBay(receiver));
 
         root.Content(floor);
+        root.Content(WalkSurface(receiver, avatarX, avatarY, moveAvatarTo));
+        root.Content(Avatar(receiver, avatarName));
         root.Content(Title(receiver));
         root.Content(Avatar(receiver, avatarName));
         root.Content(WorkshopGui.Button(receiver).Label("← EXIT FORGE")
@@ -75,6 +84,39 @@ public static class SpatialForgeGuiBuilder
         public int StateCount { get; set; }
     }
 
+    private static string CameraTransform(double avatarX, double avatarY)
+        => $"translate(calc(50vw - {avatarX:0.##}vw), calc(50vh - {avatarY:0.##}vh))";
+
+    private static ElementBuilder WalkSurface(object receiver, double avatarX, double avatarY, Action<double, double> moveAvatarTo)
+    {
+        const int cells = 24;
+        var surface = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("inset", "0").Style("z-index", "35")
+            .Style("display", "grid")
+            .Style("grid-template-columns", $"repeat({cells},1fr)")
+            .Style("grid-template-rows", $"repeat({cells},1fr)")
+            .Style("pointer-events", "none");
+
+        for (var row = 0; row < cells; row++)
+        for (var column = 0; column < cells; column++)
+        {
+            var screenX = (column + .5) / cells * 100;
+            var screenY = (row + .5) / cells * 100;
+            var worldX = avatarX + screenX - 50;
+            var worldY = avatarY + screenY - 50;
+
+            surface.Content(WorkshopGui.Button(receiver)
+                .Style("display", "block").Style("width", "100%").Style("height", "100%")
+                .Style("min-width", "0").Style("min-height", "0").Style("margin", "0").Style("padding", "0")
+                .Style("border", "0").Style("outline", "none").Style("background", "transparent")
+                .Style("pointer-events", "auto").Style("cursor", "crosshair")
+                .AriaLabel($"Walk to {worldX:0.#}, {worldY:0.#}")
+                .OnClick(() => moveAvatarTo(worldX, worldY)));
+        }
+
+        return surface;
+    }
+
     private static ElementBuilder Workbench(object receiver)
     {
         var assembly = AssemblyStates.GetOrCreateValue(receiver);
@@ -99,6 +141,17 @@ public static class SpatialForgeGuiBuilder
         return panel;
     }
 
+    private static ElementBuilder Avatar(object receiver, string name)
+        => WorkshopGui.Element(receiver, "svg")
+            .Attribute("viewBox", "0 0 40 40").Attribute("aria-label", "Your position")
+            .Style("position", "fixed").Style("left", "50%").Style("top", "50%").Style("width", "34px").Style("height", "34px")
+            .Style("transform", "translate(-50%,-50%)").Style("z-index", "45").Style("pointer-events", "none").Style("overflow", "visible")
+            .Content(WorkshopGui.Element(receiver, "circle").Attribute("cx", "20").Attribute("cy", "20").Attribute("r", "8")
+                .Attribute("fill", "none").Attribute("stroke", White).Attribute("stroke-opacity", ".4")
+                .Child(WorkshopGui.Element(receiver, "animate").Attribute("attributeName", "r").Attribute("values", "6;13;6").Attribute("dur", "1.8s").Attribute("repeatCount", "indefinite")))
+            .Content(WorkshopGui.Element(receiver, "circle").Attribute("cx", "20").Attribute("cy", "20").Attribute("r", "4").Attribute("fill", White))
+            .Content(WorkshopGui.Element(receiver, "text").Attribute("x", "20").Attribute("y", "36").Attribute("text-anchor", "middle").Attribute("fill", White).Attribute("font-size", "4").Text(name));
+
     private static ElementBuilder StateIngot(object receiver, int number)
         => WorkshopGui.Element(receiver, "div")
             .Attribute("draggable", "true")
@@ -111,15 +164,6 @@ public static class SpatialForgeGuiBuilder
             .Content(WorkshopGui.Element(receiver, "div").Style("color", White).Style("font-size", ".48rem").Style("letter-spacing", ".12em").Text($"STATE_{number}"))
             .Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", ".65rem").Style("right", ".65rem").Style("bottom", ".65rem")
                 .Style("height", "1px").Style("background", $"{Cyan}44").Text(""));
-
-    private static ElementBuilder Adaptor(object receiver, string glyph, string shape, string accent)
-        => WorkshopGui.Element(receiver, "span")
-            .Style("display", "inline-flex").Style("width", "1rem").Style("height", "1rem").Style("align-items", "center").Style("justify-content", "center")
-            .Style("border", $"1px solid {accent}66").Style("background", $"{accent}12").Style("color", accent)
-            .Style("font-size", ".48rem").Style("line-height", "1")
-            .Style("border-radius", shape == "circle" ? "50%" : "0")
-            .Style("clip-path", shape == "star" ? "polygon(50% 0%,61% 34%,98% 35%,68% 56%,79% 92%,50% 70%,21% 92%,32% 56%,2% 35%,39% 34%)" : "none")
-            .Text(glyph);
 
     private static ElementBuilder StateShelf(object receiver)
     {
@@ -210,9 +254,5 @@ public static class SpatialForgeGuiBuilder
         return station;
     }
 
-    private static ElementBuilder Avatar(object receiver, string name)
-        => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "50%").Style("top", "78%").Style("z-index", "25").Style("transform", "translate(-50%,-50%)").Style("pointer-events", "none")
-            .Content(WorkshopGui.Element(receiver, "div").Style("width", "16px").Style("height", "16px").Style("border", $"1px solid {White}").Style("border-radius", "50%").Style("box-shadow", $"0 0 16px {White}99"))
-            .Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "50%").Style("top", "-1.2rem").Style("transform", "translateX(-50%)").Style("padding", ".12rem .3rem")
-                .Style("border", "1px solid rgba(255,255,255,.18)").Style("background", "rgba(1,4,10,.84)").Style("font-size", ".45rem").Style("letter-spacing", ".1em").Style("white-space", "nowrap").Text(name));
+
 }
