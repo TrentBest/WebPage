@@ -24,7 +24,11 @@ public static class SpatialLaboratoryExperienceGuiBuilder
         string? gravityBodyBId = null,
         Action<string, string>? selectGravityBodies = null,
         bool threeDimensionalActive = false,
-        Action? enterThreeDimensionalLab = null)
+        Action? enterThreeDimensionalLab = null,
+        SpatialLaboratoryAccessControl? accessControl = null,
+        Action? scanFingerprint = null,
+        Action? scanRetina = null,
+        Action<string>? requestFloor = null)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("overflow", "hidden")
@@ -36,7 +40,7 @@ public static class SpatialLaboratoryExperienceGuiBuilder
 
         // The entrance is part of the building, not a modal. The guards and scanner are
         // visible before the visitor is allowed into the research tower.
-        root.Content(SecurityGate(receiver, laboratory.Security, scanBadge));
+        root.Content(SecurityGate(receiver, laboratory.Security, scanBadge, accessControl, scanFingerprint, scanRetina));
 
         var tower = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("left", "4vw").Style("right", "4vw")
@@ -53,7 +57,8 @@ public static class SpatialLaboratoryExperienceGuiBuilder
         foreach (var floor in laboratory.Floors)
         {
             var selected = floor.Id == selectedFloorId;
-            var locked = !laboratory.Security.BadgeAccepted && !floor.DomainId.Equals("security", StringComparison.OrdinalIgnoreCase);
+            var authorized = accessControl?.Stage == SpatialLaboratoryAccessStage.Authorized;
+            var locked = !(authorized || floor.DomainId.Equals("security", StringComparison.OrdinalIgnoreCase));
             var accent = locked ? "#52616a" : selected ? "#ffd34d" : "#00eaff";
             var button = WorkshopGui.Button(receiver)
                 .Label($"{(locked ? "🔒 " : "")}{(floor.Level + 1):00} // {floor.Name}")
@@ -66,7 +71,7 @@ public static class SpatialLaboratoryExperienceGuiBuilder
                 .Style("letter-spacing", ".08em").Style("cursor", locked ? "not-allowed" : "pointer")
                 .Style("pointer-events", locked ? "none" : "auto");
             if (!locked)
-                button.OnClick(() => selectFloor(floor.Id));
+                button.OnClick(() => requestFloor?.Invoke(floor.Id) ?? selectFloor(floor.Id));
             floors.Content(button);
         }
 
@@ -159,10 +164,19 @@ public static class SpatialLaboratoryExperienceGuiBuilder
                 .Style("margin-top", ".5rem").Style("max-width", "860px").Style("font-size", ".48rem").Style("line-height", "1.5").Style("color", "#aebfc8")
                 .Text("The lab is an instrument. Prepare experiments by assembling physical apparatus, not by filling out a worksheet. The resulting composition becomes the experiment definition."));
 
-    private static ElementBuilder SecurityGate(object receiver, SpatialLaboratorySecurity security, Action? scanBadge)
+    private static ElementBuilder SecurityGate(object receiver, SpatialLaboratorySecurity security, Action? scanBadge, SpatialLaboratoryAccessControl? accessControl, Action? scanFingerprint, Action? scanRetina)
     {
-        var status = security.BadgeAccepted ? "BADGE ACCEPTED // RESEARCH ACCESS GRANTED" : "BADGE REQUIRED // SCAN TO ENTER";
-        var color = security.BadgeAccepted ? "#52e05a" : "#ffd34d";
+        var stage = accessControl?.Stage ?? (security.BadgeAccepted ? SpatialLaboratoryAccessStage.Authorized : SpatialLaboratoryAccessStage.BadgeRequired);
+        var status = stage switch
+        {
+            SpatialLaboratoryAccessStage.BadgeRequired => "BADGE REQUIRED // PLACE ID CARD IN READER",
+            SpatialLaboratoryAccessStage.FingerprintRequired => "BADGE ACCEPTED // TOUCH FINGERPRINT TERMINAL",
+            SpatialLaboratoryAccessStage.RetinalScanRequired => "FINGERPRINT ACCEPTED // LOOK INTO RETINAL SCANNER",
+            SpatialLaboratoryAccessStage.Authorized => "IDENTITY VERIFIED // ELEVATOR ACCESS GRANTED",
+            SpatialLaboratoryAccessStage.Challenged => "CLEARANCE CHALLENGE // RETURN TO ELEVATOR",
+            _ => "SECURITY STATE UNKNOWN"
+        };
+        var color = stage == SpatialLaboratoryAccessStage.Authorized ? "#52e05a" : "#ffd34d";
 
         var panel = WorkshopGui.Panel(receiver)
             .Style("position", "absolute").Style("right", "4vw").Style("top", "3vh").Style("z-index", "10")
@@ -171,24 +185,49 @@ public static class SpatialLaboratoryExperienceGuiBuilder
             .Content(WorkshopGui.Element(receiver, "div").Style("font-size", ".43rem").Style("letter-spacing", ".14em").Style("color", color).Text("SECURITY GATE"))
             .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".35rem").Style("font-size", ".38rem").Style("color", "#d9eef4").Text(status));
 
-        foreach (var guard in security.Guards)
+        if (accessControl is not null)
         {
-            panel.Content(WorkshopGui.Element(receiver, "div")
-                .Style("display", "flex").Style("align-items", "center").Style("gap", ".45rem")
-                .Style("margin-top", ".4rem").Style("font-size", ".36rem").Style("color", "#8ea7b2")
-                .Content(WorkshopGui.Element(receiver, "span")
-                    .Style("width", "8px").Style("height", "8px").Style("border-radius", "50%")
-                    .Style("display", "inline-block").Style("background", security.BadgeAccepted ? "#52e05a" : "#ffd34d")
-                    .Style("box-shadow", security.BadgeAccepted ? "0 0 8px #52e05a" : "0 0 8px #ffd34d"))
-                .Content(WorkshopGui.Element(receiver, "span").Text($"{guard.Name}"))
-                .Content(WorkshopGui.Element(receiver, "span").Style("color", "#52616a").Text($"// {guard.Greeting}")));
-        }
+            foreach (var guard in accessControl.Guards)
+            {
+                panel.Content(WorkshopGui.Element(receiver, "div")
+                    .Style("display", "flex").Style("align-items", "center").Style("gap", ".45rem")
+                    .Style("margin-top", ".4rem").Style("font-size", ".36rem").Style("color", "#8ea7b2")
+                    .Content(WorkshopGui.Element(receiver, "span")
+                        .Style("width", "8px").Style("height", "8px").Style("border-radius", "50%")
+                        .Style("display", "inline-block").Style("background", color)
+                        .Style("box-shadow", $"0 0 8px {color}"))
+                    .Content(WorkshopGui.Element(receiver, "span").Text(guard.Name))
+                    .Content(WorkshopGui.Element(receiver, "span").Style("color", "#52616a").Text($"// {guard.Post}")));
+            }
 
-        if (!security.BadgeAccepted && scanBadge is not null)
-            panel.Content(WorkshopGui.Button(receiver).Label("[ SCAN BADGE ]")
-                .Style("margin-top", ".55rem").Style("padding", ".45rem .7rem")
-                .Style("border", "1px solid #ffd34d88").Style("background", "rgba(255,211,77,.08)")
-                .Style("color", "#ffd34d").Style("font-family", "inherit").Style("font-size", ".4rem").OnClick(scanBadge));
+            if (stage == SpatialLaboratoryAccessStage.BadgeRequired && scanBadge is not null)
+                panel.Content(WorkshopGui.Button(receiver).Label("[ SCAN ID CARD ]")
+                    .Style("margin-top", ".55rem").Style("padding", ".45rem .7rem")
+                    .Style("border", "1px solid #ffd34d88").Style("background", "rgba(255,211,77,.08)")
+                    .Style("color", "#ffd34d").Style("font-family", "inherit").Style("font-size", ".4rem").OnClick(scanBadge));
+
+            if (stage == SpatialLaboratoryAccessStage.FingerprintRequired && scanFingerprint is not null)
+                panel.Content(WorkshopGui.Button(receiver).Label("[ TOUCH FINGERPRINT TERMINAL ]")
+                    .Style("margin-top", ".55rem").Style("padding", ".45rem .7rem")
+                    .Style("border", "1px solid #ffd34d88").Style("background", "rgba(255,211,77,.08)")
+                    .Style("color", "#ffd34d").Style("font-family", "inherit").Style("font-size", ".4rem").OnClick(scanFingerprint));
+
+            if (stage == SpatialLaboratoryAccessStage.RetinalScanRequired && scanRetina is not null)
+                panel.Content(WorkshopGui.Button(receiver).Label("[ PERFORM RETINAL SCAN ]")
+                    .Style("margin-top", ".55rem").Style("padding", ".45rem .7rem")
+                    .Style("border", "1px solid #ffd34d88").Style("background", "rgba(255,211,77,.08)")
+                    .Style("color", "#ffd34d").Style("font-family", "inherit").Style("font-size", ".4rem").OnClick(scanRetina));
+
+            if (stage == SpatialLaboratoryAccessStage.Challenged)
+                panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".55rem").Style("padding", ".5rem")
+                    .Style("border", "1px solid #ff38d166").Style("color", "#ff38d1").Style("font-size", ".38rem")
+                    .Text("CLEARANCE REQUIRED // SECURITY ESCORTS VISITOR BACK TO THE ELEVATOR"));
+        }
+        else
+        {
+            foreach (var guard in security.Guards)
+                panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".4rem").Style("font-size", ".36rem").Style("color", "#8ea7b2").Text(guard.Name));
+        }
 
         return panel;
     }
