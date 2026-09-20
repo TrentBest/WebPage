@@ -245,11 +245,14 @@ public sealed class SpatialSingularityLabModel : IStateContext, IDisposable
         _pendingCommand = command;
         _handle.Update();
 
-        // Keep the FSM_API transition as the authoritative state change. A few
-        // 1.0.x package builds can evaluate the condition but leave the handle's
-        // CurrentState unchanged; in that case explicitly perform the same
-        // declared transition so the semantic model and FSM remain synchronized.
-        if (expectedNextStage.HasValue && Stage == stageBeforeCommand)
+        // FSM_API owns the transition, but entering the target state is a
+        // distinct lifecycle operation. Step() can update CurrentState without
+        // invoking the target state's Enter action until a later update cycle.
+        // The semantic model must expose the new stage immediately, so force the
+        // already-declared transition through FSM_API. This is deliberately not
+        // manual state assignment: FSM_API still performs Exit/Enter and owns the
+        // live handle state.
+        if (expectedNextStage.HasValue)
             _handle.TransitionTo(expectedNextStage.Value.ToString());
 
         _pendingCommand = SpatialSingularityLabCommand.None;
