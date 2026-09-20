@@ -145,6 +145,13 @@ public static class SpatialAECOntologyCatalog
                 "DEVELOPMENT", "CUSTOM FACILITY")
         };
 
+        var researchDomainProfile = new SpatialAECBuildingType(
+            "aec.research.vertical.engineering-development",
+            "Research Laboratory",
+            "REALITY", "RESEARCH", "FACILITY", "LABORATORY",
+            "RESEARCH FACILITY", "VERTICAL FACILITY", "ENGINEERING",
+            "DEVELOPMENT", "RESEARCH LABORATORY");
+
         var aliases = new[]
         {
             new SpatialAECBuildingType(
@@ -157,6 +164,7 @@ public static class SpatialAECOntologyCatalog
 
         return canonical
             .Concat(scenarios)
+            .Concat(new[] { researchDomainProfile })
             .Concat(aliases)
             .GroupBy(x => x.Id, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())
@@ -177,10 +185,14 @@ public static class SpatialAECOntologyCatalog
     {
         if (specification.Purpose == SpatialBuildingPurpose.Research)
         {
+            // The canonical physical specification retains its established AEC path.
+            // The ontology mall also exposes a separate research-domain profile below,
+            // allowing the same physical inventory to be discovered through the newer
+            // REALITY -> RESEARCH branch without mutating the canonical record.
             return new SpatialAECBuildingOntologyProfile(
                 specification.Id,
                 "REALITY",
-                "RESEARCH",
+                "BUILT ENVIRONMENT",
                 "FACILITY",
                 "LABORATORY",
                 "RESEARCH FACILITY",
