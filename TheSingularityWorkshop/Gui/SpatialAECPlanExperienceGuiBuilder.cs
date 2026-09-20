@@ -19,8 +19,11 @@ public static class SpatialAECPlanExperienceGuiBuilder
         string avatarName,
         int floor,
         string? selectedInteractableId,
+        double avatarX,
+        double avatarY,
         Action<int> selectFloor,
         Action<string> approachInteractable,
+        Action<double, double> walkTo,
         Action enterAuthoring,
         Action exit)
     {
@@ -32,7 +35,7 @@ public static class SpatialAECPlanExperienceGuiBuilder
             .Style("background", Ink).Style("color", White)
             .Style("font-family", "Consolas, 'Courier New', monospace");
 
-        root.Content(Plan(receiver, experience, view, selectedInteractableId, approachInteractable));
+        root.Content(Plan(receiver, experience, view, selectedInteractableId, avatarX, avatarY, approachInteractable, walkTo));
         root.Content(Header(receiver, experience, avatarName, view));
         root.Content(FloorRail(receiver, experience, view.Floor, selectFloor));
         root.Content(Inspector(receiver, experience, view, selectedInteractableId, approachInteractable, enterAuthoring));
@@ -46,7 +49,10 @@ public static class SpatialAECPlanExperienceGuiBuilder
         SpatialAECPlanExperience experience,
         SpatialAECPlanView view,
         string? selectedInteractableId,
-        Action<string> approachInteractable)
+        double avatarX,
+        double avatarY,
+        Action<string> approachInteractable,
+        Action<double, double> walkTo)
     {
         var svg = WorkshopGui.Element(receiver, "svg")
             .Attribute("viewBox", "0 0 100 100")
@@ -90,6 +96,22 @@ public static class SpatialAECPlanExperienceGuiBuilder
                 .Text(room.Name));
         }
 
+        var avatarScreenX = 10 + avatarX * scaleX;
+        var avatarScreenY = 10 + avatarY * scaleY;
+
+        svg.Child(WorkshopGui.Element(receiver, "circle")
+            .Attribute("cx", avatarScreenX).Attribute("cy", avatarScreenY)
+            .Attribute("r", "1.6")
+            .Attribute("fill", "rgba(255,211,77,.28)")
+            .Attribute("stroke", Yellow).Attribute("stroke-width", ".55"));
+
+        svg.Child(WorkshopGui.Element(receiver, "circle")
+            .Attribute("cx", avatarScreenX).Attribute("cy", avatarScreenY)
+            .Attribute("r", "3.1")
+            .Attribute("fill", "none")
+            .Attribute("stroke", Yellow).Attribute("stroke-opacity", ".45")
+            .Attribute("stroke-width", ".22"));
+
         foreach (var interactable in view.Interactables)
         {
             var x = 10 + interactable.X * scaleX;
@@ -126,7 +148,11 @@ public static class SpatialAECPlanExperienceGuiBuilder
             // WorkshopGui's element builder is intentionally event-oriented; attach the
             // interaction to the semantic group rather than inventing a renderer-level
             // object type.
-            button.OnClick(() => approachInteractable(interactable.Id));
+            button.OnClick(() =>
+            {
+                walkTo(interactable.X, interactable.Y);
+                approachInteractable(interactable.Id);
+            });
             svg.Child(button);
         }
 
