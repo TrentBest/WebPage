@@ -145,6 +145,9 @@ public static class SpatialWorkshopGuiBuilder
 
     private static ElementBuilder Interactable(object receiver, SpatialInteractable item, Func<string, Task> interact, double zoom)
     {
+        if (item.Id == "singularity-software-office")
+            return RicketySoftwareTower(receiver, item, interact, zoom);
+
         var b = item.Bounds;
         var surface = WorkshopGui.Element(receiver, "div")
             .Class("workshop-interactable")
@@ -161,6 +164,48 @@ public static class SpatialWorkshopGuiBuilder
             .OnMouseLeave(item.OnHoverExit).OnClick(() => interact(item.Id)).StopPropagation("onclick");
         if (item.IsBreathing) surface.Style("animation", "workshop-interactable-breathe 1.25s ease-in-out infinite");
         surface.Content(BuildingSign(receiver, item.Name));
+        return surface;
+    }
+
+    private static ElementBuilder RicketySoftwareTower(object receiver, SpatialInteractable item, Func<string, Task> interact, double zoom)
+    {
+        var b = item.Bounds;
+        var surface = WorkshopGui.Element(receiver, "div")
+            .Class("workshop-interactable")
+            .Style("position", "absolute")
+            .Style("left", $"{SpatialCamera.WorldToVw(b.X, zoom):0.###}vw")
+            .Style("top", $"{SpatialCamera.WorldToVh(b.Y, zoom):0.###}vh")
+            .Style("width", $"{SpatialCamera.WorldToVw(b.Width, zoom):0.###}vw")
+            .Style("height", $"{SpatialCamera.WorldToVh(b.Height, zoom):0.###}vh")
+            .Style("z-index", "8").Style("cursor", "pointer").Style("overflow", "visible")
+            .AriaLabel(item.Name).Title("SINGULARITY SOFTWARE INC. // HELIPAD ARRIVAL")
+            .OnClick(() => interact(item.Id)).StopPropagation("onclick");
+
+        var tower = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "5%").Style("bottom", "0")
+            .Style("width", "90%").Style("height", "420%")
+            .Style("transform", "rotate(-5deg)").Style("transform-origin", "bottom center")
+            .Style("background", "repeating-linear-gradient(165deg,#101b23 0 10px,#172b35 11px 18px,#0a1118 19px 28px)")
+            .Style("border", "1px solid #00eaff77")
+            .Style("box-shadow", "0 0 35px #00eaff18, inset 0 0 25px #00eaff0b");
+
+        for (var i = 0; i < 14; i++)
+        {
+            var left = 8 + (i % 3) * 31;
+            var top = 4 + i * 6.3;
+            tower.Content(WorkshopGui.Element(receiver, "div")
+                .Style("position", "absolute").Style("left", left + "%").Style("top", top + "%")
+                .Style("width", "22%").Style("height", "3.5px")
+                .Style("background", i % 2 == 0 ? "#00eaff77" : "#ffd34d66"));
+        }
+
+        var ramp = WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "38%").Style("bottom", "-9%").Style("width", "24%").Style("height", "28px")
+            .Style("border", "1px solid #ffd34d99").Style("background", "#ffd34d10").Style("transform", "skewX(-28deg)")
+            .Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "102%").Style("top", "-12px").Style("width", "80px").Style("height", "80px").Style("border", "2px solid #ffd34d").Style("border-radius", "50%").Style("background", "#ffd34d08").Text(""));
+
+        surface.Content(tower).Content(ramp)
+            .Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("left", "50%").Style("top", "8%").Style("transform", "translateX(-50%) rotate(-5deg)").Style("padding", ".3rem .5rem").Style("border", "1px solid #fff4").Style("background", "#01050bd9").Style("color", White).Style("font-size", ".5rem").Style("letter-spacing", ".12em").Style("white-space", "nowrap").Style("pointer-events", "none").Text("SINGULARITY SOFTWARE INC."));
         return surface;
     }
 
