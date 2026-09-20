@@ -85,7 +85,7 @@ public sealed class SpatialLaboratoryAccessControl
         }
 
         Stage = SpatialLaboratoryAccessStage.Authorized;
-        return SpatialAccessDecision.Allowed(floorId);
+        return SpatialAccessDecision.Grant(floorId);
     }
 
     public void ReturnToElevator()
@@ -107,7 +107,7 @@ public readonly record struct SpatialLaboratoryAccessGuard(string Id, string Nam
 
 public readonly record struct SpatialAccessDecision(bool Allowed, string Message, string? FloorId)
 {
-    public static SpatialAccessDecision Allowed(string floorId)
+    public static SpatialAccessDecision Grant(string floorId)
         => new(true, $"Access granted. Proceed to {floorId}.", floorId);
 
     public static SpatialAccessDecision Denied(string message)
