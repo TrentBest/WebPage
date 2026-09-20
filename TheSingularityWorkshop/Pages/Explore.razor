@@ -44,7 +44,6 @@
     private SpatialMansionGuiBuilder.PresentationMode mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
     private string? selectedMansionFeatureId;
     private bool mayorButlerVisible;
-    private bool mayorMeetingCancelled;
     private bool mayorOfficeOfferVisible;
     private string? occupiedCivicOfficeId;
     private bool constructionWelcomeVisible;
@@ -919,7 +918,6 @@
             mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.ExteriorElevation;
             selectedMansionFeatureId = null;
             mayorButlerVisible = true;
-            mayorMeetingCancelled = false;
             mayorOfficeOfferVisible = false;
         }
         await InvokeAsync(StateHasChanged);
@@ -1276,7 +1274,6 @@
 
         mansionWelcomeVisible = false;
         mayorButlerVisible = false;
-        mayorMeetingCancelled = false;
         mayorOfficeOfferVisible = false;
         selectedMansionFeatureId = null;
         mansionPresentation = SpatialMansionGuiBuilder.PresentationMode.Plan;
