@@ -1,4 +1,4 @@
-using SingularityHub.Abstractions;
+using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Gui;
 using Xunit;
 
