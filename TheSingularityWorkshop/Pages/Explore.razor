@@ -25,6 +25,8 @@
     private SpatialAECPlanExperience? AECPlanExperience;
     private int AECPlanFloor = 1;
     private string? AECPlanInteractableId;
+    private double AECPlanAvatarX = 3;
+    private double AECPlanAvatarY = 3;
     private readonly SpatialSingularityLabModel SingularityLab = new();
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
@@ -163,7 +165,7 @@
             return SpatialAECGeneratedStructureGuiBuilder.Build(this, AECGeneratedStructure, Experience.User.DisplayName, EnterGeneratedAECStructure, RegenerateAECStructure, ExitRoom); 
 
         if (insideRoomId == "aec-plan" && AECPlanExperience is not null)
-            return SpatialAECPlanExperienceGuiBuilder.Build(this, AECPlanExperience, Experience.User.DisplayName, AECPlanFloor, AECPlanInteractableId, SelectAECPlanFloor, ApproachAECPlanInteractable, EnterGeneratedAECStructure, ExitRoom);
+            return SpatialAECPlanExperienceGuiBuilder.Build(this, AECPlanExperience, Experience.User.DisplayName, AECPlanFloor, AECPlanInteractableId, AECPlanAvatarX, AECPlanAvatarY, SelectAECPlanFloor, ApproachAECPlanInteractable, WalkAECPlanTo, EnterGeneratedAECStructure, ExitRoom);
 
         if (insideRoomId == "aec-remote-office")
             return SpatialAECRemoteOfficeGuiBuilder.Build(this, AECManifest, AECDraft, Experience.User.DisplayName, AvatarX, AvatarY, args => _ = DrawAECPoint(args), ClearAECDraft, UndoAECDraft, SetAECElementKind, SetAECSnap, SetAECOrthogonal, SetAECFloor, SetAECTrade, ExitRoom);
@@ -919,6 +921,8 @@
         AECPlanExperience = AECIntent.CreatePlanExperience();
         AECPlanFloor = 1;
         AECPlanInteractableId = null;
+        AECPlanAvatarX = 3;
+        AECPlanAvatarY = 3;
         insideRoomId = "aec-plan";
     }
 
@@ -928,6 +932,8 @@
         AECPlanExperience = AECIntent.CreatePlanExperience();
         AECPlanFloor = 1;
         AECPlanInteractableId = null;
+        AECPlanAvatarX = 3;
+        AECPlanAvatarY = 3;
         insideRoomId = "aec-plan";
     }
 
@@ -950,6 +956,17 @@
         if (AECPlanExperience is null) return;
         AECPlanFloor = Math.Clamp(floor, 1, AECPlanExperience.Floors.Count);
         AECPlanInteractableId = null;
+        AECPlanAvatarX = 3;
+        AECPlanAvatarY = 3;
+    }
+
+    private void WalkAECPlanTo(double x, double y)
+    {
+        if (AECPlanExperience is null) return;
+
+        var view = AECPlanExperience.GetFloor(AECPlanFloor);
+        AECPlanAvatarX = Math.Clamp(x, 0, view.Width);
+        AECPlanAvatarY = Math.Clamp(y, 0, view.Depth);
     }
 
     private void ApproachAECPlanInteractable(string interactableId)
