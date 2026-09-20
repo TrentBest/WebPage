@@ -45,9 +45,9 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Text(scope switch
             {
                 SpatialMapScope.Workshop => "WORKSHOP CAMPUS // COMPLETE MAP",
-                SpatialMapScope.City => "SINGULARITY CITY // DEVELOPMENT MAP",
+                SpatialMapScope.City => "SINGULARITY CITY // UNDER CONSTRUCTION",
                 SpatialMapScope.World => "WORLD // DEVELOPMENT MAP",
-                SpatialMapScope.SolarSystem => "SOLAR SYSTEM // NASA REFERENCE DATA",
+                SpatialMapScope.SolarSystem => "SOLAR SYSTEM // UNDER CONSTRUCTION",
                 _ => "SPATIAL MAP"
             })));
 
@@ -55,9 +55,9 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("display", "flex").Style("gap", ".35rem").Style("flex-wrap", "wrap")
             .Style("align-items", "center").Style("margin", ".65rem 0")
             .Content(ScopeButton(receiver, "WORKSHOP", SpatialMapScope.Workshop, scope, setScope))
-            .Content(ScopeButton(receiver, "SINGULARITY CITY", SpatialMapScope.City, scope, setScope))
+            .Content(ScopeButton(receiver, "SINGULARITY CITY // UNDER CONSTRUCTION", SpatialMapScope.City, scope, setScope))
             .Content(ScopeButton(receiver, "WORLD // UNDER CONSTRUCTION", SpatialMapScope.World, scope, setScope))
-            .Content(ScopeButton(receiver, "SOLAR SYSTEM", SpatialMapScope.SolarSystem, scope, setScope))
+            .Content(ScopeButton(receiver, "SOLAR SYSTEM // UNDER CONSTRUCTION", SpatialMapScope.SolarSystem, scope, setScope))
             .Content(WorkshopGui.Element(receiver, "span").Style("margin-left", "auto").Style("color", "#8fa7b2").Style("font-size", ".43rem")
                 .Text("SCROLL THE MAP LIST • SCALE WITH + / −"));
 
@@ -280,7 +280,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("padding", ".45rem").Style("margin-bottom", ".45rem")
             .Style("border", $"1px solid {Yellow}44").Style("color", Yellow)
             .Style("font-size", ".42rem").Style("line-height", "1.5")
-            .Text("SCHEMATIC MAP • PHYSICAL VALUES FROM NASA • DYNAMIC EPHEMERIDES RESERVED FOR JPL HORIZONS"));
+            .Text("UNDER CONSTRUCTION • SCHEMATIC RESEARCH DATA ONLY • DYNAMIC EPHEMERIDES RESERVED FOR FUTURE JPL INTEGRATION"));
 
         foreach (var body in data.Bodies)
         {
