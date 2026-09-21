@@ -260,14 +260,19 @@ public static class SpatialSecurityCheckpointGuiBuilder
         {
             var service = WorkshopGui.Element(receiver, "g")
                 .Attribute("id", $"security-service-{checkpoint.ServicePulse}")
-                .Style("pointer-events", "none")
-                .Style("animation", "security-digitens-service .82s linear 1");
+                .Style("pointer-events", "none");
             service.Child(WorkshopGui.Element(receiver, "circle")
                 .Attribute("cx", "42").Attribute("cy", "25")
                 .Attribute("r", "1.15").Attribute("fill", Cyan));
             service.Child(WorkshopGui.Element(receiver, "path")
                 .Attribute("d", "M 40.4 30 Q 42 27 43.6 30 L 44 34 H 40 Z")
                 .Attribute("fill", $"{Cyan}33").Attribute("stroke", Cyan).Attribute("stroke-width", ".3"));
+            service.Child(WorkshopGui.Element(receiver, "animateTransform")
+                .Attribute("attributeName", "transform")
+                .Attribute("type", "translate")
+                .Attribute("values", "0 0; 12 16; 28 16; 49 20; 64 22")
+                .Attribute("dur", ".82s")
+                .Attribute("repeatCount", "1"));
             svg.Child(service);
         }
 
