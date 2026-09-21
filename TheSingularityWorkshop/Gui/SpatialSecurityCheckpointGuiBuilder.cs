@@ -47,7 +47,7 @@ public static class SpatialSecurityCheckpointGuiBuilder
         root.Content(Status(receiver, checkpoint));
         root.Content(WorkshopGui.Button(receiver).Label("← RETURN TO CAMPUS")
             .Style("position", "fixed").Style("right", "1rem").Style("bottom", "1rem")
-            .Style("z-index", "75").Style("padding", ".5rem .75rem")
+            .Style("z-index", "75").Style("padding", ".75rem 1rem")
             .Style("background", "rgba(1,6,12,.94)").Style("border", $"1px solid {Muted}66")
             .Style("color", Muted).Style("font-family", "inherit").Style("cursor", "pointer")
             .OnClick(returnToCampus));
@@ -172,11 +172,11 @@ public static class SpatialSecurityCheckpointGuiBuilder
             .Style("z-index", "100").Style("display", "flex").Style("align-items", "center").Style("gap", "1rem");
 
         header.Content(WorkshopGui.Element(receiver, "div").Style("flex", "1 1 auto").Style("min-width", "0")
-            .Style("font-size", ".52rem").Style("letter-spacing", ".13em").Style("color", Yellow)
+            .Style("font-size", "1rem").Style("letter-spacing", ".13em").Style("color", Yellow)
             .Text("SINGULARITY LABORATORY // SECURITY CHECKPOINT"));
-        header.Content(WorkshopGui.Element(receiver, "div").Style("flex", "0 0 auto").Style("font-size", ".39rem").Style("color", Muted)
+        header.Content(WorkshopGui.Element(receiver, "div").Style("flex", "0 0 auto").Style("font-size", ".8rem").Style("color", Muted)
             .Text($"BADGE {checkpoint.BadgeClearance.ToString().ToUpperInvariant()} // QUEUE {checkpoint.PlayerQueueSlot + 1}/{SpatialSecurityCheckpointModel.QueueCapacity}"));
-        header.Content(WorkshopGui.Element(receiver, "div").Style("flex", "0 0 auto").Style("font-size", ".39rem").Style("color", Cyan)
+        header.Content(WorkshopGui.Element(receiver, "div").Style("flex", "0 0 auto").Style("font-size", ".8rem").Style("color", Cyan)
             .Text($"GUARDS {traffic.OnDutyGuards(now).Count} // {now:HH:mm}"));
         return header;
     }
@@ -189,13 +189,13 @@ public static class SpatialSecurityCheckpointGuiBuilder
             .Style("max-width", "50rem").Style("padding", ".55rem .75rem")
             .Style("background", "rgba(1,6,12,.95)").Style("border", $"1px solid {accent}66").Style("z-index", "90");
 
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("font-size", ".39rem").Style("letter-spacing", ".12em").Style("color", accent)
+        panel.Content(WorkshopGui.Element(receiver, "div").Style("font-size", ".8rem").Style("letter-spacing", ".12em").Style("color", accent)
             .Text(checkpoint.Stage.ToString().ToUpperInvariant()));
         panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".2rem").Style("font-family", "system-ui,sans-serif")
-            .Style("font-size", ".7rem").Style("color", White).Text(checkpoint.LastMessage));
+            .Style("font-size", "1rem").Style("color", White).Text(checkpoint.LastMessage));
 
         if (checkpoint.CutAttempts > 0)
-            panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".18rem").Style("font-size", ".34rem").Style("color", Red)
+            panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".18rem").Style("font-size", ".8rem").Style("color", Red)
                 .Text($"DIGITEN AGITATION // {checkpoint.CutAttempts} CUT ATTEMPT(S) // LINE STILL ALLOWS PROGRESS"));
 
         return panel;
@@ -211,7 +211,7 @@ public static class SpatialSecurityCheckpointGuiBuilder
             .Style("background", enabled ? $"{accent}14" : "rgba(1,6,12,.2)")
             .Style("border", enabled ? $"1px solid {accent}99" : $"1px solid {Muted}22")
             .Style("color", enabled ? accent : $"{Muted}55")
-            .Style("font-family", "inherit").Style("font-size", ".34rem")
+            .Style("font-family", "inherit").Style("font-size", ".8rem")
             .Style("letter-spacing", ".06em").Style("cursor", enabled ? "pointer" : "default")
             .OnClick(action);
 
