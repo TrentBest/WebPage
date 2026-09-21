@@ -10,6 +10,9 @@ using System;
 /// </summary>
 public static class SpatialLaboratoryPlanGuiBuilder
 {
+    /// <summary>The laboratory is intentionally perceived through a closer building-local camera.</summary>
+    public const double BuildingZoom = 1.35;
+
     private const string Cyan = "#00eaff";
     private const string Yellow = "#ffd34d";
     private const string Magenta = "#ff38d1";
@@ -64,7 +67,8 @@ public static class SpatialLaboratoryPlanGuiBuilder
         Action director)
     {
         var svg = WorkshopGui.Element(receiver, "svg")
-            .Attribute("viewBox", "0 0 100 100")
+            .Attribute("viewBox", ViewBox(avatarX, avatarY))
+            .Attribute("preserveAspectRatio", "xMidYMid meet")
             .Style("position", "absolute").Style("inset", "0")
             .Style("width", "100vw").Style("height", "100vh")
             .OnClick(worldClick);
@@ -121,6 +125,13 @@ public static class SpatialLaboratoryPlanGuiBuilder
             .Text("THE MAP IS THE SPATIAL TRUTH // CLICK THE PLAN TO WALK"));
 
         return svg;
+    }
+
+    private static string ViewBox(double avatarX, double avatarY)
+    {
+        var width = 100d / BuildingZoom;
+        var height = 100d / BuildingZoom;
+        return $"{avatarX - width / 2d:0.###} {avatarY - height / 2d:0.###} {width:0.###} {height:0.###}";
     }
 
     private static ElementBuilder Header(object receiver, bool directorAccessGranted)
