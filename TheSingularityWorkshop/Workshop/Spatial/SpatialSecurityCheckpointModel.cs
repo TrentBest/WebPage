@@ -116,8 +116,22 @@ public sealed class SpatialSecurityCheckpointModel
 
         if (_agents.Any(agent => agent.QueueSlot == slot))
         {
+            Agitated = true;
             LastMessage = "Someone is still there. Wait for the opening.";
-            SpeakToAgents(_agents.Where(agent => agent.QueueSlot > PlayerQueueSlot), "HOLD UP! THEY'RE NOT THROUGH YET!");
+
+            if (slot < PlayerQueueSlot)
+            {
+                SpeakToAgents(
+                    _agents.Where(agent => agent.QueueSlot <= PlayerQueueSlot - 1),
+                    "HEY! WAIT! THE SPACE IS NOT OPEN!");
+            }
+            else
+            {
+                SpeakToAgents(
+                    _agents.Where(agent => agent.QueueSlot > PlayerQueueSlot),
+                    "HOLD UP! THEY'RE NOT THROUGH YET!");
+            }
+
             return false;
         }
 
