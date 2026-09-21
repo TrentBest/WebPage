@@ -5,7 +5,7 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden") @(IsWorkshopLanding && ShowWorkshopChrome ? "workshop-hub-manifested" : "") @(IsCreatePage ? "workshop-create-page" : "")">
+<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden") @(IsWorkshopLanding && ShowWorkshopChrome ? "workshop-hub-manifested" : "") @(IsCreatePage ? "workshop-create-page" : "") @(IsSpatialExplorePage ? "workshop-spatial-page" : "")">
     @if (!IsWorkshopLanding)
     {
         <div class="sidebar workshop-sidebar"><NavMenu /></div>
@@ -32,6 +32,7 @@
 @code {
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
     private bool IsCreatePage => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Equals("create", StringComparison.OrdinalIgnoreCase);
+    private bool IsSpatialExplorePage => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Equals("explore", StringComparison.OrdinalIgnoreCase);
 
     // The Hub belongs to the execution host. It presents after the terminal
     // startup Experience has had its presentation window, not after an arbitrary
