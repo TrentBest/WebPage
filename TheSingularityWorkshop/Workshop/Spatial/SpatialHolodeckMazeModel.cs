@@ -41,8 +41,8 @@ public sealed class SpatialHolodeckMazeModel
 
     private readonly List<SpatialHolodeckAgent> _agents =
     [
-        new("left-wall", "LEFT-WALL", SpatialMazeWallRule.LeftHand, SpatialMazeCatalog.Participants[1].Position, SpatialMazeHeading.South),
-        new("right-wall", "RIGHT-WALL", SpatialMazeWallRule.RightHand, SpatialMazeCatalog.Participants[2].Position, SpatialMazeHeading.North)
+        new("left-wall", "LEFT-WALL", SpatialMazeWallRule.LeftHand, SpatialMazeCatalog.Participants[1].Position, SpatialMazeHeading.South, default),
+        new("right-wall", "RIGHT-WALL", SpatialMazeWallRule.RightHand, SpatialMazeCatalog.Participants[2].Position, SpatialMazeHeading.North, default)
     ];
 
     public void Reset()
