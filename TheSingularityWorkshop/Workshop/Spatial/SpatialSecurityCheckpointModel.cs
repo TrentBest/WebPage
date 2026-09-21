@@ -91,16 +91,17 @@ public sealed class SpatialSecurityCheckpointModel
 
         var distance = PlayerQueueSlot - slot;
 
-        if (distance > 1)
+        if (distance != 1)
         {
             CutAttempts++;
             Agitated = true;
-            LastMessage = "The line stops you. Move one position at a time.";
-            SpeakToAgents(_agents.Where(agent => agent.QueueSlot < PlayerQueueSlot), "HEY! WAIT YOUR TURN!");
+            LastMessage = "The line teaches you to move one position at a time.";
+            if (distance > 1)
+                SpeakToAgents(_agents.Where(agent => agent.QueueSlot < PlayerQueueSlot), "HEY! WAIT YOUR TURN!");
             return false;
         }
 
-        if (distance == 1 && _agents.Any(agent => agent.QueueSlot == slot))
+        if (_agents.Any(agent => agent.QueueSlot == slot))
         {
             LastMessage = "Someone is still there. Wait for the opening.";
             SpeakToAgents(_agents.Where(agent => agent.QueueSlot > PlayerQueueSlot), "HOLD UP! THEY'RE NOT THROUGH YET!");
