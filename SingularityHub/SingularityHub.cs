@@ -123,12 +123,22 @@ public sealed class SingularityHub : ISingularityHub
     /// <summary>Completes an active process-group identity.</summary>
     public bool Complete(ulong id){if(!_processGroups.TryGetValue(id,out var state)||state!=ProcessGroupState.Active)return false;_processGroups[id]=ProcessGroupState.Completed;return true;}
     /// <summary>Immutable registration describing a process group and optional parent.</summary>
-    public sealed record ProcessGroupRegistration(string Name,string? ParentName)
+    public sealed record ProcessGroupRegistration
     {
+        /// <summary>Creates a process-group registration.</summary>
+        /// <param name="name">The process-group name.</param>
+        /// <param name="parentName">The optional parent process-group name.</param>
+        public ProcessGroupRegistration(string name, string? parentName)
+        {
+            Name = name;
+            ParentName = parentName;
+        }
+
         /// <summary>Gets the process-group name.</summary>
-        public string Name { get; init; } = Name;
+        public string Name { get; }
+
         /// <summary>Gets the optional parent process-group name.</summary>
-        public string? ParentName { get; init; } = ParentName;
+        public string? ParentName { get; }
     }
 }
 /// <summary>In-memory arbitration audit implementation.</summary>
