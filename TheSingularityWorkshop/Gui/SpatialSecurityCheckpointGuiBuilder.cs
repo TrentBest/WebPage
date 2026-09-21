@@ -63,7 +63,8 @@ public static class SpatialSecurityCheckpointGuiBuilder
         Action enterFacility)
     {
         var svg = WorkshopGui.Element(receiver, "svg")
-            .Attribute("viewBox", "0 0 120 72")
+            .Attribute("viewBox", ViewBox(checkpoint))
+            .Attribute("preserveAspectRatio", "xMidYMid meet")
             .Style("position", "absolute").Style("inset", "0")
             .Style("width", "100vw").Style("height", "100vh")
             .Style("cursor", "pointer")
@@ -110,9 +111,13 @@ public static class SpatialSecurityCheckpointGuiBuilder
         {
             var y = 29 + agent.QueueSlot * queueStep;
             var highlighted = agent.QueueSlot == checkpoint.PlayerQueueSlot;
+            var speech = checkpoint.GetAgentSpeech(agent.Id);
+            var agitated = checkpoint.Agitated && !string.IsNullOrWhiteSpace(speech);
 
             var person = WorkshopGui.Element(receiver, "g")
                 .Style("cursor", "pointer")
+                .Style("transform-origin", $"{queueX}px {y}px")
+                .Style("animation", agitated ? "security-digitens-agitated .28s ease-in-out infinite" : "none")
                 .OnClick(_ => moveQueue(agent.QueueSlot));
 
             person.Child(WorkshopGui.Element(receiver, "circle")
@@ -127,10 +132,9 @@ public static class SpatialSecurityCheckpointGuiBuilder
                 .Attribute("stroke", highlighted ? Magenta : Cyan)
                 .Attribute("stroke-width", highlighted ? ".5" : ".3"));
 
-            var speech = checkpoint.GetAgentSpeech(agent.Id);
             if (!string.IsNullOrWhiteSpace(speech))
                 person.Child(Speech(receiver, queueX + 4.5, y - 1, speech,
-                    agent.QueueSlot < checkpoint.PlayerQueueSlot ? Yellow : Red));
+                    agitated ? Red : agent.QueueSlot < checkpoint.PlayerQueueSlot ? Yellow : Red));
 
             svg.Child(person);
 
@@ -138,10 +142,12 @@ public static class SpatialSecurityCheckpointGuiBuilder
                 svg.Child(Label(receiver, 48, y - 1, ServiceText(checkpoint.GetAgentStage(agent.Id)), Yellow, .72));
         }
 
-        // The user's position is a person standing in the line, not a button.
-        var userY = 29 + checkpoint.PlayerQueueSlot * queueStep;
-        DrawPerson(receiver, svg, queueX, userY, Magenta, true);
-        svg.Child(Label(receiver, 47, userY + 1, userName.ToUpperInvariant(), Magenta, .72));
+        // The user's position changes from queue -> tray -> scanner -> collection.
+        // The camera follows that physical position instead of fitting the whole
+        // building onto the screen.
+        var (userX, userY) = PlayerPosition(checkpoint);
+        DrawPerson(receiver, svg, userX, userY, Magenta, true);
+        svg.Child(Label(receiver, userX + 5, userY + 1, userName.ToUpperInvariant(), Magenta, .72));
 
         // Empty spaces are physical opportunities to move forward.
         for (var slot = 0; slot < SpatialSecurityCheckpointModel.QueueCapacity; slot++)
@@ -246,8 +252,61 @@ public static class SpatialSecurityCheckpointGuiBuilder
         };
 
         svg.Child(Label(receiver, 47, 63, instruction, White, 1.05));
+
+        // Every cleared Digitens physically traverses the checkpoint. The model
+        // records a pulse for each person; the keyed SVG node makes each pulse a
+        // fresh short animation rather than a dashboard counter.
+        if (checkpoint.ServicePulse > 0 && checkpoint.Stage == SpatialSecurityCheckpointStage.Queue)
+        {
+            var service = WorkshopGui.Element(receiver, "g")
+                .Attribute("id", $"security-service-{checkpoint.ServicePulse}")
+                .Style("pointer-events", "none")
+                .Style("animation", "security-digitens-service .82s linear 1");
+            service.Child(WorkshopGui.Element(receiver, "circle")
+                .Attribute("cx", "42").Attribute("cy", "25")
+                .Attribute("r", "1.15").Attribute("fill", Cyan));
+            service.Child(WorkshopGui.Element(receiver, "path")
+                .Attribute("d", "M 40.4 30 Q 42 27 43.6 30 L 44 34 H 40 Z")
+                .Attribute("fill", $"{Cyan}33").Attribute("stroke", Cyan).Attribute("stroke-width", ".3"));
+            svg.Child(service);
+        }
+
         return svg;
     }
+
+    private static string ViewBox(SpatialSecurityCheckpointModel checkpoint)
+    {
+        const double zoom = 1.55;
+        const double width = 120d / zoom;
+        const double height = 72d / zoom;
+        var (centerX, centerY) = CameraCenter(checkpoint);
+
+        return $"{centerX - width / 2d:0.###} {centerY - height / 2d:0.###} {width:0.###} {height:0.###}";
+    }
+
+    private static (double X, double Y) CameraCenter(SpatialSecurityCheckpointModel checkpoint)
+        => checkpoint.Stage switch
+        {
+            SpatialSecurityCheckpointStage.Approach => (30, 24),
+            SpatialSecurityCheckpointStage.Queue => (48, 45),
+            SpatialSecurityCheckpointStage.TrayReady or SpatialSecurityCheckpointStage.TrayLoaded => (58, 45),
+            SpatialSecurityCheckpointStage.Scanner => (91, 45),
+            SpatialSecurityCheckpointStage.Collection => (106, 47),
+            SpatialSecurityCheckpointStage.Cleared => (106, 22),
+            _ => (48, 45)
+        };
+
+    private static (double X, double Y) PlayerPosition(SpatialSecurityCheckpointModel checkpoint)
+        => checkpoint.Stage switch
+        {
+            SpatialSecurityCheckpointStage.Approach => (28, 25),
+            SpatialSecurityCheckpointStage.Queue => (42, 29 + checkpoint.PlayerQueueSlot * 4.6),
+            SpatialSecurityCheckpointStage.TrayReady or SpatialSecurityCheckpointStage.TrayLoaded => (54, 46),
+            SpatialSecurityCheckpointStage.Scanner => (91, 45),
+            SpatialSecurityCheckpointStage.Collection => (106, 47),
+            SpatialSecurityCheckpointStage.Cleared => (106, 21),
+            _ => (42, 29 + checkpoint.PlayerQueueSlot * 4.6)
+        };
 
     private static ElementBuilder Frame(
         object receiver,
@@ -295,6 +354,9 @@ public static class SpatialSecurityCheckpointGuiBuilder
                 .Style("font-size", "clamp(.8rem,1vw,1rem)")
                 .Style("text-align", "center").Style("color", White)
                 .Text(checkpoint.LastMessage));
+
+        frame.Content(WorkshopGui.Element(receiver, "style")
+            .Text("@keyframes security-digitens-agitated{0%,100%{transform:translateX(0)}25%{transform:translateX(-.7px)}75%{transform:translateX(.7px)}}@keyframes security-digitens-service{0%{transform:translate(0,0);opacity:1}20%{transform:translate(12px,16px)}42%{transform:translate(28px,16px)}68%{transform:translate(49px,20px)}100%{transform:translate(64px,22px);opacity:.15}}"));
 
         return frame;
     }
