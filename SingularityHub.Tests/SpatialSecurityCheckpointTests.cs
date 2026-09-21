@@ -77,8 +77,19 @@ public sealed class SpatialSecurityCheckpointTests
         var checkpoint = new SpatialSecurityCheckpointModel();
 
         checkpoint.EnterQueue();
+
         checkpoint.AdvanceQueueTraffic();
-        checkpoint.TryMoveToQueueSlot(0);
+        Assert.True(checkpoint.TryMoveToQueueSlot(3));
+
+        checkpoint.AdvanceQueueTraffic();
+        Assert.True(checkpoint.TryMoveToQueueSlot(2));
+
+        checkpoint.AdvanceQueueTraffic();
+        Assert.True(checkpoint.TryMoveToQueueSlot(1));
+
+        checkpoint.AdvanceQueueTraffic();
+        Assert.True(checkpoint.TryMoveToQueueSlot(0));
+
         checkpoint.PlaceTray();
         checkpoint.LoadBelongings();
         checkpoint.WalkThroughScanner();
