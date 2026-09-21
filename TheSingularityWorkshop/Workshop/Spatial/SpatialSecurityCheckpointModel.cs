@@ -5,23 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// Reusable spatial security-checkpoint substrate.
-///
-/// The checkpoint is deliberately modeled as a physical space rather than a menu:
-/// a queue has occupied/vacant positions, a tray moves onto the X-ray rollers,
-/// belongings move into the tray, the visitor walks through the scanner, and
-/// the tray is later collected. The same substrate can be recomposed for
-/// laboratories, airports, starships, offices, secure facilities, or simulations.
+/// Physical, plan-view security line. Digitens occupy the line positions and
+/// provide the social cues that teach the visitor how to move through the space.
 /// </summary>
 public sealed class SpatialSecurityCheckpointModel
 {
-    public const int QueueCapacity = 5;
+    public const int QueueCapacity = 8;
 
     private readonly List<SpatialSecurityQueueAgent> _agents = [];
-    private readonly Dictionary<string, SpatialSecurityAgentStage> _serviceStages =
-        new(StringComparer.Ordinal);
-    private readonly Dictionary<string, string> _agentSpeech =
-        new(StringComparer.Ordinal);
+    private readonly Dictionary<string, SpatialSecurityAgentStage> _serviceStages = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _agentSpeech = new(StringComparer.Ordinal);
 
     public SpatialSecurityCheckpointModel() => Reset();
 
@@ -43,15 +36,8 @@ public sealed class SpatialSecurityCheckpointModel
     public bool HasClearedCheckpoint => Stage == SpatialSecurityCheckpointStage.Cleared;
     public bool CanFreeRoam => HasClearedCheckpoint;
 
-    public IReadOnlyList<int> VacantQueueSlots
-        => Enumerable.Range(0, QueueCapacity)
-            .Where(slot => slot != PlayerQueueSlot && _agents.All(agent => agent.QueueSlot != slot))
-            .ToArray();
-
     public SpatialSecurityAgentStage GetAgentStage(string id)
-        => _serviceStages.TryGetValue(id, out var stage)
-            ? stage
-            : SpatialSecurityAgentStage.Waiting;
+        => _serviceStages.TryGetValue(id, out var stage) ? stage : SpatialSecurityAgentStage.Waiting;
 
     public string? GetAgentSpeech(string id)
         => _agentSpeech.TryGetValue(id, out var speech) ? speech : null;
@@ -69,9 +55,9 @@ public sealed class SpatialSecurityCheckpointModel
         CutAttempts = 0;
         QueueProgresses = 0;
         LastMessage = "Join the line.";
+
         _serviceStages.Clear();
         _agentSpeech.Clear();
-
         _agents.Clear();
         _agents.AddRange(
         [
@@ -94,15 +80,13 @@ public sealed class SpatialSecurityCheckpointModel
     {
         if (Stage != SpatialSecurityCheckpointStage.Approach) return;
         Stage = SpatialSecurityCheckpointStage.Queue;
-        LastMessage = "SECURITY QUEUE // Click a vacated space to move forward.";
+        LastMessage = "WATCH THE LINE. MOVE WHEN THE SPACE IN FRONT OF YOU OPENS.";
+        RefreshSpeech();
     }
 
     public bool TryMoveToQueueSlot(int slot)
     {
-        if (Stage != SpatialSecurityCheckpointStage.Queue ||
-            slot < 0 ||
-            slot >= QueueCapacity ||
-            slot == PlayerQueueSlot)
+        if (Stage != SpatialSecurityCheckpointStage.Queue || slot < 0 || slot >= QueueCapacity || slot == PlayerQueueSlot)
             return false;
 
         var distance = PlayerQueueSlot - slot;
@@ -137,10 +121,7 @@ public sealed class SpatialSecurityCheckpointModel
         return true;
     }
 
-    /// <summary>
-    /// Advances one Digitens' physical security processing. People ahead of the
-    /// visitor are processed one at a time; people behind wait for the visitor.
-    /// </summary>
+    /// <summary>Processes the Digitens ahead of the visitor one physical screening step at a time.</summary>
     public void AdvanceQueueTraffic()
     {
         if (Stage != SpatialSecurityCheckpointStage.Queue) return;
@@ -148,16 +129,15 @@ public sealed class SpatialSecurityCheckpointModel
         var front = _agents.FirstOrDefault(agent => agent.QueueSlot == 0);
         if (front.Id is not null)
         {
-            var stage = GetAgentStage(front.Id);
-            switch (stage)
+            switch (GetAgentStage(front.Id))
             {
                 case SpatialSecurityAgentStage.Waiting:
                     _serviceStages[front.Id] = SpatialSecurityAgentStage.Tray;
-                    LastMessage = $"{front.Name} reached the screening equipment.";
+                    LastMessage = $"{front.Name} reached the tray.";
                     break;
                 case SpatialSecurityAgentStage.Tray:
                     _serviceStages[front.Id] = SpatialSecurityAgentStage.XRay;
-                    LastMessage = $"{front.Name} placed belongings on the tray.";
+                    LastMessage = $"{front.Name} sent belongings through X-ray.";
                     break;
                 case SpatialSecurityAgentStage.XRay:
                     _serviceStages[front.Id] = SpatialSecurityAgentStage.Scanner;
@@ -170,11 +150,11 @@ public sealed class SpatialSecurityCheckpointModel
                 case SpatialSecurityAgentStage.Cleared:
                     _agents.Remove(front);
                     _serviceStages.Remove(front.Id);
-                    for (var index = 0; index < _agents.Count; index++)
+                    for (var i = 0; i < _agents.Count; i++)
                     {
-                        var agent = _agents[index];
+                        var agent = _agents[i];
                         if (agent.QueueSlot > 0 && agent.QueueSlot < PlayerQueueSlot)
-                            _agents[index] = agent with { QueueSlot = agent.QueueSlot - 1 };
+                            _agents[i] = agent with { QueueSlot = agent.QueueSlot - 1 };
                     }
                     LastMessage = "THE FRONT OF THE LINE OPENED. MOVE INTO THE SPACE.";
                     break;
@@ -201,7 +181,7 @@ public sealed class SpatialSecurityCheckpointModel
         {
             _agents[_agents.FindIndex(agent => agent.Id == next.Id)] =
                 next with { QueueSlot = PlayerQueueSlot + 1 };
-            LastMessage = $"{next.Name} moved into the open space behind you.";
+            LastMessage = $"{next.Name} moved closer.";
         }
 
         RefreshSpeech();
@@ -212,7 +192,7 @@ public sealed class SpatialSecurityCheckpointModel
         if (Stage != SpatialSecurityCheckpointStage.TrayReady) return false;
         TrayOnRollers = true;
         Stage = SpatialSecurityCheckpointStage.TrayLoaded;
-        LastMessage = "TRAY ON ROLLERS. Click the tray to place your belongings on it.";
+        LastMessage = "THE TRAY IS ON THE ROLLERS. PUT YOUR BELONGINGS ON IT.";
         return true;
     }
 
@@ -221,7 +201,7 @@ public sealed class SpatialSecurityCheckpointModel
         if (Stage != SpatialSecurityCheckpointStage.TrayLoaded || !TrayOnRollers) return false;
         BelongingsOnTray = true;
         Stage = SpatialSecurityCheckpointStage.Scanner;
-        LastMessage = "BELONGINGS LOADED. Walk through the scanner and wait for the agent.";
+        LastMessage = "BELONGINGS ARE MOVING THROUGH X-RAY. NOW WALK THROUGH.";
         return true;
     }
 
@@ -230,7 +210,7 @@ public sealed class SpatialSecurityCheckpointModel
         if (Stage != SpatialSecurityCheckpointStage.Scanner || !BelongingsOnTray) return false;
         ScannerCleared = true;
         Stage = SpatialSecurityCheckpointStage.Collection;
-        LastMessage = "WAIT... OK, GOOD! Proceed to the collection point.";
+        LastMessage = "SCANNER CLEARED. GO TO THE OTHER SIDE AND COLLECT YOUR TRAY.";
         return true;
     }
 
@@ -238,7 +218,7 @@ public sealed class SpatialSecurityCheckpointModel
     {
         if (Stage != SpatialSecurityCheckpointStage.Collection || !ScannerCleared) return false;
         Stage = SpatialSecurityCheckpointStage.Cleared;
-        LastMessage = $"SECURITY CLEAR. Badge {BadgeId} // {BadgeClearance}. You may roam within your clearance.";
+        LastMessage = $"SECURITY CLEAR. BADGE {BadgeId} // {BadgeClearance}.";
         return true;
     }
 
@@ -253,42 +233,6 @@ public sealed class SpatialSecurityCheckpointModel
         return true;
     }
 
-    public void AdvanceQueueTraffic()
-    {
-        if (Stage != SpatialSecurityCheckpointStage.Queue) return;
-
-        // The checkpoint service point consumes the person at the front,
-        // then everyone behind them advances into the vacated spaces.
-        if (_agents.Any(agent => agent.QueueSlot == 0))
-        {
-            _agents.RemoveAll(agent => agent.QueueSlot == 0);
-            for (var index = 0; index < _agents.Count; index++)
-            {
-                var agent = _agents[index];
-                if (agent.QueueSlot > 0)
-                    _agents[index] = agent with { QueueSlot = agent.QueueSlot - 1 };
-            }
-
-            LastMessage = "SECURITY CALLED THE NEXT PERSON. A SPACE JUST OPENED IN THE LINE.";
-            return;
-        }
-
-        for (var index = 0; index < _agents.Count; index++)
-        {
-            var agent = _agents[index];
-            if (agent.QueueSlot <= 0) continue;
-
-            var target = agent.QueueSlot - 1;
-            if (target == PlayerQueueSlot || _agents.Any(other => other.Id != agent.Id && other.QueueSlot == target))
-                continue;
-
-            _agents[index] = agent with { QueueSlot = target };
-            LastMessage = $"{agent.Name} moved forward. Click the vacated space to advance.";
-            return;
-        }
-    }
-}
-
     private void RefreshSpeech()
     {
         _agentSpeech.Clear();
@@ -299,12 +243,9 @@ public sealed class SpatialSecurityCheckpointModel
                 _agentSpeech[agent.Id] = "MOVE UP.";
             else if (agent.QueueSlot == PlayerQueueSlot + 1)
                 _agentSpeech[agent.Id] = "COME ON. MOVE.";
-            else if (agent.QueueSlot < PlayerQueueSlot)
-                _agentSpeech[agent.Id] = GetAgentStage(agent.Id) is SpatialSecurityAgentStage.Scanner or SpatialSecurityAgentStage.Cleared
-                    ? "KEEP THE LINE MOVING."
-                    : string.Empty;
-            else
-                _agentSpeech[agent.Id] = string.Empty;
+            else if (agent.QueueSlot < PlayerQueueSlot &&
+                     GetAgentStage(agent.Id) is SpatialSecurityAgentStage.Scanner or SpatialSecurityAgentStage.Cleared)
+                _agentSpeech[agent.Id] = "KEEP THE LINE MOVING.";
         }
     }
 
