@@ -10,8 +10,10 @@ public sealed class SingularityRouting : ISingularityRouting
 {
     private readonly Dictionary<string, SingularityRoute> _routes = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Gets all routes currently registered with the router.</summary>
     public IReadOnlyCollection<SingularityRoute> Routes => _routes.Values;
 
+    /// <summary>Registers a route when its path is not already occupied.</summary>
     public bool Register(SingularityRoute route)
     {
         if (route.RouteId == 0 || route.ExperienceId == 0 || string.IsNullOrWhiteSpace(route.Path))
@@ -24,6 +26,7 @@ public sealed class SingularityRouting : ISingularityRouting
         return true;
     }
 
+    /// <summary>Removes a route by path.</summary>
     public bool Remove(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -31,6 +34,7 @@ public sealed class SingularityRouting : ISingularityRouting
         return _routes.Remove(path);
     }
 
+    /// <summary>Attempts to resolve a route by path.</summary>
     public bool TryResolve(string path, out SingularityRoute route)
     {
         if (string.IsNullOrWhiteSpace(path))
