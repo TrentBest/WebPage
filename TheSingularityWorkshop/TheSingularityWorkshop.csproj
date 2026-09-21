@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Public API documentation is expanded incrementally; do not turn every undocumented member into build noise. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <BlazorEnableCompression>false</BlazorEnableCompression>
   </PropertyGroup>
 
