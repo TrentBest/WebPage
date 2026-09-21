@@ -42,6 +42,21 @@ public sealed class SpatialSecurityCheckpointTests
     }
 
     [Fact]
+    public void Queue_Behind_Visitor_Becomes_Agitated_When_Visitor_Does_Not_Move()
+    {
+        var checkpoint = new SpatialSecurityCheckpointModel();
+        checkpoint.EnterQueue();
+
+        checkpoint.AdvanceQueueTraffic();
+        Assert.False(checkpoint.Agitated);
+
+        checkpoint.AdvanceQueueTraffic();
+
+        Assert.True(checkpoint.Agitated);
+        Assert.Contains("MOVE", checkpoint.GetAgentSpeech("security-research-03") ?? string.Empty);
+    }
+
+    [Fact]
     public void Tray_XRay_Scanner_And_Collection_Are_Separate_Physical_Stations()
     {
         var checkpoint = new SpatialSecurityCheckpointModel();
