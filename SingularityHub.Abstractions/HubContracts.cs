@@ -46,7 +46,6 @@ public enum MutationType
 }
 
 /// <summary>Reusable capability with a once-only load phase followed by bounded arbitration.</summary>
-/// <summary>Reusable capability with a once-only load phase followed by bounded arbitration.</summary>
 public interface IMicroBundle
 {
     /// <summary>Stable bundle identity.</summary>
