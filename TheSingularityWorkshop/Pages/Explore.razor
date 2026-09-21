@@ -251,7 +251,7 @@
                 SecurityCheckpoint,
                 LaboratoryTraffic,
                 Experience.User.DisplayName,
-                EnterSecurityCheckpoint,
+                HandleSecurityWorldClick,
                 MoveSecurityQueue,
                 PlaceSecurityTray,
                 LoadSecurityBelongings,
@@ -824,6 +824,14 @@
         HolodeckMaze.Reset();
         insideRoomId = "lab-holodeck";
         selectedLeaderboardEntry = null;
+    }
+
+    private void HandleSecurityWorldClick(MouseEventArgs args)
+    {
+        // Arrival is a physical threshold. Once inside, the Digitens and the
+        // equipment own the interactions; there are no queue-control buttons.
+        if (SecurityCheckpoint.Stage == SpatialSecurityCheckpointStage.Approach)
+            EnterSecurityCheckpoint();
     }
 
     private void EnterSecurityCheckpoint()
