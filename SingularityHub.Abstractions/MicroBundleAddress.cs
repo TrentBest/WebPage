@@ -13,6 +13,7 @@ public readonly record struct MicroBundleAddress(OntologySignature Ontology, int
     /// </summary>
     public const long VariantCapacity = int.MaxValue;
 
+    /// <summary>Gets whether the variant occupies a valid non-negative address slot.</summary>
     public bool IsValid => VariantId >= 0 && VariantId < int.MaxValue;
 
     /// <summary>
@@ -34,6 +35,7 @@ public readonly record struct MicroBundleAddress(OntologySignature Ontology, int
         }
     }
 
+    /// <summary>Creates and validates a MicroBundle address.</summary>
     public static MicroBundleAddress Create(OntologySignature ontology, int variantId)
     {
         var address = new MicroBundleAddress(ontology, variantId);
