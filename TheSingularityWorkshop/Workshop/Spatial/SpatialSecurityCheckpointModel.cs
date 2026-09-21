@@ -29,6 +29,8 @@ public sealed class SpatialSecurityCheckpointModel
     public bool Agitated { get; private set; }
     public int CutAttempts { get; private set; }
     public int QueueProgresses { get; private set; }
+    public int ServicePulse { get; private set; }
+    public int QueueWaitTicks { get; private set; }
     public string LastMessage { get; private set; } = "Join the line.";
     public IReadOnlyList<SpatialSecurityQueueAgent> Agents => _agents;
     public IReadOnlyDictionary<string, string> AgentSpeech => _agentSpeech;
@@ -63,6 +65,8 @@ public sealed class SpatialSecurityCheckpointModel
         Agitated = false;
         CutAttempts = 0;
         QueueProgresses = 0;
+        ServicePulse = 0;
+        QueueWaitTicks = 0;
         LastMessage = "Join the line.";
 
         _serviceStages.Clear();
@@ -119,6 +123,7 @@ public sealed class SpatialSecurityCheckpointModel
 
         PlayerQueueSlot = slot;
         QueueProgresses++;
+        QueueWaitTicks = 0;
         Agitated = false;
         LastMessage = slot == 0
             ? "YOU ARE NEXT. THE SECURITY EQUIPMENT IS AHEAD."
@@ -137,6 +142,9 @@ public sealed class SpatialSecurityCheckpointModel
         if (Stage != SpatialSecurityCheckpointStage.Queue)
             return;
 
+        QueueWaitTicks++;
+        Agitated |= QueueWaitTicks >= 2;
+
         var front = _agents.FirstOrDefault(agent => agent.QueueSlot == 0);
 
         if (front.Id is not null)
@@ -150,6 +158,7 @@ public sealed class SpatialSecurityCheckpointModel
 
             _agents.Remove(front);
             _serviceStages.Remove(front.Id);
+            ServicePulse++;
 
             // Close the physical line only for people ahead of the visitor.
             // The resulting empty position teaches the visitor where to move.
@@ -239,7 +248,7 @@ public sealed class SpatialSecurityCheckpointModel
             if (agent.QueueSlot == PlayerQueueSlot - 1)
                 _agentSpeech[agent.Id] = "MOVE UP.";
             else if (agent.QueueSlot == PlayerQueueSlot + 1)
-                _agentSpeech[agent.Id] = "COME ON. MOVE.";
+                _agentSpeech[agent.Id] = Agitated ? "MOVE. COME ON." : "COME ON. MOVE.";
             else if (agent.QueueSlot < PlayerQueueSlot &&
                      GetAgentStage(agent.Id) is SpatialSecurityAgentStage.Scanner or SpatialSecurityAgentStage.Cleared)
                 _agentSpeech[agent.Id] = "KEEP THE LINE MOVING.";
