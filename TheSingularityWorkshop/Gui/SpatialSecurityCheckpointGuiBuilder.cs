@@ -361,7 +361,7 @@ public static class SpatialSecurityCheckpointGuiBuilder
                 .Text(checkpoint.LastMessage));
 
         frame.Content(WorkshopGui.Element(receiver, "style")
-            .Text("@keyframes security-digitens-agitated{0%,100%{transform:translateX(0)}25%{transform:translateX(-.7px)}75%{transform:translateX(.7px)}}@keyframes security-digitens-service{0%{transform:translate(0,0);opacity:1}20%{transform:translate(12px,16px)}42%{transform:translate(28px,16px)}68%{transform:translate(49px,20px)}100%{transform:translate(64px,22px);opacity:.15}}"));
+            .Text("@keyframes security-digitens-agitated{0%,100%{filter:brightness(1)}50%{filter:brightness(2.2)}}"));
 
         return frame;
     }
