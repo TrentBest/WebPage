@@ -30,6 +30,20 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
 .workshop-page.workshop-chrome-visible .workshop-top-row-placeholder { flex-basis: 3.5rem; height: 3.5rem; min-height: 3.5rem; padding-left: 2rem !important; padding-right: 1.5rem !important; border-bottom-width: 1px; opacity: 1; }
 .workshop-page .workshop-content { will-change: flex-basis, height, width; }
 
+/* Explore is a spatial viewport, not a page framed by application chrome.
+   Its buildings establish their own camera scale and may intentionally extend
+   beyond the screen; the global tab header must not clip the world. */
+.workshop-spatial-page .workshop-sidebar { display: none !important; }
+.workshop-spatial-page main { width: 100%; height: 100dvh; }
+.workshop-spatial-page .top-row { display: none !important; }
+.workshop-spatial-page article.workshop-content {
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+
 /* The Hub manifests as one physical gesture: the chrome grows from a hairline
    into its full geometry while its border wakes from dark cyan through a brief
    white-hot peak and settles into a living breath. */
