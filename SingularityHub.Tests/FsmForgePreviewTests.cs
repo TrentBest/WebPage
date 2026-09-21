@@ -59,9 +59,9 @@ public sealed class FsmForgePreviewTests
     [Fact(DisplayName = "FSM Forge stocks reusable lifecycle and transition products")]
     public void CatalogContainsReusableProducts()
     {
-        Assert.Contains(FsmForgeCatalog.Products, x => x.Id == "on-enter");
-        Assert.Contains(FsmForgeCatalog.Products, x => x.Id == "on-update");
-        Assert.Contains(FsmForgeCatalog.Products, x => x.Id == "on-exit");
-        Assert.Contains(FsmForgeCatalog.Products, x => x.Id == "conditional-transition");
+        Assert.Contains(TheSingularityWorkshop.Infrastructure.FsmForge.FsmForgeCatalog.Products, x => x.Id == "on-enter");
+        Assert.Contains(TheSingularityWorkshop.Infrastructure.FsmForge.FsmForgeCatalog.Products, x => x.Id == "on-update");
+        Assert.Contains(TheSingularityWorkshop.Infrastructure.FsmForge.FsmForgeCatalog.Products, x => x.Id == "on-exit");
+        Assert.Contains(TheSingularityWorkshop.Infrastructure.FsmForge.FsmForgeCatalog.Products, x => x.Id == "conditional-transition");
     }
 }
