@@ -262,10 +262,10 @@ public static class SpatialSecurityCheckpointGuiBuilder
                 .Attribute("id", $"security-service-{checkpoint.ServicePulse}")
                 .Style("pointer-events", "none");
             service.Child(WorkshopGui.Element(receiver, "circle")
-                .Attribute("cx", "42").Attribute("cy", "25")
+                 .Attribute("cx", "42").Attribute("cy", "29")
                 .Attribute("r", "1.15").Attribute("fill", Cyan));
             service.Child(WorkshopGui.Element(receiver, "path")
-                .Attribute("d", "M 40.4 30 Q 42 27 43.6 30 L 44 34 H 40 Z")
+                 .Attribute("d", "M 40.4 34 Q 42 31 43.6 34 L 44 38 H 40 Z")
                 .Attribute("fill", $"{Cyan}33").Attribute("stroke", Cyan).Attribute("stroke-width", ".3"));
             service.Child(WorkshopGui.Element(receiver, "animateTransform")
                 .Attribute("attributeName", "transform")
