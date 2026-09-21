@@ -2,6 +2,7 @@ namespace TheSingularityWorkshop.Gui;
 
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Components.Web;
 
 /// <summary>
 /// Spatial presentation of a reusable airport-style security checkpoint.
@@ -162,7 +163,9 @@ public static class SpatialSecurityCheckpointGuiBuilder
         svg.Child(WorkshopGui.Element(receiver, "rect")
             .Attribute("x", trayX).Attribute("y", trayY).Attribute("width", "12").Attribute("height", "5").Attribute("rx", "1")
             .Attribute("fill", checkpoint.TrayOnRollers ? $"{Yellow}32" : "#10232c")
-            .Attribute("stroke", Yellow).Attribute("stroke-width", ".5"));
+            .Attribute("stroke", Yellow).Attribute("stroke-width", ".5")
+            .OnClick(_ => checkpoint.Stage == SpatialSecurityCheckpointStage.TrayReady ? placeTray() : loadBelongings())
+            .StopPropagation("onclick"));
         if (checkpoint.BelongingsOnTray)
             svg.Child(WorkshopGui.Element(receiver, "rect")
                 .Attribute("x", "57").Attribute("y", "44").Attribute("width", "6").Attribute("height", "3")
@@ -175,7 +178,8 @@ public static class SpatialSecurityCheckpointGuiBuilder
             .Attribute("fill", "#091a23").Attribute("stroke", Cyan).Attribute("stroke-width", ".7"));
         svg.Child(WorkshopGui.Element(receiver, "path")
             .Attribute("d", "M 68 37 H 77 V 52 H 68 Z")
-            .Attribute("fill", Ink).Attribute("stroke", "#39717e").Attribute("stroke-width", ".35"));
+            .Attribute("fill", Ink).Attribute("stroke", "#39717e").Attribute("stroke-width", ".35")
+            .OnClick(_ => loadBelongings()).StopPropagation("onclick"));
         svg.Child(Label(receiver, 67, 32, "SCREENING CORE", Cyan, .85));
 
         // Body scanner portal.
@@ -228,95 +232,3 @@ public static class SpatialSecurityCheckpointGuiBuilder
 
     private static ElementBuilder Frame(object receiver, SpatialSecurityCheckpointModel checkpoint, SpatialLaboratoryTrafficModel traffic)
     {
-        var now = TimeOnly.FromDateTime(DateTime.Now);
-        var accent = checkpoint.Agitated ? Red : checkpoint.HasClearedCheckpoint ? Green : Cyan;
-
-        // Inset frame + inset title eliminates the old header clipping.
-        var frame = WorkshopGui.Panel(receiver)
-            .Style("position", "fixed").Style("inset", "1.1rem")
-            .Style("pointer-events", "none").Style("border", $"1px solid {Cyan}66")
-            .Style("box-sizing", "border-box").Style("z-index", "80");
-
-        frame.Content(WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", "1.4rem").Style("top", "1.25rem")
-            .Style("padding", ".35rem .75rem").Style("background", Ink)
-            .Style("font-size", "clamp(1rem,1.35vw,1.35rem)").Style("font-weight", "700")
-            .Style("letter-spacing", ".13em").Style("color", Yellow)
-            .Text("SINGULARITY LABORATORY // SECURITY"));
-
-        frame.Content(WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("right", "1.4rem").Style("top", "1.3rem")
-            .Style("padding", ".35rem .65rem").Style("background", Ink)
-            .Style("font-size", "clamp(.8rem,1vw,1rem)").Style("letter-spacing", ".1em")
-            .Style("color", accent).Text(checkpoint.HasClearedCheckpoint ? "THRESHOLD OPEN" : "ACTIVE"));
-
-        frame.Content(WorkshopGui.Element(receiver, "div")
-            .Style("position", "absolute").Style("left", "1.4rem").Style("bottom", "1.25rem")
-            .Style("padding", ".3rem .55rem").Style("background", Ink)
-            .Style("font-size", "clamp(.72rem,.9vw,.9rem)").Style("letter-spacing", ".08em")
-            .Style("color", Muted)
-            .Text(checkpoint.HasClearedCheckpoint ? "THE MAP IS THE SPATIAL TRUTH" : $"GUARDS // {traffic.OnDutyGuards(now).Count} ON DUTY"));
-
-        if (!checkpoint.HasClearedCheckpoint)
-            frame.Content(WorkshopGui.Element(receiver, "div")
-                .Style("position", "absolute").Style("left", "50%").Style("transform", "translateX(-50%)")
-                .Style("bottom", "1.25rem").Style("max-width", "45vw")
-                .Style("padding", ".3rem .65rem").Style("background", Ink)
-                .Style("font-family", "system-ui,sans-serif")
-                .Style("font-size", "clamp(.8rem,1vw,1rem)").Style("text-align", "center")
-                .Style("color", White).Text(checkpoint.LastMessage));
-
-        return frame;
-    }
-
-    private static ElementBuilder Hotspot(object receiver, string label, string left, string top, string width, string height, string accent, Action action)
-        => WorkshopGui.Button(receiver).Label(label)
-            .Style("pointer-events", "auto").Style("position", "absolute")
-            .Style("left", left).Style("top", top).Style("width", width).Style("height", height)
-            .Style("box-sizing", "border-box").Style("background", $"{accent}08")
-            .Style("border", $"1px solid {accent}35").Style("color", $"{accent}aa")
-            .Style("font-family", "inherit").Style("font-size", "clamp(.85rem,1vw,1rem)")
-            .Style("font-weight", "700").Style("letter-spacing", ".1em").Style("cursor", "pointer")
-            .OnClick(action);
-
-    private static void DrawPerson(object receiver, ElementBuilder svg, double x, double y, string color, bool highlighted)
-    {
-        var scale = highlighted ? 1.35 : 1;
-        svg.Child(WorkshopGui.Element(receiver, "circle")
-            .Attribute("cx", x.ToString("0.##")).Attribute("cy", (y - 4 * scale).ToString("0.##"))
-            .Attribute("r", (1.2 * scale).ToString("0.##")).Attribute("fill", color));
-        svg.Child(WorkshopGui.Element(receiver, "path")
-            .Attribute("d",
-                $"M {x - 1.6 * scale} {y + 1.5 * scale} " +
-                $"Q {x} {y - 1.5 * scale} {x + 1.6 * scale} {y + 1.5 * scale} " +
-                $"L {x + 2 * scale} {y + 5 * scale} H {x - 2 * scale} Z")
-            .Attribute("fill", highlighted ? $"{color}55" : $"{color}22")
-            .Attribute("stroke", color).Attribute("stroke-width", highlighted ? ".45" : ".3"));
-    }
-
-    private static string ServiceText(SpatialSecurityAgentStage stage)
-        => stage switch
-        {
-            SpatialSecurityAgentStage.Tray => "TRAY",
-            SpatialSecurityAgentStage.XRay => "X-RAY",
-            SpatialSecurityAgentStage.Scanner => "SCAN",
-            SpatialSecurityAgentStage.Cleared => "CLEAR",
-            _ => "NEXT"
-        };
-
-    private static ElementBuilder Speech(object receiver, double x, double y, string text, string color)
-        => WorkshopGui.Element(receiver, "g")
-            .Child(WorkshopGui.Element(receiver, "rect")
-                .Attribute("x", x).Attribute("y", y - 2.2)
-                .Attribute("width", Math.Max(12, text.Length * .42)).Attribute("height", "3.5")
-                .Attribute("rx", "1").Attribute("fill", Ink).Attribute("stroke", color).Attribute("stroke-width", ".3"))
-            .Child(Label(receiver, x + .8, y, text, color, .62));
-
-    private static ElementBuilder Label(object receiver, double x, double y, string text, string color, double size)
-        => WorkshopGui.Element(receiver, "text")
-            .Attribute("x", x.ToString("0.##")).Attribute("y", y.ToString("0.##"))
-            .Attribute("fill", color).Attribute("font-size", size.ToString("0.##"))
-            .Attribute("font-family", "Consolas,'Courier New',monospace")
-            .Attribute("font-weight", size >= 1 ? "700" : "400")
-            .Attribute("letter-spacing", size >= 1 ? ".06em" : ".03em").Text(text);
-}
