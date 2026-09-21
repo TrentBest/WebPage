@@ -214,7 +214,7 @@
             return SpatialConstructionExperienceGuiBuilder.Build(this, Scene.ConstructionExperience, Experience.User.DisplayName, AvatarX, AvatarY, constructionZoom, SetConstructionZoom, HandleKeyDown, HandleConstructionWorldClick, ExitRoom);
 
         if (insideRoomId == "maze")
-            return SpatialMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
+            return SpatialAuthoredMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
 
         if (insideRoomId == "singularity-shipyard")
             return SpatialShipyardGuiBuilder.Build(this, ShipyardManifest, ShipDesignManifest, Experience.User.DisplayName, ExitRoom);
