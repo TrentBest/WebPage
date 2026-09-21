@@ -21,213 +21,262 @@ public static class SpatialSecurityCheckpointGuiBuilder
     private const string Ink = "#02080f";
 
     public static ElementBuilder Build(
-        object receiver,
-        SpatialSecurityCheckpointModel checkpoint,
-        SpatialLaboratoryTrafficModel traffic,
-        string userName,
-        Action enterQueue,
-        Action<int> moveQueue,
-        Action placeTray,
-        Action loadBelongings,
-        Action scanner,
-        Action collectTray,
-        Action returnToCampus,
-        Action enterFacility)
+        object receiver, SpatialSecurityCheckpointModel checkpoint, SpatialLaboratoryTrafficModel traffic,
+        string userName, Action enterQueue, Action<int> moveQueue, Action placeTray, Action loadBelongings,
+        Action scanner, Action collectTray, Action returnToCampus, Action enterFacility)
     {
         var root = WorkshopGui.Panel(receiver)
-            .Style("position", "fixed").Style("inset", "0")
-            .Style("overflow", "hidden")
-            .Style("background", Ink)
-            .Style("color", White)
+            .Style("position", "fixed").Style("inset", "0").Style("overflow", "hidden")
+            .Style("background", Ink).Style("color", White)
             .Style("font-family", "Consolas,'Courier New',monospace");
 
-        root.Content(FloorPlan(receiver, checkpoint, userName));
+        root.Content(Environment(receiver, checkpoint, userName));
         root.Content(InteractionLayer(receiver, checkpoint, enterQueue, moveQueue, placeTray, loadBelongings, scanner, collectTray, enterFacility));
-        root.Content(Header(receiver, checkpoint, traffic));
-        root.Content(Status(receiver, checkpoint));
-        root.Content(WorkshopGui.Button(receiver).Label("← RETURN TO CAMPUS")
-            .Style("position", "fixed").Style("right", "1rem").Style("bottom", "1rem")
-            .Style("z-index", "75").Style("padding", ".75rem 1rem")
-            .Style("background", "rgba(1,6,12,.94)").Style("border", $"1px solid {Muted}66")
-            .Style("color", Muted).Style("font-family", "inherit").Style("cursor", "pointer")
-            .OnClick(returnToCampus));
-
+        root.Content(Frame(receiver, checkpoint, traffic));
+        root.Content(WorkshopGui.Button(receiver).Label("RETURN")
+            .Style("position", "fixed").Style("right", "2rem").Style("bottom", "2rem")
+            .Style("z-index", "90").Style("padding", ".85rem 1.25rem")
+            .Style("background", "rgba(2,8,15,.9)").Style("border", $"1px solid {Muted}88")
+            .Style("color", White).Style("font-family", "inherit").Style("font-size", "1rem")
+            .Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(returnToCampus));
         return root;
     }
 
-    private static ElementBuilder FloorPlan(object receiver, SpatialSecurityCheckpointModel checkpoint, string userName)
+    private static ElementBuilder Environment(object receiver, SpatialSecurityCheckpointModel checkpoint, string userName)
     {
         var svg = WorkshopGui.Element(receiver, "svg")
-            .Attribute("viewBox", "0 0 120 72")
-            .Style("position", "absolute").Style("inset", "0")
-            .Style("width", "100vw").Style("height", "100vh");
+            .Attribute("viewBox", "0 0 120 72").Style("position", "absolute")
+            .Style("inset", "0").Style("width", "100vw").Style("height", "100vh");
 
-        svg.Child(WorkshopGui.Element(receiver, "rect").Attribute("width", "120").Attribute("height", "72").Attribute("fill", "#031019"));
-        svg.Child(WorkshopGui.Element(receiver, "path").Attribute("d", "M 4 6 H 116 V 66 H 4 Z")
-            .Attribute("fill", "#061923").Attribute("stroke", Cyan).Attribute("stroke-width", ".35"));
-        svg.Child(WorkshopGui.Element(receiver, "path").Attribute("d", "M 7 17 H 46 V 60 H 7 Z")
-            .Attribute("fill", "#081b24").Attribute("stroke", "#31515f").Attribute("stroke-width", ".3"));
+        svg.Child(WorkshopGui.Element(receiver, "rect").Attribute("width", "120").Attribute("height", "72").Attribute("fill", Ink));
+        svg.Child(WorkshopGui.Element(receiver, "rect")
+            .Attribute("x", "3").Attribute("y", "4").Attribute("width", "114").Attribute("height", "64")
+            .Attribute("fill", "#06131b").Attribute("stroke", "#23404b").Attribute("stroke-width", ".35"));
 
-        svg.Child(Label(receiver, 8, 10, "SINGULARITY LABORATORY", Yellow, 2.1));
-        svg.Child(Label(receiver, 8, 14, "BUILDING ENTRY → SECURITY → CLEARED FACILITY", Muted, .85));
-        svg.Child(Label(receiver, 10, 21, "QUEUE", Cyan, 1.1));
+        // The floor is the interface. No queue cards, tables, or status lists.
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 5 25 H 115 V 65 H 5 Z")
+            .Attribute("fill", "#071820").Attribute("stroke", "#31515f").Attribute("stroke-width", ".25"));
 
-        for (var slot = 0; slot < SpatialSecurityCheckpointModel.QueueCapacity; slot++)
-        {
-            var y = 26 + slot * 6;
-            var agent = checkpoint.Agents.FirstOrDefault(item => item.QueueSlot == slot);
-            var player = checkpoint.PlayerQueueSlot == slot;
-            var occupied = agent != default;
-            var accent = player ? Magenta : occupied ? Yellow : Green;
+        for (var x = 7; x <= 113; x += 7)
+            svg.Child(WorkshopGui.Element(receiver, "path")
+                .Attribute("d", $"M {x} 25 L {x + 5} 65")
+                .Attribute("stroke", "#17313b").Attribute("stroke-width", ".16"));
 
+        for (var y = 31; y <= 61; y += 6)
+            svg.Child(WorkshopGui.Element(receiver, "path")
+                .Attribute("d", $"M 5 {y} H 115")
+                .Attribute("stroke", "#17313b").Attribute("stroke-width", ".16"));
+
+        // Heavy security threshold.
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 6 25 V 12 H 43 V 25")
+            .Attribute("fill", "#0b2029").Attribute("stroke", Cyan).Attribute("stroke-width", ".45"));
+        svg.Child(WorkshopGui.Element(receiver, "rect")
+            .Attribute("x", "9").Attribute("y", "15").Attribute("width", "31").Attribute("height", "7")
+            .Attribute("fill", Ink).Attribute("stroke", "#31515f").Attribute("stroke-width", ".3"));
+        svg.Child(Label(receiver, 11, 19.8, "SECURITY THRESHOLD", Yellow, 1.25));
+        svg.Child(Label(receiver, 11, 23.5, "CONTROLLED ACCESS", Muted, .7));
+
+        // Physical approach lane and people.
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 15 27 H 44").Attribute("stroke", Cyan).Attribute("stroke-width", "1")
+            .Attribute("stroke-dasharray", "3 2").Attribute("opacity", ".65"));
+        svg.Child(Label(receiver, 17, 34, "WALK THE PLAN", Cyan, .95));
+        DrawPerson(receiver, svg, 20, 42, Yellow, false);
+        DrawPerson(receiver, svg, 27, 49, Yellow, false);
+        DrawPerson(receiver, svg, 34, 56, Muted, false);
+        DrawPerson(receiver, svg, 42, 39, Magenta, true);
+        svg.Child(Label(receiver, 38, 46, userName.ToUpperInvariant(), Magenta, .75));
+
+        // Physical conveyor and tray.
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 45 39 H 78 L 82 57 H 49 Z")
+            .Attribute("fill", "#0d222c").Attribute("stroke", Yellow).Attribute("stroke-width", ".45"));
+        for (var x = 51; x <= 76; x += 5)
+            svg.Child(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", x.ToString()).Attribute("y1", "40").Attribute("x2", (x + 3).ToString()).Attribute("y2", "55")
+                .Attribute("stroke", "#45616b").Attribute("stroke-width", ".65"));
+
+        var trayX = checkpoint.TrayOnRollers ? "54" : "48";
+        var trayY = checkpoint.TrayOnRollers ? "43" : "45";
+        svg.Child(WorkshopGui.Element(receiver, "rect")
+            .Attribute("x", trayX).Attribute("y", trayY).Attribute("width", "12").Attribute("height", "5").Attribute("rx", "1")
+            .Attribute("fill", checkpoint.TrayOnRollers ? $"{Yellow}32" : "#10232c")
+            .Attribute("stroke", Yellow).Attribute("stroke-width", ".5"));
+        if (checkpoint.BelongingsOnTray)
             svg.Child(WorkshopGui.Element(receiver, "rect")
-                .Attribute("x", "12").Attribute("y", y.ToString("0.##"))
-                .Attribute("width", "28").Attribute("height", "4").Attribute("rx", "1")
-                .Attribute("fill", $"{accent}12").Attribute("stroke", accent).Attribute("stroke-width", ".35"));
+                .Attribute("x", "57").Attribute("y", "44").Attribute("width", "6").Attribute("height", "3")
+                .Attribute("fill", $"{Cyan}55").Attribute("stroke", Cyan).Attribute("stroke-width", ".3"));
+        svg.Child(Label(receiver, 48, 38, "DIVEST", Yellow, 1.05));
 
-            var name = player ? "YOU" : occupied ? agent.Name : "VACATED";
-            svg.Child(Label(receiver, 26, y + 2.6, name, accent, .75));
+        // X-ray machine: a physical volume, not a flowchart box.
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 65 34 H 80 V 55 H 65 Z")
+            .Attribute("fill", "#091a23").Attribute("stroke", Cyan).Attribute("stroke-width", ".7"));
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 68 37 H 77 V 52 H 68 Z")
+            .Attribute("fill", Ink).Attribute("stroke", "#39717e").Attribute("stroke-width", ".35"));
+        svg.Child(Label(receiver, 67, 32, "SCREENING CORE", Cyan, .85));
+
+        // Body scanner portal.
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 84 57 V 38 Q 84 34 88 34 H 96 Q 100 34 100 38 V 57")
+            .Attribute("fill", "none").Attribute("stroke", Magenta).Attribute("stroke-width", "1.2"));
+        svg.Child(Label(receiver, 84, 31.8, "WALK THROUGH", Magenta, .9));
+
+        // Collection zone.
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 101 40 H 112 V 54 H 101 Z")
+            .Attribute("fill", "#0a1d25").Attribute("stroke", Green).Attribute("stroke-width", ".55"));
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 103 43 H 110 M 103 47 H 110 M 103 51 H 110")
+            .Attribute("stroke", "#4c7760").Attribute("stroke-width", ".5"));
+        svg.Child(Label(receiver, 101, 37.5, "COLLECTION", Green, .9));
+
+        if (checkpoint.HasClearedCheckpoint)
+        {
+            svg.Child(WorkshopGui.Element(receiver, "path")
+                .Attribute("d", "M 106 25 V 17 H 115 V 25")
+                .Attribute("fill", $"{Green}18").Attribute("stroke", Green).Attribute("stroke-width", ".65"));
+            svg.Child(Label(receiver, 106.5, 15, "CLEARED", Green, .9));
+            svg.Child(Label(receiver, 105, 28.5, "FACILITY ACCESS", Green, .65));
         }
 
-        Station(receiver, svg, 49, 22, 13, 15, "TRAY", Yellow,
-            checkpoint.Stage == SpatialSecurityCheckpointStage.TrayReady, checkpoint.TrayOnRollers);
-        Station(receiver, svg, 64, 22, 18, 15, "X-RAY", Cyan,
-            checkpoint.TrayOnRollers, checkpoint.BelongingsOnTray);
-        Station(receiver, svg, 84, 22, 13, 15, "SCANNER", Magenta,
-            checkpoint.Stage == SpatialSecurityCheckpointStage.Scanner, checkpoint.ScannerCleared);
-        Station(receiver, svg, 99, 22, 12, 15, "COLLECT", Green,
-            checkpoint.Stage == SpatialSecurityCheckpointStage.Collection, checkpoint.HasClearedCheckpoint);
-
-        svg.Child(WorkshopGui.Element(receiver, "path").Attribute("d", "M 46 29 H 113")
-            .Attribute("stroke", "#6d8b95").Attribute("stroke-width", ".7").Attribute("stroke-dasharray", "1.4 1.4"));
-
-        svg.Child(Label(receiver, 50, 42, "← CLICK THE PHYSICAL STATION TO PROGRESS →", Muted, .8));
-        svg.Child(Label(receiver, 49, 51, checkpoint.TrayOnRollers ? "TRAY: ON ROLLERS" : "TRAY: WAITING", Yellow, .7));
-        svg.Child(Label(receiver, 64, 53, checkpoint.BelongingsOnTray ? "BELONGINGS: LOADED" : "BELONGINGS: WITH YOU", Cyan, .7));
-        svg.Child(Label(receiver, 84, 55, checkpoint.ScannerCleared ? "AGENT: CLEARED" : "AGENT: WATCHING", Magenta, .7));
-        svg.Child(Label(receiver, 99, 57, checkpoint.HasClearedCheckpoint ? "BADGE BOUNDARY ACTIVE" : "WAITING", Green, .7));
-        svg.Child(Label(receiver, 9, 64, $"VISITOR // {userName.ToUpperInvariant()} // BADGE {checkpoint.BadgeId} // {checkpoint.BadgeClearance.ToString().ToUpperInvariant()}", White, .7));
-
+        var instruction = checkpoint.Stage switch
+        {
+            SpatialSecurityCheckpointStage.Approach => "ENTER THE THRESHOLD",
+            SpatialSecurityCheckpointStage.Queue => "MOVE WITH THE LINE",
+            SpatialSecurityCheckpointStage.TrayReady => "TAKE THE TRAY",
+            SpatialSecurityCheckpointStage.TrayLoaded => "LOAD YOUR BELONGINGS",
+            SpatialSecurityCheckpointStage.Scanner => "STEP THROUGH",
+            SpatialSecurityCheckpointStage.Collection => "COLLECT YOUR BELONGINGS",
+            SpatialSecurityCheckpointStage.Cleared => "THE THRESHOLD IS OPEN",
+            _ => "WALK THE PLAN"
+        };
+        svg.Child(Label(receiver, 47, 63, instruction, White, 1.05));
         return svg;
     }
 
     private static ElementBuilder InteractionLayer(
-        object receiver,
-        SpatialSecurityCheckpointModel checkpoint,
-        Action enterQueue,
-        Action<int> moveQueue,
-        Action placeTray,
-        Action loadBelongings,
-        Action scanner,
-        Action collectTray,
-        Action enterFacility)
+        object receiver, SpatialSecurityCheckpointModel checkpoint, Action enterQueue, Action<int> moveQueue,
+        Action placeTray, Action loadBelongings, Action scanner, Action collectTray, Action enterFacility)
     {
         var layer = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0")
             .Style("pointer-events", "none").Style("z-index", "60");
 
-        if (checkpoint.Stage == SpatialSecurityCheckpointStage.Approach)
-            layer.Content(Hotspot(receiver, "ENTER SECURITY", "8vw", "28vh", "27vw", "7vh", Cyan, enterQueue));
-
-        if (checkpoint.Stage == SpatialSecurityCheckpointStage.Queue)
+        switch (checkpoint.Stage)
         {
-            for (var slot = 0; slot < SpatialSecurityCheckpointModel.QueueCapacity; slot++)
-            {
-                var y = 26 + slot * 6;
-                var isVacant = checkpoint.VacantQueueSlots.Contains(slot);
-                layer.Content(Hotspot(receiver,
-                    isVacant ? $"MOVE HERE // SPACE {slot + 1}" : "OCCUPIED",
-                    "10vw", $"{((y - 1) / 72d) * 100:0.##}vh",
-                    "32vw", "6vh", isVacant ? Green : Muted,
-                    () => moveQueue(slot), isVacant));
-            }
+            case SpatialSecurityCheckpointStage.Approach:
+                layer.Content(Hotspot(receiver, "ENTER", "5vw", "16vh", "32vw", "22vh", Cyan, enterQueue));
+                break;
+
+            case SpatialSecurityCheckpointStage.Queue:
+                // Vacant floor positions remain spatial interactions, never a list.
+                foreach (var slot in checkpoint.VacantQueueSlots)
+                {
+                    var top = 34 + slot * 8;
+                    layer.Content(Hotspot(receiver, "MOVE", "13vw", $"{top}vh", "27vw", "7vh", Green, () => moveQueue(slot)));
+                }
+                break;
+
+            case SpatialSecurityCheckpointStage.TrayReady:
+                layer.Content(Hotspot(receiver, "TAKE TRAY", "39vw", "50vh", "18vw", "16vh", Yellow, placeTray));
+                break;
+
+            case SpatialSecurityCheckpointStage.TrayLoaded:
+                layer.Content(Hotspot(receiver, "LOAD", "45vw", "50vh", "24vw", "16vh", Cyan, loadBelongings));
+                break;
+
+            case SpatialSecurityCheckpointStage.Scanner:
+                layer.Content(Hotspot(receiver, "STEP THROUGH", "68vw", "43vh", "17vw", "27vh", Magenta, scanner));
+                break;
+
+            case SpatialSecurityCheckpointStage.Collection:
+                layer.Content(Hotspot(receiver, "COLLECT", "83vw", "47vh", "14vw", "20vh", Green, collectTray));
+                break;
         }
 
-        if (checkpoint.Stage == SpatialSecurityCheckpointStage.TrayReady)
-            layer.Content(Hotspot(receiver, "CLICK TRAY // PUT ON ROLLERS", "40vw", "31vh", "16vw", "15vh", Yellow, placeTray));
-
-        if (checkpoint.Stage == SpatialSecurityCheckpointStage.TrayLoaded)
-            layer.Content(Hotspot(receiver, "CLICK TRAY // LOAD YOUR STUFF", "54vw", "31vh", "22vw", "15vh", Cyan, loadBelongings));
-
-        if (checkpoint.Stage == SpatialSecurityCheckpointStage.Scanner)
-            layer.Content(Hotspot(receiver, "WALK THROUGH // WAIT FOR AGENT", "69vw", "31vh", "16vw", "15vh", Magenta, scanner));
-
-        if (checkpoint.Stage == SpatialSecurityCheckpointStage.Collection)
-            layer.Content(Hotspot(receiver, "CLICK TRAY // COLLECT YOUR STUFF", "82vw", "31vh", "16vw", "15vh", Green, collectTray));
-
         if (checkpoint.HasClearedCheckpoint)
-            layer.Content(Hotspot(receiver, "FREE ROAM // ENTER FACILITY", "77vw", "66vh", "19vw", "8vh", Green, enterFacility));
+            layer.Content(Hotspot(receiver, "ENTER FACILITY", "86vw", "19vh", "12vw", "15vh", Green, enterFacility));
 
         return layer;
     }
 
-    private static ElementBuilder Header(object receiver, SpatialSecurityCheckpointModel checkpoint, SpatialLaboratoryTrafficModel traffic)
+    private static ElementBuilder Frame(object receiver, SpatialSecurityCheckpointModel checkpoint, SpatialLaboratoryTrafficModel traffic)
     {
         var now = TimeOnly.FromDateTime(DateTime.Now);
-        var header = WorkshopGui.Panel(receiver)
-            .Style("position", "fixed").Style("left", "0").Style("right", "0").Style("top", "0")
-            .Style("width", "100vw").Style("box-sizing", "border-box")
-            .Style("padding", ".42rem .8rem")
-            .Style("background", "rgba(1,6,12,.96)").Style("border-bottom", $"1px solid {Cyan}55")
-            .Style("z-index", "100").Style("display", "flex").Style("align-items", "center").Style("gap", "1rem");
+        var accent = checkpoint.Agitated ? Red : checkpoint.HasClearedCheckpoint ? Green : Cyan;
 
-        header.Content(WorkshopGui.Element(receiver, "div").Style("flex", "1 1 auto").Style("min-width", "0")
-            .Style("font-size", "1rem").Style("letter-spacing", ".13em").Style("color", Yellow)
-            .Text("SINGULARITY LABORATORY // SECURITY CHECKPOINT"));
-        header.Content(WorkshopGui.Element(receiver, "div").Style("flex", "0 0 auto").Style("font-size", ".8rem").Style("color", Muted)
-            .Text($"BADGE {checkpoint.BadgeClearance.ToString().ToUpperInvariant()} // QUEUE {checkpoint.PlayerQueueSlot + 1}/{SpatialSecurityCheckpointModel.QueueCapacity}"));
-        header.Content(WorkshopGui.Element(receiver, "div").Style("flex", "0 0 auto").Style("font-size", ".8rem").Style("color", Cyan)
-            .Text($"GUARDS {traffic.OnDutyGuards(now).Count} // {now:HH:mm}"));
-        return header;
+        // Inset frame + inset title eliminates the old header clipping.
+        var frame = WorkshopGui.Panel(receiver)
+            .Style("position", "fixed").Style("inset", "1.1rem")
+            .Style("pointer-events", "none").Style("border", $"1px solid {Cyan}66")
+            .Style("box-sizing", "border-box").Style("z-index", "80");
+
+        frame.Content(WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "1.4rem").Style("top", "1.25rem")
+            .Style("padding", ".35rem .75rem").Style("background", Ink)
+            .Style("font-size", "clamp(1rem,1.35vw,1.35rem)").Style("font-weight", "700")
+            .Style("letter-spacing", ".13em").Style("color", Yellow)
+            .Text("SINGULARITY LABORATORY // SECURITY"));
+
+        frame.Content(WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("right", "1.4rem").Style("top", "1.3rem")
+            .Style("padding", ".35rem .65rem").Style("background", Ink)
+            .Style("font-size", "clamp(.8rem,1vw,1rem)").Style("letter-spacing", ".1em")
+            .Style("color", accent).Text(checkpoint.HasClearedCheckpoint ? "THRESHOLD OPEN" : "ACTIVE"));
+
+        frame.Content(WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute").Style("left", "1.4rem").Style("bottom", "1.25rem")
+            .Style("padding", ".3rem .55rem").Style("background", Ink)
+            .Style("font-size", "clamp(.72rem,.9vw,.9rem)").Style("letter-spacing", ".08em")
+            .Style("color", Muted)
+            .Text(checkpoint.HasClearedCheckpoint ? "THE MAP IS THE SPATIAL TRUTH" : $"GUARDS // {traffic.OnDutyGuards(now).Count} ON DUTY"));
+
+        if (!checkpoint.HasClearedCheckpoint)
+            frame.Content(WorkshopGui.Element(receiver, "div")
+                .Style("position", "absolute").Style("left", "50%").Style("transform", "translateX(-50%)")
+                .Style("bottom", "1.25rem").Style("max-width", "45vw")
+                .Style("padding", ".3rem .65rem").Style("background", Ink)
+                .Style("font-family", "system-ui,sans-serif")
+                .Style("font-size", "clamp(.8rem,1vw,1rem)").Style("text-align", "center")
+                .Style("color", White).Text(checkpoint.LastMessage));
+
+        return frame;
     }
 
-    private static ElementBuilder Status(object receiver, SpatialSecurityCheckpointModel checkpoint)
-    {
-        var accent = checkpoint.Agitated ? Red : checkpoint.HasClearedCheckpoint ? Green : Yellow;
-        var panel = WorkshopGui.Panel(receiver)
-            .Style("position", "fixed").Style("left", "1rem").Style("bottom", "1rem")
-            .Style("max-width", "50rem").Style("padding", ".55rem .75rem")
-            .Style("background", "rgba(1,6,12,.95)").Style("border", $"1px solid {accent}66").Style("z-index", "90");
-
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("font-size", ".8rem").Style("letter-spacing", ".12em").Style("color", accent)
-            .Text(checkpoint.Stage.ToString().ToUpperInvariant()));
-        panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".2rem").Style("font-family", "system-ui,sans-serif")
-            .Style("font-size", "1rem").Style("color", White).Text(checkpoint.LastMessage));
-
-        if (checkpoint.CutAttempts > 0)
-            panel.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".18rem").Style("font-size", ".8rem").Style("color", Red)
-                .Text($"DIGITEN AGITATION // {checkpoint.CutAttempts} CUT ATTEMPT(S) // LINE STILL ALLOWS PROGRESS"));
-
-        return panel;
-    }
-
-    private static ElementBuilder Hotspot(
-        object receiver, string label, string left, string top, string width, string height,
-        string accent, Action action, bool enabled = true)
+    private static ElementBuilder Hotspot(object receiver, string label, string left, string top, string width, string height, string accent, Action action)
         => WorkshopGui.Button(receiver).Label(label)
-            .Style("pointer-events", enabled ? "auto" : "none")
-            .Style("position", "absolute").Style("left", left).Style("top", top)
-            .Style("width", width).Style("height", height).Style("box-sizing", "border-box")
-            .Style("background", enabled ? $"{accent}14" : "rgba(1,6,12,.2)")
-            .Style("border", enabled ? $"1px solid {accent}99" : $"1px solid {Muted}22")
-            .Style("color", enabled ? accent : $"{Muted}55")
-            .Style("font-family", "inherit").Style("font-size", ".8rem")
-            .Style("letter-spacing", ".06em").Style("cursor", enabled ? "pointer" : "default")
+            .Style("pointer-events", "auto").Style("position", "absolute")
+            .Style("left", left).Style("top", top).Style("width", width).Style("height", height)
+            .Style("box-sizing", "border-box").Style("background", $"{accent}08")
+            .Style("border", $"1px solid {accent}35").Style("color", $"{accent}aa")
+            .Style("font-family", "inherit").Style("font-size", "clamp(.85rem,1vw,1rem)")
+            .Style("font-weight", "700").Style("letter-spacing", ".1em").Style("cursor", "pointer")
             .OnClick(action);
+
+    private static void DrawPerson(object receiver, ElementBuilder svg, double x, double y, string color, bool highlighted)
+    {
+        var scale = highlighted ? 1.35 : 1;
+        svg.Child(WorkshopGui.Element(receiver, "circle")
+            .Attribute("cx", x.ToString("0.##")).Attribute("cy", (y - 4 * scale).ToString("0.##"))
+            .Attribute("r", (1.2 * scale).ToString("0.##")).Attribute("fill", color));
+        svg.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d",
+                $"M {x - 1.6 * scale} {y + 1.5 * scale} " +
+                $"Q {x} {y - 1.5 * scale} {x + 1.6 * scale} {y + 1.5 * scale} " +
+                $"L {x + 2 * scale} {y + 5 * scale} H {x - 2 * scale} Z")
+            .Attribute("fill", highlighted ? $"{color}55" : $"{color}22")
+            .Attribute("stroke", color).Attribute("stroke-width", highlighted ? ".45" : ".3"));
+    }
 
     private static ElementBuilder Label(object receiver, double x, double y, string text, string color, double size)
         => WorkshopGui.Element(receiver, "text")
             .Attribute("x", x.ToString("0.##")).Attribute("y", y.ToString("0.##"))
-            .Attribute("fill", color).Attribute("font-size", size.ToString("0.##")).Text(text);
-
-    private static void Station(object receiver, ElementBuilder svg, double x, double y, double width, double height,
-        string label, string color, bool active, bool occupied)
-    {
-        svg.Child(WorkshopGui.Element(receiver, "rect")
-            .Attribute("x", x.ToString("0.##")).Attribute("y", y.ToString("0.##"))
-            .Attribute("width", width.ToString("0.##")).Attribute("height", height.ToString("0.##"))
-            .Attribute("fill", active || occupied ? $"{color}20" : "#07131b")
-            .Attribute("stroke", color).Attribute("stroke-width", ".4"));
-        svg.Child(Label(receiver, x + width / 2, y + height / 2, label, color, 1));
-    }
+            .Attribute("fill", color).Attribute("font-size", size.ToString("0.##"))
+            .Attribute("font-family", "Consolas,'Courier New',monospace")
+            .Attribute("font-weight", size >= 1 ? "700" : "400")
+            .Attribute("letter-spacing", size >= 1 ? ".06em" : ".03em").Text(text);
 }
