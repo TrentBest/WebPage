@@ -31,6 +31,9 @@
     private readonly SpatialLaboratoryAccessModel LaboratoryAccess = new();
     private readonly SpatialLaboratoryTrafficModel LaboratoryTraffic = new();
     private readonly SpatialSecurityCheckpointModel SecurityCheckpoint = new();
+    private bool laboratoryDirectorAccessGranted;
+    private double laboratoryPlanAvatarX = 50;
+    private double laboratoryPlanAvatarY = 36;
     private readonly SpatialHolodeckMazeModel HolodeckMaze = new();
     private CancellationTokenSource? holodeckCts;
     private CancellationTokenSource? securityCheckpointCts;
@@ -227,6 +230,20 @@
 
         if (insideRoomId == "singularity-island")
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
+
+        if (insideRoomId == "singularity-lab-plan")
+            return SpatialLaboratoryPlanGuiBuilder.Build(
+                this,
+                Experience.User.DisplayName,
+                laboratoryPlanAvatarX,
+                laboratoryPlanAvatarY,
+                laboratoryDirectorAccessGranted,
+                HandleLaboratoryPlanWorldClick,
+                HandleKeyDown,
+                AccessLaboratoryReception,
+                EnterLaboratoryElevator,
+                EnterLaboratoryDirector,
+                ExitRoom);
 
         if (insideRoomId == "singularity-lab-entrance")
             return SpatialSecurityCheckpointGuiBuilder.Build(
@@ -872,8 +889,59 @@
     private void EnterClearedLaboratory()
     {
         if (!SecurityCheckpoint.HasClearedCheckpoint) return;
-        insideRoomId = "singularity-lab";
+
+        // Security is a threshold, not the destination. Crossing it returns the
+        // visitor to the laboratory's actual plan on the cleared side of the line.
+        laboratoryDirectorAccessGranted = false;
+        laboratoryPlanAvatarX = 50;
+        laboratoryPlanAvatarY = 36;
+        insideRoomId = "singularity-lab-plan";
+    }
+
+    private async Task HandleLaboratoryPlanWorldClick(MouseEventArgs args)
+    {
+        if (insideRoomId != "singularity-lab-plan") return;
+
+        spatialModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/spatial-workshop.js");
+        var point = await spatialModule.InvokeAsync<SpatialPoint>(
+            "screenToCenteredWorld",
+            args.ClientX,
+            args.ClientY,
+            laboratoryPlanAvatarX,
+            laboratoryPlanAvatarY,
+            1d);
+
+        laboratoryPlanAvatarX = Math.Clamp(point.X, 12, 86);
+        laboratoryPlanAvatarY = Math.Clamp(point.Y, 31, 79);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void AccessLaboratoryReception()
+    {
+        if (insideRoomId != "singularity-lab-plan") return;
+
+        laboratoryDirectorAccessGranted = true;
+    }
+
+    private void EnterLaboratoryElevator()
+    {
+        if (insideRoomId != "singularity-lab-plan") return;
+
+        // Re-enter the existing secure-elevator Experience from the cleared side.
+        // Replaying the already-cleared threshold keeps the established FSM/API
+        // elevator sequence intact rather than creating a second elevator model.
         SingularityLab.Reset();
+        SingularityLab.EnterSecurityLine();
+        SingularityLab.PlaceBelongings();
+        SingularityLab.CompleteScreening();
+        insideRoomId = "singularity-lab";
+    }
+
+    private void EnterLaboratoryDirector()
+    {
+        if (insideRoomId != "singularity-lab-plan" || !laboratoryDirectorAccessGranted) return;
+
+        insideRoomId = "singularity-lab-director";
     }
 
     private void StartHolodeckLoopIfNeeded()
@@ -1545,6 +1613,13 @@
             holodeckCts = null;
             HolodeckMaze.Reset();
             selectedLeaderboardEntry = null;
+        }
+
+        if (insideRoomId == "singularity-lab-plan" || insideRoomId == "singularity-lab-director")
+        {
+            laboratoryDirectorAccessGranted = false;
+            laboratoryPlanAvatarX = 50;
+            laboratoryPlanAvatarY = 36;
         }
 
         if (insideRoomId == "singularity-lab-entrance")
