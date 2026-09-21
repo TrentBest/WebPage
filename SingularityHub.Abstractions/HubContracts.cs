@@ -35,7 +35,15 @@ public readonly struct OntologySignature : IEquatable<OntologySignature>
 /// <summary>Semantic version for a MicroBundle or Experience.</summary>
 public readonly record struct BundleVersion(int Major, int Minor, int Patch);
 /// <summary>Categories of recorded arbitration mutation.</summary>
-public enum MutationType { StructuralMutation, PropertyInjection, DependencyResolution }
+public enum MutationType
+{
+    /// <summary>Mutation that changes runtime structure or composition.</summary>
+    StructuralMutation,
+    /// <summary>Mutation that injects or replaces a property value.</summary>
+    PropertyInjection,
+    /// <summary>Mutation that resolves a dependency relationship.</summary>
+    DependencyResolution
+}
 
 /// <summary>Reusable capability with a once-only load phase followed by bounded arbitration.</summary>
 /// <summary>Reusable capability with a once-only load phase followed by bounded arbitration.</summary>
@@ -57,10 +65,13 @@ public interface IMicroBundle
 /// <summary>Runtime composition boundary for an Experience.</summary>
 public interface IExperience
 {
+    /// <summary>Stable Experience identity.</summary>
     ulong Id { get; }
     /// <summary>Human-readable Experience name.</summary>
     string Name { get; }
+    /// <summary>Current Experience version.</summary>
     BundleVersion Version { get; }
+    /// <summary>Ontological location of the Experience.</summary>
     OntologySignature Ontology { get; }
     /// <summary>MicroBundles explicitly composed into the Experience.</summary>
     IReadOnlyList<ulong> MicroBundleIds { get; }
@@ -76,7 +87,13 @@ public interface IExperience
 /// <summary>Immutable audit record for one arbitration mutation.</summary>
 public readonly record struct ArbitrationEvent(int RoundIndex, ulong ActorId, ulong TargetCoordinates, MutationType MutationType, ulong CausalParentId);
 /// <summary>Audit sink for arbitration events.</summary>
-public interface IArbitrationAudit { IReadOnlyList<ArbitrationEvent> Events { get; } void Record(ArbitrationEvent arbitrationEvent); }
+public interface IArbitrationAudit
+{
+    /// <summary>Gets the immutable-order audit events recorded so far.</summary>
+    IReadOnlyList<ArbitrationEvent> Events { get; }
+    /// <summary>Records one arbitration event.</summary>
+    void Record(ArbitrationEvent arbitrationEvent);
+}
 /// <summary>Coordinates MicroBundle discovery, installation, and bounded arbitration.</summary>
 public interface IArbitrator
 {
@@ -98,19 +115,45 @@ public interface IArbitrator
 /// <summary>Stable address into a data warehouse.</summary>
 public readonly record struct WarehouseAddress(ulong Identity);
 /// <summary>Resolves compact identities into warehouse addresses.</summary>
-public interface IDataWarehouseLiaison { bool TryResolve(ulong identity, out WarehouseAddress address); }
+public interface IDataWarehouseLiaison
+{
+    /// <summary>Attempts to resolve a compact identity into a warehouse address.</summary>
+    bool TryResolve(ulong identity, out WarehouseAddress address);
+}
 /// <summary>Compact description of scheduled work.</summary>
 public readonly record struct WorkDescriptor(ulong ProcessGroupId, ulong WorkId, int PathIndex);
 /// <summary>Result token for scheduled work.</summary>
 public readonly record struct CompletionToken(ulong Value, bool Completed);
 /// <summary>Executes scheduled work descriptors.</summary>
-public interface IExecutionProvider { CompletionToken Execute(WorkDescriptor work); }
+public interface IExecutionProvider
+{
+    /// <summary>Executes one scheduled work descriptor.</summary>
+    CompletionToken Execute(WorkDescriptor work);
+}
 /// <summary>Lifecycle state of a process group.</summary>
-public enum ProcessGroupState { Registered, Active, Completed }
+public enum ProcessGroupState
+{
+    /// <summary>The process group is registered but not active.</summary>
+    Registered,
+    /// <summary>The process group is currently active.</summary>
+    Active,
+    /// <summary>The process group has completed.</summary>
+    Completed
+}
 /// <summary>Snapshot of a process group's lifecycle state.</summary>
 public readonly record struct ProcessGroupSnapshot(ulong Id, ProcessGroupState State);
 /// <summary>Registers and advances process groups.</summary>
-public interface IProcessGroupHost { bool Register(ulong id); bool Activate(ulong id); bool Complete(ulong id); IReadOnlyCollection<ProcessGroupSnapshot> ActiveGroups { get; } }
+public interface IProcessGroupHost
+{
+    /// <summary>Registers a process group identity.</summary>
+    bool Register(ulong id);
+    /// <summary>Activates a registered process group.</summary>
+    bool Activate(ulong id);
+    /// <summary>Completes an active process group.</summary>
+    bool Complete(ulong id);
+    /// <summary>Gets the currently active process groups.</summary>
+    IReadOnlyCollection<ProcessGroupSnapshot> ActiveGroups { get; }
+}
 
 /// <summary>Common Hub boundary for arbitration, scheduling, data, and routing.</summary>
 public interface ISingularityHub : IArbitrator, IDataWarehouseLiaison, IProcessGroupHost
@@ -124,8 +167,11 @@ public interface ISingularityHub : IArbitrator, IDataWarehouseLiaison, IProcessG
 /// <summary>Global execution phase selected by the composition manifest and owned by the Hub host.</summary>
 public enum ExperienceExecutionPhase
 {
+    /// <summary>Initial host startup phase.</summary>
     Startup,
+    /// <summary>Phase in which the host is transitioning between Experiences.</summary>
     Transitioning,
+    /// <summary>Steady-state Experience execution phase.</summary>
     Running
 }
 
@@ -163,6 +209,8 @@ public readonly record struct ExperienceManifest(
 /// </summary>
 public interface IExperiencePresentation
 {
+    /// <summary>MicroBundles used while presenting the Experience.</summary>
     IReadOnlyList<ulong> PresentationMicroBundleIds { get; }
+    /// <summary>MicroBundles used while removing the presentation.</summary>
     IReadOnlyList<ulong> RemovalMicroBundleIds { get; }
 }
