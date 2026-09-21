@@ -35,10 +35,10 @@ public sealed class SpatialSecurityCheckpointTests
         checkpoint.EnterQueue();
         checkpoint.AdvanceQueueTraffic();
 
-        Assert.True(checkpoint.TryMoveToQueueSlot(0));
+        Assert.False(checkpoint.TryMoveToQueueSlot(0));
         Assert.Equal(1, checkpoint.CutAttempts);
         Assert.True(checkpoint.Agitated);
-        Assert.Equal(SpatialSecurityCheckpointStage.TrayReady, checkpoint.Stage);
+        Assert.Equal(SpatialSecurityCheckpointStage.Queue, checkpoint.Stage);
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public sealed class SpatialSecurityCheckpointTests
         Assert.True(checkpoint.BelongingsOnTray);
 
         Assert.True(checkpoint.WalkThroughScanner());
-        Assert.Equal("WAIT... OK, GOOD! Proceed to the collection point.", checkpoint.LastMessage);
+        Assert.Equal("SCANNER CLEARED. GO TO THE OTHER SIDE AND COLLECT YOUR TRAY.", checkpoint.LastMessage);
 
         Assert.True(checkpoint.CollectTray());
         Assert.True(checkpoint.CanFreeRoam);
