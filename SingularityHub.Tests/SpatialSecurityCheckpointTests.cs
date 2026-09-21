@@ -42,6 +42,19 @@ public sealed class SpatialSecurityCheckpointTests
     }
 
     [Fact]
+    public void Occupied_Forward_Space_Agitates_The_Digiten_In_Front()
+    {
+        var checkpoint = new SpatialSecurityCheckpointModel();
+        checkpoint.EnterQueue();
+        checkpoint.AdvanceQueueTraffic();
+
+        Assert.False(checkpoint.TryMoveToQueueSlot(3));
+        Assert.True(checkpoint.Agitated);
+        Assert.Contains("WAIT", checkpoint.GetAgentSpeech("security-visitor-01") ?? string.Empty);
+        Assert.Equal(4, checkpoint.PlayerQueueSlot);
+    }
+
+    [Fact]
     public void Queue_Behind_Visitor_Becomes_Agitated_When_Visitor_Does_Not_Move()
     {
         var checkpoint = new SpatialSecurityCheckpointModel();
