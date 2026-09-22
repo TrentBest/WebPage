@@ -90,6 +90,7 @@ public readonly record struct SpatialIntercom(
 public enum SpatialSecurityClearance
 {
     Visitor,
+    Vip,
     Employee,
     Research,
     Administrator,
