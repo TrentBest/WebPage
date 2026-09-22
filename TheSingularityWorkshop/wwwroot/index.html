@@ -146,6 +146,26 @@
                 document.body.appendChild(script);
             },
             workshopVisited:function(){ return localStorage.getItem("WorkshopVisited") === "true"; },
+            playFirstContactSound:function(){
+                try{
+                    const C=window.AudioContext||window.webkitAudioContext;
+                    if(!C)return;
+                    const ctx=new C();
+                    const now=ctx.currentTime;
+                    [110,165,220,330,495].forEach((frequency,index)=>{
+                        const osc=ctx.createOscillator();
+                        const gain=ctx.createGain();
+                        osc.type=index<2?"sine":"triangle";
+                        osc.frequency.setValueAtTime(frequency,now);
+                        osc.frequency.exponentialRampToValueAtTime(frequency*1.015,now+1.1);
+                        gain.gain.setValueAtTime(0.0001,now);
+                        gain.gain.exponentialRampToValueAtTime(0.075/(index+1),now+0.08+index*0.03);
+                        gain.gain.exponentialRampToValueAtTime(0.0001,now+1.45+index*0.08);
+                        osc.connect(gain);gain.connect(ctx.destination);
+                        osc.start(now+index*0.055);osc.stop(now+1.55+index*0.08);
+                    });
+                }catch{}
+            },
             markWorkshopVisited:function(){ localStorage.setItem("WorkshopVisited","true"); },
             workshopExploreGardenVisited:function(){ return localStorage.getItem("WorkshopExploreGardenVisited") === "true"; },
             markWorkshopExploreGardenVisited:function(){ localStorage.setItem("WorkshopExploreGardenVisited","true"); }
