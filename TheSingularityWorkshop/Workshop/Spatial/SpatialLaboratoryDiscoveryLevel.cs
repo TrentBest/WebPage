@@ -86,25 +86,3 @@ public sealed class SpatialLaboratoryDiscoveryLevel
         => new(id, name, category, new SpatialBounds(x, y, width, height));
 }
 
-public readonly record struct SpatialPoint(double X, double Y);
-
-public readonly record struct SpatialBounds(double X, double Y, double Width, double Height)
-{
-    public bool Contains(SpatialPoint point)
-        => point.X >= X && point.X <= X + Width &&
-           point.Y >= Y && point.Y <= Y + Height;
-}
-
-public readonly record struct SpatialLaboratoryArtifact(
-    string Id,
-    string Name,
-    string Category,
-    SpatialBounds Bounds);
-
-public sealed record SpatialLaboratorySwitchManifest(
-    string Id,
-    string Label,
-    SpatialPoint Position,
-    string PhysicalForm,
-    string Description,
-    TheSingularityWorkshop.World.HiddenWorldSwitch Capability);
