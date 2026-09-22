@@ -127,3 +127,27 @@ public readonly record struct SpatialLaboratorySimulator(string Id, string Name,
 
 /// <summary>A teaching or research topic discovered through interaction.</summary>
 public readonly record struct SpatialLaboratoryLesson(string Id, string Name, IReadOnlyList<string> Concepts);
+
+
+/// <summary>
+/// A semantic artifact authored into the Research Laboratory discovery level.
+/// Geometry is kept separate from meaning so the same manifest can be rendered
+/// by different spatial presenters.
+/// </summary>
+public sealed record SpatialLaboratoryArtifact(
+    string Id,
+    string Name,
+    string Category,
+    SpatialBounds Bounds);
+
+/// <summary>
+/// Describes the physical manifestation of a hidden laboratory switch.
+/// The physical object is separate from the authoritative world capability it invokes.
+/// </summary>
+public sealed record SpatialLaboratorySwitchManifest(
+    string Id,
+    string Name,
+    SpatialPoint Position,
+    string PhysicalForm,
+    string Description,
+    TheSingularityWorkshop.World.HiddenWorldSwitch Capability);
