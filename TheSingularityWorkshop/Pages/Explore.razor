@@ -33,6 +33,8 @@
     private readonly SpatialSecurityCheckpointModel SecurityCheckpoint = new();
     private bool laboratoryDirectorAccessGranted;
     private bool renderingResearchUnlocked;
+    private bool laboratoryVipPassCollected;
+    private bool securityVipRoute;
     private double laboratoryPlanAvatarX = 50;
     private double laboratoryPlanAvatarY = 36;
     private readonly SpatialHolodeckMazeModel HolodeckMaze = new();
@@ -288,10 +290,9 @@
                 ExitRoom);
 
         if (insideRoomId == "singularity-lab-entrance")
-            return SpatialSecurityCheckpointGuiBuilder.Build(
+            return SpatialSecurityCheckpointPlanGuiBuilder.Build(
                 this,
                 SecurityCheckpoint,
-                LaboratoryTraffic,
                 Experience.User.DisplayName,
                 HandleSecurityWorldClick,
                 MoveSecurityQueue,
@@ -300,7 +301,9 @@
                 WalkSecurityScanner,
                 CollectSecurityTray,
                 ExitRoom,
-                EnterClearedLaboratory);
+                EnterClearedLaboratory,
+                securityVipRoute,
+                ClearVipSecurity);
 
         if (insideRoomId == "lab-holodeck")
             return SpatialMazeExperienceGuiBuilder.Build(
@@ -870,14 +873,21 @@
 
     private void HandleSecurityWorldClick(MouseEventArgs args)
     {
-        // Arrival is a physical threshold. Once inside, the Digitens and the
-        // equipment own the interactions; there are no queue-control buttons.
+        // Arrival is a physical threshold. A collected VIP pass changes the
+        // physical route; otherwise the visitor enters the social security line.
         if (SecurityCheckpoint.Stage == SpatialSecurityCheckpointStage.Approach)
             EnterSecurityCheckpoint();
     }
 
     private void EnterSecurityCheckpoint()
     {
+        securityVipRoute = laboratoryVipPassCollected;
+        if (securityVipRoute)
+        {
+            SecurityCheckpoint.EnterVipRoute();
+            return;
+        }
+
         SecurityCheckpoint.EnterQueue();
         StartSecurityCheckpointTraffic();
     }
@@ -936,6 +946,12 @@
         SecurityCheckpoint.CollectTray();
     }
 
+    private void ClearVipSecurity()
+    {
+        if (!securityVipRoute) return;
+        SecurityCheckpoint.ClearVipRoute();
+    }
+
     private void EnterClearedLaboratory()
     {
         if (!SecurityCheckpoint.HasClearedCheckpoint) return;
@@ -971,6 +987,8 @@
         if (insideRoomId != "singularity-lab-plan") return;
 
         laboratoryDirectorAccessGranted = true;
+        laboratoryVipPassCollected = true;
+        LaboratoryAccess.UpgradeBadge("VIP-PASS", SpatialSecurityClearance.Vip);
     }
 
     private void EnterLaboratoryElevator()
@@ -1736,6 +1754,7 @@
 
         if (insideRoomId == "singularity-lab-entrance")
         {
+            securityVipRoute = false;
             securityCheckpointCts?.Cancel();
             securityCheckpointCts?.Dispose();
             securityCheckpointCts = null;
