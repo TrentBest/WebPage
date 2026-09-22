@@ -116,6 +116,32 @@ public sealed class IncrementalVersionTests
         Assert.Equal("researcher-13", second.LastEvent!.DiscovererId);
     }
 
+    [ArchitectureTest(0, 0, 170)] [Fact(DisplayName = "V0.0.170 — Research_Laboratory_Is_A_Level_Not_A_Button")]
+    public void V0_0_170ResearchLaboratoryIsALevelNotAButton()
+    {
+        var level = TheSingularityWorkshop.Gui.SpatialLaboratoryDiscoveryLevel.CreatePhysicsResearchLevel();
+
+        Assert.True(level.Artifacts.Count >= 20);
+        Assert.Contains(level.Artifacts, item => item.Category == "WHITEBOARD");
+        Assert.Contains(level.Artifacts, item => item.Category == "EXPERIMENT");
+        Assert.Contains(level.Artifacts, item => item.Category == "INSTRUMENT");
+        Assert.Contains(level.Artifacts, item => item.Category == "CONSOLE");
+        Assert.Contains(level.Artifacts, item => item.Category == "WORKSTATION");
+    }
+
+    [ArchitectureTest(0, 0, 171)] [Fact(DisplayName = "V0.0.171 — Hidden_Research_Switch_Is_Physical_And_Inside_The_Level")]
+    public void V0_0_171HiddenResearchSwitchIsPhysicalAndInsideTheLevel()
+    {
+        var level = TheSingularityWorkshop.Gui.SpatialLaboratoryDiscoveryLevel.CreatePhysicsResearchLevel();
+
+        Assert.Equal("switch.research-laboratory.3d", level.HiddenSwitch.Id);
+        Assert.Equal("wall-service-panel", level.HiddenSwitch.PhysicalForm);
+        Assert.True(level.Floor.Contains(level.HiddenSwitch.Position));
+        Assert.Equal(
+            TheSingularityWorkshop.World.WorkshopPresentationMode.ThreeDimensional,
+            level.HiddenSwitch.Capability.ResultingPresentationMode);
+    }
+
     [ArchitectureTest(0, 0, 169)] [Fact(DisplayName = "V0.0.169 — World_Event_Carries_Discovery_And_Presentation_Intent")]
     public void V0_0_169WorldEventCarriesDiscoveryAndPresentationIntent()
     {
