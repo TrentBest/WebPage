@@ -103,7 +103,10 @@
             try{
                 const AudioContext=window.AudioContext||window.webkitAudioContext;
                 if(!AudioContext)return;
-                const context=workshopRumbleContext||new AudioContext();
+                // The pointerdown handler creates the shared context before this click arrives.
+                // Never create a new AudioContext from a click path that may have lost activation.
+                const context=workshopRumbleContext;
+                if(!context)return;
                 const gain=context.createGain();
                 const oscillator=context.createOscillator();
                 const filter=context.createBiquadFilter();
@@ -148,14 +151,8 @@
             markWorkshopExploreGardenVisited:function(){ localStorage.setItem("WorkshopExploreGardenVisited","true"); }
         };
 
-        document.addEventListener('pointerenter',event=>{
-            const target=event.target instanceof Element?event.target:null;
-            if(target?.closest('[data-workshop-rumble],.monolith-btn')){
-                startWorkshopRumble();
-                const narrative=target.closest('[data-workshop-rumble]');
-                if(narrative) narrative.dataset.rumbleActive='true';
-            }
-        },true);
+        // AudioContext creation is deliberately gated behind pointerdown, which is a real user gesture.
+        // pointerenter is hover-only and cannot satisfy browser autoplay policy.
         document.addEventListener('pointerdown',event=>{
             const target=event.target instanceof Element?event.target:null;
             if(target?.closest('[data-workshop-rumble],.monolith-btn')){
