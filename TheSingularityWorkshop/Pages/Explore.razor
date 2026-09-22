@@ -18,6 +18,7 @@
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
     private readonly SpatialWorkshopArrangement WorkshopArrangement;
     private string? selectedAecBuildingId;
+    private string? pendingEntranceId;
     private readonly WorkshopRouter Router = new("workshop");
     private readonly SpatialLinework ForgeLinework = new();
     private readonly SpatialAECRemoteOfficeManifest AECManifest = SpatialAECRemoteOfficeManifest.CreateDefault();
@@ -385,7 +386,7 @@
         if (FsmScaffoldReady)
             root.Content(FsmScaffoldNotice());
         if (workshopMapVisible)
-            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope, WorkshopArrangement, CopyWorkshopAiContext, RequestAecReview));
+            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope, WorkshopArrangement));
         return root;
     }
 
@@ -592,20 +593,11 @@
         workshopMapVisible = false;
         await InvokeAsync(StateHasChanged);
 
-        // The laboratory is a real child Experience, not merely a map destination.
-        // Selecting it from the campus directory should therefore complete the same
-        // physical arrival path as clicking the laboratory itself. This removes the
-        // easy-to-miss intermediate state where the avatar arrives at the door but
-        // the visitor still has to rediscover the building interaction.
-        if (id == "singularity-lab")
-        {
-            await InteractRoom(id);
-            return;
-        }
-
-        await NavigateTo(Center(interactable.InteractionPoint));
+        // A map selection is an intention, not an entry command. The avatar walks
+        // to the building's interaction point and waits there for the visitor's
+        // second click to cross the threshold.
+        await InteractRoom(id);
     }
-
     private void SetMansionDensity(int density)
     {
         mansionDensity = Math.Max(1, density);
@@ -1326,6 +1318,26 @@
         var interactable = Scene.Interactables.FirstOrDefault(item => item.Id == id);
         if (interactable is null) return;
 
+        // First click approaches the building. Only a second click, after arrival,
+        // crosses the threshold. This is the same physical interaction whether the
+        // visitor clicked the building directly or selected it from the map.
+        if (!string.Equals(pendingEntranceId, id, StringComparison.OrdinalIgnoreCase))
+        {
+            var selectedEntrance = interactable.InteractionPoints
+                .Select(point => new { Point = point, Path = SpatialGeometryEngine.FindPath(new SpatialPoint(AvatarX, AvatarY), Center(point.Bounds), SpatialGeometryEngine.FromInteractables(Scene.Interactables)) })
+                .Where(candidate => candidate.Path.Count > 0)
+                .OrderBy(candidate => PathLength(new SpatialPoint(AvatarX, AvatarY), candidate.Path))
+                .FirstOrDefault();
+
+            if (selectedEntrance is null) return;
+            await NavigatePath(selectedEntrance.Path);
+            pendingEntranceId = id;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        pendingEntranceId = null;
+
         if (id == "singularity-software-office")
         {
             var officePoint = interactable.InteractionPoints
@@ -1830,6 +1842,7 @@
             transitMicroGameTargetId = null;
         }
 
+        pendingEntranceId = null;
         if (Router.TryExit(out var frame))
             Experience.Navigation.MoveTo(frame.ReturnPosition.X, frame.ReturnPosition.Y);
         insideRoomId = Router.CurrentSceneId == "workshop" ? null : Router.CurrentSceneId;
