@@ -23,6 +23,7 @@
     private readonly SpatialAECRemoteOfficeManifest AECManifest = SpatialAECRemoteOfficeManifest.CreateDefault();
     private readonly SpatialAECDraftModel AECDraft = new();
     private readonly SpatialAECIntentModel AECIntent = new();
+    private SpatialAECBimModel AECBimModel = SpatialAECBimModel.CreateDefault("workshop");
     private SpatialAECGeneratedStructure? AECGeneratedStructure;
     private SpatialAECPlanExperience? AECPlanExperience;
     private int AECPlanFloor = 1;
@@ -228,9 +229,17 @@
                 this,
                 Experience.User.DisplayName,
                 AECOfficeStage,
+                Scene,
+                WorkshopArrangement,
+                selectedAecBuildingId,
                 () => _ = LeadAECOfficeToConference(),
                 EnterAECConsultation,
+                MoveWorkshopBuilding,
+                OpenAecBuildingEditor,
                 ExitRoom);
+
+        if (insideRoomId == "aec-bim")
+            return SpatialAECBimModelGuiBuilder.Build(this, AECBimModel, Experience.User.DisplayName, SetAecBimFloor, SearchAecBimOntology, AddAecBimRoom, DuplicateAecBimRoom, RemoveAecBimRoom, ExitAecBim);
 
         if (insideRoomId == "aec-consultation")
             return SpatialAECConsultationGuiBuilder.Build(this, AECIntent, Experience.User.DisplayName, AnswerAECIntent, GenerateAECStructure, ExitAECConsultation);
@@ -376,7 +385,7 @@
         if (FsmScaffoldReady)
             root.Content(FsmScaffoldNotice());
         if (workshopMapVisible)
-            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope, WorkshopArrangement, MoveWorkshopBuilding, CopyWorkshopAiContext, RequestAecReview));
+            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope, WorkshopArrangement, CopyWorkshopAiContext, RequestAecReview));
         return root;
     }
 
@@ -533,8 +542,30 @@
 
     private void MoveWorkshopBuilding(string id, int dx, int dy)
     {
+        // Campus geometry is deliberately mutable only from inside the AEC Remote Office.
         WorkshopArrangement.TryMove(Scene, id, dx, dy);
     }
+
+    private void OpenAecBuildingEditor(string id)
+    {
+        var building = Scene.Interactables.FirstOrDefault(item => item.Id == id);
+        if (building is null) return;
+        selectedAecBuildingId = id;
+        AECBimModel = SpatialAECBimModel.CreateDefault(id, building.Name);
+        insideRoomId = "aec-bim";
+    }
+
+    private void SetAecBimFloor(int floor) => AECBimModel.SetActiveFloor(floor);
+
+    private void SearchAecBimOntology(string query) => AECBimModel.Search(query);
+
+    private void AddAecBimRoom(string contentId) => AECBimModel.AddRoom(contentId);
+
+    private void DuplicateAecBimRoom(string roomId) => AECBimModel.DuplicateRoom(roomId);
+
+    private void RemoveAecBimRoom(string roomId) => AECBimModel.RemoveRoom(roomId);
+
+    private void ExitAecBim() => insideRoomId = "aec-lobby";
 
     private void RequestAecReview(string id)
     {
