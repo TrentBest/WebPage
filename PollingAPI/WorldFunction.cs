@@ -29,11 +29,11 @@ public sealed class WorldFunction
         try
         {
             var entity = await table.GetEntityAsync<TableEntity>(StatePartition, StateRow);
-            return Json(req, WorkshopWorldDto.From(entity.Value));
+            return await Json(req, WorkshopWorldDto.From(entity.Value));
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
         {
-            return Json(req, WorkshopWorldDto.Initial());
+            return await Json(req, WorkshopWorldDto.Initial());
         }
     }
 
@@ -73,7 +73,7 @@ public sealed class WorldFunction
             await table.AddEntityAsync(state);
             await RecordDiscoveryAsync(table, submission.SwitchId, submission.LocationId, visitor, now);
 
-            return Json(req, WorkshopWorldDto.From(state), HttpStatusCode.OK);
+            return await Json(req, WorkshopWorldDto.From(state), HttpStatusCode.OK);
         }
         catch (RequestFailedException ex) when (ex.Status == 409)
         {
@@ -82,7 +82,7 @@ public sealed class WorldFunction
                 submission.SwitchId);
 
             var existing = await table.GetEntityAsync<TableEntity>(StatePartition, StateRow);
-            return Json(req, WorkshopWorldDto.From(existing.Value), HttpStatusCode.OK);
+            return await Json(req, WorkshopWorldDto.From(existing.Value), HttpStatusCode.OK);
         }
     }
 
@@ -116,10 +116,10 @@ public sealed class WorldFunction
         await table.AddEntityAsync(entity);
     }
 
-    private static HttpResponseData Json(HttpRequestData req, WorkshopWorldDto state, HttpStatusCode status = HttpStatusCode.OK)
+    private static async Task<HttpResponseData> Json(HttpRequestData req, WorkshopWorldDto state, HttpStatusCode status = HttpStatusCode.OK)
     {
         var response = req.CreateResponse(status);
-        response.WriteAsJsonAsync(state);
+        await response.WriteAsJsonAsync(state);
         return response;
     }
 
