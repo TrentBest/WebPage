@@ -91,7 +91,7 @@ public sealed class PongMicroBundle : IDisposable
         private const double PaddleMinCenter = 9.7;
         private const double PaddleMaxCenter = 90.3;
 
-        private readonly Random _random = new();
+        private readonly SquirrelRng _random = new(0x504F4E47u);
         private double _ballVelocityX = .65;
         private double _ballVelocityY = .42;
 
