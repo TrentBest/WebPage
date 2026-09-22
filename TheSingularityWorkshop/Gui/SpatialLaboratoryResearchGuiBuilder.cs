@@ -22,8 +22,8 @@ public static class SpatialLaboratoryResearchGuiBuilder
     private static readonly IReadOnlyList<ResearchStation> Stations =
     [
         new("micro-detail", "MICRO DETAIL", "Face against the wall. Spend the budget on cracks, stains, dust, insects, and every surface event inside reach.", "detail", "frame"),
-        new("tectonic-mass", "TECTONIC MASS", "A world assembled as material first. Continents, ridges, cuts, and enormous landforms emerge from deterministic terrain noise.", "massive", "orbit"),
-        new("weathering", "WEATHERING", "Let time become geometry. Repeated erosion and removal expose new surfaces without inventing a separate render object.", "massive", "follow"),
+        new("tectonic-mass", "TECTONIC MASS", "A deterministic plate field. Plate boundaries become uplift and divergent relief, giving us a mathematical substrate to push toward a real geophysical model.", "tectonic", "orbit"),
+        new("weathering", "WEATHERING", "A first erosion pass. Material migrates down local slopes, softening ridges and filling valleys while the same surface substrate remains authoritative.", "weathered", "follow"),
         new("far-horizon", "FAR HORIZON", "Push the camera outward without surrendering the horizon. Distance becomes a rendering-rate problem, not an excuse for fog.", "massive", "frame"),
         new("cosmic-zoom", "COSMIC ZOOM", "The long experiment: universe, cluster, galaxy, system, planet, surface, and finally the Workshop moniker.", "massive", "orbit")
     ];
