@@ -100,6 +100,21 @@ public sealed class SpatialSecurityCheckpointTests
     }
 
     [Fact]
+    public void Vip_Route_Bypasses_Queue_And_Uses_Card_Reader_Clearance()
+    {
+        var checkpoint = new SpatialSecurityCheckpointModel();
+
+        checkpoint.EnterVipRoute();
+
+        Assert.True(checkpoint.IsVipRoute);
+        Assert.Equal(SpatialSecurityCheckpointStage.VipAccess, checkpoint.Stage);
+        Assert.True(checkpoint.ClearVipRoute());
+        Assert.True(checkpoint.HasClearedCheckpoint);
+        Assert.Equal("VIP-PASS", checkpoint.BadgeId);
+        Assert.Equal(SpatialSecurityClearance.Vip, checkpoint.BadgeClearance);
+    }
+
+    [Fact]
     public void Badge_Tiers_Are_Preserved_After_Checkpoint_Clearance()
     {
         var checkpoint = new SpatialSecurityCheckpointModel();
