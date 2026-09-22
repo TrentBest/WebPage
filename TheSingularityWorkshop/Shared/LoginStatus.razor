@@ -36,7 +36,7 @@
     {
         // Mock login prompt: In a real app, this would use a modal or navigation.
         // For now, we simulate setting a unique name or defaulting to Anonymous if cancelled.
-        string? name = "Tester" + new Random().Next(100, 999).ToString();
+        string? name = "Tester" + new SquirrelRng(0x4C4F4749u).Next(100, 999).ToString();
 
         // This line would normally be a JavaScript prompt or a Blazor modal interaction
         // For simplicity in this mockup, we just assign a name.
