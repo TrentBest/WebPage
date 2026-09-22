@@ -26,12 +26,11 @@ public sealed class WorkshopExperienceService : IDisposable
         IsInitialized = true;
         IsFirstVisit = !returningVisitor;
 
-        if (IsFirstVisit)
-        {
-            CurrentState = "FirstContact";
-            _firstContact.Start();
-            StateChanged?.Invoke();
-        }
+        // Every browser launch begins at the authored first-contact boundary.
+        // Returning-visitor persistence must not bypass the perception sequence.
+        CurrentState = "FirstContact";
+        _firstContact.Start();
+        StateChanged?.Invoke();
     }
 
     public void MarkVisited() { }
