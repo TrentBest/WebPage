@@ -44,7 +44,7 @@ public sealed class SpatialWorkshopModel
         => inner.X >= outer.X &&
            inner.Y >= outer.Y &&
            inner.X + inner.Width <= outer.X + outer.Width &&
-           inner.Y + inner.Height <= outer.Y + outer.Height);
+           inner.Y + inner.Height <= outer.Y + outer.Height;
 }
 
 /// <summary>
