@@ -52,6 +52,21 @@ public sealed class PlantGrowthGeometryTests
         Assert.True(delays.SequenceEqual(delays.OrderBy(x => x)));
     }
 
+    [Fact(DisplayName = "Vine FSM clocks produce staggered bloom progress")]
+    public void HubGrowth_BloomsArriveAtDifferentTimes()
+    {
+        using var plant = new PlantGrowthMicroBundle();
+        plant.Start();
+
+        for (var i = 0; i < 60; i++)
+            plant.Update();
+
+        var progress = plant.Panels.Select(x => x.BloomProgress).ToArray();
+        Assert.Contains(progress, value => value > 0);
+        Assert.Contains(progress, value => value < 1);
+        Assert.True(progress.Distinct().Count() > 1);
+    }
+
     [Fact(DisplayName = "Growth paths terminate at their final mesh slots")]
     public void HubGrowth_VinesTerminateAtPanelAnchors()
     {
