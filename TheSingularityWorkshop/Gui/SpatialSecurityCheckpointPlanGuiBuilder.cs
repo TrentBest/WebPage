@@ -234,7 +234,7 @@ public static class SpatialSecurityCheckpointPlanGuiBuilder
             .Style("border", $"2px solid {Yellow}").Style("background", "#08151d")
             .Style("cursor", "pointer").Style("display", "flex").Style("flex-direction", "column")
             .Style("align-items", "center").Style("justify-content", "center")
-            .OnClick(_ => clearVipRoute)
+             .OnClick(_ => clearVipRoute())
             .Content(WorkshopGui.Element(receiver, "div").Style("color", Yellow).Style("font-size", "1.2rem").Style("font-weight", "700").Text("CARD"))
             .Content(WorkshopGui.Element(receiver, "div").Style("color", White).Style("font-size", "1rem").Text("READER"))
             .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".5rem").Style("color", Muted).Style("font-size", ".75rem").Text("TAP VIP PASS")));
