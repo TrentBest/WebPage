@@ -87,6 +87,10 @@
     private string? gravityBodyAId = "earth";
     private string? gravityBodyBId = "moon";
     private bool threeDimensionalLabActive;
+    private string renderingResearchStationId = "micro-detail";
+    private double renderingResearchDimension = .5d;
+    private string renderingResearchCamera = "frame";
+    private IJSObjectReference? renderingResearchModule;
     private static readonly SpatialIslandExperience Island = SpatialIslandExperience.SingularityIsland;
     private int detailLevel = 16;
     private int mansionDensity = 1;
@@ -130,26 +134,41 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender || gardenVisitResolved) return;
-
-        try
+        if (firstRender && !gardenVisitResolved)
         {
-            var visited = await JS.InvokeAsync<bool>("workshopExploreGardenVisited");
-            gardenMode = !visited;
-            gardenVisitResolved = true;
-            if (!visited)
-                await JS.InvokeVoidAsync("markWorkshopExploreGardenVisited");
-        }
-        catch (JSException)
-        {
-            // The spatial Experience must remain usable if the optional garden-visit
-            // persistence hook is unavailable (for example during a stale deployment).
-            // Do not let a browser-side storage/module problem tear down the Blazor circuit.
-            gardenMode = false;
-            gardenVisitResolved = true;
+            try
+            {
+                var visited = await JS.InvokeAsync<bool>("workshopExploreGardenVisited");
+                gardenMode = !visited;
+                gardenVisitResolved = true;
+                if (!visited)
+                    await JS.InvokeVoidAsync("markWorkshopExploreGardenVisited");
+            }
+            catch (JSException)
+            {
+                gardenMode = false;
+                gardenVisitResolved = true;
+            }
+
+            await InvokeAsync(StateHasChanged);
+            return;
         }
 
-        await InvokeAsync(StateHasChanged);
+        if (insideRoomId == "singularity-lab-research")
+        {
+            renderingResearchModule ??= await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./Workshop/voxel-substrate-lab.js?v=164");
+
+            if (!renderingResearchModule.Equals(null))
+            {
+                await renderingResearchModule.InvokeVoidAsync(
+                    "startVoxelSubstrateLab",
+                    "laboratory-rendering-canvas",
+                    RenderingResearchSpecimen(renderingResearchStationId),
+                    renderingResearchDimension,
+                    renderingResearchCamera);
+            }
+        }
     }
 
     private ElementBuilder BuildGui()
@@ -243,6 +262,19 @@
                 AccessLaboratoryReception,
                 EnterLaboratoryElevator,
                 EnterLaboratoryDirector,
+                EnterLaboratoryRenderingResearch,
+                ExitRoom);
+
+        if (insideRoomId == "singularity-lab-research")
+            return SpatialLaboratoryResearchGuiBuilder.Build(
+                this,
+                Experience.User.DisplayName,
+                renderingResearchStationId,
+                renderingResearchDimension >= .75d,
+                SelectRenderingResearchStation,
+                ToggleRenderingResearchDimension,
+                SetRenderingResearchDimension,
+                SetRenderingResearchCamera,
                 ExitRoom);
 
         if (insideRoomId == "singularity-lab-entrance")
@@ -952,6 +984,49 @@
         insideRoomId = "singularity-lab-director";
     }
 
+    private void EnterLaboratoryRenderingResearch()
+    {
+        if (insideRoomId != "singularity-lab-plan" || !laboratoryDirectorAccessGranted) return;
+
+        renderingResearchStationId = "micro-detail";
+        renderingResearchDimension = .5d;
+        renderingResearchCamera = "frame";
+        insideRoomId = "singularity-lab-research";
+    }
+
+    private void SelectRenderingResearchStation(string stationId)
+    {
+        renderingResearchStationId = stationId;
+        if (renderingResearchStationId == "micro-detail")
+        {
+            renderingResearchDimension = Math.Min(renderingResearchDimension, .5d);
+            renderingResearchCamera = "frame";
+        }
+        else
+        {
+            renderingResearchCamera = stationId == "cosmic-zoom" ? "orbit" : renderingResearchCamera;
+        }
+    }
+
+    private void ToggleRenderingResearchDimension()
+    {
+        renderingResearchDimension = renderingResearchDimension >= .75d ? .5d : 1d;
+    }
+
+    private void SetRenderingResearchDimension(string value)
+    {
+        if (double.TryParse(value, System.Globalization.CultureInfo.InvariantCulture, out var dimension))
+            renderingResearchDimension = Math.Clamp(dimension, 0d, 1d);
+    }
+
+    private void SetRenderingResearchCamera(string camera)
+    {
+        renderingResearchCamera = camera;
+    }
+
+    private static string RenderingResearchSpecimen(string stationId)
+        => stationId == "micro-detail" ? "detail" : "massive";
+
     private void StartHolodeckLoopIfNeeded()
     {
         if (insideRoomId != "lab-holodeck" || holodeckCts is not null)
@@ -1623,11 +1698,21 @@
             selectedLeaderboardEntry = null;
         }
 
-        if (insideRoomId == "singularity-lab-plan" || insideRoomId == "singularity-lab-director")
+        if (insideRoomId is "singularity-lab-plan" or "singularity-lab-director" or "singularity-lab-research")
         {
             laboratoryDirectorAccessGranted = false;
             laboratoryPlanAvatarX = 50;
             laboratoryPlanAvatarY = 36;
+            renderingResearchStationId = "micro-detail";
+            renderingResearchDimension = .5d;
+            renderingResearchCamera = "frame";
+            if (renderingResearchModule is not null)
+            {
+                try { await renderingResearchModule.InvokeVoidAsync("stopVoxelSubstrateLab"); }
+                catch (JSException) { }
+                await renderingResearchModule.DisposeAsync();
+                renderingResearchModule = null;
+            }
         }
 
         if (insideRoomId == "singularity-lab-entrance")
@@ -1674,5 +1759,11 @@
         MansionStructure.Dispose();
         MazeLeaderboard.Dispose();
         if (spatialModule is not null) _ = spatialModule.DisposeAsync();
+        if (renderingResearchModule is not null)
+        {
+            try { _ = renderingResearchModule.InvokeVoidAsync("stopVoxelSubstrateLab"); }
+            catch (JSException) { }
+            _ = renderingResearchModule.DisposeAsync();
+        }
     }
 }
