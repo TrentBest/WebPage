@@ -29,6 +29,7 @@ public sealed class UserMicroBundle : IDisposable
     public bool IsAuthenticated => Identity.IsAuthenticated;
     public bool IsAnonymous => Identity.IsAnonymous;
     public string DisplayName => Identity.DisplayName;
+    public string? AvatarUrl => Identity.AvatarUrl;
 
     /// <summary>Creates a stable anonymous visitor identity for this Experience.</summary>
     public void SignInAnonymously()
@@ -54,6 +55,12 @@ public sealed class UserMicroBundle : IDisposable
             IsAnonymous: false);
     }
 
+    public void SetAvatar(string? avatarUrl)
+    {
+        if (_disposed) return;
+        Identity = Identity with { AvatarUrl = string.IsNullOrWhiteSpace(avatarUrl) ? null : avatarUrl.Trim() };
+    }
+
     public void Update() => _lifecycle.Update();
 
     public void Invalidate() => _lifecycle.Invalidate();
@@ -71,7 +78,8 @@ public sealed record UserIdentity(
     Guid Id,
     string DisplayName,
     bool IsAuthenticated,
-    bool IsAnonymous)
+    bool IsAnonymous,
+    string? AvatarUrl = null)
 {
     public static UserIdentity Anonymous() =>
         new(Guid.NewGuid(), "Anonymous", IsAuthenticated: false, IsAnonymous: true);
