@@ -16,7 +16,8 @@ public static partial class SpatialWorkshopMapGuiBuilder
         Action<SpatialMapScope>? setScope = null,
         SpatialWorkshopArrangement? arrangement = null,
         Action<string, int, int>? moveBuilding = null,
-        Func<string, Task>? copyAiContext = null)
+        Func<string, Task>? copyAiContext = null,
+        Action<string>? requestAecReview = null)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("z-index", "200")
@@ -90,7 +91,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("gap", ".8rem").Style("min-height", "0").Style("flex", "1");
 
         layout.Content(scope == SpatialMapScope.Workshop
-            ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement, moveBuilding, copyAiContext)
+            ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement, moveBuilding, copyAiContext, requestAecReview)
             : scope == SpatialMapScope.City
                 ? CityMap(receiver, avatarX, avatarY, selectDestination, zoom, setZoom)
                 : scope == SpatialMapScope.World
@@ -130,7 +131,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("font-size", ".43rem").Style("cursor", "pointer")
             .OnClick(() => setScope?.Invoke(value));
 
-    private static ElementBuilder Map(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, SpatialWorkshopArrangement? arrangement, Action<string, int, int>? moveBuilding, Func<string, Task>? copyAiContext)
+    private static ElementBuilder Map(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, SpatialWorkshopArrangement? arrangement, Action<string, int, int>? moveBuilding, Func<string, Task>? copyAiContext, Action<string>? requestAecReview)
     {
         var map = MapFrame(receiver, zoom, setZoom);
         map.Content(WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100")
@@ -194,7 +195,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Style("font-family", "inherit").Style("font-size", ".38rem")
                 .Style("cursor", "pointer")
                 .Title($"Ask the AEC team to change {item.Name}")
-                .OnClick(() => selectDestination("aec-remote-office"))
+                .OnClick(() => requestAecReview?.Invoke(item.Id))
                 .StopPropagation("onclick"));
 
             controls.Content(WorkshopGui.Button(receiver).Label("AI")
