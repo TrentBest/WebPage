@@ -6,17 +6,16 @@ namespace TheSingularityWorkshop.Services;
 /// <summary>Owns the first-contact sequence. Razor renders state; it does not schedule it.</summary>
 public sealed class FirstContactFsm : IDisposable
 {
-    public const string Group = "FirstContact.Sequence";
-    public const string Definition = "FirstContact.SequenceFSM";
-
+    private readonly string _group = $"FirstContact.Sequence:{Guid.NewGuid():N}";
+    private readonly string _definition = $"FirstContact.SequenceFSM:{Guid.NewGuid():N}";
     private readonly FirstContactContext _context = new();
     private readonly FSMHandle _fsm;
     private bool _disposed;
 
     public FirstContactFsm()
     {
-        FSM_API.FSM_API.Create.CreateProcessingGroup(Group);
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(Definition, -1, Group)
+        FSM_API.FSM_API.Create.CreateProcessingGroup(_group);
+        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_definition, -1, _group)
             .State("Statement", EnterState, UpdateClock, null)
             .State("Question", EnterState, UpdateClock, null)
             .State("Moniker", EnterState, UpdateClock, null)
@@ -29,7 +28,7 @@ public sealed class FirstContactFsm : IDisposable
             .WithInitialState("Statement")
             .BuildDefinition();
 
-        _fsm = FSM_API.FSM_API.Create.CreateInstance(Definition, _context, Group);
+        _fsm = FSM_API.FSM_API.Create.CreateInstance(_definition, _context, _group);
     }
 
     public string CurrentState => _fsm.CurrentState;
@@ -46,7 +45,7 @@ public sealed class FirstContactFsm : IDisposable
         if (_disposed || !_context.Started || IsLanding) return;
 
         var before = _fsm.CurrentState;
-        FSM_API.FSM_API.Interaction.Update(Group);
+        FSM_API.FSM_API.Interaction.Update(_group);
 
         if (before != _fsm.CurrentState)
         {
@@ -68,7 +67,7 @@ public sealed class FirstContactFsm : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(Definition, Group);
+        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_definition, _group);
         _disposed = true;
     }
 
@@ -76,7 +75,7 @@ public sealed class FirstContactFsm : IDisposable
 
     private sealed class FirstContactContext : IStateContext
     {
-        public string Name { get; set; } = Definition;
+        public string Name { get; set; } = "FirstContact.SequenceFSM";
         public bool IsValid { get; set; } = true;
         public bool Started { get; set; }
         public long Ticks { get; set; }
