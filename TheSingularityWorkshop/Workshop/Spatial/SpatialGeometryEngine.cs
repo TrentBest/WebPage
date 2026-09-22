@@ -4,7 +4,7 @@ namespace TheSingularityWorkshop.Gui;
 public enum SpatialGeometryKind { Line, Rectangle, Circle, Wall }
 
 /// <summary>Semantic opening cut into a wall perimeter.</summary>
-public enum SpatialOpeningKind { Door, SlidingDoor, Window, Passage }
+public enum SpatialOpeningKind { Door, Window, Passage }
 
 /// <summary>A wall opening expressed along one edge of an axis-aligned building.</summary>
 public readonly record struct SpatialOpening(SpatialOpeningKind Kind, SpatialGeometryEdge Edge, double Start, double End)
