@@ -26,8 +26,13 @@ public static class SpatialAECRemoteOfficeLobbyGuiBuilder
         object receiver,
         string avatarName,
         Stage stage,
+        SpatialWorkshopScene scene,
+        SpatialWorkshopArrangement arrangement,
+        string? selectedBuildingId,
         Action speakToReceptionist,
         Action beginConsultation,
+        Action<string, int, int> moveBuilding,
+        Action<string> editBuilding,
         Action exitLobby)
     {
         var root = WorkshopGui.Panel(receiver)
@@ -41,8 +46,67 @@ public static class SpatialAECRemoteOfficeLobbyGuiBuilder
         root.Content(FloorPlan(receiver, stage));
         root.Content(Avatar(receiver, avatarName, stage));
         root.Content(StageOverlay(receiver, avatarName, stage, speakToReceptionist, beginConsultation));
+        root.Content(WorkshopConfiguration(receiver, scene, arrangement, selectedBuildingId, moveBuilding, editBuilding));
         root.Content(Exit(receiver, exitLobby));
         return root;
+    }
+
+
+    private static ElementBuilder WorkshopConfiguration(
+        object receiver,
+        SpatialWorkshopScene scene,
+        SpatialWorkshopArrangement arrangement,
+        string? selectedBuildingId,
+        Action<string, int, int> moveBuilding,
+        Action<string> editBuilding)
+    {
+        var panel = WorkshopGui.Panel(receiver)
+            .Style("position", "absolute").Style("right", "2%").Style("top", "17%").Style("z-index", "35")
+            .Style("width", "min(30rem,31vw)").Style("max-height", "68vh").Style("overflow", "auto")
+            .Style("padding", ".75rem")
+            .Style("border", $"1px solid {Yellow}55")
+            .Style("background", "rgba(1,6,12,.94)");
+
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("color", Yellow).Style("font-size", ".43rem").Style("letter-spacing", ".15em")
+            .Text("AEC REMOTE OFFICE // AUTHORIZED WORKSHOP CONFIGURATION"));
+
+        panel.Content(WorkshopGui.Element(receiver, "div")
+            .Style("margin-top", ".35rem").Style("color", Muted).Style("font-size", ".33rem").Style("line-height", "1.45")
+            .Text("This is the only place in the visitor experience where Workshop campus geometry may be proposed. The master map is read-only because a campus change affects everyone."));
+
+        foreach (var item in scene.Interactables)
+        {
+            var selected = string.Equals(item.Id, selectedBuildingId, StringComparison.OrdinalIgnoreCase);
+            var bounds = arrangement.GetBounds(item);
+            var row = WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".3rem").Style("padding", ".35rem")
+                .Style("border", $"1px solid {(selected ? Cyan : "#ffffff")}33")
+                .Style("background", selected ? $"{Cyan}0a" : "rgba(255,255,255,.018)");
+
+            row.Content(WorkshopGui.Element(receiver, "div")
+                .Style("color", selected ? Cyan : White).Style("font-size", ".37rem")
+                .Text($"{item.Name.ToUpperInvariant()} // X {bounds.X:0.#} Y {bounds.Y:0.#}"));
+
+            var controls = WorkshopGui.Element(receiver, "div")
+                .Style("display", "flex").Style("gap", ".2rem").Style("margin-top", ".25rem").Style("flex-wrap", "wrap");
+
+            foreach (var (label, dx, dy) in new[] { ("←", -1, 0), ("↑", 0, -1), ("↓", 0, 1), ("→", 1, 0) })
+                controls.Content(WorkshopGui.Button(receiver).Label(label)
+                    .Style("padding", ".22rem .34rem").Style("font-family", "inherit").Style("font-size", ".34rem")
+                    .Style("cursor", "pointer").OnClick(() => moveBuilding(item.Id, dx, dy)));
+
+            controls.Content(WorkshopGui.Button(receiver).Label("EDIT BUILDING")
+                .Style("padding", ".22rem .42rem").Style("border", $"1px solid {Magenta}66")
+                .Style("background", $"{Magenta}0a").Style("color", Magenta)
+                .Style("font-family", "inherit").Style("font-size", ".34rem").Style("cursor", "pointer")
+                .OnClick(() => editBuilding(item.Id)));
+
+            row.Content(controls);
+            panel.Content(row);
+        }
+
+        return panel;
     }
 
     private static ElementBuilder FloorPlan(object receiver, Stage stage)
