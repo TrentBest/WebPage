@@ -37,7 +37,7 @@
     // The Hub belongs to the execution host. It presents after the terminal
     // startup Experience has had its presentation window, not after an arbitrary
     // moniker-specific FSM transition completes.
-    private bool ShowWorkshopChrome => !IsWorkshopLanding || _startupPresentationComplete;
+    private bool ShowWorkshopChrome => !IsWorkshopLanding || Experience.CurrentState == "Intro";
 
     private bool _chromeReleased;
 
