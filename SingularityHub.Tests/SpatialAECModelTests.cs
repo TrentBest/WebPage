@@ -1,3 +1,4 @@
+using System.Linq;
 using TheSingularityWorkshop.Gui;
 using Xunit;
 
