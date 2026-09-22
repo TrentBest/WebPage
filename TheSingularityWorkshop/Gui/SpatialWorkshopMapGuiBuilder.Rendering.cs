@@ -64,14 +64,17 @@ public static partial class SpatialWorkshopMapGuiBuilder
                     .Text($"SESSION // {moniker.ToUpperInvariant()}"))
                 .Content(WorkshopGui.Element(receiver, "div")
                     .Style("color", "#8fa7b2").Style("font-size", ".36rem").Style("letter-spacing", ".12em")
-                    .Text("MAP STATUS // LIVE ARRANGEMENT")))
-            {
-                SpatialMapScope.Workshop => "WORKSHOP CAMPUS // COMPLETE MAP",
-                SpatialMapScope.City => "SINGULARITY CITY // UNDER CONSTRUCTION",
-                SpatialMapScope.World => "WORLD // DEVELOPMENT MAP",
-                SpatialMapScope.SolarSystem => "SOLAR SYSTEM // UNDER CONSTRUCTION",
-                _ => "SPATIAL MAP"
-            })));
+                    .Text("MAP STATUS // LIVE ARRANGEMENT"))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("color", "#8fa7b2").Style("font-size", ".36rem").Style("letter-spacing", ".12em")
+                    .Text(scope switch
+                    {
+                        SpatialMapScope.Workshop => "WORKSHOP CAMPUS // COMPLETE MAP",
+                        SpatialMapScope.City => "SINGULARITY CITY // UNDER CONSTRUCTION",
+                        SpatialMapScope.World => "WORLD // DEVELOPMENT MAP",
+                        SpatialMapScope.SolarSystem => "SOLAR SYSTEM // UNDER CONSTRUCTION",
+                        _ => "SPATIAL MAP"
+                    }))));
 
         var scopeBar = WorkshopGui.Element(receiver, "div")
             .Style("display", "flex").Style("gap", ".35rem").Style("flex-wrap", "wrap")
