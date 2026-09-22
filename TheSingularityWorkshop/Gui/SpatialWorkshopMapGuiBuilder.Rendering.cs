@@ -14,9 +14,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
         double zoom = 1d,
         Action<double>? setZoom = null,
         Action<SpatialMapScope>? setScope = null,
-        SpatialWorkshopArrangement? arrangement = null,
-        Func<string, Task>? copyAiContext = null,
-        Action<string>? requestAecReview = null)
+        SpatialWorkshopArrangement? arrangement = null)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("z-index", "200")
@@ -47,10 +45,10 @@ public static partial class SpatialWorkshopMapGuiBuilder
                     .Style("font-weight", "800").Style("letter-spacing", ".16em")
                     .Text(scope switch
                     {
-                        SpatialMapScope.Workshop => "SINGULARITY WORKSHOP // MASTER FACILITY MAP",
-                        SpatialMapScope.City => "SINGULARITY CITY // MASTER DEVELOPMENT MAP",
-                        SpatialMapScope.World => "WORLD // DEVELOPMENT MAP",
-                        SpatialMapScope.SolarSystem => "SOLAR SYSTEM // DEVELOPMENT MAP",
+                        SpatialMapScope.Workshop => "MAP: WORKSHOP",
+                        SpatialMapScope.City => "MAP: CITY // UNDER CONSTRUCTION",
+                        SpatialMapScope.World => "MAP: WORLD // UNDER CONSTRUCTION",
+                        SpatialMapScope.SolarSystem => "MAP: SOLAR SYSTEM // UNDER CONSTRUCTION",
                         _ => "SPATIAL MASTER MAP"
                     }))
                 .Content(WorkshopGui.Element(receiver, "div")
@@ -79,7 +77,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("display", "flex").Style("gap", ".35rem").Style("flex-wrap", "wrap")
             .Style("align-items", "center").Style("margin", ".65rem 0")
             .Content(ScopeButton(receiver, "WORKSHOP", SpatialMapScope.Workshop, scope, setScope))
-            .Content(ScopeButton(receiver, "SINGULARITY CITY // UNDER CONSTRUCTION", SpatialMapScope.City, scope, setScope))
+            .Content(ScopeButton(receiver, "CITY // UNDER CONSTRUCTION", SpatialMapScope.City, scope, setScope))
             .Content(ScopeButton(receiver, "WORLD // UNDER CONSTRUCTION", SpatialMapScope.World, scope, setScope))
             .Content(ScopeButton(receiver, "SOLAR SYSTEM // UNDER CONSTRUCTION", SpatialMapScope.SolarSystem, scope, setScope))
             .Content(WorkshopGui.Element(receiver, "span").Style("margin-left", "auto").Style("color", "#8fa7b2").Style("font-size", ".43rem")
@@ -93,7 +91,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("gap", ".8rem").Style("min-height", "0").Style("flex", "1");
 
         layout.Content(scope == SpatialMapScope.Workshop
-            ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement, copyAiContext, requestAecReview)
+            ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement)
             : scope == SpatialMapScope.City
                 ? CityMap(receiver, avatarX, avatarY, selectDestination, zoom, setZoom)
                 : scope == SpatialMapScope.World
@@ -114,7 +112,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("gap", "1rem").Style("margin-top", ".7rem")
             .Content(WorkshopGui.Element(receiver, "span").Style("color", "#a8bbc4").Style("font-size", ".46rem")
                 .Text(scope == SpatialMapScope.Workshop
-                    ? "SELECT A BUILDING TO REVEAL AEC / AI / ENTER CONTROLS. CAMPUS GEOMETRY IS READ-ONLY HERE."
+                    ? "SELECT A BUILDING. THE MAP CLOSES, YOUR AVATAR WALKS TO ITS DOOR, AND A SECOND CLICK ENTERS."
                     : "UNDER CONSTRUCTION: APPROXIMATE MASSING ONLY. PROXIMITY WILL EXPLAIN EACH FUTURE FUNCTION."))
             .Content(WorkshopGui.Button(receiver).Label("CLOSE MAP")
                 .Style("padding", ".45rem .7rem").Style("border", $"1px solid {Magenta}66")
@@ -133,7 +131,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("font-size", ".43rem").Style("cursor", "pointer")
             .OnClick(() => setScope?.Invoke(value));
 
-    private static ElementBuilder Map(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, SpatialWorkshopArrangement? arrangement, Func<string, Task>? copyAiContext, Action<string>? requestAecReview)
+    private static ElementBuilder Map(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, SpatialWorkshopArrangement? arrangement)
     {
         var map = MapFrame(receiver, zoom, setZoom);
         map.Content(WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100")
@@ -171,56 +169,65 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Style("text-align", "center").Style("text-shadow", "0 1px 2px #000")
                 .Style("pointer-events", "none").Text(item.Name));
 
-            var controls = WorkshopGui.Element(receiver, "div")
-                .Class("workshop-map-building-controls")
-                .Style("position", "absolute")
-                .Style("left", "50%").Style("top", "100%")
-                .Style("transform", "translateX(-50%)")
-                .Style("display", "flex").Style("gap", ".2rem")
-                .Style("align-items", "center")
-                .Style("padding", ".2rem")
-                .Style("background", "rgba(1,4,10,.96)")
-                .Style("border", $"1px solid {accent}77")
-                .Style("z-index", "20")
-                .Style("white-space", "nowrap");
+            container.Content(MapBuildingGeometry(receiver, item, b, accent));
+            container.OnClick(() => _ = selectDestination(item.Id)).StopPropagation("onclick");
 
-            controls.Content(WorkshopGui.Button(receiver).Label("AEC")
-                .Style("padding", ".22rem .35rem")
-                .Style("border", $"1px solid {Yellow}77")
-                .Style("background", $"{Yellow}12")
-                .Style("color", Yellow)
-                .Style("font-family", "inherit").Style("font-size", ".38rem")
-                .Style("cursor", "pointer")
-                .Title($"Ask the AEC team to change {item.Name}")
-                .OnClick(() => requestAecReview?.Invoke(item.Id))
-                .StopPropagation("onclick"));
 
-            controls.Content(WorkshopGui.Button(receiver).Label("AI")
-                .Style("padding", ".22rem .35rem")
-                .Style("border", $"1px solid {Cyan}77")
-                .Style("background", $"{Cyan}12")
-                .Style("color", Cyan)
-                .Style("font-family", "inherit").Style("font-size", ".38rem")
-                .Style("cursor", "pointer")
-                .Title($"Copy focused AI context for {item.Name}")
-                .OnClick(() => copyAiContext?.Invoke(item.Id))
-                .StopPropagation("onclick"));
-
-            controls.Content(WorkshopGui.Button(receiver).Label("ENTER")
-                .Style("padding", ".22rem .35rem")
-                .Style("border", $"1px solid {Green}77")
-                .Style("background", $"{Green}12")
-                .Style("color", Green)
-                .Style("font-family", "inherit").Style("font-size", ".38rem")
-                .Style("cursor", "pointer")
-                .OnClick(() => _ = selectDestination(item.Id))
-                .StopPropagation("onclick"));
-
-            container.Content(controls);
             map.Content(container);
         }
 
         return AddYouAreHere(receiver, map, avatarX, avatarY);
+    }
+
+
+    private static ElementBuilder MapBuildingGeometry(object receiver, SpatialInteractable item, SpatialBounds b, string accent)
+    {
+        var svg = WorkshopGui.Element(receiver, "svg")
+            .Attribute("viewBox", "0 0 100 100")
+            .Style("position", "absolute").Style("inset", "0").Style("width", "100%").Style("height", "100%")
+            .Style("pointer-events", "none").Style("overflow", "visible");
+
+        svg.Content(WorkshopGui.Element(receiver, "rect")
+            .Attribute("x", 1).Attribute("y", 1).Attribute("width", 98).Attribute("height", 98)
+            .Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-opacity", ".55").Attribute("stroke-width", "1.1"));
+
+        foreach (var opening in item.Openings)
+        {
+            var startX = opening.Edge is SpatialGeometryEdge.Top or SpatialGeometryEdge.Bottom
+                ? (opening.Start / Math.Max(1d, b.Width)) * 100d : 0d;
+            var startY = opening.Edge is SpatialGeometryEdge.Left or SpatialGeometryEdge.Right
+                ? (opening.Start / Math.Max(1d, b.Height)) * 100d : 0d;
+            var lengthX = opening.Edge is SpatialGeometryEdge.Top or SpatialGeometryEdge.Bottom
+                ? (opening.Length / Math.Max(1d, b.Width)) * 100d : 0d;
+            var lengthY = opening.Edge is SpatialGeometryEdge.Left or SpatialGeometryEdge.Right
+                ? (opening.Length / Math.Max(1d, b.Height)) * 100d : 0d;
+
+            switch (opening.Edge)
+            {
+                case SpatialGeometryEdge.Top:
+                    svg.Content(WorkshopGui.Element(receiver, "line").Attribute("x1", startX).Attribute("y1", 0).Attribute("x2", startX + lengthX).Attribute("y2", 0).Attribute("stroke", "#02060b").Attribute("stroke-width", "4"));
+                    if (opening.Kind == SpatialOpeningKind.Door)
+                        svg.Content(WorkshopGui.Element(receiver, "path").Attribute("d", $"M {startX + lengthX:0.##} 0 A {lengthX:0.##} {lengthX:0.##} 0 0 1 {startX:0.##} {lengthX:0.##}").Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-width", ".9"));
+                    break;
+                case SpatialGeometryEdge.Bottom:
+                    svg.Content(WorkshopGui.Element(receiver, "line").Attribute("x1", startX).Attribute("y1", 100).Attribute("x2", startX + lengthX).Attribute("y2", 100).Attribute("stroke", "#02060b").Attribute("stroke-width", "4"));
+                    if (opening.Kind == SpatialOpeningKind.Door)
+                        svg.Content(WorkshopGui.Element(receiver, "path").Attribute("d", $"M {startX + lengthX:0.##} 100 A {lengthX:0.##} {lengthX:0.##} 0 0 0 {startX:0.##} {100 - lengthX:0.##}").Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-width", ".9"));
+                    break;
+                case SpatialGeometryEdge.Right:
+                    svg.Content(WorkshopGui.Element(receiver, "line").Attribute("x1", 100).Attribute("y1", startY).Attribute("x2", 100).Attribute("y2", startY + lengthY).Attribute("stroke", "#02060b").Attribute("stroke-width", "4"));
+                    if (opening.Kind == SpatialOpeningKind.Door)
+                        svg.Content(WorkshopGui.Element(receiver, "path").Attribute("d", $"M 100 {startY + lengthY:0.##} A {lengthY:0.##} {lengthY:0.##} 0 0 0 {100 - lengthY:0.##} {startY:0.##}").Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-width", ".9"));
+                    break;
+                case SpatialGeometryEdge.Left:
+                    svg.Content(WorkshopGui.Element(receiver, "line").Attribute("x1", 0).Attribute("y1", startY).Attribute("x2", 0).Attribute("y2", startY + lengthY).Attribute("stroke", "#02060b").Attribute("stroke-width", "4"));
+                    if (opening.Kind == SpatialOpeningKind.Door)
+                        svg.Content(WorkshopGui.Element(receiver, "path").Attribute("d", $"M 0 {startY:0.##} A {lengthY:0.##} {lengthY:0.##} 0 0 0 {lengthY:0.##} {startY + lengthY:0.##}").Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-width", ".9"));
+                    break;
+            }
+        }
+
+        return svg;
     }
 
     private static ElementBuilder CityMap(object receiver, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom)
