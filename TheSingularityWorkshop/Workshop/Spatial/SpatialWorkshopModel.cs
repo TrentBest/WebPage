@@ -52,9 +52,35 @@ public sealed class SpatialWorkshopModel
 /// abstraction itself; an extension is still fully interactable but is not
 /// part of the Workshop's owned core.
 /// </summary>
-public sealed record SpatialWorkshopModelStructure(
-    string Id,
-    string Name,
-    SpatialBounds Bounds,
-    bool IsCore,
-    string? ExperienceId = null);
+public sealed class SpatialWorkshopModelStructure
+{
+    public SpatialWorkshopModelStructure(
+        string id,
+        string name,
+        SpatialBounds bounds,
+        bool isCore,
+        string? experienceId = null)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            throw new ArgumentException("A structure id is required.", nameof(id));
+
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("A structure name is required.", nameof(name));
+
+        Id = id;
+        Name = name;
+        Bounds = bounds;
+        IsCore = isCore;
+        ExperienceId = experienceId;
+    }
+
+    public string Id { get; }
+
+    public string Name { get; }
+
+    public SpatialBounds Bounds { get; }
+
+    public bool IsCore { get; }
+
+    public string? ExperienceId { get; }
+}
