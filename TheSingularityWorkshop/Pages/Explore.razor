@@ -66,6 +66,8 @@
     private bool constructionTourActive;
     private string constructionTourMessage = "Stay close. I will show you what is being built.";
     private bool workshopMapVisible = true;
+    private bool aiTerminalOpen;
+    private string aiTerminalResponse = string.Empty;
     private SpatialMapScope workshopMapScope = SpatialMapScope.Workshop;
     private double workshopMapZoom = 1d;
     private bool gardenMode = true;
@@ -387,6 +389,7 @@
             root.Content(FsmScaffoldNotice());
         if (workshopMapVisible)
             root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope, WorkshopArrangement));
+        root.Content(WorkshopAiTerminalGuiBuilder.Build(this, Experience.User.DisplayName, Experience.User.AvatarUrl, WorkshopAiTerminalContext.ForMap(workshopMapScope, Scene), aiTerminalOpen, ToggleAiTerminal, CopyCurrentAiTerminalContext, aiTerminalResponse, value => aiTerminalResponse = value));
         return root;
     }
 
@@ -446,6 +449,14 @@
         => mazeZoom = Math.Clamp(zoom, .6, 2.2);
 
     private void ShowWorkshopMap() => workshopMapVisible = true;
+
+    private void ToggleAiTerminal() => aiTerminalOpen = !aiTerminalOpen;
+
+    private async Task CopyCurrentAiTerminalContext()
+    {
+        var context = WorkshopAiTerminalContext.ForMap(workshopMapScope, Scene);
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", context);
+    }
 
     private void SetWorkshopMapScope(SpatialMapScope scope) => workshopMapScope = scope;
 
