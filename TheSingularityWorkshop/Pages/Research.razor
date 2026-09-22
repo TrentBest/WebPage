@@ -111,7 +111,7 @@
     {
         if (!firstRender || started) return;
 
-        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/dimensional-research-lab.js");
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/dimensional-research-lab.js?v=2");
         await module.InvokeVoidAsync("startDimensionalResearchLab", "dimension-research-canvas");
         started = true;
         cancellation = new CancellationTokenSource();
