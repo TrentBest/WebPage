@@ -986,7 +986,6 @@
     {
         if (insideRoomId != "singularity-lab-plan") return;
 
-        laboratoryDirectorAccessGranted = true;
         laboratoryVipPassCollected = true;
         LaboratoryAccess.UpgradeBadge("VIP-PASS", SpatialSecurityClearance.Vip);
     }
@@ -1007,8 +1006,9 @@
 
     private void EnterLaboratoryDirector()
     {
-        if (insideRoomId != "singularity-lab-plan" || !laboratoryDirectorAccessGranted) return;
+        if (insideRoomId != "singularity-lab-plan") return;
 
+        laboratoryDirectorAccessGranted = true;
         renderingResearchUnlocked = true;
         insideRoomId = "singularity-lab-director";
     }
