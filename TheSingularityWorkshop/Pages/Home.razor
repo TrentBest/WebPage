@@ -11,19 +11,8 @@
     }
     else if (Experience.CurrentState == "Intro")
     {
-        <section class="landing-stage" aria-label="The Singularity Workshop">
-            <div class="landing-aura" aria-hidden="true"></div>
-            <button class="enter-workshop" @onclick="EnterWorkshop" aria-label="Enter The Singularity Workshop">
-                <span class="enter-corner tl" aria-hidden="true"></span><span class="enter-corner tr" aria-hidden="true"></span>
-                <span class="enter-corner bl" aria-hidden="true"></span><span class="enter-corner br" aria-hidden="true"></span>
-                <span class="enter-orbit" aria-hidden="true"></span>
-                <img src="/Images/TheSingularityWorkshopLogo.png" alt="" /><strong>ENTER THE WORKSHOP</strong>
-            </button>
-            <div class="workshop-warning" role="note">
-                <div class="warning-header"><span>⚠</span> SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE <span>⚠</span></div>
-                <div class="warning-body">You are entering a living software environment assembled from state, capability, composition, and interaction.<br /><span class="warning-final">Viewer discretion and spare RAM advised.</span></div>
-            </div>
-        </section>
+        <WorkshopGatewayView OnEntryRequested="EnterWorkshop" />
+    }
     }
     else if (Experience.CurrentState == "FlexHello")
     {
