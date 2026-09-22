@@ -16,6 +16,7 @@
 
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
+    private readonly SpatialWorkshopArrangement WorkshopArrangement;
     private readonly WorkshopRouter Router = new("workshop");
     private readonly SpatialLinework ForgeLinework = new();
     private readonly SpatialAECRemoteOfficeManifest AECManifest = SpatialAECRemoteOfficeManifest.CreateDefault();
@@ -114,6 +115,7 @@
     public Explore()
     {
         Experience = new ExploreExperienceMicroBundle();
+        WorkshopArrangement = new SpatialWorkshopArrangement(Scene);
         Router.RegisterEntryPoint("mansion", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("construction-site", new SpatialPoint(12, 9));
         Router.RegisterEntryPoint("maze", SpatialMazeCatalog.Showcase.Start);
@@ -373,7 +375,7 @@
         if (FsmScaffoldReady)
             root.Content(FsmScaffoldNotice());
         if (workshopMapVisible)
-            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope));
+            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope, WorkshopArrangement, MoveWorkshopBuilding, CopyWorkshopAiContext));
         return root;
     }
 
@@ -527,6 +529,21 @@
                     : "Here is the heart of the expansion. When the definitions are ready, this becomes a place where creators can build, rehearse, record, and sell what they make.";
     }
     private void CloseWorkshopMap() => workshopMapVisible = false;
+
+    private void MoveWorkshopBuilding(string id, int dx, int dy)
+    {
+        WorkshopArrangement.TryMove(Scene, id, dx, dy);
+    }
+
+    private async Task CopyWorkshopAiContext(string id)
+    {
+        var item = Scene.Interactables.FirstOrDefault(candidate => candidate.Id == id);
+        if (item is null)
+            return;
+
+        var context = SpatialAiContextFactory.BuildContext(item, WorkshopArrangement.GetBounds(item));
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", context.ToClipboardText());
+    }
 
     private async Task SelectMapDestination(string id)
     {
