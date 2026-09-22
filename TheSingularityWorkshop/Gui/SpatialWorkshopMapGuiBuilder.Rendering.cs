@@ -13,7 +13,10 @@ public static partial class SpatialWorkshopMapGuiBuilder
         SpatialMapScope scope = SpatialMapScope.Workshop,
         double zoom = 1d,
         Action<double>? setZoom = null,
-        Action<SpatialMapScope>? setScope = null)
+        Action<SpatialMapScope>? setScope = null,
+        SpatialWorkshopArrangement? arrangement = null,
+        Action<string, int, int>? moveBuilding = null,
+        Func<string, Task>? copyAiContext = null)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("z-index", "200")
@@ -23,7 +26,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("font-family", "Consolas, 'Courier New', monospace");
 
         root.Content(WorkshopGui.Element(receiver, "style").Text(
-            "@keyframes workshop-map-pulse{0%,100%{opacity:.62;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}@keyframes workshop-map-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.42);transform:scale(1.035)}}.workshop-map-interactable:hover,.workshop-map-structure:hover{animation:workshop-map-breathe 1.35s ease-in-out infinite;transform-origin:center center}.workshop-map-interactable:focus-visible,.workshop-map-structure:focus-visible{outline:1px solid #ffd34d;outline-offset:2px}@media(prefers-reduced-motion:reduce){.workshop-map-interactable:hover,.workshop-map-structure:hover{animation:none;filter:brightness(1.2);transform:scale(1.01)}}"));
+            "@keyframes workshop-map-pulse{0%,100%{opacity:.62;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}@keyframes workshop-map-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.42);transform:scale(1.035)}}.workshop-map-interactable:hover,.workshop-map-structure:focus-within{animation:workshop-map-breathe 1.35s ease-in-out infinite;transform-origin:center center}.workshop-map-building-controls{opacity:0;pointer-events:none;transition:opacity .15s ease}.workshop-map-structure:hover .workshop-map-building-controls,.workshop-map-structure:focus-within .workshop-map-building-controls{opacity:1;pointer-events:auto}.workshop-map-interactable:focus-visible,.workshop-map-structure:focus-visible{outline:1px solid #ffd34d;outline-offset:2px}@media(prefers-reduced-motion:reduce){.workshop-map-interactable:hover,.workshop-map-structure:hover{animation:none;filter:brightness(1.2);transform:scale(1.01)}}"));
 
         var panel = WorkshopGui.Panel(receiver)
             .Style("width", "min(1280px,98vw)").Style("height", "min(92vh,900px)")
@@ -38,11 +41,29 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("display", "flex").Style("justify-content", "space-between").Style("align-items", "center")
             .Style("gap", "1rem").Style("flex-wrap", "wrap")
             .Content(WorkshopGui.Element(receiver, "div")
-                .Style("color", Cyan).Style("font-size", "clamp(.8rem,2vw,1.25rem)")
-                .Style("letter-spacing", ".22em").Text(moniker.ToUpperInvariant()))
+                .Style("display", "flex").Style("flex-direction", "column").Style("gap", ".2rem")
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("color", Cyan).Style("font-size", "clamp(.85rem,2.2vw,1.35rem)")
+                    .Style("font-weight", "800").Style("letter-spacing", ".16em")
+                    .Text(scope switch
+                    {
+                        SpatialMapScope.Workshop => "SINGULARITY WORKSHOP // MASTER FACILITY MAP",
+                        SpatialMapScope.City => "SINGULARITY CITY // MASTER DEVELOPMENT MAP",
+                        SpatialMapScope.World => "WORLD // DEVELOPMENT MAP",
+                        SpatialMapScope.SolarSystem => "SOLAR SYSTEM // DEVELOPMENT MAP",
+                        _ => "SPATIAL MASTER MAP"
+                    }))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("color", "#8fa7b2").Style("font-size", ".42rem").Style("letter-spacing", ".14em")
+                    .Text("PRIMARY NAVIGATION // SPATIAL TRUTH // INTERACTABLE FACILITIES")))
             .Content(WorkshopGui.Element(receiver, "div")
-                .Style("color", Yellow).Style("font-size", ".5rem").Style("letter-spacing", ".18em")
-                .Text(scope switch
+                .Style("display", "flex").Style("flex-direction", "column").Style("align-items", "flex-end").Style("gap", ".2rem")
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("color", Yellow).Style("font-size", ".45rem").Style("letter-spacing", ".14em")
+                    .Text($"SESSION // {moniker.ToUpperInvariant()}"))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("color", "#8fa7b2").Style("font-size", ".36rem").Style("letter-spacing", ".12em")
+                    .Text("MAP STATUS // LIVE ARRANGEMENT")))
             {
                 SpatialMapScope.Workshop => "WORKSHOP CAMPUS // COMPLETE MAP",
                 SpatialMapScope.City => "SINGULARITY CITY // UNDER CONSTRUCTION",
@@ -69,7 +90,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("gap", ".8rem").Style("min-height", "0").Style("flex", "1");
 
         layout.Content(scope == SpatialMapScope.Workshop
-            ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom)
+            ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement, moveBuilding, copyAiContext)
             : scope == SpatialMapScope.City
                 ? CityMap(receiver, avatarX, avatarY, selectDestination, zoom, setZoom)
                 : scope == SpatialMapScope.World
@@ -90,7 +111,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("gap", "1rem").Style("margin-top", ".7rem")
             .Content(WorkshopGui.Element(receiver, "span").Style("color", "#a8bbc4").Style("font-size", ".46rem")
                 .Text(scope == SpatialMapScope.Workshop
-                    ? "THE MAP SHOWS BUILDING FOOTPRINTS AND ONLY ONE MARKER: YOU ARE HERE."
+                    ? "SELECT A BUILDING TO REVEAL MOVE / AEC / AI / ENTER CONTROLS. ARROWS EDIT THE LIVE PLAN."
                     : "UNDER CONSTRUCTION: APPROXIMATE MASSING ONLY. PROXIMITY WILL EXPLAIN EACH FUTURE FUNCTION."))
             .Content(WorkshopGui.Button(receiver).Label("CLOSE MAP")
                 .Style("padding", ".45rem .7rem").Style("border", $"1px solid {Magenta}66")
@@ -109,7 +130,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("font-size", ".43rem").Style("cursor", "pointer")
             .OnClick(() => setScope?.Invoke(value));
 
-    private static ElementBuilder Map(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom)
+    private static ElementBuilder Map(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, SpatialWorkshopArrangement? arrangement, Action<string, int, int>? moveBuilding, Func<string, Task>? copyAiContext)
     {
         var map = MapFrame(receiver, zoom, setZoom);
         map.Content(WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100")
@@ -118,22 +139,87 @@ public static partial class SpatialWorkshopMapGuiBuilder
 
         foreach (var item in scene.Interactables)
         {
-            var b = item.Bounds;
+            var b = arrangement?.GetBounds(item) ?? item.Bounds;
             var accent = Accent(item.ExperienceId);
-            map.Content(WorkshopGui.Button(receiver)
-                .Class("workshop-map-interactable")
-                .Style("position", "absolute").Style("left", $"{b.X:0.##}%").Style("top", $"{b.Y:0.##}%")
-                .Style("width", $"{Math.Max(b.Width, 1.5d):0.##}%").Style("height", $"{Math.Max(b.Height, 1.5d):0.##}%")
-                .Style("box-sizing", "border-box").Style("padding", "0")
-                .Style("border", $"2px solid {accent}cc").Style("background", Fill(accent))
-                .Style("color", White).Style("font-family", "inherit").Style("cursor", "pointer").Style("z-index", "3")
-                .AriaLabel($"Navigate to {item.Name}").Title($"Select {item.Name}")
-                .OnClick(() => selectDestination(item.Id)).StopPropagation("onclick")
-                .Content(WorkshopGui.Element(receiver, "span").Style("display", "flex").Style("width", "100%").Style("height", "100%")
-                    .Style("align-items", "center").Style("justify-content", "center").Style("padding", ".15rem")
-                    .Style("box-sizing", "border-box").Style("font-size", "clamp(.4rem,.52vw,.62rem)")
-                    .Style("font-weight", "700").Style("line-height", "1.05").Style("text-align", "center")
-                    .Style("text-shadow", "0 1px 2px #000").Text(item.Name)));
+
+            var container = WorkshopGui.Element(receiver, "div")
+                .Class("workshop-map-structure")
+                .Style("position", "absolute")
+                .Style("left", $"{b.X:0.##}%")
+                .Style("top", $"{b.Y:0.##}%")
+                .Style("width", $"{Math.Max(b.Width, 1.5d):0.##}%")
+                .Style("height", $"{Math.Max(b.Height, 1.5d):0.##}%")
+                .Style("box-sizing", "border-box")
+                .Style("border", $"2px solid {accent}cc")
+                .Style("background", Fill(accent))
+                .Style("color", White)
+                .Style("z-index", "3")
+                .Style("outline", "none")
+                .Attribute("tabindex", "0")
+                .AriaLabel($"Select {item.Name}")
+                .Title($"Select {item.Name} // spatial editing controls");
+
+            container.Content(WorkshopGui.Element(receiver, "span")
+                .Style("position", "absolute")
+                .Style("left", "50%").Style("top", "50%")
+                .Style("transform", "translate(-50%,-50%)")
+                .Style("font-size", "clamp(.4rem,.52vw,.62rem)")
+                .Style("font-weight", "700").Style("line-height", "1.05")
+                .Style("text-align", "center").Style("text-shadow", "0 1px 2px #000")
+                .Style("pointer-events", "none").Text(item.Name));
+
+            var controls = WorkshopGui.Element(receiver, "div")
+                .Class("workshop-map-building-controls")
+                .Style("position", "absolute")
+                .Style("left", "50%").Style("top", "100%")
+                .Style("transform", "translateX(-50%)")
+                .Style("display", "flex").Style("gap", ".2rem")
+                .Style("align-items", "center")
+                .Style("padding", ".2rem")
+                .Style("background", "rgba(1,4,10,.96)")
+                .Style("border", $"1px solid {accent}77")
+                .Style("z-index", "20")
+                .Style("white-space", "nowrap");
+
+            controls.Content(ControlButton(receiver, "←", () => moveBuilding?.Invoke(item.Id, -1, 0)));
+            controls.Content(ControlButton(receiver, "↑", () => moveBuilding?.Invoke(item.Id, 0, -1)));
+            controls.Content(ControlButton(receiver, "↓", () => moveBuilding?.Invoke(item.Id, 0, 1)));
+            controls.Content(ControlButton(receiver, "→", () => moveBuilding?.Invoke(item.Id, 1, 0)));
+
+            controls.Content(WorkshopGui.Button(receiver).Label("AEC")
+                .Style("padding", ".22rem .35rem")
+                .Style("border", $"1px solid {Yellow}77")
+                .Style("background", $"{Yellow}12")
+                .Style("color", Yellow)
+                .Style("font-family", "inherit").Style("font-size", ".38rem")
+                .Style("cursor", "pointer")
+                .Title($"Ask the AEC team to change {item.Name}")
+                .OnClick(() => selectDestination("aec-remote-office"))
+                .StopPropagation("onclick"));
+
+            controls.Content(WorkshopGui.Button(receiver).Label("AI")
+                .Style("padding", ".22rem .35rem")
+                .Style("border", $"1px solid {Cyan}77")
+                .Style("background", $"{Cyan}12")
+                .Style("color", Cyan)
+                .Style("font-family", "inherit").Style("font-size", ".38rem")
+                .Style("cursor", "pointer")
+                .Title($"Copy focused AI context for {item.Name}")
+                .OnClick(() => copyAiContext?.Invoke(item.Id))
+                .StopPropagation("onclick"));
+
+            controls.Content(WorkshopGui.Button(receiver).Label("ENTER")
+                .Style("padding", ".22rem .35rem")
+                .Style("border", $"1px solid {Green}77")
+                .Style("background", $"{Green}12")
+                .Style("color", Green)
+                .Style("font-family", "inherit").Style("font-size", ".38rem")
+                .Style("cursor", "pointer")
+                .OnClick(() => _ = selectDestination(item.Id))
+                .StopPropagation("onclick"));
+
+            container.Content(controls);
+            map.Content(container);
         }
 
         return AddYouAreHere(receiver, map, avatarX, avatarY);
@@ -270,6 +356,18 @@ public static partial class SpatialWorkshopMapGuiBuilder
 
         return map;
     }
+
+    private static ElementBuilder ControlButton(object receiver, string label, Action action)
+        => WorkshopGui.Button(receiver).Label(label)
+            .Style("width", "1.35rem").Style("height", "1.25rem")
+            .Style("padding", "0")
+            .Style("border", "1px solid rgba(0,234,255,.35)")
+            .Style("background", "rgba(0,234,255,.06)")
+            .Style("color", White)
+            .Style("font-family", "inherit").Style("font-size", ".55rem")
+            .Style("cursor", "pointer")
+            .OnClick(action)
+            .StopPropagation("onclick");
 
     private static ElementBuilder SolarSystemDirectory(object receiver)
     {
