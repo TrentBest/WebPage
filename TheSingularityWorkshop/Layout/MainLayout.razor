@@ -39,10 +39,7 @@
     // moniker-specific FSM transition completes.
     private bool ShowWorkshopChrome => !IsWorkshopLanding || _startupPresentationComplete;
 
-    private bool _entryRequested;
     private bool _chromeReleased;
-    private bool _startupPresentationComplete;
-    private CancellationTokenSource? _monikerTimer;
 
     private string CurrentTabTitle
     {
@@ -71,13 +68,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (IsWorkshopLanding && !_entryRequested && Experience.CurrentState == "FlexHello")
-        {
-            _entryRequested = true;
-            FSM.RequestEnter();
-            return;
-        }
-
         if (!IsWorkshopLanding || !ShowWorkshopChrome || _chromeReleased)
             return;
 
@@ -97,44 +87,12 @@
 
     private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
 
-    private void HandleExperienceStateChanged()
-    {
-        if (Experience.CurrentState == "FlexHello" && _monikerTimer is null && !_startupPresentationComplete)
-            StartStartupPresentationTimer();
-
-        _ = InvokeAsync(StateHasChanged);
-    }
-
-    private void StartStartupPresentationTimer()
-    {
-        _monikerTimer = new CancellationTokenSource();
-        var token = _monikerTimer.Token;
-        _ = CompleteStartupPresentationAsync(token);
-    }
-
-    private async Task CompleteStartupPresentationAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await Task.Delay(FSM.Page.MonikerPresentationDuration, cancellationToken);
-            if (cancellationToken.IsCancellationRequested)
-                return;
-
-            _startupPresentationComplete = true;
-            FSM.SignalNavigationReady();
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-        }
-    }
+    private void HandleExperienceStateChanged() => _ = InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
         FSM.StateChanged -= HandleFSMStateChanged;
         Experience.StateChanged -= HandleExperienceStateChanged;
-        _monikerTimer?.Cancel();
-        _monikerTimer?.Dispose();
     }
 }
 
