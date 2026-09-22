@@ -910,7 +910,7 @@
     {
         try
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(900));
+            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(450));
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
                 if (insideRoomId != "singularity-lab-entrance" ||
