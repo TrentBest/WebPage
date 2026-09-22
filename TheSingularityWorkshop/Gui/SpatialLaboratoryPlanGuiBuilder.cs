@@ -91,7 +91,7 @@ public static class SpatialLaboratoryPlanGuiBuilder
 
         // Director is deliberately behind reception authority.
         Zone(svg, receiver, 42, 33, 24, 20, "LAB ADMINISTRATOR", Yellow);
-        Label(svg, receiver, 54, 44, "DIRECTOR", directorAccessGranted ? Green : Yellow, 1.25, true);
+        Label(svg, receiver, 54, 44, "LAB ADMIN", directorAccessGranted ? Green : Yellow, 1.25, true);
         Label(svg, receiver, 54, 48, directorAccessGranted ? "ACCESS GRANTED" : "ADMINISTRATIVE AUTHORITY", Muted, .72, false);
 
         // Secure vertical circulation.
@@ -126,8 +126,7 @@ public static class SpatialLaboratoryPlanGuiBuilder
         // only make the represented doors/desk discoverable.
         Hotspot(svg, receiver, 14, 33, 24, 20, Cyan, "RECEPTION", reception);
         Hotspot(svg, receiver, 70, 33, 16, 35, Magenta, "ELEVATOR", elevator);
-        if (directorAccessGranted)
-            Hotspot(svg, receiver, 42, 33, 24, 20, Green, "DIRECTOR", director);
+        Hotspot(svg, receiver, 42, 33, 24, 20, directorAccessGranted ? Green : Yellow, "LAB ADMINISTRATOR", director);
 
         Avatar(svg, receiver, avatarX, avatarY, userName);
 
