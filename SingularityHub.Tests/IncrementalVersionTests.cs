@@ -116,6 +116,16 @@ public sealed class IncrementalVersionTests
         Assert.Equal("researcher-13", second.LastEvent!.DiscovererId);
     }
 
+    [ArchitectureTest(0, 0, 169)] [Fact(DisplayName = "V0.0.169 — World_Event_Carries_Discovery_And_Presentation_Intent")]
+    public void V0_0_169WorldEventCarriesDiscoveryAndPresentationIntent()
+    {
+        var eventData = TheSingularityWorkshop.World.WorkshopWorldEvent.CreateThreeDimensionalityUnlock("singularity-laboratory", "researcher-13");
+
+        Assert.Equal("world.presentation.3d.unlock", eventData.EventType);
+        Assert.Equal("singularity-laboratory", eventData.LocationId);
+        Assert.Equal("researcher-13", eventData.DiscovererId);
+        Assert.Equal(TheSingularityWorkshop.World.WorkshopPresentationMode.ThreeDimensional, eventData.PresentationMode);
+    }
     [ArchitectureTest(0, 0, 170)] [Fact(DisplayName = "V0.0.170 — Research_Laboratory_Is_A_Level_Not_A_Button")]
     public void V0_0_170ResearchLaboratoryIsALevelNotAButton()
     {
@@ -142,14 +152,5 @@ public sealed class IncrementalVersionTests
             level.HiddenSwitch.Capability.ResultingPresentationMode);
     }
 
-    [ArchitectureTest(0, 0, 169)] [Fact(DisplayName = "V0.0.169 — World_Event_Carries_Discovery_And_Presentation_Intent")]
-    public void V0_0_169WorldEventCarriesDiscoveryAndPresentationIntent()
-    {
-        var eventData = TheSingularityWorkshop.World.WorkshopWorldEvent.CreateThreeDimensionalityUnlock("singularity-laboratory", "researcher-13");
 
-        Assert.Equal("world.presentation.3d.unlock", eventData.EventType);
-        Assert.Equal("singularity-laboratory", eventData.LocationId);
-        Assert.Equal("researcher-13", eventData.DiscovererId);
-        Assert.Equal(TheSingularityWorkshop.World.WorkshopPresentationMode.ThreeDimensional, eventData.PresentationMode);
-    }
 }
