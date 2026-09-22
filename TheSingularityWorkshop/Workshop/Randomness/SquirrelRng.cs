@@ -17,9 +17,11 @@ namespace TheSingularityWorkshop.Workshop.Randomness;
 /// </remarks>
 public sealed class SquirrelRng
 {
-    private const uint BitNoise1 = 0x68E31DA4u;
-    private const uint BitNoise2 = 0xB5297A4Du;
-    private const uint BitNoise3 = 0x1B56C4E9u;
+    private const uint BitNoise1 = 0xD2A80A3Fu;
+    private const uint BitNoise2 = 0xA884F197u;
+    private const uint BitNoise3 = 0x6C736F4Bu;
+    private const uint BitNoise4 = 0xB79F3ABBu;
+    private const uint BitNoise5 = 0x1B56C4F5u;
 
     private int _position = -1;
 
@@ -43,11 +45,15 @@ public sealed class SquirrelRng
             var mangledBits = (uint)position;
             mangledBits *= BitNoise1;
             mangledBits += seed;
-            mangledBits ^= mangledBits >> 8;
+            mangledBits ^= mangledBits >> 9;
             mangledBits += BitNoise2;
-            mangledBits ^= mangledBits << 8;
+            mangledBits ^= mangledBits >> 11;
             mangledBits *= BitNoise3;
-            mangledBits ^= mangledBits >> 8;
+            mangledBits ^= mangledBits >> 13;
+            mangledBits += BitNoise4;
+            mangledBits ^= mangledBits >> 15;
+            mangledBits *= BitNoise5;
+            mangledBits ^= mangledBits >> 17;
             return mangledBits;
         }
     }
