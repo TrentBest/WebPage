@@ -64,7 +64,7 @@ public sealed class SpatialLaboratoryDiscoveryLevel
         var hiddenSwitch = new SpatialLaboratorySwitchManifest(
             "switch.research-laboratory.3d",
             "RESEARCH SYSTEM // 07",
-            new SpatialPoint(36.5, 84),
+            new SpatialPoint(34.5, 84),
             "wall-service-panel",
             "A recessed physical switch hidden among ordinary laboratory infrastructure.",
             TheSingularityWorkshop.World.HiddenWorldSwitch.ResearchLaboratoryThreeDimensionality);
