@@ -1,0 +1,69 @@
+@using TheSingularityWorkshop.Workshop.Plant
+
+<section class="first-contact-stage @(State == "Moniker" || State == "HubGrowth" ? "living" : "")" aria-live="polite">
+    @if (State == "Statement")
+    {
+        <div class="contact-half top"><div class="statement">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div></div>
+    }
+    else if (State == "Question")
+    {
+        <div class="contact-half top memory"><div class="statement">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div></div>
+        <div class="contact-half bottom"><div class="question">HOW MANY WORDS IS A LIVING IMAGE WORTH?</div></div>
+    }
+    else
+    {
+        <div class="moniker-water" aria-hidden="true"></div>
+        <div class="moniker-foreground" aria-label="The Singularity Workshop"><div>THE</div><div>SINGULARITY</div><div>WORKSHOP</div></div>
+
+        @if (Plant is not null)
+        {
+            <svg class="plant-hub" viewBox="0 0 100 60" preserveAspectRatio="none" aria-label="The Hub growing from a plant">
+                <circle cx="2" cy="4" r="1.5" class="root-hole" />
+                @foreach (var vine in Plant.Vines)
+                {
+                    <path d="@vine.Path" pathLength="100" class="vine" style="stroke-dashoffset:@(100 - vine.Progress * 100);" />
+                }
+                @foreach (var panel in Plant.Panels)
+                {
+                    var bloom = panel.BloomProgress;
+                    var open = panel.OpenProgress;
+                    <g transform="translate(@panel.X @panel.Y)">
+                        <g class="flower" style="transform:scale(@(0.001 + bloom * 0.999));transform-origin:0 0;opacity:@(1 - open);">
+                            <circle r="2.1" class="flower-core" />
+                            <circle cx="0" cy="-3.2" r="2" class="petal" /><circle cx="3.1" cy="-1" r="2" class="petal" />
+                            <circle cx="2" cy="2.5" r="2" class="petal" /><circle cx="-2" cy="2.5" r="2" class="petal" />
+                            <circle cx="-3.1" cy="-1" r="2" class="petal" />
+                        </g>
+                        <g class="hub-panel" style="transform:scale(@(0.001 + open * 0.999));transform-origin:0 0;opacity:@open;">
+                            <rect x="@(-panel.Width / 2)" y="@(-panel.Height / 2)" width="@panel.Width" height="@panel.Height" rx=".8" />
+                            <text x="@(-panel.Width / 2 + 1.4)" y="@(-panel.Height / 2 + 3.2)">@panel.Title</text>
+                            @if (panel.Id == "content") { <text x="@(-panel.Width / 2 + 1.4)" y="@(-panel.Height / 2 + 6.2)" class="panel-detail">LIVE EXPERIENCE</text> }
+                            @if (panel.Id == "ai") { <text x="@(-panel.Width / 2 + 1.4)" y="@(-panel.Height / 2 + 6.2)" class="panel-detail">PROTOCOL / GRAMMAR</text> }
+                        </g>
+                    </g>
+                }
+            </svg>
+        }
+    }
+</section>
+
+<style>
+.first-contact-stage{position:absolute;inset:0;overflow:hidden;background:#020711;color:#fff}
+.contact-half{position:absolute;left:0;right:0;height:50%;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:6vw;text-align:center}.contact-half.top{top:0}.contact-half.bottom{bottom:0}
+.statement{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.1rem,3.2vw,3.4rem);font-weight:700;letter-spacing:.035em;color:#eefaff;text-shadow:0 0 18px rgba(0,234,255,.22)}
+.question{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.4rem,4vw,4.4rem);font-weight:700;letter-spacing:.02em;color:#ffd34d;text-shadow:0 0 18px rgba(255,211,77,.28)}
+.memory{opacity:.22;filter:blur(.5px);transform:scale(.98)}
+.moniker-water{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 78%,rgba(0,168,255,.18),transparent 28%),radial-gradient(ellipse at 48% 88%,rgba(0,234,255,.08),transparent 42%);opacity:.8}.moniker-water::after{content:"";position:absolute;left:18%;right:18%;bottom:14%;height:18%;border-radius:50%;border-top:1px solid rgba(0,234,255,.35);box-shadow:0 -12px 35px rgba(0,168,255,.08)}
+.moniker-foreground{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);z-index:4;text-align:center;font-size:clamp(1.1rem,3vw,3rem);font-weight:900;line-height:.86;letter-spacing:.08em;color:#eefaff;text-shadow:0 0 12px rgba(0,234,255,.75),0 0 35px rgba(0,168,255,.18)}
+.plant-hub{position:absolute;inset:0;width:100%;height:100%;z-index:3}.root-hole{fill:#000;stroke:#00eaff;stroke-width:.35;filter:drop-shadow(0 0 2px #00eaff)}
+.vine{fill:none;stroke:#64e6a0;stroke-width:.7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;filter:drop-shadow(0 0 1.5px rgba(100,230,160,.8))}
+.flower .petal{fill:#ff7adf;stroke:#ffd34d;stroke-width:.22;filter:drop-shadow(0 0 1.5px rgba(255,122,223,.9))}.flower .flower-core{fill:#ffd34d;stroke:#fff;stroke-width:.18}
+.hub-panel rect{fill:#020a14;stroke:#00eaff;stroke-width:.35;filter:drop-shadow(0 0 2px rgba(0,234,255,.8))}.hub-panel text{fill:#eefaff;font-family:Consolas,'Courier New',monospace;font-size:2.2px;font-weight:700;letter-spacing:.12px}.hub-panel .panel-detail{fill:#8eefff;font-size:1.35px}
+@@media(prefers-reduced-motion:reduce){.memory{filter:none}}
+</style>
+
+@code {
+    [Parameter] public string State { get; set; } = "Statement";
+    [Parameter] public long Ticks { get; set; }
+    [Parameter] public PlantGrowthMicroBundle? Plant { get; set; }
+}
