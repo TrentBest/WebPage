@@ -1,180 +1,158 @@
 @page "/rendering"
 @page "/explore3d"
 @using Microsoft.JSInterop
-@using TheSingularityWorkshop.Workshop.Rendering
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 
-<PageTitle>Singularity Rendering // Visual Substrate Lab</PageTitle>
+<PageTitle>Singularity Rendering // Voxel Substrate Lab</PageTitle>
 
 <div class="rendering-lab">
-    <canvas id="starship-line-canvas" class="rendering-canvas" aria-label="Singularity Starship rendering continuum"></canvas>
+    <canvas id="voxel-substrate-canvas" class="rendering-canvas" aria-label="Singularity voxel rendering laboratory"></canvas>
 
     <header class="rendering-header">
-        <div class="rendering-kicker">SINGULARITY WEB RENDERING // VISUAL SUBSTRATE LAB</div>
-        <h1>ONE GEOMETRY.<br />CHANGE THE REALITY.</h1>
+        <div class="rendering-kicker">SINGULARITY RENDERING // VOXEL SUBSTRATE</div>
+        <h1>REMOVE THE CUBES.<br />RENDER WHAT REMAINS.</h1>
         <p>
-            The same Starship is rendered across a continuous visual domain:
-            planar 2D, isometric, and perspective 3D. The renderer receives intent
-            — target, dimension, and camera behavior — rather than a pile of camera commands.
+            Geometry begins as a solid volume of tiny data cubes. Tools scrape cubes away.
+            Only exposed surfaces become mesh data. The cubes themselves never need to be drawn.
         </p>
     </header>
 
-    <aside class="rendering-console" aria-label="Rendering laboratory controls">
-        <div class="console-title">RENDERING INTENT</div>
+    <aside class="rendering-console" aria-label="Voxel rendering laboratory controls">
+        <div class="console-title">SUBSTRATE // CUBE FIELD</div>
 
         <section class="console-section">
-            <div class="section-label">DIMENSION // @($"{intent.ClampedDimension:P0}")</div>
+            <div class="section-label">SPECIMEN SCALE</div>
+            <div class="control-grid">
+                <button class="@SpecimenClass("detail")" @onclick='() => SetSpecimenAsync("detail")'>CLOSE DETAIL</button>
+                <button class="@SpecimenClass("massive")" @onclick='() => SetSpecimenAsync("massive")'>MASSIVE WORLD</button>
+            </div>
+        </section>
+
+        <section class="console-section">
+            <div class="section-label">DIMENSION // @($"{dimension:P0}")</div>
             <input class="dimension-slider"
                    type="range"
                    min="0"
                    max="1"
                    step="0.01"
-                   value="@intent.ClampedDimension"
+                   value="@dimension"
                    @oninput="HandleDimensionInput"
                    aria-label="Rendering dimension from 2D to 3D" />
             <div class="dimension-scale">
-                <button class="@DomainClass(0d)" @onclick="() => SetDimensionAsync(0d)">2D PLAN</button>
+                <button class="@DomainClass(0d)" @onclick="() => SetDimensionAsync(0d)">2D</button>
                 <button class="@DomainClass(.5d)" @onclick="() => SetDimensionAsync(.5d)">ISO</button>
                 <button class="@DomainClass(1d)" @onclick="() => SetDimensionAsync(1d)">3D</button>
             </div>
-            <div class="dimension-readout">@intent.Domain</div>
         </section>
 
         <section class="console-section">
-            <div class="section-label">CAMERA BEHAVIOR // INTENT</div>
+            <div class="section-label">SCRAPE TOOL</div>
             <div class="control-grid">
-                <button class="@BehaviorClass(RenderingCameraBehavior.Frame)" @onclick="() => SetBehaviorAsync(RenderingCameraBehavior.Frame)">FRAME</button>
-                <button class="@BehaviorClass(RenderingCameraBehavior.Follow)" @onclick="() => SetBehaviorAsync(RenderingCameraBehavior.Follow)">FOLLOW</button>
-                <button class="@BehaviorClass(RenderingCameraBehavior.Orbit)" @onclick="() => SetBehaviorAsync(RenderingCameraBehavior.Orbit)">ORBIT</button>
+                <button class="@ToolClass("sphere")" @onclick='() => ApplyToolAsync("sphere")'>SPHERE</button>
+                <button class="@ToolClass("tunnel")" @onclick='() => ApplyToolAsync("tunnel")'>TUNNEL</button>
+                <button class="@ToolClass("slice")" @onclick='() => ApplyToolAsync("slice")'>SLICE</button>
+                <button class="@ToolClass("box")" @onclick='() => ApplyToolAsync("box")'>BOX</button>
             </div>
+            <button class="wide-button" @onclick="() => ResetSpecimenAsync()">RESET BLOCK</button>
         </section>
 
         <section class="console-section">
-            <div class="section-label">TARGET</div>
+            <div class="section-label">CAMERA INTENT</div>
             <div class="control-grid">
-                <button class="@TargetClass("hull")" @onclick='() => SetTargetAsync("hull")'>HULL</button>
-                <button class="@TargetClass("bridge")" @onclick='() => SetTargetAsync("bridge")'>BRIDGE</button>
-                <button class="@TargetClass("engineering")" @onclick='() => SetTargetAsync("engineering")'>ENGINEERING</button>
-                <button class="@TargetClass("orbit")" @onclick='() => SetTargetAsync("orbit")'>ORBIT</button>
-            </div>
-        </section>
-
-        <section class="console-section">
-            <div class="section-label">VISUAL CHARACTER</div>
-            <div class="control-grid">
-                <button class="@ModeClass("toon")" @onclick='() => SetRenderingModeAsync("toon")'>TOON</button>
-                <button class="@ModeClass("tween")" @onclick='() => SetRenderingModeAsync("tween")'>TWEEN</button>
-                <button class="@ModeClass("hybrid")" @onclick='() => SetRenderingModeAsync("hybrid")'>HYBRID</button>
-                <button class="@ModeClass("reality")" @onclick='() => SetRenderingModeAsync("reality")'>REALITY</button>
-            </div>
-        </section>
-
-        <section class="console-section">
-            <div class="section-label">GEOMETRY LOAD</div>
-            <div class="control-grid density-grid">
-                <button @onclick="() => SetLineCountAsync(2500)">2.5K</button>
-                <button @onclick="() => SetLineCountAsync(10000)">10K</button>
-                <button @onclick="() => SetLineCountAsync(25000)">25K</button>
-                <button @onclick="() => SetLineCountAsync(50000)">50K</button>
+                <button @onclick='() => SetCameraAsync("frame")'>FRAME</button>
+                <button @onclick='() => SetCameraAsync("follow")'>FOLLOW</button>
+                <button @onclick='() => SetCameraAsync("orbit")'>ORBIT</button>
+                <button @onclick='() => SetCameraAsync("walk")'>WALK</button>
             </div>
         </section>
 
         <section class="metrics">
-            <div><span>LINES</span><strong>@lineCount.ToString("N0")</strong></div>
-            <div><span>VERTICES</span><strong>@vertices.ToString("N0")</strong></div>
+            <div><span>VOXELS</span><strong>@voxels.ToString("N0")</strong></div>
+            <div><span>EXPOSED</span><strong>@exposed.ToString("N0")</strong></div>
+            <div><span>MESH VERTICES</span><strong>@vertices.ToString("N0")</strong></div>
             <div><span>FPS</span><strong>@fps.ToString("0.0")</strong></div>
-            <div><span>FRAME</span><strong>@frameMs.ToString("0.00") MS</strong></div>
         </section>
 
-        <p class="console-note">
-            The renderer owns projection and camera mechanics. The Experience supplies intent.
-            This is the seam we are going to grow.
-        </p>
+        <div class="architecture-note">
+            <strong>DATA → SURFACE → GPU</strong>
+            <span>Voxel occupancy is the construction truth.</span>
+            <span>Exterior cube faces become mesh.</span>
+            <span>Renderer owns projection, lighting and camera.</span>
+        </div>
     </aside>
 
     <div class="rendering-readout">
-        <span>SPECIMEN // SINGULARITY STARSHIP</span>
-        <span>DOMAIN // @intent.Domain</span>
-        <span>TARGET // @intent.TargetId.ToUpperInvariant()</span>
-        <span>CAMERA // @intent.CameraBehavior.ToString().ToUpperInvariant()</span>
-    </div>
-
-    <div class="next-specimen">
-        NEXT SPECIMEN // SINGULARITY DOOM
+        <span>SUBSTRATE // @specimen.ToUpperInvariant()</span>
+        <span>DOMAIN // @DomainName</span>
+        <span>TOOL // @tool.ToUpperInvariant()</span>
+        <span>CAMERA // @camera.ToUpperInvariant()</span>
     </div>
 </div>
 
 <style>
-.rendering-lab{position:fixed;inset:0;overflow:hidden;background:#01040a;color:#eafcff;font-family:Consolas,'Courier New',monospace}
+.rendering-lab{position:fixed;inset:0;overflow:hidden;background:#02050a;color:#eafcff;font-family:Consolas,'Courier New',monospace}
 .rendering-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.rendering-header{position:absolute;left:2.2rem;top:1.8rem;width:min(650px,48vw);pointer-events:none;text-shadow:0 0 18px rgba(0,234,255,.18)}
+.rendering-header{position:absolute;left:2.2rem;top:1.8rem;width:min(680px,50vw);pointer-events:none;text-shadow:0 0 18px rgba(0,234,255,.18)}
 .rendering-kicker{color:#00eaff;font-size:.72rem;letter-spacing:.2em;font-weight:700}
-.rendering-header h1{margin:.45rem 0 .8rem;font-size:clamp(2rem,4vw,4.6rem);line-height:.92;letter-spacing:.05em;color:#fff}
+.rendering-header h1{margin:.45rem 0 .8rem;font-size:clamp(2rem,4vw,4.5rem);line-height:.92;letter-spacing:.04em;color:#fff}
 .rendering-header p{margin:0;color:#a7c0c9;font-family:system-ui,sans-serif;font-size:clamp(.9rem,1.2vw,1.05rem);line-height:1.6}
-.rendering-console{position:absolute;right:1.5rem;top:1.5rem;width:min(390px,31vw);max-height:calc(100vh - 3rem);overflow:auto;padding:1.15rem;border:1px solid rgba(0,234,255,.42);background:rgba(1,6,13,.9);box-shadow:0 0 35px rgba(0,234,255,.09);backdrop-filter:blur(7px)}
+.rendering-console{position:absolute;right:1.5rem;top:1.5rem;width:min(400px,31vw);max-height:calc(100vh - 3rem);overflow:auto;padding:1.15rem;border:1px solid rgba(0,234,255,.42);background:rgba(1,6,13,.92);box-shadow:0 0 35px rgba(0,234,255,.09);backdrop-filter:blur(7px)}
 .console-title{color:#ffd34d;font-size:.72rem;font-weight:800;letter-spacing:.18em;margin-bottom:.9rem}
 .console-section{padding:.85rem 0;border-top:1px solid rgba(0,234,255,.12)}
 .section-label{color:#87a7b2;font-size:.62rem;font-weight:800;letter-spacing:.13em;margin-bottom:.55rem}
 .dimension-slider{width:100%;accent-color:#00eaff;cursor:pointer}
-.dimension-scale{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-top:.45rem}
-.dimension-scale button,.control-grid button{min-height:2.5rem;padding:.5rem .4rem;border:1px solid rgba(0,234,255,.32);background:rgba(0,234,255,.035);color:#8eb2bd;font:800 .65rem Consolas,'Courier New',monospace;letter-spacing:.07em;cursor:pointer}
-.dimension-scale button:hover,.dimension-scale button.selected,.control-grid button:hover,.control-grid button.selected{border-color:#ff2cff;color:#fff;background:rgba(255,44,255,.09);box-shadow:0 0 14px rgba(255,44,255,.09)}
-.dimension-readout{margin-top:.55rem;color:#00eaff;font-size:.82rem;font-weight:800;letter-spacing:.12em}
-.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.dimension-scale,.control-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.4rem;margin-top:.45rem}
+.dimension-scale{grid-template-columns:repeat(3,1fr)}
+.dimension-scale button,.control-grid button,.wide-button{min-height:2.65rem;padding:.5rem .4rem;border:1px solid rgba(0,234,255,.32);background:rgba(0,234,255,.035);color:#8eb2bd;font:800 .65rem Consolas,'Courier New',monospace;letter-spacing:.07em;cursor:pointer}
+.dimension-scale button:hover,.dimension-scale button.selected,.control-grid button:hover,.control-grid button.selected,.wide-button:hover{border-color:#ff2cff;color:#fff;background:rgba(255,44,255,.09);box-shadow:0 0 14px rgba(255,44,255,.09)}
+.wide-button{width:100%;margin-top:.4rem}
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-top:.85rem}
 .metrics div{padding:.65rem;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.018)}
 .metrics span{display:block;color:#66818b;font-size:.56rem;letter-spacing:.1em}
-.metrics strong{display:block;margin-top:.2rem;color:#fff;font-size:.9rem}
-.console-note{margin:.85rem 0 0;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.08);color:#718c96;font-family:system-ui,sans-serif;font-size:.78rem;line-height:1.5}
+.metrics strong{display:block;margin-top:.2rem;color:#fff;font-size:.85rem}
+.architecture-note{display:flex;flex-direction:column;gap:.3rem;margin-top:.85rem;padding:.8rem;border-left:2px solid #00eaff;background:rgba(0,234,255,.025);color:#78929c;font-family:system-ui,sans-serif;font-size:.76rem;line-height:1.35}
+.architecture-note strong{font-family:Consolas,'Courier New',monospace;color:#00eaff;font-size:.62rem;letter-spacing:.12em}
 .rendering-readout{position:absolute;left:2.2rem;right:2.2rem;bottom:1.25rem;display:flex;justify-content:space-between;gap:1rem;color:#66818b;font-size:.55rem;font-weight:700;letter-spacing:.12em;pointer-events:none}
-.next-specimen{position:absolute;left:50%;bottom:3.1rem;transform:translateX(-50%);padding:.45rem .7rem;border:1px solid rgba(255,44,255,.35);background:rgba(8,1,13,.55);color:#ff70e5;font-size:.55rem;font-weight:800;letter-spacing:.16em;pointer-events:none}
-@@media(max-width:1100px){.rendering-header{width:55vw}.rendering-console{width:330px}.rendering-readout{display:none}.next-specimen{display:none}}
-@@media(max-width:760px){.rendering-header{left:1rem;top:1rem;width:calc(100vw - 2rem)}.rendering-header h1{font-size:2rem}.rendering-header p{display:none}.rendering-console{left:1rem;right:1rem;top:auto;bottom:1rem;width:auto;max-height:52vh}.rendering-console{padding:.85rem}.console-section{padding:.6rem 0}}
+@@media(max-width:1100px){.rendering-header{width:55vw}.rendering-console{width:340px}.rendering-readout{display:none}}
+@@media(max-width:760px){.rendering-header{left:1rem;top:1rem;width:calc(100vw - 2rem)}.rendering-header h1{font-size:2rem}.rendering-header p{display:none}.rendering-console{left:1rem;right:1rem;top:auto;bottom:1rem;width:auto;max-height:52vh;padding:.85rem}.console-section{padding:.6rem 0}}
 </style>
 
 @code {
     private IJSObjectReference? module;
     private CancellationTokenSource? metricsCancellation;
-    private int lineCount = 2500;
+    private bool started;
+    private string specimen = "detail";
+    private string tool = "sphere";
+    private string camera = "frame";
+    private double dimension = .75d;
+    private int voxels;
+    private int exposed;
     private int vertices;
     private double fps;
-    private double frameMs;
-    private bool started;
-    private string renderingMode = "hybrid";
-    private RenderingIntent intent = new("hull", .5d, RenderingCameraBehavior.Frame);
+
+    private string DomainName => dimension switch
+    {
+        <= .25d => "2D",
+        >= .75d => "3D",
+        _ => "ISO / HYBRID"
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender || started)
             return;
 
-        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/starship-line-lab.js");
-        await module.InvokeVoidAsync(
-            "startStarshipLineLab",
-            "starship-line-canvas",
-            lineCount,
-            renderingMode,
-            intent.ClampedDimension,
-            intent.TargetId,
-            intent.CameraBehavior.ToString().ToLowerInvariant());
-
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/voxel-substrate-lab.js");
+        await module.InvokeVoidAsync("startVoxelSubstrateLab", "voxel-substrate-canvas", specimen, dimension, camera);
         started = true;
         metricsCancellation = new CancellationTokenSource();
         _ = RefreshMetricsAsync(metricsCancellation.Token);
     }
 
-    private string DomainClass(double anchor)
-        => Math.Abs(intent.ClampedDimension - anchor) < .02d ? "selected" : string.Empty;
-
-    private string BehaviorClass(RenderingCameraBehavior behavior)
-        => intent.CameraBehavior == behavior ? "selected" : string.Empty;
-
-    private string TargetClass(string target)
-        => string.Equals(intent.TargetId, target, StringComparison.Ordinal) ? "selected" : string.Empty;
-
-    private string ModeClass(string mode)
-        => renderingMode == mode ? "selected" : string.Empty;
+    private string SpecimenClass(string value) => specimen == value ? "selected" : string.Empty;
+    private string ToolClass(string value) => tool == value ? "selected" : string.Empty;
+    private string DomainClass(double value) => Math.Abs(dimension - value) < .02d ? "selected" : string.Empty;
 
     private async Task HandleDimensionInput(ChangeEventArgs args)
     {
@@ -182,39 +160,38 @@
             await SetDimensionAsync(value);
     }
 
-    private async Task SetDimensionAsync(double dimension)
+    private async Task SetDimensionAsync(double value)
     {
-        intent = intent with { Dimension = Math.Clamp(dimension, 0d, 1d) };
+        dimension = Math.Clamp(value, 0d, 1d);
         if (module is not null)
-            await module.InvokeVoidAsync("setStarshipRenderIntent", intent.ClampedDimension, intent.TargetId, intent.CameraBehavior.ToString().ToLowerInvariant());
+            await module.InvokeVoidAsync("setVoxelRenderIntent", dimension, camera);
     }
 
-    private async Task SetBehaviorAsync(RenderingCameraBehavior behavior)
+    private async Task SetSpecimenAsync(string value)
     {
-        intent = intent with { CameraBehavior = behavior };
+        specimen = value;
         if (module is not null)
-            await module.InvokeVoidAsync("setStarshipRenderIntent", intent.ClampedDimension, intent.TargetId, intent.CameraBehavior.ToString().ToLowerInvariant());
+            await module.InvokeVoidAsync("setVoxelSpecimen", specimen);
     }
 
-    private async Task SetTargetAsync(string target)
+    private async Task ApplyToolAsync(string value)
     {
-        intent = intent with { TargetId = target };
+        tool = value;
         if (module is not null)
-            await module.InvokeVoidAsync("setStarshipRenderIntent", intent.ClampedDimension, intent.TargetId, intent.CameraBehavior.ToString().ToLowerInvariant());
+            await module.InvokeVoidAsync("applyVoxelScrapeTool", tool);
     }
 
-    private async Task SetRenderingModeAsync(string mode)
+    private async Task ResetSpecimenAsync()
     {
-        renderingMode = mode;
         if (module is not null)
-            await module.InvokeVoidAsync("setStarshipRenderingMode", renderingMode);
+            await module.InvokeVoidAsync("resetVoxelSpecimen");
     }
 
-    private async Task SetLineCountAsync(int count)
+    private async Task SetCameraAsync(string value)
     {
-        lineCount = count;
+        camera = value;
         if (module is not null)
-            await module.InvokeVoidAsync("setStarshipLineCount", lineCount);
+            await module.InvokeVoidAsync("setVoxelCameraBehavior", camera);
     }
 
     private async Task RefreshMetricsAsync(CancellationToken cancellationToken)
@@ -227,24 +204,18 @@
                 if (module is null)
                     continue;
 
-                var metrics = await module.InvokeAsync<StarshipMetrics>("getStarshipLineMetrics");
+                var metrics = await module.InvokeAsync<VoxelMetrics>("getVoxelMetrics");
                 await InvokeAsync(() =>
                 {
-                    lineCount = metrics.Lines;
+                    voxels = metrics.Voxels;
+                    exposed = metrics.Exposed;
                     vertices = metrics.Vertices;
                     fps = metrics.Fps;
-                    frameMs = metrics.FrameMs;
                     StateHasChanged();
                 });
             }
-            catch (OperationCanceledException)
-            {
-                break;
-            }
-            catch (JSException)
-            {
-                break;
-            }
+            catch (OperationCanceledException) { break; }
+            catch (JSException) { break; }
         }
     }
 
@@ -255,12 +226,16 @@
 
         if (module is not null)
         {
-            try { await module.InvokeVoidAsync("stopStarshipLineLab"); }
+            try { await module.InvokeVoidAsync("stopVoxelSubstrateLab"); }
             catch (JSException) { }
 
             await module.DisposeAsync();
         }
     }
 
-    private sealed record StarshipMetrics(double Fps, double FrameMs, int Lines, int Vertices);
+    private sealed record VoxelMetrics(double Fps, double FrameMs, int Lines, int Vertices)
+    {
+        public int Voxels { get; init; }
+        public int Exposed { get; init; }
+    }
 }
