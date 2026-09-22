@@ -65,7 +65,6 @@
 </style>
 
 @code {
-    private readonly Random _random = new();
     private CancellationTokenSource? _shutdown;
     private Task? _loop;
     private DateTime _lastActivityUtc = DateTime.UtcNow;
