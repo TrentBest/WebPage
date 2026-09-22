@@ -102,19 +102,12 @@ public sealed class SpatialSecurityCheckpointModel
         if (Stage != SpatialSecurityCheckpointStage.Queue || slot < 0 || slot >= QueueCapacity || slot == PlayerQueueSlot)
             return false;
 
-        var distance = PlayerQueueSlot - slot;
+        var occupied = _agents.FirstOrDefault(agent => agent.QueueSlot == slot);
 
-        if (distance != 1)
-        {
-            CutAttempts++;
-            Agitated = true;
-            LastMessage = "The line teaches you to move one position at a time.";
-            if (distance > 1)
-                SpeakToAgents(_agents.Where(agent => agent.QueueSlot < PlayerQueueSlot), "HEY! WAIT YOUR TURN!");
-            return false;
-        }
-
-        if (_agents.Any(agent => agent.QueueSlot == slot))
+        // An occupied physical position is a distinct social violation from
+        // skipping an open position. The Digiten who owns that space reacts
+        // even when the attempted destination is more than one position away.
+        if (occupied.Id is not null)
         {
             Agitated = true;
             LastMessage = "Someone is still there. Wait for the opening.";
@@ -132,6 +125,18 @@ public sealed class SpatialSecurityCheckpointModel
                     "HOLD UP! THEY'RE NOT THROUGH YET!");
             }
 
+            return false;
+        }
+
+        var distance = PlayerQueueSlot - slot;
+
+        if (distance != 1)
+        {
+            CutAttempts++;
+            Agitated = true;
+            LastMessage = "The line teaches you to move one position at a time.";
+            if (distance > 1)
+                SpeakToAgents(_agents.Where(agent => agent.QueueSlot < PlayerQueueSlot), "HEY! WAIT YOUR TURN!");
             return false;
         }
 
