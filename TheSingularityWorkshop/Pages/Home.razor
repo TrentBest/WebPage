@@ -11,10 +11,9 @@
     }
     else if (Experience.CurrentState == "Intro")
     {
-        <section class="hub-arrival" aria-label="The Workshop Hub">
-            <div class="hub-arrival-title">THE WORKSHOP</div>
-            <div class="hub-arrival-subtitle">HUB // MANIFESTED</div>
-        </section>
+        @* The landing state is the completed Hub, not a second screen. The geometry
+           that grew during first contact remains the geometry of the living Hub. *@
+        <FirstContactView State="Landing" Ticks="@Experience.FirstContact.StateTicks" Plant="@Experience.Plant" />
     }
 </div>
 
