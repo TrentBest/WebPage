@@ -11,6 +11,7 @@ namespace TheSingularityWorkshop.Gui;
 /// </summary>
 public sealed class SpatialAECBimModel
 {
+    private readonly List<int> _floors = [];
     private readonly List<SpatialAECBimRoom> _rooms = [];
     private readonly List<SpatialOntologyContent> _results = [];
 
@@ -19,12 +20,12 @@ public sealed class SpatialAECBimModel
         BuildingId = buildingId;
         BuildingName = buildingName;
         for (var floor = 1; floor <= 4; floor++)
-            Floors.Add(floor);
+            _floors.Add(floor);
     }
 
     public string BuildingId { get; }
     public string BuildingName { get; }
-    public IReadOnlyList<int> Floors { get; }
+    public IReadOnlyList<int> Floors => _floors;
     public int ActiveFloor { get; private set; } = 1;
     public string SearchQuery { get; private set; } = "";
     public IReadOnlyList<SpatialAECBimRoom> Rooms => _rooms;
@@ -72,7 +73,7 @@ public sealed class SpatialAECBimModel
         var content = SpatialOntologyContentCatalog.All
             .FirstOrDefault(item => item.Id.Equals(contentId, StringComparison.OrdinalIgnoreCase));
 
-        if (content is null) return;
+        if (content.Equals(default(SpatialOntologyContent))) return;
 
         var index = _rooms.Count(room => room.Floor == ActiveFloor) + 1;
         _rooms.Add(new SpatialAECBimRoom(
@@ -90,7 +91,7 @@ public sealed class SpatialAECBimModel
     public void DuplicateRoom(string roomId)
     {
         var source = _rooms.FirstOrDefault(room => room.Id == roomId);
-        if (source is null) return;
+        if (source.Equals(default(SpatialAECBimRoom))) return;
 
         var index = _rooms.Count(room => room.Floor == source.Floor) + 1;
         _rooms.Add(source with
