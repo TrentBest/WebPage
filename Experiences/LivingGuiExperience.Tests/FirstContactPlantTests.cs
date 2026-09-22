@@ -23,10 +23,23 @@ public sealed class FirstContactPlantTests
     }
 
     [Fact]
-    public void FirstContact_Transitions_To_Conventional_Landing()
+    public void FirstContact_Presents_Question_Then_Requires_Gateway_Entry_Before_Landing()
     {
         using var experience = new WorkshopExperienceService();
         experience.Initialize(returningVisitor: false);
+
+        for (var i = 0; i < 200 && experience.FirstContact.CurrentState != "Gateway"; i++)
+            experience.Tick();
+
+        Assert.Equal("Gateway", experience.FirstContact.CurrentState);
+        Assert.Equal("FirstContact", experience.CurrentState);
+        Assert.Null(experience.Plant);
+
+        experience.RequestEntry();
+        experience.Tick();
+
+        Assert.Equal("Moniker", experience.FirstContact.CurrentState);
+        Assert.Equal("FirstContact", experience.CurrentState);
 
         for (var i = 0; i < 500 && experience.CurrentState == "FirstContact"; i++)
             experience.Tick();
