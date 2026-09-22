@@ -1037,7 +1037,13 @@
     }
 
     private static string RenderingResearchSpecimen(string stationId)
-        => stationId == "micro-detail" ? "detail" : "massive";
+        => stationId switch
+        {
+            "micro-detail" => "detail",
+            "tectonic-mass" => "tectonic",
+            "weathering" => "weathered",
+            _ => "massive"
+        };
 
     private void StartHolodeckLoopIfNeeded()
     {
