@@ -32,6 +32,7 @@ public static class SpatialLaboratoryPlanGuiBuilder
         Action reception,
         Action elevator,
         Action director,
+        Action research,
         Action exit)
     {
         var root = WorkshopGui.Panel(receiver)
@@ -43,7 +44,7 @@ public static class SpatialLaboratoryPlanGuiBuilder
             .Attribute("tabindex", "0")
             .OnKeyDown(keyDown);
 
-        root.Content(Plan(receiver, userName, avatarX, avatarY, directorAccessGranted, worldClick, reception, elevator, director));
+        root.Content(Plan(receiver, userName, avatarX, avatarY, directorAccessGranted, worldClick, reception, elevator, director, research));
         root.Content(Header(receiver, directorAccessGranted));
         root.Content(WorkshopGui.Button(receiver).Label("← EXIT LAB")
             .Style("position", "fixed").Style("right", "1.5rem").Style("bottom", "1.25rem")
@@ -64,7 +65,8 @@ public static class SpatialLaboratoryPlanGuiBuilder
         Action<Microsoft.AspNetCore.Components.Web.MouseEventArgs> worldClick,
         Action reception,
         Action elevator,
-        Action director)
+        Action director,
+        Action research)
     {
         var svg = WorkshopGui.Element(receiver, "svg")
             .Attribute("viewBox", ViewBox(avatarX, avatarY))
@@ -101,6 +103,17 @@ public static class SpatialLaboratoryPlanGuiBuilder
         Zone(svg, receiver, 14, 57, 52, 22, "RESEARCH", Cyan);
         Label(svg, receiver, 40, 68, "RESEARCH FLOOR", White, 1.1, true);
         Label(svg, receiver, 40, 72, "AUTHORIZED LABORATORY SPACE", Muted, .7, false);
+
+        // The rendering research level is deliberately hidden until the visitor has
+        // reached the laboratory's director authority. It is discovered as a place,
+        // not advertised as a campus tab.
+        if (directorAccessGranted)
+        {
+            Zone(svg, receiver, 68, 57, 18, 22, "RENDERING RESEARCH", Magenta);
+            Label(svg, receiver, 77, 67, "RENDERING", White, 1.0, true);
+            Label(svg, receiver, 77, 71, "RESEARCH LEVEL", Muted, .68, false);
+            Hotspot(svg, receiver, 68, 57, 18, 22, Magenta, "RESEARCH", research);
+        }
 
         // Physical corridor from the cleared threshold.
         svg.Child(WorkshopGui.Element(receiver, "path")
