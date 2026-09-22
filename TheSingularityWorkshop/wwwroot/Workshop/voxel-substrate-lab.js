@@ -120,19 +120,25 @@ function clamp01(v) { return Math.max(0, Math.min(1, v)); }
 function smooth(v) { const t=clamp01(v); return t*t*(3-2*t); }
 
 // Squirrel Noise 5: deterministic, random-access procedural entropy.
-const SQUIRREL_NOISE_1 = 0x68E31DA4;
-const SQUIRREL_NOISE_2 = 0xB5297A4D;
-const SQUIRREL_NOISE_3 = 0x1B56C4E9;
+const SQUIRREL_NOISE_1 = 0xD2A80A3F;
+const SQUIRREL_NOISE_2 = 0xA884F197;
+const SQUIRREL_NOISE_3 = 0x6C736F4B;
+const SQUIRREL_NOISE_4 = 0xB79F3ABB;
+const SQUIRREL_NOISE_5 = 0x1B56C4F5;
 
 function squirrelNoise5(position, seed=0) {
     let bits = position | 0;
     bits = Math.imul(bits, SQUIRREL_NOISE_1);
     bits = (bits + seed) | 0;
-    bits ^= bits >>> 8;
+    bits ^= bits >>> 9;
     bits = (bits + SQUIRREL_NOISE_2) | 0;
-    bits ^= bits << 8;
+    bits ^= bits >>> 11;
     bits = Math.imul(bits, SQUIRREL_NOISE_3);
-    bits ^= bits >>> 8;
+    bits ^= bits >>> 13;
+    bits = (bits + SQUIRREL_NOISE_4) | 0;
+    bits ^= bits >>> 15;
+    bits = Math.imul(bits, SQUIRREL_NOISE_5);
+    bits ^= bits >>> 17;
     return bits >>> 0;
 }
 
