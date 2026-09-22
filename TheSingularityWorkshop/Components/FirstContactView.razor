@@ -1,19 +1,16 @@
 @using TheSingularityWorkshop.Workshop.Plant
 
 <section class="first-contact-stage @(State == "Moniker" || State == "HubGrowth" ? "living" : "")" aria-live="polite">
-    @if (State == "Statement")
+    @if (State == "Statement" || State == "Question")
     {
-        <div class="contact-half top">
-            <div class="contact-label statement" style="@LabelStyle(1, 0)">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
-        </div>
-    }
-    else if (State == "Question")
-    {
-        var secondProgress = Math.Clamp(Ticks / 30d, 0d, 1d);
-        var fadeProgress = Math.Clamp((Ticks - 30d) / 40d, 0d, 1d);
+        var secondProgress = State == "Statement" ? 0d : Math.Clamp(Ticks / 30d, 0d, 1d);
+        var fadeProgress = State == "Statement" ? 0d : Math.Clamp((Ticks - 30d) / 40d, 0d, 1d);
+        var firstOpacity = State == "Statement"
+            ? Math.Clamp(Ticks / 35d, 0d, 1d)
+            : .18 * (1d - fadeProgress);
 
         <div class="contact-half top">
-            <div class="contact-label statement" style="@LabelStyle(.18 * (1d - fadeProgress), secondProgress)">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
+            <div class="contact-label statement" style="@LabelStyle(firstOpacity, State == "Statement" ? Ticks / 35d : secondProgress)">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
         </div>
         <div class="contact-half bottom">
             <div class="contact-label question" style="@QuestionStyle(secondProgress, fadeProgress)">HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>
