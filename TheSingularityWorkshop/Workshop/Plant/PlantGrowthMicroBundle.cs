@@ -11,17 +11,16 @@ namespace TheSingularityWorkshop.Workshop.Plant;
 /// </summary>
 public sealed class PlantGrowthMicroBundle : IDisposable
 {
-    public const string ProcessingGroup = "FirstContact.Plant";
-    public const string DefinitionName = "FirstContact.PlantGrowth";
-
+    private readonly string _processingGroup = $"FirstContact.Plant:{Guid.NewGuid():N}";
+    private readonly string _definitionName = $"FirstContact.PlantGrowth:{Guid.NewGuid():N}";
     private readonly PlantContext _context = new();
     private readonly FSMHandle _fsm;
     private bool _disposed;
 
     public PlantGrowthMicroBundle()
     {
-        FSM_API.FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(DefinitionName, -1, ProcessingGroup)
+        FSM_API.FSM_API.Create.CreateProcessingGroup(_processingGroup);
+        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_definitionName, -1, _processingGroup)
             .State("Rooting", null, UpdateRooting, null)
             .State("Crawling", null, UpdateCrawling, null)
             .State("Blooming", null, UpdateBlooming, null)
@@ -34,7 +33,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
             .WithInitialState("Rooting")
             .BuildDefinition();
 
-        _fsm = FSM_API.FSM_API.Create.CreateInstance(DefinitionName, _context, ProcessingGroup);
+        _fsm = FSM_API.FSM_API.Create.CreateInstance(_definitionName, _context, _processingGroup);
     }
 
     public string CurrentState => _fsm.CurrentState;
@@ -51,7 +50,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         if (_disposed || !_context.Started) return;
 
         var before = _fsm.CurrentState;
-        FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
+        FSM_API.FSM_API.Interaction.Update(_processingGroup);
 
         if (before != _fsm.CurrentState)
         {
@@ -98,7 +97,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(DefinitionName, ProcessingGroup);
+        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_definitionName, _processingGroup);
         _disposed = true;
     }
 
@@ -158,7 +157,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
             };
         }
 
-        public string Name { get; set; } = DefinitionName;
+        public string Name { get; set; } = "FirstContact.PlantGrowth";
         public bool IsValid { get; set; } = true;
         public bool Started { get; set; }
         public double RootProgress { get; set; }
