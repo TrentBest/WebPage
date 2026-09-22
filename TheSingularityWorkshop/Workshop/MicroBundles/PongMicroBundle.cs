@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TheSingularityWorkshop.FSM_API;
 using TheSingularityWorkshop.SingularityHub;
+using TheSingularityWorkshop.Workshop.Randomness;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
