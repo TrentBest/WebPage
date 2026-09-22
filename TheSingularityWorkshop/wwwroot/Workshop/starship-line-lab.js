@@ -11,6 +11,7 @@ function makeShader(gl, type, source) {
 
 function makeProgram(gl) {
     const vertex = makeShader(gl, gl.VERTEX_SHADER, `
+        precision mediump float;
         attribute vec3 aPosition;
         uniform mat4 uViewProjection;
         uniform float uTime;
