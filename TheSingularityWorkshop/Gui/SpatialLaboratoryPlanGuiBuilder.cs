@@ -87,12 +87,12 @@ public static class SpatialLaboratoryPlanGuiBuilder
         // Public arrival space.
         Zone(svg, receiver, 14, 33, 24, 20, "RECEPTION", Cyan);
         Label(svg, receiver, 26, 44, "RECEPTION", White, 1.35, true);
-        Label(svg, receiver, 26, 48, "VISITOR PROCESSING", Muted, .75, false);
+        Label(svg, receiver, 26, 48, "ASK FOR A VIP PASS", Muted, .75, false);
 
         // Director is deliberately behind reception authority.
-        Zone(svg, receiver, 42, 33, 24, 20, "DIRECTOR", Yellow);
+        Zone(svg, receiver, 42, 33, 24, 20, "LAB ADMINISTRATOR", Yellow);
         Label(svg, receiver, 54, 44, "DIRECTOR", directorAccessGranted ? Green : Yellow, 1.25, true);
-        Label(svg, receiver, 54, 48, directorAccessGranted ? "ACCESS GRANTED" : "RECEPTION AUTHORITY", Muted, .72, false);
+        Label(svg, receiver, 54, 48, directorAccessGranted ? "ACCESS GRANTED" : "ADMINISTRATIVE AUTHORITY", Muted, .72, false);
 
         // Secure vertical circulation.
         Zone(svg, receiver, 70, 33, 16, 35, "ELEVATOR", Magenta);
