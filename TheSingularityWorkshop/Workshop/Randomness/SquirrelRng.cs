@@ -7,6 +7,8 @@ namespace TheSingularityWorkshop.Workshop.Randomness;
 /// Fast, deterministic Squirrel Noise 5 based random stream.
 /// </summary>
 /// <remarks>
+/// This implementation is based on Squirrel Noise 5 by Squirrel Eiserloh.
+/// The original Squirrel Noise 5 source is released under CC-BY 3.0; attribution is retained here.
 /// Squirrel Noise is a counter-based noise function: each position can be evaluated
 /// independently, which makes it useful for procedural generation and concurrent work.
 /// This wrapper adds an atomic position counter so callers can also consume it as a
