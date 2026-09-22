@@ -26,11 +26,13 @@ public sealed class PlantGrowthMicroBundle : IDisposable
             .State("Crawling", null, UpdateCrawling, null)
             .State("Blooming", null, UpdateBlooming, null)
             .State("Opening", null, UpdateOpening, null)
+            .State("Relocating", null, UpdateRelocating, null)
             .State("Settled", null, null, null)
             .Transition("Rooting", "Crawling", c => ((PlantContext)c).RootProgress >= 1)
             .Transition("Crawling", "Blooming", c => ((PlantContext)c).AllBranchesMature)
             .Transition("Blooming", "Opening", c => ((PlantContext)c).BloomThresholdReached)
-            .Transition("Opening", "Settled", c => ((PlantContext)c).Panels.All(p => p.OpenProgress >= 1))
+            .Transition("Opening", "Relocating", c => ((PlantContext)c).Panels.All(p => p.OpenProgress >= 1))
+            .Transition("Relocating", "Settled", c => ((PlantContext)c).Panels.All(p => p.PositionProgress >= 1))
             .WithInitialState("Rooting")
             .BuildDefinition();
 
@@ -63,6 +65,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
                 "Crawling" => PlantSoundCue.VineGrowth,
                 "Blooming" => PlantSoundCue.Bloom,
                 "Opening" => PlantSoundCue.PanelRip,
+                "Relocating" => PlantSoundCue.PanelMove,
                 _ => PlantSoundCue.None
             };
             SoundCueRequested?.Invoke(LastSoundCue);
@@ -98,6 +101,16 @@ public sealed class PlantGrowthMicroBundle : IDisposable
             panel.OpenProgress = Math.Min(1, panel.OpenProgress + .09);
     }
 
+    private void UpdateRelocating(IStateContext _)
+    {
+        foreach (var panel in _context.Panels)
+        {
+            var speed = .052 + panel.RelocationOrder * .006;
+            panel.PositionProgress = Math.Min(1, panel.PositionProgress + speed);
+            panel.UpdateRenderPosition();
+        }
+    }
+
     public void Dispose()
     {
         if (_disposed) return;
@@ -105,7 +118,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         _disposed = true;
     }
 
-    public enum PlantSoundCue { None, VineGrowth, Bloom, PanelRip }
+    public enum PlantSoundCue { None, VineGrowth, Bloom, PanelRip, PanelMove }
 
     /// <summary>
     /// A panel in the final Hub layout. These coordinates are the source of truth
@@ -121,6 +134,9 @@ public sealed class PlantGrowthMicroBundle : IDisposable
             Y = geometry.Y;
             Width = geometry.Width;
             Height = geometry.Height;
+            RenderX = HubGeometry.StagingX;
+            RenderY = HubGeometry.StagingY;
+            RelocationOrder = geometry.RelocationOrder;
         }
 
         public string Id { get; }
@@ -129,9 +145,20 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         public double Y { get; }
         public double Width { get; }
         public double Height { get; }
+        public double RenderX { get; internal set; }
+        public double RenderY { get; internal set; }
+        public int RelocationOrder { get; }
         public double BloomProgress { get; internal set; }
         public int BloomTicks { get; internal set; }
         public double OpenProgress { get; internal set; }
+        public double PositionProgress { get; internal set; }
+
+        internal void UpdateRenderPosition()
+        {
+            var progress = PositionProgress * PositionProgress * (3 - 2 * PositionProgress);
+            RenderX = HubGeometry.StagingX + (X - HubGeometry.StagingX) * progress;
+            RenderY = HubGeometry.StagingY + (Y - HubGeometry.StagingY) * progress;
+        }
     }
 
     /// <summary>A growth branch whose destination is a concrete point on a final Hub panel.</summary>
@@ -163,6 +190,9 @@ public sealed class PlantGrowthMicroBundle : IDisposable
     /// </summary>
     public static class HubGeometry
     {
+        public static double StagingX => Panels.Single(x => x.Id == "content").X;
+        public static double StagingY => Panels.Single(x => x.Id == "content").Y;
+
         public static IReadOnlyList<HubPanelGeometry> Panels { get; } = new[]
         {
             new HubPanelGeometry("header", "HUB", 50, 7, 46, 9),
@@ -207,6 +237,17 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         /// Selects a deterministic perimeter point facing the root. The growth branch
         /// therefore appears to enter the panel from its nearest edge.
         /// </summary>
+        public int RelocationOrder => Id switch
+        {
+            "header" => 0,
+            "identity" => 1,
+            "context" => 2,
+            "navigation" => 3,
+            "ai" => 4,
+            "content" => 5,
+            _ => 99
+        };
+
         public double AnchorX => X <= 50 ? Right : Left;
 
         public double AnchorY => Y <= 12 ? Bottom : Top;
