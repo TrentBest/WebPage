@@ -214,7 +214,8 @@
         // pointerenter is hover-only and cannot satisfy browser autoplay policy.
         document.addEventListener('pointerdown',event=>{
             const target=event.target instanceof Element?event.target:null;
-            if(target?.closest('.first-contact-stage')){ window.interop.firstContactSound('pressure'); }\n            if(target?.closest('[data-workshop-rumble],.monolith-btn')){
+            if(target?.closest('.first-contact-stage')){ window.interop.firstContactSound('pressure'); }
+            if(target?.closest('[data-workshop-rumble],.monolith-btn')){
                 startWorkshopRumble();
                 const narrative=document.querySelector('[data-workshop-rumble]');
                 if(narrative) narrative.dataset.rumbleActive='true';
