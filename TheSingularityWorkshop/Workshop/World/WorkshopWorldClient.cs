@@ -32,6 +32,24 @@ public sealed class WorkshopWorldClient : IAsyncDisposable
             await RefreshAsync(_cts.Token);
     }
 
+    public async Task<WorkshopWorldState> ActivateAsync(HiddenWorldSwitch worldSwitch, string discovererId, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(worldSwitch);
+
+        var response = await _http.PostAsJsonAsync(
+            "api/world/switch",
+            new
+            {
+                SwitchId = worldSwitch.Id,
+                LocationId = worldSwitch.LocationId,
+                DiscovererId = discovererId
+            },
+            cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+        return await RefreshAsync(cancellationToken);
+    }
+
     public async Task<WorkshopWorldState> RefreshAsync(CancellationToken cancellationToken = default)
     {
         var dto = await _http.GetFromJsonAsync<WorldStateDto>("api/world/state", cancellationToken)
