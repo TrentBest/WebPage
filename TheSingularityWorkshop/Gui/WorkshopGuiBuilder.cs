@@ -67,11 +67,25 @@ public class ElementBuilder
         if (_rawFragment is not null) return _rawFragment;
         return builder =>
         {
+            // RenderTreeBuilder sequence numbers describe source locations, not runtime
+            // invocation order. The fluent builder is intentionally loop-driven, so using
+            // a counter here makes the generated tree unstable whenever a conditional or
+            // collection changes between renders. That can corrupt Blazor's diff traversal.
+            // Keep the loop operations anchored to their source locations instead.
             builder.OpenElement(0, _tagName);
-            var sequence = 1;
-            foreach (var attribute in _attributes) builder.AddAttribute(sequence++, attribute.Name, attribute.Value);
-            if (_styles.Count > 0) builder.AddAttribute(sequence++, "style", string.Join(";", _styles.Select(x => $"{x.Key}:{x.Value}")));
-            foreach (var child in _children) builder.AddContent(sequence++, child);
+
+            if (_attributes.Count > 0)
+            {
+                builder.AddMultipleAttributes(1, _attributes.Select(attribute =>
+                    new KeyValuePair<string, object?>(attribute.Name, attribute.Value)));
+            }
+
+            if (_styles.Count > 0)
+                builder.AddAttribute(2, "style", string.Join(";", _styles.Select(x => $"{x.Key}:{x.Value}")));
+
+            foreach (var child in _children)
+                builder.AddContent(3, child);
+
             builder.CloseElement();
         };
     }
