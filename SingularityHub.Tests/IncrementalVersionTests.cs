@@ -67,4 +67,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 159)] [Fact(DisplayName = "V0.0.159 — Laboratory_Exterior_Security_Traffic_And_First_Holodeck_Maze")] public void V0_0_159_LaboratoryExteriorSecurityTrafficAndFirstHolodeckMaze() => Assert.Equal("0.0.159", "0.0.159");
     [ArchitectureTest(0, 0, 160)] [Fact(DisplayName = "V0.0.160 — Rendering_Is_Intent_Driven_Across_The_2D_To_3D_Continuum")] public void V0_0_160_RenderingIsIntentDrivenAcrossThe2DTo3DContinuum() => Assert.Equal("0.0.160", "0.0.160");
     [ArchitectureTest(0, 0, 161)] [Fact(DisplayName = "V0.0.161 — Voxel_Substrate_Removes_Data_Cubes_And_Renders_Exterior_Surface")] public void V0_0_161_VoxelSubstrateRemovesDataCubesAndRendersExteriorSurface() => Assert.Equal("0.0.161", "0.0.161");
+    [ArchitectureTest(0, 0, 162)] [Fact(DisplayName = "V0.0.162 — Security_Line_Cutting_Telemetry_And_Voxel_Shader_Cache_Bust")] public void V0_0_162_SecurityLineCuttingTelemetryAndVoxelShaderCacheBust() => Assert.Equal("0.0.162", "0.0.162");
 }
