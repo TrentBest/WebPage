@@ -109,6 +109,9 @@ public sealed class SpatialSecurityCheckpointModel
         // even when the attempted destination is more than one position away.
         if (occupied.Id is not null)
         {
+            if (slot < PlayerQueueSlot)
+                CutAttempts++;
+
             Agitated = true;
             LastMessage = "Someone is still there. Wait for the opening.";
 
