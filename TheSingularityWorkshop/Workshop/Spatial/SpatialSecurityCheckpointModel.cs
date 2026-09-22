@@ -166,9 +166,20 @@ public sealed class SpatialSecurityCheckpointModel
             return false;
         }
 
+        var previousPlayerSlot = PlayerQueueSlot;
         PlayerQueueSlot = slot;
         QueueProgresses++;
         QueueWaitTicks = 0;
+
+        // The queue is a physical chain. When the visitor occupies the newly
+        // vacated position, everyone behind them takes the same single step.
+        // There is never a second virtual queue hidden behind the scene.
+        for (var i = 0; i < _agents.Count; i++)
+        {
+            var agent = _agents[i];
+            if (agent.QueueSlot > previousPlayerSlot)
+                _agents[i] = agent with { QueueSlot = agent.QueueSlot - 1 };
+        }
         Agitated = false;
         LastMessage = slot == 0
             ? "YOU ARE NEXT. THE SECURITY EQUIPMENT IS AHEAD."
