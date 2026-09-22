@@ -26,7 +26,7 @@ public sealed class RenderingPerceptionTests
         var model = new RenderingPerceptionModel();
 
         Assert.False(model.ShouldRefresh(20, TimeSpan.FromMilliseconds(10), 1));
-        Assert.True(model.ShouldRefresh(20, TimeSpan.FromMilliseconds(10), 4));
+        Assert.True(model.ShouldRefresh(20, TimeSpan.FromMilliseconds(10), 8));
         Assert.True(model.ShouldRefresh(20, TimeSpan.FromMilliseconds(600), 0));
     }
 }
