@@ -42,7 +42,7 @@
     {
         <div class="moniker-water" aria-hidden="true"></div>
 
-        @if (State == "Moniker")
+        @if (State == "Moniker" || State == "HubGrowth")
         {
             <section class="flex-hello" aria-label="The Singularity Workshop">
                 <div class="flex-hello-orbit" aria-hidden="true"></div>
@@ -53,11 +53,6 @@
                 </div>
             </section>
         }
-        else
-        {
-            <div class="moniker-foreground" aria-label="The Singularity Workshop"><div>THE</div><div>SINGULARITY</div><div>WORKSHOP</div></div>
-        }
-
         @if (Plant is not null)
         {
             <svg class="plant-hub" viewBox="0 0 100 60" preserveAspectRatio="none" aria-label="The Hub growing through its invisible navigation mesh">
