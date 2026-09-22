@@ -6,8 +6,9 @@ using TheSingularityWorkshop.FSM_API;
 namespace TheSingularityWorkshop.Workshop.Plant;
 
 /// <summary>
-/// A plant-shaped presentation micro-bundle. FSM_API owns its lifecycle and advances
-/// the geometry that the renderer displays.
+/// A plant-shaped presentation micro-bundle whose growth is constrained by the
+/// final Hub geometry. The animation is not a random layout generator: the Hub
+/// geometry is the destination and the vines are the construction paths toward it.
 /// </summary>
 public sealed class PlantGrowthMicroBundle : IDisposable
 {
@@ -35,6 +36,9 @@ public sealed class PlantGrowthMicroBundle : IDisposable
 
         _fsm = FSM_API.FSM_API.Create.CreateInstance(_definitionName, _context, _processingGroup);
     }
+
+    /// <summary>The geometry the growth animation is ultimately constructing.</summary>
+    public static IReadOnlyList<HubPanelGeometry> FinalHubGeometry => HubGeometry.Panels;
 
     public string CurrentState => _fsm.CurrentState;
     public IReadOnlyList<PlantVine> Vines => _context.Vines;
@@ -103,10 +107,21 @@ public sealed class PlantGrowthMicroBundle : IDisposable
 
     public enum PlantSoundCue { None, VineGrowth, Bloom, PanelRip }
 
+    /// <summary>
+    /// A panel in the final Hub layout. These coordinates are the source of truth
+    /// for both the destination UI and the growth animation.
+    /// </summary>
     public sealed class PlantPanel
     {
-        internal PlantPanel(string id, string title, double x, double y, double width, double height)
-        { Id = id; Title = title; X = x; Y = y; Width = width; Height = height; }
+        internal PlantPanel(HubPanelGeometry geometry)
+        {
+            Id = geometry.Id;
+            Title = geometry.Title;
+            X = geometry.X;
+            Y = geometry.Y;
+            Width = geometry.Width;
+            Height = geometry.Height;
+        }
 
         public string Id { get; }
         public string Title { get; }
@@ -119,42 +134,101 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         public double OpenProgress { get; internal set; }
     }
 
+    /// <summary>A growth branch whose destination is a concrete point on a final Hub panel.</summary>
     public sealed class PlantVine
     {
-        internal PlantVine(string id, string targetId, string path, double speed)
-        { Id = id; TargetId = targetId; Path = path; Speed = speed; }
+        internal PlantVine(string id, string targetId, string path, double targetX, double targetY, double speed)
+        {
+            Id = id;
+            TargetId = targetId;
+            Path = path;
+            TargetX = targetX;
+            TargetY = targetY;
+            Speed = speed;
+        }
 
         public string Id { get; }
         public string TargetId { get; }
         public string Path { get; }
+        public double TargetX { get; }
+        public double TargetY { get; }
         public double Progress { get; internal set; }
         internal double Speed { get; }
         internal int MatureTicks { get; set; }
+    }
+
+    /// <summary>
+    /// Final Hub geometry. Growth is derived from this table rather than carrying
+    /// a second, hand-tuned set of unrelated coordinates.
+    /// </summary>
+    public static class HubGeometry
+    {
+        public static IReadOnlyList<HubPanelGeometry> Panels { get; } = new[]
+        {
+            new HubPanelGeometry("header", "HUB", 50, 7, 46, 9),
+            new HubPanelGeometry("identity", "IDENTITY", 14, 18, 22, 15),
+            new HubPanelGeometry("context", "CONTEXT", 38, 18, 22, 15),
+            new HubPanelGeometry("navigation", "NAVIGATION", 63, 32, 25, 14),
+            new HubPanelGeometry("ai", "AI", 66, 43, 21, 14),
+            new HubPanelGeometry("content", "EXPERIENCES", 47, 21, 31, 27)
+        };
+
+        internal static string BuildGrowthPath(HubPanelGeometry panel, int index)
+        {
+            const double rootX = 2;
+            const double rootY = 4;
+
+            var targetX = panel.AnchorX;
+            var targetY = panel.AnchorY;
+            var bend = 7 + index * 1.4;
+            var control1X = rootX + (targetX - rootX) * .28;
+            var control1Y = rootY + Math.Sign(targetY - rootY) * bend;
+            var control2X = targetX - (targetX - rootX) * .22;
+            var control2Y = targetY - Math.Sign(targetY - rootY) * bend;
+
+            return $"M {rootX:0.##} {rootY:0.##} C {control1X:0.##} {control1Y:0.##} {control2X:0.##} {control2Y:0.##} {targetX:0.##} {targetY:0.##}";
+        }
+    }
+
+    public sealed record HubPanelGeometry(
+        string Id,
+        string Title,
+        double X,
+        double Y,
+        double Width,
+        double Height)
+    {
+        public double Left => X - Width / 2;
+        public double Right => X + Width / 2;
+        public double Top => Y - Height / 2;
+        public double Bottom => Y + Height / 2;
+
+        /// <summary>
+        /// Selects a deterministic perimeter point facing the root. The growth branch
+        /// therefore appears to enter the panel from its nearest edge.
+        /// </summary>
+        public double AnchorX => X <= 50 ? Right : Left;
+
+        public double AnchorY => Y <= 12 ? Bottom : Top;
     }
 
     private sealed class PlantContext : IStateContext
     {
         public PlantContext()
         {
-            Vines = new List<PlantVine>
-            {
-                new("root-header", "header", "M 2 4 C 10 7 15 4 24 7 S 39 8 50 7", .018),
-                new("root-identity", "identity", "M 3 5 C 10 10 14 18 21 18 S 27 15 31 19", .021),
-                new("root-context", "context", "M 4 5 C 14 12 22 24 35 25 S 46 19 49 18", .022),
-                new("root-navigation", "navigation", "M 3 6 C 13 17 24 34 41 34 S 56 30 63 32", .020),
-                new("root-ai", "ai", "M 3 6 C 16 20 30 39 48 44 S 66 42 78 43", .023),
-                new("root-content", "content", "M 4 6 C 18 18 32 22 46 20 S 61 19 78 22", .019)
-            };
+            Vines = HubGeometry.Panels
+                .Select((panel, index) => new PlantVine(
+                    $"root-{panel.Id}",
+                    panel.Id,
+                    HubGeometry.BuildGrowthPath(panel, index),
+                    panel.AnchorX,
+                    panel.AnchorY,
+                    .019 + index * .001))
+                .ToList();
 
-            Panels = new List<PlantPanel>
-            {
-                new("header", "HUB", 50, 7, 46, 9),
-                new("identity", "IDENTITY", 14, 18, 22, 15),
-                new("context", "CONTEXT", 38, 18, 22, 15),
-                new("navigation", "NAVIGATION", 63, 32, 25, 14),
-                new("ai", "AI", 66, 43, 21, 14),
-                new("content", "EXPERIENCES", 47, 21, 31, 27)
-            };
+            Panels = HubGeometry.Panels
+                .Select(panel => new PlantPanel(panel))
+                .ToList();
         }
 
         public string Name { get; set; } = "FirstContact.PlantGrowth";
