@@ -17,6 +17,7 @@
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
     private readonly SpatialWorkshopArrangement WorkshopArrangement;
+    private string? selectedAecBuildingId;
     private readonly WorkshopRouter Router = new("workshop");
     private readonly SpatialLinework ForgeLinework = new();
     private readonly SpatialAECRemoteOfficeManifest AECManifest = SpatialAECRemoteOfficeManifest.CreateDefault();
@@ -375,7 +376,7 @@
         if (FsmScaffoldReady)
             root.Content(FsmScaffoldNotice());
         if (workshopMapVisible)
-            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope, WorkshopArrangement, MoveWorkshopBuilding, CopyWorkshopAiContext));
+            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope, WorkshopArrangement, MoveWorkshopBuilding, CopyWorkshopAiContext, RequestAecReview));
         return root;
     }
 
@@ -533,6 +534,12 @@
     private void MoveWorkshopBuilding(string id, int dx, int dy)
     {
         WorkshopArrangement.TryMove(Scene, id, dx, dy);
+    }
+
+    private void RequestAecReview(string id)
+    {
+        selectedAecBuildingId = id;
+        _ = InteractRoom("aec-remote-office");
     }
 
     private async Task CopyWorkshopAiContext(string id)
