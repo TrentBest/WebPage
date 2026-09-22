@@ -261,12 +261,98 @@ function buildDetail() {
     return v;
 }
 
+function terrainHeightField(width, depth, seed=17) {
+    const plateSeeds=[];
+    for(let i=0;i<12;i++) {
+        plateSeeds.push({
+            x:Math.floor(squirrelNoise2D(i, seed, 211)*width),
+            z:Math.floor(squirrelNoise2D(i, seed, 313)*depth),
+            polarity:squirrelNoise2D(i, seed, 419)
+        });
+    }
+
+    const heights=new Float32Array(width*depth);
+    for(let z=0;z<depth;z++) {
+        for(let x=0;x<width;x++) {
+            let nearest=Infinity, second=Infinity, plate=0;
+            for(let i=0;i<plateSeeds.length;i++) {
+                const dx=x-plateSeeds[i].x;
+                const dz=z-plateSeeds[i].z;
+                const distance=dx*dx+dz*dz;
+                if(distance<nearest) {
+                    second=nearest;
+                    nearest=distance;
+                    plate=i;
+                } else if(distance<second) {
+                    second=distance;
+                }
+            }
+
+            const boundary=smooth(1-Math.sqrt(Math.max(0,second-nearest))/18);
+            const continental=squirrelSmooth2D(x,z,58,seed+plate*7);
+            const regional=squirrelSmooth2D(x,z,19,seed+91);
+            const local=squirrelNoise2D(x,z,seed+131);
+            const collision=plateSeeds[plate].polarity>.56 ? 1 : -1;
+            const uplift=boundary*(collision>0 ? 20 : -8);
+            heights[x+width*z]=Math.max(2,7+continental*10+regional*7+local*2+uplift);
+        }
+    }
+    return heights;
+}
+
+function voxelizeHeightField(heights,width,height,depth) {
+    const v=createVolume(width,height,depth);
+    for(let z=0;z<depth;z++)
+        for(let x=0;x<width;x++) {
+            const top=Math.min(height-1,Math.max(1,Math.floor(heights[x+width*z])));
+            for(let y=0;y<top;y++) v.cells[index(v,x,y,z)]=1;
+        }
+    return v;
+}
+
+function buildTectonic() {
+    const w=144,h=60,d=144;
+    return voxelizeHeightField(terrainHeightField(w,d,17),w,h,d);
+}
+
+function buildWeathered() {
+    const w=144,h=60,d=144;
+    let heights=terrainHeightField(w,d,17);
+
+    // A compact thermal-weathering pass: material above a local slope threshold
+    // migrates toward the lower neighbor. Repeating it makes ridges soften and
+    // valleys collect material without introducing a separate render representation.
+    for(let iteration=0;iteration<10;iteration++) {
+        const next=new Float32Array(heights);
+        for(let z=1;z<d-1;z++) {
+            for(let x=1;x<w-1;x++) {
+                const i=x+w*z;
+                const center=heights[i];
+                const neighbors=[heights[i-1],heights[i+1],heights[i-w],heights[i+w]];
+                let lowest=neighbors[0];
+                for(const value of neighbors) lowest=Math.min(lowest,value);
+                const slope=center-lowest;
+                if(slope>2.25) {
+                    const wear=Math.min(.42,(slope-2.25)*.075);
+                    next[i]-=wear;
+                    const share=wear/4;
+                    next[i-1]+=share; next[i+1]+=share; next[i-w]+=share; next[i+w]+=share;
+                }
+            }
+        }
+        heights=next;
+    }
+
+    return voxelizeHeightField(heights,w,h,d);
+}
+
 function buildMassive() {
     const w=144,h=52,d=144;
     const v=createVolume(w,h,d);
     v.cells.fill(1);
 
-    // Scrape the sky away from a procedural landscape.
+    // Massive is intentionally a scale experiment: deterministic Squirrel noise
+    // supplies continental, regional, and local terrain structure.
     for(let z=0;z<d;z++)
         for(let x=0;x<w;x++) {
             const continental = squirrelSmooth2D(x, z, 52, 17);
@@ -278,7 +364,6 @@ function buildMassive() {
                 v.cells[index(v,x,y,z)] = 0;
         }
 
-    // Preserve large structures as remaining material in the carved landscape.
     const structures=[
         [18,18,34,34,38],
         [50,14,62,62,43],
@@ -290,7 +375,6 @@ function buildMassive() {
     for(const [x0,z0,x1,z1,top] of structures)
         fillBox(v,x0,1,z0,x1,Math.min(h,top),z1);
 
-    // Cut avenues through the environment.
     for(let z=20;z<d;z+=28)
         clearCylinder(v,72,z,0,h,5);
 
@@ -404,6 +488,8 @@ function rebuildMesh() {
 }
 
 function makeVolume(name) {
+    if(name==="tectonic") return buildTectonic();
+    if(name==="weathered") return buildWeathered();
     return name==="massive" ? buildMassive() : buildDetail();
 }
 
