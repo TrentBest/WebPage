@@ -44,7 +44,9 @@ public sealed class SpatialSecurityCheckpointModel
             .Where(slot => slot != PlayerQueueSlot && _agents.All(agent => agent.QueueSlot != slot))
             .ToArray();
 
+    public bool IsVipRoute => Stage == SpatialSecurityCheckpointStage.VipAccess;
     public bool HasClearedCheckpoint => Stage == SpatialSecurityCheckpointStage.Cleared;
+
     public bool CanFreeRoam => HasClearedCheckpoint;
 
     public SpatialSecurityAgentStage GetAgentStage(string id)
@@ -87,6 +89,27 @@ public sealed class SpatialSecurityCheckpointModel
             _serviceStages[agent.Id] = SpatialSecurityAgentStage.Waiting;
 
         RefreshSpeech();
+    }
+
+    /// <summary>Begins the VIP bypass path. The queue is deliberately not entered.</summary>
+    public void EnterVipRoute()
+    {
+        Stage = SpatialSecurityCheckpointStage.VipAccess;
+        LastMessage = "VIP ACCESS // PRESENT YOUR PASS TO THE CARD READER.";
+        Agitated = false;
+    }
+
+    /// <summary>Clears the VIP card-reader path after the security guards approve the pass.</summary>
+    public bool ClearVipRoute()
+    {
+        if (Stage != SpatialSecurityCheckpointStage.VipAccess)
+            return false;
+
+        Stage = SpatialSecurityCheckpointStage.Cleared;
+        BadgeId = "VIP-PASS";
+        BadgeClearance = SpatialSecurityClearance.Vip;
+        LastMessage = "VIP ACCESS GRANTED. SECURITY BYPASS OPEN.";
+        return true;
     }
 
     public void EnterQueue()
@@ -287,6 +310,7 @@ public sealed class SpatialSecurityCheckpointModel
 public enum SpatialSecurityCheckpointStage
 {
     Approach,
+    VipAccess,
     Queue,
     TrayReady,
     TrayLoaded,
