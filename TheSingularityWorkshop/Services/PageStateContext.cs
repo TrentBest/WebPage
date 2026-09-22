@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TheSingularityWorkshop.FSM_API;
+using TheSingularityWorkshop.Workshop.Randomness;
 
 namespace TheSingularityWorkshop.Services
 {
