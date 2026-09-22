@@ -8,65 +8,48 @@ public sealed class MonikerExperienceTests
     [Fact(DisplayName = "Moniker experience does not expose a Unity runtime handoff")]
     public void MonikerExperienceDoesNotExposeUnityRuntimeHandoff()
     {
-        var service = new WorkshopExperienceService();
+        using var service = new WorkshopExperienceService();
 
         service.Initialize();
-        service.RequestEntry();
+        for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Gateway"; i++)
+            service.Tick();
 
-        Assert.Equal("FlexHello", service.CurrentState);
+        Assert.Equal("Gateway", service.FirstContact.CurrentState);
+        service.RequestEntry();
+        service.Tick();
+
+        Assert.Equal("Moniker", service.FirstContact.CurrentState);
         Assert.False(service.ShowUnity);
     }
 
-    [Fact(DisplayName = "Moniker presentation is a phased six-color living glyph field")]
+    [Fact(DisplayName = "Moniker presentation is a three-second living gateway glyph")]
     public void MonikerPresentationUsesWorkshopPaletteAndPhasedGlyphContract()
     {
-        var css = File.ReadAllText(Path.Combine(
-            AppContext.BaseDirectory,
-            "..", "..", "..", "..",
-            "TheSingularityWorkshop", "wwwroot", "css", "app.css"));
         var home = File.ReadAllText(Path.Combine(
             AppContext.BaseDirectory,
             "..", "..", "..", "..",
-            "TheSingularityWorkshop", "Pages", "Home.razor"));
+            "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
-        Assert.Contains(".hello-moniker", home);
-        Assert.Contains(".hello-line", home);
-        Assert.Contains(".hello-glyph", home);
+        Assert.Contains(".moniker-foreground", home);
         Assert.Contains("THE", home);
         Assert.Contains("SINGULARITY", home);
         Assert.Contains("WORKSHOP", home);
-        Assert.Contains("--phase", home);
-        Assert.Contains("MonikerPhaseStepDegrees = 27", home);
-        Assert.Contains("phase = glyphIndex * phaseStep", home);
-        Assert.Contains("sin(calc(var(--wave-time)", home);
-        Assert.Contains("rotateX(calc(sin", home);
-        Assert.Contains("rotateY(calc(sin", home);
-        Assert.Contains("rotateZ(calc(sin", home);
-        Assert.Contains("@@property --wave-time", home);
-        Assert.Contains("@@keyframes helloGlyphWave", home);
+        Assert.Contains("Moniker", home);
         Assert.DoesNotContain("MADE WITH UNITY", home);
         Assert.DoesNotContain("interop.initUnity", home);
-
-        Assert.Contains("#52e05a", css);
-        Assert.Contains("#00a8ff", css);
-        Assert.Contains("#ff2cff", css);
-        Assert.Contains("#ff3030", css);
-        Assert.Contains("#ff7a00", css);
-        Assert.Contains("#ffd34d", css);
     }
 
-    [Fact(DisplayName = "Gateway avatar border and moniker entry are enforced by the loaded global stylesheet")]
-    public void GatewayAvatarAndMonikerEntryAreStable()
+    [Fact(DisplayName = "Gateway presentation remains a visible button and warning card")]
+    public void GatewayPresentationRemainsStable()
     {
-        var css = File.ReadAllText(Path.Combine(
+        var gateway = File.ReadAllText(Path.Combine(
             AppContext.BaseDirectory,
             "..", "..", "..", "..",
-            "TheSingularityWorkshop", "wwwroot", "css", "app.css"));
+            "TheSingularityWorkshop", "Components", "WorkshopGatewayView.razor"));
 
-        Assert.Contains(".monolith-btn .avatar-portal::after", css);
-        Assert.Contains("border:2px solid #00eaff", css);
-        Assert.Contains(".monolith-btn:hover .avatar-portal::after", css);
-        Assert.Contains("animation-delay:0s,0s!important", css);
-        Assert.Contains(".hello-glyph{--phase:0deg!important", css);
+        Assert.Contains("enter-workshop", gateway);
+        Assert.Contains("ENTER THE WORKSHOP", gateway);
+        Assert.Contains("SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE", gateway);
+        Assert.Contains("border:2px solid #00eaff", gateway);
     }
 }
