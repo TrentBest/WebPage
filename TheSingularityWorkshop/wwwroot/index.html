@@ -166,6 +166,45 @@
                     });
                 }catch{}
             },
+            firstContactSound:function(cue){
+                try{
+                    const C=window.AudioContext||window.webkitAudioContext;
+                    if(!C)return;
+                    if(!window.__workshopSfx){
+                        const ctx=new C();
+                        const master=ctx.createGain();
+                        const convolver=ctx.createConvolver();
+                        const wet=ctx.createGain();
+                        const dry=ctx.createGain();
+                        const early=ctx.createDelay(1.0);
+                        const earlyGain=ctx.createGain();
+                        const irLength=Math.floor(ctx.sampleRate*5.8);
+                        const ir=ctx.createBuffer(2,irLength,ctx.sampleRate);
+                        for(let ch=0;ch<2;ch++){
+                            const data=ir.getChannelData(ch);
+                            for(let i=0;i<irLength;i++){
+                                const t=i/ctx.sampleRate;
+                                data[i]=(Math.random()*2-1)*Math.pow(1-t/5.8,3.1);
+                            }
+                        }
+                        convolver.buffer=ir; wet.gain.value=.38; dry.gain.value=.76; early.delayTime.value=.047; earlyGain.gain.value=.18;
+                        const input=ctx.createGain(); input.connect(dry).connect(master); input.connect(convolver).connect(wet).connect(master); input.connect(early).connect(earlyGain).connect(master); master.connect(ctx.destination);
+                        master.gain.value=.82;
+                        window.__workshopSfx={ctx,master,input};
+                    }
+                    const s=window.__workshopSfx; const ctx=s.ctx; if(ctx.state==='suspended')ctx.resume().catch(()=>{}); const now=ctx.currentTime;
+                    const tone=(frequency,duration,type='sine',gain=.08,detune=0)=>{const osc=ctx.createOscillator(),g=ctx.createGain();osc.type=type;osc.frequency.value=frequency;osc.detune.value=detune;g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(gain,now+.025);g.gain.exponentialRampToValueAtTime(.0001,now+duration);osc.connect(g).connect(s.input);osc.start(now);osc.stop(now+duration+.03);};
+                    const noise=(duration,filterType,frequency,gain)=>{const buffer=ctx.createBuffer(1,Math.floor(ctx.sampleRate*duration),ctx.sampleRate),data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;const src=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),g=ctx.createGain();src.buffer=buffer;filter.type=filterType;filter.frequency.value=frequency;g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(gain,now+.02);g.gain.exponentialRampToValueAtTime(.0001,now+duration);src.connect(filter).connect(g).connect(s.input);src.start(now);};
+                    if(cue.includes('pressure')){tone(38,2.4,'sine',.22);tone(57,2.0,'sine',.12);noise(2.2,'lowpass',95,.08);}
+                    else if(cue.includes('DigitalResonance')){tone(247,1.5,'sawtooth',.045);tone(371,1.2,'triangle',.035);tone(554,1.0,'square',.018);}
+                    else if(cue.includes('Water')){tone(146,4.5,'sine',.018);noise(4.2,'lowpass',720,.018);}
+                    else if(cue.includes('VineGrowth')){noise(.9,'lowpass',160,.12);tone(43,.8,'sine',.12);tone(67,.65,'triangle',.045);}
+                    else if(cue.includes('Bloom')){tone(392,.9,'sine',.08);tone(587,1.15,'sine',.055,7);tone(784,1.35,'triangle',.035,12);}
+                    else if(cue.includes('PanelRip')){noise(.65,'bandpass',1450,.14);tone(91,.5,'sawtooth',.055);}
+                    else if(cue.includes('HubArrival')){tone(110,1.2,'sine',.08);tone(165,1.0,'triangle',.05);tone(247,.9,'sine',.04);}
+                    else if(cue.includes('Silence')){s.master.gain.setTargetAtTime(.0001,now,.45);}
+                }catch(error){console.debug('[First Contact SFX] audio unavailable:',error);}
+            },
             markWorkshopVisited:function(){ localStorage.setItem("WorkshopVisited","true"); },
             workshopExploreGardenVisited:function(){ return localStorage.getItem("WorkshopExploreGardenVisited") === "true"; },
             markWorkshopExploreGardenVisited:function(){ localStorage.setItem("WorkshopExploreGardenVisited","true"); }
