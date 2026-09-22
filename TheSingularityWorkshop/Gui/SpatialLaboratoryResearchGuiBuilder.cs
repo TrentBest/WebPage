@@ -40,7 +40,9 @@ public static class SpatialLaboratoryResearchGuiBuilder
         Action<string> setCamera,
         Action exit)
     {
-        var station = Stations.FirstOrDefault(x => x.Id == selectedStationId) ?? Stations[0];
+        var station = Stations.FirstOrDefault(x => x.Id == selectedStationId);
+        if (station.Id is null)
+            station = Stations[0];
 
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("overflow", "hidden")
