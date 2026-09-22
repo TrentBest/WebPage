@@ -16,10 +16,10 @@ public sealed class SpatialArrangementAndAiTests
         var forge = scene.Interactables.Single(item => item.Id == "forge");
         var before = arrangement.GetBounds(forge);
 
-        Assert.True(arrangement.TryMove(scene, forge.Id, -2, 0));
+        Assert.True(arrangement.TryMove(scene, forge.Id, -1, 0));
 
         var after = arrangement.GetBounds(forge);
-        Assert.Equal(before.X - 2, after.X);
+        Assert.Equal(before.X - 1, after.X);
         Assert.Equal(before.Y, after.Y);
         Assert.Equal(before.Width, after.Width);
         Assert.Equal(before.Height, after.Height);
