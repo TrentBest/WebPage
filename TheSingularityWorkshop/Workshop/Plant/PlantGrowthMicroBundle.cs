@@ -179,6 +179,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
 
     public sealed class PlantVine
     {
+        // Runtime state remains internal; consumers observe the public vine projection above.
         internal PlantVine(string id, string targetId, string path, double targetX, double targetY, double speed, int phaseDelayTicks)
         {
             Id = id;
