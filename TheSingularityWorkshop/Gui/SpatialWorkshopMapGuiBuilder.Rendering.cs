@@ -15,7 +15,6 @@ public static partial class SpatialWorkshopMapGuiBuilder
         Action<double>? setZoom = null,
         Action<SpatialMapScope>? setScope = null,
         SpatialWorkshopArrangement? arrangement = null,
-        Action<string, int, int>? moveBuilding = null,
         Func<string, Task>? copyAiContext = null,
         Action<string>? requestAecReview = null)
     {
@@ -94,7 +93,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("gap", ".8rem").Style("min-height", "0").Style("flex", "1");
 
         layout.Content(scope == SpatialMapScope.Workshop
-            ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement, moveBuilding, copyAiContext, requestAecReview)
+            ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement, copyAiContext, requestAecReview)
             : scope == SpatialMapScope.City
                 ? CityMap(receiver, avatarX, avatarY, selectDestination, zoom, setZoom)
                 : scope == SpatialMapScope.World
@@ -115,7 +114,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("gap", "1rem").Style("margin-top", ".7rem")
             .Content(WorkshopGui.Element(receiver, "span").Style("color", "#a8bbc4").Style("font-size", ".46rem")
                 .Text(scope == SpatialMapScope.Workshop
-                    ? "SELECT A BUILDING TO REVEAL MOVE / AEC / AI / ENTER CONTROLS. ARROWS EDIT THE LIVE PLAN."
+                    ? "SELECT A BUILDING TO REVEAL AEC / AI / ENTER CONTROLS. CAMPUS GEOMETRY IS READ-ONLY HERE."
                     : "UNDER CONSTRUCTION: APPROXIMATE MASSING ONLY. PROXIMITY WILL EXPLAIN EACH FUTURE FUNCTION."))
             .Content(WorkshopGui.Button(receiver).Label("CLOSE MAP")
                 .Style("padding", ".45rem .7rem").Style("border", $"1px solid {Magenta}66")
@@ -134,7 +133,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("font-size", ".43rem").Style("cursor", "pointer")
             .OnClick(() => setScope?.Invoke(value));
 
-    private static ElementBuilder Map(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, SpatialWorkshopArrangement? arrangement, Action<string, int, int>? moveBuilding, Func<string, Task>? copyAiContext, Action<string>? requestAecReview)
+    private static ElementBuilder Map(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, SpatialWorkshopArrangement? arrangement, Func<string, Task>? copyAiContext, Action<string>? requestAecReview)
     {
         var map = MapFrame(receiver, zoom, setZoom);
         map.Content(WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100")
@@ -184,11 +183,6 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Style("border", $"1px solid {accent}77")
                 .Style("z-index", "20")
                 .Style("white-space", "nowrap");
-
-            controls.Content(ControlButton(receiver, "←", () => moveBuilding?.Invoke(item.Id, -1, 0)));
-            controls.Content(ControlButton(receiver, "↑", () => moveBuilding?.Invoke(item.Id, 0, -1)));
-            controls.Content(ControlButton(receiver, "↓", () => moveBuilding?.Invoke(item.Id, 0, 1)));
-            controls.Content(ControlButton(receiver, "→", () => moveBuilding?.Invoke(item.Id, 1, 0)));
 
             controls.Content(WorkshopGui.Button(receiver).Label("AEC")
                 .Style("padding", ".22rem .35rem")
