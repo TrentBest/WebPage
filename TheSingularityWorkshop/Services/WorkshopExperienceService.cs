@@ -38,8 +38,12 @@ public sealed class WorkshopExperienceService : IDisposable
 
     public void RequestEntry()
     {
+        if (CurrentState != "FirstContact" || _firstContact.CurrentState != "Gateway")
+            return;
+
         SelectedFlexExperience = FlexExperienceCatalog.SelectDefault();
-        SetState("FlexHello");
+        _firstContact.RequestEntry();
+        StateChanged?.Invoke();
     }
 
     public void Tick()
@@ -48,7 +52,7 @@ public sealed class WorkshopExperienceService : IDisposable
 
         _firstContact.Update();
 
-        if (_firstContact.CurrentState == "Moniker" && _plant is null)
+        if (_firstContact.CurrentState == "HubGrowth" && _plant is null)
         {
             _plant = new PlantGrowthMicroBundle();
             _plant.Start();
