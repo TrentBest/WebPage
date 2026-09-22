@@ -77,6 +77,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
 
         var before = _fsm.CurrentState;
         FSM_API.FSM_API.Interaction.Update(_processingGroup);
+        SyncPanelsFromVines();
 
         if (before != _fsm.CurrentState)
         {
@@ -96,7 +97,9 @@ public sealed class PlantGrowthMicroBundle : IDisposable
 
     private void UpdateGrowing(IStateContext _) { }
 
-    private void UpdateBlooming(IStateContext _)
+    private void UpdateBlooming(IStateContext _) => SyncPanelsFromVines();
+
+    private void SyncPanelsFromVines()
     {
         foreach (var vine in _context.Vines)
         {
