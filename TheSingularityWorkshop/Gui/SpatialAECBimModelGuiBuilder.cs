@@ -120,7 +120,9 @@ public static class SpatialAECBimModelGuiBuilder
             .Style("width", "100%").Style("box-sizing", "border-box").Style("padding", ".45rem")
             .Style("background", "rgba(0,234,255,.04)").Style("border", $"1px solid {Cyan}44")
             .Style("color", White).Style("font-family", "inherit").Style("font-size", ".38rem")
-            .OnInput((Microsoft.AspNetCore.Components.ChangeEventArgs args) => search(args.Value?.ToString() ?? ""));
+            .Attribute("oninput", Microsoft.AspNetCore.Components.EventCallback.Factory.Create<Microsoft.AspNetCore.Components.ChangeEventArgs>(
+                receiver,
+                (Microsoft.AspNetCore.Components.ChangeEventArgs args) => search(args.Value?.ToString() ?? "")));
         panel.Content(input);
 
         foreach (var content in model.SearchResults)
