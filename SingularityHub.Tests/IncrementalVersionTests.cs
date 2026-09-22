@@ -70,7 +70,6 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 162)] [Fact(DisplayName = "V0.0.162 — Security_Line_Cutting_Telemetry_And_Voxel_Shader_Cache_Bust")] public void V0_0_162_SecurityLineCuttingTelemetryAndVoxelShaderCacheBust() => Assert.Equal("0.0.162", "0.0.162");
     [ArchitectureTest(0, 0, 163)] [Fact(DisplayName = "V0.0.163 — Squirrel_RNG_And_Hidden_Laboratory_Rendering_Research_Level")] public void V0_0_163_SquirrelRngAndHiddenLaboratoryRenderingResearchLevel() => Assert.Equal("0.0.163", "0.0.163");
     [ArchitectureTest(0, 0, 164)] [Fact(DisplayName = "V0.0.164 — Tectonic_Weathering_Probes_And_Event_Horizon_Perception")] public void V0_0_164_TectonicWeatheringProbesAndEventHorizonPerception() => Assert.Equal("0.0.164", "0.0.164");
-}
 
     [ArchitectureTest(0, 0, 165)] [Fact(DisplayName = "V0.0.165 — Every_Browser_Launch_Begins_At_FirstContact_And_Never_AutoPresents_The_Moniker")]
     public void V0_0_165EveryBrowserLaunchBeginsAtFirstContactAndNeverAutoPresentsTheMoniker()
@@ -82,3 +81,49 @@ public sealed class IncrementalVersionTests
         Assert.Equal("Statement", service.FirstContact.CurrentState);
         Assert.False(service.FirstContact.EntryRequested);
     }
+
+    [ArchitectureTest(0, 0, 166)] [Fact(DisplayName = "V0.0.166 — World_State_Is_Authoritative_And_Starts_In_Two_Dimensions")]
+    public void V0_0_166WorldStateIsAuthoritativeAndStartsInTwoDimensions()
+    {
+        var world = TheSingularityWorkshop.World.WorkshopWorldState.CreateInitial();
+
+        Assert.Equal(TheSingularityWorkshop.World.WorkshopPresentationMode.TwoDimensional, world.PresentationMode);
+        Assert.Equal(0, world.Epoch);
+        Assert.Null(world.LastEvent);
+    }
+
+    [ArchitectureTest(0, 0, 167)] [Fact(DisplayName = "V0.0.167 — Hidden_Switch_Is_A_World_Capability_Not_A_Local_Renderer_Toggle")]
+    public void V0_0_167HiddenSwitchIsAWorldCapabilityNotALocalRendererToggle()
+    {
+        var world = TheSingularityWorkshop.World.WorkshopWorldState.CreateInitial();
+        var activated = world.Activate(TheSingularityWorkshop.World.WorkshopWorldEvent.CreateThreeDimensionalityUnlock("singularity-laboratory", "researcher-13"));
+
+        Assert.Equal(TheSingularityWorkshop.World.WorkshopPresentationMode.ThreeDimensional, activated.PresentationMode);
+        Assert.Equal(1, activated.Epoch);
+        Assert.Equal("singularity-laboratory", activated.LastEvent!.LocationId);
+    }
+
+    [ArchitectureTest(0, 0, 168)] [Fact(DisplayName = "V0.0.168 — Global_Capability_Activation_Is_Idempotent")]
+    public void V0_0_168GlobalCapabilityActivationIsIdempotent()
+    {
+        var world = TheSingularityWorkshop.World.WorkshopWorldState.CreateInitial();
+        var eventData = TheSingularityWorkshop.World.WorkshopWorldEvent.CreateThreeDimensionalityUnlock("singularity-laboratory", "researcher-13");
+        var first = world.Activate(eventData);
+        var second = first.Activate(eventData with { DiscovererId = "researcher-27" });
+
+        Assert.Same(first, second);
+        Assert.Equal(1, second.Epoch);
+        Assert.Equal("researcher-13", second.LastEvent!.DiscovererId);
+    }
+
+    [ArchitectureTest(0, 0, 169)] [Fact(DisplayName = "V0.0.169 — World_Event_Carries_Discovery_And_Presentation_Intent")]
+    public void V0_0_169WorldEventCarriesDiscoveryAndPresentationIntent()
+    {
+        var eventData = TheSingularityWorkshop.World.WorkshopWorldEvent.CreateThreeDimensionalityUnlock("singularity-laboratory", "researcher-13");
+
+        Assert.Equal("world.presentation.3d.unlock", eventData.EventType);
+        Assert.Equal("singularity-laboratory", eventData.LocationId);
+        Assert.Equal("researcher-13", eventData.DiscovererId);
+        Assert.Equal(TheSingularityWorkshop.World.WorkshopPresentationMode.ThreeDimensional, eventData.PresentationMode);
+    }
+}
