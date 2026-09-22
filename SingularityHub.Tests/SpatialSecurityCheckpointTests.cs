@@ -48,9 +48,9 @@ public sealed class SpatialSecurityCheckpointTests
         checkpoint.EnterQueue();
         checkpoint.AdvanceQueueTraffic();
 
-        Assert.False(checkpoint.TryMoveToQueueSlot(3));
+        Assert.False(checkpoint.TryMoveToQueueSlot(2));
         Assert.True(checkpoint.Agitated);
-        Assert.Contains("WAIT", checkpoint.GetAgentSpeech("security-visitor-01") ?? string.Empty);
+        Assert.Contains("WAIT", checkpoint.GetAgentSpeech("security-admin-01") ?? string.Empty);
         Assert.Equal(4, checkpoint.PlayerQueueSlot);
     }
 
