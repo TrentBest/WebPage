@@ -119,6 +119,40 @@ function lookAt(eye, center, up) {
 function clamp01(v) { return Math.max(0, Math.min(1, v)); }
 function smooth(v) { const t=clamp01(v); return t*t*(3-2*t); }
 
+// Squirrel Noise 5: deterministic, random-access procedural entropy.
+const SQUIRREL_NOISE_1 = 0x68E31DA4;
+const SQUIRREL_NOISE_2 = 0xB5297A4D;
+const SQUIRREL_NOISE_3 = 0x1B56C4E9;
+
+function squirrelNoise5(position, seed=0) {
+    let bits = position | 0;
+    bits = Math.imul(bits, SQUIRREL_NOISE_1);
+    bits = (bits + seed) | 0;
+    bits ^= bits >>> 8;
+    bits = (bits + SQUIRREL_NOISE_2) | 0;
+    bits ^= bits << 8;
+    bits = Math.imul(bits, SQUIRREL_NOISE_3);
+    bits ^= bits >>> 8;
+    return bits >>> 0;
+}
+
+function squirrelNoise2D(x, z, seed=0) {
+    const mixed = Math.imul(x | 0, 0x1f123bb5) ^ Math.imul(z | 0, 0x5f356495);
+    return squirrelNoise5(mixed, seed) / 4294967296;
+}
+
+function squirrelSmooth2D(x, z, scale, seed=0) {
+    const px = x / scale;
+    const pz = z / scale;
+    const x0 = Math.floor(px), z0 = Math.floor(pz);
+    const tx = smooth(px - x0), tz = smooth(pz - z0);
+    const a = squirrelNoise2D(x0, z0, seed);
+    const b = squirrelNoise2D(x0 + 1, z0, seed);
+    const c = squirrelNoise2D(x0, z0 + 1, seed);
+    const d = squirrelNoise2D(x0 + 1, z0 + 1, seed);
+    return a + (b-a)*tx + (c-a)*tz + (a-b-c+d)*tx*tz;
+}
+
 function createVolume(width, height, depth) {
     return {
         width,
@@ -229,12 +263,10 @@ function buildMassive() {
     // Scrape the sky away from a procedural landscape.
     for(let z=0;z<d;z++)
         for(let x=0;x<w;x++) {
-            const wave =
-                14 +
-                Math.sin(x*0.075)*4 +
-                Math.cos(z*0.065)*4 +
-                Math.sin((x+z)*0.035)*3;
-
+            const continental = squirrelSmooth2D(x, z, 52, 17);
+            const regional = squirrelSmooth2D(x, z, 18, 71);
+            const local = squirrelNoise2D(x, z, 131);
+            const wave = 7 + continental*15 + regional*8 + local*3;
             const height=Math.max(3,Math.floor(wave));
             for(let y=height;y<h;y++)
                 v.cells[index(v,x,y,z)] = 0;
