@@ -32,6 +32,7 @@
     private readonly SpatialLaboratoryTrafficModel LaboratoryTraffic = new();
     private readonly SpatialSecurityCheckpointModel SecurityCheckpoint = new();
     private bool laboratoryDirectorAccessGranted;
+    private bool renderingResearchUnlocked;
     private double laboratoryPlanAvatarX = 50;
     private double laboratoryPlanAvatarY = 36;
     private readonly SpatialHolodeckMazeModel HolodeckMaze = new();
@@ -265,7 +266,7 @@
                 Experience.User.DisplayName,
                 laboratoryPlanAvatarX,
                 laboratoryPlanAvatarY,
-                laboratoryDirectorAccessGranted,
+                laboratoryDirectorAccessGranted || renderingResearchUnlocked,
                 args => _ = HandleLaboratoryPlanWorldClick(args),
                 HandleKeyDown,
                 AccessLaboratoryReception,
@@ -990,13 +991,15 @@
     {
         if (insideRoomId != "singularity-lab-plan" || !laboratoryDirectorAccessGranted) return;
 
+        renderingResearchUnlocked = true;
         insideRoomId = "singularity-lab-director";
     }
 
     private void EnterLaboratoryRenderingResearch()
     {
-        if (insideRoomId != "singularity-lab-plan" || !laboratoryDirectorAccessGranted) return;
+        if (insideRoomId != "singularity-lab-plan" || !(laboratoryDirectorAccessGranted || renderingResearchUnlocked)) return;
 
+        renderingResearchUnlocked = true;
         renderingResearchStationId = "micro-detail";
         renderingResearchDimension = .5d;
         renderingResearchCamera = "frame";
