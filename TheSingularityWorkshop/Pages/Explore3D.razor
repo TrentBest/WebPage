@@ -233,9 +233,11 @@
         }
     }
 
-    private sealed record VoxelMetrics(double Fps, double FrameMs, int Lines, int Vertices)
+    private sealed class VoxelMetrics
     {
-        public int Voxels { get; init; }
-        public int Exposed { get; init; }
+        public double Fps { get; set; }
+        public int Voxels { get; set; }
+        public int Exposed { get; set; }
+        public int Vertices { get; set; }
     }
 }
