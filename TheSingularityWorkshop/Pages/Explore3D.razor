@@ -144,7 +144,7 @@
             return;
 
         // Cache-bust the renderer module so shader changes cannot leave an older WebGL program alive in the browser.
-        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/voxel-substrate-lab.js?v=164");
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/voxel-substrate-lab.js?v=165");
         await module.InvokeVoidAsync("startVoxelSubstrateLab", "voxel-substrate-canvas", specimen, dimension, camera);
         started = true;
         metricsCancellation = new CancellationTokenSource();
