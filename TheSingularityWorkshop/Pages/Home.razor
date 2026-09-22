@@ -11,12 +11,10 @@
     }
     else if (Experience.CurrentState == "Intro")
     {
-        <WorkshopGatewayView OnEntryRequested="EnterWorkshop" />
-    }
-    }
-    else if (Experience.CurrentState == "FlexHello")
-    {
-        <section class="flex-hello"><div class="hello-moniker">THE<br />SINGULARITY<br />WORKSHOP</div></section>
+        <section class="hub-arrival" aria-label="The Workshop Hub">
+            <div class="hub-arrival-title">THE WORKSHOP</div>
+            <div class="hub-arrival-subtitle">HUB // MANIFESTED</div>
+        </section>
     }
 </div>
 
@@ -30,7 +28,6 @@
 .enter-orbit{position:absolute;width:48%;aspect-ratio:1;border:1px solid rgba(255,44,255,.22);border-radius:50%;pointer-events:none}
 .workshop-warning{width:min(680px,78%);padding:.75rem 1.2rem .85rem;box-sizing:border-box;text-align:center;background:rgba(20,10,2,.92);border:3px solid #ff6600;border-radius:5px;box-shadow:0 0 14px rgba(255,102,0,.22),0 0 30px rgba(255,102,0,.12)}
 .warning-header{display:flex;justify-content:center;gap:.65rem;margin-bottom:.4rem;color:#ffb15c;font-size:clamp(.65rem,1vw,.86rem);font-weight:700;letter-spacing:.13em}.warning-body{font-size:clamp(.62rem,.9vw,.8rem);line-height:1.6;color:#dceaf2}.warning-final{color:#ffb15c}
-.flex-hello{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#020711}.hello-moniker{font-size:clamp(2rem,7vw,6rem);font-weight:900;line-height:.84;text-align:center;color:#fff;text-shadow:0 0 18px #00eaff}
 @@media(max-width:700px){.enter-workshop{width:82vw;height:46vh}.workshop-warning{width:88%}}@@media(prefers-reduced-motion:reduce){.enter-workshop img{transition:none}}
 </style>
 
