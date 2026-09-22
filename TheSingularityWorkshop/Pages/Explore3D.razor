@@ -1,82 +1,136 @@
 @page "/rendering"
 @page "/explore3d"
 @using Microsoft.JSInterop
+@using TheSingularityWorkshop.Workshop.Rendering
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 
-<PageTitle>Singularity Web Rendering // Starship</PageTitle>
+<PageTitle>Singularity Rendering // Visual Substrate Lab</PageTitle>
 
-<div class="starship-lab">
-    <canvas id="starship-line-canvas" class="starship-canvas" aria-label="Singularity Starship 3D line rendering experiment"></canvas>
+<div class="rendering-lab">
+    <canvas id="starship-line-canvas" class="rendering-canvas" aria-label="Singularity Starship rendering continuum"></canvas>
 
-    <header class="lab-header">
-        <div class="lab-kicker">SINGULARITY WEB RENDERING // EXPERIMENTAL DECK</div>
-        <h1>FULL VISUAL DOMAIN</h1>
-        <p>This is the temporary rendering laboratory: one WebGL scene spanning the visual continuum from toon presentation and tweened motion through hybrid composition toward reality-oriented rendering.</p>
+    <header class="rendering-header">
+        <div class="rendering-kicker">SINGULARITY WEB RENDERING // VISUAL SUBSTRATE LAB</div>
+        <h1>ONE GEOMETRY.<br />CHANGE THE REALITY.</h1>
+        <p>
+            The same Starship is rendered across a continuous visual domain:
+            planar 2D, isometric, and perspective 3D. The renderer receives intent
+            — target, dimension, and camera behavior — rather than a pile of camera commands.
+        </p>
     </header>
 
-    <aside class="lab-console" aria-label="Starship line rendering controls">
-        <div class="console-title">LINE RENDERING BENCH</div>
-        <div class="console-row"><span>LINES</span><strong>@lineCount.ToString("N0")</strong></div>
-        <div class="console-row"><span>FPS</span><strong>@fps.ToString("0.0")</strong></div>
-        <div class="console-row"><span>FRAME</span><strong>@frameMs.ToString("0.00") MS</strong></div>
-        <div class="console-row"><span>VERTICES</span><strong>@vertices.ToString("N0")</strong></div>
+    <aside class="rendering-console" aria-label="Rendering laboratory controls">
+        <div class="console-title">RENDERING INTENT</div>
 
-        <div class="console-label">LOAD THE SAME SHIP AT DIFFERENT LINE DENSITIES</div>
-        <div class="line-presets">
-            <button @onclick="() => SetLineCount(2500)">2.5K</button>
-            <button @onclick="() => SetLineCount(10000)">10K</button>
-            <button @onclick="() => SetLineCount(25000)">25K</button>
-            <button @onclick="() => SetLineCount(50000)">50K</button>
-        </div>
+        <section class="console-section">
+            <div class="section-label">DIMENSION // @($"{intent.ClampedDimension:P0}")</div>
+            <input class="dimension-slider"
+                   type="range"
+                   min="0"
+                   max="1"
+                   step="0.01"
+                   value="@intent.ClampedDimension"
+                   @oninput="HandleDimensionInput"
+                   aria-label="Rendering dimension from 2D to 3D" />
+            <div class="dimension-scale">
+                <button class="@DomainClass(0d)" @onclick="() => SetDimensionAsync(0d)">2D PLAN</button>
+                <button class="@DomainClass(.5d)" @onclick="() => SetDimensionAsync(.5d)">ISO</button>
+                <button class="@DomainClass(1d)" @onclick="() => SetDimensionAsync(1d)">3D</button>
+            </div>
+            <div class="dimension-readout">@intent.Domain</div>
+        </section>
 
-        <div class="console-label">VISUAL DOMAIN</div>
-        <div class="line-presets">
-            <button class='@ModeClass("toon")' @onclick='() => SetRenderingMode("toon")'>TOON</button>
-            <button class='@ModeClass("tween")' @onclick='() => SetRenderingMode("tween")'>TWEEN</button>
-            <button class='@ModeClass("hybrid")' @onclick='() => SetRenderingMode("hybrid")'>HYBRID</button>
-            <button class='@ModeClass("reality")' @onclick='() => SetRenderingMode("reality")'>REALITY</button>
-        </div>
+        <section class="console-section">
+            <div class="section-label">CAMERA BEHAVIOR // INTENT</div>
+            <div class="control-grid">
+                <button class="@BehaviorClass(RenderingCameraBehavior.Frame)" @onclick="() => SetBehaviorAsync(RenderingCameraBehavior.Frame)">FRAME</button>
+                <button class="@BehaviorClass(RenderingCameraBehavior.Follow)" @onclick="() => SetBehaviorAsync(RenderingCameraBehavior.Follow)">FOLLOW</button>
+                <button class="@BehaviorClass(RenderingCameraBehavior.Orbit)" @onclick="() => SetBehaviorAsync(RenderingCameraBehavior.Orbit)">ORBIT</button>
+            </div>
+        </section>
 
-        <div class="console-label">STARSHIP PROCEDURE</div>
-        <div class="procedure">
-            <div class="procedure-step active"><b>01</b><span>OBSERVE</span></div>
-            <div class="procedure-step"><b>02</b><span>ORIENT</span></div>
-            <div class="procedure-step"><b>03</b><span>OPERATE</span></div>
-            <div class="procedure-step"><b>04</b><span>FLY</span></div>
-        </div>
-        <p class="console-note">The future operating loop is deliberately simple: the ship highlights what needs attention, the visitor moves to it, performs the action, and the next instruction appears.</p>
+        <section class="console-section">
+            <div class="section-label">TARGET</div>
+            <div class="control-grid">
+                <button class="@TargetClass("hull")" @onclick='() => SetTargetAsync("hull")'>HULL</button>
+                <button class="@TargetClass("bridge")" @onclick='() => SetTargetAsync("bridge")'>BRIDGE</button>
+                <button class="@TargetClass("engineering")" @onclick='() => SetTargetAsync("engineering")'>ENGINEERING</button>
+                <button class="@TargetClass("orbit")" @onclick='() => SetTargetAsync("orbit")'>ORBIT</button>
+            </div>
+        </section>
+
+        <section class="console-section">
+            <div class="section-label">VISUAL CHARACTER</div>
+            <div class="control-grid">
+                <button class="@ModeClass("toon")" @onclick='() => SetRenderingModeAsync("toon")'>TOON</button>
+                <button class="@ModeClass("tween")" @onclick='() => SetRenderingModeAsync("tween")'>TWEEN</button>
+                <button class="@ModeClass("hybrid")" @onclick='() => SetRenderingModeAsync("hybrid")'>HYBRID</button>
+                <button class="@ModeClass("reality")" @onclick='() => SetRenderingModeAsync("reality")'>REALITY</button>
+            </div>
+        </section>
+
+        <section class="console-section">
+            <div class="section-label">GEOMETRY LOAD</div>
+            <div class="control-grid density-grid">
+                <button @onclick="() => SetLineCountAsync(2500)">2.5K</button>
+                <button @onclick="() => SetLineCountAsync(10000)">10K</button>
+                <button @onclick="() => SetLineCountAsync(25000)">25K</button>
+                <button @onclick="() => SetLineCountAsync(50000)">50K</button>
+            </div>
+        </section>
+
+        <section class="metrics">
+            <div><span>LINES</span><strong>@lineCount.ToString("N0")</strong></div>
+            <div><span>VERTICES</span><strong>@vertices.ToString("N0")</strong></div>
+            <div><span>FPS</span><strong>@fps.ToString("0.0")</strong></div>
+            <div><span>FRAME</span><strong>@frameMs.ToString("0.00") MS</strong></div>
+        </section>
+
+        <p class="console-note">
+            The renderer owns projection and camera mechanics. The Experience supplies intent.
+            This is the seam we are going to grow.
+        </p>
     </aside>
 
-    <div class="ship-readout">
-        <span>SHIP // SINGULARITY STARSHIP</span>
-        <span>RENDER // @renderingMode.ToUpperInvariant()</span>
-        <span>MISSION // SOLAR SYSTEM CRUISE</span>
+    <div class="rendering-readout">
+        <span>SPECIMEN // SINGULARITY STARSHIP</span>
+        <span>DOMAIN // @intent.Domain</span>
+        <span>TARGET // @intent.TargetId.ToUpperInvariant()</span>
+        <span>CAMERA // @intent.CameraBehavior.ToString().ToUpperInvariant()</span>
+    </div>
+
+    <div class="next-specimen">
+        NEXT SPECIMEN // SINGULARITY DOOM
     </div>
 </div>
 
 <style>
-.starship-lab{position:fixed;inset:0;overflow:hidden;background:#01040a;color:#eafcff;font-family:Consolas,'Courier New',monospace}
-.starship-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.lab-header{position:absolute;left:2rem;top:1.5rem;width:min(620px,52vw);pointer-events:none;text-shadow:0 0 18px rgba(0,234,255,.18)}
-.lab-kicker{color:#00eaff;font-size:.55rem;letter-spacing:.2em}
-.lab-header h1{margin:.35rem 0;font-size:clamp(1.6rem,3.2vw,3.4rem);letter-spacing:.12em;color:#fff}
-.lab-header p{margin:0;color:#8aa6b0;font-family:system-ui,sans-serif;font-size:.82rem;line-height:1.5}
-.lab-console{position:absolute;right:1.5rem;top:1.5rem;width:min(310px,25vw);padding:1rem;border:1px solid rgba(0,234,255,.35);background:rgba(1,6,13,.88);box-shadow:0 0 35px rgba(0,234,255,.07);backdrop-filter:blur(5px)}
-.console-title{color:#ffd34d;font-size:.55rem;letter-spacing:.17em;margin-bottom:.65rem}
-.console-row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(0,234,255,.1);padding:.38rem 0;font-size:.55rem;color:#5f7c87}
-.console-row strong{color:#fff}
-.console-label{margin-top:.75rem;color:#78909c;font-size:.43rem;letter-spacing:.11em;line-height:1.4}
-.line-presets{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-top:.45rem}
-.line-presets button{padding:.45rem;border:1px solid rgba(0,234,255,.35);background:rgba(0,234,255,.035);color:#00eaff;font:700 .55rem Consolas,'Courier New',monospace;cursor:pointer}
-.line-presets button:hover,.line-presets button.selected{border-color:#ff2cff;color:#ff2cff;background:rgba(255,44,255,.08)}
-.procedure{margin-top:.5rem;display:grid;grid-template-columns:1fr 1fr;gap:.35rem}
-.procedure-step{padding:.45rem;border:1px solid rgba(255,255,255,.08);color:#4f6973;font-size:.45rem}
-.procedure-step b{color:#ff38d1;margin-right:.35rem}.procedure-step.active{border-color:rgba(255,211,77,.55);color:#ffd34d;background:rgba(255,211,77,.04)}
-.console-note{margin:.65rem 0 0;color:#5d7680;font-family:system-ui,sans-serif;font-size:.7rem;line-height:1.45}
-.ship-readout{position:absolute;left:2rem;right:2rem;bottom:1.25rem;display:flex;justify-content:space-between;color:#4d6973;font-size:.43rem;letter-spacing:.13em;pointer-events:none}
-@@media(max-width:900px){.lab-header{width:60vw}.lab-console{width:270px}.ship-readout{display:none}}
-@@media(max-width:700px){.lab-header{left:1rem;top:1rem;width:calc(100vw - 2rem)}.lab-header p{display:none}.lab-console{left:1rem;right:1rem;top:auto;bottom:1rem;width:auto}.ship-readout{display:none}}
+.rendering-lab{position:fixed;inset:0;overflow:hidden;background:#01040a;color:#eafcff;font-family:Consolas,'Courier New',monospace}
+.rendering-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.rendering-header{position:absolute;left:2.2rem;top:1.8rem;width:min(650px,48vw);pointer-events:none;text-shadow:0 0 18px rgba(0,234,255,.18)}
+.rendering-kicker{color:#00eaff;font-size:.72rem;letter-spacing:.2em;font-weight:700}
+.rendering-header h1{margin:.45rem 0 .8rem;font-size:clamp(2rem,4vw,4.6rem);line-height:.92;letter-spacing:.05em;color:#fff}
+.rendering-header p{margin:0;color:#a7c0c9;font-family:system-ui,sans-serif;font-size:clamp(.9rem,1.2vw,1.05rem);line-height:1.6}
+.rendering-console{position:absolute;right:1.5rem;top:1.5rem;width:min(390px,31vw);max-height:calc(100vh - 3rem);overflow:auto;padding:1.15rem;border:1px solid rgba(0,234,255,.42);background:rgba(1,6,13,.9);box-shadow:0 0 35px rgba(0,234,255,.09);backdrop-filter:blur(7px)}
+.console-title{color:#ffd34d;font-size:.72rem;font-weight:800;letter-spacing:.18em;margin-bottom:.9rem}
+.console-section{padding:.85rem 0;border-top:1px solid rgba(0,234,255,.12)}
+.section-label{color:#87a7b2;font-size:.62rem;font-weight:800;letter-spacing:.13em;margin-bottom:.55rem}
+.dimension-slider{width:100%;accent-color:#00eaff;cursor:pointer}
+.dimension-scale{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-top:.45rem}
+.dimension-scale button,.control-grid button{min-height:2.5rem;padding:.5rem .4rem;border:1px solid rgba(0,234,255,.32);background:rgba(0,234,255,.035);color:#8eb2bd;font:800 .65rem Consolas,'Courier New',monospace;letter-spacing:.07em;cursor:pointer}
+.dimension-scale button:hover,.dimension-scale button.selected,.control-grid button:hover,.control-grid button.selected{border-color:#ff2cff;color:#fff;background:rgba(255,44,255,.09);box-shadow:0 0 14px rgba(255,44,255,.09)}
+.dimension-readout{margin-top:.55rem;color:#00eaff;font-size:.82rem;font-weight:800;letter-spacing:.12em}
+.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-top:.85rem}
+.metrics div{padding:.65rem;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.018)}
+.metrics span{display:block;color:#66818b;font-size:.56rem;letter-spacing:.1em}
+.metrics strong{display:block;margin-top:.2rem;color:#fff;font-size:.9rem}
+.console-note{margin:.85rem 0 0;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.08);color:#718c96;font-family:system-ui,sans-serif;font-size:.78rem;line-height:1.5}
+.rendering-readout{position:absolute;left:2.2rem;right:2.2rem;bottom:1.25rem;display:flex;justify-content:space-between;gap:1rem;color:#66818b;font-size:.55rem;font-weight:700;letter-spacing:.12em;pointer-events:none}
+.next-specimen{position:absolute;left:50%;bottom:3.1rem;transform:translateX(-50%);padding:.45rem .7rem;border:1px solid rgba(255,44,255,.35);background:rgba(8,1,13,.55);color:#ff70e5;font-size:.55rem;font-weight:800;letter-spacing:.16em;pointer-events:none}
+@@media(max-width:1100px){.rendering-header{width:55vw}.rendering-console{width:330px}.rendering-readout{display:none}.next-specimen{display:none}}
+@@media(max-width:760px){.rendering-header{left:1rem;top:1rem;width:calc(100vw - 2rem)}.rendering-header h1{font-size:2rem}.rendering-header p{display:none}.rendering-console{left:1rem;right:1rem;top:auto;bottom:1rem;width:auto;max-height:52vh}.rendering-console{padding:.85rem}.console-section{padding:.6rem 0}}
 </style>
 
 @code {
@@ -88,28 +142,75 @@
     private double frameMs;
     private bool started;
     private string renderingMode = "hybrid";
+    private RenderingIntent intent = new("hull", .5d, RenderingCameraBehavior.Frame);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender || started) return;
+        if (!firstRender || started)
+            return;
 
         module = await JS.InvokeAsync<IJSObjectReference>("import", "./Workshop/starship-line-lab.js");
-        await module.InvokeVoidAsync("startStarshipLineLab", "starship-line-canvas", lineCount, renderingMode);
+        await module.InvokeVoidAsync(
+            "startStarshipLineLab",
+            "starship-line-canvas",
+            lineCount,
+            renderingMode,
+            intent.ClampedDimension,
+            intent.TargetId,
+            intent.CameraBehavior.ToString().ToLowerInvariant());
+
         started = true;
         metricsCancellation = new CancellationTokenSource();
         _ = RefreshMetricsAsync(metricsCancellation.Token);
     }
 
-    private string ModeClass(string mode) => renderingMode == mode ? "selected" : string.Empty;
+    private string DomainClass(double anchor)
+        => Math.Abs(intent.ClampedDimension - anchor) < .02d ? "selected" : string.Empty;
 
-    private async Task SetRenderingMode(string mode)
+    private string BehaviorClass(RenderingCameraBehavior behavior)
+        => intent.CameraBehavior == behavior ? "selected" : string.Empty;
+
+    private string TargetClass(string target)
+        => string.Equals(intent.TargetId, target, StringComparison.Ordinal) ? "selected" : string.Empty;
+
+    private string ModeClass(string mode)
+        => renderingMode == mode ? "selected" : string.Empty;
+
+    private async Task HandleDimensionInput(ChangeEventArgs args)
+    {
+        if (double.TryParse(args.Value?.ToString(), out var value))
+            await SetDimensionAsync(value);
+    }
+
+    private async Task SetDimensionAsync(double dimension)
+    {
+        intent = intent with { Dimension = Math.Clamp(dimension, 0d, 1d) };
+        if (module is not null)
+            await module.InvokeVoidAsync("setStarshipRenderIntent", intent.ClampedDimension, intent.TargetId, intent.CameraBehavior.ToString().ToLowerInvariant());
+    }
+
+    private async Task SetBehaviorAsync(RenderingCameraBehavior behavior)
+    {
+        intent = intent with { CameraBehavior = behavior };
+        if (module is not null)
+            await module.InvokeVoidAsync("setStarshipRenderIntent", intent.ClampedDimension, intent.TargetId, intent.CameraBehavior.ToString().ToLowerInvariant());
+    }
+
+    private async Task SetTargetAsync(string target)
+    {
+        intent = intent with { TargetId = target };
+        if (module is not null)
+            await module.InvokeVoidAsync("setStarshipRenderIntent", intent.ClampedDimension, intent.TargetId, intent.CameraBehavior.ToString().ToLowerInvariant());
+    }
+
+    private async Task SetRenderingModeAsync(string mode)
     {
         renderingMode = mode;
         if (module is not null)
             await module.InvokeVoidAsync("setStarshipRenderingMode", renderingMode);
     }
 
-    private async Task SetLineCount(int count)
+    private async Task SetLineCountAsync(int count)
     {
         lineCount = count;
         if (module is not null)
@@ -123,7 +224,8 @@
             try
             {
                 await Task.Delay(500, cancellationToken);
-                if (module is null) continue;
+                if (module is null)
+                    continue;
 
                 var metrics = await module.InvokeAsync<StarshipMetrics>("getStarshipLineMetrics");
                 await InvokeAsync(() =>
@@ -150,10 +252,12 @@
     {
         metricsCancellation?.Cancel();
         metricsCancellation?.Dispose();
+
         if (module is not null)
         {
             try { await module.InvokeVoidAsync("stopStarshipLineLab"); }
             catch (JSException) { }
+
             await module.DisposeAsync();
         }
     }
