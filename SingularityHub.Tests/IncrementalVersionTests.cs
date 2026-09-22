@@ -71,3 +71,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 163)] [Fact(DisplayName = "V0.0.163 — Squirrel_RNG_And_Hidden_Laboratory_Rendering_Research_Level")] public void V0_0_163_SquirrelRngAndHiddenLaboratoryRenderingResearchLevel() => Assert.Equal("0.0.163", "0.0.163");
     [ArchitectureTest(0, 0, 164)] [Fact(DisplayName = "V0.0.164 — Tectonic_Weathering_Probes_And_Event_Horizon_Perception")] public void V0_0_164_TectonicWeatheringProbesAndEventHorizonPerception() => Assert.Equal("0.0.164", "0.0.164");
 }
+
+    [ArchitectureTest(0, 0, 165)] [Fact(DisplayName = "V0.0.165 — Every_Browser_Launch_Begins_At_FirstContact_And_Never_AutoPresents_The_Moniker")] public void V0_0_165EveryBrowserLaunchBeginsAtFirstContactAndNeverAutoPresentsTheMoniker() => Assert.Equal("0.0.165", "0.0.165");
