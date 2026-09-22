@@ -2,6 +2,7 @@
 @inject NavigationManager Navigation
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
 @inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
+@inject TheSingularityWorkshop.World.WorkshopWorldClient World
 @inject IJSRuntime JS
 @implements IDisposable
 
@@ -26,6 +27,15 @@
         }
 
         <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">@Body</article>
+        @if (_worldAnnouncementVisible && _worldAnnouncement is not null)
+        {
+            <section class="world-event-announcement" role="status" aria-live="assertive">
+                <div class="world-event-kicker">WORLD EVENT // GLOBAL</div>
+                <div class="world-event-title">@_worldAnnouncementTitle</div>
+                <div class="world-event-body">@_worldAnnouncementBody</div>
+                <div class="world-event-source">@_worldAnnouncementSource</div>
+            </section>
+        }
     </main>
 </div>
 
@@ -40,6 +50,10 @@
     private bool ShowWorkshopChrome => !IsWorkshopLanding || Experience.CurrentState == "Intro";
 
     private bool _chromeReleased;
+    private bool _worldAnnouncementVisible;
+    private TheSingularityWorkshop.World.WorkshopWorldEvent? _worldAnnouncement;
+    private CancellationTokenSource? _announcementCancellation;
+    private Task? _worldObservationTask;
 
     private string CurrentTabTitle
     {
@@ -64,6 +78,8 @@
     {
         FSM.StateChanged += HandleFSMStateChanged;
         Experience.StateChanged += HandleExperienceStateChanged;
+        World.WorldChanged += HandleWorldChanged;
+        _worldObservationTask = ObserveWorldAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -89,13 +105,79 @@
 
     private void HandleExperienceStateChanged() => _ = InvokeAsync(StateHasChanged);
 
+    private async Task ObserveWorldAsync()
+    {
+        try
+        {
+            await World.StartAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch
+        {
+            // The presentation layer remains usable if the remote world authority is unavailable.
+        }
+    }
+
+    private void HandleWorldChanged(TheSingularityWorkshop.World.WorkshopWorldState state)
+    {
+        if (state.LastEvent is null) return;
+
+        _announcementCancellation?.Cancel();
+        _announcementCancellation?.Dispose();
+        _announcementCancellation = new CancellationTokenSource();
+        _worldAnnouncement = state.LastEvent;
+        _worldAnnouncementVisible = true;
+
+        _ = InvokeAsync(async () =>
+        {
+            StateHasChanged();
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(12), _announcementCancellation.Token);
+                _worldAnnouncementVisible = false;
+                StateHasChanged();
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        });
+    }
+
+    private string _worldAnnouncementTitle
+        => _worldAnnouncement?.PresentationMode == TheSingularityWorkshop.World.WorkshopPresentationMode.ThreeDimensional
+            ? "THREE-DIMENSIONAL PRESENTATION DISCOVERED"
+            : "WORLD CAPABILITY DISCOVERED";
+
+    private string _worldAnnouncementBody
+        => "A visitor discovered a hidden capability inside the Workshop. The shared world has changed for everyone.";
+
+    private string _worldAnnouncementSource
+        => _worldAnnouncement is null
+            ? string.Empty
+            : $"DISCOVERY // {_worldAnnouncement.LocationId} // {_worldAnnouncement.DiscovererId}";
+
     public void Dispose()
     {
         FSM.StateChanged -= HandleFSMStateChanged;
         Experience.StateChanged -= HandleExperienceStateChanged;
+        World.WorldChanged -= HandleWorldChanged;
+        _announcementCancellation?.Cancel();
+        _announcementCancellation?.Dispose();
     }
 }
 
 <style>
     .workshop-create-page .workshop-sidebar{width:3.8rem;flex:0 0 3.8rem;max-width:3.8rem;transition:width .35s ease,flex-basis .35s ease}.workshop-create-page .workshop-sidebar:has(.workshop-nav-shell.expanded){width:15rem;flex-basis:15rem;max-width:15rem}.workshop-create-page main{min-width:0}.workshop-create-page .content{padding-left:.5rem!important;padding-right:.5rem!important}
+</style>
+
+
+<style>
+    .world-event-announcement{position:fixed;left:50%;top:8%;transform:translateX(-50%);z-index:5000;width:min(46rem,calc(100vw - 2rem));padding:1.4rem 1.7rem;border:1px solid rgba(0,234,255,.85);background:rgba(3,9,15,.94);box-shadow:0 0 2rem rgba(0,234,255,.2),inset 0 0 2rem rgba(0,234,255,.05);backdrop-filter:blur(12px);pointer-events:none;animation:world-event-arrival .65s ease-out}
+    .world-event-kicker{font-size:.68rem;letter-spacing:.25em;color:#00eaff;margin-bottom:.65rem}
+    .world-event-title{font-size:1.25rem;letter-spacing:.09em;color:#fff;margin-bottom:.7rem}
+    .world-event-body{font-size:.9rem;line-height:1.55;color:#d6e6ec}
+    .world-event-source{margin-top:.9rem;font-size:.67rem;letter-spacing:.14em;color:#ffe04a}
+    @keyframes world-event-arrival{from{opacity:0;transform:translateX(-50%) scale(.96);filter:blur(8px)}to{opacity:1;transform:translateX(-50%) scale(1);filter:blur(0)}}
 </style>
