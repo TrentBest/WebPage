@@ -91,7 +91,13 @@ public static class SpatialSecurityCheckpointPlanGuiBuilder
             .Attribute("x", "10").Attribute("y", "34").Attribute("width", "13").Attribute("height", "7")
             .Attribute("rx", "1").Attribute("fill", "#10242d")
             .Attribute("stroke", Yellow).Attribute("stroke-width", ".5")
-            .OnClick(_ => checkpoint.Stage == SpatialSecurityCheckpointStage.TrayReady ? placeTray() : loadBelongings()));
+            .OnClick(_ =>
+            {
+                if (checkpoint.Stage == SpatialSecurityCheckpointStage.TrayReady)
+                    placeTray();
+                else
+                    loadBelongings();
+            }));
 
         if (checkpoint.BelongingsOnTray)
             svg.Child(WorkshopGui.Element(receiver, "rect")
