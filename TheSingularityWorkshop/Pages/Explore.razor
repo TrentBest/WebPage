@@ -91,6 +91,7 @@
     private double renderingResearchDimension = .5d;
     private string renderingResearchCamera = "frame";
     private IJSObjectReference? renderingResearchModule;
+    private bool renderingResearchStarted;
     private static readonly SpatialIslandExperience Island = SpatialIslandExperience.SingularityIsland;
     private int detailLevel = 16;
     private int mansionDensity = 1;
@@ -159,7 +160,7 @@
             renderingResearchModule ??= await JS.InvokeAsync<IJSObjectReference>(
                 "import", "./Workshop/voxel-substrate-lab.js?v=164");
 
-            if (!renderingResearchModule.Equals(null))
+            if (!renderingResearchStarted)
             {
                 await renderingResearchModule.InvokeVoidAsync(
                     "startVoxelSubstrateLab",
@@ -167,6 +168,14 @@
                     RenderingResearchSpecimen(renderingResearchStationId),
                     renderingResearchDimension,
                     renderingResearchCamera);
+                renderingResearchStarted = true;
+            }
+            else
+            {
+                await renderingResearchModule.InvokeVoidAsync(
+                    "setVoxelSpecimen", RenderingResearchSpecimen(renderingResearchStationId));
+                await renderingResearchModule.InvokeVoidAsync(
+                    "setVoxelRenderIntent", renderingResearchDimension, renderingResearchCamera);
             }
         }
     }
@@ -1712,6 +1721,7 @@
                 catch (JSException) { }
                 await renderingResearchModule.DisposeAsync();
                 renderingResearchModule = null;
+                renderingResearchStarted = false;
             }
         }
 
@@ -1764,6 +1774,7 @@
             try { _ = renderingResearchModule.InvokeVoidAsync("stopVoxelSubstrateLab"); }
             catch (JSException) { }
             _ = renderingResearchModule.DisposeAsync();
+            renderingResearchStarted = false;
         }
     }
 }
