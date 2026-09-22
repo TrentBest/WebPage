@@ -6,18 +6,19 @@ namespace SingularityHub.Tests;
 
 public sealed class PlantGrowthGeometryTests
 {
-    [Fact(DisplayName = "Hub growth is authored from the final Hub geometry")]
-    public void HubGrowth_UsesFinalGeometryAsSourceOfTruth()
+    [Fact(DisplayName = "Hub growth is authored from the final invisible navigation mesh")]
+    public void HubGrowth_UsesFinalMeshAsSourceOfTruth()
     {
         using var plant = new PlantGrowthMicroBundle();
 
         Assert.Equal(6, plant.Panels.Count);
-        Assert.Equal(
-            PlantGrowthMicroBundle.FinalHubGeometry.Select(x => x.Id),
-            plant.Panels.Select(x => x.Id));
+        Assert.Equal(plant.Panels.Count, PlantGrowthMicroBundle.FinalHubGeometry.Count);
 
         foreach (var panel in PlantGrowthMicroBundle.FinalHubGeometry)
         {
+            Assert.True(PlantGrowthMicroBundle.HubGeometry.MeshBounds.Contains(
+                new PlantGrowthMicroBundle.SpatialPoint(panel.X, panel.Y)));
+
             Assert.Contains(plant.Panels, x =>
                 x.Id == panel.Id &&
                 x.X == panel.X &&
@@ -27,21 +28,47 @@ public sealed class PlantGrowthGeometryTests
         }
     }
 
-    [Fact(DisplayName = "Panels begin their opening sequence at the shared main-panel staging point")]
-    public void HubGrowth_PanelsStageAtMainPanelBeforeRelocation()
+    [Fact(DisplayName = "Every vine starts from the common upper-left mesh root")]
+    public void HubGrowth_VinesShareCommonRoot()
     {
         using var plant = new PlantGrowthMicroBundle();
+        var root = PlantGrowthMicroBundle.HubGeometry.Root;
 
-        foreach (var panel in plant.Panels)
+        foreach (var vine in plant.Vines)
         {
-            Assert.Equal(PlantGrowthMicroBundle.HubGeometry.StagingX, panel.RenderX);
-            Assert.Equal(PlantGrowthMicroBundle.HubGeometry.StagingY, panel.RenderY);
-            Assert.Equal(0, panel.PositionProgress);
+            Assert.StartsWith($"M {root.X:0.##} {root.Y:0.##}", vine.Path);
+            Assert.Equal(0, vine.Progress);
+            Assert.Equal(0, vine.BloomProgress);
         }
     }
 
-    [Fact(DisplayName = "Panel relocation converges on each panel's final navigation position")]
-    public void HubGrowth_PanelsRelocateIntoFinalGeometry()
+    [Fact(DisplayName = "Vine FSMs use staggered phase delays")]
+    public void HubGrowth_VinesDoNotBloomAsOneSynchronousBatch()
+    {
+        using var plant = new PlantGrowthMicroBundle();
+        var delays = plant.Vines.Select(v => v.PhaseDelayTicks).ToArray();
+
+        Assert.Equal(delays.Length, delays.Distinct().Count());
+        Assert.True(delays.SequenceEqual(delays.OrderBy(x => x)));
+    }
+
+    [Fact(DisplayName = "Growth paths terminate at their final mesh slots")]
+    public void HubGrowth_VinesTerminateAtPanelAnchors()
+    {
+        using var plant = new PlantGrowthMicroBundle();
+
+        foreach (var vine in plant.Vines)
+        {
+            var panel = PlantGrowthMicroBundle.FinalHubGeometry.Single(x => x.Id == vine.TargetId);
+            Assert.Equal(panel.AnchorX, vine.TargetX);
+            Assert.Equal(panel.AnchorY, vine.TargetY);
+            Assert.Contains(vine.TargetX.ToString("0.##"), vine.Path);
+            Assert.Contains(vine.TargetY.ToString("0.##"), vine.Path);
+        }
+    }
+
+    [Fact(DisplayName = "The final bloom leaves every GUI panel at its authored mesh position")]
+    public void HubGrowth_BloomPlacesPanelsDirectlyIntoFinalPositions()
     {
         using var plant = new PlantGrowthMicroBundle();
         plant.Start();
@@ -53,27 +80,10 @@ public sealed class PlantGrowthGeometryTests
 
         foreach (var panel in plant.Panels)
         {
-            Assert.Equal(panel.X, panel.RenderX, 6);
-            Assert.Equal(panel.Y, panel.RenderY, 6);
-            Assert.Equal(1, panel.PositionProgress);
-        }
-    }
-
-    [Fact(DisplayName = "Every growth branch terminates on its destination panel perimeter")]
-    public void HubGrowth_VinesTerminateAtPanelAnchors()
-    {
-        using var plant = new PlantGrowthMicroBundle();
-
-        Assert.Equal(plant.Panels.Count, plant.Vines.Count);
-
-        foreach (var vine in plant.Vines)
-        {
-            var panel = PlantGrowthMicroBundle.FinalHubGeometry.Single(x => x.Id == vine.TargetId);
-
-            Assert.Equal(panel.AnchorX, vine.TargetX);
-            Assert.Equal(panel.AnchorY, vine.TargetY);
-            Assert.Contains(vine.TargetX.ToString("0.##"), vine.Path);
-            Assert.Contains(vine.TargetY.ToString("0.##"), vine.Path);
+            Assert.Equal(1, panel.BloomProgress);
+            var authored = PlantGrowthMicroBundle.FinalHubGeometry.Single(x => x.Id == panel.Id);
+            Assert.Equal(authored.X, panel.X);
+            Assert.Equal(authored.Y, panel.Y);
         }
     }
 }
