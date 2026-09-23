@@ -12,7 +12,7 @@
         var firstOpacity = Math.Sin(Math.PI * phase);
         var secondOpacity = State == "Statement"
             ? 0d
-            : Math.Sin(Math.PI * Math.Clamp((Ticks + 0d) / 30d, 0d, 1d));
+            : Math.Sin(Math.PI * Math.Clamp(Ticks / 60d, 0d, 1d));
 
         <div class="contact-half top">
             <div class="contact-label statement" style="@LabelStyle(firstOpacity)">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
