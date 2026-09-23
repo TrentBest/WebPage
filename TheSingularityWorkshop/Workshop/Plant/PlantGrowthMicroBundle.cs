@@ -173,6 +173,14 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         public double Height { get; }
         public int MeshSlot { get; }
         public double BloomProgress { get; internal set; }
+
+        /// <summary>
+        /// Compatibility projection for consumers that describe the final panel
+        /// manifestation as the hub opening. The living plant now uses
+        /// <see cref="BloomProgress"/> as the single progress value.
+        /// </summary>
+        public double OpenProgress => BloomProgress;
+
         public int BloomTicks { get; internal set; }
     }
 
