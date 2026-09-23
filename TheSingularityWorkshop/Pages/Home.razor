@@ -2,6 +2,7 @@
 @inject IJSRuntime JS
 @inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 @implements IDisposable
+@using TheSingularityWorkshop.Services
 <PageTitle>The Singularity Workshop</PageTitle>
 
 <div class="workshop-root">
@@ -33,7 +34,7 @@
 @code {
     private readonly System.Timers.Timer heartbeat = new(50);
     private bool firstRender;
-    private string lastSoundCue = "";
+    private FirstContactFsm.FirstContactSoundCue lastSoundCue = FirstContactFsm.FirstContactSoundCue.None;
 
     protected override void OnInitialized()
     {
@@ -67,7 +68,7 @@
         if (cue != lastSoundCue)
         {
             lastSoundCue = cue;
-            _ = InvokeAsync(() => JS.InvokeVoidAsync("interop.firstContactSound", cue));
+            _ = InvokeAsync(() => JS.InvokeVoidAsync("interop.firstContactSound", cue.ToString()));
         }
 
         _ = InvokeAsync(StateHasChanged);
