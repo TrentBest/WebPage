@@ -52,30 +52,32 @@ public sealed class MonikerExperienceTests
         Assert.Contains("SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE", gateway);
         Assert.Contains("border:2px solid #00eaff", gateway);
     }
-    [Fact(DisplayName = "First-contact labels crossfade on a 180 degree phase boundary")]
-    public void FirstContactLabelsCrossfadeWithoutAFlash()
+
+    [Fact(DisplayName = "First-contact presentation is driven by explicit FSM phases")]
+    public void FirstContactPresentationUsesExplicitPhasesWithoutAFlash()
     {
         using var service = new WorkshopExperienceService();
 
         service.Initialize();
 
+        Assert.Equal("FirstOnly", service.FirstContact.CurrentState);
         Assert.Equal(0d, service.FirstContact.StatementOpacity, 6);
         Assert.Equal(0d, service.FirstContact.QuestionOpacity, 6);
 
-        // Complete the statement's fade-in. The next FSM phase must begin with
-        // the statement fully visible and the question fully invisible.
+        // FirstOnly owns the entire fade-in. The transition is evaluated
+        // immediately after the tick that reaches full visibility.
         for (var i = 0; i < 30; i++)
             service.Tick();
 
-        Assert.Equal("Question", service.FirstContact.CurrentState);
+        Assert.Equal("FirstFadingSecondComingIn", service.FirstContact.CurrentState);
         Assert.Equal(1d, service.FirstContact.StatementOpacity, 6);
         Assert.Equal(0d, service.FirstContact.QuestionOpacity, 6);
 
-        // The very next frame is the crossfade: statement falls while question rises.
+        // FSM_API defers OnEnter for the newly selected state until the next
+        // tick. Therefore the handoff frame remains exactly 1 / 0.
         service.Tick();
 
-        Assert.InRange(service.FirstContact.StatementOpacity, 0d, 1d);
-        Assert.InRange(service.FirstContact.QuestionOpacity, 0d, 1d);
+        Assert.Equal("FirstFadingSecondComingIn", service.FirstContact.CurrentState);
         Assert.True(service.FirstContact.StatementOpacity < 1d);
         Assert.True(service.FirstContact.QuestionOpacity > 0d);
         Assert.Equal(
@@ -83,16 +85,25 @@ public sealed class MonikerExperienceTests
             service.FirstContact.StatementOpacity + service.FirstContact.QuestionOpacity,
             6);
 
-        // At the midpoint the two labels meet exactly at the phase boundary.
+        // Complete the crossfade. The transition to SecondOnly happens on
+        // the same tick that the incoming label reaches exactly 1.
         for (var i = 0; i < 29; i++)
             service.Tick();
 
-        Assert.Equal(30L, service.FirstContact.StateTicks);
+        Assert.Equal("SecondOnly", service.FirstContact.CurrentState);
         Assert.Equal(0d, service.FirstContact.StatementOpacity, 6);
         Assert.Equal(1d, service.FirstContact.QuestionOpacity, 6);
 
-        // The second label then fades away; the landing state follows immediately.
-        for (var i = 0; i < 30; i++)
+        // SecondOnly owns the final fade-out. There is no return to either
+        // of the preceding presentation phases.
+        service.Tick();
+
+        Assert.Equal("SecondOnly", service.FirstContact.CurrentState);
+        Assert.Equal(0d, service.FirstContact.StatementOpacity, 6);
+        Assert.InRange(service.FirstContact.QuestionOpacity, 0d, 1d);
+        Assert.True(service.FirstContact.QuestionOpacity < 1d);
+
+        for (var i = 0; i < 29; i++)
             service.Tick();
 
         Assert.Equal("Gateway", service.FirstContact.CurrentState);
@@ -100,4 +111,15 @@ public sealed class MonikerExperienceTests
         Assert.Equal(0d, service.FirstContact.QuestionOpacity, 6);
     }
 
+    [Fact(DisplayName = "Gateway does not render a duplicate first-contact question")]
+    public void GatewayDoesNotReintroduceFirstContactQuestion()
+    {
+        var view = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
+
+        Assert.DoesNotContain("gateway-memory", view);
+        Assert.DoesNotContain("HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>", view);
+    }
 }
