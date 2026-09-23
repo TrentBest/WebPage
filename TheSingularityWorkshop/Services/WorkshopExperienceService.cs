@@ -8,7 +8,6 @@ public sealed class WorkshopExperienceService : IDisposable
     public event Action? StateChanged;
 
     private readonly FirstContactFsm _firstContact = new();
-    private PlantGrowthMicroBundle? _plant;
     private bool _disposed;
 
     public string CurrentState { get; private set; } = "Intro";
@@ -17,7 +16,6 @@ public sealed class WorkshopExperienceService : IDisposable
     public bool IsInitialized { get; private set; }
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public FirstContactFsm FirstContact => _firstContact;
-    public PlantGrowthMicroBundle? Plant => _plant;
 
     public void Initialize(bool returningVisitor = false)
     {
@@ -51,15 +49,10 @@ public sealed class WorkshopExperienceService : IDisposable
 
         _firstContact.Update();
 
-        if (_firstContact.CurrentState == "HubGrowth" && _plant is null)
-        {
-            _plant = new PlantGrowthMicroBundle();
-            _plant.Start();
-        }
-
-        _plant?.Update();
-
-        if (_plant?.IsSettled == true)
+        // The Hub is now manifested as a presentation-layer warp rather than
+        // the older vine-growth demo. Keep the plant micro-bundle independent so
+        // it remains available for future experiences without owning first contact.
+        if (_firstContact.CurrentState == "HubGrowth" && _firstContact.StateTicks >= 24)
             _firstContact.SetHubReady();
 
         if (_firstContact.IsLanding)
@@ -81,7 +74,6 @@ public sealed class WorkshopExperienceService : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        _plant?.Dispose();
         _firstContact.Dispose();
         _disposed = true;
     }
