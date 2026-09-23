@@ -8,7 +8,11 @@
 <div class="workshop-root">
     @if (Experience.CurrentState == "FirstContact")
     {
-        <FirstContactView State="@Experience.FirstContact.CurrentState" Ticks="@Experience.FirstContact.StateTicks" OnEntryRequested="EnterWorkshop" />
+        <FirstContactView State="@Experience.FirstContact.CurrentState"
+                  Ticks="@Experience.FirstContact.StateTicks"
+                  PresentationProgress="@Experience.FirstContact.PresentationProgress"
+                  QuestionPresentationStarted="@Experience.FirstContact.QuestionPresentationStarted"
+                  OnEntryRequested="EnterWorkshop" />
     }
     else if (Experience.CurrentState == "Intro")
     {
