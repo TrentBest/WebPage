@@ -3,19 +3,17 @@
 <section class="first-contact-stage @(State == "Moniker" || State == "HubGrowth" ? "living" : "")" aria-live="polite">
     @if (State == "Statement" || State == "Question")
     {
-        // One phase is 30 ticks = 1.5 seconds. The two labels share the
-        // exact same eased scalar, so there is one continuous hand-off.
-        var phase = Math.Clamp(Ticks / 30d, 0d, 1d);
-        var eased = phase * phase * (3d - 2d * phase);
-        var firstOpacity = State == "Statement" ? eased : 1d - eased;
-        var secondOpacity = State == "Statement" ? 0d : eased;
+        var firstOpacity = State == "Statement" ? PresentationProgress : 1d - PresentationProgress;
 
-        <div class="contact-half top">
+        <div @key="State" class="contact-half top">
             <div class="contact-label statement" style="@LabelStyle(firstOpacity)">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
         </div>
-        <div class="contact-half bottom">
-            <div class="contact-label question" style="@QuestionStyle(secondOpacity)">HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>
-        </div>
+        @if (QuestionPresentationStarted)
+        {
+            <div class="contact-half bottom">
+                <div class="contact-label question" style="@QuestionStyle(PresentationProgress)">HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>
+            </div>
+        }
     }
     else if (State == "Gateway")
     {
@@ -98,6 +96,8 @@
 
     [Parameter] public string State { get; set; } = "Statement";
     [Parameter] public long Ticks { get; set; }
+    [Parameter] public double PresentationProgress { get; set; }
+    [Parameter] public bool QuestionPresentationStarted { get; set; }
     [Parameter] public PlantGrowthMicroBundle? Plant { get; set; }
 
     private static string LabelStyle(double opacity)
