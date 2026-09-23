@@ -63,7 +63,7 @@
         if (!Experience.IsInitialized) return;
         Experience.Tick();
 
-        var cue = $"{Experience.FirstContact.LastSoundCue}:{Experience.Plant?.LastSoundCue}";
+        var cue = Experience.FirstContact.LastSoundCue;
         if (cue != lastSoundCue)
         {
             lastSoundCue = cue;
