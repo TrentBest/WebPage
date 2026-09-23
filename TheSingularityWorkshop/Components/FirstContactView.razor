@@ -7,7 +7,7 @@
             <div class="contact-label statement" style="@LabelStyle(StatementOpacity)">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
         </div>
         <div class="contact-half bottom">
-            <div class="contact-label question" style="@QuestionStyle(QuestionOpacity)">HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>
+            <div class="contact-label question" style="@QuestionStyle(QuestionOpacity)" aria-hidden="@(QuestionOpacity <= 0d ? "true" : "false")">HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>
         </div>
     }
     else if (State == "Gateway")
@@ -105,8 +105,11 @@
 
     private static string QuestionStyle(double opacity)
     {
-        var blur = (1d - opacity) * 3.2;
-        return $"opacity:{Math.Clamp(opacity, 0, 1):0.###};filter:blur({blur:0.##}px);text-shadow:0 0 {Math.Max(.02, opacity) * 22d:0.##}px rgba(255,211,77,.32);";
+        var clamped = Math.Clamp(opacity, 0, 1);
+        var blur = (1d - clamped) * 3.2;
+        var visibility = clamped <= 0d ? "hidden" : "visible";
+
+        return $"opacity:{clamped:0.###};visibility:{visibility};filter:blur({blur:0.##}px);text-shadow:0 0 {Math.Max(.02, clamped) * 22d:0.##}px rgba(255,211,77,.32);";
     }
 
     private async Task EnterWorkshop()
