@@ -78,7 +78,7 @@ public sealed class IncrementalVersionTests
         service.Initialize(returningVisitor: true);
 
         Assert.Equal("FirstContact", service.CurrentState);
-        Assert.Equal("Statement", service.FirstContact.CurrentState);
+        Assert.Equal("FirstOnly", service.FirstContact.CurrentState);
         Assert.False(service.FirstContact.EntryRequested);
     }
 
