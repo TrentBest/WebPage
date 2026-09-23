@@ -23,7 +23,7 @@ public sealed class FirstContactFsm : IDisposable
             .State("HubGrowth", EnterState, UpdateClock, null)
             .State("Landing", null, null, null)
             .Transition("Statement", "Question", c => ((FirstContactContext)c).Ticks >= 30)
-            .Transition("Question", "Gateway", c => ((FirstContactContext)c).Ticks >= 30)
+            .Transition("Question", "Gateway", c => ((FirstContactContext)c).Ticks >= 60)
             .Transition("Gateway", "Moniker", c => ((FirstContactContext)c).EntryRequested)
             .Transition("Moniker", "HubGrowth", c => ((FirstContactContext)c).Ticks >= 60)
             .Transition("HubGrowth", "Landing", c => ((FirstContactContext)c).HubReady)
@@ -41,8 +41,23 @@ public sealed class FirstContactFsm : IDisposable
     /// <summary>Progress through the current 1.5 second presentation phase.</summary>
     public double PresentationProgress => Math.Clamp(_context.Ticks / 30d, 0d, 1d);
 
-    /// <summary>The second label is not even manifested on the first frame of Question.</summary>
-    public bool QuestionPresentationStarted => CurrentState == "Question" && _context.Ticks > 0;
+    /// <summary>Opacity of the first contact statement, driven entirely by the FSM phase.</summary>
+    public double StatementOpacity
+        => CurrentState == "Statement"
+            ? PresentationProgress
+            : CurrentState == "Question"
+                ? Math.Clamp(1d - PresentationProgress, 0d, 1d)
+                : 0d;
+
+    /// <summary>Opacity of the question label, driven entirely by the FSM phase.</summary>
+    public double QuestionOpacity
+        => CurrentState == "Statement"
+            ? 0d
+            : CurrentState == "Question"
+                ? Math.Clamp(PresentationProgress <= 1d
+                    ? PresentationProgress
+                    : 2d - PresentationProgress, 0d, 1d)
+                : 0d;
 
     public FirstContactSoundCue LastSoundCue { get; private set; }
     public event Action<FirstContactSoundCue>? SoundCueRequested;
