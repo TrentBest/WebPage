@@ -38,29 +38,50 @@ public sealed class FirstContactFsm : IDisposable
     public bool IsLanding => CurrentState == "Landing";
     public bool EntryRequested => _context.EntryRequested;
 
-    /// <summary>Progress through the current 1.5 second presentation phase.</summary>
+    /// <summary>
+    /// Progress through one 1.5 second presentation phase.
+    /// The opacity curve is a normalized sine wave with zero slope at both ends,
+    /// so the labels arrive and leave without a linear-looking snap.
+    /// </summary>
     public double PresentationProgress => Math.Clamp(_context.Ticks / 30d, 0d, 1d);
 
-    /// <summary>Opacity of the first contact statement, driven entirely by the FSM phase.</summary>
+    /// <summary>
+    /// A normalized sine curve from 0 to 1. The curve is deliberately bounded
+    /// so the first frame is invisible and the terminal frame is fully visible.
+    /// </summary>
+    private static double FadeWave(double progress)
+    {
+        var p = Math.Clamp(progress, 0d, 1d);
+        return 0.5d + (0.5d * Math.Sin((p - 0.5d) * Math.PI));
+    }
+
+    /// <summary>
+    /// Opacity of the first contact statement.
+    ///
+    /// Statement phase: 0 -> 1.
+    /// Question phase: 1 -> 0 while the question moves 0 -> 1.
+    /// Everything is owned by the FSM; Razor only renders the values.
+    /// </summary>
     public double StatementOpacity
         => CurrentState == "Statement"
-            ? PresentationProgress
+            ? FadeWave(PresentationProgress)
             : CurrentState == "Question"
-                ? Math.Clamp(1d - PresentationProgress, 0d, 1d)
+                ? 1d - FadeWave(PresentationProgress)
                 : 0d;
 
-    /// <summary>Opacity of the question label, driven entirely by the FSM phase.</summary>
+    /// <summary>
+    /// Opacity of the question label.
+    ///
+    /// The first half of Question is exactly 180 degrees out of phase with
+    /// Statement: when Statement is 1, Question is 0; as Statement falls,
+    /// Question rises. The second half then fades the question to zero.
+    /// </summary>
     public double QuestionOpacity
-        => CurrentState == "Statement"
-            ? 0d
-            : CurrentState == "Question"
-                ? Math.Clamp(
-                    (_context.Ticks / 30d) <= 1d
-                        ? _context.Ticks / 30d
-                        : 2d - (_context.Ticks / 30d),
-                    0d,
-                    1d)
-                : 0d;
+        => CurrentState == "Question"
+            ? _context.Ticks <= 30
+                ? FadeWave(_context.Ticks / 30d)
+                : FadeWave(2d - (_context.Ticks / 30d))
+            : 0d;
 
     public FirstContactSoundCue LastSoundCue { get; private set; }
     public event Action<FirstContactSoundCue>? SoundCueRequested;
