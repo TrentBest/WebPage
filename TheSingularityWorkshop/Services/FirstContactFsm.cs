@@ -22,10 +22,10 @@ public sealed class FirstContactFsm : IDisposable
             .State("Moniker", EnterState, UpdateClock, null)
             .State("HubGrowth", EnterState, UpdateClock, null)
             .State("Landing", null, null, null)
-            .Transition("Statement", "Question", c => ((FirstContactContext)c).Ticks >= 12)
-            .Transition("Question", "Gateway", c => ((FirstContactContext)c).Ticks >= 18)
+            .Transition("Statement", "Question", c => ((FirstContactContext)c).Ticks >= 20)
+            .Transition("Question", "Gateway", c => ((FirstContactContext)c).Ticks >= 24)
             .Transition("Gateway", "Moniker", c => ((FirstContactContext)c).EntryRequested)
-            .Transition("Moniker", "HubGrowth", c => ((FirstContactContext)c).Ticks >= 30)
+            .Transition("Moniker", "HubGrowth", c => ((FirstContactContext)c).Ticks >= 60)
             .Transition("HubGrowth", "Landing", c => ((FirstContactContext)c).HubReady)
             .WithInitialState("Statement")
             .BuildDefinition();
