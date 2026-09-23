@@ -7,13 +7,13 @@
 <div class="workshop-root">
     @if (Experience.CurrentState == "FirstContact")
     {
-        <FirstContactView State="@Experience.FirstContact.CurrentState" Ticks="@Experience.FirstContact.StateTicks" Plant="@Experience.Plant" OnEntryRequested="EnterWorkshop" />
+        <FirstContactView State="@Experience.FirstContact.CurrentState" Ticks="@Experience.FirstContact.StateTicks" OnEntryRequested="EnterWorkshop" />
     }
     else if (Experience.CurrentState == "Intro")
     {
         @* The landing state is the completed Hub, not a second screen. The geometry
            that grew during first contact remains the geometry of the living Hub. *@
-        <FirstContactView State="Landing" Ticks="@Experience.FirstContact.StateTicks" Plant="@Experience.Plant" />
+        <FirstContactView State="Landing" Ticks="@Experience.FirstContact.StateTicks" />
     }
 </div>
 
