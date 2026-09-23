@@ -3,7 +3,7 @@ using TheSingularityWorkshop.FSM_API;
 
 namespace TheSingularityWorkshop.Services;
 
-/// <summary>Owns the first-contact sequence. Razor renders state; it does not schedule it.</summary>
+/// <summary>Owns the first-contact sequence and its presentation timing. Razor renders state; it does not schedule it.</summary>
 public sealed class FirstContactFsm : IDisposable
 {
     private readonly string _group = $"FirstContact.Sequence:{Guid.NewGuid():N}";
@@ -37,6 +37,13 @@ public sealed class FirstContactFsm : IDisposable
     public long StateTicks => _context.Ticks;
     public bool IsLanding => CurrentState == "Landing";
     public bool EntryRequested => _context.EntryRequested;
+
+    /// <summary>Progress through the current 1.5 second presentation phase.</summary>
+    public double PresentationProgress => Math.Clamp(_context.Ticks / 30d, 0d, 1d);
+
+    /// <summary>The second label is not even manifested on the first frame of Question.</summary>
+    public bool QuestionPresentationStarted => CurrentState == "Question" && _context.Ticks > 0;
+
     public FirstContactSoundCue LastSoundCue { get; private set; }
     public event Action<FirstContactSoundCue>? SoundCueRequested;
 
