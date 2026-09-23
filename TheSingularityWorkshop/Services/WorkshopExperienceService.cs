@@ -52,7 +52,7 @@ public sealed class WorkshopExperienceService : IDisposable
         // The Hub is now manifested as a presentation-layer warp rather than
         // the older vine-growth demo. Keep the plant micro-bundle independent so
         // it remains available for future experiences without owning first contact.
-        if (_firstContact.CurrentState == "HubGrowth" && _firstContact.StateTicks >= 24)
+        if (_firstContact.CurrentState == "HubGrowth" && _firstContact.StateTicks >= 30)
             _firstContact.SetHubReady();
 
         if (_firstContact.IsLanding)
