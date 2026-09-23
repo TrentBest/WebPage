@@ -33,7 +33,6 @@ public sealed class FirstContactPlantTests
 
         Assert.Equal("Gateway", experience.FirstContact.CurrentState);
         Assert.Equal("FirstContact", experience.CurrentState);
-        Assert.Null(experience.Plant);
 
         experience.RequestEntry();
         experience.Tick();
@@ -41,12 +40,16 @@ public sealed class FirstContactPlantTests
         Assert.Equal("Moniker", experience.FirstContact.CurrentState);
         Assert.Equal("FirstContact", experience.CurrentState);
 
+        var reachedHubGrowth = false;
         for (var i = 0; i < 500 && experience.CurrentState == "FirstContact"; i++)
+        {
             experience.Tick();
+            reachedHubGrowth |= experience.FirstContact.CurrentState == "HubGrowth";
+        }
 
+        Assert.True(reachedHubGrowth);
         Assert.Equal("Intro", experience.CurrentState);
-        Assert.NotNull(experience.Plant);
-        Assert.True(experience.Plant!.IsSettled);
+        Assert.True(experience.FirstContact.IsLanding);
     }
 
     [Fact]
