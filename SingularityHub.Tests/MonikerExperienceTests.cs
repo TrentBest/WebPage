@@ -120,6 +120,22 @@ public sealed class MonikerExperienceTests
             "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
         Assert.DoesNotContain("gateway-memory", view);
-        Assert.DoesNotContain("HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>", view);
+
+        const phrase = "HOW MANY WORDS IS A LIVING IMAGE WORTH?";
+        Assert.Equal(1, CountOccurrences(view, phrase));
+    }
+
+    private static int CountOccurrences(string text, string value)
+    {
+        var count = 0;
+        var offset = 0;
+
+        while ((offset = text.IndexOf(value, offset, StringComparison.Ordinal)) >= 0)
+        {
+            count++;
+            offset += value.Length;
+        }
+
+        return count;
     }
 }
