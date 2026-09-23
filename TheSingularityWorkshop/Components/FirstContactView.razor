@@ -1,7 +1,7 @@
 @using TheSingularityWorkshop.Workshop.Plant
 
 <section class="first-contact-stage @(State == "Moniker" || State == "HubGrowth" ? "living" : "")" aria-live="polite">
-    @if (State == "Statement" || State == "Question")
+    @if (State == "FirstOnly" || State == "FirstFadingSecondComingIn" || State == "SecondOnly")
     {
         <div class="contact-half top">
             <div class="contact-label statement" style="@LabelStyle(StatementOpacity)">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
@@ -13,11 +13,6 @@
     else if (State == "Gateway")
     {
         <section class="gateway-stage" aria-label="Workshop entry">
-            <div class="gateway-copy" aria-hidden="true">
-                <div class="gateway-memory">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
-                <div class="gateway-memory">HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>
-            </div>
-
             <button class="enter-workshop" @onclick="EnterWorkshop" aria-label="Enter The Singularity Workshop">
                 <span class="enter-corner tl" aria-hidden="true"></span><span class="enter-corner tr" aria-hidden="true"></span>
                 <span class="enter-corner bl" aria-hidden="true"></span><span class="enter-corner br" aria-hidden="true"></span>
