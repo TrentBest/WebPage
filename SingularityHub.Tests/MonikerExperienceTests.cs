@@ -52,4 +52,52 @@ public sealed class MonikerExperienceTests
         Assert.Contains("SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE", gateway);
         Assert.Contains("border:2px solid #00eaff", gateway);
     }
+    [Fact(DisplayName = "First-contact labels crossfade on a 180 degree phase boundary")]
+    public void FirstContactLabelsCrossfadeWithoutAFlash()
+    {
+        using var service = new WorkshopExperienceService();
+
+        service.Initialize();
+
+        Assert.Equal(0d, service.FirstContact.StatementOpacity, 6);
+        Assert.Equal(0d, service.FirstContact.QuestionOpacity, 6);
+
+        // Complete the statement's fade-in. The next FSM phase must begin with
+        // the statement fully visible and the question fully invisible.
+        for (var i = 0; i < 30; i++)
+            service.Tick();
+
+        Assert.Equal("Question", service.FirstContact.CurrentState);
+        Assert.Equal(1d, service.FirstContact.StatementOpacity, 6);
+        Assert.Equal(0d, service.FirstContact.QuestionOpacity, 6);
+
+        // The very next frame is the crossfade: statement falls while question rises.
+        service.Tick();
+
+        Assert.InRange(service.FirstContact.StatementOpacity, 0d, 1d);
+        Assert.InRange(service.FirstContact.QuestionOpacity, 0d, 1d);
+        Assert.True(service.FirstContact.StatementOpacity < 1d);
+        Assert.True(service.FirstContact.QuestionOpacity > 0d);
+        Assert.Equal(
+            1d,
+            service.FirstContact.StatementOpacity + service.FirstContact.QuestionOpacity,
+            6);
+
+        // At the midpoint the two labels meet exactly at the phase boundary.
+        for (var i = 0; i < 29; i++)
+            service.Tick();
+
+        Assert.Equal(30L, service.FirstContact.StateTicks);
+        Assert.Equal(0d, service.FirstContact.StatementOpacity, 6);
+        Assert.Equal(1d, service.FirstContact.QuestionOpacity, 6);
+
+        // The second label then fades away; the landing state follows immediately.
+        for (var i = 0; i < 30; i++)
+            service.Tick();
+
+        Assert.Equal("Gateway", service.FirstContact.CurrentState);
+        Assert.Equal(0d, service.FirstContact.StatementOpacity, 6);
+        Assert.Equal(0d, service.FirstContact.QuestionOpacity, 6);
+    }
+
 }
