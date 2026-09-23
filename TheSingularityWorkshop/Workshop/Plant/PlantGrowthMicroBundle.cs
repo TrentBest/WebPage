@@ -54,7 +54,6 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         foreach (var vine in _context.Vines)
         {
             var vineContext = new VineContext(vine);
-            vine.Runtime = vineContext;
             _vineFsms.Add(FSM_API.FSM_API.Create.CreateInstance(_vineDefinitionName, vineContext, _processingGroup));
         }
 
@@ -179,7 +178,6 @@ public sealed class PlantGrowthMicroBundle : IDisposable
 
     public sealed class PlantVine
     {
-        // Runtime state remains internal; consumers observe the public vine projection above.
         internal PlantVine(string id, string targetId, string path, double targetX, double targetY, double speed, int phaseDelayTicks)
         {
             Id = id;
@@ -200,7 +198,6 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         public int PhaseDelayTicks { get; }
         public double Progress { get; internal set; }
         public double BloomProgress { get; internal set; }
-        internal VineContext? Runtime { get; set; }
     }
 
     public static class HubGeometry
