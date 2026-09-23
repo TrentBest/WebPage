@@ -3,17 +3,12 @@
 <section class="first-contact-stage @(State == "Moniker" || State == "HubGrowth" ? "living" : "")" aria-live="polite">
     @if (State == "Statement" || State == "Question")
     {
-        var firstOpacity = State == "Statement" ? PresentationProgress : 1d - PresentationProgress;
-
-        <div @key="State" class="contact-half top">
-            <div class="contact-label statement" style="@LabelStyle(firstOpacity)">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
+        <div class="contact-half top">
+            <div class="contact-label statement" style="@LabelStyle(StatementOpacity)">THEY SAY A PICTURE IS WORTH A THOUSAND WORDS.</div>
         </div>
-        @if (QuestionPresentationStarted)
-        {
-            <div class="contact-half bottom">
-                <div class="contact-label question" style="@QuestionStyle(PresentationProgress)">HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>
-            </div>
-        }
+        <div class="contact-half bottom">
+            <div class="contact-label question" style="@QuestionStyle(QuestionOpacity)">HOW MANY WORDS IS A LIVING IMAGE WORTH?</div>
+        </div>
     }
     else if (State == "Gateway")
     {
@@ -97,7 +92,8 @@
     [Parameter] public string State { get; set; } = "Statement";
     [Parameter] public long Ticks { get; set; }
     [Parameter] public double PresentationProgress { get; set; }
-    [Parameter] public bool QuestionPresentationStarted { get; set; }
+    [Parameter] public double StatementOpacity { get; set; }
+    [Parameter] public double QuestionOpacity { get; set; }
     [Parameter] public PlantGrowthMicroBundle? Plant { get; set; }
 
     private static string LabelStyle(double opacity)
