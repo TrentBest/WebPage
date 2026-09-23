@@ -54,9 +54,12 @@ public sealed class FirstContactFsm : IDisposable
         => CurrentState == "Statement"
             ? 0d
             : CurrentState == "Question"
-                ? Math.Clamp(PresentationProgress <= 1d
-                    ? PresentationProgress
-                    : 2d - PresentationProgress, 0d, 1d)
+                ? Math.Clamp(
+                    (_context.Ticks / 30d) <= 1d
+                        ? _context.Ticks / 30d
+                        : 2d - (_context.Ticks / 30d),
+                    0d,
+                    1d)
                 : 0d;
 
     public FirstContactSoundCue LastSoundCue { get; private set; }
