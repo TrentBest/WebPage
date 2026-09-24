@@ -39,6 +39,45 @@ public sealed class MonikerExperienceTests
         Assert.DoesNotContain("interop.initUnity", home);
     }
 
+    [Fact(DisplayName = "Landing keeps the moniker as the sole primary-panel occupant")]
+    public void LandingKeepsMonikerAsPrimaryPanel()
+    {
+        var view = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
+
+        Assert.Contains('State == "Moniker" || State == "HubGrowth" || State == "Landing"', view);
+        Assert.Contains('State == "Landing" ? "hub-moniker-panel" : ""', view);
+        Assert.Contains('@if (State == "HubGrowth")', view);
+    }
+
+    [Fact(DisplayName = "Landing leaves the moniker in place until the user navigates away")]
+    public void LandingDoesNotAutoDismissMoniker()
+    {
+        using var service = new WorkshopExperienceService();
+        service.Initialize();
+
+        for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Gateway"; i++)
+            service.Tick();
+
+        Assert.Equal("Gateway", service.FirstContact.CurrentState);
+
+        service.RequestEntry();
+
+        for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Landing"; i++)
+            service.Tick();
+
+        Assert.Equal("Landing", service.FirstContact.CurrentState);
+        Assert.Equal("Intro", service.CurrentState);
+
+        for (var i = 0; i < 120; i++)
+            service.Tick();
+
+        Assert.Equal("Landing", service.FirstContact.CurrentState);
+        Assert.Equal("Intro", service.CurrentState);
+    }
+
     [Fact(DisplayName = "Gateway presentation uses the active first-contact gateway contract")]
     public void GatewayPresentationRemainsStable()
     {
