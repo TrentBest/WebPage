@@ -34,7 +34,8 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("border", $"{Cyan}99 solid 1px")
             .Style("background", "rgba(2,9,18,.99)")
             .Style("box-shadow", $"0 0 90px {Cyan}18,inset 0 0 50px {Cyan}08")
-            .Style("padding", "1rem");
+            .Style("padding", "1rem")
+            .Style("overflow", "visible");
 
         panel.Content(WorkshopGui.Element(receiver, "div")
             .Style("display", "flex").Style("justify-content", "space-between").Style("align-items", "center")
@@ -91,7 +92,8 @@ public static partial class SpatialWorkshopMapGuiBuilder
         var layout = WorkshopGui.Element(receiver, "div")
             .Style("display", "grid")
             .Style("grid-template-columns", "minmax(0,1fr) minmax(260px,330px)")
-            .Style("gap", ".8rem").Style("min-height", "0").Style("flex", "1");
+            .Style("gap", ".8rem").Style("min-height", "0").Style("flex", "1")
+            .Style("overflow", "visible");
 
         layout.Content(scope == SpatialMapScope.Workshop
             ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement)
@@ -136,7 +138,9 @@ public static partial class SpatialWorkshopMapGuiBuilder
 
     private static ElementBuilder Map(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, SpatialWorkshopArrangement? arrangement)
     {
-        var map = MapFrame(receiver, zoom, setZoom);
+        var map = MapFrame(receiver, zoom, setZoom)
+            .Style("overflow", "visible")
+            .Style("isolation", "isolate");
         map.Content(WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100")
             .Style("position", "absolute").Style("inset", "0").Style("width", "100%").Style("height", "100%")
             .Style("pointer-events", "none").Content(Grid(receiver)).Content(Compass(receiver)).Content(ScaleBar(receiver)));
@@ -161,7 +165,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Style("color", White)
                 .Style("z-index", "3")
                 .Style("outline", "none")
-                .Style("overflow", "visible")
+                .Style("overflow", "visible");
                 .Attribute("tabindex", "0")
                 .AriaLabel($"Select {item.Name}")
                 .Title($"Select {item.Name} // hover for facility details")
