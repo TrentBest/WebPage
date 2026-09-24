@@ -18,19 +18,38 @@ public static class WorkshopAiTerminalGuiBuilder
         Action toggle,
         Func<Task> copyContext,
         string responseText,
-        Action<string> responseChanged)
+        Action<string> responseChanged,
+        bool docked = false)
     {
         var root = WorkshopGui.Element(receiver, "div")
-            .Style("position", "fixed")
-            .Style("right", "1rem")
-            .Style("top", "1rem")
-            .Style("z-index", "260")
-            .Style("font-family", "Consolas, 'Courier New', monospace");
+            .Style("position", docked ? "relative" : "fixed")
+            .Style("right", docked ? "auto" : "1rem")
+            .Style("top", docked ? "auto" : "1rem")
+            .Style("z-index", docked ? "auto" : "260")
+            .Style("width", docked ? "100%" : "auto")
+            .Style("box-sizing", "border-box")
+            .Style("font-family", "Consolas, 'Courier New', monospace")
+            .Style("display", "flex")
+            .Style("flex-direction", "column")
+            .Style("align-items", "flex-end")
+            .Style("padding", docked ? ".35rem 0 .1rem" : "0")
+            .Style("border-top", docked ? "1px solid rgba(0,234,255,.16)" : "none")
+            .Style("margin-top", docked ? ".15rem" : "0");
 
         var avatars = WorkshopGui.Element(receiver, "div")
             .Style("display", "flex")
             .Style("align-items", "center")
-            .Style("gap", ".35rem");
+            .Style("gap", ".55rem");
+
+        if (docked)
+        {
+            avatars.Content(WorkshopGui.Element(receiver, "span")
+                .Style("margin-right", ".15rem")
+                .Style("color", "#708892")
+                .Style("font-size", ".36rem")
+                .Style("letter-spacing", ".16em")
+                .Text("SESSION LINK"));
+        }
 
         avatars.Content(Avatar(receiver, avatarUrl, displayName, "YOUR AVATAR", Yellow));
         avatars.Content(Avatar(receiver, null, "AI", "AI TERMINAL", Cyan).OnClick(toggle));
