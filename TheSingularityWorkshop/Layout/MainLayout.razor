@@ -6,14 +6,14 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden") @(IsWorkshopLanding && ShowWorkshopChrome ? "workshop-hub-manifested" : "") @(IsCreatePage ? "workshop-create-page" : "") @(IsSpatialExplorePage ? "workshop-spatial-page" : "")">
+<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden") @(IsWorkshopLanding && ShowWorkshopChrome ? "workshop-hub-manifested workshop-hub-split" : "") @(IsCreatePage ? "workshop-create-page" : "") @(IsSpatialExplorePage ? "workshop-spatial-page" : "")">
     @if (!IsWorkshopLanding)
     {
         <div class="sidebar workshop-sidebar"><NavMenu /></div>
     }
     else
     {
-        <div class="sidebar workshop-sidebar" aria-hidden="true"><NavMenu /></div>
+        <div class="sidebar workshop-sidebar" aria-hidden="@(ShowWorkshopChrome ? "false" : "true")"><NavMenu /></div>
     }
 
     <main>
