@@ -165,6 +165,33 @@ public sealed class MonikerExperienceTests
         Assert.Equal(0d, service.FirstContact.QuestionOpacity, 6);
     }
 
+    [Fact(DisplayName = "Moniker glyphs preserve their authored row origin during animation delay")]
+    public void MonikerGlyphsPreserveAuthoredRowOrigin()
+    {
+        var view = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
+
+        var layout = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Layout", "MainLayout.razor.css"));
+
+        Assert.Contains("RenderMonikerLine(\"THE\", 0, 1d)", view);
+        Assert.Contains("RenderMonikerLine(\"SINGULARITY\", 3, 5d)", view);
+        Assert.Contains("RenderMonikerLine(\"WORKSHOP\", 14, 3.5d)", view);
+        Assert.Contains("--glyph-index:{glyphIndex}", view);
+        Assert.Contains("--glyph-midpoint:{midpoint:0.##}", view);
+
+        // Positive animation delays must retain the 0% transform. Otherwise the
+        // delayed glyph has no transform and sits at its absolute left/top point
+        // (the row center) until the animation starts.
+        Assert.Contains("transform: translate(-50%, -50%)", layout);
+        Assert.Contains("animation-fill-mode: backwards !important", layout);
+        Assert.DoesNotContain(".hello-glyph:nth-child", layout);
+    }
+
     [Fact(DisplayName = "Gateway does not render a duplicate first-contact question")]
     public void GatewayDoesNotReintroduceFirstContactQuestion()
     {
