@@ -1,4 +1,5 @@
 @using TheSingularityWorkshop.Workshop.Plant
+@using TheSingularityWorkshop.Gui
 
 <section class="first-contact-stage @(State == "Moniker" || State == "HubGrowth" ? "living" : "")" aria-live="polite">
     @if (State == "FirstOnly" || State == "FirstFadingSecondComingIn" || State == "SecondOnly")
@@ -13,17 +14,7 @@
     else if (State == "Gateway")
     {
         <section class="gateway-stage" aria-label="Workshop entry">
-            <button class="enter-workshop" @onclick="EnterWorkshop" aria-label="Enter The Singularity Workshop">
-                <span class="enter-corner tl" aria-hidden="true"></span><span class="enter-corner tr" aria-hidden="true"></span>
-                <span class="enter-corner bl" aria-hidden="true"></span><span class="enter-corner br" aria-hidden="true"></span>
-                <span class="gateway-avatar" aria-hidden="true"><img src="/Images/TheSingularityWorkshopLogo.png" alt="" /></span>
-                <strong>ENTER THE WORKSHOP</strong>
-            </button>
-
-            <div class="workshop-warning" role="note">
-                <div class="warning-header"><span>⚠</span> SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE <span>⚠</span></div>
-                <div class="warning-body">You are entering a living software environment assembled from state, capability, composition, and interaction.<br /><span class="warning-final">Viewer discretion and spare RAM advised.</span></div>
-            </div>
+            @BuildGateway()
         </section>
     }
     else
@@ -67,7 +58,7 @@
 .contact-half{position:absolute;left:0;right:0;height:50%;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:6vw;text-align:center}.contact-half.top{top:0}.contact-half.bottom{bottom:0}
 .contact-label{will-change:opacity,filter,text-shadow}.statement{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.1rem,3.2vw,3.4rem);font-weight:700;letter-spacing:.035em;color:#eefaff}.question{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.4rem,4vw,4.4rem);font-weight:700;letter-spacing:.02em;color:#ffd34d}
 .gateway-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;overflow:hidden;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711}
-.enter-workshop{position:relative;container-type:size;width:min(560px,62vw);height:min(390px,48vh);min-width:280px;min-height:230px;display:flex;align-items:center;justify-content:center;overflow:visible;padding:0;box-sizing:border-box;border:2px solid #00eaff;border-radius:16px;background:rgba(3,10,22,.76);color:#fff;cursor:pointer;box-shadow:0 0 18px rgba(0,234,255,.35),0 0 65px rgba(0,234,255,.1),inset 0 0 35px rgba(0,234,255,.06);animation:gatewayManifest .55s steps(6,end) both;transition:transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s ease,border-color .35s ease}.enter-workshop:hover{transform:scale(1.025);border-color:#ff2cff;box-shadow:0 0 18px rgba(255,44,255,.7),0 0 60px rgba(0,234,255,.2),inset 0 0 40px rgba(255,44,255,.08)}.gateway-avatar{position:absolute;left:50%;top:50%;width:100cqh;height:100cqh;transform:translate(-50%,-50%);transform-origin:center;border:2px solid #00eaff;border-radius:50%;overflow:hidden;box-sizing:border-box;z-index:1;transition:transform .45s cubic-bezier(.16,1,.3,1),filter .45s ease,box-shadow .45s ease,border-color .35s ease,border-width .35s ease;box-shadow:0 0 12px rgba(0,234,255,.7),0 0 38px rgba(0,234,255,.22),0 0 60px rgba(255,44,255,.1)}.gateway-avatar img{display:block;position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;object-fit:cover;object-position:50% 50%;border-radius:50%;opacity:.88;filter:saturate(1.1);transition:transform .45s cubic-bezier(.16,1,.3,1),filter .45s ease;transform:translate(10%,4%) scale(1.8);transform-origin:center}.enter-workshop:hover .gateway-avatar{transform:translate(-50%,-50%) scale(1.16);border-color:#ff2cff;box-shadow:0 0 18px rgba(255,44,255,.95),0 0 48px rgba(0,234,255,.35),0 0 82px rgba(255,44,255,.3)}.enter-workshop:hover .gateway-avatar img{transform:translate(10%,4%) scale(2.05);filter:saturate(1.32) contrast(1.08) brightness(1.1)}.enter-workshop strong{position:absolute;bottom:8%;font-size:clamp(1rem,2vw,1.7rem);letter-spacing:.18em;text-shadow:0 0 12px #00eaff}
+.gateway-corner{position:absolute;width:42px;height:42px;z-index:2}.gateway-corner::before,.gateway-corner::after{content:"";position:absolute;background:#00eaff;box-shadow:0 0 8px rgba(0,234,255,.55)}.gateway-corner::before{width:42px;height:1px}.gateway-corner::after{width:1px;height:42px}.gateway-corner.tl{left:15px;top:15px}.gateway-corner.tr{right:15px;top:15px;transform:rotate(90deg)}.gateway-corner.bl{left:15px;bottom:15px;transform:rotate(-90deg)}.gateway-corner.br{right:15px;bottom:15px;transform:rotate(180deg)}
 .enter-corner{position:absolute;width:42px;height:42px;z-index:2}.enter-corner::before,.enter-corner::after{content:"";position:absolute;background:#00eaff;box-shadow:0 0 8px rgba(0,234,255,.55)}.enter-corner::before{width:42px;height:1px}.enter-corner::after{width:1px;height:42px}.tl{left:15px;top:15px}.tr{right:15px;top:15px;transform:rotate(90deg)}.bl{left:15px;bottom:15px;transform:rotate(-90deg)}.br{right:15px;bottom:15px;transform:rotate(180deg)}
 .workshop-warning{width:min(680px,78%);padding:.75rem 1.2rem .85rem;box-sizing:border-box;text-align:center;background:rgba(20,10,2,.92);border:3px solid #ff6600;border-radius:5px;box-shadow:0 0 14px rgba(255,102,0,.22),0 0 30px rgba(255,102,0,.12)}.warning-header{display:flex;justify-content:center;gap:.65rem;margin-bottom:.4rem;color:#ffb15c;font-size:clamp(.65rem,1vw,.86rem);font-weight:700;letter-spacing:.13em}.warning-body{font-size:clamp(.62rem,.9vw,.8rem);line-height:1.6;color:#dceaf2}.warning-final{color:#ffb15c}
 .moniker-water{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 78%,rgba(0,168,255,.18),transparent 28%),radial-gradient(ellipse at 48% 88%,rgba(0,234,255,.08),transparent 42%);opacity:.8}.moniker-water::after{content:"";position:absolute;left:18%;right:18%;bottom:14%;height:18%;border-radius:50%;border-top:1px solid rgba(0,234,255,.35);box-shadow:0 -12px 35px rgba(0,168,255,.08)}
@@ -104,6 +95,143 @@
         var visibility = clamped <= 0d ? "hidden" : "visible";
 
         return $"opacity:{clamped:0.###};visibility:{visibility};filter:blur({blur:0.##}px);text-shadow:0 0 {Math.Max(.02, clamped) * 22d:0.##}px rgba(255,211,77,.32);";
+    }
+
+    private bool _gatewayHovered;
+
+    private RenderFragment BuildGateway()
+    {
+        var button = WorkshopGui.Button(this)
+            .Class("enter-workshop")
+            .AriaLabel("Enter The Singularity Workshop")
+            .Style("position", "relative")
+            .Style("width", "min(560px,62vw)")
+            .Style("height", "min(390px,48vh)")
+            .Style("min-width", "280px")
+            .Style("min-height", "230px")
+            .Style("display", "flex")
+            .Style("align-items", "center")
+            .Style("justify-content", "center")
+            .Style("overflow", "visible")
+            .Style("padding", "0")
+            .Style("box-sizing", "border-box")
+            .Style("border", $"2px solid {(_gatewayHovered ? "#ff2cff" : "#00eaff")}")
+            .Style("border-radius", "16px")
+            .Style("background", "rgba(3,10,22,.76)")
+            .Style("color", "#fff")
+            .Style("cursor", "pointer")
+            .Style("box-shadow", _gatewayHovered
+                ? "0 0 18px rgba(255,44,255,.7),0 0 60px rgba(0,234,255,.2),inset 0 0 40px rgba(255,44,255,.08)"
+                : "0 0 18px rgba(0,234,255,.35),0 0 65px rgba(0,234,255,.1),inset 0 0 35px rgba(0,234,255,.06)")
+            .Style("transform", _gatewayHovered ? "scale(1.025)" : "scale(1)")
+            .Style("transition", "transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s ease,border-color .35s ease")
+            .OnClick(EnterWorkshop)
+            .OnMouseEnter(() => _gatewayHovered = true)
+            .OnMouseLeave(() => _gatewayHovered = false);
+
+        button.Child(WorkshopGui.Element(this, "span")
+            .Class("gateway-avatar")
+            .Attribute("aria-hidden", "true")
+            .Style("position", "absolute")
+            .Style("left", "50%")
+            .Style("top", "50%")
+            .Style("height", "100%")
+            .Style("width", "auto")
+            .Style("aspect-ratio", "1")
+            .Style("transform", _gatewayHovered ? "translate(-50%,-50%) scale(1.2)" : "translate(-50%,-50%) scale(.72)")
+            .Style("transform-origin", "center")
+            .Style("border", $"2px solid {(_gatewayHovered ? "#ff2cff" : "#00eaff")}")
+            .Style("border-radius", "50%")
+            .Style("overflow", "hidden")
+            .Style("display", "flex")
+            .Style("align-items", "center")
+            .Style("justify-content", "center")
+            .Style("box-sizing", "border-box")
+            .Style("pointer-events", "none")
+            .Style("z-index", "1")
+            .Style("box-shadow", _gatewayHovered
+                ? "0 0 18px rgba(255,44,255,.95),0 0 48px rgba(0,234,255,.35),0 0 82px rgba(255,44,255,.3)"
+                : "0 0 12px rgba(0,234,255,.7),0 0 38px rgba(0,234,255,.22),0 0 60px rgba(255,44,255,.1)")
+            .Style("transition", "transform .45s cubic-bezier(.16,1,.3,1),filter .45s ease,box-shadow .45s ease,border-color .35s ease")
+            .Child(WorkshopGui.Image(this)
+                .Class("gateway-avatar-image")
+                .Attribute("alt", "")
+                .Style("display", "block")
+                .Style("width", "100%")
+                .Style("height", "100%")
+                .Style("margin", "0")
+                .Style("padding", "0")
+                .Style("object-fit", "cover")
+                .Style("object-position", "center")
+                .Style("border-radius", "50%")
+                .Style("opacity", ".88")
+                .Style("filter", _gatewayHovered ? "saturate(1.32) contrast(1.08) brightness(1.1)" : "saturate(1.08) contrast(1.04)")
+                .Image("/Images/TheSingularityWorkshopLogo.png")));
+
+        button.Child(WorkshopGui.Element(this, "span")
+            .Class("gateway-corner tl")
+            .Attribute("aria-hidden", "true"));
+        button.Child(WorkshopGui.Element(this, "span")
+            .Class("gateway-corner tr")
+            .Attribute("aria-hidden", "true"));
+        button.Child(WorkshopGui.Element(this, "span")
+            .Class("gateway-corner bl")
+            .Attribute("aria-hidden", "true"));
+        button.Child(WorkshopGui.Element(this, "span")
+            .Class("gateway-corner br")
+            .Attribute("aria-hidden", "true"));
+
+        button.Child(WorkshopGui.Element(this, "strong")
+            .Style("position", "absolute")
+            .Style("bottom", "8%")
+            .Style("font-size", "clamp(1rem,2vw,1.7rem)")
+            .Style("letter-spacing", ".18em")
+            .Style("text-shadow", "0 0 12px #00eaff")
+            .Text("ENTER THE WORKSHOP"));
+
+        var warning = WorkshopGui.Element(this, "div")
+            .Class("workshop-warning")
+            .Attribute("role", "note")
+            .Style("display", "block")
+            .Style("width", "min(680px,78%)")
+            .Style("padding", ".75rem 1.2rem .85rem")
+            .Style("box-sizing", "border-box")
+            .Style("text-align", "center")
+            .Style("background", "rgba(20,10,2,.92)")
+            .Style("border", "3px solid #ff6600")
+            .Style("border-radius", "5px")
+            .Style("box-shadow", "0 0 14px rgba(255,102,0,.22),0 0 30px rgba(255,102,0,.12)");
+
+        warning.Child(WorkshopGui.Element(this, "div")
+            .Class("warning-header")
+            .Style("display", "flex")
+            .Style("justify-content", "center")
+            .Style("gap", ".65rem")
+            .Style("margin-bottom", ".4rem")
+            .Style("color", "#ffb15c")
+            .Style("font-size", "clamp(.65rem,1vw,.86rem)")
+            .Style("font-weight", "700")
+            .Style("letter-spacing", ".13em")
+            .Text("⚠ SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE ⚠"));
+
+        warning.Child(WorkshopGui.Element(this, "div")
+            .Class("warning-body")
+            .Style("font-size", "clamp(.62rem,.9vw,.8rem)")
+            .Style("line-height", "1.6")
+            .Style("color", "#dceaf2")
+            .Text("You are entering a living software environment assembled from state, capability, composition, and interaction. Viewer discretion and spare RAM advised."));
+
+        var root = WorkshopGui.Panel(this)
+            .Class("gateway-builder-surface")
+            .Style("display", "flex")
+            .Style("flex-direction", "column")
+            .Style("align-items", "center")
+            .Style("justify-content", "center")
+            .Style("gap", "1.2rem");
+
+        root.Child(button);
+        root.Child(warning);
+        return root.Build();
     }
 
     private async Task EnterWorkshop()
