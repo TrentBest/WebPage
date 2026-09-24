@@ -1,7 +1,7 @@
 @using TheSingularityWorkshop.Workshop.Plant
 @using TheSingularityWorkshop.Gui
 
-<section class="first-contact-stage @(State == "Moniker" || State == "HubGrowth" ? "living" : "")" aria-live="polite">
+<section class="first-contact-stage @(State == "Moniker" || State == "HubGrowth" || State == "Landing" ? "living" : "")" aria-live="polite">
     @if (State == "FirstOnly" || State == "FirstFadingSecondComingIn" || State == "SecondOnly")
     {
         <div class="contact-half top">
