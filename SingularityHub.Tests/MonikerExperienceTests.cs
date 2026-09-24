@@ -47,9 +47,9 @@ public sealed class MonikerExperienceTests
             "..", "..", "..", "..",
             "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
-        Assert.Contains('State == "Moniker" || State == "HubGrowth" || State == "Landing"', view);
-        Assert.Contains('State == "Landing" ? "hub-moniker-panel" : ""', view);
-        Assert.Contains('@if (State == "HubGrowth")', view);
+        Assert.Contains("State == \"Moniker\" || State == \"HubGrowth\" || State == \"Landing\"", view);
+        Assert.Contains("State == \"Landing\" ? \"hub-moniker-panel\" : \"\"", view);
+        Assert.Contains("@if (State == \"HubGrowth\")", view);
     }
 
     [Fact(DisplayName = "Landing leaves the moniker in place until the user navigates away")]
