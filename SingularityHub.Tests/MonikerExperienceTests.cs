@@ -39,18 +39,36 @@ public sealed class MonikerExperienceTests
         Assert.DoesNotContain("interop.initUnity", home);
     }
 
-    [Fact(DisplayName = "Gateway presentation remains a visible button and warning card")]
+    [Fact(DisplayName = "Gateway presentation uses the active first-contact gateway contract")]
     public void GatewayPresentationRemainsStable()
     {
         var gateway = File.ReadAllText(Path.Combine(
             AppContext.BaseDirectory,
             "..", "..", "..", "..",
-            "TheSingularityWorkshop", "Components", "WorkshopGatewayView.razor"));
+            "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
         Assert.Contains("enter-workshop", gateway);
         Assert.Contains("ENTER THE WORKSHOP", gateway);
         Assert.Contains("SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE", gateway);
         Assert.Contains("border:2px solid #00eaff", gateway);
+        Assert.DoesNotContain("enter-orbit", gateway);
+    }
+
+    [Fact(DisplayName = "Gateway avatar fills the inscribed circle and pressure scales on hover")]
+    public void GatewayAvatarUsesInscribedCircleAndPressureHover()
+    {
+        var gateway = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
+
+        Assert.Contains("width:100cqh;height:100cqh", gateway);
+        Assert.Contains("width:100%;height:100%", gateway);
+        Assert.Contains("object-fit:cover", gateway);
+        Assert.Contains(".enter-workshop:hover{transform:scale(1.025)", gateway);
+        Assert.Contains(".enter-workshop:hover .gateway-avatar{transform:translate(-50%,-50%) scale(1.16)", gateway);
+        Assert.Contains(".enter-workshop{position:relative;container-type:size", gateway);
+        Assert.Contains("overflow:visible", gateway);
     }
 
     [Fact(DisplayName = "First-contact presentation is driven by explicit FSM phases")]
