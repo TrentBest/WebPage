@@ -50,8 +50,8 @@ public sealed class MonikerExperienceTests
         Assert.Contains("enter-workshop", gateway);
         Assert.Contains("ENTER THE WORKSHOP", gateway);
         Assert.Contains("SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE", gateway);
-        Assert.Contains("border:2px solid #00eaff", gateway);
-            }
+        Assert.Contains("WorkshopGui.Button(this)", gateway);
+    }
 
     [Fact(DisplayName = "Gateway avatar fills the inscribed circle and pressure scales on hover")]
     public void GatewayAvatarUsesInscribedCircleAndPressureHover()
@@ -61,17 +61,20 @@ public sealed class MonikerExperienceTests
             "..", "..", "..", "..",
             "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
-        Assert.Contains("width:100cqh;height:100cqh", gateway);
-        Assert.Contains("width:100%;height:100%", gateway);
-        Assert.Contains("object-fit:cover", gateway);
-        Assert.Contains(".enter-workshop:hover{transform:scale(1.025)", gateway);
-        Assert.Contains(".enter-workshop:hover .gateway-avatar{transform:translate(-50%,-50%) scale(1.16)", gateway);
-        Assert.Contains(".enter-workshop:hover .gateway-avatar img{transform:translate(10%,4%) scale(2.05)", gateway);
-        Assert.Contains(".enter-workshop{position:relative;container-type:size", gateway);
-        Assert.Contains("overflow:visible", gateway);
-        Assert.Contains("padding:0;box-sizing:border-box", gateway);
-        Assert.Contains("transform:translate(10%,4%) scale(1.8);transform-origin:center", gateway);
-        Assert.DoesNotContain("enter-orbit", gateway);
+        Assert.Contains("WorkshopGui.Button(this)", gateway);
+        Assert.Contains("WorkshopGui.Image(this)", gateway);
+        Assert.Contains(".Style("left", "50%")", gateway);
+        Assert.Contains(".Style("top", "50%")", gateway);
+        Assert.Contains(".Style("height", "100%")", gateway);
+        Assert.Contains(".Style("width", "auto")", gateway);
+        Assert.Contains(".Style("aspect-ratio", "1")", gateway);
+        Assert.Contains(".Style("transform", _gatewayHovered ? "translate(-50%,-50%) scale(1.2)" : "translate(-50%,-50%) scale(.72)")", gateway);
+        Assert.Contains(".Style("object-fit", "cover")", gateway);
+        Assert.Contains(".Style("object-position", "center")", gateway);
+        Assert.Contains(".OnMouseEnter(() => _gatewayHovered = true)", gateway);
+        Assert.Contains(".OnMouseLeave(() => _gatewayHovered = false)", gateway);
+        Assert.DoesNotContain("<button class="enter-workshop"", gateway);
+
     }
 
     [Fact(DisplayName = "First-contact presentation is driven by explicit FSM phases")]
