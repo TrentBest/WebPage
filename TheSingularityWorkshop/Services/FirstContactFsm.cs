@@ -24,7 +24,7 @@ public sealed class FirstContactFsm : IDisposable
             .State("FirstOnly", EnterFirstOnly, UpdateFirstOnly, null)
             .State("FirstFadingSecondComingIn", EnterCrossfade, UpdateCrossfade, null)
             .State("SecondOnly", EnterSecondOnly, UpdateSecondOnly, null)
-            .State("Gateway", EnterGateway, null, null)
+            .State("Gateway", EnterGateway, UpdateGateway, null)
             .State("Moniker", EnterState, UpdateClock, null)
             .State("HubGrowth", EnterState, UpdateClock, null)
             .State("Landing", null, null, null)
@@ -47,6 +47,7 @@ public sealed class FirstContactFsm : IDisposable
     public double PresentationProgress => Math.Clamp(_context.Ticks / PhaseDurationTicks, 0d, 1d);
     public double StatementOpacity => _context.StatementOpacity;
     public double QuestionOpacity => _context.QuestionOpacity;
+    public double GatewayBreath => _context.GatewayBreath;
 
     public FirstContactSoundCue LastSoundCue { get; private set; }
     public event Action<FirstContactSoundCue>? SoundCueRequested;
@@ -134,6 +135,14 @@ public sealed class FirstContactFsm : IDisposable
         state.Ticks = 0;
         state.StatementOpacity = 0d;
         state.QuestionOpacity = 0d;
+        state.GatewayBreath = 0.5d;
+    }
+
+    private static void UpdateGateway(IStateContext context)
+    {
+        var state = (FirstContactContext)context;
+        state.Ticks++;
+        state.GatewayBreath = BreathWave(state.Ticks, 96d);
     }
 
     private static void EnterState(IStateContext context)
@@ -146,6 +155,12 @@ public sealed class FirstContactFsm : IDisposable
     {
         var p = Math.Clamp(progress, 0d, 1d);
         return 0.5d + (0.5d * Math.Sin((p - 0.5d) * Math.PI));
+    }
+
+    private static double BreathWave(long ticks, double period)
+    {
+        var phase = (ticks % period) / period;
+        return 0.5d + (0.5d * Math.Sin(phase * Math.PI * 2d));
     }
 
     public void Dispose()
@@ -176,5 +191,6 @@ public sealed class FirstContactFsm : IDisposable
         public bool HubReady { get; set; }
         public double StatementOpacity { get; set; }
         public double QuestionOpacity { get; set; }
+        public double GatewayBreath { get; set; }
     }
 }
