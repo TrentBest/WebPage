@@ -19,9 +19,9 @@
     }
     else
     {
-        @if (State == "Moniker" || State == "HubGrowth")
+        @if (State == "Moniker" || State == "HubGrowth" || State == "Landing")
         {
-            <section class="flex-hello" aria-label="The Singularity Workshop">
+            <section class="flex-hello @(State == "Landing" ? "hub-moniker-panel" : "")" aria-label="The Singularity Workshop">
                 <div class="hello-moniker">
                     <div class="hello-line">@RenderMonikerLine("THE", 0, 1d)</div>
                     <div class="hello-line">@RenderMonikerLine("SINGULARITY", 3, 5d)</div>
@@ -29,7 +29,7 @@
                 </div>
             </section>
         }
-        @if (State == "HubGrowth" || State == "Landing")
+        @if (State == "HubGrowth")
         {
             <section class="hub-warp" aria-label="The Workshop Hub materializing">
                 <div class="warp-core" aria-hidden="true"></div>
