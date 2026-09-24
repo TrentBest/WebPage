@@ -77,6 +77,14 @@ public sealed class MonikerExperienceTests
         Assert.Contains(".OnMouseLeave(() => _gatewayHovered = false)", gateway);
         Assert.DoesNotContain("<button class=\"enter-workshop\"", gateway);
 
+        var home = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Pages", "Home.razor"));
+
+        Assert.DoesNotContain(".enter-workshop:hover img", home);
+        Assert.DoesNotContain(".enter-workshop img", home);
+
     }
 
     [Fact(DisplayName = "Gateway breathing is driven by FSM ticks")]
