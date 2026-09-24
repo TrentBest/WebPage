@@ -212,7 +212,8 @@ public sealed class MonikerExperienceTests
             "..", "..", "..", "..",
             "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
-        Assert.Contains("<section class=\"flex-hello\"", view);
+        Assert.Contains("<section class=\"flex-hello", view);
+        Assert.Contains("hub-moniker-panel", view);
         Assert.Contains("hello-moniker", view);
         Assert.Contains("hello-glyph", view);
         Assert.DoesNotContain("moniker-water", view);
