@@ -154,7 +154,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Style("width", $"{Math.Max(b.Width, 1.5d):0.##}%")
                 .Style("height", $"{Math.Max(b.Height, 1.5d):0.##}%")
                 .Style("box-sizing", "border-box")
-                .Style("border", $"1.5px solid {accent}dd")
+                .Style("border", $"1px solid {accent}66")
                 .Style("border-radius", "2px")
                 .Style("background", BuildingFill(accent))
                 .Style("box-shadow", $"0 0 14px {accent}18,inset 0 0 18px {accent}12")
@@ -212,12 +212,12 @@ public static partial class SpatialWorkshopMapGuiBuilder
 
         svg.Content(WorkshopGui.Element(receiver, "polygon")
             .Attribute("points", "5,13 13,5 87,5 95,13 95,87 87,95 13,95 5,87")
-            .Attribute("fill", accent).Attribute("fill-opacity", ".035")
-            .Attribute("stroke", accent).Attribute("stroke-opacity", ".32").Attribute("stroke-width", ".8"));
+            .Attribute("fill", accent).Attribute("fill-opacity", ".075")
+            .Attribute("stroke", accent).Attribute("stroke-opacity", ".58").Attribute("stroke-width", ".9"));
 
         svg.Content(WorkshopGui.Element(receiver, "rect")
             .Attribute("x", 1).Attribute("y", 1).Attribute("width", 98).Attribute("height", 98)
-            .Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-opacity", ".72").Attribute("stroke-width", "1.1"));
+            .Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-opacity", ".34").Attribute("stroke-width", ".8"));
 
         var spec = SingularityCampusCatalog.Buildings.FirstOrDefault(building => building.Id == item.Id);
         var columns = Math.Clamp(spec?.Columns ?? 0, 0, 8);
