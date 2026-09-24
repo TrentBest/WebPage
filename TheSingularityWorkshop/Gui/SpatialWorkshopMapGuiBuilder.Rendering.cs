@@ -25,7 +25,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("font-family", "Consolas, 'Courier New', monospace");
 
         root.Content(WorkshopGui.Element(receiver, "style").Text(
-            "@keyframes workshop-map-pulse{0%,100%{opacity:.62;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}@keyframes workshop-map-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.42);transform:scale(1.035)}}.workshop-map-interactable:hover,.workshop-map-structure:focus-within{animation:workshop-map-breathe 1.35s ease-in-out infinite;transform-origin:center center}.workshop-map-building-controls{opacity:0;pointer-events:none;transition:opacity .15s ease}.workshop-map-structure:hover .workshop-map-building-controls,.workshop-map-structure:focus-within .workshop-map-building-controls{opacity:1;pointer-events:auto}.workshop-map-interactable:focus-visible,.workshop-map-structure:focus-visible{outline:1px solid #ffd34d;outline-offset:2px}@media(prefers-reduced-motion:reduce){.workshop-map-interactable:hover,.workshop-map-structure:hover{animation:none;filter:brightness(1.2);transform:scale(1.01)}}"));
+            "@keyframes workshop-map-pulse{0%,100%{opacity:.62;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}@keyframes workshop-map-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.42);transform:scale(1.035)}}.workshop-map-interactable:hover,.workshop-map-structure:focus-within{animation:workshop-map-breathe 1.35s ease-in-out infinite;transform-origin:center center}.workshop-map-building-controls{opacity:0;pointer-events:none;transition:opacity .15s ease}.workshop-map-structure:hover .workshop-map-building-controls,.workshop-map-structure:focus-within .workshop-map-building-controls{opacity:1;pointer-events:auto}.workshop-map-interactable:focus-visible,.workshop-map-structure:focus-visible{outline:1px solid #ffd34d;outline-offset:2px}@media(prefers-reduced-motion:reduce){.workshop-map-interactable:hover,.workshop-map-structure:hover{animation:none;filter:brightness(1.2);transform:scale(1.01)}}.workshop-map-structure{transition:filter .18s ease,box-shadow .18s ease,transform .18s ease,border-color .18s ease}.workshop-map-structure:hover,.workshop-map-structure:focus-within{filter:brightness(1.16)}.workshop-map-building-info{position:absolute;left:50%;bottom:calc(100% + .45rem);transform:translate(-50%,.35rem);width:min(240px,28vw);padding:.5rem .6rem;border:1px solid rgba(0,234,255,.42);background:rgba(1,6,12,.96);box-shadow:0 0 24px rgba(0,234,255,.12),inset 0 0 18px rgba(0,234,255,.035);opacity:0;pointer-events:none;transition:opacity .16s ease,transform .16s ease;z-index:30}.workshop-map-structure:hover .workshop-map-building-info,.workshop-map-structure:focus-within .workshop-map-building-info{opacity:1;transform:translate(-50%,0)}.workshop-map-directory-item{transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease}.workshop-map-directory-item:hover,.workshop-map-directory-item:focus-visible{transform:translateX(3px);border-color:rgba(255,255,255,.52)!important;background:rgba(255,255,255,.055)!important;box-shadow:0 0 18px rgba(0,234,255,.08)}}"));
 
         var panel = WorkshopGui.Panel(receiver)
             .Style("width", "min(1280px,98vw)").Style("height", "min(92vh,900px)")
@@ -154,23 +154,43 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Style("width", $"{Math.Max(b.Width, 1.5d):0.##}%")
                 .Style("height", $"{Math.Max(b.Height, 1.5d):0.##}%")
                 .Style("box-sizing", "border-box")
-                .Style("border", $"2px solid {accent}cc")
-                .Style("background", Fill(accent))
+                .Style("border", $"1.5px solid {accent}dd")
+                .Style("border-radius", "2px")
+                .Style("background", BuildingFill(accent))
+                .Style("box-shadow", $"0 0 14px {accent}18,inset 0 0 18px {accent}12")
                 .Style("color", White)
                 .Style("z-index", "3")
                 .Style("outline", "none")
+                .Style("overflow", "visible")
                 .Attribute("tabindex", "0")
                 .AriaLabel($"Select {item.Name}")
-                .Title($"Select {item.Name} // spatial editing controls");
+                .Title($"Select {item.Name} // hover for facility details")
+                .OnMouseEnter(() => item.OnHover(new NormalizedPointer(.5d, .5d)))
+                .OnMouseLeave(item.OnHoverExit);
 
             container.Content(WorkshopGui.Element(receiver, "span")
                 .Style("position", "absolute")
                 .Style("left", "50%").Style("top", "50%")
                 .Style("transform", "translate(-50%,-50%)")
                 .Style("font-size", "clamp(.4rem,.52vw,.62rem)")
-                .Style("font-weight", "700").Style("line-height", "1.05")
-                .Style("text-align", "center").Style("text-shadow", "0 1px 2px #000")
-                .Style("pointer-events", "none").Text(item.Name));
+                .Style("font-weight", "800").Style("line-height", "1.05")
+                .Style("text-align", "center").Style("text-shadow", "0 1px 3px #000")
+                .Style("pointer-events", "none")
+                .Style("z-index", "8")
+                .Text(item.Name));
+
+            var placeDescription = item.Place?.Description ?? "Spatial Workshop facility.";
+            container.Content(WorkshopGui.Element(receiver, "div")
+                .Class("workshop-map-building-info")
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("color", accent).Style("font-size", ".48rem").Style("font-weight", "800")
+                    .Style("letter-spacing", ".12em").Text(item.Name.ToUpperInvariant()))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("margin-top", ".25rem").Style("color", "#a8bbc4").Style("font-size", ".37rem")
+                    .Style("line-height", "1.45").Text(placeDescription))
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("margin-top", ".35rem").Style("color", Yellow).Style("font-size", ".34rem")
+                    .Style("letter-spacing", ".1em").Text("CLICK TO NAVIGATE // SECOND CLICK ENTERS")));
 
             container.Content(MapBuildingGeometry(receiver, item, b, accent));
             container.OnClick(() => _ = selectDestination(item.Id)).StopPropagation("onclick");
@@ -190,9 +210,38 @@ public static partial class SpatialWorkshopMapGuiBuilder
             .Style("position", "absolute").Style("inset", "0").Style("width", "100%").Style("height", "100%")
             .Style("pointer-events", "none").Style("overflow", "visible");
 
+        svg.Content(WorkshopGui.Element(receiver, "polygon")
+            .Attribute("points", "5,13 13,5 87,5 95,13 95,87 87,95 13,95 5,87")
+            .Attribute("fill", accent).Attribute("fill-opacity", ".035")
+            .Attribute("stroke", accent).Attribute("stroke-opacity", ".32").Attribute("stroke-width", ".8"));
+
         svg.Content(WorkshopGui.Element(receiver, "rect")
             .Attribute("x", 1).Attribute("y", 1).Attribute("width", 98).Attribute("height", 98)
-            .Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-opacity", ".55").Attribute("stroke-width", "1.1"));
+            .Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-opacity", ".72").Attribute("stroke-width", "1.1"));
+
+        var spec = SingularityCampusCatalog.Buildings.FirstOrDefault(building => building.Id == item.Id);
+        var columns = Math.Clamp(spec?.Columns ?? 0, 0, 8);
+        var rows = Math.Clamp(spec?.Rows ?? 0, 0, 8);
+
+        for (var column = 1; column < columns; column++)
+        {
+            var x = 5d + 90d * column / columns;
+            svg.Content(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", x).Attribute("y1", 7).Attribute("x2", x).Attribute("y2", 93)
+                .Attribute("stroke", accent).Attribute("stroke-opacity", ".13").Attribute("stroke-width", ".55"));
+        }
+
+        for (var row = 1; row < rows; row++)
+        {
+            var y = 5d + 90d * row / rows;
+            svg.Content(WorkshopGui.Element(receiver, "line")
+                .Attribute("x1", 7).Attribute("y1", y).Attribute("x2", 93).Attribute("y2", y)
+                .Attribute("stroke", accent).Attribute("stroke-opacity", ".11").Attribute("stroke-width", ".55"));
+        }
+
+        svg.Content(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M 14 8 H 86")
+            .Attribute("stroke", accent).Attribute("stroke-opacity", ".55").Attribute("stroke-width", "1.4"));
 
         foreach (var opening in item.Openings)
         {
@@ -447,14 +496,33 @@ public static partial class SpatialWorkshopMapGuiBuilder
             directory.Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".55rem").Style("color", Yellow)
                 .Style("font-size", ".5rem").Style("font-weight", "700").Style("letter-spacing", ".12em")
                 .Text(group.Key == SpatialDomain.Workshop ? "WORKSHOP TOOLS & STUDIOS" : "CITY PLACES"));
+            var index = 0;
             foreach (var item in group)
             {
+                index++;
                 var accent = Accent(item.ExperienceId);
-                directory.Content(WorkshopGui.Button(receiver).Label(item.Name.ToUpperInvariant())
-                    .Style("display", "block").Style("width", "100%").Style("margin", ".2rem 0").Style("padding", ".42rem")
-                    .Style("text-align", "left").Style("border", $"1px solid {accent}66").Style("border-left", $"4px solid {accent}")
-                    .Style("background", "rgba(255,255,255,.025)").Style("color", White).Style("font-family", "inherit")
-                    .Style("font-size", ".44rem").Style("font-weight", "700").Style("cursor", "pointer")
+                var category = group.Key == SpatialDomain.Workshop ? "WORKSHOP FACILITY" : "CITY DESTINATION";
+                directory.Content(WorkshopGui.Button(receiver)
+                    .Class("workshop-map-directory-item")
+                    .Style("display", "grid").Style("grid-template-columns", "2rem minmax(0,1fr) auto")
+                    .Style("align-items", "center").Style("gap", ".45rem")
+                    .Style("width", "100%").Style("margin", ".22rem 0").Style("padding", ".42rem .45rem")
+                    .Style("text-align", "left").Style("border", $"1px solid {accent}55").Style("border-left", $"4px solid {accent}")
+                    .Style("background", "linear-gradient(90deg,rgba(255,255,255,.045),rgba(255,255,255,.012))")
+                    .Style("color", White).Style("font-family", "inherit").Style("cursor", "pointer")
+                    .Style("font-size", ".44rem").Style("font-weight", "700")
+                    .AriaLabel($"Navigate to {item.Name}")
+                    .Title(item.Place?.Description ?? item.Name)
+                    .Content(WorkshopGui.Element(receiver, "span")
+                        .Style("color", accent).Style("font-size", ".36rem").Style("letter-spacing", ".08em")
+                        .Text($"{index:00}"))
+                    .Content(WorkshopGui.Element(receiver, "span")
+                        .Style("min-width", "0").Style("display", "flex").Style("flex-direction", "column").Style("gap", ".12rem")
+                        .Content(WorkshopGui.Element(receiver, "span").Style("color", White).Text(item.Name.ToUpperInvariant()))
+                        .Content(WorkshopGui.Element(receiver, "span").Style("color", "#708892").Style("font-size", ".32rem").Style("font-weight", "400")
+                            .Text(category)))
+                    .Content(WorkshopGui.Element(receiver, "span")
+                        .Style("color", accent).Style("font-size", ".8rem").Text("↗"))
                     .OnClick(() => selectDestination(item.Id)));
             }
         }
@@ -538,6 +606,14 @@ public static partial class SpatialWorkshopMapGuiBuilder
         Yellow => "rgba(255,211,77,.10)",
         Magenta => "rgba(255,56,209,.10)",
         _ => "rgba(82,224,90,.10)"
+    };
+
+    private static string BuildingFill(string accent) => accent switch
+    {
+        Cyan => "linear-gradient(145deg,rgba(0,234,255,.14),rgba(0,234,255,.035) 58%,rgba(1,8,14,.72))",
+        Yellow => "linear-gradient(145deg,rgba(255,211,77,.14),rgba(255,211,77,.035) 58%,rgba(10,8,2,.72))",
+        Magenta => "linear-gradient(145deg,rgba(255,56,209,.14),rgba(255,56,209,.035) 58%,rgba(10,2,9,.72))",
+        _ => "linear-gradient(145deg,rgba(82,224,90,.13),rgba(82,224,90,.035) 58%,rgba(2,10,5,.72))"
     };
 
     private static string Accent(string experienceId) => experienceId switch
