@@ -1,0 +1,4 @@
+[submodule "TheSingularityWorkshop.GUI"]
+	path = TheSingularityWorkshop.GUI
+	url = https://github.com/TrentBest/TheSingularityWorkshop.GUI.git
+	branch = development
