@@ -165,6 +165,23 @@ public sealed class MonikerExperienceTests
         Assert.Equal(0d, service.FirstContact.QuestionOpacity, 6);
     }
 
+    [Fact(DisplayName = "Moniker scene contains only the colorful glyph field")]
+    public void MonikerSceneContainsOnlyColorfulGlyphField()
+    {
+        var view = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
+
+        Assert.Contains("<section class=\"flex-hello\"", view);
+        Assert.Contains("hello-moniker", view);
+        Assert.Contains("hello-glyph", view);
+        Assert.DoesNotContain("moniker-water", view);
+        Assert.DoesNotContain("flex-hello-orbit", view);
+        Assert.DoesNotContain("moniker-foreground", view);
+        Assert.DoesNotContain("helloOrbit", view);
+    }
+
     [Fact(DisplayName = "Moniker glyphs preserve their authored row origin during animation delay")]
     public void MonikerGlyphsPreserveAuthoredRowOrigin()
     {
