@@ -121,7 +121,7 @@ public sealed class MonikerExperienceTests
 
         Assert.DoesNotContain("gateway-memory", view);
 
-        const phrase = "HOW MANY WORDS IS A LIVING IMAGE WORTH?";
+        const string phrase = "HOW MANY WORDS IS A LIVING IMAGE WORTH?";
         Assert.Equal(1, CountOccurrences(view, phrase));
     }
 
