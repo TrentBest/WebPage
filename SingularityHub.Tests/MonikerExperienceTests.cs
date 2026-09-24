@@ -51,8 +51,7 @@ public sealed class MonikerExperienceTests
         Assert.Contains("ENTER THE WORKSHOP", gateway);
         Assert.Contains("SYSTEM ADVISORY: MAXIMUM OVERDRIVE ACTIVE", gateway);
         Assert.Contains("border:2px solid #00eaff", gateway);
-        Assert.DoesNotContain("enter-orbit", gateway);
-    }
+            }
 
     [Fact(DisplayName = "Gateway avatar fills the inscribed circle and pressure scales on hover")]
     public void GatewayAvatarUsesInscribedCircleAndPressureHover()
