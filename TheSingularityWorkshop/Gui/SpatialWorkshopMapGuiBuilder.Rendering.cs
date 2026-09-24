@@ -466,9 +466,10 @@ public static partial class SpatialWorkshopMapGuiBuilder
     private static ElementBuilder MapFrame(object receiver, double zoom, Action<double>? setZoom)
     {
         var frame = WorkshopGui.Panel(receiver).Style("position", "relative").Style("min-width", "0")
-            .Style("min-height", "0").Style("overflow", "hidden")
+            .Style("min-height", "0").Style("overflow", "visible")
             .Style("border", $"1px solid {Cyan}55").Style("background", "#01060d")
-            .Style("transform", $"scale({Math.Clamp(zoom, .75, 2.5):0.###})").Style("transform-origin", "center center");
+            .Style("transform", $"scale({Math.Clamp(zoom, .75, 2.5):0.###})").Style("transform-origin", "center center")
+            .Style("isolation", "isolate");
 
         frame.Content(WorkshopGui.Element(receiver, "div").Style("position", "absolute").Style("right", ".5rem").Style("bottom", ".5rem")
             .Style("z-index", "10").Style("display", "flex").Style("gap", ".25rem")
