@@ -63,17 +63,17 @@ public sealed class MonikerExperienceTests
 
         Assert.Contains("WorkshopGui.Button(this)", gateway);
         Assert.Contains("WorkshopGui.Image(this)", gateway);
-        Assert.Contains(".Style("left", "50%")", gateway);
-        Assert.Contains(".Style("top", "50%")", gateway);
-        Assert.Contains(".Style("height", "100%")", gateway);
-        Assert.Contains(".Style("width", "auto")", gateway);
-        Assert.Contains(".Style("aspect-ratio", "1")", gateway);
-        Assert.Contains(".Style("transform", _gatewayHovered ? "translate(-50%,-50%) scale(1.2)" : "translate(-50%,-50%) scale(.72)")", gateway);
-        Assert.Contains(".Style("object-fit", "cover")", gateway);
-        Assert.Contains(".Style("object-position", "center")", gateway);
+        Assert.Contains(".Style(\"left\", \"50%\")", gateway);
+        Assert.Contains(".Style(\"top\", \"50%\")", gateway);
+        Assert.Contains(".Style(\"height\", \"100%\")", gateway);
+        Assert.Contains(".Style(\"width\", \"auto\")", gateway);
+        Assert.Contains(".Style(\"aspect-ratio\", \"1\")", gateway);
+        Assert.Contains(".Style(\"transform\", _gatewayHovered ? \"translate(-50%,-50%) scale(1.2)\" : \"translate(-50%,-50%) scale(.72)\")", gateway);
+        Assert.Contains(".Style(\"object-fit\", \"cover\")", gateway);
+        Assert.Contains(".Style(\"object-position\", \"center\")", gateway);
         Assert.Contains(".OnMouseEnter(() => _gatewayHovered = true)", gateway);
         Assert.Contains(".OnMouseLeave(() => _gatewayHovered = false)", gateway);
-        Assert.DoesNotContain("<button class="enter-workshop"", gateway);
+        Assert.DoesNotContain("<button class=\"enter-workshop\"", gateway);
 
     }
 
