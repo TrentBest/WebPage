@@ -65,15 +65,38 @@ public sealed class MonikerExperienceTests
         Assert.Contains("WorkshopGui.Image(this)", gateway);
         Assert.Contains(".Style(\"left\", \"50%\")", gateway);
         Assert.Contains(".Style(\"top\", \"50%\")", gateway);
-        Assert.Contains(".Style(\"width\", \"100cqh\")", gateway);
-        Assert.Contains(".Style(\"height\", \"100cqh\")", gateway);
-        Assert.Contains(".Style(\"transform\", _gatewayHovered ? \"translate(-50%,-50%) scale(1.16)\" : \"translate(-50%,-50%)\")", gateway);
+        Assert.Contains(".Style(\"width\", \"auto\")", gateway);
+        Assert.Contains(".Style(\"height\", \"72%\")", gateway);
+        Assert.Contains(".Style(\"aspect-ratio\", \"1\")", gateway);
+        Assert.Contains(".Style(\"transform\", $\"translate(-50%,-50%) scale(", gateway);
+        Assert.Contains("_gatewayHovered ? 1.55d : 1d", gateway);
+        Assert.Contains("GatewayBreath", gateway);
         Assert.Contains(".Style(\"object-fit\", \"cover\")", gateway);
         Assert.Contains(".Style(\"object-position\", \"center\")", gateway);
         Assert.Contains(".OnMouseEnter(() => _gatewayHovered = true)", gateway);
         Assert.Contains(".OnMouseLeave(() => _gatewayHovered = false)", gateway);
         Assert.DoesNotContain("<button class=\"enter-workshop\"", gateway);
 
+    }
+
+    [Fact(DisplayName = "Gateway breathing is driven by FSM ticks")]
+    public void GatewayBreathingIsFsmDriven()
+    {
+        using var service = new WorkshopExperienceService();
+        service.Initialize();
+
+        for (var i = 0; i < 90; i++)
+            service.Tick();
+
+        Assert.Equal("Gateway", service.FirstContact.CurrentState);
+        var first = service.FirstContact.GatewayBreath;
+
+        for (var i = 0; i < 12; i++)
+            service.Tick();
+
+        Assert.Equal("Gateway", service.FirstContact.CurrentState);
+        Assert.NotEqual(first, service.FirstContact.GatewayBreath);
+        Assert.InRange(service.FirstContact.GatewayBreath, 0d, 1d);
     }
 
     [Fact(DisplayName = "First-contact presentation is driven by explicit FSM phases")]
