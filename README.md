@@ -80,6 +80,31 @@ The durable guideposts are:
 
 The implementation route toward those goals is expected to evolve.
 
+## GUI architecture proving ground
+
+The WebPage is the first practical proving ground for [TheSingularityWorkshop.GUI](https://github.com/TrentBest/TheSingularityWorkshop.GUI).
+
+The intended boundary is:
+
+```
+WebPage experience
+      |
+      v
+semantic GUI model
+      |
+      v
+Blazor adapter
+      |
+      v
+browser manifestation
+```
+
+The WebPage should demonstrate the architecture by using the GUI repository to construct its reusable presentation layer while keeping Workshop-specific domain meaning in this repository.
+
+This separation matters because the WebPage is not merely documentation for the GUI. It is a real consumer of it. A developer evaluating the GUI should eventually be able to run the WebPage, observe the resulting experience, and then inspect the same boundary in source code.
+
+The migration is intentionally incremental on `development`. The production `master` manifestation remains a separate concern until the development slice is ready.
+
 ## The current landing experience
 
 The home page is intentionally **not a conventional marketing hero**.
