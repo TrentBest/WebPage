@@ -26,9 +26,9 @@
             <section class="flex-hello" aria-label="The Singularity Workshop">
                 <div class="flex-hello-orbit" aria-hidden="true"></div>
                 <div class="hello-moniker">
-                    <div class="hello-line">@RenderMonikerLine("THE", 0)</div>
-                    <div class="hello-line">@RenderMonikerLine("SINGULARITY", 3)</div>
-                    <div class="hello-line">@RenderMonikerLine("WORKSHOP", 14)</div>
+                    <div class="hello-line">@RenderMonikerLine("THE", 0, 1d)</div>
+                    <div class="hello-line">@RenderMonikerLine("SINGULARITY", 3, 5d)</div>
+                    <div class="hello-line">@RenderMonikerLine("WORKSHOP", 14, 3.5d)</div>
                 </div>
             </section>
         }
@@ -252,7 +252,7 @@
 
     [Parameter] public EventCallback OnEntryRequested { get; set; }
 
-    private static RenderFragment RenderMonikerLine(string text, int startIndex) => builder =>
+    private static RenderFragment RenderMonikerLine(string text, int startIndex, double midpoint) => builder =>
     {
         for (var glyphIndex = 0; glyphIndex < text.Length; glyphIndex++)
         {
@@ -270,7 +270,7 @@
 
             builder.OpenElement(0, "span");
             builder.AddAttribute(1, "class", $"hello-glyph {colorClass}");
-            builder.AddAttribute(2, "style", $"--phase:{phase}deg;--phase-index:{phaseIndex};");
+            builder.AddAttribute(2, "style", $"--phase:{phase}deg;--phase-index:{phaseIndex};--glyph-index:{glyphIndex};--glyph-midpoint:{midpoint:0.##};");
             builder.AddContent(3, text[glyphIndex].ToString());
             builder.CloseElement();
         }
