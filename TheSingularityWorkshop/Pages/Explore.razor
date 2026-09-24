@@ -388,8 +388,34 @@
         if (FsmScaffoldReady)
             root.Content(FsmScaffoldNotice());
         if (workshopMapVisible)
-            root.Content(SpatialWorkshopMapGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.User.DisplayName, SelectMapDestination, CloseWorkshopMap, workshopMapScope, workshopMapZoom, SetWorkshopMapZoom, SetWorkshopMapScope, WorkshopArrangement));
-        root.Content(WorkshopAiTerminalGuiBuilder.Build(this, Experience.User.DisplayName, Experience.User.AvatarUrl, WorkshopAiTerminalContext.ForMap(workshopMapScope, Scene), aiTerminalOpen, ToggleAiTerminal, CopyCurrentAiTerminalContext, aiTerminalResponse, value => aiTerminalResponse = value));
+        {
+            var hubIdentityDock = WorkshopAiTerminalGuiBuilder.Build(
+                this,
+                Experience.User.DisplayName,
+                Experience.User.AvatarUrl,
+                WorkshopAiTerminalContext.ForMap(workshopMapScope, Scene),
+                aiTerminalOpen,
+                ToggleAiTerminal,
+                CopyCurrentAiTerminalContext,
+                aiTerminalResponse,
+                value => aiTerminalResponse = value,
+                docked: true);
+
+            root.Content(SpatialWorkshopMapGuiBuilder.Build(
+                this,
+                Scene,
+                AvatarX,
+                AvatarY,
+                Experience.User.DisplayName,
+                SelectMapDestination,
+                CloseWorkshopMap,
+                workshopMapScope,
+                workshopMapZoom,
+                SetWorkshopMapZoom,
+                SetWorkshopMapScope,
+                WorkshopArrangement,
+                hubIdentityDock));
+        }
         return root;
     }
 
