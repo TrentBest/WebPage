@@ -54,6 +54,22 @@
     </script>
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script>
+        (function installWorkshopLoaderFade(){
+            const root=document.documentElement;
+            const check=window.setInterval(()=>{
+                const raw=getComputedStyle(root).getPropertyValue('--blazor-load-percentage').trim();
+                const percent=parseFloat(raw);
+                if(Number.isFinite(percent) && percent >= 75){
+                    root.classList.add('workshop-loader-complete');
+                }
+                if(!document.querySelector('.loading-progress')){
+                    window.clearInterval(check);
+                }
+            },40);
+        })();
+    </script>
+
+    <script>
         Blazor.start({
             loadBootResource:function(type,name,defaultUri,integrity){
                 if(type==='dotnetjs') return defaultUri;
