@@ -14,7 +14,8 @@ public static partial class SpatialWorkshopMapGuiBuilder
         double zoom = 1d,
         Action<double>? setZoom = null,
         Action<SpatialMapScope>? setScope = null,
-        SpatialWorkshopArrangement? arrangement = null)
+        SpatialWorkshopArrangement? arrangement = null,
+        ElementBuilder? hubIdentityDock = null)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("z-index", "200")
@@ -84,6 +85,8 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Text("SCROLL THE MAP LIST • SCALE WITH + / −"));
 
         panel.Content(scopeBar);
+        if (hubIdentityDock is not null)
+            panel.Content(hubIdentityDock);
 
         var layout = WorkshopGui.Element(receiver, "div")
             .Style("display", "grid")
