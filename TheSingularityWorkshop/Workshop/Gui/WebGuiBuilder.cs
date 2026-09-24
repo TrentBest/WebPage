@@ -4,21 +4,29 @@ namespace TheSingularityWorkshop.Workshop.Gui;
 
 /// <summary>
 /// Web manifestation of the platform-neutral recursive GUI builder.
-/// This is the first concrete platform family built on the shared GUI tree.
+/// This is the first concrete WebPage-facing builder over the shared GUI model.
 /// </summary>
 public sealed class WebGuiBuilder : ICoreGuiBuilder<RenderFragment>
 {
     private readonly GuiBuilder _semanticBuilder;
+    private readonly string _kind;
+    private readonly string _id;
 
-    private WebGuiBuilder(GuiBuilder semanticBuilder, WebGuiBuilder? parent)
+    private WebGuiBuilder(
+        GuiBuilder semanticBuilder,
+        string kind,
+        string id,
+        WebGuiBuilder? parent)
     {
         _semanticBuilder = semanticBuilder;
+        _kind = kind;
+        _id = id;
         Parent = parent;
     }
 
     /// <summary>Creates a new root web builder.</summary>
     public static WebGuiBuilder Create(string kind, string id)
-        => new(GuiBuilder.Create(kind, id), null);
+        => new(GuiBuilder.Create(kind, id), kind, id, null);
 
     /// <summary>Creates a semantic panel.</summary>
     public static WebGuiBuilder Panel(string id)
@@ -48,10 +56,10 @@ public sealed class WebGuiBuilder : ICoreGuiBuilder<RenderFragment>
     public object? Parent { get; }
 
     /// <summary>Gets the semantic node kind.</summary>
-    public string Kind => _semanticBuilder.Kind;
+    public string Kind => _kind;
 
     /// <summary>Gets the stable builder identifier.</summary>
-    public string GetBuilderId() => _semanticBuilder.GetBuilderId();
+    public string GetBuilderId() => _id;
 
     /// <summary>Sets text content.</summary>
     public WebGuiBuilder Text(string text)
@@ -95,8 +103,8 @@ public sealed class WebGuiBuilder : ICoreGuiBuilder<RenderFragment>
         => Property("command", commandId);
 
     /// <summary>
-    /// Recursively composes another builder. The child is still represented by the
-    /// platform-neutral <see cref="GuiNode"/> tree before Web rendering occurs.
+    /// Recursively composes another builder. The child is represented by the
+    /// shared platform-neutral <see cref="GuiNode"/> tree before Web rendering occurs.
     /// </summary>
     public WebGuiBuilder Child(
         string kind,
@@ -106,7 +114,7 @@ public sealed class WebGuiBuilder : ICoreGuiBuilder<RenderFragment>
         _semanticBuilder.Child(
             kind,
             id,
-            child => configure?.Invoke(new WebGuiBuilder(child, this)));
+            child => configure?.Invoke(new WebGuiBuilder(child, kind, id, this)));
 
         return this;
     }
@@ -117,5 +125,4 @@ public sealed class WebGuiBuilder : ICoreGuiBuilder<RenderFragment>
     /// <summary>Manifests the tree as a Blazor render fragment.</summary>
     public RenderFragment Build()
         => BlazorGuiRenderer.Render(BuildNode());
-
 }
