@@ -28,9 +28,9 @@ public sealed class SpatialConstructionAndMapTests
         Assert.Contains("MapBuildingGeometry(receiver, item, b, accent)", map);
         Assert.Contains("workshop-map-building-info", map);
         Assert.Contains("SingularityCampusCatalog.Buildings.FirstOrDefault", map);
-        Assert.Contains("Attribute(" + ""points"" + ", "5,13 13,5 87,5 95,13 95,87 87,95 13,95 5,87")", map);
+        Assert.Contains("Attribute(\"points\", \"5,13 13,5 87,5 95,13 95,87 87,95 13,95 5,87\")", map);
         Assert.Contains("workshop-map-directory-item", map);
-        Assert.Contains("CLICK TO NAVIGATE // SECOND CLICK ENTERS", map);
+        Assert.Contains("HOVER FOR LIVE DETAILS", map);
     }
 
     [Fact(DisplayName = "Workshop map docks You and AI below its navigation controls")]
@@ -50,7 +50,7 @@ public sealed class SpatialConstructionAndMapTests
         Assert.Contains("panel.Content(scopeBar);", map);
         Assert.Contains("panel.Content(hubIdentityDock);", map);
         Assert.Contains("bool docked = false", ai);
-        Assert.Contains(".Style("position", docked ? "relative" : "fixed")", ai);
+        Assert.Contains(".Style(\"position\", docked ? \"relative\" : \"fixed\")", ai);
         Assert.Contains("SESSION LINK", ai);
     }
 
