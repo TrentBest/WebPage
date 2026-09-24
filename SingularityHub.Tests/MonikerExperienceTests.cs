@@ -30,7 +30,7 @@ public sealed class MonikerExperienceTests
             "..", "..", "..", "..",
             "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
-        Assert.Contains(".moniker-foreground", home);
+        Assert.DoesNotContain(".moniker-foreground", home);
         Assert.Contains("THE", home);
         Assert.Contains("SINGULARITY", home);
         Assert.Contains("WORKSHOP", home);
