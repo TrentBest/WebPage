@@ -1,13 +1,21 @@
+using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.Plant;
 
 namespace TheSingularityWorkshop.Services;
 
-/// <summary>Owns the page lifecycle and the first-contact presentation FSM.</summary>
+/// <summary>
+/// Owns the page lifecycle and the first-contact presentation FSM.
+/// FSM_COS assembles the semantic composition; the Experience remains responsible
+/// for executing the presentation of that composition.
+/// </summary>
 public sealed class WorkshopExperienceService : IDisposable
 {
     public event Action? StateChanged;
 
     private readonly FirstContactFsm _firstContact = new();
+    private readonly IFsmCos _compositionSystem =
+        new FsmCos(new WorkshopCompositionCatalog());
     private bool _disposed;
 
     public string CurrentState { get; private set; } = "Intro";
@@ -17,12 +25,33 @@ public sealed class WorkshopExperienceService : IDisposable
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public FirstContactFsm FirstContact => _firstContact;
 
+    /// <summary>Semantic runtime assembly produced for the current WebForge host.</summary>
+    public RuntimeAssembly? RuntimeAssembly { get; private set; }
+
+    /// <summary>Semantic Moniker composition assembled by FSM_COS, before presentation executes.</summary>
+    public GuiNode? MonikerComposition =>
+        RuntimeAssembly?.LoadedBundles
+            .OfType<MonikerCompositionBundle>()
+            .Select(bundle => bundle.Composition)
+            .FirstOrDefault(composition => composition is not null);
+
     public void Initialize(bool returningVisitor = false)
     {
         if (IsInitialized) return;
 
         IsInitialized = true;
         IsFirstVisit = !returningVisitor;
+
+        // The first manifest is intentionally tiny: the Moniker is the zeroth
+        // composition slot. FSM_COS loads/arbitrates it without executing its
+        // presentation Experience.
+        RuntimeAssembly = _compositionSystem.Execute(
+            new RuntimeManifest(
+                RuntimeId: 1UL,
+                Bundles: new[]
+                {
+                    BundleRequest.Unconfigured(MonikerCompositionBundle.BundleId)
+                }));
 
         // Every browser launch begins at the authored first-contact boundary.
         // Returning-visitor persistence must not bypass the perception sequence.
