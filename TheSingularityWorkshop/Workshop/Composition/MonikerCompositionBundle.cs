@@ -1,0 +1,37 @@
+using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.Workshop.Gui;
+
+namespace TheSingularityWorkshop.Workshop.Composition;
+
+/// <summary>
+/// Semantic Moniker composition assembled by FSM_COS.
+/// This bundle describes what is present; it does not execute the Moniker's
+/// swaying presentation. The presentation remains an Experience concern.
+/// </summary>
+public sealed class MonikerCompositionBundle : IMicroBundle
+{
+    public const ulong BundleId = 0UL;
+
+    public ulong Id => BundleId;
+    public IReadOnlyList<BundleRequest> Dependencies => Array.Empty<BundleRequest>();
+    public GuiNode? Composition { get; private set; }
+
+    public void Load(MicroBundleLoadContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        Composition = GuiBuilder
+            .Create("Panel", "moniker-composition")
+            .Property("composition", "Moniker")
+            .Child("Text", "the", text => text.Text("THE"))
+            .Child("Text", "singularity", text => text.Text("SINGULARITY"))
+            .Child("Text", "workshop", text => text.Text("WORKSHOP"))
+            .Build();
+    }
+
+    public bool Arbitrate(ArbitrationContext context, int roundIndex)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        return false;
+    }
+}
