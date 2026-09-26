@@ -142,7 +142,7 @@ public sealed record FsmForgeUpdateCountCondition(int Minimum) : FsmForgeConditi
         => context.UpdateCount >= Minimum;
 
     public override string Scaffold
-        => $"return context.UpdateCount >= {Minimum};";
+        => $"// Forge preview condition: UpdateCount >= {Minimum}. Bind this to the application context.\n        return false;";
 }
 
 public sealed record FsmForgeSignalCondition(string Signal) : FsmForgeCondition
@@ -151,5 +151,5 @@ public sealed record FsmForgeSignalCondition(string Signal) : FsmForgeCondition
         => context.Signals.Contains(Signal);
 
     public override string Scaffold
-        => $"return context.Signals.Contains(\"{Signal}\");";
+        => $"// Forge preview condition: signal \"{Signal}\". Bind this to the application context.\n        return false;";
 }
