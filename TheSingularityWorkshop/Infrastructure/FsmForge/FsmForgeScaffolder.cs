@@ -15,7 +15,8 @@ public static class FsmForgeScaffolder
         ArgumentException.ThrowIfNullOrWhiteSpace(className);
 
         var sb = new StringBuilder();
-        sb.AppendLine("using TheSingularityWorkshop.FSM_API;");
+        sb.AppendLine("using TheSingularityWorkshop.FSM_API;
+using FsmApi = TheSingularityWorkshop.FSM_API.FSM_API;");
         sb.AppendLine();
         sb.AppendLine($"public static class {className}");
         sb.AppendLine("{");
