@@ -131,7 +131,7 @@ public sealed class FsmForgePreviewTests
         Assert.Contains(".State(\"Running\"", scaffold, StringComparison.Ordinal);
         Assert.Contains(".WithInitialState(\"Idle\")", scaffold, StringComparison.Ordinal);
         Assert.Contains(".Transition(\"Idle\", \"Running\", ShouldRun)", scaffold, StringComparison.Ordinal);
-        Assert.Contains("context.Signals.Contains(\"RUN\")", scaffold, StringComparison.Ordinal);
+        Assert.Contains("Forge preview condition: signal \"RUN\"", scaffold, StringComparison.Ordinal);
         Assert.Contains("TODO: replace the scaffold", scaffold, StringComparison.Ordinal);
     }
 }
