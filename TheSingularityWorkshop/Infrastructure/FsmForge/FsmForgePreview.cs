@@ -5,9 +5,9 @@ namespace TheSingularityWorkshop.Infrastructure.FsmForge;
 
 /// <summary>
 /// A tiny context used only by the Forge preview. It gives the real FSM API a
-/// valid context while keeping the preview independent of any application domain.
+/// valid context while allowing optional MicroBundle capabilities to be attached.
 /// </summary>
-public sealed class FsmForgePreviewContext : IStateContext
+public class FsmForgePreviewContext : IStateContext
 {
     public string Name { get; set; } = "ForgePreview";
     public int Context_ID => 1;
@@ -24,7 +24,7 @@ public sealed class FsmForgePreview
 {
     private static int _definitionSequence;
     private FSMHandle? _handle;
-    private FsmForgePreviewContext? _context;
+    private FsmForgeLogicContext? _context;
     private readonly List<string> _events = new();
 
     public string State => _handle?.CurrentState ?? "NOT STARTED";
@@ -32,6 +32,7 @@ public sealed class FsmForgePreview
     public IReadOnlyList<string> Events => _events;
     public bool IsRunning => _handle?.IsValid == true;
     public FsmForgeDefinition? Definition { get; private set; }
+    public FsmForgeLogicContext? Context => _context;
 
     public bool CanPreview(FsmForgeDefinition definition, out string reason)
         => definition.CanPreview(out reason);
@@ -50,7 +51,7 @@ public sealed class FsmForgePreview
 
         var suffix = Interlocked.Increment(ref _definitionSequence);
         var name = $"WorkshopForgePreview_{suffix}";
-        _context = new FsmForgePreviewContext();
+        _context = new FsmForgeLogicContext();
         _events.Clear();
         Definition = definition;
 
@@ -64,13 +65,7 @@ public sealed class FsmForgePreview
                 onEnter: _ => _events.Add($"OnInitialize → {state.Name}"),
                 onUpdate: ctx =>
                 {
-                    if (state.Name.Equals(definition.InitialState, StringComparison.Ordinal) ||
-                        definition.States.Count > 0)
-                    {
-                        if (ReferenceEquals(ctx, _context))
-                            _context.UpdateCount++;
-                    }
-
+                    _context.UpdateCount++;
                     _events.Add($"OnUpdate → {state.Name}");
                 },
                 onExit: _ => _events.Add($"OnExit → {state.Name}"));
@@ -89,6 +84,9 @@ public sealed class FsmForgePreview
         builder.BuildDefinition();
         _handle = FsmApi.Create.CreateInstance(name, _context, "ForgePreview");
     }
+
+    public void AttachBundle(TheSingularityWorkshop.FSM_COS.IMicroBundle bundle)
+        => _context?.AttachBundle(bundle);
 
     public void SetSignal(string signal, bool enabled = true)
     {
