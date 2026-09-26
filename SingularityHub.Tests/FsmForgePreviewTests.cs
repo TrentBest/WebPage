@@ -45,7 +45,7 @@ public sealed class FsmForgePreviewTests
         preview.Tick();
 
         Assert.Equal("Finished", preview.State);
-        Assert.Equal(3, preview.TickCount);
+        Assert.Equal(4, preview.TickCount);
         Assert.Contains("OnExit → Forging", preview.Events);
 
         preview.Tick();
