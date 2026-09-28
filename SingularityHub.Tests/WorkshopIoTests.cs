@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.FSM_Serialization;
 using TheSingularityWorkshop.Workshop.IO;
 using Xunit;
 
