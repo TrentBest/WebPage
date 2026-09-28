@@ -14,7 +14,7 @@ The address is deliberately independent of source-file names and test-runner ord
 
 ## One-to-one test ownership
 
-Behavioral test classes follow the production type they test. A production type gets one corresponding test class, and that class owns the complete public surface of that type. Do not create `*DomainTests` aggregation classes that mix unrelated production types.
+Behavioral test classes follow the production type they test. A production type gets one corresponding test class, and that class owns the complete public surface of that type. Do not create `*DomainTests` aggregation classes that mix unrelated production types. Test class names should describe the production contract directly: `MicroBundleTests`, `ArbitrationTests`, `ProviderTests`, and so on.
 
 Interfaces and value types are production contracts too; they receive the same one-to-one treatment when they have public behavior or surface that must be verified.
 
