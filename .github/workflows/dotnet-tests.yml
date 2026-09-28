@@ -43,9 +43,11 @@ jobs:
           retention-days: 14
           if-no-files-found: error
       - name: Upload coverage to Codecov
-        if: always() && secrets.CODECOV_TOKEN != ''
+        if: always() && env.CODECOV_TOKEN != ''
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         uses: codecov/codecov-action@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ env.CODECOV_TOKEN }}
           files: ./TestResults/**/coverage.cobertura.xml
           fail_ci_if_error: true
