@@ -2,6 +2,8 @@
 
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![FSM_API](https://img.shields.io/badge/FSM_API-1.0.13-00A98F?style=flat-square)](https://github.com/TrentBest/FSM_API)
+[![FSM_Serialization](https://img.shields.io/badge/FSM_Serialization-0.1.0--alpha.2-8A2BE2?style=flat-square)](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization)
+[![NuGet](https://img.shields.io/nuget/v/TheSingularityWorkshop.FSM_Serialization.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/)
 [![Repository](https://img.shields.io/badge/repository-private-6e7781?style=flat-square&logo=github)](https://github.com/TrentBest/WebPage)
 [![Tests](https://img.shields.io/badge/tests-manual%20CI-f39c12?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/TrentBest/WebPage/actions)
 
