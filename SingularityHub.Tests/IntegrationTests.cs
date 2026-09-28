@@ -12,8 +12,8 @@ namespace SingularityHub.Tests;
 public sealed class IntegrationTests
 {
     [ArchitectureTest(4, 1, 1)]
-    [Fact(DisplayName = "4.01.001 — Workshop_Element_Is_A_MicroBundle_Domain_Object")]
-    public void Workshop_Element_Is_A_MicroBundle_Domain_Object()
+    [Fact(DisplayName = "4.01.001 — Workshop_Element_Implements_MicroBundle_Contract")]
+    public void Workshop_Element_Implements_MicroBundle_Contract()
     {
         var element = new MicroBundle(4001, "Integration", new WebMicroBundleProvider());
         Assert.IsAssignableFrom<TheSingularityWorkshop.Workshop.MicroBundles.IMicroBundle>(element);
