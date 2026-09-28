@@ -8,10 +8,10 @@ namespace SingularityHub.Tests;
 
 public sealed class RecursiveGuiBuilderTests
 {
-    [Fact(DisplayName = "Incremental Unit Test 05 — Gateway is a recursively composed GUI tree")]
+    [Fact(DisplayName = "Incremental Unit Test 05 — Gateway uses the canonical Workshop identity image")]
     public void IncrementalUnitTest05_GatewayIsRecursivelyComposed()
     {
-        const string avatar = "https://avatars.githubusercontent.com/u/16405167?v=4";
+        const string avatar = "/Images/TheSingularityWorkshopLogo.png";
 
         var gateway = GuiBuilder
             .Create("Panel", "gateway")
