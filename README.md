@@ -510,3 +510,29 @@ That's the point of a workshop.
 *This way leads to the Singularity.*
 
 *Built by The Singularity Workshop.*
+
+---
+
+## 🔗 Resources & Support
+
+### 📦 Get FSM_API
+
+- **Unity Asset Store:** [FSM_API for Unity](https://assetstore.unity.com/packages/slug/332450)
+- **Core NuGet:** [TheSingularityWorkshop.FSM_API](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_API)
+- **Source Code:** [WebPage on GitHub](https://github.com/TrentBest/WebPage)
+
+### 💖 Support The Singularity Workshop
+
+- **Patreon:** [Support us on Patreon](https://www.patreon.com/c/TheSingularityWorkshop)
+- **PayPal:** [Make a donation](https://www.paypal.com/donate/?hosted_button_id=3Z7263LCQMV9J)
+
+<p align="center">
+  <a href="https://github.com/TrentBest/FSM_API">
+    <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" height="200">
+  </a>
+</p>
+
+<p align="center">
+  <em>The Singularity Workshop — Tools for the curious, the bold, and the systemically inclined.</em><br>
+  <strong>Because state shouldn't be a mess.</strong>
+</p>
