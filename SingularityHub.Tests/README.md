@@ -33,3 +33,18 @@ public void V0_0_77() => Assert.Equal("0.0.77", "0.0.77");
 The version string is intentionally boring. It records the version claimed by the commit. It does not replace behavioral tests, and behavioral tests must not be moved into the version ledger.
 
 There must not be another `IncrementalVersion###Tests.cs` class.
+
+
+---
+
+## 🔗 The Singularity Workshop
+
+This project is part of a deliberately troublesome ecosystem:
+
+- **[FSM_API](https://github.com/TrentBest/FSM_API)** — behavior and state.
+- **[FSM_COS](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS)** — composition and runtime assembly.
+- **[FSM_Serialization](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization)** — representation and the byte boundary.
+- **[WebPage](https://github.com/TrentBest/WebPage)** — browser manifestation and proving ground.
+- **[FSM_API_Unity](https://github.com/TrentBest/FSM_API_Unity)** — Unity manifestation.
+
+<p align="center"><em>The Singularity Workshop — Tools for the curious, the bold, and the systemically inclined.</em><br><strong>Because state shouldn't be a mess.</strong><br><em>And because static boundaries are invitations to cause trouble.</em></p>
