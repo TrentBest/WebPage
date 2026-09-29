@@ -153,4 +153,13 @@ public sealed class IncrementalVersionTests
     }
 
 
+
+    [ArchitectureTest(0, 0, 172)] [Fact(DisplayName = "V0.0.172 — WebForge_Explicitly_Separates_Direct_And_FSM_COS_Integration_Paths")]
+    public void V0_0_172WebForgeExplicitlySeparatesDirectAndFsmCosIntegrationPaths()
+    {
+        Assert.Equal(
+            new[] { "Direct", "FsmCos" },
+            Enum.GetNames<TheSingularityWorkshop.Workshop.Composition.WorkshopIntegrationMode>());
+    }
+
 }
