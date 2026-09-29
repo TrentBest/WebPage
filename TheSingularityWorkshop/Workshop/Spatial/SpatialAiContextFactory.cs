@@ -14,20 +14,20 @@ public static class SpatialAiContextFactory
     {
         var contextIds = new[]
         {
-            ProtocolAi.Identity("spatial.plan"),
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.plan"),
             ProtocolAi.Identity("spatial.position"),
             ProtocolAi.Identity("spatial.footprint")
         };
 
         var operations = new[]
         {
-            ProtocolAi.Select,
-            ProtocolAi.MoveNorth,
-            ProtocolAi.MoveSouth,
-            ProtocolAi.MoveWest,
-            ProtocolAi.MoveEast,
-            ProtocolAi.Open,
-            ProtocolAi.RequestAecReview
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Select,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveNorth,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveSouth,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveWest,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveEast,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Open,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.RequestAecReview
         };
 
         var allowed = new[]
