@@ -60,6 +60,7 @@ public sealed class WorkshopCompositionTests
 
         experience.RequestEntry();
         experience.Tick();
+        experience.Tick();
         experience.SelectIntegration(WorkshopIntegrationMode.FsmCos);
     }
 }
