@@ -34,7 +34,7 @@ public sealed class ExperienceDefinitionTests
             "Workshop",
             [new ExperienceSurfaceDefinition("shell", gui)]);
 
-        Assert.IsAssignableFrom<ICoreGuiBuilder<GuiNode>>(
+        Assert.IsNotAssignableFrom<ICoreGuiBuilder<GuiNode>>(
             GuiBuilder.Create("Panel", "builder"));
 
         Assert.Equal("Panel", experience.FindSurface("shell").Gui.Kind);
