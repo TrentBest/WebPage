@@ -46,6 +46,10 @@
             builder.AddAttribute(9,"State","Landing");
             builder.AddAttribute(10,"Ticks",Experience.FirstContact.StateTicks);
             builder.CloseComponent();
+
+            builder.OpenComponent<ForgeProofView>(11);
+            builder.AddAttribute(12,"Experience",Experience);
+            builder.CloseComponent();
         }
     };
 

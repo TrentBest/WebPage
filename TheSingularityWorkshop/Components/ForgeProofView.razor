@@ -1,0 +1,99 @@
+@using Microsoft.AspNetCore.Components
+@using TheSingularityWorkshop.Infrastructure.FsmForge
+@using TheSingularityWorkshop.Services
+@implements IDisposable
+
+@code {
+    [Parameter, EditorRequired]
+    public WorkshopExperienceService Experience { get; set; } = null!;
+
+    private readonly FsmForgePreview _preview = new();
+
+    private RenderFragment BuildProof() => builder =>
+    {
+        var assembly = Experience.RuntimeAssembly;
+        var composition = Experience.MonikerComposition;
+        var compositionText = composition is null
+            ? "NOT ASSEMBLED"
+            : string.Join(" / ", composition.Children.Select(child => child.Text));
+
+        var root = WorkshopGui.Panel(this)
+            .Style("position", "absolute").Style("right", "2vw").Style("bottom", "2vh")
+            .Style("z-index", "25").Style("width", "min(430px,38vw)").Style("min-width", "300px")
+            .Style("max-height", "58vh").Style("overflow", "auto").Style("padding", "1rem")
+            .Style("box-sizing", "border-box")
+            .Style("border", "1px solid rgba(0,234,255,.55)")
+            .Style("background", "rgba(2,8,16,.91)")
+            .Style("box-shadow", "0 0 35px rgba(0,234,255,.12), inset 0 0 24px rgba(0,234,255,.035)")
+            .Style("color", "#dceaf2").Style("font-family", "Consolas,'Courier New',monospace");
+
+        root.Content(WorkshopGui.Element(this, "div").Style("color", "#00eaff").Style("font-size", ".68rem")
+            .Style("font-weight", "800").Style("letter-spacing", ".18em").Text("WEBFORGE // LIVE COMPOSITION"));
+
+        root.Content(WorkshopGui.Element(this, "div").Style("margin-top", ".3rem").Style("color", "#8fa7b2")
+            .Style("font-size", ".48rem").Style("letter-spacing", ".08em")
+            .Text("THIS PANEL READS THE ACTUAL ASSEMBLY. IT IS NOT TELEMETRY DECORATION."));
+
+        root.Content(Metric("RUNTIME", assembly is null ? "NOT INITIALIZED" : $"0x{assembly.RuntimeId:X16}"));
+        root.Content(Metric("MICROBUNDLES", assembly?.Bundles.Count.ToString() ?? "0"));
+        root.Content(Metric("ARBITRATION", assembly is null ? "—" : $"{assembly.ArbitrationRounds} ROUND(S)"));
+        root.Content(Metric("MONIKER", compositionText));
+
+        root.Content(WorkshopGui.Element(this, "div")
+            .Style("margin-top", ".75rem").Style("padding-top", ".7rem")
+            .Style("border-top", "1px solid rgba(0,234,255,.18)")
+            .Content(WorkshopGui.Element(this, "div").Style("color", "#ffd34d").Style("font-size", ".58rem")
+                .Style("letter-spacing", ".15em").Text("FSM FORGE PREVIEW"))
+            .Content(WorkshopGui.Element(this, "div").Style("margin-top", ".35rem").Style("font-size", ".8rem")
+                .Style("font-weight", "800").Style("color", _preview.IsRunning ? "#52e05a" : "#ff2cff")
+                .Text($"STATE // {_preview.State}"))
+            .Content(WorkshopGui.Element(this, "div").Style("margin-top", ".2rem").Style("font-size", ".48rem")
+                .Style("color", "#8fa7b2").Text($"UPDATES // {_preview.TickCount}"))
+            .Content(WorkshopGui.Element(this, "div").Style("display", "flex").Style("gap", ".35rem")
+                .Style("flex-wrap", "wrap").Style("margin-top", ".55rem")
+                .Content(ActionButton("START", StartPreview, "#00eaff"))
+                .Content(ActionButton("TICK", TickPreview, "#ffd34d"))
+                .Content(ActionButton("STOP", StopPreview, "#ff2cff"))));
+
+        foreach (var entry in _preview.Events.TakeLast(5))
+        {
+            root.Content(WorkshopGui.Element(this, "div").Style("margin-top", ".2rem")
+                .Style("padding-left", ".45rem").Style("border-left", "1px solid rgba(0,234,255,.28)")
+                .Style("color", "#a8bbc4").Style("font-size", ".43rem").Text(entry));
+        }
+
+        builder.AddContent(0, root.Build());
+    };
+
+    private ElementBuilder Metric(string name, string value)
+        => WorkshopGui.Element(this, "div").Style("display", "grid")
+            .Style("grid-template-columns", "7.5rem 1fr").Style("gap", ".5rem").Style("margin-top", ".35rem")
+            .Content(WorkshopGui.Element(this, "span").Style("color", "#8fa7b2").Style("font-size", ".46rem").Text(name))
+            .Content(WorkshopGui.Element(this, "span").Style("color", "#eefaff").Style("font-size", ".48rem").Text(value));
+
+    private ElementBuilder ActionButton(string label, Action action, string accent)
+        => WorkshopGui.Button(this).Label(label).Style("padding", ".35rem .55rem")
+            .Style("border", $"1px solid {accent}88").Style("background", $"{accent}10").Style("color", accent)
+            .Style("font-family", "inherit").Style("font-size", ".45rem").Style("font-weight", "800")
+            .Style("letter-spacing", ".08em").Style("cursor", "pointer").OnClick(action);
+
+    private void StartPreview()
+    {
+        if (!_preview.IsRunning) _preview.Start();
+        StateHasChanged();
+    }
+
+    private void TickPreview()
+    {
+        _preview.Tick();
+        StateHasChanged();
+    }
+
+    private void StopPreview()
+    {
+        _preview.Stop();
+        StateHasChanged();
+    }
+
+    public void Dispose() => _preview.Stop();
+}
