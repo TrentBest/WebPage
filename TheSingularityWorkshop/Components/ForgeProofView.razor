@@ -1,9 +1,12 @@
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
 @using TheSingularityWorkshop.Infrastructure.FsmForge
 @using TheSingularityWorkshop.Services
 @implements IDisposable
 
 @code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
     [Parameter, EditorRequired]
     public WorkshopExperienceService Experience { get; set; } = null!;
 
@@ -53,7 +56,8 @@
                 .Style("flex-wrap", "wrap").Style("margin-top", ".55rem")
                 .Content(ActionButton("START", StartPreview, "#00eaff"))
                 .Content(ActionButton("TICK", TickPreview, "#ffd34d"))
-                .Content(ActionButton("STOP", StopPreview, "#ff2cff"))));
+                .Content(ActionButton("STOP", StopPreview, "#ff2cff"))
+                .Content(ActionButton("ENTER FORGE", EnterForge, "#52e05a"))));
 
         foreach (var entry in _preview.Events.TakeLast(5))
         {
@@ -94,6 +98,9 @@
         _preview.Stop();
         StateHasChanged();
     }
+
+    private void EnterForge()
+        => Navigation.NavigateTo("/explore");
 
     public void Dispose() => _preview.Stop();
 }
