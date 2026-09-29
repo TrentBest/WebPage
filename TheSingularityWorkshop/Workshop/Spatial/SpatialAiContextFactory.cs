@@ -10,13 +10,15 @@ namespace TheSingularityWorkshop.Gui;
 /// </summary>
 public static class SpatialAiContextFactory
 {
+    private const string ProtocolType = "TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi";
+
     public static IAiInteractable Create(SpatialInteractable item, SpatialBounds bounds)
     {
         var contextIds = new[]
         {
             TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.plan"),
-            ProtocolAi.Identity("spatial.position"),
-            ProtocolAi.Identity("spatial.footprint")
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.position"),
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.footprint")
         };
 
         var operations = new[]
@@ -32,10 +34,10 @@ public static class SpatialAiContextFactory
 
         var allowed = new[]
         {
-            ProtocolAi.MoveNorth,
-            ProtocolAi.MoveSouth,
-            ProtocolAi.MoveWest,
-            ProtocolAi.MoveEast
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveNorth,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveSouth,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveWest,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveEast
         };
 
         return new SpatialAiInteractable(
@@ -55,9 +57,9 @@ public static class SpatialAiContextFactory
         {
             HumanContext = new Dictionary<int, string>
             {
-                [ProtocolAi.Identity("spatial.plan")] = "WORKSHOP MASTER PLAN",
-                [ProtocolAi.Identity("spatial.position")] = $"X={bounds.X:0.##},Y={bounds.Y:0.##}",
-                [ProtocolAi.Identity("spatial.footprint")] = $"W={bounds.Width:0.##},H={bounds.Height:0.##}"
+                [TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.plan")] = "WORKSHOP MASTER PLAN",
+                [TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.position")] = $"X={bounds.X:0.##},Y={bounds.Y:0.##}",
+                [TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.footprint")] = $"W={bounds.Width:0.##},H={bounds.Height:0.##}"
             }
         };
     }
