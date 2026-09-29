@@ -151,6 +151,5 @@ public sealed class IncrementalVersionTests
             TheSingularityWorkshop.World.WorkshopPresentationMode.ThreeDimensional,
             level.HiddenSwitch.Capability.ResultingPresentationMode);
     }
-
-
+    [ArchitectureTest(0, 0, 172)] [Fact(DisplayName = "V0.0.172 — AI_Exchange_Human_Loop_Uses_Alternating_Clipboard_Rounds_And_Stacked_Responses")] public void V0_0_172_AiExchangeHumanLoopUsesAlternatingClipboardRoundsAndStackedResponses() => Assert.Equal("0.0.172", "0.0.172");
 }
