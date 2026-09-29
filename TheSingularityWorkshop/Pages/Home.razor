@@ -4,6 +4,7 @@
 @implements IDisposable
 @using Microsoft.AspNetCore.Components
 @using TheSingularityWorkshop.Services
+@using TheSingularityWorkshop.Workshop.Composition
 <PageTitle>The Singularity Workshop</PageTitle>
 
 @BuildRootGui()
@@ -30,25 +31,33 @@
     {
         if (Experience.CurrentState == "FirstContact")
         {
-            builder.OpenComponent<FirstContactView>(0);
-            builder.AddAttribute(1,"State",Experience.FirstContact.CurrentState);
-            builder.AddAttribute(2,"Ticks",Experience.FirstContact.StateTicks);
-            builder.AddAttribute(3,"PresentationProgress",Experience.FirstContact.PresentationProgress);
-            builder.AddAttribute(4,"StatementOpacity",Experience.FirstContact.StatementOpacity);
-            builder.AddAttribute(5,"QuestionOpacity",Experience.FirstContact.QuestionOpacity);
-            builder.AddAttribute(6,"GatewayBreathValue",Experience.FirstContact.GatewayBreath);
-            builder.AddAttribute(7,"OnEntryRequested",EventCallback.Factory.Create(this,EnterWorkshop));
+            if (Experience.FirstContact.IsIntegrationChoice)
+            {
+                builder.OpenComponent<IntegrationChoiceView>(0);
+                builder.AddAttribute(1,"OnSelected",EventCallback.Factory.Create<WorkshopIntegrationMode>(this,SelectIntegration));
+                builder.CloseComponent();
+                return;
+            }
+
+            builder.OpenComponent<FirstContactView>(2);
+            builder.AddAttribute(3,"State",Experience.FirstContact.CurrentState);
+            builder.AddAttribute(4,"Ticks",Experience.FirstContact.StateTicks);
+            builder.AddAttribute(5,"PresentationProgress",Experience.FirstContact.PresentationProgress);
+            builder.AddAttribute(6,"StatementOpacity",Experience.FirstContact.StatementOpacity);
+            builder.AddAttribute(7,"QuestionOpacity",Experience.FirstContact.QuestionOpacity);
+            builder.AddAttribute(8,"GatewayBreathValue",Experience.FirstContact.GatewayBreath);
+            builder.AddAttribute(9,"OnEntryRequested",EventCallback.Factory.Create(this,EnterWorkshop));
             builder.CloseComponent();
         }
         else if (Experience.CurrentState == "Intro")
         {
-            builder.OpenComponent<FirstContactView>(8);
-            builder.AddAttribute(9,"State","Landing");
-            builder.AddAttribute(10,"Ticks",Experience.FirstContact.StateTicks);
+            builder.OpenComponent<FirstContactView>(10);
+            builder.AddAttribute(11,"State","Landing");
+            builder.AddAttribute(12,"Ticks",Experience.FirstContact.StateTicks);
             builder.CloseComponent();
 
-            builder.OpenComponent<ForgeProofView>(11);
-            builder.AddAttribute(12,"Experience",Experience);
+            builder.OpenComponent<ForgeProofView>(13);
+            builder.AddAttribute(14,"Experience",Experience);
             builder.CloseComponent();
         }
     };
@@ -74,6 +83,9 @@
         await JS.InvokeVoidAsync("interop.markWorkshopVisited");
         Experience.RequestEntry();
     }
+
+    private void SelectIntegration(WorkshopIntegrationMode mode)
+        => Experience.SelectIntegration(mode);
 
     private void Tick(object? sender,System.Timers.ElapsedEventArgs e)
     {
