@@ -1,3 +1,5 @@
+using TheSingularityWorkshop.FSM_Serialization;
+
 namespace TheSingularityWorkshop.Workshop.IO;
 
 public interface IFileSystem
