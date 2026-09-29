@@ -18,6 +18,7 @@ public sealed class MonikerExperienceTests
         Assert.Equal("Gateway", service.FirstContact.CurrentState);
         service.RequestEntry();
         service.Tick();
+        service.Tick();
         service.SelectIntegration(WorkshopIntegrationMode.Direct);
         service.Tick();
 
@@ -67,6 +68,7 @@ public sealed class MonikerExperienceTests
         Assert.Equal("Gateway", service.FirstContact.CurrentState);
 
         service.RequestEntry();
+        service.Tick();
         service.Tick();
         service.SelectIntegration(WorkshopIntegrationMode.Direct);
 
