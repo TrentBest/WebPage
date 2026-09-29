@@ -26,6 +26,7 @@ public readonly record struct HubTabAcquisition(
     ulong SourceId,
     string? Selector = null)
 {
+    /// <summary>Gets whether this acquisition identifies a valid provider source.</summary>
     public bool IsValid => Kind == HubTabAcquisitionKind.Provider && SourceId != 0;
 }
 
@@ -35,6 +36,7 @@ public readonly record struct HubTabAcquisition(
 /// </summary>
 public sealed record HubTabDefinition
 {
+    /// <summary>Creates a Hub tab definition.</summary>
     public HubTabDefinition(
         ulong id,
         string label,
@@ -67,15 +69,23 @@ public sealed record HubTabDefinition
         Acquisition = acquisition;
     }
 
+    /// <summary>Gets the stable tab identity.</summary>
     public ulong Id { get; }
+    /// <summary>Gets the human-readable tab label.</summary>
     public string Label { get; }
+    /// <summary>Gets the tab placement order within its Hub level.</summary>
     public int Order { get; }
+    /// <summary>Gets the kind of target exposed by the tab.</summary>
     public HubTabTargetKind TargetKind { get; }
+    /// <summary>Gets the route used to enter the tab.</summary>
     public string Route { get; }
+    /// <summary>Gets the target identity when the tab declares one.</summary>
     public ulong? TargetId { get; }
+    /// <summary>Gets the provider acquisition information when the tab is acquired.</summary>
     public HubTabAcquisition? Acquisition { get; }
-
+    /// <summary>Gets whether this tab opens another Hub view.</summary>
     public bool IsNestedHub => TargetKind == HubTabTargetKind.Hub;
+    /// <summary>Gets whether this tab obtains its content from an acquisition source.</summary>
     public bool IsAcquired => Acquisition.HasValue;
 }
 
@@ -85,6 +95,7 @@ public sealed record HubTabDefinition
 /// </summary>
 public sealed class SingularityHubDefinition
 {
+    /// <summary>Creates a Hub definition with deterministically ordered tabs.</summary>
     public SingularityHubDefinition(
         ulong id,
         string path,
@@ -108,9 +119,13 @@ public sealed class SingularityHubDefinition
             throw new ArgumentException("Hub tab placement order must be unique.", nameof(tabs));
     }
 
+    /// <summary>Gets the stable Hub identity.</summary>
     public ulong Id { get; }
+    /// <summary>Gets the canonical path of this Hub level.</summary>
     public string Path { get; }
+    /// <summary>Gets the display title of this Hub level.</summary>
     public string Title { get; }
+    /// <summary>Gets the deterministically ordered tabs for this Hub level.</summary>
     public IReadOnlyList<HubTabDefinition> Tabs { get; }
 }
 
@@ -121,9 +136,14 @@ public sealed class SingularityHubDefinition
 /// </summary>
 public interface ISingularityHubConfiguration
 {
+    /// <summary>Gets all registered Hub definitions.</summary>
     IReadOnlyCollection<SingularityHubDefinition> Hubs { get; }
+    /// <summary>Registers a Hub definition.</summary>
     bool Register(SingularityHubDefinition definition);
+    /// <summary>Removes a Hub definition by identity.</summary>
     bool Remove(ulong hubId);
+    /// <summary>Finds a Hub definition by identity.</summary>
     bool TryGet(ulong hubId, out SingularityHubDefinition? definition);
+    /// <summary>Finds a Hub definition by canonical path.</summary>
     bool TryResolve(string path, out SingularityHubDefinition? definition);
 }
