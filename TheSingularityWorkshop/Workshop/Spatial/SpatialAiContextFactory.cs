@@ -10,8 +10,6 @@ namespace TheSingularityWorkshop.Gui;
 /// </summary>
 public static class SpatialAiContextFactory
 {
-    private const string ProtocolType = "TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi";
-
     public static IAiInteractable Create(SpatialInteractable item, SpatialBounds bounds)
     {
         var contextIds = new[]
