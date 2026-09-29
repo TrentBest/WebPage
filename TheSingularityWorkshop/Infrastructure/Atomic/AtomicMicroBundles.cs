@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 
 namespace TheSingularityWorkshop.Infrastructure.Atomic;
 
@@ -13,6 +14,7 @@ public sealed record AtomicElement(int AtomicNumber, string Symbol, string Name,
 
 public sealed class AtomicCoreBundle : IMicroBundle
 {
+    public MicroBundleDescriptor Descriptor { get; } = new(AtomicBundleIds.Core, "0.1.0");
     public ulong Id => AtomicBundleIds.Core;
     public IReadOnlyList<BundleRequest> Dependencies => Array.Empty<BundleRequest>();
     public AtomicElement Element { get; }
@@ -23,6 +25,10 @@ public sealed class AtomicCoreBundle : IMicroBundle
 
 public sealed class AtomicThermalBundle : IMicroBundle
 {
+    public MicroBundleDescriptor Descriptor { get; } = new(
+        AtomicBundleIds.Thermal,
+        "0.1.0",
+        new[] { new MicroBundleDependency(AtomicBundleIds.Core) });
     public ulong Id => AtomicBundleIds.Thermal;
     public IReadOnlyList<BundleRequest> Dependencies => new[] { BundleRequest.Unconfigured(AtomicBundleIds.Core) };
     public double MeltingPointKelvin { get; }
@@ -35,6 +41,14 @@ public sealed class AtomicThermalBundle : IMicroBundle
 
 public sealed class AtomicMaterialPhysicsBundle : IMicroBundle
 {
+    public MicroBundleDescriptor Descriptor { get; } = new(
+        AtomicBundleIds.MaterialPhysics,
+        "0.1.0",
+        new[]
+        {
+            new MicroBundleDependency(AtomicBundleIds.Core),
+            new MicroBundleDependency(AtomicBundleIds.Thermal)
+        });
     public ulong Id => AtomicBundleIds.MaterialPhysics;
     public IReadOnlyList<BundleRequest> Dependencies => new[]
     {
