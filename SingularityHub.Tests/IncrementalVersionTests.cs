@@ -1,4 +1,6 @@
 using Xunit;
+using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.Workshop.Composition;
 
 namespace SingularityHub.Tests;
 
@@ -74,7 +76,7 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 165)] [Fact(DisplayName = "V0.0.165 — Every_Browser_Launch_Begins_At_FirstContact_And_Never_AutoPresents_The_Moniker")]
     public void V0_0_165EveryBrowserLaunchBeginsAtFirstContactAndNeverAutoPresentsTheMoniker()
     {
-        using var service = new TheSingularityWorkshop.Services.WorkshopExperienceService();
+        using var service = new TheSingularityWorkshop.Services.WorkshopExperienceService(new FsmCos(new WorkshopCompositionCatalog()));
         service.Initialize(returningVisitor: true);
 
         Assert.Equal("FirstContact", service.CurrentState);
