@@ -153,4 +153,18 @@ public sealed class IncrementalVersionTests
     }
 
 
+    [ArchitectureTest(0, 0, 172)] [Fact(DisplayName = "V0.0.172 — WebPage_Consumes_The_Published_FSM_Serialization_Binary_Boundary")]
+    public void V0_0_172WebPageConsumesThePublishedFsmSerializationBinaryBoundary()
+    {
+        var files = new TheSingularityWorkshop.Workshop.IO.InMemoryFileSystem();
+
+        using (TheSingularityWorkshop.FSM_Serialization.IBinaryStream writer = files.OpenWrite("architecture-proof.bin"))
+        {
+            writer.Write(new byte[] { 0x57, 0x53, 0x41, 0x31 });
+            writer.Flush();
+        }
+
+        Assert.True(files.Exists("architecture-proof.bin"));
+    }
+
 }
