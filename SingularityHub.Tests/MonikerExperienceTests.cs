@@ -19,6 +19,7 @@ public sealed class MonikerExperienceTests
         service.RequestEntry();
         service.Tick();
         service.SelectIntegration(WorkshopIntegrationMode.Direct);
+        service.Tick();
 
         Assert.Equal("Moniker", service.FirstContact.CurrentState);
         Assert.False(service.ShowUnity);
