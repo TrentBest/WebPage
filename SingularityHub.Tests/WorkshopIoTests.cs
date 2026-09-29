@@ -43,8 +43,8 @@ public sealed class WorkshopIoTests
     [Fact]
     public void BinaryStreamCanPipeBytesBetweenImplementations()
     {
-        using var source = new MemoryBinaryStream(new byte[] { 9, 8, 7, 6 });
-        using var destination = new MemoryBinaryStream();
+        using var source = new TheSingularityWorkshop.Workshop.IO.MemoryBinaryStream(new byte[] { 9, 8, 7, 6 });
+        using var destination = new TheSingularityWorkshop.Workshop.IO.MemoryBinaryStream();
 
         var buffer = new byte[2];
         int read;
