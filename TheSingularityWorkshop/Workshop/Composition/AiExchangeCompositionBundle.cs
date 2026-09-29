@@ -40,6 +40,37 @@ public sealed class AiExchangeCompositionBundle : IMicroBundle
     public ProtocolDefinition? Protocol { get; private set; }
     public GrammarDefinition? Grammar { get; private set; }
     public string? ExchangeText { get; private set; }
+    private readonly List<AiExchangeRound> _rounds = new();
+
+    /// <summary>Gets the completed human/LLM exchange rounds owned by this capability.</summary>
+    public IReadOnlyList<AiExchangeRound> Rounds => _rounds;
+
+    /// <summary>Returns the current deterministic exchange payload for the active tool.</summary>
+    public string BuildExchangeMessage() => ExchangeText ?? string.Empty;
+
+    /// <summary>Starts a new outbound exchange round and records the exact payload sent to the human/LLM.</summary>
+    public AiExchangeRound BeginExchange()
+    {
+        var payload = BuildExchangeMessage();
+        if (string.IsNullOrWhiteSpace(payload))
+            throw new InvalidOperationException("The AI exchange has not converged to a usable payload.");
+
+        var round = new AiExchangeRound(_rounds.Count + 1, payload, null);
+        _rounds.Add(round);
+        return round;
+    }
+
+    /// <summary>Records the human/LLM response against the current outbound round without parsing it.</summary>
+    public AiExchangeRound RecordResponse(string response)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(response);
+        if (_rounds.Count == 0)
+            throw new InvalidOperationException("An exchange round must be started before a response is recorded.");
+
+        var updated = _rounds[^1] with { Response = response };
+        _rounds[^1] = updated;
+        return updated;
+    }
 
     public void Load(MicroBundleLoadContext context)
     {
@@ -191,3 +222,7 @@ public sealed class GrammarAiCompositionBundle : IMicroBundle
         return false;
     }
 }
+
+
+/// <summary>One deterministic outbound/inbound human-in-the-loop exchange round.</summary>
+public sealed record AiExchangeRound(int Number, string Outbound, string? Response);
