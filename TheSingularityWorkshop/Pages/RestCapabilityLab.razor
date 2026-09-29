@@ -68,7 +68,7 @@
 
             <div class="rest-actions">
                 <button type="button" class="primary" @onclick="SerializeRecipe">SERIALIZE MICROBUNDLE RECIPE</button>
-                <button type="button" @onclick="Experience.Reset; SerializeRecipe()">RESET</button>
+                <button type="button" @onclick="ResetRecipe">RESET</button>
             </div>
         </section>
 
@@ -113,6 +113,12 @@
     }
 
     private void SerializeRecipe() => SerializedRecipe = Experience.Serialize();
+
+    private void ResetRecipe()
+    {
+        Experience.Reset();
+        SerializeRecipe();
+    }
 }
 
 <style>
