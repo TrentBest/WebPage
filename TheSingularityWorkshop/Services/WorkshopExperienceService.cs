@@ -8,7 +8,7 @@ public sealed class WorkshopExperienceService : IDisposable
 {
     public event Action? StateChanged;
     private readonly FirstContactFsm _firstContact = new();
-    private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
+    private readonly IFsmCos _compositionSystem;
     private bool _disposed;
 
     public string CurrentState { get; private set; } = "Intro";
@@ -18,13 +18,23 @@ public sealed class WorkshopExperienceService : IDisposable
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public FirstContactFsm FirstContact => _firstContact;
     public RuntimeAssembly? RuntimeAssembly { get; private set; }
-    public GuiNode? MonikerComposition => RuntimeAssembly?.Bundles.OfType<MonikerCompositionBundle>().Select(bundle => bundle.Composition).FirstOrDefault(composition => composition is not null);
+    public GuiNode? MonikerComposition => RuntimeAssembly?.Bundles
+        .OfType<MonikerCompositionBundle>()
+        .Select(bundle => bundle.Composition)
+        .FirstOrDefault(composition => composition is not null);
+
+    public WorkshopExperienceService(IFsmCos compositionSystem)
+    {
+        _compositionSystem = compositionSystem ?? throw new ArgumentNullException(nameof(compositionSystem));
+    }
 
     public void Initialize(bool returningVisitor = false)
     {
         if(IsInitialized)return;
         IsInitialized=true; IsFirstVisit=!returningVisitor;
-        RuntimeAssembly=_compositionSystem.Execute(new RuntimeManifest(RuntimeId:1UL,Bundles:new[]{BundleRequest.Unconfigured(MonikerCompositionBundle.BundleId)}));
+        RuntimeAssembly=_compositionSystem.Execute(new RuntimeManifest(
+            RuntimeId:1UL,
+            Bundles:new[]{BundleRequest.Unconfigured(MonikerCompositionBundle.BundleId)}));
         CurrentState="FirstContact";
         _firstContact.Start();
         StateChanged?.Invoke();
