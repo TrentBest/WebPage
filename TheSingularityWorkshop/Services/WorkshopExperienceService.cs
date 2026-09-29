@@ -18,7 +18,7 @@ public sealed class WorkshopExperienceService : IDisposable
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public FirstContactFsm FirstContact => _firstContact;
     public RuntimeAssembly? RuntimeAssembly { get; private set; }
-    public GuiNode? MonikerComposition => RuntimeAssembly?.LoadedBundles.OfType<MonikerCompositionBundle>().Select(bundle => bundle.Composition).FirstOrDefault(composition => composition is not null);
+    public GuiNode? MonikerComposition => RuntimeAssembly?.Bundles.OfType<MonikerCompositionBundle>().Select(bundle => bundle.Composition).FirstOrDefault(composition => composition is not null);
 
     public void Initialize(bool returningVisitor = false)
     {
