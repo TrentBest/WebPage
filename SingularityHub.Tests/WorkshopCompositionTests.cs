@@ -11,6 +11,8 @@ public sealed class WorkshopCompositionTests
     {
         using var experience = new WorkshopExperienceService();
         experience.Initialize();
+        SelectFsmCos(experience);
+
         Assert.NotNull(experience.RuntimeAssembly);
         Assert.Contains(experience.RuntimeAssembly!.Bundles, bundle => bundle.Id == MonikerCompositionBundle.BundleId);
         Assert.NotNull(experience.MonikerComposition);
@@ -25,6 +27,7 @@ public sealed class WorkshopCompositionTests
     {
         using var experience = new WorkshopExperienceService();
         experience.Initialize();
+        SelectFsmCos(experience);
 
         var ai = experience.AiExchangeComposition;
         Assert.NotNull(ai);
@@ -43,16 +46,20 @@ public sealed class WorkshopCompositionTests
     {
         using var experience = new WorkshopExperienceService();
         experience.Initialize();
+        SelectFsmCos(experience);
 
-        Assert.Contains(
-            experience.RuntimeAssembly!.Bundles,
-            bundle => bundle.Id == AiExchangeCompositionBundle.ProtocolBundleId);
-        Assert.Contains(
-            experience.RuntimeAssembly.Bundles,
-            bundle => bundle.Id == AiExchangeCompositionBundle.GrammarBundleId);
-        Assert.Contains(
-            experience.RuntimeAssembly.Bundles,
-            bundle => bundle.Id == AiExchangeCompositionBundle.BundleId);
+        Assert.Contains(experience.RuntimeAssembly!.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.ProtocolBundleId);
+        Assert.Contains(experience.RuntimeAssembly.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.GrammarBundleId);
+        Assert.Contains(experience.RuntimeAssembly.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.BundleId);
     }
 
+    private static void SelectFsmCos(WorkshopExperienceService experience)
+    {
+        while (experience.FirstContact.CurrentState != "Gateway")
+            experience.Tick();
+
+        experience.RequestEntry();
+        experience.Tick();
+        experience.SelectIntegration(WorkshopIntegrationMode.FsmCos);
+    }
 }
