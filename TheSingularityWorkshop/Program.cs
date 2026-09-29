@@ -6,9 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
 using TheSingularityWorkshop;
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.SingularityHub;
+using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.IO;
 
 internal class Program
@@ -30,6 +32,11 @@ internal class Program
         builder.Services.AddScoped<WorkshopWorldClient>();
         builder.Services.AddScoped<IWorkshopStorage, BrowserWorkshopStorage>();
         builder.Services.AddScoped<WorkshopAssetLibrary>();
+
+        // WebPage supplies the catalog; FSM_COS owns manifest composition.
+        builder.Services.AddSingleton<IMicroBundleCatalog, WorkshopCompositionCatalog>();
+        builder.Services.AddSingleton<IFsmCos>(sp =>
+            new FsmCos(sp.GetRequiredService<IMicroBundleCatalog>()));
 
         // The WebPage hosts the concrete Hub but owns no Hub mechanics.
         builder.Services.AddSingleton<SingularityHub>();
