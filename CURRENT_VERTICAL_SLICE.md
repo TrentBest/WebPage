@@ -16,6 +16,36 @@ The page launches the Hub with a WebPage host manifest. The Hub uses that manife
 
 The first concrete implementations are Pong and Living GUI. They are examples of the protocol, not hardcoded protocol names.
 
+## Integration demonstration boundary
+
+After the gateway, WebForge deliberately exposes two host integration paths for the same Workshop entry:
+
+```text
+                 WORKSHOP ENTRY
+                       |
+              +--------+--------+
+              |                 |
+          DIRECT            FSM_COS
+              |                 |
+      Workshop packages   RuntimeManifest
+              |                 |
+          WebPage host      dependency closure
+              |                 |
+           Blazor host       arbitration
+              |                 |
+              |            RuntimeAssembly
+              |                 |
+              +--------+--------+
+                       |
+                  host / GUI
+```
+
+The Direct path demonstrates that the published Workshop packages can be consumed without FSM_COS. The FSM_COS path demonstrates the additional composition boundary: the host supplies a manifest/catalog, FSM_COS assembles the runtime, and the host manifests the resulting assembly.
+
+The concrete `SingularityHub` remains host infrastructure. `HubRuntime` is a WebPage host adapter; FSM_COS is not the Hub and does not own rendering, browser lifecycle, or platform hosting.
+
+The purpose of this seam is to make the migration delta observable: a developer can first use the packages directly, then cross the composition boundary without changing the fundamental capabilities being demonstrated.
+
 ## Intended presentation sequence
 
 ```text
