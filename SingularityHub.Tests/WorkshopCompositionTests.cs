@@ -14,6 +14,8 @@ public sealed class WorkshopCompositionTests
         experience.Initialize();
         Assert.NotNull(experience.RuntimeAssembly);
         Assert.Contains(experience.RuntimeAssembly!.Bundles, bundle => bundle.Id == MonikerCompositionBundle.BundleId);
+        Assert.Equal(MonikerCompositionBundle.BundleId, experience.RuntimeAssembly.Bundles.Single().Descriptor.Id);
+        Assert.Equal("0.1.0-webpage", experience.RuntimeAssembly.Bundles.Single().Descriptor.Version);
         Assert.NotNull(experience.MonikerComposition);
         Assert.Equal("Moniker", experience.MonikerComposition!.Properties["composition"]);
         Assert.Equal("THE", experience.MonikerComposition.Find("the").Text);
