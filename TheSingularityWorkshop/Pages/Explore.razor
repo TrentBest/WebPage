@@ -385,6 +385,7 @@
 
         var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap, EnterConstructionSite, constructionTourActive, constructionTourMessage, constructionWelcomeVisible, RequestConstructionTour, ExitConstructionSite);
         var root = WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(WorkshopAdBanner());
+        root.Content(RestCapabilityLabPortal());
         if (FsmScaffoldReady)
             root.Content(FsmScaffoldNotice());
         if (workshopMapVisible)
@@ -418,6 +419,26 @@
         }
         return root;
     }
+
+    private ElementBuilder RestCapabilityLabPortal()
+        => WorkshopGui.Button(this)
+            .Style("position", "fixed")
+            .Style("right", "1.25rem")
+            .Style("top", "4.75rem")
+            .Style("z-index", "45")
+            .Style("padding", ".65rem .9rem")
+            .Style("border", "1px solid #00eaff99")
+            .Style("background", "rgba(1,4,10,.92)")
+            .Style("color", "#00eaff")
+            .Style("font-family", "Consolas, 'Courier New', monospace")
+            .Style("font-size", ".55rem")
+            .Style("font-weight", "700")
+            .Style("letter-spacing", ".1em")
+            .Style("box-shadow", "0 0 22px #00eaff18")
+            .AriaLabel("Enter REST Capability Lab")
+            .OnClick(() => NavigationManager.NavigateTo("/rest-lab"))
+            .Content(WorkshopGui.Element(this, "span")
+                .Text("REST CAPABILITY LAB"));
 
     private ElementBuilder FsmScaffoldNotice()
         => WorkshopGui.Element(this, "div")
