@@ -89,11 +89,11 @@ public sealed class FsmForgePreviewTests
         definition.AddState("Running");
         definition.AddTransition("Idle", "Running", "ShouldRun", new FsmForgeSignalCondition("RUN"));
         var scaffold = FsmForgeScaffolder.Generate(definition);
-        Assert.Contains(".State("Idle"", scaffold, StringComparison.Ordinal);
-        Assert.Contains(".State("Running"", scaffold, StringComparison.Ordinal);
-        Assert.Contains(".WithInitialState("Idle")", scaffold, StringComparison.Ordinal);
-        Assert.Contains(".Transition("Idle", "Running", ShouldRun)", scaffold, StringComparison.Ordinal);
-        Assert.Contains("Forge preview condition: signal "RUN"", scaffold, StringComparison.Ordinal);
+        Assert.Contains(".State(\"Idle\"", scaffold, StringComparison.Ordinal);
+        Assert.Contains(".State(\"Running\"", scaffold, StringComparison.Ordinal);
+        Assert.Contains(".WithInitialState(\"Idle\")", scaffold, StringComparison.Ordinal);
+        Assert.Contains(".Transition(\"Idle\", \"Running\", ShouldRun)", scaffold, StringComparison.Ordinal);
+        Assert.Contains("Forge preview condition: signal \"RUN\"", scaffold, StringComparison.Ordinal);
         Assert.Contains("TODO: replace the scaffold", scaffold, StringComparison.Ordinal);
     }
 }

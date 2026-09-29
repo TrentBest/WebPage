@@ -165,7 +165,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Style("color", White)
                 .Style("z-index", "3")
                 .Style("outline", "none")
-                .Style("overflow", "visible");
+                .Style("overflow", "visible")
                 .Attribute("tabindex", "0")
                 .AriaLabel($"Select {item.Name}")
                 .Title($"Select {item.Name} // hover for facility details")

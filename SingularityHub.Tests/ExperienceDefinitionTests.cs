@@ -34,9 +34,15 @@ public sealed class ExperienceDefinitionTests
             "Workshop",
             [new ExperienceSurfaceDefinition("shell", gui)]);
 
-        Assert.IsAssignableFrom<ICoreGuiBuilder<GuiNode>>(
-            GuiBuilder.Create("Panel", "builder"));
+        var builder = GuiBuilder.Create("Panel", "builder");
+        Assert.IsType<GuiBuilder>(builder);
 
+        var references = typeof(GuiBuilder).Assembly
+            .GetReferencedAssemblies()
+            .Select(x => x.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        Assert.DoesNotContain("Microsoft.AspNetCore.Components", references);
         Assert.Equal("Panel", experience.FindSurface("shell").Gui.Kind);
     }
 

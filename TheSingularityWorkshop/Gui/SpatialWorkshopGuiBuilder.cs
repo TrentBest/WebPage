@@ -160,7 +160,6 @@ public static class SpatialWorkshopGuiBuilder
             .Style("z-index", "6").Style("overflow", "visible").AriaLabel(item.Name)
             .Title($"{item.Name} // schematic structure")
             .OnMouseEnter(() => item.OnHover(new NormalizedPointer(.5, .5)))
-            .OnMouseMove(_ => item.OnHover(new NormalizedPointer(.5, .5)))
             .OnMouseLeave(item.OnHoverExit).OnClick(() => interact(item.Id)).StopPropagation("onclick");
         if (item.IsBreathing) surface.Style("animation", "workshop-interactable-breathe 1.25s ease-in-out infinite");
         surface.Content(BuildingSign(receiver, item.Name));

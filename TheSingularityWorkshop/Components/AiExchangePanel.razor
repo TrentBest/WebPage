@@ -1,0 +1,106 @@
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@using TheSingularityWorkshop.Services
+@using TheSingularityWorkshop.Workshop.Composition
+@using TheSingularityWorkshop.Workshop.Gui
+@inject IJSRuntime JS
+@inject WorkshopExperienceService Experience
+
+@BuildPanel()
+
+@code {
+    private string _llmResponse = string.Empty;
+    private string _status = "READY";
+
+    protected override void OnInitialized()
+    {
+        if (!Experience.IsInitialized)
+            Experience.Initialize();
+    }
+
+    private AiExchangeCompositionBundle? Exchange =>
+        Experience.AiExchangeComposition;
+
+    private RenderFragment BuildPanel()
+    {
+        var exchange = Exchange;
+
+        return WorkshopGui.Panel(this)
+            .Heading("AI EXCHANGE", 2)
+            .Paragraph("The runtime assembled this ProtocolAI + GrammarAI surface. Copy the semantic exchange to an LLM, then paste its response back here.")
+            .Content(
+                WorkshopGui.Element(this, "div")
+                    .Class("ai-exchange-grid")
+                    .Child(BuildReadonlyBlock("Protocol", exchange?.Protocol?.Describe() ?? "Waiting for composition..."))
+                    .Child(BuildReadonlyBlock("Grammar", exchange?.Grammar?.Describe() ?? "Waiting for composition...")))
+            .Content(
+                WorkshopGui.Element(this, "textarea")
+                    .Attribute("id", "ai-llm-response")
+                    .Attribute("rows", 10)
+                    .Attribute("placeholder", "Paste the LLM response here...")
+                    .Attribute("value", _llmResponse)
+                    .Attribute("aria-label", "LLM response")
+                    .Style("width", "100%")
+                    .Style("box-sizing", "border-box"))
+            .Content(
+                WorkshopGui.Button(this)
+                    .Label("Extract to Clipboard")
+                    .OnClick(ExtractAsync))
+            .Content(
+                WorkshopGui.Button(this)
+                    .Label("Paste from Clipboard")
+                    .OnClick(PasteAsync))
+            .Content(
+                WorkshopGui.Button(this)
+                    .Label("Capture Response")
+                    .OnClick(CaptureResponse))
+            .Paragraph($"STATUS // {_status}")
+            .Build();
+    }
+
+    private ElementBuilder BuildReadonlyBlock(string label, string value) =>
+        WorkshopGui.Element(this, "div")
+            .Style("display", "flex")
+            .Style("flex-direction", "column")
+            .Style("gap", ".35rem")
+            .Child(WorkshopGui.Element(this, "strong").Text(label))
+            .Child(
+                WorkshopGui.Element(this, "textarea")
+                    .Attribute("readonly", true)
+                    .Attribute("rows", 8)
+                    .Attribute("aria-label", label)
+                    .Style("width", "100%")
+                    .Style("box-sizing", "border-box")
+                    .Text(value));
+
+    private async Task ExtractAsync()
+    {
+        var exchange = Exchange;
+        if (exchange?.ExchangeText is null)
+        {
+            _status = "NO EXCHANGE";
+            StateHasChanged();
+            return;
+        }
+
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", exchange.ExchangeText);
+        _status = "EXCHANGE COPIED";
+        StateHasChanged();
+    }
+
+    private async Task PasteAsync()
+    {
+        _llmResponse = await JS.InvokeAsync<string>("navigator.clipboard.readText");
+        _status = "RESPONSE PASTED";
+        StateHasChanged();
+    }
+
+    private void CaptureResponse()
+    {
+        _status = string.IsNullOrWhiteSpace(_llmResponse)
+            ? "NO RESPONSE"
+            : "RESPONSE CAPTURED — PARSER BOUNDARY READY";
+
+        StateHasChanged();
+    }
+}
