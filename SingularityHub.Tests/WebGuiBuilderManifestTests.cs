@@ -1,3 +1,5 @@
+#pragma warning disable BL0006 // These tests intentionally inspect the Blazor manifestation RenderTree boundary.
+
 using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.AspNetCore.Components.Rendering;
 using TheSingularityWorkshop.Workshop.Gui;
@@ -68,3 +70,5 @@ public sealed class WebGuiBuilderManifestTests
     public void V0_0_159_WebGuiBuilderManifestation()
         => Assert.Equal("0.0.159", "0.0.159");
 }
+
+#pragma warning restore BL0006
