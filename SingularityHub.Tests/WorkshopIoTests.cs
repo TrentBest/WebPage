@@ -10,7 +10,7 @@ public sealed class WorkshopIoTests
     public void BinaryPackAndUnpackCanShareAStream()
     {
         var value = new TestValue(42);
-        using var stream = new MemoryBinaryStream();
+        using var stream = new TheSingularityWorkshop.FSM_Serialization.StreamBinaryStream(new MemoryStream());
 
         value.Pack(stream);
         stream.Position = 0;
@@ -60,14 +60,14 @@ public sealed class WorkshopIoTests
         public TestValue(int value) => Value = value;
         public int Value { get; private set; }
 
-        public void Pack(IBinaryStream stream)
+        public void Pack(TheSingularityWorkshop.FSM_Serialization.IBinaryStream stream)
         {
             Span<byte> bytes = stackalloc byte[4];
             BitConverter.TryWriteBytes(bytes, Value);
             stream.Write(bytes);
         }
 
-        public void Unpack(IBinaryStream stream)
+        public void Unpack(TheSingularityWorkshop.FSM_Serialization.IBinaryStream stream)
         {
             Span<byte> bytes = stackalloc byte[4];
             if (stream.Read(bytes) != 4)
