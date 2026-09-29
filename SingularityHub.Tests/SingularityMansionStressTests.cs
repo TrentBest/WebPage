@@ -9,7 +9,7 @@ public sealed class SingularityMansionStressTests
     [Fact(DisplayName = "Incremental Unit Test 29 — Campus catalog contains the Singularity Mansion")]
     public void CampusCatalogContainsMansion()
     {
-        var mansion = Assert.Single(SingularityCampusCatalog.Buildings.Where(item => item.Id == "singularity-mansion"));
+        var mansion = Assert.Single(SingularityCampusCatalog.Buildings, item => item.Id == "singularity-mansion");
 
         Assert.Equal("Singularity Mansion", mansion.Name);
         Assert.True(mansion.Bounds.Width >= 30);
@@ -19,9 +19,10 @@ public sealed class SingularityMansionStressTests
     [Fact(DisplayName = "Incremental Unit Test 30 — Mansion exposes a defined entrance")]
     public void MansionExposesAnEntrance()
     {
-        var mansion = Assert.Single(SingularityCampusCatalog.Buildings.Where(item => item.Id == "singularity-mansion"));
+        var mansion = Assert.Single(SingularityCampusCatalog.Buildings, item => item.Id == "singularity-mansion");
 
-        Assert.Contains(mansion.Openings, opening => opening.Kind == SpatialOpeningKind.Door);
+        var openings = mansion.Openings ?? throw new InvalidOperationException("Mansion openings must be defined.");
+        Assert.Contains(openings, opening => opening.Kind == SpatialOpeningKind.Door);
     }
 
     [Fact(DisplayName = "Incremental Unit Test 31 — Mansion density increases line count")]
