@@ -1,3 +1,5 @@
+#pragma warning disable BL0006 // These tests intentionally inspect the Blazor manifestation RenderTree boundary.
+
 using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.AspNetCore.Components.Rendering;
 using TheSingularityWorkshop.Workshop.Gui;
@@ -47,3 +49,5 @@ public sealed class WebGuiBuilderTests
         Assert.Contains(frames, frame => frame.FrameType == RenderTreeFrameType.Text && frame.TextContent == "Enter Workshop");
     }
 }
+
+#pragma warning restore BL0006
