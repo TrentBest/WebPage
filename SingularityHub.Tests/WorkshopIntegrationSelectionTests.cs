@@ -28,8 +28,8 @@ public sealed class WorkshopIntegrationSelectionTests
         Assert.Equal(5, experience.RuntimeAssembly!.Bundles.Count);
     }
 
-    [Fact(DisplayName = "Blazor integration leaves FSM_COS uninvoked")]
-    public void BlazorSelectionDoesNotAssembleCosRuntime()
+    [Fact(DisplayName = "Direct integration uses the Workshop packages without FSM_COS")]
+    public void DirectSelectionDoesNotAssembleCosRuntime()
     {
         using var experience = new WorkshopExperienceService();
         experience.Initialize();
@@ -39,9 +39,9 @@ public sealed class WorkshopIntegrationSelectionTests
 
         experience.RequestEntry();
         experience.Tick();
-        experience.SelectIntegration(WorkshopIntegrationMode.Blazor);
+        experience.SelectIntegration(WorkshopIntegrationMode.Direct);
 
-        Assert.Equal(WorkshopIntegrationMode.Blazor, experience.IntegrationMode);
+        Assert.Equal(WorkshopIntegrationMode.Direct, experience.IntegrationMode);
         Assert.Null(experience.RuntimeAssembly);
     }
 }
