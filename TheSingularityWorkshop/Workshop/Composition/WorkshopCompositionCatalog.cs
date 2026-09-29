@@ -8,6 +8,7 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
 
     public WorkshopCompositionCatalog()
     {
+        var shell = new WorkshopShellCompositionBundle();
         var protocol = new ProtocolAiCompositionBundle();
         var grammar = new GrammarAiCompositionBundle();
         var aiExchange = new AiExchangeCompositionBundle();
@@ -15,6 +16,7 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
 
         _bundles = new Dictionary<ulong, IMicroBundle>
         {
+            [shell.Id] = shell,
             [moniker.Id] = moniker,
             [protocol.Id] = protocol,
             [grammar.Id] = grammar,
