@@ -46,7 +46,7 @@ public sealed class SingularityRoutingTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void EmptyPathCannotResolve(string path)
+    public void EmptyPathCannotResolve(string? path)
     {
         Assert.False(new SingularityRouting().TryResolve(path!, out _));
     }
@@ -69,7 +69,7 @@ public sealed class SingularityRoutingTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void RemoveReturnsFalseForEmptyPath(string path)
+    public void RemoveReturnsFalseForEmptyPath(string? path)
         => Assert.False(new SingularityRouting().Remove(path!));
 
     [Fact(DisplayName = "Removing unknown route returns false")]
