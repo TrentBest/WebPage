@@ -12,7 +12,7 @@ public sealed class WorkshopCompositionTests
         using var experience = new WorkshopExperienceService();
         experience.Initialize();
         Assert.NotNull(experience.RuntimeAssembly);
-        Assert.Contains(experience.RuntimeAssembly!.LoadedBundles, bundle => bundle.Id == MonikerCompositionBundle.BundleId);
+        Assert.Contains(experience.RuntimeAssembly!.Bundles, bundle => bundle.Id == MonikerCompositionBundle.BundleId);
         Assert.NotNull(experience.MonikerComposition);
         Assert.Equal("Moniker", experience.MonikerComposition!.Properties["composition"]);
         Assert.Equal("THE", experience.MonikerComposition.Find("the").Text);
