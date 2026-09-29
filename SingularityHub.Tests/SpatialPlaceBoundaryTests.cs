@@ -11,12 +11,18 @@ public sealed class SpatialPlaceBoundaryTests
     {
         var scene = SpatialWorkshopScene.CreateDefault();
 
-        Assert.Equal(scene.Interactables.Count, scene.Interactables.Select(x => x.Place.Id).Distinct().Count());
-        Assert.All(scene.Interactables, item =>
+        var places = scene.Interactables
+            .Select(x => x.Place ?? throw new InvalidOperationException($"Interactable '{x.Id}' has no authoritative place."))
+            .ToArray();
+
+        Assert.Equal(scene.Interactables.Count, places.Select(x => x.Id).Distinct().Count());
+        Assert.All(scene.Interactables.Zip(places), pair =>
         {
-            Assert.Equal(item.ExperienceId, item.Place.SceneId);
-            Assert.Equal(item.Name, item.Place.Name);
-            Assert.NotEqual(default, item.Place.EntryPoint);
+            var item = pair.First;
+            var place = pair.Second;
+            Assert.Equal(item.ExperienceId, place.SceneId);
+            Assert.Equal(item.Name, place.Name);
+            Assert.NotEqual(default, place.EntryPoint);
         });
     }
 
