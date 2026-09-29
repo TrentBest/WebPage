@@ -161,6 +161,8 @@ public interface ISingularityHub : IArbitrator, IDataWarehouseLiaison, IProcessG
     IArbitrationAudit Audit { get; }
     /// <summary>Gets the Hub routing table.</summary>
     ISingularityRouting Routing { get; }
+    /// <summary>Gets the configuration describing what each Hub level renders.</summary>
+    ISingularityHubConfiguration Configuration { get; }
 }
 
 /// <summary>Global execution phase selected by the composition manifest and owned by the Hub host.</summary>
