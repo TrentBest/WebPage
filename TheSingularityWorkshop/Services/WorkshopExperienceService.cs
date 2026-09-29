@@ -86,6 +86,8 @@ public sealed class WorkshopExperienceService : IDisposable
         }
         else
         {
+            // Direct integration deliberately does not create an FSM_COS runtime.
+            // The host can consume the Workshop packages through its normal boundaries.
             RuntimeAssembly = null;
         }
 
