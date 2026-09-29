@@ -26,10 +26,7 @@ public sealed class FirstContactPresentationTests
         Assert.Equal("FirstFadingSecondComingIn", fsm.CurrentState);
         Assert.InRange(fsm.StatementOpacity, 0d, 1d);
         Assert.InRange(fsm.QuestionOpacity, 0d, 1d);
-        Assert.Equal(
-            1d,
-            fsm.StatementOpacity + fsm.QuestionOpacity,
-            6);
+        Assert.Equal(1d, fsm.StatementOpacity + fsm.QuestionOpacity, 6);
 
         while (fsm.CurrentState != "SecondOnly")
             fsm.Update();
@@ -51,5 +48,28 @@ public sealed class FirstContactPresentationTests
         Assert.Equal("Gateway", fsm.CurrentState);
         Assert.Equal(0d, fsm.StatementOpacity);
         Assert.Equal(0d, fsm.QuestionOpacity);
+    }
+
+    [Fact(DisplayName = "Entry opens the integration boundary before the Workshop moniker")]
+    public void EntryRequiresIntegrationSelection()
+    {
+        using var fsm = new FirstContactFsm();
+        fsm.Start();
+
+        while (fsm.CurrentState != "Gateway")
+            fsm.Update();
+
+        fsm.RequestEntry();
+        fsm.Update();
+
+        Assert.Equal("IntegrationChoice", fsm.CurrentState);
+        Assert.True(fsm.IsIntegrationChoice);
+        Assert.False(fsm.IntegrationSelected);
+
+        fsm.SelectIntegration();
+        fsm.Update();
+
+        Assert.Equal("Moniker", fsm.CurrentState);
+        Assert.False(fsm.IsIntegrationChoice);
     }
 }
