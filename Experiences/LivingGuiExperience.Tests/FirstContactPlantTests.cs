@@ -1,6 +1,7 @@
 using TheSingularityWorkshop.Services;
 using Xunit;
 using TheSingularityWorkshop.Workshop.Plant;
+using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.Sound;
 
 namespace LivingGuiExperience.Tests;
@@ -35,6 +36,9 @@ public sealed class FirstContactPlantTests
         Assert.Equal("FirstContact", experience.CurrentState);
 
         experience.RequestEntry();
+        experience.Tick();
+        experience.Tick();
+        experience.SelectIntegration(WorkshopIntegrationMode.Direct);
         experience.Tick();
 
         Assert.Equal("Moniker", experience.FirstContact.CurrentState);
