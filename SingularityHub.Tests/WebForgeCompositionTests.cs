@@ -38,11 +38,11 @@ public sealed class WebForgeCompositionTests
         Assert.Equal(
             new[]
             {
+                WorkshopShellCompositionBundle.BundleId,
+                MonikerCompositionBundle.BundleId,
                 AiExchangeCompositionBundle.ProtocolBundleId,
                 AiExchangeCompositionBundle.GrammarBundleId,
-                AiExchangeCompositionBundle.BundleId,
-                WorkshopShellCompositionBundle.BundleId,
-                MonikerCompositionBundle.BundleId
+                AiExchangeCompositionBundle.BundleId
             },
             assembly.Bundles.Select(bundle => bundle.Id));
     }
