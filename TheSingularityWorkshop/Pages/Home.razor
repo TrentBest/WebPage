@@ -2,30 +2,13 @@
 @inject IJSRuntime JS
 @inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 @implements IDisposable
+@using Microsoft.AspNetCore.Components
 @using TheSingularityWorkshop.Services
 <PageTitle>The Singularity Workshop</PageTitle>
 
-<div class="workshop-root">
-    @if (Experience.CurrentState == "FirstContact")
-    {
-        <FirstContactView State="@Experience.FirstContact.CurrentState"
-                  Ticks="@Experience.FirstContact.StateTicks"
-                  PresentationProgress="@Experience.FirstContact.PresentationProgress"
-                  StatementOpacity="@Experience.FirstContact.StatementOpacity"
-                  QuestionOpacity="@Experience.FirstContact.QuestionOpacity"
-                  GatewayBreathValue="@Experience.FirstContact.GatewayBreath"
-                  OnEntryRequested="EnterWorkshop" />
-    }
-    else if (Experience.CurrentState == "Intro")
-    {
-        @* The landing state is the completed Hub, not a second screen. The geometry
-           that grew during first contact remains the geometry of the living Hub. *@
-        <FirstContactView State="Landing" Ticks="@Experience.FirstContact.StateTicks" />
-    }
-</div>
+@BuildRootGui()
 
 <style>
-.workshop-root{position:relative;width:100%;height:100%;min-height:100%;overflow:hidden;background:#020711;color:#fff;font-family:Consolas,'Courier New',monospace}
 .landing-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;overflow:hidden;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711}
 .landing-aura{position:absolute;width:60vw;height:60vw;border:1px solid rgba(0,234,255,.08);border-radius:50%;box-shadow:0 0 100px rgba(0,234,255,.04);pointer-events:none}
 </style>
@@ -35,6 +18,37 @@
     private bool firstRender;
     private FirstContactFsm.FirstContactSoundCue lastSoundCue = FirstContactFsm.FirstContactSoundCue.None;
 
+    private RenderFragment BuildRootGui()
+    {
+        return WorkshopGui.Panel(this)
+            .Class("workshop-root").Style("position","relative").Style("width","100%").Style("height","100%")
+            .Style("min-height","100%").Style("overflow","hidden").Style("background","#020711").Style("color","#fff")
+            .Style("font-family","Consolas,'Courier New',monospace").Child(BuildExperienceContent()).Build();
+    }
+
+    private RenderFragment BuildExperienceContent() => builder =>
+    {
+        if (Experience.CurrentState == "FirstContact")
+        {
+            builder.OpenComponent<FirstContactView>(0);
+            builder.AddAttribute(1,"State",Experience.FirstContact.CurrentState);
+            builder.AddAttribute(2,"Ticks",Experience.FirstContact.StateTicks);
+            builder.AddAttribute(3,"PresentationProgress",Experience.FirstContact.PresentationProgress);
+            builder.AddAttribute(4,"StatementOpacity",Experience.FirstContact.StatementOpacity);
+            builder.AddAttribute(5,"QuestionOpacity",Experience.FirstContact.QuestionOpacity);
+            builder.AddAttribute(6,"GatewayBreathValue",Experience.FirstContact.GatewayBreath);
+            builder.AddAttribute(7,"OnEntryRequested",EventCallback.Factory.Create(this,EnterWorkshop));
+            builder.CloseComponent();
+        }
+        else if (Experience.CurrentState == "Intro")
+        {
+            builder.OpenComponent<FirstContactView>(8);
+            builder.AddAttribute(9,"State","Landing");
+            builder.AddAttribute(10,"Ticks",Experience.FirstContact.StateTicks);
+            builder.CloseComponent();
+        }
+    };
+
     protected override void OnInitialized()
     {
         heartbeat.Elapsed += Tick;
@@ -43,13 +57,12 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender || this.firstRender) return;
-        this.firstRender = true;
-        var returningVisitor = await JS.InvokeAsync<bool>("interop.workshopVisited");
+        if(!firstRender || this.firstRender)return;
+        this.firstRender=true;
+        var returningVisitor=await JS.InvokeAsync<bool>("interop.workshopVisited");
         Experience.Initialize(returningVisitor);
         heartbeat.Start();
-        if (Experience.CurrentState == "FirstContact")
-            await JS.InvokeVoidAsync("interop.firstContactSound", "pressure");
+        if(Experience.CurrentState=="FirstContact")await JS.InvokeVoidAsync("interop.firstContactSound","pressure");
     }
 
     private async Task EnterWorkshop()
@@ -58,29 +71,19 @@
         Experience.RequestEntry();
     }
 
-    private void Tick(object? sender, System.Timers.ElapsedEventArgs e)
+    private void Tick(object? sender,System.Timers.ElapsedEventArgs e)
     {
-        if (!Experience.IsInitialized) return;
+        if(!Experience.IsInitialized)return;
         Experience.Tick();
-
-        var cue = Experience.FirstContact.LastSoundCue;
-        if (cue != lastSoundCue)
-        {
-            lastSoundCue = cue;
-            _ = InvokeAsync(() => JS.InvokeVoidAsync("interop.firstContactSound", cue.ToString()));
-        }
-
-        _ = InvokeAsync(StateHasChanged);
+        var cue=Experience.FirstContact.LastSoundCue;
+        if(cue!=lastSoundCue){lastSoundCue=cue;_=InvokeAsync(()=>JS.InvokeVoidAsync("interop.firstContactSound",cue.ToString()));}
+        _=InvokeAsync(StateHasChanged);
     }
 
-    private void ExperienceChanged() => _ = InvokeAsync(StateHasChanged);
+    private void ExperienceChanged()=>_=InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
-        heartbeat.Stop();
-        heartbeat.Elapsed -= Tick;
-        Experience.StateChanged -= ExperienceChanged;
-        heartbeat.Dispose();
-        Experience.Dispose();
+        heartbeat.Stop(); heartbeat.Elapsed-=Tick; Experience.StateChanged-=ExperienceChanged; heartbeat.Dispose(); Experience.Dispose();
     }
 }
