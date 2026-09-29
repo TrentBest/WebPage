@@ -28,6 +28,7 @@ public sealed class SingularityHub : ISingularityHub
         _update=update??throw new ArgumentNullException(nameof(update));
         Audit=new ArbitrationAudit();
         Routing=new SingularityRouting();
+        Configuration=new SingularityHubConfiguration();
     }
     /// <summary>Gets bundles that completed installation.</summary>
     public IReadOnlyCollection<IMicroBundle> LoadedBundles=>_loadedBundles;
@@ -37,6 +38,8 @@ public sealed class SingularityHub : ISingularityHub
     public IArbitrationAudit Audit{get;}
     /// <summary>Gets the Hub routing table.</summary>
     public ISingularityRouting Routing{get;}
+    /// <summary>Gets the configuration describing what the current Hub level renders.</summary>
+    public ISingularityHubConfiguration Configuration{get;}
     /// <summary>Gets the registered process-group declarations.</summary>
     public IReadOnlyList<ProcessGroupRegistration> ProcessGroups=>_registrations;
     /// <summary>Gets process groups currently in the active lifecycle state.</summary>
