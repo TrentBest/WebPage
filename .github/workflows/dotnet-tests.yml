@@ -1,12 +1,25 @@
 name: .NET Tests
+
 on:
+  push:
+    branches:
+      - development
+      - "mvp/**"
+  pull_request:
+    branches:
+      - development
   workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -19,21 +32,25 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
+
       - name: Restore
         run: |
           dotnet restore SingularityHub.Tests/SingularityHub.Tests.csproj
           dotnet restore Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj
           dotnet restore Experiences/PongExperience.Tests/PongExperience.Tests.csproj
+
       - name: Build
         run: |
           dotnet build SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-restore
+
       - name: Test with TRX and coverage
         run: |
           dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults/SingularityHub --logger "trx;LogFileName=SingularityHub.Tests.trx"
           dotnet test Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults/LivingGui --logger "trx;LogFileName=LivingGuiExperience.Tests.trx"
           dotnet test Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults/Pong --logger "trx;LogFileName=PongExperience.Tests.trx"
+
       - name: Upload test results and coverage
         if: always()
         uses: actions/upload-artifact@v4
@@ -42,8 +59,9 @@ jobs:
           path: TestResults/
           retention-days: 14
           if-no-files-found: error
+
       - name: Upload coverage to Codecov
-        if: always() && env.CODECOV_TOKEN != ''
+        if: ${{ always() && env.CODECOV_TOKEN != '' }}
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         uses: codecov/codecov-action@v5
