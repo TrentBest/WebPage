@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.Services;
+using TheSingularityWorkshop.Workshop.Composition;
 using Xunit;
 
 namespace SingularityHub.Tests;
@@ -17,6 +18,7 @@ public sealed class MonikerExperienceTests
         Assert.Equal("Gateway", service.FirstContact.CurrentState);
         service.RequestEntry();
         service.Tick();
+        service.SelectIntegration(WorkshopIntegrationMode.Direct);
 
         Assert.Equal("Moniker", service.FirstContact.CurrentState);
         Assert.False(service.ShowUnity);
@@ -64,6 +66,8 @@ public sealed class MonikerExperienceTests
         Assert.Equal("Gateway", service.FirstContact.CurrentState);
 
         service.RequestEntry();
+        service.Tick();
+        service.SelectIntegration(WorkshopIntegrationMode.Direct);
 
         for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Landing"; i++)
             service.Tick();
