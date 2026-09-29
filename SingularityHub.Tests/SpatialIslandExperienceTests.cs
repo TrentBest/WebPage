@@ -35,7 +35,8 @@ public sealed class SpatialIslandExperienceTests
         var manifest = SpatialTransitManifest.CreateDefault();
 
         var destination = Assert.Single(
-            manifest.Destinations.Where(x => x.Id == "singularity-island"));
+            manifest.Destinations,
+            x => x.Id == "singularity-island");
 
         Assert.Equal("SINGULARITY ISLAND", destination.Label);
         Assert.Equal("singularity-island", destination.SceneId);
