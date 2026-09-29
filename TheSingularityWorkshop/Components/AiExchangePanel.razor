@@ -104,7 +104,7 @@
     {
         var exchange = Exchange;
 
-        return WorkshopGui.Panel(this)
+        var panel = WorkshopGui.Panel(this)
             .Heading("AI EXCHANGE", 2)
             .Paragraph("The Hub assembled this ProtocolAI + GrammarAI surface. Extract sends the registered AI content to the human/LLM; Extract from Clipboard brings the next round back into the active tool.")
             .Content(
@@ -121,8 +121,12 @@
                     .Attribute("aria-label", "LLM response")
                     .Style("width", "100%")
                     .Style("box-sizing", "border-box"))
-            .Content(BuildActions())
-            .Content(_showStack ? BuildStackViewer() : null)
+            .Content(BuildActions());
+
+        if (_showStack)
+            panel.Content(BuildStackViewer());
+
+        return panel
             .Paragraph($"STATUS // {_status}")
             .Build();
     }
