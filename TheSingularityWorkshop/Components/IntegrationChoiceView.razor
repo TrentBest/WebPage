@@ -5,15 +5,15 @@
         <div class="integration-eyebrow">THE SINGULARITY WORKSHOP // INTEGRATION BOUNDARY</div>
         <h1>CHOOSE HOW TO ENTER</h1>
         <p class="integration-lead">
-            The Workshop can be presented directly by Blazor, or assembled through
-            FSM_COS before Blazor manifests it.
+            The same Workshop can be built directly from its packages, or composed through
+            FSM_COS before the host manifests it.
         </p>
 
         <div class="integration-options">
-            <button class="integration-option blazor" @onclick="() => Select(WorkshopIntegrationMode.Blazor)">
+            <button class="integration-option direct" @onclick="() => Select(WorkshopIntegrationMode.Direct)">
                 <span class="option-index">01</span>
-                <strong>BLAZOR INTEGRATION</strong>
-                <span>Direct platform manifestation.</span>
+                <strong>DIRECT INTEGRATION</strong>
+                <span>Use the Workshop packages directly. No FSM_COS assembly.</span>
             </button>
 
             <button class="integration-option cos" @onclick="() => Select(WorkshopIntegrationMode.FsmCos)">
@@ -39,7 +39,7 @@
 .integration-option strong{font-size:clamp(.85rem,1.6vw,1.25rem);letter-spacing:.08em}
 .integration-option span:last-child{color:#91a7b1;font-size:.58rem;line-height:1.5}
 .integration-option.cos strong{color:#ffd34d}
-.integration-option.blazor strong{color:#00eaff}
+.integration-option.direct strong{color:#00eaff}
 @media(max-width:700px){.integration-options{grid-template-columns:1fr}.integration-option{min-height:145px}}
 @media(prefers-reduced-motion:reduce){.integration-option{transition:none}}
 </style>
