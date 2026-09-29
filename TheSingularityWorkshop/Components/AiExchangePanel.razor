@@ -8,9 +8,88 @@
 
 @BuildPanel()
 
+<style>
+    .ai-exchange-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .65rem;
+        align-items: center;
+    }
+
+    .ai-exchange-action {
+        min-width: 12rem;
+        transition: opacity .25s ease, transform .25s ease, filter .25s ease;
+    }
+
+    .ai-exchange-action-active {
+        animation: aiExchangeBreath 1.8s ease-in-out infinite;
+        transform-origin: center;
+    }
+
+    .ai-exchange-action-inactive {
+        opacity: .58;
+        filter: saturate(.55);
+    }
+
+    .ai-exchange-stack {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid rgba(0, 234, 255, .2);
+        background: rgba(0, 234, 255, .025);
+    }
+
+    .ai-exchange-round {
+        padding: .8rem;
+        border-left: 2px solid rgba(255, 44, 255, .65);
+        background: rgba(0, 0, 0, .16);
+    }
+
+    .ai-exchange-round-label {
+        margin-bottom: .35rem;
+        color: #00eaff;
+        font: .7rem Consolas, 'Courier New', monospace;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .ai-exchange-round pre {
+        margin: .35rem 0 0;
+        max-height: 14rem;
+        overflow: auto;
+        white-space: pre-wrap;
+        color: #d7fbff;
+        font: .72rem/1.45 Consolas, 'Courier New', monospace;
+    }
+
+    @keyframes aiExchangeBreath {
+        0%, 100% {
+            transform: scale(1);
+            filter: brightness(.92) saturate(.9);
+            box-shadow: 0 0 0 rgba(0, 234, 255, 0);
+        }
+
+        50% {
+            transform: scale(1.035);
+            filter: brightness(1.18) saturate(1.15);
+            box-shadow: 0 0 22px rgba(0, 234, 255, .2);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .ai-exchange-action-active {
+            animation: none;
+        }
+    }
+</style>
+
 @code {
     private string _llmResponse = string.Empty;
     private string _status = "READY";
+    private bool _awaitingResponse;
+    private bool _showStack;
 
     protected override void OnInitialized()
     {
@@ -27,7 +106,7 @@
 
         return WorkshopGui.Panel(this)
             .Heading("AI EXCHANGE", 2)
-            .Paragraph("The runtime assembled this ProtocolAI + GrammarAI surface. Copy the semantic exchange to an LLM, then paste its response back here.")
+            .Paragraph("The Hub assembled this ProtocolAI + GrammarAI surface. Extract sends the registered AI content to the human/LLM; Extract from Clipboard brings the next round back into the active tool.")
             .Content(
                 WorkshopGui.Element(this, "div")
                     .Class("ai-exchange-grid")
@@ -37,25 +116,43 @@
                 WorkshopGui.Element(this, "textarea")
                     .Attribute("id", "ai-llm-response")
                     .Attribute("rows", 10)
-                    .Attribute("placeholder", "Paste the LLM response here...")
+                    .Attribute("placeholder", "Paste the LLM response here if you want to inspect it before capturing...")
                     .Attribute("value", _llmResponse)
                     .Attribute("aria-label", "LLM response")
                     .Style("width", "100%")
                     .Style("box-sizing", "border-box"))
-            .Content(
-                WorkshopGui.Button(this)
-                    .Label("Extract to Clipboard")
-                    .OnClick(ExtractAsync))
-            .Content(
-                WorkshopGui.Button(this)
-                    .Label("Paste from Clipboard")
-                    .OnClick(PasteAsync))
-            .Content(
-                WorkshopGui.Button(this)
-                    .Label("Capture Response")
-                    .OnClick(CaptureResponse))
+            .Content(BuildActions())
+            .Content(_showStack ? BuildStackViewer() : null)
             .Paragraph($"STATUS // {_status}")
             .Build();
+    }
+
+    private ElementBuilder BuildActions()
+    {
+        var actions = WorkshopGui.Element(this, "div")
+            .Class("ai-exchange-actions");
+
+        actions.Child(
+            WorkshopGui.Button(this)
+                .Label("Extract to Clipboard")
+                .Style("animation", _awaitingResponse ? "none" : "aiExchangeBreath 1.8s ease-in-out infinite")
+                .Style("opacity", _awaitingResponse ? ".58" : "1")
+                .OnClick(ExtractAsync));
+
+        actions.Child(
+            WorkshopGui.Button(this)
+                .Label("Extract from Clipboard")
+                .Style("animation", _awaitingResponse ? "aiExchangeBreath 1.8s ease-in-out infinite" : "none")
+                .Style("opacity", _awaitingResponse ? "1" : ".58")
+                .OnClick(PasteAsync));
+
+        actions.Child(
+            WorkshopGui.Button(this)
+                .Label(_showStack ? "Hide Exchange Stack" : "View Exchange Stack")
+                .Style("opacity", ".82")
+                .OnClick(ToggleStack));
+
+        return actions;
     }
 
     private ElementBuilder BuildReadonlyBlock(string label, string value) =>
@@ -73,34 +170,109 @@
                     .Style("box-sizing", "border-box")
                     .Text(value));
 
+    private ElementBuilder BuildStackViewer()
+    {
+        var viewer = WorkshopGui.Element(this, "div")
+            .Class("ai-exchange-stack");
+
+        var rounds = Exchange?.Rounds ?? Array.Empty<AiExchangeRound>();
+
+        if (rounds.Count == 0)
+        {
+            viewer.Child(
+                WorkshopGui.Element(this, "div")
+                    .Text("No completed exchange rounds yet."));
+            return viewer;
+        }
+
+        foreach (var round in rounds.Reverse())
+        {
+            viewer.Child(
+                WorkshopGui.Element(this, "article")
+                    .Class("ai-exchange-round")
+                    .Child(
+                        WorkshopGui.Element(this, "div")
+                            .Class("ai-exchange-round-label")
+                            .Text($"ROUND {round.Number}"))
+                    .Child(
+                        WorkshopGui.Element(this, "strong")
+                            .Text("OUTBOUND"))
+                    .Child(
+                        WorkshopGui.Element(this, "pre")
+                            .Text(round.Outbound))
+                    .Child(
+                        WorkshopGui.Element(this, "strong")
+                            .Text(round.Response is null ? "INBOUND // WAITING" : "INBOUND"))
+                    .Child(
+                        WorkshopGui.Element(this, "pre")
+                            .Text(round.Response ?? "Waiting for the human/LLM response...")));
+        }
+
+        return viewer;
+    }
+
     private async Task ExtractAsync()
     {
         var exchange = Exchange;
-        if (exchange?.ExchangeText is null)
+        if (exchange is null)
         {
             _status = "NO EXCHANGE";
             StateHasChanged();
             return;
         }
 
-        await JS.InvokeVoidAsync("navigator.clipboard.writeText", exchange.ExchangeText);
-        _status = "EXCHANGE COPIED";
+        try
+        {
+            var round = exchange.BeginExchange();
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", round.Outbound);
+            _awaitingResponse = true;
+            _status = $"ROUND {round.Number} // EXTRACTED // WAITING FOR RESPONSE";
+        }
+        catch (Exception exception)
+        {
+            _status = $"EXTRACT FAILED // {exception.Message}";
+        }
+
         StateHasChanged();
     }
 
     private async Task PasteAsync()
     {
-        _llmResponse = await JS.InvokeAsync<string>("navigator.clipboard.readText");
-        _status = "RESPONSE PASTED";
+        var exchange = Exchange;
+        if (exchange is null)
+        {
+            _status = "NO EXCHANGE";
+            StateHasChanged();
+            return;
+        }
+
+        try
+        {
+            var response = await JS.InvokeAsync<string>("navigator.clipboard.readText");
+
+            if (string.IsNullOrWhiteSpace(response))
+            {
+                _status = "CLIPBOARD EMPTY";
+                StateHasChanged();
+                return;
+            }
+
+            var round = exchange.RecordResponse(response);
+            _llmResponse = response;
+            _awaitingResponse = false;
+            _status = $"ROUND {round.Number} // RESPONSE CAPTURED // EXTRACT READY";
+        }
+        catch (Exception exception)
+        {
+            _status = $"CLIPBOARD READ FAILED // {exception.Message}";
+        }
+
         StateHasChanged();
     }
 
-    private void CaptureResponse()
+    private void ToggleStack()
     {
-        _status = string.IsNullOrWhiteSpace(_llmResponse)
-            ? "NO RESPONSE"
-            : "RESPONSE CAPTURED — PARSER BOUNDARY READY";
-
+        _showStack = !_showStack;
         StateHasChanged();
     }
 }
