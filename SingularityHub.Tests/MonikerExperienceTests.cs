@@ -1,4 +1,6 @@
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Services;
+using TheSingularityWorkshop.Workshop.Composition;
 using Xunit;
 
 namespace SingularityHub.Tests;
@@ -8,7 +10,7 @@ public sealed class MonikerExperienceTests
     [Fact(DisplayName = "Moniker experience does not expose a Unity runtime handoff")]
     public void MonikerExperienceDoesNotExposeUnityRuntimeHandoff()
     {
-        using var service = new WorkshopExperienceService();
+        using var service = new WorkshopExperienceService(new FsmCos(new WorkshopCompositionCatalog()));
 
         service.Initialize();
         for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Gateway"; i++)
@@ -55,7 +57,7 @@ public sealed class MonikerExperienceTests
     [Fact(DisplayName = "Landing leaves the moniker in place until the user navigates away")]
     public void LandingDoesNotAutoDismissMoniker()
     {
-        using var service = new WorkshopExperienceService();
+        using var service = new WorkshopExperienceService(new FsmCos(new WorkshopCompositionCatalog()));
         service.Initialize();
 
         for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Gateway"; i++)
@@ -129,7 +131,7 @@ public sealed class MonikerExperienceTests
     [Fact(DisplayName = "Gateway breathing is driven by FSM ticks")]
     public void GatewayBreathingIsFsmDriven()
     {
-        using var service = new WorkshopExperienceService();
+        using var service = new WorkshopExperienceService(new FsmCos(new WorkshopCompositionCatalog()));
         service.Initialize();
 
         for (var i = 0; i < 90; i++)
@@ -149,7 +151,7 @@ public sealed class MonikerExperienceTests
     [Fact(DisplayName = "First-contact presentation is driven by explicit FSM phases")]
     public void FirstContactPresentationUsesExplicitPhasesWithoutAFlash()
     {
-        using var service = new WorkshopExperienceService();
+        using var service = new WorkshopExperienceService(new FsmCos(new WorkshopCompositionCatalog()));
 
         service.Initialize();
 
