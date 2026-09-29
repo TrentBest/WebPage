@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Workshop.Composition;
 using Xunit;
@@ -9,7 +10,7 @@ public sealed class WorkshopCompositionTests
     [Fact(DisplayName = "Workshop startup assembles the zeroth Moniker composition through FSM_COS")]
     public void StartupAssemblesMonikerComposition()
     {
-        using var experience = new WorkshopExperienceService();
+        using var experience = new WorkshopExperienceService(new FsmCos(new WorkshopCompositionCatalog()));
         experience.Initialize();
         Assert.NotNull(experience.RuntimeAssembly);
         Assert.Contains(experience.RuntimeAssembly!.Bundles, bundle => bundle.Id == MonikerCompositionBundle.BundleId);
