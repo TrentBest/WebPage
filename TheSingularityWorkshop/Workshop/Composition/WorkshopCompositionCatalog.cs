@@ -1,11 +1,27 @@
 using TheSingularityWorkshop.FSM_COS;
+
 namespace TheSingularityWorkshop.Workshop.Composition;
+
 public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
 {
-    private readonly IMicroBundle _moniker=new MonikerCompositionBundle();
-    public bool TryResolve(ulong bundleId,out IMicroBundle? bundle)
+    private readonly IReadOnlyDictionary<ulong, IMicroBundle> _bundles;
+
+    public WorkshopCompositionCatalog()
     {
-        if(bundleId==MonikerCompositionBundle.BundleId){bundle=_moniker;return true;}
-        bundle=null;return false;
+        var protocol = new ProtocolAiCompositionBundle();
+        var grammar = new GrammarAiCompositionBundle();
+        var aiExchange = new AiExchangeCompositionBundle();
+        var moniker = new MonikerCompositionBundle();
+
+        _bundles = new Dictionary<ulong, IMicroBundle>
+        {
+            [moniker.Id] = moniker,
+            [protocol.Id] = protocol,
+            [grammar.Id] = grammar,
+            [aiExchange.Id] = aiExchange
+        };
     }
+
+    public bool TryResolve(ulong bundleId, out IMicroBundle? bundle) =>
+        _bundles.TryGetValue(bundleId, out bundle);
 }
