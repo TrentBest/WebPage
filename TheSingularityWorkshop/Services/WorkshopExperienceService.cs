@@ -18,13 +18,20 @@ public sealed class WorkshopExperienceService : IDisposable
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public FirstContactFsm FirstContact => _firstContact;
     public RuntimeAssembly? RuntimeAssembly { get; private set; }
-    public GuiNode? MonikerComposition => RuntimeAssembly?.Bundles.OfType<MonikerCompositionBundle>().Select(bundle => bundle.Composition).FirstOrDefault(composition => composition is not null);
+    public GuiNode? MonikerComposition => RuntimeAssembly?.TryGetBundle<MonikerCompositionBundle>(MonikerCompositionBundle.BundleId, out var moniker) == true ? moniker!.Composition : null;
+    public AiExchangeCompositionBundle? AiExchangeComposition => RuntimeAssembly?.TryGetBundle<AiExchangeCompositionBundle>(AiExchangeCompositionBundle.BundleId, out var ai) == true ? ai : null;
 
     public void Initialize(bool returningVisitor = false)
     {
         if(IsInitialized)return;
         IsInitialized=true; IsFirstVisit=!returningVisitor;
-        RuntimeAssembly=_compositionSystem.Execute(new RuntimeManifest(RuntimeId:1UL,Bundles:new[]{BundleRequest.Unconfigured(MonikerCompositionBundle.BundleId)}));
+        RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
+            RuntimeId: 1UL,
+            Bundles: new[]
+            {
+                BundleRequest.Unconfigured(MonikerCompositionBundle.BundleId),
+                BundleRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
+            }));
         CurrentState="FirstContact";
         _firstContact.Start();
         StateChanged?.Invoke();
