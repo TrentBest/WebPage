@@ -31,7 +31,7 @@ public sealed class SpatialLaboratoryAndUniverseExperienceTests
         Assert.Equal("security", lab.Floors.Single(x => x.Level == -1).DomainId);
         Assert.Equal("administration", lab.Floors.Single(x => x.Level == 0).DomainId);
 
-        var collider = Assert.Single(lab.Simulators, x => x.Id == "particle-collider";
+        var collider = Assert.Single(lab.Simulators, x => x.Id == "particle-collider");
         Assert.Contains("SOLAR SYSTEM", collider.Scale);
         Assert.Contains("atomics", collider.DomainIds);
         Assert.Contains("fsm-physics", collider.DomainIds);
@@ -42,7 +42,7 @@ public sealed class SpatialLaboratoryAndUniverseExperienceTests
     {
         var scene = SpatialWorkshopScene.CreateDefault();
 
-        var lab = Assert.Single(scene.Interactables, x => x.Id == "singularity-lab";
+        var lab = Assert.Single(scene.Interactables, x => x.Id == "singularity-lab");
         Assert.Equal("singularity-lab", lab.ExperienceId);
         Assert.True(lab.Bounds.Width > 0);
         Assert.True(lab.Bounds.Height > 0);
