@@ -2,6 +2,6 @@ namespace TheSingularityWorkshop.Workshop.Composition;
 
 public enum WorkshopIntegrationMode
 {
-    Blazor,
+    Direct,
     FsmCos
 }
