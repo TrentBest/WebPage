@@ -25,13 +25,15 @@ public sealed class FirstContactFsm : IDisposable
             .State("FirstFadingSecondComingIn", EnterCrossfade, UpdateCrossfade, null)
             .State("SecondOnly", EnterSecondOnly, UpdateSecondOnly, null)
             .State("Gateway", EnterGateway, UpdateGateway, null)
+            .State("IntegrationChoice", EnterIntegrationChoice, UpdateIntegrationChoice, null)
             .State("Moniker", EnterState, UpdateClock, null)
             .State("HubGrowth", EnterState, UpdateClock, null)
             .State("Landing", null, null, null)
             .Transition("FirstOnly", "FirstFadingSecondComingIn", c => ((FirstContactContext)c).StatementOpacity >= 1d)
             .Transition("FirstFadingSecondComingIn", "SecondOnly", c => ((FirstContactContext)c).QuestionOpacity >= 1d)
             .Transition("SecondOnly", "Gateway", c => ((FirstContactContext)c).QuestionOpacity <= 0d)
-            .Transition("Gateway", "Moniker", c => ((FirstContactContext)c).EntryRequested)
+            .Transition("Gateway", "IntegrationChoice", c => ((FirstContactContext)c).EntryRequested)
+            .Transition("IntegrationChoice", "Moniker", c => ((FirstContactContext)c).IntegrationSelected)
             .Transition("Moniker", "HubGrowth", c => ((FirstContactContext)c).Ticks >= 60)
             .Transition("HubGrowth", "Landing", c => ((FirstContactContext)c).HubReady)
             .WithInitialState("FirstOnly")
@@ -43,7 +45,9 @@ public sealed class FirstContactFsm : IDisposable
     public string CurrentState => _fsm.CurrentState;
     public long StateTicks => _context.Ticks;
     public bool IsLanding => CurrentState == "Landing";
+    public bool IsIntegrationChoice => CurrentState == "IntegrationChoice";
     public bool EntryRequested => _context.EntryRequested;
+    public bool IntegrationSelected => _context.IntegrationSelected;
     public double PresentationProgress => Math.Clamp(_context.Ticks / PhaseDurationTicks, 0d, 1d);
     public double StatementOpacity => _context.StatementOpacity;
     public double QuestionOpacity => _context.QuestionOpacity;
@@ -54,6 +58,7 @@ public sealed class FirstContactFsm : IDisposable
 
     public void Start() => _context.Started = true;
     public void RequestEntry() => _context.EntryRequested = true;
+    public void SelectIntegration() => _context.IntegrationSelected = true;
     public void SetHubReady() => _context.HubReady = true;
 
     public void Update()
@@ -71,6 +76,7 @@ public sealed class FirstContactFsm : IDisposable
         {
             "FirstFadingSecondComingIn" => FirstContactSoundCue.DigitalResonance,
             "Gateway" => FirstContactSoundCue.Silence,
+            "IntegrationChoice" => FirstContactSoundCue.Silence,
             "Moniker" => FirstContactSoundCue.Water,
             "HubGrowth" => FirstContactSoundCue.HubArrival,
             "Landing" => FirstContactSoundCue.Silence,
@@ -145,6 +151,16 @@ public sealed class FirstContactFsm : IDisposable
         state.GatewayBreath = BreathWave(state.Ticks, 96d);
     }
 
+    private static void EnterIntegrationChoice(IStateContext context)
+    {
+        var state = (FirstContactContext)context;
+        state.Ticks = 0;
+        state.IntegrationSelected = false;
+    }
+
+    private static void UpdateIntegrationChoice(IStateContext context)
+        => ((FirstContactContext)context).Ticks++;
+
     private static void EnterState(IStateContext context)
         => ((FirstContactContext)context).Ticks = 0;
 
@@ -188,6 +204,7 @@ public sealed class FirstContactFsm : IDisposable
         public bool Started { get; set; }
         public long Ticks { get; set; }
         public bool EntryRequested { get; set; }
+        public bool IntegrationSelected { get; set; }
         public bool HubReady { get; set; }
         public double StatementOpacity { get; set; }
         public double QuestionOpacity { get; set; }
