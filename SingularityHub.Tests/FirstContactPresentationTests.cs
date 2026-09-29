@@ -66,6 +66,11 @@ public sealed class FirstContactPresentationTests
         Assert.True(fsm.IsIntegrationChoice);
         Assert.False(fsm.IntegrationSelected);
 
+        // The new state's OnEnter runs on the following tick; let that deferred
+        // entry complete before setting the selection consumed by its transition.
+        fsm.Update();
+        Assert.True(fsm.IsIntegrationChoice);
+
         fsm.SelectIntegration();
         fsm.Update();
 
