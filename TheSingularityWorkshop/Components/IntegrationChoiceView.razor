@@ -1,0 +1,52 @@
+@using TheSingularityWorkshop.Workshop.Composition
+
+<section class="integration-choice-stage" aria-label="Workshop integration selection">
+    <div class="integration-choice-frame">
+        <div class="integration-eyebrow">THE SINGULARITY WORKSHOP // INTEGRATION BOUNDARY</div>
+        <h1>CHOOSE HOW TO ENTER</h1>
+        <p class="integration-lead">
+            The Workshop can be presented directly by Blazor, or assembled through
+            FSM_COS before Blazor manifests it.
+        </p>
+
+        <div class="integration-options">
+            <button class="integration-option blazor" @onclick="() => Select(WorkshopIntegrationMode.Blazor)">
+                <span class="option-index">01</span>
+                <strong>BLAZOR INTEGRATION</strong>
+                <span>Direct platform manifestation.</span>
+            </button>
+
+            <button class="integration-option cos" @onclick="() => Select(WorkshopIntegrationMode.FsmCos)">
+                <span class="option-index">02</span>
+                <strong>FSM_COS INTEGRATION</strong>
+                <span>Manifest → dependency closure → arbitration → runtime assembly.</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<style>
+.integration-choice-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,rgba(0,234,255,.11),transparent 36%),#020711;color:#eefaff}
+.integration-choice-frame{width:min(920px,86vw);padding:clamp(1.5rem,4vw,3.5rem);box-sizing:border-box;border:1px solid rgba(0,234,255,.34);background:rgba(2,8,16,.78);box-shadow:0 0 55px rgba(0,234,255,.09),inset 0 0 35px rgba(0,234,255,.025);text-align:center}
+.integration-eyebrow{color:#00eaff;font:700 clamp(.55rem,1vw,.78rem) Consolas,'Courier New',monospace;letter-spacing:.18em}
+.integration-choice-frame h1{margin:.65rem 0 .5rem;font:900 clamp(1.7rem,4vw,3.8rem) Georgia,'Times New Roman',serif;letter-spacing:.04em}
+.integration-lead{max-width:720px;margin:0 auto;color:#9db2bc;font:400 clamp(.72rem,1.25vw,1rem) Consolas,'Courier New',monospace;line-height:1.7}
+.integration-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:2rem}
+.integration-option{min-height:190px;padding:1.35rem;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:.45rem;text-align:left;border:1px solid rgba(0,234,255,.35);background:rgba(0,234,255,.035);color:#eefaff;cursor:pointer;font-family:inherit;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.integration-option:hover{transform:translateY(-4px);border-color:#00eaff;box-shadow:0 0 28px rgba(0,234,255,.13)}
+.integration-option.cos:hover{border-color:#ffd34d;box-shadow:0 0 32px rgba(255,211,77,.13)}
+.integration-option .option-index{font-size:.55rem;letter-spacing:.16em;color:#6f8994}
+.integration-option strong{font-size:clamp(.85rem,1.6vw,1.25rem);letter-spacing:.08em}
+.integration-option span:last-child{color:#91a7b1;font-size:.58rem;line-height:1.5}
+.integration-option.cos strong{color:#ffd34d}
+.integration-option.blazor strong{color:#00eaff}
+@media(max-width:700px){.integration-options{grid-template-columns:1fr}.integration-option{min-height:145px}}
+@media(prefers-reduced-motion:reduce){.integration-option{transition:none}}
+</style>
+
+@code {
+    [Parameter] public EventCallback<WorkshopIntegrationMode> OnSelected { get; set; }
+
+    private Task Select(WorkshopIntegrationMode mode)
+        => OnSelected.InvokeAsync(mode);
+}
