@@ -22,11 +22,8 @@ public enum HubTabAcquisitionKind
 
 /// <summary>Explicit source information for a tab whose content is acquired rather than declared.</summary>
 public readonly record struct HubTabAcquisition(
-    /// <param name="Kind">Describes whether the tab source is declared or provider-backed.</param>
     HubTabAcquisitionKind Kind,
-    /// <param name="SourceId">Stable identity of the acquisition source.</param>
     ulong SourceId,
-    /// <param name="Selector">Optional provider-specific selector.</param>
     string? Selector = null)
 {
     /// <summary>Gets whether this acquisition identifies a valid provider source.</summary>
@@ -40,20 +37,20 @@ public readonly record struct HubTabAcquisition(
 public sealed record HubTabDefinition
 {
     /// <summary>Creates a Hub tab definition.</summary>
+    /// <param name="id">Stable identity of the tab.</param>
+    /// <param name="label">Human-readable tab label.</param>
+    /// <param name="order">Zero-based placement order within the Hub level.</param>
+    /// <param name="targetKind">Kind of surface exposed by the tab.</param>
+    /// <param name="route">Canonical route used to enter the tab.</param>
+    /// <param name="targetId">Stable target identity when the tab is explicitly declared.</param>
+    /// <param name="acquisition">Optional provider acquisition descriptor.</param>
     public HubTabDefinition(
-        /// <param name="id">Stable identity of the tab.</param>
         ulong id,
-        /// <param name="label">Human-readable tab label.</param>
         string label,
-        /// <param name="order">Zero-based placement order within the Hub level.</param>
         int order,
-        /// <param name="targetKind">Kind of surface exposed by the tab.</param>
         HubTabTargetKind targetKind,
-        /// <param name="route">Canonical route used to enter the tab.</param>
         string route,
-        /// <param name="targetId">Stable target identity when the tab is explicitly declared.</param>
         ulong? targetId = null,
-        /// <param name="acquisition">Optional provider acquisition descriptor.</param>
         HubTabAcquisition? acquisition = null)
     {
         if (id == 0) throw new ArgumentException("A Hub tab requires a stable identity.", nameof(id));
