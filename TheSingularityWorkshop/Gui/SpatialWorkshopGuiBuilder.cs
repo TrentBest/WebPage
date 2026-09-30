@@ -24,6 +24,7 @@ public static class SpatialWorkshopGuiBuilder
         root.Content(Styles(receiver));
         root.Content(World(receiver, scene, avatarX, avatarY, presence, detailLevel, effectiveZoom, zoomEnabled, onKeyDown, onWorldClick, interact, setZoom, enterConstructionSite, constructionTourActive, constructionTourMessage));
         root.Content(ViewBar(receiver, detailLevel, setDetailLevel, effectiveZoom, zoomEnabled, setZoom, showMap));
+        root.Content(WorldInstrument(receiver, scene, presence));
         root.Content(ConstructionBanner(receiver));
         if (constructionWelcomeVisible)
             root.Content(ConstructionHandover(receiver, scene.ConstructionSite, requestConstructionTour, exitConstructionSite));
@@ -297,6 +298,39 @@ public static class SpatialWorkshopGuiBuilder
             .Style("width", "14px").Style("height", "14px").Style("border", $"1px solid {White}")
             .Style("border-radius", "50%").Style("box-shadow", $"0 0 12px {White}88")
             .Style("transform", "translate(-50%,-50%)").Style("z-index", "10").Style("pointer-events", "none");
+
+    private static ElementBuilder WorldInstrument(object receiver, SpatialWorkshopScene scene, WorkshopPresenceMicroBundle presence)
+    {
+        var connected = presence.Source == WorkshopPresenceSource.Connected;
+        var source = connected ? "CONNECTED" : "SIMULATED";
+        var accent = connected ? Cyan : Yellow;
+
+        return WorkshopGui.Element(receiver, "div")
+            .Style("position", "fixed")
+            .Style("left", "1rem")
+            .Style("bottom", "1rem")
+            .Style("z-index", "30")
+            .Style("min-width", "220px")
+            .Style("padding", ".45rem .6rem")
+            .Style("border", $"1px solid {accent}55")
+            .Style("background", "rgba(1,4,10,.86)")
+            .Style("box-shadow", $"0 0 18px {accent}10")
+            .Style("font-size", ".43rem")
+            .Style("letter-spacing", ".12em")
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("color", accent)
+                .Text($"WORLD // {source} PRESENCE"))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".3rem")
+                .Style("display", "flex")
+                .Style("gap", ".7rem")
+                .Style("color", White)
+                .Text($"YOU // CENTERED    VISITORS // {presence.Participants.Count:00}    STRUCTURES // {scene.Interactables.Count:00}"))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".25rem")
+                .Style("color", "#8fa7b0")
+                .Text("WORLD STATE IS SHARED; EXPERIENCE STATE MAY REMAIN LOCAL."));
+    }
 
     private static ElementBuilder ViewBar(object receiver, int detailLevel, Action<int> setDetailLevel, double zoom, bool zoomEnabled, Action<double>? setZoom, Action? showMap)
     {
