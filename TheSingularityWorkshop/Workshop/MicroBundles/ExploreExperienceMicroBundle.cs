@@ -25,6 +25,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         User = new UserMicroBundle();
         Conference = new ConferenceMicroBundle();
         Forge = new FsmForgeMicroBundle();
+        Presence = new WorkshopPresenceMicroBundle();
         SoftwarePatterns = new SoftwarePatternsMicroBundle();
         SoftwarePatternsAnnotation = new SoftwarePatternsAnnotationMicroBundle(SoftwarePatterns);
         Moniker = GetOrLoadMoniker();
@@ -44,6 +45,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     public UserMicroBundle User { get; }
     public ConferenceMicroBundle Conference { get; }
     public FsmForgeMicroBundle Forge { get; }
+    public WorkshopPresenceMicroBundle Presence { get; }
     public SoftwarePatternsMicroBundle SoftwarePatterns { get; }
     public SoftwarePatternsAnnotationMicroBundle SoftwarePatternsAnnotation { get; }
 
@@ -56,6 +58,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         User.Update();
         Conference.Update();
         Forge.Update();
+        Presence.Update();
         SoftwarePatterns.Update();
         SoftwarePatternsAnnotation.Update();
     }
@@ -68,6 +71,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         SoftwarePatternsAnnotation.Dispose();
         SoftwarePatterns.Dispose();
         Forge.Dispose();
+        Presence.Dispose();
         Conference.Dispose();
         User.Dispose();
         Navigation.Dispose();
