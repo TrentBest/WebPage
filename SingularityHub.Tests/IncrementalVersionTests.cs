@@ -172,4 +172,13 @@ public sealed class IncrementalVersionTests
             presence.Source);
     }
 
+    [ArchitectureTest(0, 0, 174)] [Fact(DisplayName = "V0.0.174 — Explore_Exposes_Shared_World_Status_As_A_Diegetic_Instrument")]
+    public void V0_0_174ExploreExposesSharedWorldStatusAsADiegeticInstrument()
+    {
+        using var presence = new TheSingularityWorkshop.Workshop.MicroBundles.WorkshopPresenceMicroBundle();
+
+        Assert.Equal(TheSingularityWorkshop.Workshop.MicroBundles.WorkshopPresenceSource.Simulated, presence.Source);
+        Assert.Equal(4, presence.Participants.Count);
+    }
+
 }
