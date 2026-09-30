@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components.Web;
+using TheSingularityWorkshop.Workshop.MicroBundles;
 
 namespace TheSingularityWorkshop.Gui;
 
