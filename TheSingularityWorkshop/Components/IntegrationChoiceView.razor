@@ -80,10 +80,10 @@
 .integration-question strong{display:block;color:#eefaff;font:700 clamp(.7rem,1vw,1rem)/1.25 Consolas,'Courier New',monospace;letter-spacing:.08em}
 .integration-footnote{position:absolute;z-index:7;left:50%;bottom:1.1rem;transform:translateX(-50%);display:flex;align-items:center;gap:.55rem;color:#607781;font-size:.45rem;letter-spacing:.16em;pointer-events:none}
 .integration-footnote i{display:block;width:28px;height:1px;background:linear-gradient(to right,#00eaff,#ffd34d)}
-@keyframes integration-ambient-drift{from{transform:rotate(-4deg) translate3d(0,0,0)}to{transform:rotate(-4deg) translate3d(5vw,3vh,0)}}
-@keyframes integration-life-pulse{0%,100%{filter:brightness(.9);transform:scale(1.02)}50%{filter:brightness(1.35);transform:scale(1.08)}}
-@media(max-width:700px){.slice-content{width:42vw}.integration-slice-direct .slice-content{left:1.25rem;top:5rem}.integration-slice-cos .slice-content{right:1.25rem;bottom:5rem}.slice-content strong{font-size:clamp(1.65rem,8vw,3rem)}.slice-description{font-size:.48rem}.integration-question{width:46vw}.integration-question strong{font-size:.58rem}}
-@media(prefers-reduced-motion:reduce){.integration-ambient,.integration-slice:hover .slice-life,.integration-slice:focus-visible .slice-life{animation:none}.integration-slice,.integration-slice::before,.integration-slice::after,.slice-life,.slice-grid,.slice-content strong{transition:none}}
+@@keyframes integration-ambient-drift{from{transform:rotate(-4deg) translate3d(0,0,0)}to{transform:rotate(-4deg) translate3d(5vw,3vh,0)}}
+@@keyframes integration-life-pulse{0%,100%{filter:brightness(.9);transform:scale(1.02)}50%{filter:brightness(1.35);transform:scale(1.08)}}
+@@media(max-width:700px){.slice-content{width:42vw}.integration-slice-direct .slice-content{left:1.25rem;top:5rem}.integration-slice-cos .slice-content{right:1.25rem;bottom:5rem}.slice-content strong{font-size:clamp(1.65rem,8vw,3rem)}.slice-description{font-size:.48rem}.integration-question{width:46vw}.integration-question strong{font-size:.58rem}}
+@@media(prefers-reduced-motion:reduce){.integration-ambient,.integration-slice:hover .slice-life,.integration-slice:focus-visible .slice-life{animation:none}.integration-slice,.integration-slice::before,.integration-slice::after,.slice-life,.slice-grid,.slice-content strong{transition:none}}
 </style>
 
 @code {
