@@ -161,5 +161,15 @@ public sealed class IncrementalVersionTests
             new[] { "Direct", "FsmCos" },
             Enum.GetNames<TheSingularityWorkshop.Workshop.Composition.WorkshopIntegrationMode>());
     }
+    [ArchitectureTest(0, 0, 173)] [Fact(DisplayName = "V0.0.173 — WebForge_Shared_Presence_Is_A_FirstClass_MicroBundle_Boundary")]
+    public void V0_0_173WebForgeSharedPresenceIsAFirstClassMicroBundleBoundary()
+    {
+        using var presence = new TheSingularityWorkshop.Workshop.MicroBundles.WorkshopPresenceMicroBundle();
+
+        Assert.Equal(4, presence.Participants.Count);
+        Assert.Equal(
+            TheSingularityWorkshop.Workshop.MicroBundles.WorkshopPresenceSource.Simulated,
+            presence.Source);
+    }
 
 }
