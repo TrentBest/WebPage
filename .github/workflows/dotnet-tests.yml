@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - development
+      - webforge-fsm-cos-replication
+      - "forge/**"
+      - webforge-fsm-cos-replication
+      - "forge/**"
       - "mvp/**"
   pull_request:
     branches:
