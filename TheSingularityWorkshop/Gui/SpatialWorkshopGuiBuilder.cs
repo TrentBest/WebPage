@@ -12,7 +12,7 @@ public static class SpatialWorkshopGuiBuilder
     private const string Magenta = "#ff38d1";
 
     /// <summary>Builds the avatar-centered Workshop world and its interaction surface.</summary>
-    public static ElementBuilder Build(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, int detailLevel, Action<int> setDetailLevel, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, double zoom = 1d, Action<double>? setZoom = null, Action? showMap = null, Func<Task>? enterConstructionSite = null, bool constructionTourActive = false, string? constructionTourMessage = null, bool constructionWelcomeVisible = false, Action? requestConstructionTour = null, Action? exitConstructionSite = null)
+    public static ElementBuilder Build(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, WorkshopPresenceMicroBundle presence, int detailLevel, Action<int> setDetailLevel, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, double zoom = 1d, Action<double>? setZoom = null, Action? showMap = null, Func<Task>? enterConstructionSite = null, bool constructionTourActive = false, string? constructionTourMessage = null, bool constructionWelcomeVisible = false, Action? requestConstructionTour = null, Action? exitConstructionSite = null)
     {
         var effectiveZoom = new SpatialCamera(avatarX, avatarY, zoom).Clamped().Zoom;
         var zoomEnabled = scene.View.ZoomEnabled && setZoom is not null;
@@ -21,7 +21,7 @@ public static class SpatialWorkshopGuiBuilder
             .Style("overflow", "hidden").Style("background", "#020a12").Style("color", White)
             .Style("font-family", "Consolas, 'Courier New', monospace").Attribute("id", "workshop-spatial-experience");
         root.Content(Styles(receiver));
-        root.Content(World(receiver, scene, avatarX, avatarY, detailLevel, effectiveZoom, zoomEnabled, onKeyDown, onWorldClick, interact, setZoom, enterConstructionSite, constructionTourActive, constructionTourMessage));
+        root.Content(World(receiver, scene, avatarX, avatarY, presence, detailLevel, effectiveZoom, zoomEnabled, onKeyDown, onWorldClick, interact, setZoom, enterConstructionSite, constructionTourActive, constructionTourMessage));
         root.Content(ViewBar(receiver, detailLevel, setDetailLevel, effectiveZoom, zoomEnabled, setZoom, showMap));
         root.Content(ConstructionBanner(receiver));
         if (constructionWelcomeVisible)
@@ -29,7 +29,7 @@ public static class SpatialWorkshopGuiBuilder
         return root;
     }
 
-    private static ElementBuilder World(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, int detailLevel, double zoom, bool zoomEnabled, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, Action<double>? setZoom, Func<Task>? enterConstructionSite, bool constructionTourActive, string? constructionTourMessage)
+    private static ElementBuilder World(object receiver, SpatialWorkshopScene scene, double avatarX, double avatarY, WorkshopPresenceMicroBundle presence, int detailLevel, double zoom, bool zoomEnabled, Action<KeyboardEventArgs> onKeyDown, Func<MouseEventArgs, Task> onWorldClick, Func<string, Task> interact, Action<double>? setZoom, Func<Task>? enterConstructionSite, bool constructionTourActive, string? constructionTourMessage)
     {
         var camera = new SpatialCamera(avatarX, avatarY, zoom).Clamped();
         var world = WorkshopGui.Panel(receiver)
@@ -51,6 +51,8 @@ public static class SpatialWorkshopGuiBuilder
         worldPlane.Content(FloorPlan(receiver, zoom));
         worldPlane.Content(SpatialGeometryGuiBuilder.Build(receiver, scene, interact, zoom));
         worldPlane.Content(ConstructionSite(receiver, scene.ConstructionSite, zoom, enterConstructionSite));
+        foreach (var participant in presence.Participants)
+            worldPlane.Content(PresenceAvatar(receiver, participant, zoom));
         foreach (var vehicle in scene.ConstructionVehicles) worldPlane.Content(Vehicle(receiver, vehicle, zoom));
         foreach (var item in scene.Interactables) worldPlane.Content(Interactable(receiver, item, interact, zoom));
         world.Content(worldPlane);
@@ -257,6 +259,38 @@ public static class SpatialWorkshopGuiBuilder
                 .Content(WorkshopGui.Element(receiver, "div").Style("width", "20px").Style("height", "24px").Style("border", $"1px solid {Yellow}aa").Style("background", $"{Yellow}18").Style("clip-path", "polygon(50% 0,90% 25%,82% 100%,18% 100%,10% 25%)"))
                 .Content(WorkshopGui.Element(receiver, "div").Style("padding", ".45rem .6rem").Style("border", $"1px solid {Yellow}66").Style("background", "rgba(1,4,10,.92)").Style("color", White).Style("font-family", "system-ui,sans-serif").Style("font-size", ".68rem").Text(message)));
 
+    private static ElementBuilder PresenceAvatar(object receiver, WorkshopPresenceParticipant participant, double zoom)
+    {
+        var simulated = participant.Kind == WorkshopPresenceKind.Simulated;
+        var accent = simulated ? Yellow : Cyan;
+        return WorkshopGui.Element(receiver, "div")
+            .Style("position", "absolute")
+            .Style("left", $"{SpatialCamera.WorldToVw(participant.X, zoom):0.###}vw")
+            .Style("top", $"{SpatialCamera.WorldToVh(participant.Y, zoom):0.###}vh")
+            .Style("transform", "translate(-50%,-50%)")
+            .Style("z-index", "9")
+            .Style("pointer-events", "none")
+            .Style("text-align", "center")
+            .Style("animation", "workshop-presence-breathe 2.4s ease-in-out infinite")
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("width", "10px").Style("height", "10px")
+                .Style("margin", "0 auto")
+                .Style("border", $"1px solid {accent}")
+                .Style("border-radius", "50%")
+                .Style("background", $"{accent}33")
+                .Style("box-shadow", $"0 0 10px {accent}88"))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", "3px")
+                .Style("padding", "1px 3px")
+                .Style("background", "rgba(1,4,10,.78)")
+                .Style("border", $"1px solid {accent}44")
+                .Style("color", accent)
+                .Style("font-size", ".38rem")
+                .Style("letter-spacing", ".08em")
+                .Style("white-space", "nowrap")
+                .Text(participant.DisplayName));
+    }
+
     private static ElementBuilder Avatar(object receiver)
         => WorkshopGui.Element(receiver, "div").Style("position", "fixed").Style("left", "50%").Style("top", "50%")
             .Style("width", "14px").Style("height", "14px").Style("border", $"1px solid {White}")
@@ -293,5 +327,5 @@ public static class SpatialWorkshopGuiBuilder
             .Style("letter-spacing", ".18em").Text("⚠ UNDER CONSTRUCTION // SCHEMATIC MODE");
 
     private static ElementBuilder Styles(object receiver)
-        => WorkshopGui.Element(receiver, "style").Text("@keyframes workshop-interactable-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.8);transform:scale(1.025)}}.workshop-interactable:hover{animation:workshop-interactable-breathe 1.25s ease-in-out infinite}.workshop-interactable:focus-visible{outline:1px solid #ffd34d;outline-offset:2px}@media(prefers-reduced-motion:reduce){.workshop-interactable:hover{animation:none;filter:brightness(1.2);transform:scale(1.01)}}@keyframes workshop-vehicle-crane{0%,100%{translate:0 0}50%{translate:8vw 2vh}}@keyframes workshop-vehicle-rover{0%,100%{translate:0 0}50%{translate:-7vw 1vh}}@keyframes workshop-vehicle-lifter{0%,100%{translate:0 0}50%{translate:5vw -2vh}}@keyframes workshop-vehicle-backhoe{0%,100%{translate:0 0}50%{translate:6vw -1vh}}");
+        => WorkshopGui.Element(receiver, "style").Text("@keyframes workshop-presence-breathe{0%,100%{opacity:.72;filter:brightness(1)}50%{opacity:1;filter:brightness(1.35)}}@keyframes workshop-interactable-breathe{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.8);transform:scale(1.025)}}.workshop-interactable:hover{animation:workshop-interactable-breathe 1.25s ease-in-out infinite}.workshop-interactable:focus-visible{outline:1px solid #ffd34d;outline-offset:2px}@media(prefers-reduced-motion:reduce){.workshop-interactable:hover{animation:none;filter:brightness(1.2);transform:scale(1.01)}}@keyframes workshop-vehicle-crane{0%,100%{translate:0 0}50%{translate:8vw 2vh}}@keyframes workshop-vehicle-rover{0%,100%{translate:0 0}50%{translate:-7vw 1vh}}@keyframes workshop-vehicle-lifter{0%,100%{translate:0 0}50%{translate:5vw -2vh}}@keyframes workshop-vehicle-backhoe{0%,100%{translate:0 0}50%{translate:6vw -1vh}}");
 }
