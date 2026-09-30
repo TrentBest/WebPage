@@ -8,9 +8,13 @@ public sealed class SingularityHubConfiguration : ISingularityHubConfiguration
     private readonly Dictionary<ulong, SingularityHubDefinition> _hubs = new();
     private readonly Dictionary<string, ulong> _paths = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Gets the currently registered Hub definitions.</summary>
     public IReadOnlyCollection<SingularityHubDefinition> Hubs =>
         new ReadOnlyCollection<SingularityHubDefinition>(_hubs.Values.ToList());
 
+    /// <summary>Registers a Hub definition when its ID and path are both unused.</summary>
+    /// <param name="definition">The Hub definition to register.</param>
+    /// <returns><see langword="true"/> when the definition was registered; otherwise, <see langword="false"/>.</returns>
     public bool Register(SingularityHubDefinition definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
@@ -23,6 +27,9 @@ public sealed class SingularityHubConfiguration : ISingularityHubConfiguration
         return true;
     }
 
+    /// <summary>Removes a registered Hub definition by ID.</summary>
+    /// <param name="hubId">The ID of the Hub to remove.</param>
+    /// <returns><see langword="true"/> when a definition was removed; otherwise, <see langword="false"/>.</returns>
     public bool Remove(ulong hubId)
     {
         if (!_hubs.Remove(hubId, out var definition))
@@ -32,9 +39,17 @@ public sealed class SingularityHubConfiguration : ISingularityHubConfiguration
         return true;
     }
 
+    /// <summary>Gets a registered Hub definition by ID.</summary>
+    /// <param name="hubId">The ID of the Hub to find.</param>
+    /// <param name="definition">Receives the matching definition when found; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> when the Hub exists; otherwise, <see langword="false"/>.</returns>
     public bool TryGet(ulong hubId, out SingularityHubDefinition? definition) =>
         _hubs.TryGetValue(hubId, out definition);
 
+    /// <summary>Resolves a registered Hub definition by its path.</summary>
+    /// <param name="path">The path to resolve.</param>
+    /// <param name="definition">Receives the matching definition when found; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> when the path resolves to a Hub; otherwise, <see langword="false"/>.</returns>
     public bool TryResolve(string path, out SingularityHubDefinition? definition)
     {
         if (string.IsNullOrWhiteSpace(path) ||
