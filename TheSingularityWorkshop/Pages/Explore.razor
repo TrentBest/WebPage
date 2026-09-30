@@ -383,7 +383,7 @@
             return SpatialInteriorGuiBuilder.Build(this, title, description, Experience.User.DisplayName, ExitRoom);
         }
 
-        var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap, EnterConstructionSite, constructionTourActive, constructionTourMessage, constructionWelcomeVisible, RequestConstructionTour, ExitConstructionSite);
+        var world = SpatialWorkshopGuiBuilder.Build(this, Scene, AvatarX, AvatarY, Experience.Presence, detailLevel, SetDetailLevel, HandleKeyDown, HandleWorldClick, InteractRoom, spatialZoom, SetSpatialZoom, ShowWorkshopMap, EnterConstructionSite, constructionTourActive, constructionTourMessage, constructionWelcomeVisible, RequestConstructionTour, ExitConstructionSite);
         var root = WorkshopGui.MultiPanel(this).Style("position", "fixed").Style("inset", "0").Style("width", "100vw").Style("height", "100vh").Style("overflow", "hidden").Content(world).Content(WorkshopAdBanner());
         if (FsmScaffoldReady)
             root.Content(FsmScaffoldNotice());
