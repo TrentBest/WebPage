@@ -1,47 +1,89 @@
 @using TheSingularityWorkshop.Workshop.Composition
 
 <section class="integration-choice-stage" aria-label="Workshop integration selection">
-    <div class="integration-choice-frame">
-        <div class="integration-eyebrow">THE SINGULARITY WORKSHOP // INTEGRATION BOUNDARY</div>
-        <h1>CHOOSE HOW TO ENTER</h1>
-        <p class="integration-lead">
-            The same Workshop can be built directly from its packages, or composed through
-            FSM_COS before the host manifests it.
-        </p>
+    <div class="integration-ambient" aria-hidden="true"></div>
 
-        <div class="integration-options">
-            <button class="integration-option direct" @onclick="() => Select(WorkshopIntegrationMode.Direct)">
-                <span class="option-index">01</span>
-                <strong>DIRECT INTEGRATION</strong>
-                <span>Use the Workshop packages directly. No FSM_COS assembly.</span>
-            </button>
+    <button class="integration-slice integration-slice-direct" type="button"
+            @onclick="() => Select(WorkshopIntegrationMode.Direct)"
+            aria-label="Enter the Workshop through direct package integration">
+        <span class="slice-life" aria-hidden="true"></span>
+        <span class="slice-grid" aria-hidden="true"></span>
+        <span class="slice-content">
+            <span class="slice-index">01 // DIRECT</span>
+            <strong>ENTER<br />DIRECTLY</strong>
+            <span class="slice-description">WORKSHOP PACKAGES → HOST</span>
+            <span class="slice-state">NO COMPOSITION BOUNDARY</span>
+        </span>
+    </button>
 
-            <button class="integration-option cos" @onclick="() => Select(WorkshopIntegrationMode.FsmCos)">
-                <span class="option-index">02</span>
-                <strong>FSM_COS INTEGRATION</strong>
-                <span>Manifest → dependency closure → arbitration → runtime assembly.</span>
-            </button>
-        </div>
+    <button class="integration-slice integration-slice-cos" type="button"
+            @onclick="() => Select(WorkshopIntegrationMode.FsmCos)"
+            aria-label="Enter the Workshop through FSM_COS composition">
+        <span class="slice-life" aria-hidden="true"></span>
+        <span class="slice-grid" aria-hidden="true"></span>
+        <span class="slice-content">
+            <span class="slice-index">02 // FSM_COS</span>
+            <strong>ENTER<br />COMPOSED</strong>
+            <span class="slice-description">MANIFEST → CLOSURE → ARBITRATION → ASSEMBLY</span>
+            <span class="slice-state">COMPOSITION BOUNDARY ACTIVE</span>
+        </span>
+    </button>
+
+    <div class="integration-crosshair" aria-hidden="true"><span></span><span></span></div>
+
+    <div class="integration-question" aria-hidden="true">
+        <span>THE SAME WORKSHOP</span>
+        <strong>HOW DO YOU WANT TO CROSS THE BOUNDARY?</strong>
+    </div>
+
+    <div class="integration-footnote" aria-hidden="true">
+        <span>HOVER</span><i></i><span>THE SURFACE RESPONDS</span>
     </div>
 </section>
 
 <style>
-.integration-choice-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,rgba(0,234,255,.11),transparent 36%),#020711;color:#eefaff}
-.integration-choice-frame{width:min(920px,86vw);padding:clamp(1.5rem,4vw,3.5rem);box-sizing:border-box;border:1px solid rgba(0,234,255,.34);background:rgba(2,8,16,.78);box-shadow:0 0 55px rgba(0,234,255,.09),inset 0 0 35px rgba(0,234,255,.025);text-align:center}
-.integration-eyebrow{color:#00eaff;font:700 clamp(.55rem,1vw,.78rem) Consolas,'Courier New',monospace;letter-spacing:.18em}
-.integration-choice-frame h1{margin:.65rem 0 .5rem;font:900 clamp(1.7rem,4vw,3.8rem) Georgia,'Times New Roman',serif;letter-spacing:.04em}
-.integration-lead{max-width:720px;margin:0 auto;color:#9db2bc;font:400 clamp(.72rem,1.25vw,1rem) Consolas,'Courier New',monospace;line-height:1.7}
-.integration-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:2rem}
-.integration-option{min-height:190px;padding:1.35rem;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:.45rem;text-align:left;border:1px solid rgba(0,234,255,.35);background:rgba(0,234,255,.035);color:#eefaff;cursor:pointer;font-family:inherit;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
-.integration-option:hover{transform:translateY(-4px);border-color:#00eaff;box-shadow:0 0 28px rgba(0,234,255,.13)}
-.integration-option.cos:hover{border-color:#ffd34d;box-shadow:0 0 32px rgba(255,211,77,.13)}
-.integration-option .option-index{font-size:.55rem;letter-spacing:.16em;color:#6f8994}
-.integration-option strong{font-size:clamp(.85rem,1.6vw,1.25rem);letter-spacing:.08em}
-.integration-option span:last-child{color:#91a7b1;font-size:.58rem;line-height:1.5}
-.integration-option.cos strong{color:#ffd34d}
-.integration-option.direct strong{color:#00eaff}
-@@media(max-width:700px){.integration-options{grid-template-columns:1fr}.integration-option{min-height:145px}}
-@@media(prefers-reduced-motion:reduce){.integration-option{transition:none}}
+.integration-choice-stage{position:absolute;inset:0;overflow:hidden;isolation:isolate;background:radial-gradient(circle at 50% 50%,rgba(0,234,255,.08),transparent 28%),radial-gradient(circle at 18% 82%,rgba(0,234,255,.035),transparent 30%),radial-gradient(circle at 82% 18%,rgba(255,211,77,.03),transparent 30%),#02060c;color:#eefaff;font-family:Consolas,'Courier New',monospace}
+.integration-ambient{position:absolute;inset:-20%;z-index:0;pointer-events:none;opacity:.32;background:repeating-linear-gradient(118deg,transparent 0 44px,rgba(0,234,255,.035) 45px,transparent 46px),repeating-linear-gradient(28deg,transparent 0 88px,rgba(255,255,255,.018) 89px,transparent 90px);transform:rotate(-4deg);animation:integration-ambient-drift 22s linear infinite}
+.integration-slice{position:absolute;inset:-1px;z-index:1;overflow:hidden;padding:0;border:0;color:#eefaff;cursor:pointer;text-align:left;font:inherit;appearance:none;transition:filter .35s ease,transform .35s ease}
+.integration-slice-direct{clip-path:polygon(0 0,100% 0,0 100%);background:radial-gradient(circle at 16% 18%,rgba(0,234,255,.13),transparent 28%),linear-gradient(138deg,#06141d 0%,#020911 52%,#02060c 100%)}
+.integration-slice-cos{clip-path:polygon(100% 0,100% 100%,0 100%);background:radial-gradient(circle at 84% 82%,rgba(255,211,77,.10),transparent 28%),linear-gradient(318deg,#121108 0%,#080b0c 52%,#02060c 100%)}
+.integration-slice::before{content:"";position:absolute;inset:-12%;opacity:.16;background:repeating-linear-gradient(90deg,transparent 0 31px,rgba(255,255,255,.055) 32px,transparent 33px),repeating-linear-gradient(0deg,transparent 0 31px,rgba(255,255,255,.035) 32px,transparent 33px);transform:perspective(500px) rotateX(58deg) translateY(5%);transform-origin:center;transition:opacity .45s ease,transform .8s ease}
+.integration-slice::after{content:"";position:absolute;width:42vw;height:42vw;border:1px solid rgba(255,255,255,.06);border-radius:50%;opacity:.16;transform:translate(-50%,-50%) scale(.72);transition:opacity .45s ease,transform .75s cubic-bezier(.16,1,.3,1)}
+.integration-slice-direct::after{left:17%;top:24%;box-shadow:0 0 0 3vw rgba(0,234,255,.018),0 0 0 7vw rgba(0,234,255,.012)}
+.integration-slice-cos::after{left:83%;top:76%;box-shadow:0 0 0 3vw rgba(255,211,77,.018),0 0 0 7vw rgba(255,211,77,.012)}
+.slice-life{position:absolute;inset:-10%;opacity:0;background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.09) 0 1px,transparent 1px 38px);transition:opacity .3s ease,transform .9s cubic-bezier(.16,1,.3,1);transform:scale(.76);pointer-events:none}
+.integration-slice-direct .slice-life{background:repeating-radial-gradient(circle at 20% 25%,rgba(0,234,255,.14) 0 1px,transparent 1px 34px)}
+.integration-slice-cos .slice-life{background:repeating-radial-gradient(circle at 80% 75%,rgba(255,211,77,.13) 0 1px,transparent 1px 34px)}
+.slice-grid{position:absolute;inset:0;opacity:.1;pointer-events:none;background:linear-gradient(135deg,transparent 49.8%,rgba(255,255,255,.18) 50%,transparent 50.2%),repeating-linear-gradient(135deg,transparent 0 52px,rgba(255,255,255,.025) 53px,transparent 54px);transition:opacity .4s ease}
+.integration-slice:hover,.integration-slice:focus-visible{z-index:3;filter:brightness(1.28)}
+.integration-slice:hover::before,.integration-slice:focus-visible::before{opacity:.42;transform:perspective(500px) rotateX(58deg) translateY(-2%) scale(1.06)}
+.integration-slice:hover::after,.integration-slice:focus-visible::after{opacity:.7;transform:translate(-50%,-50%) scale(1)}
+.integration-slice:hover .slice-life,.integration-slice:focus-visible .slice-life{opacity:1;transform:scale(1.06);animation:integration-life-pulse 2.8s ease-in-out infinite}
+.integration-slice:hover .slice-grid,.integration-slice:focus-visible .slice-grid{opacity:.28}
+.integration-slice:focus-visible{outline:2px solid #eefaff;outline-offset:-8px}
+.integration-slice-direct:hover,.integration-slice-direct:focus-visible{box-shadow:inset 0 0 120px rgba(0,234,255,.12)}
+.integration-slice-cos:hover,.integration-slice-cos:focus-visible{box-shadow:inset 0 0 120px rgba(255,211,77,.10)}
+.slice-content{position:absolute;z-index:4;display:flex;flex-direction:column;gap:.55rem;width:min(31vw,420px);pointer-events:none}
+.integration-slice-direct .slice-content{left:clamp(2rem,8vw,9rem);top:clamp(4rem,15vh,10rem)}
+.integration-slice-cos .slice-content{right:clamp(2rem,8vw,9rem);bottom:clamp(4rem,15vh,10rem);align-items:flex-end;text-align:right}
+.slice-index{font-size:clamp(.52rem,.75vw,.72rem);letter-spacing:.2em;color:#78919b}
+.integration-slice-direct strong{color:#00eaff}.integration-slice-cos strong{color:#ffd34d}
+.slice-content strong{font:900 clamp(2rem,5vw,5.2rem)/.88 Georgia,'Times New Roman',serif;letter-spacing:.035em;text-shadow:0 0 28px currentColor;transition:letter-spacing .4s ease,text-shadow .4s ease}
+.integration-slice:hover .slice-content strong,.integration-slice:focus-visible .slice-content strong{letter-spacing:.08em;text-shadow:0 0 42px currentColor}
+.slice-description{color:#d3e2e7;font-size:clamp(.55rem,.8vw,.76rem);letter-spacing:.13em;line-height:1.5}
+.slice-state{color:#718892;font-size:clamp(.45rem,.62vw,.6rem);letter-spacing:.12em}
+.integration-crosshair{position:absolute;z-index:5;left:50%;top:50%;width:54px;height:54px;transform:translate(-50%,-50%) rotate(45deg);pointer-events:none;border:1px solid rgba(238,250,255,.28);background:rgba(2,6,12,.74);box-shadow:0 0 22px rgba(0,234,255,.08)}
+.integration-crosshair span:first-child{position:absolute;left:50%;top:-18vh;width:1px;height:calc(36vh + 54px);background:linear-gradient(to bottom,transparent,rgba(238,250,255,.5),transparent)}
+.integration-crosshair span:last-child{position:absolute;top:50%;left:-18vw;width:calc(36vw + 54px);height:1px;background:linear-gradient(to right,transparent,rgba(238,250,255,.5),transparent)}
+.integration-question{position:absolute;z-index:6;left:50%;top:50%;width:min(32vw,430px);transform:translate(-50%,-50%);text-align:center;pointer-events:none;opacity:.82;mix-blend-mode:screen}
+.integration-question span{display:block;margin-bottom:.35rem;color:#8ca2ab;font-size:clamp(.45rem,.62vw,.62rem);letter-spacing:.2em}
+.integration-question strong{display:block;color:#eefaff;font:700 clamp(.7rem,1vw,1rem)/1.25 Consolas,'Courier New',monospace;letter-spacing:.08em}
+.integration-footnote{position:absolute;z-index:7;left:50%;bottom:1.1rem;transform:translateX(-50%);display:flex;align-items:center;gap:.55rem;color:#607781;font-size:.45rem;letter-spacing:.16em;pointer-events:none}
+.integration-footnote i{display:block;width:28px;height:1px;background:linear-gradient(to right,#00eaff,#ffd34d)}
+@keyframes integration-ambient-drift{from{transform:rotate(-4deg) translate3d(0,0,0)}to{transform:rotate(-4deg) translate3d(5vw,3vh,0)}}
+@keyframes integration-life-pulse{0%,100%{filter:brightness(.9);transform:scale(1.02)}50%{filter:brightness(1.35);transform:scale(1.08)}}
+@media(max-width:700px){.slice-content{width:42vw}.integration-slice-direct .slice-content{left:1.25rem;top:5rem}.integration-slice-cos .slice-content{right:1.25rem;bottom:5rem}.slice-content strong{font-size:clamp(1.65rem,8vw,3rem)}.slice-description{font-size:.48rem}.integration-question{width:46vw}.integration-question strong{font-size:.58rem}}
+@media(prefers-reduced-motion:reduce){.integration-ambient,.integration-slice:hover .slice-life,.integration-slice:focus-visible .slice-life{animation:none}.integration-slice,.integration-slice::before,.integration-slice::after,.slice-life,.slice-grid,.slice-content strong{transition:none}}
 </style>
 
 @code {
