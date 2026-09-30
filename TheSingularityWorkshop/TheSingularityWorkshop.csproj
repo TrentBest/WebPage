@@ -17,7 +17,7 @@
     <PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.3" />
     <PackageReference Include="TheSingularityWorkshop.GUI.Blazor" Version="0.1.0-alpha.8" />
     <PackageReference Include="TheSingularityWorkshop.ProtocolAi" Version="0.1.0-alpha.2" />
-    <PackageReference Include="TheSingularityWorkshop.GrammarAi" Version="0.1.0-alpha.1" />
+    <PackageReference Include="TheSingularityWorkshop.GrammarAi" Version="0.1.0-alpha.2" />
     <ProjectReference Include="..\SingularityHub\SingularityHub.csproj" />
   </ItemGroup>
 
