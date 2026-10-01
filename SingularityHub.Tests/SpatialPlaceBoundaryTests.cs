@@ -11,7 +11,8 @@ public sealed class SpatialPlaceBoundaryTests
     {
         var scene = SpatialWorkshopScene.CreateDefault();
 
-        Assert.Equal(scene.Interactables.Count, scene.Interactables.Select(x => x.Place.Id).Distinct().Count());
+        var places = scene.Interactables.Select(x => x.Place ?? throw new InvalidOperationException($"Interactable '{x.Name}' has no authoritative place.")).ToArray();
+        Assert.Equal(scene.Interactables.Count, places.Select(place => place.Id).Distinct().Count());
         Assert.All(scene.Interactables, item =>
         {
             var place = item.Place ?? throw new InvalidOperationException($"Interactable '{item.Name}' has no authoritative place.");
