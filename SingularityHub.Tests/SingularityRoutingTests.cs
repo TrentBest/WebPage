@@ -43,13 +43,16 @@ public sealed class SingularityRoutingTests
         => Assert.Throws<ArgumentException>(() => new SingularityRouting().Register(new SingularityRoute(1, null!, "X", 1)));
 
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void EmptyPathCannotResolve(string? path)
+    public void EmptyPathCannotResolve(string path)
     {
-        Assert.False(new SingularityRouting().TryResolve(path!, out _));
+        Assert.False(new SingularityRouting().TryResolve(path, out _));
     }
+
+    [Fact]
+    public void NullPathCannotResolve()
+        => Assert.False(new SingularityRouting().TryResolve(null!, out _));
 
     [Fact(DisplayName = "Unknown path cannot resolve")]
     public void UnknownPathCannotResolve()
@@ -66,11 +69,14 @@ public sealed class SingularityRoutingTests
     }
 
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void RemoveReturnsFalseForEmptyPath(string? path)
-        => Assert.False(new SingularityRouting().Remove(path!));
+    public void RemoveReturnsFalseForEmptyPath(string path)
+        => Assert.False(new SingularityRouting().Remove(path));
+
+    [Fact]
+    public void RemoveReturnsFalseForNullPath()
+        => Assert.False(new SingularityRouting().Remove(null!));
 
     [Fact(DisplayName = "Removing unknown route returns false")]
     public void RemovingUnknownRouteReturnsFalse()
