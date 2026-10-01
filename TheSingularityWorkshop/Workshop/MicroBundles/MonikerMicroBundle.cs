@@ -1,15 +1,22 @@
 using System;
 using System.Collections.Generic;
 using TheSingularityWorkshop.FSM_API;
+using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.SingularityHub;
+using TheSingularityWorkshop.Workshop.Gui;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
 /// <summary>
 /// Reusable MicroBundle providing the Workshop moniker as a safe semantic capability.
-/// The bundle owns lifecycle through FSM_API; a host may choose any visual manifestation.
+/// The same bundle is now consumable by the FSM_COS runtime composition boundary.
 /// </summary>
-public sealed class MonikerMicroBundle : IMicroBundle, TheSingularityWorkshop.SingularityHub.IMicroBundle, IDisposable
+public sealed class MonikerMicroBundle :
+    IMicroBundle,
+    TheSingularityWorkshop.SingularityHub.IMicroBundle,
+    TheSingularityWorkshop.FSM_COS.IMicroBundle,
+    IDisposable
 {
     public const int BundleId = 2110;
     public const string DefaultText = "THE SINGULARITY WORKSHOP";
@@ -21,7 +28,6 @@ public sealed class MonikerMicroBundle : IMicroBundle, TheSingularityWorkshop.Si
     private readonly FSMHandle _fsm;
     private bool _disposed;
 
-    /// <summary>Creates the default moniker manifestation with no host-specific initialization required.</summary>
     public MonikerMicroBundle(string text = DefaultText)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -29,6 +35,7 @@ public sealed class MonikerMicroBundle : IMicroBundle, TheSingularityWorkshop.Si
 
         Text = text;
         Context = new MonikerContext(text);
+        CosDescriptor = new MicroBundleDescriptor((ulong)BundleId, "1.0.0");
 
         FSM_API.FSM_API.Create.CreateProcessingGroup(_processingGroup);
         FSM_API.FSM_API.Create.CreateFiniteStateMachine(_fsmName, -1, _processingGroup)
@@ -45,67 +52,89 @@ public sealed class MonikerMicroBundle : IMicroBundle, TheSingularityWorkshop.Si
             .BuildDefinition();
 
         _fsm = FSM_API.FSM_API.Create.CreateInstance(_fsmName, Context, _processingGroup);
-
-        // Establish the safe default immediately. Consumers never need to know how
-        // to initialize the bundle before they can obtain its provided capability.
         FSM_API.FSM_API.Interaction.Update(_processingGroup);
     }
 
-    /// <summary>Stable integer identity used by compact Workshop protocols.</summary>
     public int Id => BundleId;
 
-    /// <summary>Stable Hub identity projection.</summary>
     ulong TheSingularityWorkshop.SingularityHub.IMicroBundle.Id => checked((ulong)Id);
 
-    /// <summary>Semantic moniker text supplied by this bundle.</summary>
     public string Text { get; }
 
-    /// <summary>Runtime context carried by this bundle's FSM.</summary>
     public IStateContext Context { get; }
 
-    /// <summary>Current FSM state, suitable for lightweight state queries.</summary>
     public string Status => _fsm.CurrentState;
 
-    /// <summary>Whether the bundle has reached its safe default state.</summary>
     public bool IsReady => Status == "Ready";
 
-    /// <summary>Hub-facing ontology projection for the reusable moniker capability.</summary>
-    OntologySignature TheSingularityWorkshop.SingularityHub.IMicroBundle.Ontology => new(0, 0, 0, 0, 0, 0, 0, 0, BundleId);
+    public GuiNode? Composition { get; private set; }
 
-    /// <summary>Hub-facing bundle version.</summary>
-    BundleVersion TheSingularityWorkshop.SingularityHub.IMicroBundle.Version => new(1, 0, 0);
+    /// <summary>Descriptor used by FSM_COS for composition identity and versioning.</summary>
+    public MicroBundleDescriptor CosDescriptor { get; }
 
-    /// <summary>The moniker has no required MicroBundle dependencies.</summary>
-    IReadOnlyList<ulong> TheSingularityWorkshop.SingularityHub.IMicroBundle.Dependencies => Array.Empty<ulong>();
+    MicroBundleDescriptor TheSingularityWorkshop.FSM_COS.IMicroBundle.Descriptor => CosDescriptor;
 
-    /// <summary>Requests presentation without prescribing the host's visual implementation.</summary>
+    ulong TheSingularityWorkshop.FSM_COS.IMicroBundle.Id => (ulong)BundleId;
+
+    IReadOnlyList<BundleRequest> TheSingularityWorkshop.FSM_COS.IMicroBundle.Dependencies =>
+        Array.Empty<BundleRequest>();
+
+    void TheSingularityWorkshop.FSM_COS.IMicroBundle.Load(MicroBundleLoadContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        Composition = GuiBuilder.Create("Panel", "moniker-composition")
+            .Property("composition", "Moniker")
+            .Child("Text", "the", text => text.Text("THE"))
+            .Child("Text", "singularity", text => text.Text("SINGULARITY"))
+            .Child("Text", "workshop", text => text.Text("WORKSHOP"))
+            .Build();
+    }
+
+    bool TheSingularityWorkshop.FSM_COS.IMicroBundle.Arbitrate(
+        ArbitrationContext context,
+        int roundIndex)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        return false;
+    }
+
+    OntologySignature TheSingularityWorkshop.SingularityHub.IMicroBundle.Ontology =>
+        new(0, 0, 0, 0, 0, 0, 0, 0, BundleId);
+
+    BundleVersion TheSingularityWorkshop.SingularityHub.IMicroBundle.Version =>
+        new(1, 0, 0);
+
+    IReadOnlyList<ulong> TheSingularityWorkshop.SingularityHub.IMicroBundle.Dependencies =>
+        Array.Empty<ulong>();
+
     public void Present()
     {
         if (_disposed) return;
         ((MonikerContext)Context).PresentationRequested = true;
     }
 
-    /// <summary>Requests removal of the current presentation.</summary>
     public void Remove()
     {
         if (_disposed) return;
         ((MonikerContext)Context).RemovalRequested = true;
     }
 
-    /// <summary>Advances the bundle's FSM lifecycle.</summary>
     public void Update()
     {
         if (_disposed) return;
         FSM_API.FSM_API.Interaction.Update(_processingGroup);
     }
 
-    /// <summary>Participates in Hub arbitration without exposing implementation details.</summary>
-    void TheSingularityWorkshop.SingularityHub.IMicroBundle.LoadBundle(TheSingularityWorkshop.SingularityHub.IArbitrator arbitrator)
+    void TheSingularityWorkshop.SingularityHub.IMicroBundle.LoadBundle(
+        TheSingularityWorkshop.SingularityHub.IArbitrator arbitrator)
     {
         ArgumentNullException.ThrowIfNull(arbitrator);
     }
 
-    bool TheSingularityWorkshop.SingularityHub.IMicroBundle.Arbitrate(TheSingularityWorkshop.SingularityHub.IArbitrator arbitrator, int roundIndex)
+    bool TheSingularityWorkshop.SingularityHub.IMicroBundle.Arbitrate(
+        TheSingularityWorkshop.SingularityHub.IArbitrator arbitrator,
+        int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(arbitrator);
         return roundIndex >= 0 && !_disposed;
