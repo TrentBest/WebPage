@@ -1,5 +1,6 @@
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Workshop.Composition;
+using TheSingularityWorkshop.Workshop.MicroBundles;
 using TheSingularityWorkshop.Workshop.Plant;
 
 namespace TheSingularityWorkshop.Services;
@@ -18,49 +19,84 @@ public sealed class WorkshopExperienceService : IDisposable
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public FirstContactFsm FirstContact => _firstContact;
     public RuntimeAssembly? RuntimeAssembly { get; private set; }
-    public GuiNode? MonikerComposition => RuntimeAssembly?.TryGetBundle<MonikerCompositionBundle>(MonikerCompositionBundle.BundleId, out var moniker) == true ? moniker!.Composition : null;
-    public AiExchangeCompositionBundle? AiExchangeComposition => RuntimeAssembly?.TryGetBundle<AiExchangeCompositionBundle>(AiExchangeCompositionBundle.BundleId, out var ai) == true ? ai : null;
+
+    public GuiNode? MonikerComposition =>
+        RuntimeAssembly?.TryGetBundle<MonikerMicroBundle>(
+            (ulong)MonikerMicroBundle.BundleId,
+            out var moniker) == true
+            ? moniker!.Composition
+            : null;
+
+    public AiExchangeCompositionBundle? AiExchangeComposition =>
+        RuntimeAssembly?.TryGetBundle<AiExchangeCompositionBundle>(
+            AiExchangeCompositionBundle.BundleId,
+            out var ai) == true
+            ? ai
+            : null;
 
     public void Initialize(bool returningVisitor = false)
     {
-        if(IsInitialized)return;
-        IsInitialized=true; IsFirstVisit=!returningVisitor;
+        if (IsInitialized) return;
+
+        IsInitialized = true;
+        IsFirstVisit = !returningVisitor;
+
         RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
             RuntimeId: 1UL,
             Bundles: new[]
             {
-                BundleRequest.Unconfigured(MonikerCompositionBundle.BundleId),
+                BundleRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId),
                 BundleRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
             }));
-        CurrentState="FirstContact";
+
+        CurrentState = "FirstContact";
         _firstContact.Start();
         StateChanged?.Invoke();
     }
-    public void MarkVisited(){}
+
+    public void MarkVisited() { }
+
     public void RequestEntry()
     {
-        if(CurrentState!="FirstContact"||_firstContact.CurrentState!="Gateway")return;
-        SelectedFlexExperience=FlexExperienceCatalog.SelectDefault();
-        _firstContact.RequestEntry(); StateChanged?.Invoke();
+        if (CurrentState != "FirstContact" || _firstContact.CurrentState != "Gateway") return;
+
+        SelectedFlexExperience = FlexExperienceCatalog.SelectDefault();
+        _firstContact.RequestEntry();
+        StateChanged?.Invoke();
     }
+
     public void Tick()
     {
-        if(_disposed||!IsInitialized||CurrentState!="FirstContact")return;
+        if (_disposed || !IsInitialized || CurrentState != "FirstContact") return;
+
         _firstContact.Update();
-        if(_firstContact.CurrentState=="HubGrowth"&&_firstContact.StateTicks>=30)_firstContact.SetHubReady();
-        if(_firstContact.IsLanding)SetState("Intro");
+
+        if (_firstContact.CurrentState == "HubGrowth" && _firstContact.StateTicks >= 30)
+            _firstContact.SetHubReady();
+
+        if (_firstContact.IsLanding)
+            SetState("Intro");
     }
-    public void MarkUnityStarted(){}
-    public void SetCriticalMassReached()=>SetState("CriticalMass");
+
+    public void MarkUnityStarted() { }
+
+    public void SetCriticalMassReached() => SetState("CriticalMass");
+
     public void SetState(string state)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(state);
-        if(CurrentState==state)return;
-        CurrentState=state; StateChanged?.Invoke();
+
+        if (CurrentState == state) return;
+
+        CurrentState = state;
+        StateChanged?.Invoke();
     }
+
     public void Dispose()
     {
-        if(_disposed)return;
-        _firstContact.Dispose(); _disposed=true;
+        if (_disposed) return;
+
+        _firstContact.Dispose();
+        _disposed = true;
     }
 }
