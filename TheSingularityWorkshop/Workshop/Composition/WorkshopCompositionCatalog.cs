@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.Workshop.MicroBundles;
 
 namespace TheSingularityWorkshop.Workshop.Composition;
 
@@ -11,11 +12,11 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
         var protocol = new ProtocolAiCompositionBundle();
         var grammar = new GrammarAiCompositionBundle();
         var aiExchange = new AiExchangeCompositionBundle();
-        var moniker = new MonikerCompositionBundle();
+        var moniker = new MonikerMicroBundle();
 
         _bundles = new Dictionary<ulong, IMicroBundle>
         {
-            [moniker.Id] = moniker,
+            [moniker.CosDescriptor.Id] = moniker,
             [protocol.Id] = protocol,
             [grammar.Id] = grammar,
             [aiExchange.Id] = aiExchange
