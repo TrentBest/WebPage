@@ -1,5 +1,3 @@
-#pragma warning disable BL0006
-
 using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.AspNetCore.Components.Rendering;
 using TheSingularityWorkshop.Workshop.Gui;
@@ -50,4 +48,3 @@ public sealed class WebGuiBuilderTests
     }
 }
 
-#pragma warning restore BL0006
