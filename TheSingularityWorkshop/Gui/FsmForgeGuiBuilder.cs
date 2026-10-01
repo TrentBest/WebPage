@@ -97,7 +97,7 @@ public static class FsmForgeGuiBuilder
             .Style("flex-wrap", "wrap")
             .Style("gap", ".35rem");
 
-        workbenchActions.Content(Action(receiver, "PLACE STATE INGOT", forge.Workbench.PlaceSelectedState, Cyan));
+        workbenchActions.Content(Action(receiver, "PLACE STATE INGOT", () => forge.Workbench.PlaceSelectedState(), Cyan));
 
         if (forge.Workbench.StatePlates.Count > 0)
             workbenchActions.Content(Action(receiver, "NAME FIRST STATE // IDLE", () => forge.Workbench.NameState(0, "Idle"), Yellow));
