@@ -30,12 +30,12 @@ public static class FsmForgeGuiBuilder
             .Style("gap", ".75rem")
             .Style("overflow", "hidden");
 
-        workspace.Content(Stock(receiver, forge.Presentation));
+        workspace.Content(Stock(receiver, forge));
         workspace.Content(Preview(receiver, forge, exitForge));
         return workspace;
     }
 
-    private static ElementBuilder Stock(object receiver, MicroBundlePresentation presentation)
+    private static ElementBuilder Stock(object receiver, FsmForgeMicroBundle forge)
     {
         var panel = WorkshopGui.Panel(receiver)
             .Style("min-width", "0")
@@ -49,17 +49,17 @@ public static class FsmForgeGuiBuilder
             .Style("color", Cyan)
             .Style("font-size", ".5rem")
             .Style("letter-spacing", ".18em")
-            .Text(presentation.Surface + " // STOCK"));
+            .Text(forge.Presentation.Surface + " // STOCK"));
         panel.Content(WorkshopGui.Element(receiver, "h2")
             .Style("margin", ".45rem 0 .25rem")
             .Style("font-size", "clamp(1.2rem,2vw,1.8rem)")
-            .Text(presentation.Title));
+            .Text(forge.Presentation.Title));
         panel.Content(WorkshopGui.Element(receiver, "p")
             .Style("margin", "0 0 .8rem")
             .Style("color", "#718e99")
             .Style("font-family", "system-ui, sans-serif")
             .Style("font-size", ".75rem")
-            .Text(presentation.Description));
+            .Text(forge.Presentation.Description));
 
         var products = WorkshopGui.MultiPanel(receiver)
             .Style("display", "grid")
@@ -68,13 +68,82 @@ public static class FsmForgeGuiBuilder
             .Style("min-height", "0");
 
         foreach (var product in FsmForgeCatalog.Products)
-            products.Content(Product(receiver, product));
+            products.Content(Product(receiver, forge, product));
 
         panel.Content(products);
+
+        var workbench = WorkshopGui.Panel(receiver)
+            .Style("margin-top", ".75rem")
+            .Style("padding", ".75rem")
+            .Style("border", "1px solid rgba(82,224,90,.2)")
+            .Style("background", "rgba(82,224,90,.03)");
+
+        workbench.Content(WorkshopGui.Element(receiver, "div")
+            .Style("color", Green)
+            .Style("font-size", ".45rem")
+            .Style("letter-spacing", ".16em")
+            .Text("WORKBENCH // AUTHORING"));
+
+        workbench.Content(WorkshopGui.Element(receiver, "div")
+            .Style("color", "#78939c")
+            .Style("font-size", ".58rem")
+            .Style("margin", ".35rem 0 .55rem")
+            .Text(forge.Workbench.SelectedStockId is null
+                ? "Select an ingot from stock."
+                : $"SELECTED // {forge.Workbench.SelectedStockId}"));
+
+        var workbenchActions = WorkshopGui.MultiPanel(receiver)
+            .Style("display", "flex")
+            .Style("flex-wrap", "wrap")
+            .Style("gap", ".35rem");
+
+        workbenchActions.Content(Action(receiver, "PLACE STATE INGOT", forge.Workbench.PlaceSelectedState, Cyan));
+
+        if (forge.Workbench.StatePlates.Count > 0)
+            workbenchActions.Content(Action(receiver, "NAME FIRST STATE // IDLE", () => forge.Workbench.NameState(0, "Idle"), Yellow));
+
+        if (forge.Workbench.StatePlates.Count > 1)
+            workbenchActions.Content(Action(receiver, "NAME SECOND STATE // RUNNING", () => forge.Workbench.NameState(1, "Running"), Yellow));
+
+        if (forge.Workbench.StatePlates.Count >= 2)
+        {
+            workbenchActions.Content(Action(
+                receiver,
+                "PLACE TRANSITION // RUN",
+                () => forge.Workbench.PlaceSelectedTransition(
+                    forge.Workbench.StatePlates[0].Name,
+                    forge.Workbench.StatePlates[1].Name,
+                    "RUN"),
+                Magenta));
+        }
+
+        workbench.Content(workbenchActions);
+
+        foreach (var plate in forge.Workbench.StatePlates)
+            workbench.Content(WorkshopGui.Element(receiver, "div")
+                .Style("display", "inline-block")
+                .Style("margin", ".45rem .35rem 0 0")
+                .Style("padding", ".4rem .6rem")
+                .Style("border", $"1px solid {Cyan}44")
+                .Style("color", White)
+                .Style("font-size", ".55rem")
+                .Text($"STATE PLATE // {plate.Name}"));
+
+        foreach (var plate in forge.Workbench.TransitionPlates)
+            workbench.Content(WorkshopGui.Element(receiver, "div")
+                .Style("display", "inline-block")
+                .Style("margin", ".45rem .35rem 0 0")
+                .Style("padding", ".4rem .6rem")
+                .Style("border", $"1px solid {Magenta}44")
+                .Style("color", White)
+                .Style("font-size", ".55rem")
+                .Text($"TRANSITION PLATE // {plate.FromState} → {plate.ToState} // {plate.Signal}"));
+
+        panel.Content(workbench);
         return panel;
     }
 
-    private static ElementBuilder Product(object receiver, FsmForgeProduct product)
+    private static ElementBuilder Product(object receiver, FsmForgeMicroBundle forge, FsmForgeProduct product)
     {
         var accent = product.Category switch
         {
@@ -89,7 +158,9 @@ public static class FsmForgeGuiBuilder
             .Style("padding", ".65rem")
             .Style("border", $"1px solid {accent}33")
             .Style("background", $"{accent}06")
-            .Style("gap", ".25rem");
+.Style("gap", ".25rem")
+            .Style("cursor", "pointer")
+            .OnClick(() => forge.Workbench.SelectStock(product.Id));
 
         card.Content(WorkshopGui.Element(receiver, "div")
             .Style("color", accent)
