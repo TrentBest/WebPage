@@ -31,7 +31,7 @@ public sealed record GrammarAiContract(
 /// </summary>
 public interface IGrammarAiInteractable
 {
-    ProtocolAiContract Protocol { get; }
+    WorkshopAiProtocolContract Protocol { get; }
     GrammarAiContract Grammar { get; }
     AiContextSnapshot BuildAiContext();
 }
