@@ -14,9 +14,10 @@ public sealed class SpatialPlaceBoundaryTests
         Assert.Equal(scene.Interactables.Count, scene.Interactables.Select(x => x.Place.Id).Distinct().Count());
         Assert.All(scene.Interactables, item =>
         {
-            Assert.Equal(item.ExperienceId, item.Place.SceneId);
-            Assert.Equal(item.Name, item.Place.Name);
-            Assert.NotEqual(default, item.Place.EntryPoint);
+            var place = item.Place ?? throw new InvalidOperationException($"Interactable '{item.Name}' has no authoritative place.");
+            Assert.Equal(item.ExperienceId, place.SceneId);
+            Assert.Equal(item.Name, place.Name);
+            Assert.NotEqual(default, place.EntryPoint);
         });
     }
 
