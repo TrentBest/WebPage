@@ -14,7 +14,7 @@ public sealed record ProgramAi(
 {
     public static ProgramAi Parse(IEnumerable<int> instructions, IEnumerable<string>? creationNames = null)
         => new(
-            ProtocolAi.Normalize(instructions),
+            WorkshopAiProtocol.Normalize(instructions),
             creationNames?.Where(name => !string.IsNullOrWhiteSpace(name)).ToArray() ?? Array.Empty<string>());
 }
 
