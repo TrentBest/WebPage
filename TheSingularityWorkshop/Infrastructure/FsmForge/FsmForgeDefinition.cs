@@ -8,53 +8,97 @@ public sealed class FsmForgeDefinition
     public IReadOnlyList<FsmForgeTransition> Transitions => _transitions;
     public string? InitialState { get; private set; }
 
-    public FsmForgeState AddState(string name,string? onInitializeMethod=null,string? onUpdateMethod=null,string? onExitMethod=null)
+    public FsmForgeState AddState(string name, string? onInitializeMethod = null, string? onUpdateMethod = null, string? onExitMethod = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        var state=new FsmForgeState(name,onInitializeMethod??$"OnInitialize_{name}",onUpdateMethod??$"OnUpdate_{name}",onExitMethod??$"OnExit_{name}");
-        _states.Add(state); InitialState ??= name; return state;
+        if (_states.Any(state => state.Name.Equals(name, StringComparison.Ordinal)))
+            throw new InvalidOperationException($"Forge state '{name}' already exists.");
+
+        var state = new FsmForgeState(
+            name,
+            onInitializeMethod ?? $"OnInitialize_{name}",
+            onUpdateMethod ?? $"OnUpdate_{name}",
+            onExitMethod ?? $"OnExit_{name}");
+        _states.Add(state);
+        InitialState ??= name;
+        return state;
     }
-    public void SetInitialState(string name){RequireState(name); InitialState=name;}
-    public FsmForgeTransition AddTransition(string fromState,string toState,string methodName,FsmForgeCondition condition)
+
+    public void SetInitialState(string name)
     {
-        RequireState(fromState); RequireState(toState); ArgumentException.ThrowIfNullOrWhiteSpace(methodName); ArgumentNullException.ThrowIfNull(condition);
-        var transition=new FsmForgeTransition(fromState,toState,methodName,condition); _transitions.Add(transition); return transition;
+        RequireState(name);
+        InitialState = name;
     }
+
+    public FsmForgeTransition AddTransition(string fromState, string toState, string methodName, FsmForgeCondition condition)
+    {
+        RequireState(fromState);
+        RequireState(toState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(methodName);
+        ArgumentNullException.ThrowIfNull(condition);
+        var transition = new FsmForgeTransition(fromState, toState, methodName, condition);
+        _transitions.Add(transition);
+        return transition;
+    }
+
+    public void ReplaceWith(FsmForgeDefinition source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        _states.Clear();
+        _states.AddRange(source._states);
+        _transitions.Clear();
+        _transitions.AddRange(source._transitions);
+        InitialState = source.InitialState;
+    }
+
     public bool CanPreview(out string reason)
     {
-        if(_states.Count==0){reason="ADD AT LEAST ONE STATE";return false;}
-        if(string.IsNullOrWhiteSpace(InitialState)){reason="SELECT AN INITIAL STATE";return false;}
-        if(_transitions.Count==0){reason="ADD AT LEAST ONE TRANSITION";return false;}
-        var disconnected=_transitions.Where(t=>t.Condition is FsmForgeUnboundCondition).Select(t=>t.MethodName).FirstOrDefault();
-        if(disconnected is not null){reason=$"PLUG A CONDITION INTO {disconnected}";return false;}
-        reason="READY";return true;
+        if (_states.Count == 0) { reason = "ADD AT LEAST ONE STATE"; return false; }
+        if (string.IsNullOrWhiteSpace(InitialState)) { reason = "SELECT AN INITIAL STATE"; return false; }
+        if (_transitions.Count == 0) { reason = "ADD AT LEAST ONE TRANSITION"; return false; }
+        var disconnected = _transitions.Where(t => t.Condition is FsmForgeUnboundCondition).Select(t => t.MethodName).FirstOrDefault();
+        if (disconnected is not null) { reason = $"PLUG A CONDITION INTO {disconnected}"; return false; }
+        reason = "READY";
+        return true;
     }
-    private void RequireState(string name){if(_states.All(state=>!state.Name.Equals(name,StringComparison.Ordinal)))throw new InvalidOperationException($"Forge state '{name}' does not exist.");}
+
+    private void RequireState(string name)
+    {
+        if (_states.All(state => !state.Name.Equals(name, StringComparison.Ordinal)))
+            throw new InvalidOperationException($"Forge state '{name}' does not exist.");
+    }
 }
-public sealed record FsmForgeState(string Name,string OnInitializeMethod,string OnUpdateMethod,string OnExitMethod);
-public sealed record FsmForgeTransition(string FromState,string ToState,string MethodName,FsmForgeCondition Condition);
+
+public sealed record FsmForgeState(string Name, string OnInitializeMethod, string OnUpdateMethod, string OnExitMethod);
+public sealed record FsmForgeTransition(string FromState, string ToState, string MethodName, FsmForgeCondition Condition);
+
 public abstract record FsmForgeCondition
 {
     public abstract bool Evaluate(FsmForgePreviewContext context);
-    public abstract string Scaffold {get;}
+    public abstract string Scaffold { get; }
 }
-public sealed record FsmForgeUnboundCondition:FsmForgeCondition
+
+public sealed record FsmForgeUnboundCondition : FsmForgeCondition
 {
-    public override bool Evaluate(FsmForgePreviewContext context)=>false;
-    public override string Scaffold=>"return false;";
+    public override bool Evaluate(FsmForgePreviewContext context) => false;
+    public override string Scaffold => "return false;";
 }
-public sealed record FsmForgeAlwaysCondition:FsmForgeCondition
+
+public sealed record FsmForgeAlwaysCondition : FsmForgeCondition
 {
-    public override bool Evaluate(FsmForgePreviewContext context)=>true;
-    public override string Scaffold=>"return true;";
+    public override bool Evaluate(FsmForgePreviewContext context) => true;
+    public override string Scaffold => "return true;";
 }
-public sealed record FsmForgeUpdateCountCondition(int Minimum):FsmForgeCondition
+
+public sealed record FsmForgeUpdateCountCondition(int Minimum) : FsmForgeCondition
 {
-    public override bool Evaluate(FsmForgePreviewContext context)=>context.UpdateCount>=Minimum;
-    public override string Scaffold=>$"// Forge preview condition: UpdateCount >= {Minimum}. Bind this to the application context.\n        return false;";
+    public override bool Evaluate(FsmForgePreviewContext context) => context.UpdateCount >= Minimum;
+    public override string Scaffold => $"// Forge preview condition: UpdateCount >= {Minimum}. Bind this to the application context.\n        return false;";
 }
-public sealed record FsmForgeSignalCondition(string Signal):FsmForgeCondition
+
+public sealed record FsmForgeSignalCondition(string Signal) : FsmForgeCondition
 {
-    public override bool Evaluate(FsmForgePreviewContext context)=>context.Signals.Contains(Signal);
-    public override string Scaffold=>$"// Forge preview condition: signal \"{Signal}\". Bind this to the application context.\n        return false;";
+    public override bool Evaluate(FsmForgePreviewContext context) => context.Signals.Contains(Signal);
+    public override string Scaffold => $"// Forge preview condition: signal \"{Signal}\". Bind this to the application context.\n        return false;";
 }
