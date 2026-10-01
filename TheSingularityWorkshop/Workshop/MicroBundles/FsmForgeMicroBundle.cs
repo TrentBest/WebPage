@@ -45,10 +45,15 @@ public sealed class FsmForgeMicroBundle : IDisposable
 
     public void Start()
     {
-        if (!Workbench.Definition.CanPreview(out _))
+        if (Workbench.Definition.CanPreview(out _))
+        {
+            _preview.Start(Workbench.Definition);
             return;
+        }
 
-        _preview.Start(Workbench.Definition);
+        // The Forge remains immediately explorable before a human has authored
+        // a definition; once authored, the workbench definition becomes authoritative.
+        _preview.Start();
     }
 
     public void Tick() => _preview.Tick();
