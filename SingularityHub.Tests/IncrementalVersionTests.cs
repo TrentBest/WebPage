@@ -152,5 +152,19 @@ public sealed class IncrementalVersionTests
             level.HiddenSwitch.Capability.ResultingPresentationMode);
     }
 
+    [ArchitectureTest(0, 0, 172)] [Fact(DisplayName = "V0.0.172 — Canonical_Moniker_Is_Composed_Through_FSM_COS")]
+    public void V0_0_172CanonicalMonikerIsComposedThroughFsmCos()
+    {
+        using var service = new TheSingularityWorkshop.Services.WorkshopExperienceService();
+        service.Initialize(returningVisitor: true);
+
+        Assert.NotNull(service.RuntimeAssembly);
+        Assert.True(service.RuntimeAssembly!.TryGetBundle<TheSingularityWorkshop.Workshop.MicroBundles.MonikerMicroBundle>(
+            (ulong)TheSingularityWorkshop.Workshop.MicroBundles.MonikerMicroBundle.BundleId,
+            out var moniker));
+        Assert.NotNull(moniker);
+        Assert.NotNull(moniker!.Composition);
+        Assert.Same(moniker.Composition, service.MonikerComposition);
+    }
 
 }
