@@ -18,7 +18,7 @@ public sealed class SpatialAiInteractable : IAiInteractable
         IEnumerable<int> allowedProgramTokens,
         Func<ProgramAi, ProgramAi> apply)
     {
-        Protocol = ProtocolAiContract.Create(canonicalIdentity, operationIds, contextIds);
+        Protocol = WorkshopAiProtocolContract.Create(canonicalIdentity, operationIds, contextIds);
         Grammar = new GrammarAiContract(
             Protocol.IdentityId,
             [
@@ -30,7 +30,7 @@ public sealed class SpatialAiInteractable : IAiInteractable
         _apply = apply ?? throw new ArgumentNullException(nameof(apply));
     }
 
-    public ProtocolAiContract Protocol { get; }
+    public WorkshopAiProtocolContract Protocol { get; }
     public GrammarAiContract Grammar { get; }
 
     public AiContextSnapshot BuildAiContext()
