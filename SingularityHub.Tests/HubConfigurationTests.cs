@@ -1,3 +1,4 @@
+using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 using TheSingularityWorkshop.SingularityHub;
 using Xunit;
 
@@ -93,7 +94,7 @@ public sealed class HubConfigurationTests
     [Fact(DisplayName = "Hub runtime exposes the same configuration boundary as its routing and arbitration")]
     public void RuntimeHubExposesConfiguration()
     {
-        var hub = new SingularityHub(_ => { });
+        var hub = new HubKernel(_ => { });
 
         Assert.NotNull(hub.Configuration);
         Assert.Same(hub.Configuration, ((ISingularityHub)hub).Configuration);
