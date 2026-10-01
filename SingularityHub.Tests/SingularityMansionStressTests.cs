@@ -19,7 +19,7 @@ public sealed class SingularityMansionStressTests
     [Fact(DisplayName = "Incremental Unit Test 30 — Mansion exposes a defined entrance")]
     public void MansionExposesAnEntrance()
     {
-        var mansion = Assert.Single(SingularityCampusCatalog.Buildings.Where(item => item.Id == "singularity-mansion"));
+        var mansion = Assert.Single(SingularityCampusCatalog.Buildings, item => item.Id == "singularity-mansion");
 
         var openings = mansion.Openings ?? throw new InvalidOperationException("Singularity Mansion has no openings.");
         Assert.Contains(openings, opening => opening.Kind == SpatialOpeningKind.Door);
