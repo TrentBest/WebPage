@@ -23,6 +23,7 @@ public sealed class FsmForgeMicroBundle : IDisposable
     {
         _lifecycle = new MicroBundle(BundleId, "FSM FORGE", new WebMicroBundleProvider());
         _preview = new FsmForgePreview();
+        Workbench = new FsmForgeWorkbench();
         Presentation = new MicroBundlePresentation(
             "The Forge",
             "FSM WORKSHOP",
@@ -35,15 +36,28 @@ public sealed class FsmForgeMicroBundle : IDisposable
     public MicroBundleManifestation? Manifestation => _lifecycle.Manifestation;
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
     public MicroBundlePresentation Presentation { get; }
+    public FsmForgeWorkbench Workbench { get; }
 
     public string State => _preview.State;
     public int TickCount => _preview.TickCount;
     public IReadOnlyList<string> Events => _preview.Events;
     public bool IsRunning => _preview.IsRunning;
 
-    public void Start() => _preview.Start();
+    public void Start()
+    {
+        if (!Workbench.Definition.CanPreview(out _))
+            return;
+
+        _preview.Start(Workbench.Definition);
+    }
+
     public void Tick() => _preview.Tick();
-    public void Reset() => _preview.Stop();
+    public void Reset()
+    {
+        _preview.Stop();
+        Workbench.RebuildDefinition();
+    }
+
     public void Update() => _lifecycle.Update();
     public void Invalidate() => _lifecycle.Invalidate();
 
