@@ -89,15 +89,15 @@ public static class WorkshopAiProgramProcessor
 
     private static string Describe(int operationId) => operationId switch
     {
-        ProtocolAi.Select => "SELECT",
-        ProtocolAi.MoveNorth => "MOVE NORTH",
-        ProtocolAi.MoveSouth => "MOVE SOUTH",
-        ProtocolAi.MoveWest => "MOVE WEST",
-        ProtocolAi.MoveEast => "MOVE EAST",
-        ProtocolAi.Open => "OPEN",
-        ProtocolAi.RequestAecReview => "REQUEST AEC REVIEW",
-        ProtocolAi.CopyContext => "COPY CONTEXT",
-        ProtocolAi.ApplyProgram => "APPLY PROGRAM",
+        WorkshopAiProtocol.Select => "SELECT",
+        WorkshopAiProtocol.MoveNorth => "MOVE NORTH",
+        WorkshopAiProtocol.MoveSouth => "MOVE SOUTH",
+        WorkshopAiProtocol.MoveWest => "MOVE WEST",
+        WorkshopAiProtocol.MoveEast => "MOVE EAST",
+        WorkshopAiProtocol.Open => "OPEN",
+        WorkshopAiProtocol.RequestAecReview => "REQUEST AEC REVIEW",
+        WorkshopAiProtocol.CopyContext => "COPY CONTEXT",
+        WorkshopAiProtocol.ApplyProgram => "APPLY PROGRAM",
         _ => "UNKNOWN OPERATION"
     };
 }
