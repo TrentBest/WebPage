@@ -59,6 +59,17 @@ public sealed class FsmForgeWorkbench
         RebuildDefinition();
     }
 
+    /// <summary>Places the selected transition ingot as a transition plate between two named states.</summary>
+    public FsmForgeTransitionPlate PlaceSelectedTransition(string fromState, string toState, string signal)
+    {
+        if (!string.Equals(SelectedStockId, "transition-ingot", StringComparison.Ordinal))
+            throw new InvalidOperationException("Select a transition ingot before placing a transition plate.");
+
+        var plate = PlaceTransition(fromState, toState, signal);
+        SelectedStockId = null;
+        return plate;
+    }
+
     /// <summary>Places a transition plate between two named states.</summary>
     public FsmForgeTransitionPlate PlaceTransition(string fromState, string toState, string signal)
     {
