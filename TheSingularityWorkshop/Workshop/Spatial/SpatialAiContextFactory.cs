@@ -14,28 +14,28 @@ public static class SpatialAiContextFactory
     {
         var contextIds = new[]
         {
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.plan"),
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.position"),
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.footprint")
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.Identity("spatial.plan"),
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.Identity("spatial.position"),
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.Identity("spatial.footprint")
         };
 
         var operations = new[]
         {
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Select,
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveNorth,
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveSouth,
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveWest,
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveEast,
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Open,
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.RequestAecReview
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.Select,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.MoveNorth,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.MoveSouth,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.MoveWest,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.MoveEast,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.Open,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.RequestAecReview
         };
 
         var allowed = new[]
         {
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveNorth,
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveSouth,
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveWest,
-            TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.MoveEast
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.MoveNorth,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.MoveSouth,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.MoveWest,
+            TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.MoveEast
         };
 
         return new SpatialAiInteractable(
@@ -55,9 +55,9 @@ public static class SpatialAiContextFactory
         {
             HumanContext = new Dictionary<int, string>
             {
-                [TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.plan")] = "WORKSHOP MASTER PLAN",
-                [TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.position")] = $"X={bounds.X:0.##},Y={bounds.Y:0.##}",
-                [TheSingularityWorkshop.Workshop.MicroBundles.AI.ProtocolAi.Identity("spatial.footprint")] = $"W={bounds.Width:0.##},H={bounds.Height:0.##}"
+                [TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.Identity("spatial.plan")] = "WORKSHOP MASTER PLAN",
+                [TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.Identity("spatial.position")] = $"X={bounds.X:0.##},Y={bounds.Y:0.##}",
+                [TheSingularityWorkshop.Workshop.MicroBundles.AI.WorkshopAiProtocol.Identity("spatial.footprint")] = $"W={bounds.Width:0.##},H={bounds.Height:0.##}"
             }
         };
     }
