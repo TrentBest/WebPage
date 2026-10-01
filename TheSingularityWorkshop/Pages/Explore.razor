@@ -531,16 +531,16 @@
     {
         switch (operationId)
         {
-            case ProtocolAi.MoveNorth:
+            case WorkshopAiProtocol.MoveNorth:
                 _ = MoveAvatar(0, -1);
                 return true;
-            case ProtocolAi.MoveSouth:
+            case WorkshopAiProtocol.MoveSouth:
                 _ = MoveAvatar(0, 1);
                 return true;
-            case ProtocolAi.MoveWest:
+            case WorkshopAiProtocol.MoveWest:
                 _ = MoveAvatar(-1, 0);
                 return true;
-            case ProtocolAi.MoveEast:
+            case WorkshopAiProtocol.MoveEast:
                 _ = MoveAvatar(1, 0);
                 return true;
             default:
