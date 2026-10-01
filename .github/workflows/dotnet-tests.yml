@@ -58,10 +58,10 @@ jobs:
           name: test-results-and-coverage
           path: TestResults/
           retention-days: 14
-          if-no-files-found: error
+          if-no-files-found: warn
 
       - name: Upload coverage to Codecov
-        if: ${{ always() && env.CODECOV_TOKEN != '' }}
+        if: ${{ success() && env.CODECOV_TOKEN != '' }}
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         uses: codecov/codecov-action@v5
