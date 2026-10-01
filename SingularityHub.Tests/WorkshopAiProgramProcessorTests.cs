@@ -50,7 +50,7 @@ public sealed class WorkshopAiProgramProcessorTests
             [WorkshopAiProtocol.MoveNorth]);
         var grammar = new GrammarAiContract(
             42,
-            [new GrammarAiRule(WorkshopAiProtocol.MoveSouth, [1], [])]);
+            [new GrammarAiRule(WorkshopAiProtocol.MoveSouth, [2], [])]);
 
         var result = WorkshopAiProgramProcessor.Process(
             WorkshopAiProtocol.MoveSouth.ToString(),
