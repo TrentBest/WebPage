@@ -84,7 +84,7 @@ public static class WorkshopAiTerminalContext
         return $"""
 YOU ARE THE WORKSHOP AI TERMINAL.
 PROTOCOL={WorkshopAiProtocol.ProtocolVersion}
-GRAMMAR={GrammarAi.GrammarVersion}
+GRAMMAR={GrammarAiLocal.GrammarVersion}
 CURRENT VIEW: {title}
 {focus}
 The visitor can select a building or destination. Selecting a Workshop building closes the map and walks the visitor's avatar to that building's entrance. A second click at the entrance crosses the threshold and enters the building.
