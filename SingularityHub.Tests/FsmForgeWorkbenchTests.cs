@@ -1,3 +1,5 @@
+using Xunit;
+
 using TheSingularityWorkshop.Infrastructure.FsmForge;
 
 namespace SingularityHub.Tests;
