@@ -15,12 +15,12 @@ public sealed class WorkshopAiProgramProcessorTests
         var executed = new List<int>();
 
         var result = WorkshopAiProgramProcessor.Process(
-            $"{ProtocolAi.MoveNorth}\n{ProtocolAi.Open}\n{ProtocolAi.RequestAecReview}",
+            $"{WorkshopAiProtocol.MoveNorth}\n{WorkshopAiProtocol.Open}\n{WorkshopAiProtocol.RequestAecReview}",
             snapshot,
             grammar,
             operation =>
             {
-                if (operation is ProtocolAi.MoveNorth)
+                if (operation is WorkshopAiProtocol.MoveNorth)
                 {
                     executed.Add(operation);
                     return true;
@@ -30,7 +30,7 @@ public sealed class WorkshopAiProgramProcessorTests
             });
 
         Assert.Single(executed);
-        Assert.Equal(ProtocolAi.MoveNorth, executed[0]);
+        Assert.Equal(WorkshopAiProtocol.MoveNorth, executed[0]);
         Assert.Equal(3, result.Entries.Count);
         Assert.Equal(WorkshopAiLedgerStatus.AutoExecuted, result.Entries[0].Status);
         Assert.Equal(WorkshopAiLedgerStatus.AwaitingHumanApproval, result.Entries[1].Status);
@@ -46,14 +46,14 @@ public sealed class WorkshopAiProgramProcessorTests
             42,
             [1],
             new Dictionary<int, string> { [1] = "TEST" },
-            [ProtocolAi.MoveNorth],
-            [ProtocolAi.MoveNorth]);
+            [WorkshopAiProtocol.MoveNorth],
+            [WorkshopAiProtocol.MoveNorth]);
         var grammar = new GrammarAiContract(
             42,
-            [new GrammarAiRule(ProtocolAi.MoveSouth, [1], [])]);
+            [new GrammarAiRule(WorkshopAiProtocol.MoveSouth, [1], [])]);
 
         var result = WorkshopAiProgramProcessor.Process(
-            ProtocolAi.MoveSouth.ToString(),
+            WorkshopAiProtocol.MoveSouth.ToString(),
             snapshot,
             grammar,
             _ => true);
