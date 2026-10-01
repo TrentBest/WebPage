@@ -12,6 +12,8 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles.AI;
 /// </summary>
 public static class ProtocolAi
 {
+    public const string ProtocolVersion = "ProtocolAi/1";
+
     public const int Select = 1001;
     public const int MoveNorth = 1002;
     public const int MoveSouth = 1003;
