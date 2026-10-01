@@ -1,5 +1,3 @@
-#pragma warning disable BL0006
-
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -86,4 +84,3 @@ public sealed class RecursiveGuiBuilderTests
     }
 }
 
-#pragma warning restore BL0006
