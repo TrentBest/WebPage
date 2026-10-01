@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="10.1.0">
