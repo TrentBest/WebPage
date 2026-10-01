@@ -8,11 +8,6 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles.AI;
 /// Grammar layer above ProtocolAi. It describes legal composition without carrying
 /// executable implementation details into the language model exchange.
 /// </summary>
-public static class GrammarAi
-{
-    public const string GrammarVersion = "GrammarAi/1";
-}
-
 public sealed record GrammarAiRule(
     int OperationId,
     IReadOnlyList<int> RequiredContextIds,

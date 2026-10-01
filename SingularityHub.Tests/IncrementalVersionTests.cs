@@ -170,7 +170,4 @@ public sealed class IncrementalVersionTests
 
     [ArchitectureTest(0, 0, 173)] [Fact(DisplayName = "V0.0.173 — Forge_Stock_Ingots_Become_Authored_State_And_Transition_Plates")]
     public void V0_0_173ForgeStockIngotsBecomeAuthoredStateAndTransitionPlates() => Assert.Equal("0.0.173", "0.0.173");
-
-    [ArchitectureTest(0, 0, 174)] [Fact(DisplayName = "V0.0.174 — AI_Clipboard_Exchange_Uses_Protocol_Grammar_And_Action_Ledger")]
-    public void V0_0_174AiClipboardExchangeUsesProtocolGrammarAndActionLedger() => Assert.Equal("0.0.174", "0.0.174");
 }
