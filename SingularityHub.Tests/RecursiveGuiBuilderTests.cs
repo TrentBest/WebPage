@@ -1,3 +1,5 @@
+#pragma warning disable BL0006
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -83,3 +85,5 @@ public sealed class RecursiveGuiBuilderTests
         Assert.Contains(frames, frame => frame.FrameType == RenderTreeFrameType.Text && frame.TextContent == "Enter Workshop");
     }
 }
+
+#pragma warning restore BL0006
