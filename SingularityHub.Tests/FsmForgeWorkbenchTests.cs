@@ -46,7 +46,8 @@ public sealed class FsmForgeWorkbenchTests
         workbench.PlaceSelectedState();
         workbench.NameState(1, "Running");
 
-        var transition = workbench.PlaceTransition("Idle", "Running", "RUN");
+        workbench.SelectStock("transition-ingot");
+        var transition = workbench.PlaceSelectedTransition("Idle", "Running", "RUN");
 
         Assert.Equal("Idle", transition.FromState);
         Assert.Equal("Running", transition.ToState);
