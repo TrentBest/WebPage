@@ -9,25 +9,25 @@ public static class WorkshopAiTerminalContext
 {
     public static AiContextSnapshot BuildMapSnapshot(SpatialMapScope scope, SpatialWorkshopScene scene)
     {
-        var subjectId = ProtocolAi.Identity($"spatial.map.{scope}");
+        var subjectId = WorkshopAiProtocol.Identity($"spatial.map.{scope}");
         var contextIds = new[]
         {
-            ProtocolAi.Identity("spatial.plan"),
-            ProtocolAi.Identity("spatial.navigation"),
-            ProtocolAi.Identity("spatial.approval")
+            WorkshopAiProtocol.Identity("spatial.plan"),
+            WorkshopAiProtocol.Identity("spatial.navigation"),
+            WorkshopAiProtocol.Identity("spatial.approval")
         };
 
         var operations = new[]
         {
-            ProtocolAi.Select,
-            ProtocolAi.MoveNorth,
-            ProtocolAi.MoveSouth,
-            ProtocolAi.MoveWest,
-            ProtocolAi.MoveEast,
-            ProtocolAi.Open,
-            ProtocolAi.RequestAecReview,
-            ProtocolAi.CopyContext,
-            ProtocolAi.ApplyProgram
+            WorkshopAiProtocol.Select,
+            WorkshopAiProtocol.MoveNorth,
+            WorkshopAiProtocol.MoveSouth,
+            WorkshopAiProtocol.MoveWest,
+            WorkshopAiProtocol.MoveEast,
+            WorkshopAiProtocol.Open,
+            WorkshopAiProtocol.RequestAecReview,
+            WorkshopAiProtocol.CopyContext,
+            WorkshopAiProtocol.ApplyProgram
         };
 
         return new AiContextSnapshot(
@@ -83,7 +83,7 @@ public static class WorkshopAiTerminalContext
 
         return $"""
 YOU ARE THE WORKSHOP AI TERMINAL.
-PROTOCOL={ProtocolAi.ProtocolVersion}
+PROTOCOL={WorkshopAiProtocol.ProtocolVersion}
 GRAMMAR={GrammarAi.GrammarVersion}
 CURRENT VIEW: {title}
 {focus}
