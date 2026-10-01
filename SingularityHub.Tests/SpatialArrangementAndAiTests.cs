@@ -56,8 +56,8 @@ public sealed class SpatialArrangementAndAiTests
         Assert.True(context.SubjectId > 0);
         Assert.NotEmpty(context.ContextIds);
         Assert.NotEmpty(context.AvailableOperations);
-        Assert.Contains(ProtocolAi.MoveNorth, context.AvailableOperations);
-        Assert.Contains(ProtocolAi.MoveEast, context.AvailableOperations);
+        Assert.Contains(WorkshopAiProtocol.MoveNorth, context.AvailableOperations);
+        Assert.Contains(WorkshopAiProtocol.MoveEast, context.AvailableOperations);
         Assert.DoesNotContain("forge", context.ToClipboardText(), System.StringComparison.OrdinalIgnoreCase);
     }
 }
