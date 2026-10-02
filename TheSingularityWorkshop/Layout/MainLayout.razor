@@ -120,6 +120,7 @@
                 return;
 
             _startupPresentationComplete = true;
+            Experience.SetState("Living");
             FSM.SignalNavigationReady();
             await InvokeAsync(StateHasChanged);
         }
