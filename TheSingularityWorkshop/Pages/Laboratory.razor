@@ -8,6 +8,7 @@
 
 @((RenderFragment)BlazorGuiRenderer.Render(
     SingularityLaboratoryGuiBuilder.Build(_laboratory.ConfigurableRooms),
+    this,
     HandleCommand))
 
 @code {
