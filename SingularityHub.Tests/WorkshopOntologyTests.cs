@@ -46,4 +46,22 @@ public sealed class WorkshopOntologyTests
         Assert.Contains(chemistryBundle, science);
         Assert.Contains(laboratoryBundle, science);
     }
+    [Fact]
+    public void CanonicalCoordinatesAreDerivedFromRetainedProtocolAiVocabulary()
+    {
+        Assert.Equal(OntologyVocabulary.StableToken("Workshop"), WorkshopOntology.Paradigm.Workshop);
+        Assert.Equal(OntologyVocabulary.StableToken("Science"), WorkshopOntology.Domain.Science);
+        Assert.Equal(OntologyVocabulary.StableToken("PhysicalScience"), WorkshopOntology.Kingdom.PhysicalScience);
+        Assert.Equal(OntologyVocabulary.StableToken("Chemistry"), WorkshopOntology.Class.Chemistry);
+        Assert.Equal(OntologyVocabulary.StableToken("Laboratory"), WorkshopOntology.Class.Laboratory);
+
+        var domainDescription = WorkshopOntology.DescribeLayer(1);
+        var classDescription = WorkshopOntology.DescribeLayer(4);
+
+        Assert.Contains("Science", domainDescription);
+        Assert.Contains(WorkshopOntology.Domain.Science.ToString(), domainDescription);
+        Assert.Contains("Chemistry", classDescription);
+        Assert.Contains("Laboratory", classDescription);
+    }
+
 }
