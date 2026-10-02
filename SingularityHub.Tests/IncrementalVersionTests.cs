@@ -62,4 +62,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 136)] [Fact(DisplayName = "V0.0.136 — Laboratory_Page_Surfaces_Configurable_Rooms_From_The_MicroBundle")] public void V0_0_136_LaboratoryPageSurfacesConfigurableRoomsFromTheMicroBundle() => Assert.Equal("0.0.136", "0.0.136");
     [ArchitectureTest(0, 0, 137)] [Fact(DisplayName = "V0.0.137 — Laboratory_Gui_Provides_Semantic_Room_Configuration_Commands")] public void V0_0_137_LaboratoryGuiProvidesSemanticRoomConfigurationCommands() => Assert.Equal("0.0.137", "0.0.137");
     [ArchitectureTest(0, 0, 138)] [Fact(DisplayName = "V0.0.138 — Laboratory_Configuration_Commands_Rerender_Through_The_Blazor_Adapter")] public void V0_0_138_LaboratoryConfigurationCommandsRerenderThroughTheBlazorAdapter() => Assert.Equal("0.0.138", "0.0.138");
+    [ArchitectureTest(0, 0, 139)] [Fact(DisplayName = "V0.0.139 — Laboratory_Rooms_Configure_From_The_Full_Scientific_Catalog")] public void V0_0_139_LaboratoryRoomsConfigureFromTheFullScientificCatalog() => Assert.Equal("0.0.139", "0.0.139");
 }
