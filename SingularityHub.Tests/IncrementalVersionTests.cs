@@ -65,4 +65,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 139)] [Fact(DisplayName = "V0.0.139 — Laboratory_Rooms_Configure_From_The_Full_Scientific_Catalog")] public void V0_0_139_LaboratoryRoomsConfigureFromTheFullScientificCatalog() => Assert.Equal("0.0.139", "0.0.139");
     [ArchitectureTest(0, 0, 140)] [Fact(DisplayName = "V0.0.140 — Laboratory_Rooms_Expose_Executable_Experiment_Commands")] public void V0_0_140_LaboratoryRoomsExposeExecutableExperimentCommands() => Assert.Equal("0.0.140", "0.0.140");
     [ArchitectureTest(0, 0, 141)] [Fact(DisplayName = "V0.0.141 — Landscape_Hydrodynamics_Composes_Terrain_Water_Weather_Waves_Tectonics_And_Boats")] public void V0_0_141_LandscapeHydrodynamicsComposesTerrainWaterWeatherWavesTectonicsAndBoats() => Assert.Equal("0.0.141", "0.0.141");
+    [ArchitectureTest(0, 0, 142)] [Fact(DisplayName = "V0.0.142 — Landscape_Hydrodynamics_Supports_Arbitrary_Boundaries_And_Water_Fill")] public void V0_0_142_LandscapeHydrodynamicsSupportsArbitraryBoundariesAndWaterFill() => Assert.Equal("0.0.142", "0.0.142");
 }
