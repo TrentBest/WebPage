@@ -105,5 +105,20 @@ public sealed class SingularityLaboratoryMicroBundleTests
         Assert.Contains("Crack Monitor", fracture.Find("room-instruments-fracture-bay").Text);
     }
 
+    [Fact]
+    public void Laboratory_MicroBundle_Exposes_Reusable_Physics_Simulation_Benches()
+    {
+        using var laboratory = new SingularityLaboratoryMicroBundle();
+
+        var collision = laboratory.ParticleCollider;
+        collision.Configure(
+            new ColliderParticle("a", 1, 1, 8),
+            new ColliderParticle("b", 1, -1, 8));
+
+        Assert.True(collision.Collide(16).ConservesEnergy);
+        Assert.Equal(101_325, laboratory.Hydrodynamics.State.PressurePa);
+        Assert.Equal(293.15, laboratory.Thermodynamics.State.TemperatureK);
+        Assert.Equal(2, laboratory.Electromagnetism.State.CurrentAmps);
+    }
 
 }
