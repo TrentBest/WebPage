@@ -58,7 +58,7 @@ public sealed class SingularityLaboratoryMicroBundleTests
         Assert.Equal(0.001, PhysicsRelationships.ThermalExpansionM(0.00001, 10, 10));
 
         Assert.Equal(98_100, PhysicsRelationships.HydrostaticPressurePa(1000, 9.81, 10));
-        Assert.Equal(250, PhysicsRelationships.DynamicPressurePa(10, 5));
+        Assert.Equal(125, PhysicsRelationships.DynamicPressurePa(10, 5));
         Assert.Equal(6, PhysicsRelationships.VolumetricFlowRateM3PerS(2, 3));
         Assert.Equal(100_000, PhysicsRelationships.ReynoldsNumber(1000, 2, 0.5, 0.01));
         Assert.Equal(9810, PhysicsRelationships.BuoyantForceNewtons(1000, 1, 9.81));
