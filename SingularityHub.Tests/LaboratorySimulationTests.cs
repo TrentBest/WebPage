@@ -84,6 +84,21 @@ public sealed class LaboratorySimulationTests
     }
 
     [Fact]
+    public void DigitalLogicSimulator_Composes_Gates_And_A_Full_Adder_Into_Arithmetic()
+    {
+        Assert.True(DigitalLogicSimulator.Evaluate(LogicGate.And, true, true));
+        Assert.True(DigitalLogicSimulator.Evaluate(LogicGate.Xor, true, false));
+        Assert.False(DigitalLogicSimulator.Evaluate(LogicGate.Nand, true, true));
+
+        var full = DigitalLogicSimulator.FullAdder(true, true, true);
+
+        Assert.True(full.Sum);
+        Assert.True(full.Carry);
+        Assert.Equal(42u, DigitalLogicSimulator.Add(19, 23));
+        Assert.Equal(43u, DigitalLogicSimulator.Add(19, 23, true));
+    }
+
+    [Fact]
     public void TectonicSimulator_Produces_Deterministic_Fault_Event_And_Displacement_Field()
     {
         var simulator = new TectonicSimulator(4);
