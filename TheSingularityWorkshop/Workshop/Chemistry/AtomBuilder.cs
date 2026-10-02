@@ -20,7 +20,7 @@ public sealed class AtomBuilder
     private string _oxidationStates = string.Empty;
     private string _stateAtStp = string.Empty;
     private string _category = string.Empty;
-    private ElementOrigin _origin = ElementOrigin.Natural;
+    private ElementOrigin _origin = ElementOrigin.Natural;\n    private ElementalPropertySet? _properties;
 
     public AtomBuilder(string name, int atomicNumber, string symbol)
     {
@@ -41,7 +41,7 @@ public sealed class AtomBuilder
     public AtomBuilder WithOxidationStates(string value) { _oxidationStates = value ?? string.Empty; return this; }
     public AtomBuilder WithStateAtStp(string value) { _stateAtStp = value ?? string.Empty; return this; }
     public AtomBuilder WithCategory(string value) { _category = value ?? string.Empty; return this; }
-    public AtomBuilder WithOrigin(ElementOrigin value) { _origin = value; return this; }
+    public AtomBuilder WithOrigin(ElementOrigin value) { _origin = value; return this; }\n    public AtomBuilder WithProperties(ElementalPropertySet? value) { _properties = value; return this; }
 
     private string? _nameOverride;
     private string? _symbolOverride;
