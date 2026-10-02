@@ -26,7 +26,7 @@ The original Atom/AtomBuilder work in TheForge established the useful distinctio
 
 The chemistry arbitrator evaluates **what a material is made from and how it is being applied**, not what the containing bundle calls itself. This allows a future weapons bundle, armor bundle, vehicle bundle, building bundle, or fictional bundle to participate through the same boundary.
 
-The first implementation produces normalized default physics heuristics. These are deliberately not laboratory measurements; authoritative material-property data belongs in the data domain and can replace the heuristics without changing the arbitration contract.
+The first implementation produces normalized default physics heuristics. These are deliberately not laboratory measurements; authoritative material-property data belongs in the data domain and can replace the heuristics without changing the arbitration contract.\n\n`ElementalPropertySet` is the structured handoff for that future data domain. It provides nullable slots for phase behavior, thermodynamics, transport, electromagnetic behavior, mechanical response (including fracture and fatigue), fluid/material behavior, and nuclear/radiological properties, plus source/version/uncertainty metadata. `Atom` remains the elemental identity; the property set is optional and replaceable. This deliberately allows the eventual warehouse to carry much richer data without forcing every element to pretend that every measurement is known.
 
 ## Fiction
 
