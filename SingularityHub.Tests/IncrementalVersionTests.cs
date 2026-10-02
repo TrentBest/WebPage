@@ -50,3 +50,4 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 126)] [Fact(DisplayName = "V0.0.126 — Research_Hadron_Collider_And_Workshop_Orbital_Tether")] public void V0_0_126_ResearchHadronColliderAndWorkshopOrbitalTether() => Assert.Equal("0.0.126", "0.0.126");
     [ArchitectureTest(0, 0, 127)] [Fact(DisplayName = "V0.0.127 — Workshop_Interactable_Specialization_And_Reusable_Sign_Faces")] public void V0_0_127_WorkshopInteractableSpecializationAndReusableSignFaces() => Assert.Equal("0.0.127", "0.0.127");
 }
+    [ArchitectureTest(0, 0, 128)] [Fact(DisplayName = "V0.0.128 — Chemistry_Property_Data_Source_Is_Injected_Through_The_Bundle_Boundary")] public void V0_0_128_ChemistryPropertyDataSourceIsInjectedThroughTheBundleBoundary() => Assert.Equal("0.0.128", "0.0.128");
