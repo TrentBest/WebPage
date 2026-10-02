@@ -18,6 +18,7 @@ public sealed class LandscapeHydrodynamicsSimulator
     private readonly int _width;
     private readonly int _height;
     private long _step;
+    private readonly bool[] _activeCells;
 
     public LandscapeHydrodynamicsSimulator(
         int width,
@@ -35,9 +36,11 @@ public sealed class LandscapeHydrodynamicsSimulator
         _height = height;
         CellSizeM = cellSizeM;
         _cells = new LandscapeCell[terrainElevationM.Count];
+        _activeCells = new bool[terrainElevationM.Count];
 
         for (var i = 0; i < _cells.Length; i++)
             _cells[i] = new LandscapeCell(terrainElevationM[i], 0, 0, 0);
+            _activeCells[i] = true;
     }
 
     public double CellSizeM { get; }
@@ -46,6 +49,22 @@ public sealed class LandscapeHydrodynamicsSimulator
     public double DepositionCoefficient { get; init; } = 0.005;
     public IReadOnlyList<LandscapeCell> Cells => _cells;
     public IReadOnlyList<BoatState> Boats => _boats;
+    public IReadOnlyList<bool> ActiveCells => _activeCells;
+
+    public void SetBoundary(int x, int y, bool active)
+    {
+        ValidateCoordinates(x, y);
+        _activeCells[Index(x, y)] = active;
+        if (!active)
+            _cells[Index(x, y)] = _cells[Index(x, y)] with { WaterDepthM = 0, VelocityXMPerS = 0, VelocityYMPerS = 0 };
+    }
+
+    public void FillWater(double waterDepthM)
+    {
+        if (waterDepthM < 0) throw new ArgumentOutOfRangeException(nameof(waterDepthM));
+        for (var i = 0; i < _cells.Length; i++)
+            if (_activeCells[i]) _cells[i] = _cells[i] with { WaterDepthM = waterDepthM };
+    }
     private readonly List<BoatState> _boats = [];
 
     public LandscapeCell GetCell(int x, int y)
@@ -117,6 +136,7 @@ public sealed class LandscapeHydrodynamicsSimulator
         {
             var index = Index(x, y);
             var cell = before[index];
+            if (!_activeCells[index]) continue;
             velocityX[index] = (cell.VelocityXMPerS + WindX * 0.001 * timeStepS) * 0.995;
             velocityY[index] = (cell.VelocityYMPerS + WindY * 0.001 * timeStepS) * 0.995;
             maxWaveHeight = Math.Max(maxWaveHeight, cell.WaterDepthM);
@@ -137,6 +157,7 @@ public sealed class LandscapeHydrodynamicsSimulator
         {
             var index = Index(x, y);
             var cell = before[index];
+            if (!_activeCells[index]) continue;
             var water = Math.Max(0, cell.WaterDepthM + waterDelta[index]);
             var speed = Math.Sqrt(velocityX[index] * velocityX[index] + velocityY[index] * velocityY[index]);
 
@@ -177,6 +198,7 @@ public sealed class LandscapeHydrodynamicsSimulator
     {
         var aIndex = Index(x1, y1);
         var bIndex = Index(x2, y2);
+        if (!_activeCells[aIndex] || !_activeCells[bIndex]) return;
         var a = cells[aIndex];
         var b = cells[bIndex];
         var headA = a.TerrainElevationM + a.WaterDepthM;
