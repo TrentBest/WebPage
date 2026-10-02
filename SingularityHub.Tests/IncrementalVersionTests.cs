@@ -51,4 +51,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 127)] [Fact(DisplayName = "V0.0.127 — Workshop_Interactable_Specialization_And_Reusable_Sign_Faces")] public void V0_0_127_WorkshopInteractableSpecializationAndReusableSignFaces() => Assert.Equal("0.0.127", "0.0.127");
     [ArchitectureTest(0, 0, 128)] [Fact(DisplayName = "V0.0.128 — Chemistry_Property_Data_Source_Is_Injected_Through_The_Bundle_Boundary")] public void V0_0_128_ChemistryPropertyDataSourceIsInjectedThroughTheBundleBoundary() => Assert.Equal("0.0.128", "0.0.0.128");
     [ArchitectureTest(0, 0, 129)] [Fact(DisplayName = "V0.0.129 — Singularity_Laboratory_Becomes_A_Diegetic_Scientific_Test_Facility")] public void V0_0_129_SingularityLaboratoryBecomesADiegeticScientificTestFacility() => Assert.Equal("0.0.129", "0.0.129");
+    [ArchitectureTest(0, 0, 130)] [Fact(DisplayName = "V0.0.130 — Repair_Laboratory_Heartbeat_And_Physics_Test_Arithmetic")] public void V0_0_130_RepairLaboratoryHeartbeatAndPhysicsTestArithmetic() => Assert.Equal("0.0.130", "0.0.130");
 }
