@@ -26,12 +26,14 @@ public sealed class ChemistryMicroBundle : IMicroBundle, HubBundle, IDisposable
     private readonly MicroBundle _runtime;
     private readonly ElementalArbitrator _arbitrator = new();
     private readonly FictionalElementRegistry _fictionalElements = new();
+    private readonly IElementalDataSource _dataSource;
     private bool _disposed;
     private bool _arbitrated;
 
-    public ChemistryMicroBundle()
+    public ChemistryMicroBundle(IElementalDataSource? dataSource = null)
     {
         _runtime = new MicroBundle(BundleId, "Chemistry", new Provider());
+        _dataSource = dataSource ?? new ElementalCatalogDataSource();
         _fictionalElements.RegisterRange(ElementalCatalog.Fictional.Values);
     }
 
@@ -54,11 +56,20 @@ public sealed class ChemistryMicroBundle : IMicroBundle, HubBundle, IDisposable
     /// </summary>
     public bool TryGetElement(string symbol, out Atom? element)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(symbol);
+
         if (ElementalCatalog.Core.TryGetValue(symbol, out element))
             return true;
 
         return _fictionalElements.TryGetBySymbol(symbol, out element);
     }
+
+    /// <summary>
+    /// Retrieves structured physical properties from the injected data boundary.
+    /// Element identity and property provenance remain separate concerns.
+    /// </summary>
+    public bool TryGetProperties(string symbol, out ElementalPropertySet? properties) =>
+        _dataSource.TryGetProperties(symbol, out properties);
 
     public IReadOnlyList<MaterialResolution> ResolvedMaterials { get; private set; } = Array.Empty<MaterialResolution>();
 
