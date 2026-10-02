@@ -37,6 +37,40 @@ public sealed class LaboratorySimulationTests
     }
 
     [Fact]
+    public void LandscapeHydrodynamics_Conserves_Water_When_Flowing_Between_Terrain_Cells()
+    {
+        var simulator = new LandscapeHydrodynamicsSimulator(2, 1, [0d, -1d]);
+        simulator.ApplyWave(new WaveForcing(0, 0, 2, 0, 0));
+
+        var before = simulator.GetCell(0, 0).WaterDepthM + simulator.GetCell(1, 0).WaterDepthM;
+        simulator.Step(0.1);
+        var after = simulator.GetCell(0, 0).WaterDepthM + simulator.GetCell(1, 0).WaterDepthM;
+
+        Assert.Equal(2, before);
+        Assert.Equal(before, after, 10);
+        Assert.True(simulator.GetCell(1, 0).WaterDepthM > 0);
+    }
+
+    [Fact]
+    public void LandscapeHydrodynamics_Applies_Weather_Tectonics_Waves_And_Boat_Forcing()
+    {
+        var simulator = new LandscapeHydrodynamicsSimulator(3, 3, new double[9]);
+
+        simulator.ApplyWeather(new WeatherForcing(0.1, 4, 2, 10));
+        simulator.ApplyTectonics(new TectonicForcing([0, 0, 0, 0, 1, 0, 0, 0, 0]));
+        simulator.ApplyWave(new WaveForcing(1, 1, 3, 2, 0));
+        simulator.LaunchBoat(new BoatState("toy-boat", 1, 1, 10, 0.02));
+
+        var step = simulator.Step(0.1);
+
+        Assert.Equal(1, step.Step);
+        Assert.Equal(4, simulator.GetCell(1, 1).TerrainElevationM, 10);
+        Assert.True(step.MaximumWaterDepthM > 0);
+        Assert.Single(step.Boats);
+        Assert.Equal("toy-boat", step.Boats[0].Id);
+    }
+
+    [Fact]
     public void ThermodynamicSimulator_Conserves_Added_Heat_Through_Temperature_Change()
     {
         var simulator = new ThermodynamicSimulator(new ThermalState(2, 900, 300));
