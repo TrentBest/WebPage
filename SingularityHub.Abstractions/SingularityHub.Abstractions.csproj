@@ -8,5 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" />
+    <PackageReference Include="TheSingularityWorkshop.ProtocolAi" Version="0.1.0-alpha.2" />
   </ItemGroup>
 </Project>
