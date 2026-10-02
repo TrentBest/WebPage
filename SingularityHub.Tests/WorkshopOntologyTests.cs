@@ -30,17 +30,20 @@ public sealed class WorkshopOntologyTests
         using var laboratory = new SingularityLaboratoryMicroBundle();
         var registry = new MicroBundleRegistry();
 
+        var chemistryBundle = (IMicroBundle)chemistry;
+        var laboratoryBundle = (IMicroBundle)laboratory;
+
         Assert.True(registry.TryPublish(
-            MicroBundleAddress.Create(chemistry.Ontology, ChemistryMicroBundle.BundleId), chemistry));
+            MicroBundleAddress.Create(chemistryBundle.Ontology, ChemistryMicroBundle.BundleId), chemistryBundle));
         Assert.True(registry.TryPublish(
-            MicroBundleAddress.Create(laboratory.Ontology, SingularityLaboratoryMicroBundle.BundleId), laboratory));
+            MicroBundleAddress.Create(laboratoryBundle.Ontology, SingularityLaboratoryMicroBundle.BundleId), laboratoryBundle));
 
         var science = registry.GetByLayer(1, WorkshopOntology.Domain.Science);
         var physicalScience = registry.GetByLayer(2, WorkshopOntology.Kingdom.PhysicalScience);
 
         Assert.Equal(2, science.Count);
         Assert.Equal(2, physicalScience.Count);
-        Assert.Contains(chemistry, science);
-        Assert.Contains(laboratory, science);
+        Assert.Contains(chemistryBundle, science);
+        Assert.Contains(laboratoryBundle, science);
     }
 }
