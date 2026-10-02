@@ -106,6 +106,41 @@ public sealed class SingularityLaboratoryMicroBundleTests
     }
 
     [Fact]
+    public void Laboratory_MicroBundle_Provides_Empty_Rooms_That_Users_Can_Configure()
+    {
+        using var laboratory = new SingularityLaboratoryMicroBundle();
+
+        Assert.Equal(3, laboratory.ConfigurableRooms.Count);
+        Assert.All(laboratory.ConfigurableRooms, room =>
+        {
+            Assert.Null(room.Discipline);
+            Assert.Empty(room.Instruments);
+            Assert.Empty(room.Experiments);
+        });
+
+        var room = laboratory.ConfigurableRooms[0];
+        room.Configure(
+                "Materials Research Cell",
+                LaboratoryDiscipline.Materials,
+                "User-defined materials and fracture experiments.")
+            .AddInstrument(new LaboratoryInstrument(
+                "custom-tensile-rig",
+                "Custom Tensile Rig",
+                "User-configured tensile measurement."))
+            .AddExperiment(new LaboratoryExperiment(
+                "custom-elasticity",
+                LaboratoryDiscipline.Materials,
+                "Custom Elasticity Study",
+                "User-defined constitutive experiment."));
+
+        Assert.Equal(LaboratoryDiscipline.Materials, room.Discipline);
+        Assert.Equal("Materials Research Cell", room.Name);
+        Assert.Single(room.Instruments);
+        Assert.Single(room.Experiments);
+        Assert.Equal("custom-elasticity", room.Experiments[0].Id);
+    }
+
+    [Fact]
     public void Laboratory_MicroBundle_Exposes_Reusable_Physics_Simulation_Benches()
     {
         using var laboratory = new SingularityLaboratoryMicroBundle();
