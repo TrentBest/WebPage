@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TheSingularityWorkshop.FSM_API;
 using TheSingularityWorkshop.Workshop.Chemistry;
 using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
@@ -24,17 +25,41 @@ public sealed class ChemistryMicroBundle : IMicroBundle, HubBundle, IDisposable
 
     private readonly MicroBundle _runtime;
     private readonly ElementalArbitrator _arbitrator = new();
+    private readonly FictionalElementRegistry _fictionalElements = new();
     private bool _disposed;
     private bool _arbitrated;
 
     public ChemistryMicroBundle()
     {
         _runtime = new MicroBundle(BundleId, "Chemistry", new Provider());
+        _fictionalElements.RegisterRange(ElementalCatalog.Fictional.Values);
     }
 
     public int Id => BundleId;
     public IStateContext Context => _runtime.Context;
+
+    /// <summary>All canonical elements owned by the domain catalog.</summary>
     public IReadOnlyDictionary<string, Atom> Elements => ElementalCatalog.Core;
+
+    /// <summary>Fictional/experience-specific elements available to this bundle.</summary>
+    public IReadOnlyCollection<Atom> FictionalElements => _fictionalElements.Elements;
+
+    /// <summary>
+    /// Registers an additional fictional element without modifying the canonical catalog.
+    /// </summary>
+    public bool RegisterFictionalElement(Atom element) => _fictionalElements.Register(element);
+
+    /// <summary>
+    /// Resolves either a canonical or registered fictional element by symbol.
+    /// </summary>
+    public bool TryGetElement(string symbol, out Atom? element)
+    {
+        if (ElementalCatalog.Core.TryGetValue(symbol, out element))
+            return true;
+
+        return _fictionalElements.TryGetBySymbol(symbol, out element);
+    }
+
     public IReadOnlyList<MaterialResolution> ResolvedMaterials { get; private set; } = Array.Empty<MaterialResolution>();
 
     /// <summary>
