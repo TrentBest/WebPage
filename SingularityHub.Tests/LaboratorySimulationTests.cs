@@ -52,6 +52,19 @@ public sealed class LaboratorySimulationTests
     }
 
     [Fact]
+    public void LandscapeHydrodynamics_Supports_Custom_Boundaries_And_Water_Fill()
+    {
+        var simulator = new LandscapeHydrodynamicsSimulator(3, 1, [0d, 0d, 0d]);
+        simulator.SetBoundary(2, 0, false);
+        simulator.FillWater(2);
+
+        Assert.Equal(2, simulator.GetCell(0, 0).WaterDepthM);
+        Assert.Equal(2, simulator.GetCell(1, 0).WaterDepthM);
+        Assert.Equal(0, simulator.GetCell(2, 0).WaterDepthM);
+        Assert.False(simulator.ActiveCells[2]);
+    }
+
+    [Fact]
     public void LandscapeHydrodynamics_Applies_Weather_Tectonics_Waves_And_Boat_Forcing()
     {
         var simulator = new LandscapeHydrodynamicsSimulator(3, 3, new double[9]);
