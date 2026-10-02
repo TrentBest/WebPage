@@ -23,6 +23,20 @@ public sealed class ChemistryMicroBundleTests
     }
 
     [Fact]
+    public void ElementalCatalog_Contains_All_118_Named_Elements_And_Provides_Stable_Lookups()
+    {
+        Assert.Equal(118, ElementalCatalog.Count);
+        Assert.Equal(118, ElementalCatalog.Core.Count);
+        Assert.Equal(118, ElementalCatalog.ByAtomicNumber.Count);
+
+        Assert.Equal("H", ElementalCatalog.GetByAtomicNumber(1).Symbol);
+        Assert.Equal("Fe", ElementalCatalog.GetByAtomicNumber(26).Symbol);
+        Assert.Equal("U", ElementalCatalog.GetByAtomicNumber(92).Symbol);
+        Assert.Equal("Og", ElementalCatalog.GetByAtomicNumber(118).Symbol);
+        Assert.Equal(26, ElementalCatalog.GetBySymbol("Fe").AtomicNumber);
+    }
+
+    [Fact]
     public void ChemistryArbitrator_Resolves_Material_By_Application_And_Elements()
     {
         var iron = ElementalCatalog.Core["Fe"];
