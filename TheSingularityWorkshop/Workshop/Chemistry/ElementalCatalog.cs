@@ -135,11 +135,25 @@ public static class ElementalCatalog
             ["Og"] = new AtomBuilder("Oganesson", 118, "Og").WithAtomicWeight(294).Build(),
         };
 
+    private static readonly IReadOnlyDictionary<string, Atom> _fictional =
+        new Dictionary<string, Atom>(System.StringComparer.Ordinal)
+        {
+            // Hypothetical identity only; fictional properties are supplied separately.
+            ["Ub"] = new AtomBuilder("Unobtanium", 120, "Ub")
+                .WithAtomicWeight(120)
+                .WithOrigin(ElementOrigin.Fictional)
+                .WithCategory("Fictional")
+                .Build(),
+        };
+
     private static readonly IReadOnlyDictionary<int, Atom> _byAtomicNumber =
         _core.Values.ToDictionary(x => x.AtomicNumber);
 
     public static IReadOnlyDictionary<string, Atom> Core => _core;
     public static IReadOnlyDictionary<int, Atom> ByAtomicNumber => _byAtomicNumber;
+    public static IReadOnlyDictionary<string, Atom> Fictional => _fictional;
+    public static int FictionalCount => _fictional.Count;
+
     public static int Count => _core.Count;
     public static Atom GetBySymbol(string symbol) => _core[symbol];
     public static Atom GetByAtomicNumber(int atomicNumber) => _byAtomicNumber[atomicNumber];
