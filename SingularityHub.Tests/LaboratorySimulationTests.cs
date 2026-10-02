@@ -70,6 +70,9 @@ public sealed class LaboratorySimulationTests
         var simulator = new LandscapeHydrodynamicsSimulator(3, 3, new double[9]);
 
         simulator.ApplyWeather(new WeatherForcing(0.1, 4, 2, 10));
+        Assert.Equal(4, simulator.WindXMPerS);
+        Assert.Equal(2, simulator.WindYMPerS);
+
         simulator.ApplyTectonics(new TectonicForcing([0, 0, 0, 0, 1, 0, 0, 0, 0]));
         simulator.ApplyWave(new WaveForcing(1, 1, 3, 2, 0));
         simulator.LaunchBoat(new BoatState("toy-boat", 1, 1, 10, 0.02));
