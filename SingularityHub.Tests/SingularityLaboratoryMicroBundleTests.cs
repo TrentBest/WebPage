@@ -68,7 +68,7 @@ public sealed class SingularityLaboratoryMicroBundleTests
 
         var critical = PhysicsRelationships.CriticalCrackLengthM(1_000_000, 1, 100_000_000);
         Assert.Equal(0.0000318309886, critical, 10);
-        Assert.Equal(0.001, PhysicsRelationships.ParisCrackGrowthRateMPerCycle(0.000001, 100, 2), 12);
+        Assert.Equal(0.01, PhysicsRelationships.ParisCrackGrowthRateMPerCycle(0.000001, 100, 2), 12);
 
         Assert.Equal(Math.Log(2) / 10, PhysicsRelationships.DecayConstantFromHalfLifeSeconds(10), 12);
         Assert.Equal(500, PhysicsRelationships.DecayedQuantity(1000, Math.Log(2) / 10, 10), 10);
