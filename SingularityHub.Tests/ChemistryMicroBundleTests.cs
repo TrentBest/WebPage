@@ -12,6 +12,32 @@ namespace SingularityHub.Tests;
 public sealed class ChemistryMicroBundleTests
 {
     [Fact]
+    public void AtomBuilder_Preserves_Structured_Physical_And_Provenance_Properties()
+    {
+        var properties = new ElementalPropertySet
+        {
+            DensityKgPerM3 = 7850,
+            YoungsModulusPa = 200_000_000_000,
+            FractureToughnessPaSqrtM = 50_000_000,
+            SourceId = "test-dataset",
+            SourceVersion = "1.0",
+            Uncertainty = "illustrative test data"
+        };
+
+        var iron = new AtomBuilder("Iron", 26, "Fe")
+            .WithProperties(properties)
+            .Build();
+
+        Assert.Same(properties, iron.Properties);
+        Assert.Equal(7850, iron.Properties!.DensityKgPerM3);
+        Assert.Equal(200_000_000_000, iron.Properties.YoungsModulusPa);
+        Assert.Equal(50_000_000, iron.Properties.FractureToughnessPaSqrtM);
+        Assert.Equal("test-dataset", iron.Properties.SourceId);
+        Assert.Equal("1.0", iron.Properties.SourceVersion);
+        Assert.Equal("illustrative test data", iron.Properties.Uncertainty);
+    }
+
+    [Fact]
     public void AtomBuilder_Produces_Validated_Elemental_Data()
     {
         var carbon = ElementalCatalog.Core["C"];
