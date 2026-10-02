@@ -1,6 +1,9 @@
 using System;
 using TheSingularityWorkshop.FSM_API;
 using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
+using CosBundle = TheSingularityWorkshop.FSM_COS.IMicroBundle;
+using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.SingularityHub;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
@@ -12,16 +15,18 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// It also projects itself through the Hub-level micro-bundle contract so the
 /// runtime Element can participate in Hub arbitration without exposing its FSM mechanics.
 /// </summary>
-public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
+public sealed class MicroBundle : IMicroBundle, CosBundle, HubBundle, IDisposable
 {
     private readonly FSMHandle _fsm;
     private readonly IMicroBundleProvider _provider;
     private bool _arbitrated;
+    private bool _cosArbitrated;
     private bool _disposed;
 
     public MicroBundle(int id, string name, IMicroBundleProvider provider, int parentId = -1, int generation = 0)
     {
         Id = id;
+        Descriptor = new MicroBundleDescriptor((ulong)id, "1.0.0");
         _provider = provider;
         Context = new MicroBundleContext(id, name)
         {
@@ -57,8 +62,31 @@ public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
     public int Id { get; }
     public IStateContext Context { get; }
 
+    /// <summary>Domain-owned identity and version descriptor consumed by FSM_COS.</summary>
+    public MicroBundleDescriptor Descriptor { get; }
+
+    /// <summary>Composition dependencies. WebPage lifecycle bundles currently have no dependencies.</summary>
+    public IReadOnlyList<BundleRequest> Dependencies { get; } = Array.Empty<BundleRequest>();
+
     /// <summary>Latest platform-specific manifestation produced by the provider.</summary>
     public MicroBundleManifestation? Manifestation { get; private set; }
+
+    /// <summary>Installs this WebPage capability into the FSM_COS composition.</summary>
+    public void Load(MicroBundleLoadContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+    }
+
+    /// <summary>Participates in FSM_COS arbitration exactly once per lifecycle instance.</summary>
+    public bool Arbitrate(ArbitrationContext context, int roundIndex)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        if (roundIndex < 0 || _cosArbitrated)
+            return false;
+
+        _cosArbitrated = true;
+        return true;
+    }
 
     /// <summary>Hub-facing identity. It is the same stable identity represented by the Workshop integer id.</summary>
     ulong HubBundle.Id => checked((ulong)Id);
