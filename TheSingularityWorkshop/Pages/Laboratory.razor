@@ -1,6 +1,14 @@
 @page "/laboratory"
 @using TheSingularityWorkshop.Workshop.Gui
+@using TheSingularityWorkshop.Workshop.MicroBundles
+@implements IDisposable
 
 <PageTitle>Singularity Laboratory // The Singularity Workshop</PageTitle>
 
-@((RenderFragment)BlazorGuiRenderer.Render(SingularityLaboratoryGuiBuilder.Build()))
+@((RenderFragment)BlazorGuiRenderer.Render(SingularityLaboratoryGuiBuilder.Build(_laboratory.ConfigurableRooms)))
+
+@code {
+    private readonly SingularityLaboratoryMicroBundle _laboratory = new();
+
+    public void Dispose() => _laboratory.Dispose();
+}
