@@ -83,12 +83,17 @@ public static class SingularityLaboratoryGuiBuilder
                 .Child("Text", $"configurable-room-experiments-{room.Id}", experiments => experiments
                     .Text($"EXPERIMENTS: {(room.Experiments.Count == 0 ? "NONE // USER ADDS" : string.Join(" // ", room.Experiments.Select(x => x.Id)))}")
                     .Property("style", "color:#7896a0;font-size:.6rem;"))
-                .Child("Panel", $"configurable-room-experiment-actions-{room.Id}", actions => actions
-                    .Property("style", "display:flex;flex-wrap:wrap;gap:.25rem;")
-                    .Children(room.Experiments.Select(experiment => GuiBuilder.Create("Button", $"run-{room.Id}-{experiment.Id}")
-                        .Text($"RUN // {experiment.Name.ToUpperInvariant()}")
-                        .Property("command", $"run:{room.Id}:{experiment.Id}")
-                        .Property("style", "cursor:pointer;color:#9cff57;font:inherit;font-size:.55rem;"))))
+                .Child("Panel", $"configurable-room-experiment-actions-{room.Id}", actions =>
+                {
+                    actions.Property("style", "display:flex;flex-wrap:wrap;gap:.25rem;");
+                    foreach (var experiment in room.Experiments)
+                    {
+                        actions.Child("Button", $"run-{room.Id}-{experiment.Id}", button => button
+                            .Text($"RUN // {experiment.Name.ToUpperInvariant()}")
+                            .Property("command", $"run:{room.Id}:{experiment.Id}")
+                            .Property("style", "cursor:pointer;color:#9cff57;font:inherit;font-size:.55rem;"));
+                    }
+                })
                 .Child("Panel", $"configurable-room-actions-{room.Id}", actions => actions
                     .Property("style", "display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.35rem;")
                     .Child("Button", $"configure-mechanics-${room.Id}", button => button
