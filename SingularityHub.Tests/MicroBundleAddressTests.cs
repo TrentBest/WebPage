@@ -57,4 +57,76 @@ public sealed class MicroBundleAddressTests
         var other = new OntologySignature(9, 8, 7, 6, 5, 4, 3, 2, 1);
         Assert.NotEqual(new MicroBundleAddress(Ontology, 1).StructuralId, new MicroBundleAddress(other, 1).StructuralId);
     }
+
+    [Fact(DisplayName = "Registry indexes every bundle across all nine ontology layers")]
+    public void RegistryIndexesAllNineLayers()
+    {
+        var registry = new MicroBundleRegistry();
+        var bundle = new TestMicroBundle(101, Ontology);
+
+        Assert.True(registry.TryPublish(MicroBundleAddress.Create(Ontology, 7), bundle));
+
+        for (var layer = 0; layer < OntologySignature.LayerCount; layer++)
+        {
+            var matches = registry.GetByLayer(layer, Ontology[layer]);
+            Assert.Single(matches);
+            Assert.Same(bundle, matches.Single());
+        }
+    }
+
+    [Fact(DisplayName = "Registry keeps exact address identity separate from ontology indexing")]
+    public void RegistrySupportsMultipleVariantsUnderOneOntology()
+    {
+        var registry = new MicroBundleRegistry();
+        var first = new TestMicroBundle(201, Ontology);
+        var second = new TestMicroBundle(202, Ontology);
+
+        Assert.True(registry.TryPublish(MicroBundleAddress.Create(Ontology, 1), first));
+        Assert.True(registry.TryPublish(MicroBundleAddress.Create(Ontology, 2), second));
+
+        Assert.True(registry.TryGet(MicroBundleAddress.Create(Ontology, 1), out var exact));
+        Assert.Same(first, exact);
+
+        var matches = registry.GetByLayer(8, Ontology[8]);
+        Assert.Equal(2, matches.Count);
+        Assert.Contains(first, matches);
+        Assert.Contains(second, matches);
+    }
+
+    [Fact(DisplayName = "Registry withdraw removes the bundle from every ontology layer index")]
+    public void RegistryWithdrawRemovesAllLayerIndexes()
+    {
+        var registry = new MicroBundleRegistry();
+        var address = MicroBundleAddress.Create(Ontology, 3);
+        var bundle = new TestMicroBundle(301, Ontology);
+
+        Assert.True(registry.TryPublish(address, bundle));
+        Assert.True(registry.TryWithdraw(address, out var withdrawn));
+        Assert.Same(bundle, withdrawn);
+
+        for (var layer = 0; layer < OntologySignature.LayerCount; layer++)
+            Assert.Empty(registry.GetByLayer(layer, Ontology[layer]));
+
+        Assert.False(registry.Contains(address));
+    }
+
+    [Fact(DisplayName = "Registry rejects a bundle whose ontology disagrees with its address")]
+    public void RegistryRejectsOntologyMismatch()
+    {
+        var registry = new MicroBundleRegistry();
+        var differentOntology = new OntologySignature(9, 8, 7, 6, 5, 4, 3, 2, 1);
+        var bundle = new TestMicroBundle(401, differentOntology);
+
+        Assert.False(registry.TryPublish(MicroBundleAddress.Create(Ontology, 1), bundle));
+        Assert.Empty(registry.Bundles);
+    }
+
+    private sealed class TestMicroBundle(ulong id, OntologySignature ontology) : IMicroBundle
+    {
+        public ulong Id { get; } = id;
+        public OntologySignature Ontology { get; } = ontology;
+        public BundleVersion Version => new(1, 0, 0);
+        public IReadOnlyList<ulong> Dependencies => Array.Empty<ulong>();
+        public bool Arbitrate(IArbitrator arbitrator, int roundIndex) => true;
+    }
 }
