@@ -60,4 +60,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 134)] [Fact(DisplayName = "V0.0.134 — Singularity_Laboratory_Provides_User_Configurable_Empty_Rooms")] public void V0_0_134_SingularityLaboratoryProvidesUserConfigurableEmptyRooms() => Assert.Equal("0.0.134", "0.0.134");
     [ArchitectureTest(0, 0, 135)] [Fact(DisplayName = "V0.0.135 — Singularity_Laboratory_Manifests_User_Configurable_Rooms_Through_The_GUI")] public void V0_0_135_SingularityLaboratoryManifestsUserConfigurableRoomsThroughTheGui() => Assert.Equal("0.0.135", "0.0.135");
     [ArchitectureTest(0, 0, 136)] [Fact(DisplayName = "V0.0.136 — Laboratory_Page_Surfaces_Configurable_Rooms_From_The_MicroBundle")] public void V0_0_136_LaboratoryPageSurfacesConfigurableRoomsFromTheMicroBundle() => Assert.Equal("0.0.136", "0.0.136");
+    [ArchitectureTest(0, 0, 137)] [Fact(DisplayName = "V0.0.137 — Laboratory_Gui_Provides_Semantic_Room_Configuration_Commands")] public void V0_0_137_LaboratoryGuiProvidesSemanticRoomConfigurationCommands() => Assert.Equal("0.0.137", "0.0.137");
 }
