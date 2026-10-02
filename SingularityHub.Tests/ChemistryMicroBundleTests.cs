@@ -38,6 +38,18 @@ public sealed class ChemistryMicroBundleTests
     }
 
     [Fact]
+    public void ElementalCatalog_Supports_Fictional_Elements_Through_The_Same_Domain_Model()
+    {
+        var unobtanium = ElementalCatalog.Fictional["Ub"];
+
+        Assert.True(unobtanium.IsFictional);
+        Assert.Equal(ElementOrigin.Fictional, unobtanium.Origin);
+        Assert.Equal("Unobtanium", unobtanium.Name);
+        Assert.Equal("Ub", unobtanium.Symbol);
+        Assert.Equal("Fictional", unobtanium.Category);
+    }
+
+    [Fact]
     public void ChemistryArbitrator_Resolves_Material_By_Application_And_Elements()
     {
         var iron = ElementalCatalog.Core["Fe"];
