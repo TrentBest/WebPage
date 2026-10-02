@@ -14,13 +14,13 @@ public static class BlazorGuiRenderer
     /// <summary>
     /// Creates a Blazor render fragment for the complete recursive GUI tree.
     /// </summary>
-    public static RenderFragment Render(GuiNode node)
+    public static RenderFragment Render(GuiNode node, Action<string>? onCommand = null)
     {
         ArgumentNullException.ThrowIfNull(node);
-        return builder => RenderNode(builder, node, 0);
+        return builder => RenderNode(builder, node, 0, onCommand);
     }
 
-    private static int RenderNode(RenderTreeBuilder builder, GuiNode node, int sequence)
+    private static int RenderNode(RenderTreeBuilder builder, GuiNode node, int sequence, Action<string>? onCommand)
     {
         builder.OpenElement(sequence++, ResolveTag(node.Kind));
         builder.AddAttribute(sequence++, "id", node.Id);
@@ -29,13 +29,18 @@ public static class BlazorGuiRenderer
             builder.AddAttribute(sequence++, "src", node.Source);
 
         foreach (var property in node.Properties)
-            builder.AddAttribute(sequence++, property.Key, property.Value);
+        {
+            if (property.Key == "command" && onCommand is not null && node.Kind == "Button")
+                builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(builder, () => onCommand(property.Value)));
+            else if (property.Key != "command")
+                builder.AddAttribute(sequence++, property.Key, property.Value);
+        }
 
         if (node.Text is not null)
             builder.AddContent(sequence++, node.Text);
 
         foreach (var child in node.Children)
-            sequence = RenderNode(builder, child, sequence);
+            sequence = RenderNode(builder, child, sequence, onCommand);
 
         builder.CloseElement();
         return sequence;
