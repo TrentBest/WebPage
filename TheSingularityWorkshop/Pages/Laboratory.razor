@@ -35,12 +35,13 @@
             string.Equals(parts[0], "configure", StringComparison.Ordinal) &&
             Enum.TryParse<LaboratoryDiscipline>(parts[2], ignoreCase: true, out var discipline))
         {
-            room.Configure(
-                discipline == LaboratoryDiscipline.Materials ? "Materials Research Cell" : "Physics Research Cell",
-                discipline,
-                discipline == LaboratoryDiscipline.Materials
-                    ? "User-configured materials and fracture research."
-                    : "User-configured mechanics and physics research.");
+            var catalogRoom = LaboratoryRoomCatalog.Rooms.FirstOrDefault(x => x.Discipline == discipline);
+            if (catalogRoom is null) return;
+            room.Clear();
+            room.Configure(catalogRoom.Name, catalogRoom.Discipline, catalogRoom.Description);
+            foreach (var instrument in catalogRoom.Instruments) room.AddInstrument(instrument);
+            foreach (var experimentId in catalogRoom.ExperimentIds)
+                room.AddExperiment(SingularityLaboratory.Experiments.First(x => x.Id == experimentId));
         }
     }
 
