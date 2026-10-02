@@ -14,13 +14,19 @@ public static class BlazorGuiRenderer
     /// <summary>
     /// Creates a Blazor render fragment for the complete recursive GUI tree.
     /// </summary>
-    public static RenderFragment Render(GuiNode node, Action<string>? onCommand = null)
+    public static RenderFragment Render(GuiNode node)
+        => Render(node, receiver: null, onCommand: null);
+
+    public static RenderFragment Render(
+        GuiNode node,
+        object? receiver,
+        Action<string>? onCommand)
     {
         ArgumentNullException.ThrowIfNull(node);
-        return builder => RenderNode(builder, node, 0, onCommand);
+        return builder => RenderNode(builder, node, 0, receiver, onCommand);
     }
 
-    private static int RenderNode(RenderTreeBuilder builder, GuiNode node, int sequence, Action<string>? onCommand)
+    private static int RenderNode(RenderTreeBuilder builder, GuiNode node, int sequence, object? receiver, Action<string>? onCommand)
     {
         builder.OpenElement(sequence++, ResolveTag(node.Kind));
         builder.AddAttribute(sequence++, "id", node.Id);
@@ -31,7 +37,7 @@ public static class BlazorGuiRenderer
         foreach (var property in node.Properties)
         {
             if (property.Key == "command" && onCommand is not null && node.Kind == "Button")
-                builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(builder, () => onCommand(property.Value)));
+                builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(receiver ?? builder, () => onCommand(property.Value)));
             else if (property.Key != "command")
                 builder.AddAttribute(sequence++, property.Key, property.Value);
         }
@@ -40,7 +46,7 @@ public static class BlazorGuiRenderer
             builder.AddContent(sequence++, node.Text);
 
         foreach (var child in node.Children)
-            sequence = RenderNode(builder, child, sequence, onCommand);
+            sequence = RenderNode(builder, child, sequence, receiver, onCommand);
 
         builder.CloseElement();
         return sequence;
