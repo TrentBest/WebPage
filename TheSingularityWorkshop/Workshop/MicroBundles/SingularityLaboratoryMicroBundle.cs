@@ -45,6 +45,8 @@ public sealed class SingularityLaboratoryMicroBundle : IMicroBundle, HubBundle, 
     public ParticleColliderSimulator ParticleCollider { get; } = new();
     public HydrodynamicSimulator Hydrodynamics { get; } =
         new(new FluidCell(1000, 0, 101_325, 293.15));
+    public LandscapeHydrodynamicsSimulator LandscapeHydrodynamics { get; } =
+        new(8, 8, new double[64]);
     public ThermodynamicSimulator Thermodynamics { get; } =
         new(new ThermalState(1, 4186, 293.15));
     public ElectromagneticCircuitSimulator Electromagnetism { get; } =
