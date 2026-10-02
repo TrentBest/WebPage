@@ -39,8 +39,10 @@ public sealed class LandscapeHydrodynamicsSimulator
         _activeCells = new bool[terrainElevationM.Count];
 
         for (var i = 0; i < _cells.Length; i++)
+        {
             _cells[i] = new LandscapeCell(terrainElevationM[i], 0, 0, 0);
             _activeCells[i] = true;
+        }
     }
 
     public double CellSizeM { get; }
@@ -76,7 +78,7 @@ public sealed class LandscapeHydrodynamicsSimulator
     public void ApplyWeather(WeatherForcing forcing)
     {
         if (forcing.RainfallMPerS < 0) throw new ArgumentOutOfRangeException(nameof(forcing));
-        if (forcing.WindMPerS < 0) throw new ArgumentOutOfRangeException(nameof(forcing));
+        if (forcing.DurationS < 0) throw new ArgumentOutOfRangeException(nameof(forcing));
 
         for (var i = 0; i < _cells.Length; i++)
         {
@@ -84,8 +86,8 @@ public sealed class LandscapeHydrodynamicsSimulator
             _cells[i] = _cells[i] with { WaterDepthM = water };
         }
 
-        WindX = forcing.WindXMPerS;
-        WindY = forcing.WindYMPerS;
+        WindXMPerS = forcing.WindXMPerS;
+        WindYMPerS = forcing.WindYMPerS;
     }
 
     public void ApplyTectonics(TectonicForcing forcing)
@@ -137,8 +139,8 @@ public sealed class LandscapeHydrodynamicsSimulator
             var index = Index(x, y);
             var cell = before[index];
             if (!_activeCells[index]) continue;
-            velocityX[index] = (cell.VelocityXMPerS + WindX * 0.001 * timeStepS) * 0.995;
-            velocityY[index] = (cell.VelocityYMPerS + WindY * 0.001 * timeStepS) * 0.995;
+            velocityX[index] = (cell.VelocityXMPerS + WindXMPerS * 0.001 * timeStepS) * 0.995;
+            velocityY[index] = (cell.VelocityYMPerS + WindYMPerS * 0.001 * timeStepS) * 0.995;
             maxWaveHeight = Math.Max(maxWaveHeight, cell.WaterDepthM);
 
             if (cell.WaterDepthM <= 0)
@@ -226,7 +228,9 @@ public sealed class LandscapeHydrodynamicsSimulator
         for (var i = 0; i < _boats.Count; i++)
         {
             var boat = _boats[i];
-            var cell = GetCell((int)Math.Round(boat.X), (int)Math.Round(boat.Y));
+            var cell = GetCell(
+                Math.Clamp((int)Math.Round(boat.X), 0, _width - 1),
+                Math.Clamp((int)Math.Round(boat.Y), 0, _height - 1));
             var buoyancy = Math.Max(0, cell.WaterDepthM) * boat.DisplacementAreaM2 * 1000 * GravityMPerS2;
             var verticalError = buoyancy - boat.MassKg * GravityMPerS2;
             var acceleration = Math.Clamp(verticalError / Math.Max(boat.MassKg, 0.001), -10, 10);
