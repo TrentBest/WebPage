@@ -261,6 +261,12 @@ public sealed class LandscapeHydrodynamicsSimulator
         if (x < 0 || x >= _width || y < 0 || y >= _height)
             throw new ArgumentOutOfRangeException($"({x},{y}) is outside the landscape.");
     }
+
+    private void ValidateCoordinates(double x, double y)
+    {
+        if (x < 0 || x > _width - 1 || y < 0 || y > _height - 1)
+            throw new ArgumentOutOfRangeException($"({x},{y}) is outside the landscape.");
+    }
 }
 
 public readonly record struct LandscapeCell(
