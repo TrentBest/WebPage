@@ -73,7 +73,7 @@ public sealed class SingularityLaboratoryMicroBundleTests
         Assert.Equal(Math.Log(2) / 10, PhysicsRelationships.DecayConstantFromHalfLifeSeconds(10), 12);
         Assert.Equal(500, PhysicsRelationships.DecayedQuantity(1000, Math.Log(2) / 10, 10), 10);
         Assert.Equal(100, PhysicsRelationships.ActivityBecquerels(1000, 0.1));
-        Assert.Equal(89_875_517_873_681_764d, PhysicsRelationships.MassEnergyJoules(1), 1_000_000_000);
+        Assert.Equal(89_875_517_873_681_764d, PhysicsRelationships.MassEnergyJoules(1), 10);
     }
     [Fact]
     public void Laboratory_Room_Catalog_Maps_Diegetic_Instruments_To_Executable_Experiments()
