@@ -6,7 +6,7 @@ namespace SingularityHub.Tests.Ontology;
 public sealed class OntologyVocabularyTests
 {
     [Fact]
-    public void RetainsStringAndIntegerCoordinatesPerLayer()
+    public void RetainsStringAndIntegerCoordinatesPerLayerThroughProtocolAi()
     {
         var vocabulary = new OntologyVocabulary();
 
@@ -40,7 +40,7 @@ public sealed class OntologyVocabularyTests
     }
 
     [Fact]
-    public void HashCollisionIsRejectedRatherThanSilentlyAliased()
+    public void HashCollisionIsRejectedByProtocolAiVocabulary()
     {
         const string first = "VqM4H32Y";
         const string second = "m6nxcAO6";
@@ -56,5 +56,18 @@ public sealed class OntologyVocabularyTests
             () => vocabulary.GetOrAdd(1, second));
 
         Assert.Contains("collision", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void ProtocolAiRetainsTheLayerVocabularyAsASelfDescribingDefinition()
+    {
+        var vocabulary = new OntologyVocabulary();
+        var token = vocabulary.GetOrAdd(1, "Science");
+
+        var description = vocabulary.DescribeLayer(1);
+
+        Assert.Contains("Ontology.Layer1", description);
+        Assert.Contains(token.ToString(), description);
+        Assert.Contains("Science", description);
     }
 }
