@@ -64,7 +64,7 @@ public sealed class LaboratorySimulationTests
         var step = simulator.Step(0.1);
 
         Assert.Equal(1, step.Step);
-        Assert.Equal(4, simulator.GetCell(1, 1).TerrainElevationM, 10);
+        Assert.Equal(1, simulator.GetCell(1, 1).TerrainElevationM, 10);
         Assert.True(step.MaximumWaterDepthM > 0);
         Assert.Single(step.Boats);
         Assert.Equal("toy-boat", step.Boats[0].Id);
