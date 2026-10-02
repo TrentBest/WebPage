@@ -163,7 +163,7 @@ public sealed class SingularityLaboratoryMicroBundleTests
         var actions = root.Find("configurable-room-actions-configurable-lab-01");
 
         Assert.Equal("configure:configurable-lab-01:Materials", actions.Find("configure-materials-configurable-lab-01").Properties["command"]);
-        Assert.Equal("configure:configurable-lab-01:Mechanics", actions.Find("configure-physics-configurable-lab-01").Properties["command"]);
+        Assert.Equal("configure:configurable-lab-01:Mechanics", actions.Find("configure-mechanics-configurable-lab-01").Properties["command"]);
         Assert.Equal("clear:configurable-lab-01", actions.Find("clear-room-configurable-lab-01").Properties["command"]);
     }
 
@@ -181,6 +181,20 @@ public sealed class SingularityLaboratoryMicroBundleTests
             Assert.Contains(actions.Children, child =>
                 child.Properties.TryGetValue("command", out var value) && value == command);
         }
+    }
+
+    [Fact]
+    public void Laboratory_Gui_Builder_Provides_Executable_Experiment_Commands()
+    {
+        using var laboratory = new SingularityLaboratoryMicroBundle();
+        var room = laboratory.ConfigurableRooms[0]
+            .Configure("Materials Research Cell", LaboratoryDiscipline.Materials, "Research.")
+            .AddExperiment(SingularityLaboratory.Experiments.First(x => x.Id == "materials-elasticity"));
+
+        var root = TheSingularityWorkshop.Workshop.Gui.SingularityLaboratoryGuiBuilder.Build(laboratory.ConfigurableRooms);
+        var action = root.Find("run-configurable-lab-01-materials-elasticity");
+
+        Assert.Equal("run:configurable-lab-01:materials-elasticity", action.Properties["command"]);
     }
 
     [Fact]
