@@ -20,7 +20,10 @@ public sealed class WorkshopExperienceService
 
     public void RequestEntry()
     {
-        SelectedFlexExperience = FlexExperienceCatalog.SelectDefault();
+        // The moniker is the startup presentation of the actual Living GUI Flex.
+        // Keep the presentation phase explicit; MainLayout releases it after the
+        // configured window and advances the host into the selected experience.
+        SelectedFlexExperience = FlexExperienceCatalog.Available.Single(x => x.Id == "living-gui");
         SetState("FlexHello");
     }
 
