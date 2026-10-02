@@ -33,6 +33,7 @@ public sealed class SingularityLaboratoryMicroBundle : IMicroBundle, HubBundle, 
     public int Id => BundleId;
     public IStateContext Context => _runtime.Context;
     public IReadOnlyList<LaboratoryExperiment> Experiments => SingularityLaboratory.Experiments;
+    public IReadOnlyList<LaboratoryRoom> Rooms => LaboratoryRoomCatalog.Rooms;
     public IReadOnlyList<LaboratoryResult> LastResults { get; private set; } = Array.Empty<LaboratoryResult>();
 
     public LaboratoryResult RunExperiment(string experimentId)
