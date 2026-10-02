@@ -57,4 +57,5 @@ public sealed class IncrementalVersionTests
 
     [ArchitectureTest(0, 0, 133)] [Fact(DisplayName = "V0.0.133 — Singularity_Laboratory_Gains_Reusable_Physics_Simulation_Benches")] public void V0_0_133_SingularityLaboratoryGainsReusablePhysicsSimulationBenches() => Assert.Equal("0.0.133", "0.0.133");
 
+    [ArchitectureTest(0, 0, 134)] [Fact(DisplayName = "V0.0.134 — Singularity_Laboratory_Provides_User_Configurable_Empty_Rooms")] public void V0_0_134_SingularityLaboratoryProvidesUserConfigurableEmptyRooms() => Assert.Equal("0.0.134", "0.0.134");
 }
