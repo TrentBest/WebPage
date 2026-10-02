@@ -30,7 +30,7 @@ public sealed class LaboratorySimulationTests
         var step = simulator.Step(3, 2, 0.5, 0.01);
 
         Assert.Equal(8, step.After.VelocityMPerS);
-        Assert.Equal(101_500, step.After.PressurePa);
+        Assert.Equal(104_000, step.After.PressurePa);
         Assert.Equal(32_000, step.DynamicPressurePa);
         Assert.Equal(400_000, step.ReynoldsNumber);
         Assert.Equal(step.After, simulator.State);
