@@ -75,4 +75,22 @@ public sealed class SingularityLaboratoryMicroBundleTests
         Assert.Equal(100, PhysicsRelationships.ActivityBecquerels(1000, 0.1));
         Assert.Equal(89_875_517_873_681_764d, PhysicsRelationships.MassEnergyJoules(1), 1_000_000_000);
     }
+    [Fact]
+    public void Laboratory_Room_Catalog_Maps_Diegetic_Instruments_To_Executable_Experiments()
+    {
+        Assert.Equal(SingularityLaboratory.Experiments.Count, LaboratoryRoomCatalog.Rooms.Count);
+        Assert.All(LaboratoryRoomCatalog.Rooms, room =>
+        {
+            Assert.NotEmpty(room.Instruments);
+            Assert.NotEmpty(room.ExperimentIds);
+            Assert.All(room.ExperimentIds, experimentId =>
+                Assert.Contains(SingularityLaboratory.Experiments, experiment => experiment.Id == experimentId));
+        });
+
+        var fracture = LaboratoryRoomCatalog.GetById("fracture-bay");
+        Assert.Equal(LaboratoryDiscipline.FractureMechanics, fracture.Discipline);
+        Assert.Contains(fracture.Instruments, instrument => instrument.Id == "crack-monitor");
+        Assert.Contains("fracture-mode-one", fracture.ExperimentIds);
+    }
+
 }
