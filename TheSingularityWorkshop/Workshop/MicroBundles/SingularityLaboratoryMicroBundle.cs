@@ -36,6 +36,12 @@ public sealed class SingularityLaboratoryMicroBundle : IMicroBundle, HubBundle, 
     public IStateContext Context => _runtime.Context;
     public IReadOnlyList<LaboratoryExperiment> Experiments => SingularityLaboratory.Experiments;
     public IReadOnlyList<LaboratoryRoom> Rooms => LaboratoryRoomCatalog.Rooms;
+    public IReadOnlyList<ConfigurableLaboratoryRoom> ConfigurableRooms { get; } =
+    [
+        ConfigurableLaboratory.CreateEmptyRoom("configurable-lab-01"),
+        ConfigurableLaboratory.CreateEmptyRoom("configurable-lab-02"),
+        ConfigurableLaboratory.CreateEmptyRoom("configurable-lab-03")
+    ];
     public ParticleColliderSimulator ParticleCollider { get; } = new();
     public HydrodynamicSimulator Hydrodynamics { get; } =
         new(new FluidCell(1000, 0, 101_325, 293.15));
