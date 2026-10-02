@@ -27,7 +27,8 @@ public sealed class Atom
         string oxidationStates,
         string stateAtStp,
         string category,
-        ElementOrigin origin = ElementOrigin.Natural)
+        ElementOrigin origin = ElementOrigin.Natural,
+        ElementalPropertySet? properties = null)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Atom name is required.", nameof(name));
         if (string.IsNullOrWhiteSpace(symbol)) throw new ArgumentException("Atomic symbol is required.", nameof(symbol));
@@ -52,6 +53,7 @@ public sealed class Atom
         StateAtStp = stateAtStp ?? string.Empty;
         Category = category ?? string.Empty;
         Origin = origin;
+        Properties = properties;
     }
 
     public string Name { get; }
@@ -67,6 +69,7 @@ public sealed class Atom
     public string Category { get; }
     public ElementOrigin Origin { get; }
     public bool IsFictional => Origin == ElementOrigin.Fictional;
+    public ElementalPropertySet? Properties { get; }
 
     public override string ToString() => $"{Name} ({Symbol}), Z={AtomicNumber}, Ar={AtomicWeight}";
 }
