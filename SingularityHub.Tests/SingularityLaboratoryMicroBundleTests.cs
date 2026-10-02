@@ -141,6 +141,35 @@ public sealed class SingularityLaboratoryMicroBundleTests
     }
 
     [Fact]
+    public void Laboratory_Gui_Builder_Manifests_User_Configurable_Empty_Rooms()
+    {
+        using var laboratory = new SingularityLaboratoryMicroBundle();
+
+        var root = TheSingularityWorkshop.Workshop.Gui.SingularityLaboratoryGuiBuilder.Build(laboratory.ConfigurableRooms);
+
+        Assert.Equal(laboratory.ConfigurableRooms.Count, root.Children.Count(child => child.Id.StartsWith("configurable-room-", StringComparison.Ordinal)));
+        var empty = root.Find("configurable-room-configurable-lab-01");
+        Assert.Contains("EMPTY // READY FOR USER CONFIGURATION", empty.Find("configurable-room-state-configurable-lab-01").Text);
+        Assert.Contains("NONE // USER ADDS", empty.Find("configurable-room-instruments-configurable-lab-01").Text);
+        Assert.Contains("NONE // USER ADDS", empty.Find("configurable-room-experiments-configurable-lab-01").Text);
+    }
+
+    [Fact]
+    public void Laboratory_Gui_Builder_Reflects_A_User_Configured_Room()
+    {
+        using var laboratory = new SingularityLaboratoryMicroBundle();
+        var room = laboratory.ConfigurableRooms[0]
+            .Configure("Materials Research Cell", LaboratoryDiscipline.Materials, "User-defined materials research.")
+            .AddInstrument(new LaboratoryInstrument("custom-tensile-rig", "Custom Tensile Rig", "Custom tensile measurement."));
+
+        var root = TheSingularityWorkshop.Workshop.Gui.SingularityLaboratoryGuiBuilder.Build(laboratory.ConfigurableRooms);
+        var configured = root.Find("configurable-room-configurable-lab-01");
+
+        Assert.Contains("CONFIGURED // MATERIALS", configured.Find("configurable-room-state-configurable-lab-01").Text);
+        Assert.Contains("Custom Tensile Rig", configured.Find("configurable-room-instruments-configurable-lab-01").Text);
+    }
+
+    [Fact]
     public void Laboratory_MicroBundle_Exposes_Reusable_Physics_Simulation_Benches()
     {
         using var laboratory = new SingularityLaboratoryMicroBundle();
