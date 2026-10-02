@@ -88,7 +88,7 @@ public sealed class SingularityLaboratoryMicroBundle : IMicroBundle, HubBundle, 
     }
 
     ulong HubBundle.Id => BundleId;
-    OntologySignature HubBundle.Ontology => new(0, 0, 0, 0, 0, 0, 0, 0, BundleId);
+    OntologySignature HubBundle.Ontology => WorkshopOntology.Laboratory(BundleId);
     BundleVersion HubBundle.Version => new(1, 0, 0);
     IReadOnlyList<ulong> HubBundle.Dependencies => Array.Empty<ulong>();
     bool HubBundle.Arbitrate(IArbitrator arbitrator, int roundIndex) => Arbitrate(arbitrator, roundIndex);
