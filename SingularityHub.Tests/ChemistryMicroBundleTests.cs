@@ -76,6 +76,34 @@ public sealed class ChemistryMicroBundleTests
     }
 
     [Fact]
+    public void ChemistryMicroBundle_Uses_Injected_Elemental_Property_Data_Source()
+    {
+        var ironProperties = new ElementalPropertySet
+        {
+            DensityKgPerM3 = 7874,
+            YoungsModulusPa = 200_000_000_000,
+            SourceId = "warehouse:test",
+            SourceVersion = "2026.10"
+        };
+
+        var source = new ElementalCatalogDataSource(
+            new Dictionary<string, ElementalPropertySet>
+            {
+                ["Fe"] = ironProperties
+            });
+
+        using var chemistry = new ChemistryMicroBundle(source);
+
+        Assert.True(chemistry.TryGetProperties("Fe", out var resolved));
+        Assert.Same(ironProperties, resolved);
+        Assert.Equal("warehouse:test", resolved!.SourceId);
+        Assert.Equal("2026.10", resolved.SourceVersion);
+
+        Assert.False(chemistry.TryGetProperties("Og", out var missing));
+        Assert.Null(missing);
+    }
+
+    [Fact]
     public void ChemistryMicroBundle_Exposes_Canonical_And_Fictional_Element_Spaces()
     {
         using var chemistry = new ChemistryMicroBundle();
