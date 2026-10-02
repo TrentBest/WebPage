@@ -1,7 +1,9 @@
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.Services
+@using TheSingularityWorkshop.Infrastructure.FsmCos
 @using TheSingularityWorkshop.Workshop.MicroBundles
 @inject FSMManagerService FSM
+@inject WebPageCosRuntime CosRuntime
 @implements IAsyncDisposable
 
 @if (_idleActive && _pongBundle is not null)
@@ -74,8 +76,10 @@
 
     private static readonly TimeSpan IdleThreshold = TimeSpan.FromSeconds(7);
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await CosRuntime.LoadAsync("runtime/webapp.runtime.json");
+
         _shutdown = new CancellationTokenSource();
         _loop = RunAsync(_shutdown.Token);
     }
@@ -118,8 +122,16 @@
     private void StartIdleExperience()
     {
         StopIdleExperience();
+        var assembly = CosRuntime.Assembly;
+        if (assembly is null)
+            throw new InvalidOperationException("FSM_COS has not composed the WebApp runtime.");
+
+        if (!assembly.TryGetBundle<PongMicroBundle>(PongMicroBundle.BundleId, out var pong) || pong is null)
+            throw new InvalidOperationException(
+                $"The WebApp runtime manifest did not compose MicroBundle {PongMicroBundle.BundleId}.");
+
         _idleActive = true;
-        _pongBundle = MicroBundleCatalog.CreatePong();
+        _pongBundle = pong;
     }
 
     private void StopIdleExperience()
