@@ -92,5 +92,18 @@ public sealed class SingularityLaboratoryMicroBundleTests
         Assert.Contains(fracture.Instruments, instrument => instrument.Id == "crack-monitor");
         Assert.Contains("fracture-mode-one", fracture.ExperimentIds);
     }
+    [Fact]
+    public void Laboratory_Gui_Builder_Manifests_The_Same_Rooms_And_Experiments()
+    {
+        var root = TheSingularityWorkshop.Workshop.Gui.SingularityLaboratoryGuiBuilder.Build();
+
+        Assert.Equal("singularity-laboratory", root.Id);
+        Assert.Equal(LaboratoryRoomCatalog.Rooms.Count, root.Children.Count(child => child.Id.StartsWith("room-", StringComparison.Ordinal)));
+
+        var fracture = root.Find("room-fracture-bay");
+        Assert.Contains("fracture-mode-one", fracture.Find("room-experiments-fracture-bay").Text);
+        Assert.Contains("Crack Monitor", fracture.Find("room-instruments-fracture-bay").Text);
+    }
+
 
 }
