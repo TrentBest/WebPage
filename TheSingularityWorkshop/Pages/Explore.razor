@@ -13,7 +13,7 @@
 
     private readonly ExploreExperienceMicroBundle Experience = new();
     private string? insideRoomId;
-    private bool unknownUnlocked;
+    private bool unknownUnlocked = false;
 
     private static readonly IReadOnlyList<SpatialRoom> Rooms =
     [
