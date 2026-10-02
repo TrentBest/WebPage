@@ -81,7 +81,21 @@ public static class SingularityLaboratoryGuiBuilder
                     .Property("style", "color:#7896a0;font-size:.6rem;"))
                 .Child("Text", $"configurable-room-experiments-{room.Id}", experiments => experiments
                     .Text($"EXPERIMENTS: {(room.Experiments.Count == 0 ? "NONE // USER ADDS" : string.Join(" // ", room.Experiments.Select(x => x.Id)))}")
-                    .Property("style", "color:#7896a0;font-size:.6rem;")));
+                    .Property("style", "color:#7896a0;font-size:.6rem;"))
+                .Child("Panel", $"configurable-room-actions-{room.Id}", actions => actions
+                    .Property("style", "display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.35rem;")
+                    .Child("Button", $"configure-materials-{room.Id}", button => button
+                        .Text("CONFIGURE MATERIALS")
+                        .Property("command", $"configure:{room.Id}:Materials")
+                        .Property("style", "cursor:pointer;padding:.35rem .5rem;border:1px solid rgba(255,211,77,.35);background:rgba(255,211,77,.06);color:#ffd34d;font:inherit;font-size:.6rem;"))
+                    .Child("Button", $"configure-physics-{room.Id}", button => button
+                        .Text("CONFIGURE PHYSICS")
+                        .Property("command", $"configure:{room.Id}:Mechanics")
+                        .Property("style", "cursor:pointer;padding:.35rem .5rem;border:1px solid rgba(0,234,255,.35);background:rgba(0,234,255,.06);color:#00eaff;font:inherit;font-size:.6rem;"))
+                    .Child("Button", $"clear-room-{room.Id}", button => button
+                        .Text("CLEAR")
+                        .Property("command", $"clear:{room.Id}")
+                        .Property("style", "cursor:pointer;padding:.35rem .5rem;border:1px solid rgba(255,44,255,.35);background:rgba(255,44,255,.04);color:#ff2cff;font:inherit;font-size:.6rem;"))));
         }
 
         return root.Build();
