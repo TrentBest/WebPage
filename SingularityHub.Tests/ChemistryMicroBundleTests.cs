@@ -50,6 +50,25 @@ public sealed class ChemistryMicroBundleTests
     }
 
     [Fact]
+    public void ChemistryMicroBundle_Exposes_Canonical_And_Fictional_Element_Spaces()
+    {
+        using var chemistry = new ChemistryMicroBundle();
+        var custom = new AtomBuilder("Dilithium", 0, "Dl")
+            .WithAtomicWeight(0)
+            .WithOrigin(ElementOrigin.Fictional)
+            .WithCategory("Fictional")
+            .Build();
+
+        Assert.Equal(1, chemistry.FictionalElements.Count);
+        Assert.True(chemistry.TryGetElement("Ub", out var unobtanium));
+        Assert.True(unobtanium!.IsFictional);
+
+        Assert.True(chemistry.RegisterFictionalElement(custom));
+        Assert.True(chemistry.TryGetElement("Dl", out var dilithium));
+        Assert.Same(custom, dilithium);
+    }
+
+    [Fact]
     public void ChemistryArbitrator_Resolves_Material_By_Application_And_Elements()
     {
         var iron = ElementalCatalog.Core["Fe"];
@@ -69,6 +88,33 @@ public sealed class ChemistryMicroBundleTests
         Assert.Contains(result.Elements, x => x.Symbol == "C");
         Assert.True(result.Physics.Hardness > 0.5);
         Assert.True(result.Physics.Flexibility > 0.0);
+    }
+
+    [Fact]
+    public void ChemistryArbitrator_Preserves_Multiple_Fictional_Elements_With_Unassigned_Atomic_Number()
+    {
+        var fictionalA = new AtomBuilder("Dilithium", 0, "Dl")
+            .WithOrigin(ElementOrigin.Fictional)
+            .WithCategory("Fictional")
+            .Build();
+        var fictionalB = new AtomBuilder("Unobtanium-X", 0, "Ux")
+            .WithOrigin(ElementOrigin.Fictional)
+            .WithCategory("Fictional")
+            .Build();
+
+        var material = new MaterialComposition(
+            "fictional-alloy",
+            "Fictional Alloy",
+            MaterialApplication.Structural,
+            new ElementalFraction(fictionalA, 0.40),
+            new ElementalFraction(fictionalB, 0.30));
+
+        var source = new MaterialSourceBundle(material);
+        var result = Assert.Single(new ElementalArbitrator().Evaluate(new HubBundle[] { source }));
+
+        Assert.Equal(2, result.Elements.Count);
+        Assert.Contains(result.Elements, x => x.Symbol == "Dl");
+        Assert.Contains(result.Elements, x => x.Symbol == "Ux");
     }
 
     [Fact]
