@@ -67,34 +67,3 @@ public interface IElementalDataSource
 {
     bool TryGetProperties(string symbol, out ElementalPropertySet? properties);
 }
-
-/// <summary>
-/// Fundamental relationships exposed by the chemistry/physics domain.
-/// These are equations, not additional stored measurements.
-/// </summary>
-public static class PhysicsRelationships
-{
-    /// <summary>Electrical power: P = I × V.</summary>
-    public static double ElectricalPowerWatts(double currentAmps, double voltageVolts)
-        => currentAmps * voltageVolts;
-
-    /// <summary>Newton's second law: F = m × a.</summary>
-    public static double ForceNewtons(double massKg, double accelerationMPerS2)
-        => massKg * accelerationMPerS2;
-
-    /// <summary>Mechanical power from force and velocity: P = F × v.</summary>
-    public static double MechanicalPowerWatts(double forceNewtons, double velocityMPerS)
-        => forceNewtons * velocityMPerS;
-
-    /// <summary>Work: W = F × d for force parallel to displacement.</summary>
-    public static double WorkJoules(double forceNewtons, double displacementM)
-        => forceNewtons * displacementM;
-
-    /// <summary>Density: ρ = m / V.</summary>
-    public static double DensityKgPerM3(double massKg, double volumeM3)
-        => massKg / volumeM3;
-
-    /// <summary>Pressure: p = F / A.</summary>
-    public static double PressurePa(double forceNewtons, double areaM2)
-        => forceNewtons / areaM2;
-}
