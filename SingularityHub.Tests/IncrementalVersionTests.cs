@@ -75,4 +75,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 150)] [Fact(DisplayName = "V0.0.150 — Laboratory_GUI_And_Hydrodynamics_Compile_Contracts_Are_Repaired")]
     public void V0_0_150_LaboratoryGuiAndHydrodynamicsCompileContractsAreRepaired() => Assert.Equal("0.0.150", "0.0.150");
     [ArchitectureTest(0, 0, 151)] [Fact(DisplayName = "V0.0.151 — Scientific_Test_Contracts_Build_With_Disambiguated_MicroBundle_And_Valid_Double_Precision")] public void V0_0_151_ScientificTestContractsBuildWithDisambiguatedMicroBundleAndValidDoublePrecision() => Assert.Equal("0.0.151", "0.0.151");
+    [ArchitectureTest(0, 0, 152)] [Fact(DisplayName = "V0.0.152 — Workshop_Entry_Transitions_From_Moniker_Presentation_Into_Living_GUI")] public void V0_0_152_WorkshopEntryTransitionsFromMonikerPresentationIntoLivingGui() => Assert.Equal("0.0.152", "0.0.152");
 }
