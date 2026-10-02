@@ -31,7 +31,9 @@ public sealed class Atom
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Atom name is required.", nameof(name));
         if (string.IsNullOrWhiteSpace(symbol)) throw new ArgumentException("Atomic symbol is required.", nameof(symbol));
-        if (atomicNumber <= 0) throw new ArgumentOutOfRangeException(nameof(atomicNumber));
+        if (atomicNumber < 0) throw new ArgumentOutOfRangeException(nameof(atomicNumber));
+        if (origin != ElementOrigin.Fictional && atomicNumber == 0)
+            throw new ArgumentOutOfRangeException(nameof(atomicNumber), "Canonical elements require an atomic number.");
         if (protons != atomicNumber) throw new ArgumentException("Protons must equal atomic number (Z).", nameof(protons));
         if (electrons < 0) throw new ArgumentOutOfRangeException(nameof(electrons));
         if (neutrons < 0) throw new ArgumentOutOfRangeException(nameof(neutrons));
