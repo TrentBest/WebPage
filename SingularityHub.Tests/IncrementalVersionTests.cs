@@ -73,3 +73,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 148)] [Fact(DisplayName = "V0.0.148 — Ontology_Vocabulary_Is_Backend_By_ProtocolAi")] public void V0_0_148_OntologyVocabularyIsBackedByProtocolAi() => Assert.Equal("0.0.148", "0.0.148");
     [ArchitectureTest(0, 0, 149)] [Fact(DisplayName = "V0.0.149 — Canonical_Workshop_Ontology_Uses_ProtocolAi_Identity")] public void V0_0_149_CanonicalWorkshopOntologyUsesProtocolAiIdentity() => Assert.Equal("0.0.149", "0.0.149");
 }
+    [ArchitectureTest(0, 0, 150)] [Fact(DisplayName = "V0.0.150 — Laboratory_GUI_And_Hydrodynamics_Compile_Contracts_Are_Repaired")]
+    public void V0_0_150_LaboratoryGuiAndHydrodynamicsCompileContractsAreRepaired() => Assert.Equal("0.0.150", "0.0.150");
