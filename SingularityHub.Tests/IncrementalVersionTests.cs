@@ -53,5 +53,7 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 129)] [Fact(DisplayName = "V0.0.129 — Singularity_Laboratory_Becomes_A_Diegetic_Scientific_Test_Facility")] public void V0_0_129_SingularityLaboratoryBecomesADiegeticScientificTestFacility() => Assert.Equal("0.0.129", "0.0.129");
     [ArchitectureTest(0, 0, 130)] [Fact(DisplayName = "V0.0.130 — Repair_Laboratory_Heartbeat_And_Physics_Test_Arithmetic")] public void V0_0_130_RepairLaboratoryHeartbeatAndPhysicsTestArithmetic() => Assert.Equal("0.0.130", "0.0.130");
     [ArchitectureTest(0, 0, 131)] [Fact(DisplayName = "V0.0.131 — Laboratory_Rooms_And_Instruments_Become_Diegetic_Experiment_Surfaces")] public void V0_0_131_LaboratoryRoomsAndInstrumentsBecomeDiegeticExperimentSurfaces() => Assert.Equal("0.0.131", "0.0.131");
+    [ArchitectureTest(0, 0, 132)] [Fact(DisplayName = "V0.0.132 — Singularity_Laboratory_Rooms_Manifest_Through_The_Recursive_GUI_Builder")] public void V0_0_132_SingularityLaboratoryRoomsManifestThroughTheRecursiveGuiBuilder() => Assert.Equal("0.0.132", "0.0.132");
+
 
 }
