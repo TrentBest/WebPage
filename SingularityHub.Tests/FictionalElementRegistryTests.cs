@@ -21,6 +21,16 @@ public sealed class FictionalElementRegistryTests
         Assert.True(registry.GetBySymbol("Dl").IsFictional);
     }
 
+
+    [Fact]
+    public void Atom_Rejects_Unassigned_Atomic_Number_For_Canonical_Elements()
+    {
+        var exception = Assert.Throws<System.ArgumentOutOfRangeException>(
+            () => new AtomBuilder("Invalid", 0, "Iv").Build());
+
+        Assert.Contains("Canonical elements require an atomic number.", exception.Message);
+    }
+
     [Fact]
     public void Registry_Rejects_Canonical_Elements()
     {
