@@ -12,8 +12,8 @@ public sealed class WorkshopOntologyTests
         using var chemistry = new ChemistryMicroBundle();
         using var laboratory = new SingularityLaboratoryMicroBundle();
 
-        var chemistryBundle = (TheSingularityWorkshop.Workshop.MicroBundles.IMicroBundle)chemistry;
-        var laboratoryBundle = (TheSingularityWorkshop.Workshop.MicroBundles.IMicroBundle)laboratory;
+        var chemistryBundle = (TheSingularityWorkshop.SingularityHub.IMicroBundle)chemistry;
+        var laboratoryBundle = (TheSingularityWorkshop.SingularityHub.IMicroBundle)laboratory;
 
         Assert.Equal(9, OntologySignature.LayerCount);
         Assert.Equal(WorkshopOntology.Chemistry(ChemistryMicroBundle.BundleId), chemistryBundle.Ontology);
@@ -30,8 +30,8 @@ public sealed class WorkshopOntologyTests
         using var laboratory = new SingularityLaboratoryMicroBundle();
         var registry = new MicroBundleRegistry();
 
-        var chemistryBundle = (TheSingularityWorkshop.Workshop.MicroBundles.IMicroBundle)chemistry;
-        var laboratoryBundle = (TheSingularityWorkshop.Workshop.MicroBundles.IMicroBundle)laboratory;
+        var chemistryBundle = (TheSingularityWorkshop.SingularityHub.IMicroBundle)chemistry;
+        var laboratoryBundle = (TheSingularityWorkshop.SingularityHub.IMicroBundle)laboratory;
 
         Assert.True(registry.TryPublish(
             MicroBundleAddress.Create(chemistryBundle.Ontology, ChemistryMicroBundle.BundleId), chemistryBundle));
