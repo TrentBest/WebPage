@@ -28,8 +28,10 @@ public sealed class ElementalArbitrator
     {
         var elements = material.Elements
             .OrderByDescending(x => x.Fraction)
+            // Atomic number is not a unique identity for fictional elements:
+            // multiple fictional elements may intentionally have an unassigned Z=0.
             .Select(x => x.Element)
-            .DistinctBy(x => x.AtomicNumber)
+            .DistinctBy(x => x.Symbol)
             .ToArray();
 
         return new MaterialResolution(
