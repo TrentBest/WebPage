@@ -68,4 +68,5 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 142)] [Fact(DisplayName = "V0.0.142 — Landscape_Hydrodynamics_Supports_Arbitrary_Boundaries_And_Water_Fill")] public void V0_0_142_LandscapeHydrodynamicsSupportsArbitraryBoundariesAndWaterFill() => Assert.Equal("0.0.142", "0.0.142");
     [ArchitectureTest(0, 0, 143)] [Fact(DisplayName = "V0.0.143 — Reusable_Tectonic_Simulation_Substrate_Produces_Deterministic_Fault_Events")] public void V0_0_143_ReusableTectonicSimulationSubstrateProducesDeterministicFaultEvents() => Assert.Equal("0.0.143", "0.0.143");
     [ArchitectureTest(0, 0, 144)] [Fact(DisplayName = "V0.0.144 — Reusable_Digital_Logic_Simulation_Provides_Gates_And_Arithmetic_Primitives")] public void V0_0_144_ReusableDigitalLogicSimulationProvidesGatesAndArithmeticPrimitives() => Assert.Equal("0.0.144", "0.0.144");
+    [ArchitectureTest(0, 0, 145)] [Fact(DisplayName = "V0.0.145 — MicroBundle_Registry_Indexes_The_Nine_Layer_Ontology")] public void V0_0_145_MicroBundleRegistryIndexesTheNineLayerOntology() => Assert.Equal("0.0.145", "0.0.145");
 }
