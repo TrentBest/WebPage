@@ -13,11 +13,12 @@ public static class SingularityLaboratoryGuiBuilder
 {
     public static GuiNode Build() => Build(Array.Empty<ConfigurableLaboratoryRoom>());
 
-    public static GuiNode Build(IEnumerable<ConfigurableLaboratoryRoom> configurableRooms)
+    public static GuiNode Build(IEnumerable<ConfigurableLaboratoryRoom> configurableRooms, IReadOnlyList<LaboratoryResult>? results = null)
     {
         ArgumentNullException.ThrowIfNull(configurableRooms);
 
         var configurableRoomList = configurableRooms.ToList();
+        var resultList = results ?? Array.Empty<LaboratoryResult>();
         var root = GuiBuilder.Create("Panel", "singularity-laboratory")
             .Property("style", "display:grid;gap:1rem;padding:1rem;border:1px solid rgba(0,234,255,.35);background:rgba(3,12,24,.8);color:#eafcff;font-family:Consolas,'Courier New',monospace;")
             .Child("Text", "laboratory-title", b => b
@@ -82,6 +83,12 @@ public static class SingularityLaboratoryGuiBuilder
                 .Child("Text", $"configurable-room-experiments-{room.Id}", experiments => experiments
                     .Text($"EXPERIMENTS: {(room.Experiments.Count == 0 ? "NONE // USER ADDS" : string.Join(" // ", room.Experiments.Select(x => x.Id)))}")
                     .Property("style", "color:#7896a0;font-size:.6rem;"))
+                .Child("Panel", $"configurable-room-experiment-actions-{room.Id}", actions => actions
+                    .Property("style", "display:flex;flex-wrap:wrap;gap:.25rem;")
+                    .Children(room.Experiments.Select(experiment => GuiBuilder.Create("Button", $"run-{room.Id}-{experiment.Id}")
+                        .Text($"RUN // {experiment.Name.ToUpperInvariant()}")
+                        .Property("command", $"run:{room.Id}:{experiment.Id}")
+                        .Property("style", "cursor:pointer;color:#9cff57;font:inherit;font-size:.55rem;"))))
                 .Child("Panel", $"configurable-room-actions-{room.Id}", actions => actions
                     .Property("style", "display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.35rem;")
                     .Child("Button", $"configure-mechanics-${room.Id}", button => button
@@ -107,6 +114,11 @@ public static class SingularityLaboratoryGuiBuilder
                         .Property("command", $"clear:{room.Id}")
                         .Property("style", "cursor:pointer;padding:.35rem .5rem;border:1px solid rgba(255,44,255,.35);background:rgba(255,44,255,.04);color:#ff2cff;font:inherit;font-size:.6rem;"))));
         }
+
+        foreach (var result in resultList)
+            root.Child("Text", $"result-{result.ExperimentId}", node => node
+                .Text($"RESULT // {result.Name.ToUpperInvariant()} // {(result.Passed ? "PASS" : "FAIL")} // {result.Evidence}")
+                .Property("style", result.Passed ? "color:#9cff57;font-size:.62rem;" : "color:#ff5577;font-size:.62rem;"));
 
         return root.Build();
     }
