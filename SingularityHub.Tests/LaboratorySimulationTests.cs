@@ -84,6 +84,25 @@ public sealed class LaboratorySimulationTests
     }
 
     [Fact]
+    public void TectonicSimulator_Produces_Deterministic_Fault_Event_And_Displacement_Field()
+    {
+        var simulator = new TectonicSimulator(4);
+        simulator.AddPlate(new TectonicPlate("plate-a", [0, 1], 2, 0));
+        simulator.AddPlate(new TectonicPlate("plate-b", [1, 2], -1, 0));
+
+        var eventResult = simulator.SimulateFault(1, 0.5, 2);
+
+        Assert.Equal(1, eventResult.EventId);
+        Assert.True(eventResult.Magnitude > 0);
+        Assert.True(eventResult.EnergyJoules > 0);
+        Assert.Equal(1, eventResult.MaximumDisplacementM);
+        Assert.Equal(1, eventResult.DisplacementM[0]);
+        Assert.Equal(2, eventResult.DisplacementM[1]);
+        Assert.Equal(1, eventResult.DisplacementM[2]);
+        Assert.Equal(0, eventResult.DisplacementM[3]);
+    }
+
+    [Fact]
     public void ThermodynamicSimulator_Conserves_Added_Heat_Through_Temperature_Change()
     {
         var simulator = new ThermodynamicSimulator(new ThermalState(2, 900, 300));
