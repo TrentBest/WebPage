@@ -115,7 +115,7 @@ public sealed class LaboratorySimulationTests
         Assert.Equal(eventResult.EventId + 1, nextEvent.EventId);
         Assert.True(eventResult.Magnitude > 0);
         Assert.True(eventResult.EnergyJoules > 0);
-        Assert.Equal(1, eventResult.MaximumDisplacementM);
+        Assert.Equal(2, eventResult.MaximumDisplacementM);
         Assert.Equal(1, eventResult.DisplacementM[0]);
         Assert.Equal(2, eventResult.DisplacementM[1]);
         Assert.Equal(1, eventResult.DisplacementM[2]);
