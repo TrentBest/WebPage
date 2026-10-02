@@ -14,7 +14,11 @@ public sealed class MonikerExperienceTests
         service.RequestEntry();
 
         Assert.Equal("FlexHello", service.CurrentState);
+        Assert.Equal("living-gui", service.SelectedFlexExperience?.Id);
         Assert.False(service.ShowUnity);
+
+        service.SetState("Living");
+        Assert.Equal("Living", service.CurrentState);
     }
 
     [Fact(DisplayName = "Moniker presentation is a phased six-color living glyph field")]
