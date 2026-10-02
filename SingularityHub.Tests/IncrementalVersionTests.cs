@@ -70,3 +70,4 @@ public sealed class IncrementalVersionTests
     [ArchitectureTest(0, 0, 144)] [Fact(DisplayName = "V0.0.144 — Reusable_Digital_Logic_Simulation_Provides_Gates_And_Arithmetic_Primitives")] public void V0_0_144_ReusableDigitalLogicSimulationProvidesGatesAndArithmeticPrimitives() => Assert.Equal("0.0.144", "0.0.144");
     [ArchitectureTest(0, 0, 145)] [Fact(DisplayName = "V0.0.145 — MicroBundle_Registry_Indexes_The_Nine_Layer_Ontology")] public void V0_0_145_MicroBundleRegistryIndexesTheNineLayerOntology() => Assert.Equal("0.0.145", "0.0.145");
 }
+    [ArchitectureTest(0, 0, 146)] [Fact(DisplayName = "V0.0.146 — Scientific_MicroBundles_Publish_Canonical_Nine_Layer_Ontology_Coordinates")] public void V0_0_146_ScientificMicroBundlesPublishCanonicalNineLayerOntologyCoordinates() => Assert.Equal("0.0.146", "0.0.146");
