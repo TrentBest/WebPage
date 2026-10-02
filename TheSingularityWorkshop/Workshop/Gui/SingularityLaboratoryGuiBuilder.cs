@@ -96,23 +96,23 @@ public static class SingularityLaboratoryGuiBuilder
                 })
                 .Child("Panel", $"configurable-room-actions-{room.Id}", actions => actions
                     .Property("style", "display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.35rem;")
-                    .Child("Button", $"configure-mechanics-${room.Id}", button => button
+                    .Child("Button", $"configure-mechanics-{room.Id}", button => button
                         .Text("MECHANICS").Property("command", $"configure:{room.Id}:Mechanics").Property("style", "cursor:pointer;color:#00eaff;font:inherit;font-size:.6rem;"))
-                    .Child("Button", $"configure-electromagnetism-${room.Id}", button => button
+                    .Child("Button", $"configure-electromagnetism-{room.Id}", button => button
                         .Text("ELECTROMAGNETISM").Property("command", $"configure:{room.Id}:Electromagnetism").Property("style", "cursor:pointer;color:#00eaff;font:inherit;font-size:.6rem;"))
-                    .Child("Button", $"configure-thermodynamics-${room.Id}", button => button
+                    .Child("Button", $"configure-thermodynamics-{room.Id}", button => button
                         .Text("THERMODYNAMICS").Property("command", $"configure:{room.Id}:Thermodynamics").Property("style", "cursor:pointer;color:#00eaff;font:inherit;font-size:.6rem;"))
-                    .Child("Button", $"configure-fluid-dynamics-${room.Id}", button => button
+                    .Child("Button", $"configure-fluid-dynamics-{room.Id}", button => button
                         .Text("FLUID DYNAMICS").Property("command", $"configure:{room.Id}:FluidDynamics").Property("style", "cursor:pointer;color:#00eaff;font:inherit;font-size:.6rem;"))
-                    .Child("Button", $"configure-materials-${room.Id}", button => button
+                    .Child("Button", $"configure-materials-{room.Id}", button => button
                         .Text("MATERIALS").Property("command", $"configure:{room.Id}:Materials").Property("style", "cursor:pointer;color:#ffd34d;font:inherit;font-size:.6rem;"))
-                    .Child("Button", $"configure-fracture-${room.Id}", button => button
+                    .Child("Button", $"configure-fracture-{room.Id}", button => button
                         .Text("FRACTURE").Property("command", $"configure:{room.Id}:FractureMechanics").Property("style", "cursor:pointer;color:#ffd34d;font:inherit;font-size:.6rem;"))
-                    .Child("Button", $"configure-nuclear-${room.Id}", button => button
+                    .Child("Button", $"configure-nuclear-{room.Id}", button => button
                         .Text("NUCLEAR").Property("command", $"configure:{room.Id}:NuclearPhysics").Property("style", "cursor:pointer;color:#ff2cff;font:inherit;font-size:.6rem;"))
-                    .Child("Button", $"configure-chemistry-${room.Id}", button => button
+                    .Child("Button", $"configure-chemistry-{room.Id}", button => button
                         .Text("CHEMISTRY").Property("command", $"configure:{room.Id}:Chemistry").Property("style", "cursor:pointer;color:#ff2cff;font:inherit;font-size:.6rem;"))
-                    .Child("Button", $"configure-research-${room.Id}", button => button
+                    .Child("Button", $"configure-research-{room.Id}", button => button
                         .Text("RESEARCH").Property("command", $"configure:{room.Id}:Research").Property("style", "cursor:pointer;color:#ff2cff;font:inherit;font-size:.6rem;"))
                     .Child("Button", $"clear-room-{room.Id}", button => button
                         .Text("CLEAR")
