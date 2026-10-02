@@ -138,19 +138,19 @@ public sealed class PathfindingMicroBundle : IDisposable
         return result;
     }
 
-    private static SpatialWaypoint FindNearestWalkable(GridCell origin, IReadOnlyList<SpatialObstacle> obstacles)
+    private static GridCell FindNearestWalkable(GridCell origin, IReadOnlyList<SpatialObstacle> obstacles)
     {
-        if (IsWalkable(origin, obstacles)) return FromCell(origin);
+        if (IsWalkable(origin, obstacles)) return origin;
         for (var radius = 1; radius <= 100; radius++)
         {
             for (var x = origin.X - radius; x <= origin.X + radius; x++)
             for (var y = origin.Y - radius; y <= origin.Y + radius; y++)
             {
                 var candidate = new GridCell(x, y);
-                if (IsWalkable(candidate, obstacles)) return FromCell(candidate);
+                if (IsWalkable(candidate, obstacles)) return candidate;
             }
         }
-        return new SpatialWaypoint(50, 50);
+        return ToCell(50, 50);
     }
 
     private static bool IsWalkable(GridCell cell, IReadOnlyList<SpatialObstacle> obstacles)
