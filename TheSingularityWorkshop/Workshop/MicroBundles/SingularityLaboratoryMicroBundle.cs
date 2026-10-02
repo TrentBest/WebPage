@@ -9,7 +9,9 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
 /// <summary>
 /// Diegetic scientific research facility for the Workshop. Its instruments can
-/// later be manifested through the Hub while experiments remain renderer-neutral.
+/// later be manifested through the Hub while experiments remain renderer-neutral. The
+/// simulation engines are exposed as diegetic instruments so the same state transitions
+/// can drive interactive benches and executable verification tests.
 /// </summary>
 public sealed class SingularityLaboratoryMicroBundle : IMicroBundle, HubBundle, IDisposable
 {
@@ -34,6 +36,13 @@ public sealed class SingularityLaboratoryMicroBundle : IMicroBundle, HubBundle, 
     public IStateContext Context => _runtime.Context;
     public IReadOnlyList<LaboratoryExperiment> Experiments => SingularityLaboratory.Experiments;
     public IReadOnlyList<LaboratoryRoom> Rooms => LaboratoryRoomCatalog.Rooms;
+    public ParticleColliderSimulator ParticleCollider { get; } = new();
+    public HydrodynamicSimulator Hydrodynamics { get; } =
+        new(new FluidCell(1000, 0, 101_325, 293.15));
+    public ThermodynamicSimulator Thermodynamics { get; } =
+        new(new ThermalState(1, 4186, 293.15));
+    public ElectromagneticCircuitSimulator Electromagnetism { get; } =
+        new(12, 6);
     public IReadOnlyList<LaboratoryResult> LastResults { get; private set; } = Array.Empty<LaboratoryResult>();
 
     public LaboratoryResult RunExperiment(string experimentId)
