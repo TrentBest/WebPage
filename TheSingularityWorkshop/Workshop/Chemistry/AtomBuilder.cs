@@ -25,7 +25,7 @@ public sealed class AtomBuilder
     public AtomBuilder(string name, int atomicNumber, string symbol)
     {
         _initialName = string.IsNullOrWhiteSpace(name) ? "Hydrogen" : name.Trim();
-        _initialAtomicNumber = atomicNumber > 0 ? atomicNumber : 1;
+        _initialAtomicNumber = atomicNumber >= 0 ? atomicNumber : 1;
         _initialSymbol = string.IsNullOrWhiteSpace(symbol) ? "H" : symbol.Trim();
         _protons = _initialAtomicNumber;
         _electrons = _initialAtomicNumber;
