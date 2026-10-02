@@ -20,7 +20,7 @@ public static class ElementalCatalog
             ["Li"] = new AtomBuilder("Lithium", 3, "Li").WithAtomicWeight(6.94).Build(),
             ["Be"] = new AtomBuilder("Beryllium", 4, "Be").WithAtomicWeight(9.0122).Build(),
             ["B"] = new AtomBuilder("Boron", 5, "B").WithAtomicWeight(10.81).Build(),
-            ["C"] = new AtomBuilder("Carbon", 6, "C").WithAtomicWeight(12.011).Build(),
+            ["C"] = new AtomBuilder("Carbon", 6, "C").WithAtomicWeight(12.011).WithElectronConfiguration(["1s2", "2s2", "2p2"]).WithNeutrons(6).Build(),
             ["N"] = new AtomBuilder("Nitrogen", 7, "N").WithAtomicWeight(14.007).Build(),
             ["O"] = new AtomBuilder("Oxygen", 8, "O").WithAtomicWeight(15.999).Build(),
             ["F"] = new AtomBuilder("Fluorine", 9, "F").WithAtomicWeight(18.998).Build(),
