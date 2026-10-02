@@ -168,6 +168,22 @@ public sealed class SingularityLaboratoryMicroBundleTests
     }
 
     [Fact]
+    public void Laboratory_Gui_Builder_Exposes_All_Scientific_Discipline_Commands()
+    {
+        using var laboratory = new SingularityLaboratoryMicroBundle();
+
+        var root = TheSingularityWorkshop.Workshop.Gui.SingularityLaboratoryGuiBuilder.Build(laboratory.ConfigurableRooms);
+        var actions = root.Find("configurable-room-actions-configurable-lab-01");
+
+        foreach (var discipline in Enum.GetNames<LaboratoryDiscipline>())
+        {
+            var command = "configure:configurable-lab-01:" + discipline;
+            Assert.Contains(actions.Children, child =>
+                child.Properties.TryGetValue("command", out var value) && value == command);
+        }
+    }
+
+    [Fact]
     public void Laboratory_Gui_Builder_Reflects_A_User_Configured_Room()
     {
         using var laboratory = new SingularityLaboratoryMicroBundle();
