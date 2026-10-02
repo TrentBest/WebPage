@@ -35,3 +35,8 @@ The same Atom/Builder pipeline is intended to support fictional elements such as
 ## Presentation
 
 `ChemistryLabGuiBuilder` consumes the domain catalog and produces the recursive `GuiNode` tree. It does not own elemental data, and the chemistry domain does not depend on Blazor, CSS, Unity, WPF, or another host renderer.
+
+
+### Physics relationships
+
+The chemistry domain also exposes fundamental relationships as calculations rather than duplicated data: electrical power `P = I × V`, force `F = m × a`, mechanical power `P = F × v`, work `W = F × d`, density `ρ = m / V`, and pressure `p = F / A`. This keeps the model composable: measured or sourced quantities can participate in derived physical behavior without baking derived values into elemental identity.
