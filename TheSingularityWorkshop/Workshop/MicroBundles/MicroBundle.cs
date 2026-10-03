@@ -14,7 +14,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// It also projects itself through the Hub-level micro-bundle contract so the
 /// runtime Element can participate in Hub arbitration without exposing its FSM mechanics.
 /// </summary>
-public sealed class MicroBundle : IMicroBundle, TheSingularityWorkshop.MicroBundleDomain.IMicroBundle, HubBundle, IDisposable
+public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
 {
     private readonly FSMHandle _fsm;
     private readonly IMicroBundleProvider _provider;
@@ -65,7 +65,7 @@ public sealed class MicroBundle : IMicroBundle, TheSingularityWorkshop.MicroBund
     public MicroBundleDescriptor Descriptor { get; }
 
     /// <summary>Composition dependencies. WebPage lifecycle bundles currently have no dependencies.</summary>
-    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies { get; } = Array.Empty<BundleRequest>();
+    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies { get; } = Array.Empty<MicroBundleDependencyRequest>();
 
     /// <summary>Latest platform-specific manifestation produced by the provider.</summary>
     public MicroBundleManifestation? Manifestation { get; private set; }
