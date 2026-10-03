@@ -1,6 +1,7 @@
 name: .NET Tests
 
 on:
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -15,6 +16,20 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Checkout MicroBundleDomain dependency
+        uses: actions/checkout@v4
+        with:
+          repository: TrentBest/TheSingularityWorkshop.MicroBundleDomain
+          ref: architecture/runtime-contract-ownership
+          path: _dependencies/MicroBundleDomain
+
+      - name: Checkout FSM_COS dependency
+        uses: actions/checkout@v4
+        with:
+          repository: TrentBest/TheSingularityWorkshop.FSM_COS
+          ref: architecture/domain-owned-microbundle-contract
+          path: _dependencies/FSM_COS
+
       - name: Cache NuGet packages
         uses: actions/cache@v4
         with:
@@ -22,6 +37,17 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
+
+      - name: Pack local composition dependencies
+        run: |
+          dotnet restore _dependencies/MicroBundleDomain/TheSingularityWorkshop.MicroBundleDomain.slnx
+          dotnet build _dependencies/MicroBundleDomain/TheSingularityWorkshop.MicroBundleDomain.slnx --configuration Release --no-restore
+          mkdir -p _dependencies/nuget
+          dotnet pack _dependencies/MicroBundleDomain/TheSingularityWorkshop.MicroBundleDomain.csproj --configuration Release --no-build --output _dependencies/nuget
+          dotnet nuget add source "$GITHUB_WORKSPACE/_dependencies/nuget" --name CompositionDependenciesLocal
+          dotnet restore _dependencies/FSM_COS/TheSingularityWorkshop.FSM_COS.sln
+          dotnet build _dependencies/FSM_COS/TheSingularityWorkshop.FSM_COS.sln --configuration Release --no-restore
+          dotnet pack _dependencies/FSM_COS/src/FSM_COS/FSM_COS.csproj --configuration Release --no-build --output _dependencies/nuget
 
       - name: Restore
         run: |
