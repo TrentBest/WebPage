@@ -551,3 +551,10 @@ This project is part of a deliberately troublesome ecosystem:
 - **[FSM_API_Unity](https://github.com/TrentBest/FSM_API_Unity)** — Unity manifestation.
 
 <p align="center"><em>The Singularity Workshop — Tools for the curious, the bold, and the systemically inclined.</em><br><strong>Because state shouldn't be a mess.</strong><br><em>And because static boundaries are invitations to cause trouble.</em></p>
+
+
+## WebApp runtime architecture
+
+The WebPage is the WebApp manifestation of the Workshop. Its MVP runtime is now being refactored toward file-backed composition through FSM_COS rather than host-owned MicroBundle selection.
+
+See [WEBAPP_RUNTIME_ARCHITECTURE.md](WEBAPP_RUNTIME_ARCHITECTURE.md) for the executable boundary and the planned WebApp → AnyApp → DistributedApp symmetry.

@@ -7,6 +7,7 @@ using System.Net.Http;
 using TheSingularityWorkshop;
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Infrastructure.Hub;
+using TheSingularityWorkshop.Infrastructure.FsmCos;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.IO;
 
@@ -31,6 +32,10 @@ internal class Program
         // The WebPage hosts the concrete Hub but owns no Hub mechanics.
         builder.Services.AddSingleton<SingularityHub>();
         builder.Services.AddSingleton<HubRuntime>();
+
+        // WebApp composition is manifest-driven and delegated to FSM_COS.
+        builder.Services.AddScoped<WebPageMicroBundleCatalog>();
+        builder.Services.AddScoped<WebPageCosRuntime>();
 
         await builder.Build().RunAsync();
     }
