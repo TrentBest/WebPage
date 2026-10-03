@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TheSingularityWorkshop.FSM_API;
-using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.MicroBundleDomain;
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
@@ -16,7 +16,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// The Pong simulation is itself FSM_API-driven. The Blazor host supplies input
 /// and renders state; it does not own the simulation clock or physics.
 /// </summary>
-public sealed class PongMicroBundle : IDisposable, TheSingularityWorkshop.FSM_COS.IMicroBundle
+public sealed class PongMicroBundle : IDisposable, TheSingularityWorkshop.MicroBundleDomain.IMicroBundle
 {
     public const int BundleId = 2001;
     private const string GameStateName = "PLAYING";
@@ -51,13 +51,13 @@ public sealed class PongMicroBundle : IDisposable, TheSingularityWorkshop.FSM_CO
     public ulong Id => (ulong)_lifecycle.Id;
 
     /// <summary>Pong currently has no MicroBundle dependencies.</summary>
-    public IReadOnlyList<BundleRequest> Dependencies => _lifecycle.Dependencies;
+    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies => _lifecycle.Dependencies;
 
     /// <summary>Installs Pong into the FSM_COS runtime assembly.</summary>
-    public void Load(MicroBundleLoadContext context) => _lifecycle.Load(context);
+    public void Load(IMicroBundleLoadContext context) => _lifecycle.Load(context);
 
     /// <summary>Contributes Pong's composition state to FSM_COS.</summary>
-    public bool Arbitrate(ArbitrationContext context, int roundIndex) => _lifecycle.Arbitrate(context, roundIndex);
+    public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex) => _lifecycle.Arbitrate(context, roundIndex);
     public MicroBundleManifestation? Manifestation => _lifecycle.Manifestation;
     public string Phase => ((MicroBundleContext)_lifecycle.Context).Phase;
     public string GameState => _gameHandle.CurrentState;
