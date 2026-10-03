@@ -1,5 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 using CosEngine = TheSingularityWorkshop.FSM_COS.FsmCos;
 
 namespace TheSingularityWorkshop.Infrastructure.FsmCos;
@@ -36,7 +38,7 @@ public sealed class WebPageCosRuntime
         return Assembly;
     }
 
-    private static BundleRequest ToBundleRequest(WebPageBundleRequest request)
+    private static MicroBundleDependencyRequest ToBundleRequest(WebPageBundleRequest request)
     {
         if (request.Id == 0)
             throw new InvalidOperationException("A WebApp MicroBundle request must specify a non-zero ID.");
