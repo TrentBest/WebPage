@@ -1,9 +1,8 @@
 using System;
 using TheSingularityWorkshop.FSM_API;
 using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
-using CosBundle = TheSingularityWorkshop.FSM_COS.IMicroBundle;
-using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.MicroBundleDomain;
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
@@ -15,7 +14,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// It also projects itself through the Hub-level micro-bundle contract so the
 /// runtime Element can participate in Hub arbitration without exposing its FSM mechanics.
 /// </summary>
-public sealed class MicroBundle : IMicroBundle, CosBundle, HubBundle, IDisposable
+public sealed class MicroBundle : IMicroBundle, TheSingularityWorkshop.MicroBundleDomain.IMicroBundle, HubBundle, IDisposable
 {
     private readonly FSMHandle _fsm;
     private readonly IMicroBundleProvider _provider;
@@ -66,19 +65,19 @@ public sealed class MicroBundle : IMicroBundle, CosBundle, HubBundle, IDisposabl
     public MicroBundleDescriptor Descriptor { get; }
 
     /// <summary>Composition dependencies. WebPage lifecycle bundles currently have no dependencies.</summary>
-    public IReadOnlyList<BundleRequest> Dependencies { get; } = Array.Empty<BundleRequest>();
+    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies { get; } = Array.Empty<BundleRequest>();
 
     /// <summary>Latest platform-specific manifestation produced by the provider.</summary>
     public MicroBundleManifestation? Manifestation { get; private set; }
 
     /// <summary>Installs this WebPage capability into the FSM_COS composition.</summary>
-    public void Load(MicroBundleLoadContext context)
+    public void Load(IMicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
     }
 
     /// <summary>Participates in FSM_COS arbitration exactly once per lifecycle instance.</summary>
-    public bool Arbitrate(ArbitrationContext context, int roundIndex)
+    public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
         if (roundIndex < 0 || _cosArbitrated)
