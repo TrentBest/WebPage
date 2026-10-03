@@ -1,6 +1,5 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using TheSingularityWorkshop.FSM_COS;
 using CosEngine = TheSingularityWorkshop.FSM_COS.FsmCos;
 
 namespace TheSingularityWorkshop.Infrastructure.FsmCos;
@@ -46,6 +45,6 @@ public sealed class WebPageCosRuntime
             ? ReadOnlyMemory<byte>.Empty
             : Convert.FromBase64String(request.Configuration);
 
-        return new BundleRequest(request.Id, configuration);
+        return new MicroBundleDependencyRequest(request.Id, configuration);
     }
 }
