@@ -6,9 +6,9 @@ namespace TheSingularityWorkshop.Infrastructure.FsmCos;
 
 public sealed class WebPageMicroBundleCatalog : IMicroBundleCatalog
 {
-    public bool TryResolve(ulong bundleId, out IMicroBundle? bundle)
+    public bool TryResolve(MicroBundleDependencyRequest request, out IMicroBundle? bundle)
     {
-        if (bundleId == PongMicroBundle.BundleId)
+        if (request.BundleId == PongMicroBundle.BundleId)
         {
             bundle = new PongMicroBundle();
             return true;
