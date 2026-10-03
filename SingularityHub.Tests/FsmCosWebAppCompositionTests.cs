@@ -1,4 +1,3 @@
-using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Infrastructure.FsmCos;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
@@ -20,7 +19,7 @@ public sealed class FsmCosWebAppCompositionTests
         var assembly = cos.Execute(
             new RuntimeManifest(
                 1,
-                new[] { BundleRequest.Unconfigured(PongMicroBundle.BundleId) }));
+                new[] { MicroBundleDependencyRequest.Unconfigured(PongMicroBundle.BundleId) }));
 
         Assert.Single(assembly.Bundles);
         Assert.True(assembly.TryGetBundle<PongMicroBundle>(
