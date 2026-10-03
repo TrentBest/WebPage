@@ -1,12 +1,10 @@
-using CosBundle = TheSingularityWorkshop.FSM_COS.IMicroBundle;
-using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 
 namespace TheSingularityWorkshop.Infrastructure.FsmCos;
 
 public sealed class WebPageMicroBundleCatalog : IMicroBundleCatalog
 {
-    public bool TryResolve(ulong bundleId, out CosBundle? bundle)
+    public bool TryResolve(ulong bundleId, out TheSingularityWorkshop.MicroBundleDomain.IMicroBundle? bundle)
     {
         if (bundleId == PongMicroBundle.BundleId)
         {
