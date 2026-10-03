@@ -13,26 +13,70 @@ on:
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed') }}
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v7
         with:
           submodules: true
           lfs: false
-      - name: Build And Deploy
+
+      - name: Checkout MicroBundleDomain dependency
+        uses: actions/checkout@v7
+        with:
+          repository: TrentBest/TheSingularityWorkshop.MicroBundleDomain
+          ref: architecture/runtime-contract-ownership
+          path: _dependencies/MicroBundleDomain
+
+      - name: Checkout FSM_COS dependency
+        uses: actions/checkout@v7
+        with:
+          repository: TrentBest/TheSingularityWorkshop.FSM_COS
+          ref: architecture/domain-owned-microbundle-contract
+          path: _dependencies/FSM_COS
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install WebAssembly workload
+        run: dotnet workload install wasm-tools
+
+      - name: Pack local composition dependencies
+        run: |
+          dotnet restore _dependencies/MicroBundleDomain/TheSingularityWorkshop.MicroBundleDomain.slnx
+          dotnet build _dependencies/MicroBundleDomain/TheSingularityWorkshop.MicroBundleDomain.slnx --configuration Release --no-restore
+          mkdir -p _dependencies/nuget
+          dotnet pack _dependencies/MicroBundleDomain/TheSingularityWorkshop.MicroBundleDomain.csproj --configuration Release --no-build --output _dependencies/nuget
+          dotnet nuget add source "$GITHUB_WORKSPACE/_dependencies/nuget" --name CompositionDependenciesLocal
+          dotnet restore _dependencies/FSM_COS/TheSingularityWorkshop.FSM_COS.sln
+          dotnet build _dependencies/FSM_COS/TheSingularityWorkshop.FSM_COS.sln --configuration Release --no-restore
+          dotnet pack _dependencies/FSM_COS/src/FSM_COS/FSM_COS.csproj --configuration Release --no-build --output _dependencies/nuget
+
+      - name: Restore WebPage
+        run: dotnet restore TheSingularityWorkshop/TheSingularityWorkshop.csproj
+
+      - name: Publish WebPage
+        run: >
+          dotnet publish TheSingularityWorkshop/TheSingularityWorkshop.csproj
+          --configuration Release
+          --no-restore
+
+      - name: Deploy prebuilt WebPage
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LEMON_GROUND_09F542010 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "./TheSingularityWorkshop"
-          output_location: "wwwroot"
+          app_location: "./TheSingularityWorkshop/bin/Release/net8.0/publish/wwwroot"
+          skip_app_build: true
 
   close_pull_request_job:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
     runs-on: ubuntu-latest
     name: Close Pull Request Job
     steps:
