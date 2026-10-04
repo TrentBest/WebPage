@@ -107,6 +107,7 @@ namespace TheSingularityWorkshop.Services
                 {
                     c.GravityReleased = false;
                     c.LivingGuiFallen = false;
+                    c.FreezeLivingGui();
                     behavior?.OnGravity?.Invoke(c);
                 }), Tick, null)
                 .State(LivingGuiDissipating, Enter(behavior?.OnLivingGuiDissipating), Tick, null)
@@ -122,7 +123,7 @@ namespace TheSingularityWorkshop.Services
                 {
                     var context = (PageStateContext)c;
                     return context.LivingGuiPopulated &&
-                           context.LivingNodes.Count == PageStateContext.CriticalMass &&
+                           context.LivingNodes.Count > 1 &&
                            context.PopulationCompletedTick >= 0 &&
                            context.TotalTicks > context.PopulationCompletedTick;
                 })
@@ -167,9 +168,9 @@ namespace TheSingularityWorkshop.Services
             context.TotalTicks++;
             context.StateTicks++;
 
-            if (stateBeforeTick == LivingGuiPopulating &&
-                !context.LivingGuiFrozen &&
-                !context.LivingGuiPopulated)
+            if ((stateBeforeTick == LivingGuiPopulating ||
+                 stateBeforeTick == MonikerReveal) &&
+                !context.LivingGuiFrozen)
             {
                 _livingGuiRuntime.Update();
             }
