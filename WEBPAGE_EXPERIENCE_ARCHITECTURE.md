@@ -551,3 +551,18 @@ The Experience gives the visitor a place to stand.
 The architecture lets them look underneath it.
 
 And the Forge lets them start building.
+
+
+---
+
+## Workshop tooling, Singularity City, and Software Inc.
+
+The Workshop is intended to **present tooling and let visitors play with it**. It is the sandbox in which the ecosystem's capabilities become places, instruments, experiments, and persistent creations.
+
+Singularity City is deliberately different. It is persistent background proof: a living digital environment populated by Digitens that continues to demonstrate persistence, behavior, spatial composition, and scale while the visitor works elsewhere in the Workshop. The City is also the long-term substrate for digital real estate, user-created shops, and an Ontology Mall whose floors and departments spatialize the ontology itself.
+
+The eventual commercial model should let a visitor encounter a user-created shop while playing an Experience and purchase digital or paired real-world goods without leaving the Experience. The underlying shop identity and product semantics should remain reusable across City and Experience manifestations.
+
+**Singularity Software Inc. is separate from the Workshop.** It is the future visualized, agent-backed code-creation technology. The Workshop may expose a helipad as its eventual doorway to a rooftop helipad at Software Inc., but it must not present that destination as functional until the product is actually ready.
+
+See WORKSHOP_CITY_AND_SOFTWARE_VISION.md for the fuller model.
