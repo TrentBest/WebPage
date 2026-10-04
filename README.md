@@ -169,7 +169,7 @@ The current Workshop language includes:
 These effects are not sacred implementations. They **are** sacred intent.
 
 A future developer may replace the CSS animation with a canvas, a shader, a
-MicroBundle provider, Unity rendering, or something we have not invented yet.
+MicroBundle provider, another renderer, or something we have not invented yet.
 What must survive is the feeling and the underlying behavior.
 
 If a refactor turns the Workshop into a generic SaaS landing page, it is almost
