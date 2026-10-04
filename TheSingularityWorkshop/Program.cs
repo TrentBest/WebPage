@@ -10,6 +10,7 @@ using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.IO;
+using TheSingularityWorkshop.Workshop.Composition;
 
 internal class Program
 {
@@ -27,6 +28,7 @@ internal class Program
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<BlazorFSMIntegration>();
         builder.Services.AddScoped<WorkshopExperienceService>();
+        builder.Services.AddSingleton<WorkshopExperienceCatalog>();
         builder.Services.AddScoped<WorkshopWorldClient>();
         builder.Services.AddScoped<IWorkshopStorage, BrowserWorkshopStorage>();
         builder.Services.AddScoped<WorkshopAssetLibrary>();
