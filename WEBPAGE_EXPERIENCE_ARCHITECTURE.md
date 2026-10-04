@@ -566,3 +566,40 @@ The eventual commercial model should let a visitor encounter a user-created shop
 **Singularity Software Inc. is separate from the Workshop.** It is the future visualized, agent-backed code-creation technology. The Workshop may expose a helipad as its eventual doorway to a rooftop helipad at Software Inc., but it must not present that destination as functional until the product is actually ready.
 
 See WORKSHOP_CITY_AND_SOFTWARE_VISION.md for the fuller model.
+
+
+## Singularity City as the living recipe library
+
+Singularity City is intended to become a persistent simulated world in which visitors can inspect not only what they see, but **how what they see was composed**.
+
+A City artifact should eventually expose a distinction between:
+
+- **recipe** — Manifest, MicroBundles, configuration, initial data, arbitration, and composition choices;
+- **runtime state** — what the composed system has done since it began running;
+- **representation** — how that state is currently manifested for this observer.
+
+This makes the City an executable library of Workshop examples:
+
+```text
+SEE
+  |
+INSPECT
+  |
+SHOW RECIPE
+  |
+COPY
+  |
+MODIFY
+  |
+COMPOSE
+  |
+OBSERVE CONSEQUENCE
+```
+
+The goal is not to make City a conventional digital-twin product. It is to create a persistent simulated reality that can teach the construction of simulated realities by exposing its own compositional lineage.
+
+The City can therefore contain reference examples for companies, buildings, Digitens, transit, shops, neighborhoods, physics, rendering, and other capabilities. Each new example can become another reusable lesson and another starting point for creation.
+
+This also gives the City a natural proving ground for Event Horizons and Computation: distant populations can remain represented while computational attention follows observable consequence. That is a benchmarkable hypothesis, not a claim that the architecture has already achieved a particular efficiency.
+
+See WORKSHOP_CITY_AND_SOFTWARE_VISION.md for the deeper City model.
