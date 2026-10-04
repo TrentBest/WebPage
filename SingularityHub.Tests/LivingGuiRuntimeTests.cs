@@ -29,7 +29,7 @@ public sealed class LivingGuiRuntimeTests
         fsm.RequestEnter();
 
         for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
-            fsm.Update();
+            runtime.Update();
 
         var root = Assert.Single(fsm.Context.LivingNodes);
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
@@ -89,16 +89,19 @@ public sealed class LivingGuiRuntimeTests
     [Fact(DisplayName = "Living GUI child reaches default size through flight and scaling, then grows to reproduction size")]
     public void LivingGui_ChildReachesDefaultAndGrows()
     {
-        using var fsm = new PageFSM();
-        fsm.RequestEnter();
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        hub.RegisterProcessGroup("TestParent");
+        using var runtime = new LivingGuiFsm(hub, context, "TestParent");
 
         const int guard = 10_000;
         var ticks = 0;
-        while (fsm.Context.LivingNodes.Count < 2 && ticks++ < guard)
-            fsm.Update();
+        while (context.LivingNodes.Count < 2 && ticks++ < guard)
+            runtime.Update();
 
-        Assert.True(fsm.Context.LivingNodes.Count >= 2);
-        var child = fsm.Context.LivingNodes[1];
+        Assert.True(context.LivingNodes.Count >= 2);
+        var child = context.LivingNodes[1];
 
         ticks = 0;
         while (child.Size < 200 && ticks++ < guard)
@@ -176,38 +179,44 @@ public sealed class LivingGuiRuntimeTests
     [Fact(DisplayName = "Living GUI lineage names root children and descendants deterministically")]
     public void LivingGui_LineageNaming()
     {
-        using var fsm = new PageFSM();
-        fsm.RequestEnter();
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        hub.RegisterProcessGroup("TestParent");
+        using var runtime = new LivingGuiFsm(hub, context, "TestParent");
 
         const int guard = 10_000;
         var ticks = 0;
-        while (fsm.Context.LivingNodes.Count < PageStateContext.PopulationObservationThreshold && ticks++ < guard)
-            fsm.Update();
+        while (context.LivingNodes.Count < PageStateContext.PopulationObservationThreshold && ticks++ < guard)
+            runtime.Update();
 
-        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold);
-        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:0");
-        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:1");
-        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:2");
-        Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage.StartsWith("G:1-", System.StringComparison.Ordinal));
+        Assert.True(context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold);
+        Assert.Contains(context.LivingNodes, node => node.Lineage == "G:0");
+        Assert.Contains(context.LivingNodes, node => node.Lineage == "G:1");
+        Assert.Contains(context.LivingNodes, node => node.Lineage == "G:2");
+        Assert.Contains(context.LivingNodes, node => node.Lineage.StartsWith("G:1-", System.StringComparison.Ordinal));
     }
 
     [Fact(DisplayName = "Living GUI remains alive after reaching critical mass")]
     public void LivingGui_RemainsAliveAfterCriticalMass()
     {
-        using var fsm = new PageFSM();
-        fsm.RequestEnter();
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        hub.RegisterProcessGroup("TestParent");
+        using var runtime = new LivingGuiFsm(hub, context, "TestParent");
 
         const int guard = 10_000;
         var ticks = 0;
-        while (fsm.Context.LivingNodes.Count < PageStateContext.PopulationObservationThreshold && ticks++ < guard)
-            fsm.Update();
+        while (context.LivingNodes.Count < PageStateContext.PopulationObservationThreshold && ticks++ < guard)
+            runtime.Update();
 
-        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold, "Living GUI did not reach the population observation threshold within the scheduler guard.");
-        Assert.False(fsm.Context.LivingGuiFrozen);
-        var populationBefore = fsm.Context.LivingNodes.Count;
-        for (var i = 0; i < 200; i++) fsm.Update();
-        Assert.True(fsm.Context.LivingNodes.Count > populationBefore, "Living GUI stopped reproducing after reaching the observation threshold.");
-        Assert.Contains(fsm.Context.LivingNodes, node => node.Generation > 1);
+        Assert.True(context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold, "Living GUI did not reach the population observation threshold within the scheduler guard.");
+        Assert.False(context.LivingGuiFrozen);
+        var populationBefore = context.LivingNodes.Count;
+        for (var i = 0; i < 200; i++) runtime.Update();
+        Assert.True(context.LivingNodes.Count > populationBefore, "Living GUI stopped reproducing after reaching the observation threshold.");
+        Assert.Contains(context.LivingNodes, node => node.Generation > 1);
     }
 
     [Fact(DisplayName = "PageFSM registers its root and nested process groups with the Hub")]
