@@ -152,8 +152,8 @@ public sealed class IncrementalVersionTests
             level.HiddenSwitch.Capability.ResultingPresentationMode);
     }
 
-    [ArchitectureTest(0, 0, 172)] [Fact(DisplayName = "V0.0.172 — Canonical_Moniker_Is_Composed_Through_FSM_COS")]
-    public void V0_0_172CanonicalMonikerIsComposedThroughFsmCos()
+    [ArchitectureTest(0, 0, 172)] [Fact(DisplayName = "V0.0.172 — Canonical_Moniker_Is_Not_Composed_Before_Explicit_Entry")]
+    public void V0_0_172CanonicalMonikerIsNotComposedBeforeExplicitEntry()
     {
         using var service = new TheSingularityWorkshop.Services.WorkshopExperienceService();
         service.Initialize(returningVisitor: true);
