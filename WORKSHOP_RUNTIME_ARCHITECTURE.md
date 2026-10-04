@@ -174,3 +174,23 @@ Arbitrate(IArbitrator, round)
 Installation completion order is the default arbitration order. A dependency loaded by a dependent bundle's load hook therefore precedes the dependent. A future Experience manifest can replace that ordering.
 
 A missing dependency is never fabricated. It may become available later and participate in later arbitration.
+
+
+## Optional WebPage-only providers
+
+MicroBundles are provider collections. A composed MicroBundle may expose optional providers to the host that is executing it. WebPage uses one such optional capability: IDeepDiveProvider.
+
+The WebPage acquisition pattern is:
+
+~~~csharp
+foreach (var microBundle in microBundles)
+{
+    var provider = microBundle.TryGetProvider<IDeepDiveProvider>();
+    if (provider is not null)
+        return provider.Execute(experience, microBundles);
+}
+~~~
+
+IDeepDiveProvider is deliberately defined inside WebPage. FSM_COS, MicroBundleDomain, AnyApp, and other runtime hosts do not depend on it. Ontology and runtime identity remain portable; the Workshop's educational Deep Dive remains a WebPage capability.
+
+A native host that wants the Deep Dive should hand the Experience identity to the user's default browser and open /deep-dive/{ExperienceId}. Browser-tab reuse is host/browser-specific and cannot be promised as a portable OS primitive.
