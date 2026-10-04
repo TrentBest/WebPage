@@ -364,7 +364,7 @@ Provider
 ```
 
 A MicroBundle should describe what is happening without needing to know whether
-that behavior eventually appears as HTML, CSS, a Unity object, sound, speech, or
+that behavior eventually appears as HTML, CSS, a host object, sound, speech, or
 something else.
 
 See:
@@ -460,7 +460,6 @@ This WebPage repository provides:
 - demonstrations
 - the living landing experiment
 - WebAssembly/Blazor runtime integration
-- Unity WebGL hosting experiments
 - Workshop-facing developer infrastructure
 - a place to make the larger architecture visible
 
