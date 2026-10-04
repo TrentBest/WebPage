@@ -19,7 +19,7 @@ namespace TheSingularityWorkshop.Services
         private const double MaximumNodeSize = 400;
         private const double SeedFlightStep = 4.5;
         private const double SeedScalingStep = 40;
-        private const double ParentRecoveryStep = 100;
+        private const double ParentRecoveryStep = 200;
         private const double MinX = 10;
         private const double MaxX = 90;
         private const double MinY = 10;
@@ -160,14 +160,6 @@ namespace TheSingularityWorkshop.Services
                 if (_livingNodes.Count + newborns.Count >= CriticalMass) break;
             }
             _livingNodes.AddRange(newborns);
-            if (_livingNodes.Count >= CriticalMass)
-            {
-                if (_livingNodes.Count > CriticalMass) _livingNodes.RemoveRange(CriticalMass, _livingNodes.Count - CriticalMass);
-                LivingGuiFrozen = true;
-                LivingGuiPopulated = true;
-                MonikerReady = true;
-                PopulationCompletedTick = TotalTicks;
-            }
         }
 
         public void AdvanceParentRecovery()
@@ -190,7 +182,8 @@ namespace TheSingularityWorkshop.Services
         {
             var (x, y) = NextSafePosition();
             var lineage = parent.Generation == 0 ? $"G:{parent.OffspringCount}" : $"{parent.Lineage}-{parent.OffspringCount - 1}";
-            return new LivingNodeState(lineage, parent.Generation + 1, parent.X, parent.Y, SeedSize, growthReady: false, seedDoubled: false, isRoot: false, phase: LivingNodePhase.SeedFlight, targetX: x, targetY: y);
+            var rotation = (_random.NextDouble() * 360.0) - 180.0;
+            return new LivingNodeState(lineage, parent.Generation + 1, parent.X, parent.Y, SeedSize, growthReady: false, seedDoubled: false, isRoot: false, phase: LivingNodePhase.SeedFlight, targetX: x, targetY: y, rotation: rotation);
         }
 
         private (double X, double Y) NextSafePosition() => (MinX + _random.NextDouble() * (MaxX - MinX), MinY + _random.NextDouble() * (MaxY - MinY));
@@ -212,9 +205,9 @@ namespace TheSingularityWorkshop.Services
 
         public sealed class LivingNodeState
         {
-            internal LivingNodeState(string lineage, int generation, double x, double y, double size, bool growthReady, bool seedDoubled, bool isRoot, LivingNodePhase phase, double targetX = 0, double targetY = 0)
+            internal LivingNodeState(string lineage, int generation, double x, double y, double size, bool growthReady, bool seedDoubled, bool isRoot, LivingNodePhase phase, double targetX = 0, double targetY = 0, double rotation = 0)
             {
-                Lineage = lineage; Generation = generation; X = x; Y = y; Size = size; GrowthReady = growthReady; SeedDoubled = seedDoubled; IsRoot = isRoot; Phase = phase; TargetX = targetX; TargetY = targetY;
+                Lineage = lineage; Generation = generation; X = x; Y = y; Size = size; GrowthReady = growthReady; SeedDoubled = seedDoubled; IsRoot = isRoot; Phase = phase; TargetX = targetX; TargetY = targetY; Rotation = rotation;
             }
             public string Lineage { get; }
             public int Generation { get; }
