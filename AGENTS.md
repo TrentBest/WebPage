@@ -39,7 +39,7 @@ Protocol AI / Grammar AI / Command AI
    v
 Manifestation
    +---- Blazor / WebAssembly
-   +---- Unity / WebGL
+   +---- Desktop / future hosts
    +---- future hosts
 ```
 
@@ -253,7 +253,6 @@ A useful progression is:
 Field
  -> Pong
  -> Living GUI
- -> Unity
  -> Workshop
  -> FSM telemetry
  -> Simulation Lab
@@ -280,7 +279,7 @@ The visual goal is **mundane magical**, not generic sci-fi decoration.
 
 The AI tab exists and should remain.
 
-Be careful when editing `NavMenu.razor`: earlier navigation included important links such as Booking and Unity Asset Store/package destinations. Do not silently remove existing useful navigation while adding AI. Inspect the current file before rewriting it.
+Be careful when editing `NavMenu.razor`: earlier navigation included important links such as Booking and legacy package destinations. Do not silently remove existing useful navigation while adding AI. Inspect the current file before rewriting it.
 
 ## Engineering/documentation standards
 
