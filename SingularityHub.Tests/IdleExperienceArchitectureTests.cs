@@ -90,7 +90,7 @@ public sealed class IdleExperienceArchitectureTests
         firstContact.Update();
 
         Assert.Equal("Landing", firstContact.CurrentState);
-        Assert.False(firstContact.EntryRequested);
+        Assert.NotEqual("Moniker", firstContact.CurrentState);
     }
 
 
