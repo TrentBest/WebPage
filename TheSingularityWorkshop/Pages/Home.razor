@@ -41,7 +41,7 @@
             builder.AddAttribute(7,"OnEntryRequested",EventCallback.Factory.Create(this,EnterWorkshop));
             builder.CloseComponent();
         }
-        else if (Experience.CurrentState == "Intro")
+        else if (Experience.CurrentState is "ExperienceLoading" or "LivingGui" or "CriticalMass")
         {
             builder.OpenComponent<LivingGui>(8);
             builder.CloseComponent();
@@ -75,7 +75,6 @@
     {
         await JS.InvokeVoidAsync("interop.markWorkshopVisited");
         Experience.RequestEntry();
-        FSM.RequestEnter();
     }
 
     private void Tick(object? sender,System.Timers.ElapsedEventArgs e)
@@ -87,7 +86,13 @@
         _=InvokeAsync(StateHasChanged);
     }
 
-    private void ExperienceChanged()=>_=InvokeAsync(StateHasChanged);
+    private void ExperienceChanged()
+    {
+        if (Experience.CurrentState == "LivingGui" && FSM.CurrentState == PageFSM.Gateway)
+            FSM.RequestEnter();
+
+        _ = InvokeAsync(StateHasChanged);
+    }
 
     public void Dispose()
     {
