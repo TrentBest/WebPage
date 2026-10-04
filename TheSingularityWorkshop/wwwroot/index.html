@@ -132,17 +132,6 @@
             window.setTimeout(()=>{for(const source of workshopRumbleSources){try{source.stop();}catch{}}try{context.close();}catch{}workshopRumbleContext=null;workshopRumbleMaster=null;workshopRumbleSources=[];},1300);
         }
         window.interop = {
-            initUnity:function(canvasId){
-                console.log("[Interop] 1. initUnity called for canvas:",canvasId);
-                const canvas=document.getElementById(canvasId); if(!canvas){console.error("[Interop] CRITICAL: Canvas element not found in the DOM!");return;}
-                const buildUrl="Workshop/Forge/Build"; const loaderUrl=buildUrl+"/Build001.loader.js";
-                const config={dataUrl:buildUrl+"/Build001.data.br",frameworkUrl:buildUrl+"/Build001.framework.js.br",codeUrl:buildUrl+"/Build001.wasm.br",streamingAssetsUrl:"StreamingAssets",companyName:"The Singularity Workshop",productName:"Genesis"};
-                console.table(config);
-                const script=document.createElement("script"); script.src=loaderUrl;
-                script.onerror=()=>console.error("[Interop] CRITICAL: Failed to download loader.js! Check the Build folder path.");
-                script.onload=()=>{ createUnityInstance(canvas,config,(progress)=>console.log("[Unity Engine] Boot Progress: "+(100*progress).toFixed(1)+"%")).then((instance)=>{window.sovereignUnityInstance=instance;console.log("[Interop] 5. SUCCESS! Sovereign Kernel anchored to Blazor DOM.");}).catch((message)=>console.error("[Unity Engine] CRITICAL BOOT FAILURE:",message)); };
-                document.body.appendChild(script);
-            },
             workshopVisited:function(){ return localStorage.getItem("WorkshopVisited") === "true"; },
             playFirstContactSound:function(){
                 try{
@@ -228,7 +217,7 @@
             let activeOverlay=null,animationFrame=0,pauseUntil=0,tinyHeader=null;
             const technical=[
                 "The Workshop is a living software environment assembled from deterministic state, event flow, and aggressively opinionated abstractions.",
-                "The landing surface is Blazor WebAssembly. The destination trajectory may cross into Unity WebGL without asking the DOM for permission.",
+                "The landing surface is Blazor WebAssembly. The destination trajectory is owned by the Workshop runtime rather than a browser-engine handoff.",
                 "The same lightweight C# state machinery can describe both sides of the boundary.",
                 "Finite state transitions are boring. Finite state transitions composed into a living machine are considerably less boring.",
                 "Runtime state is data. Data becomes behavior when the machine is allowed to own the transition.",
