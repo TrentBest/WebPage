@@ -34,20 +34,20 @@ public sealed class IdleExperienceArchitectureTests
         }
 
         Assert.True(fsm.Context.LivingGuiPopulated);
-        Assert.True(populationTicks < populationGuard, "Living GUI population did not reach critical mass within the test guard.");
-        Assert.True(fsm.Context.LivingNodes.Count > 1);
+        Assert.True(populationTicks < populationGuard, "Living GUI population did not reach the observation threshold within the test guard.");
+        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold);
         Assert.False(fsm.Context.LivingGuiFrozen);
-        Assert.True(fsm.Context.MonikerReady);
+        Assert.False(fsm.Context.MonikerReady);
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
 
         fsm.Update();
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
-        Assert.True(fsm.Context.MonikerReady);
+        Assert.False(fsm.Context.MonikerReady);
         Assert.False(fsm.Context.LivingGuiFrozen);
 
-        // Gravity is the explicit freeze boundary for the living GUI. FSM_API applies
-        // state-entry actions on the following heartbeat, so observe the freeze after
-        // that heartbeat rather than assuming entry actions are immediate.
+        // Gravity is the explicit freeze/reveal boundary. FSM_API applies state-entry
+        // actions on the following heartbeat, so the Moniker becomes visible only when
+        // Gravity has actually entered and the organisms are frozen.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         fsm.Update();
