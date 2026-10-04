@@ -173,4 +173,5 @@ public sealed class IncrementalVersionTests
 
     [ArchitectureTest(0, 0, 174)] [Fact(DisplayName = "V0.0.174 — AI_Clipboard_Exchange_Uses_Protocol_Grammar_And_Action_Ledger")]
     public void V0_0_174AiClipboardExchangeUsesProtocolGrammarAndActionLedger() => Assert.Equal("0.0.174", "0.0.174");
+    [ArchitectureTest(0, 0, 175)] [Fact(DisplayName = "V0.0.175 — Existing_Landing_Hands_Off_To_Living_GUI_Before_Forge_Proof")] public void V0_0_175ExistingLandingHandsOffToLivingGuiBeforeForgeProof() => Assert.Equal("0.0.175", "0.0.175");
 }
