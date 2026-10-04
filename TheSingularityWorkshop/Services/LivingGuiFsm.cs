@@ -140,6 +140,8 @@ public sealed class LivingGuiFsm : IDisposable
     /// Selects the most urgent lifecycle work first. Reproduction and parent
     /// recovery must outrank newborn flight: a parent begins contracting as soon
     /// as it creates an offspring, rather than waiting behind the child's journey.
+    /// Population handoff is not a lifecycle stop: once the first offspring exists,
+    /// the GUI remains active until the page explicitly freezes it for gravity.
     /// A frozen or otherwise empty runtime has no active phase and must never
     /// masquerade as parent recovery.
     /// </summary>
@@ -147,7 +149,7 @@ public sealed class LivingGuiFsm : IDisposable
     {
         get
         {
-            if (_context.LivingGuiFrozen || _context.LivingGuiPopulated)
+            if (_context.LivingGuiFrozen)
                 return IdleState;
             if (_context.NeedsRootGrowth) return RootGrowthState;
             if (_context.NeedsReproduction) return ReproductionState;
