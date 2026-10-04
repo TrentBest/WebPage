@@ -35,8 +35,8 @@ public sealed class IdleExperienceArchitectureTests
 
         Assert.True(fsm.Context.LivingGuiPopulated);
         Assert.True(populationTicks < populationGuard, "Living GUI population did not reach critical mass within the test guard.");
-        Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
-        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.True(fsm.Context.LivingNodes.Count > 1);
+        Assert.False(fsm.Context.LivingGuiFrozen);
         Assert.True(fsm.Context.MonikerReady);
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
 
@@ -134,8 +134,8 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Equal(PageFSM.Gateway, second.CurrentState);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 09 — moniker remains hidden until exactly 100 nodes")]
-    public void IncrementalUnitTest09_MonikerRemainsHiddenUntilExactly100Nodes()
+    [Fact(DisplayName = "Incremental Unit Test 09 — moniker becomes ready at first reproduction")]
+    public void IncrementalUnitTest09_MonikerBecomesReadyAtFirstReproduction()
     {
         using var fsm = new PageFSM();
 
@@ -147,14 +147,14 @@ public sealed class IdleExperienceArchitectureTests
         var ticks = 0;
         while (!fsm.Context.LivingGuiPopulated && ticks++ < guard)
         {
-            Assert.True(fsm.Context.LivingNodes.Count < PageStateContext.CriticalMass);
+            Assert.True(fsm.Context.LivingNodes.Count <= 1);
             Assert.False(fsm.Context.MonikerReady);
             fsm.Update();
         }
 
-        Assert.True(ticks < guard, "Living GUI population did not reach critical mass within the test guard.");
-        Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
-        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.True(ticks < guard, "Living GUI did not reach first reproduction within the test guard.");
+        Assert.True(fsm.Context.LivingNodes.Count > 1);
+        Assert.False(fsm.Context.LivingGuiFrozen);
         Assert.True(fsm.Context.MonikerReady);
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
 
@@ -175,8 +175,9 @@ public sealed class IdleExperienceArchitectureTests
         defaultFsm.RequestEnter();
         defaultFsm.Update();
         defaultFsm.Update();
-        while (!defaultFsm.Context.LivingGuiPopulated)
+        for (var ticks = 0; !defaultFsm.Context.LivingGuiPopulated && ticks < 10000; ticks++)
             defaultFsm.Update();
+        Assert.True(defaultFsm.Context.LivingGuiPopulated);
         defaultFsm.Update();
         Assert.Equal(PageFSM.MonikerReveal, defaultFsm.CurrentState);
         Assert.False(defaultFsm.Context.NavigationReady);
@@ -185,8 +186,9 @@ public sealed class IdleExperienceArchitectureTests
         defaultFsm.Update();
         Assert.Equal(PageFSM.Gravity, defaultFsm.CurrentState);
 
-        while (!defaultFsm.Context.LivingGuiFallen)
+        for (var ticks = 0; !defaultFsm.Context.LivingGuiFallen && ticks < 1000; ticks++)
             defaultFsm.Update();
+        Assert.True(defaultFsm.Context.LivingGuiFallen);
         Assert.Equal(PageFSM.LivingGuiDissipating, defaultFsm.CurrentState);
         defaultFsm.Update();
         Assert.Equal(PageFSM.NavigationArrival, defaultFsm.CurrentState);
@@ -200,11 +202,13 @@ public sealed class IdleExperienceArchitectureTests
         fsm.Update();
         fsm.Update();
 
-        while (!fsm.Context.LivingGuiFallen)
+        for (var ticks = 0; !fsm.Context.LivingGuiFallen && ticks < 1000; ticks++)
             fsm.Update();
+        Assert.True(fsm.Context.LivingGuiFallen);
 
-        while (fsm.CurrentState != PageFSM.Running)
+        for (var ticks = 0; fsm.CurrentState != PageFSM.Running && ticks < 1000; ticks++)
             fsm.Update();
+        Assert.Equal(PageFSM.Running, fsm.CurrentState);
 
         Assert.True(fsm.Context.MonikerReady);
         Assert.True(fsm.Context.LivingGuiFallen);
