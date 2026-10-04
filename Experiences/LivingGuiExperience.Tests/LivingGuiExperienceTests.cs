@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Experiences;
 using TheSingularityWorkshop.Workshop.MicroBundles;
@@ -26,8 +27,8 @@ public sealed class LivingGuiExperienceTests
         var bundle = new LivingGuiExperienceMicroBundle();
 
         Assert.Contains(
-            bundle.Dependencies,
-            dependency => dependency.BundleId == (ulong)MonikerMicroBundle.BundleId);
+            BundleRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId),
+            bundle.Dependencies);
         Assert.Equal(new BundleVersion(1, 0, 0), bundle.Descriptor.Version);
     }
 }
