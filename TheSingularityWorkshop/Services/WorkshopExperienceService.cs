@@ -13,7 +13,6 @@ public sealed class WorkshopExperienceService : IDisposable
 
     public string CurrentState { get; private set; } = "Intro";
     public bool IsFirstVisit { get; private set; }
-    public bool ShowUnity => false;
     public bool IsInitialized { get; private set; }
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public FirstContactFsm FirstContact => _firstContact;
@@ -74,7 +73,6 @@ public sealed class WorkshopExperienceService : IDisposable
             SetState("Intro");
     }
 
-    public void MarkUnityStarted() { }
 
     public void SetCriticalMassReached() => SetState("CriticalMass");
 
