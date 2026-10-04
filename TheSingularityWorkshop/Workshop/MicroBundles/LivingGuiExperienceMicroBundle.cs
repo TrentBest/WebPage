@@ -8,7 +8,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// FSM_COS must load the Workshop Moniker before this Experience capability can install.
 /// The actual living organism is then scheduled by the host's FSM_API process groups.
 /// </summary>
-public sealed class LivingGuiExperienceMicroBundle : IMicroBundle
+public sealed class LivingGuiExperienceMicroBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
 {
     public const int BundleId = 2102;
 
@@ -22,7 +22,7 @@ public sealed class LivingGuiExperienceMicroBundle : IMicroBundle
     public IReadOnlyList<BundleRequest> Dependencies { get; } =
         [BundleRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)];
 
-    void IMicroBundle.Load(MicroBundleLoadContext context)
+    void TheSingularityWorkshop.FSM_COS.IMicroBundle.Load(MicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -30,7 +30,9 @@ public sealed class LivingGuiExperienceMicroBundle : IMicroBundle
         // remains owned by LivingGui.razor; FSM_COS owns the installation order.
     }
 
-    bool IMicroBundle.Arbitrate(ArbitrationContext context, int roundIndex)
+    bool TheSingularityWorkshop.FSM_COS.IMicroBundle.Arbitrate(
+        ArbitrationContext context,
+        int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
         return false;
