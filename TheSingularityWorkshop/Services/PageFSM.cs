@@ -74,7 +74,7 @@ namespace TheSingularityWorkshop.Services
         {
             Context = new PageStateContext(singularityHub);
             _hub = singularityHub as HubKernel ?? new HubKernel();
-            MonikerPresentationDuration = monikerPresentationDuration ?? DefaultMonikerPresentationDuration;
+            MonikerPresentationDuration = monikerPresentationDuration ?? TimeSpan.FromSeconds(WorkshopPresentationProfile.Current.MonikerDurationSeconds);
             if (MonikerPresentationDuration < TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException(nameof(monikerPresentationDuration));
 
