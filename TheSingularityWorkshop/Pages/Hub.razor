@@ -1,28 +1,128 @@
 @page "/hub"
 @using TheSingularityWorkshop.Infrastructure.Hub
+@using TheSingularityWorkshop.Services
 @inject HubRuntime Runtime
+@inject FSMManagerService FSM
+@inject NavigationManager Navigation
 
-<PageTitle>Singularity Hub</PageTitle>
+<PageTitle>Singularity Hub // Living Presentation</PageTitle>
 
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">Singularity Hub</h1>
-        <p class="lead text-muted">The WebPage is hosting the platform-neutral Hub kernel.</p>
-    </div>
+<div class="hub-shell">
+    <header class="hub-header">
+        <div>
+            <div class="eyebrow">THE SINGULARITY WORKSHOP // HUB</div>
+            <h1>THE MACHINE BEHIND THE MONIKER</h1>
+            <p>Watch the current run. Change the rules. Throw the WebPage back into the machine.</p>
+        </div>
+        <div class="state-readout">
+            <span>PAGE FSM</span>
+            <strong>@FSM.CurrentState</strong>
+        </div>
+    </header>
 
-    <div class="row g-4">
-        <div class="col-md-4"><div class="card h-100 shadow-sm"><div class="card-body"><h2 class="h5">Bundles</h2><div class="display-6">@Runtime.Hub.LoadedBundles.Count</div><p class="text-muted mb-0">Loaded MicroBundles</p></div></div></div>
-        <div class="col-md-4"><div class="card h-100 shadow-sm"><div class="card-body"><h2 class="h5">Arbitration</h2><div class="display-6">@Runtime.ArbitrationMutations</div><p class="text-muted mb-0">Mutations observed</p></div></div></div>
-        <div class="col-md-4"><div class="card h-100 shadow-sm"><div class="card-body"><h2 class="h5">Audit Graph</h2><div class="display-6">@Runtime.Hub.Audit.Events.Count</div><p class="text-muted mb-0">Recorded events</p></div></div></div>
-    </div>
+    <section class="telemetry">
+        <div class="telemetry-card"><span>POPULATION</span><strong>@FSM.Context.LivingNodes.Count</strong><small>/ @WorkshopPresentationProfile.Current.PopulationThreshold</small></div>
+        <div class="telemetry-card"><span>LIVING GUI</span><strong>@FSM.LivingGuiState</strong><small>@FSM.LivingGuiActivePhase</small></div>
+        <div class="telemetry-card"><span>TOTAL TICKS</span><strong>@FSM.Context.TotalTicks</strong><small>runtime heartbeat</small></div>
+        <div class="telemetry-card"><span>MONIKER</span><strong>@(FSM.Context.MonikerReady ? "REVEALED" : "WAITING")</strong><small>@FSM.MonikerPresentationDuration.TotalSeconds.ToString("0.##")s presentation</small></div>
+    </section>
 
-    <div class="mt-5 p-4 border rounded bg-light">
-        <h2 class="h4">Kernel boundaries</h2>
-        <ul>
-            <li>Hub owns bundle registration and deterministic arbitration.</li>
-            <li>Process-group lifecycle is tracked without owning execution mechanics.</li>
-            <li>Execution providers remain an abstract platform boundary.</li>
-            <li>Runtime ontology identity is a fixed nine-layer integer signature.</li>
-        </ul>
-    </div>
+    <section class="control-grid">
+        <div class="control-panel">
+            <div class="eyebrow">LIVE PRESENTATION PROFILE</div>
+            <h2>YOU CAN CHANGE THE PHENOMENON.</h2>
+            <p class="hint">These parameters are captured by the next page-level runtime. They are not CSS animation knobs.</p>
+
+            <label>Population threshold <output>@Profile.PopulationThreshold</output></label>
+            <input type="range" min="20" max="300" step="1" @bind="Profile.PopulationThreshold" />
+
+            <label>Growth step <output>@Profile.GrowthStep.ToString("0.##")</output></label>
+            <input type="range" min="5" max="60" step="1" @bind="Profile.GrowthStep" />
+
+            <label>Maximum bloom size <output>@Profile.MaximumNodeSize.ToString("0.##")</output></label>
+            <input type="range" min="50" max="180" step="5" @bind="Profile.MaximumNodeSize" />
+
+            <label>Seed flight step <output>@Profile.SeedFlightStep.ToString("0.##")</output></label>
+            <input type="range" min="1" max="12" step=".5" @bind="Profile.SeedFlightStep" />
+
+            <label>Seed planting speed <output>@Profile.SeedScalingStep.ToString("0.##")</output></label>
+            <input type="range" min="10" max="100" step="5" @bind="Profile.SeedScalingStep" />
+
+            <label>Parent recovery speed <output>@Profile.ParentRecoveryStep.ToString("0.##")</output></label>
+            <input type="range" min="20" max="160" step="5" @bind="Profile.ParentRecoveryStep" />
+
+            <label>Gravity acceleration <output>@Profile.GravityAcceleration.ToString("0.##")</output></label>
+            <input type="range" min=".2" max="3" step=".05" @bind="Profile.GravityAcceleration" />
+
+            <label>Moniker reveal duration <output>@Profile.MonikerDurationSeconds.ToString("0.##")s</output></label>
+            <input type="range" min="1" max="8" step=".5" @bind="Profile.MonikerDurationSeconds" />
+
+            <div class="actions">
+                <button class="primary" @onclick="RunAgain">REBUILD PRESENTATION</button>
+                <button class="secondary" @onclick="ResetProfile">RESET PARAMETERS</button>
+            </div>
+            <p class="warning">Changing the profile does not rewrite the current organisms. REBUILD starts a fresh runtime with the selected parameters.</p>
+        </div>
+
+        <div class="architecture-panel">
+            <div class="eyebrow">OBSERVATION</div>
+            <h2>NO CURTAIN CALLS.</h2>
+            <p>The organisms are released into the runtime. This dashboard exists so the builder can observe what the machine is doing without making the public presentation explain itself.</p>
+            <div class="flow">
+                <span>FSM_COS</span><i>→</i><span>EXPERIENCE</span><i>→</i><span>LIVING GUI</span><i>→</i><span>MONIKER</span>
+            </div>
+            <dl>
+                <dt>Loaded MicroBundles</dt><dd>@Runtime.Hub.LoadedBundles.Count</dd>
+                <dt>Arbitration mutations</dt><dd>@Runtime.ArbitrationMutations</dd>
+                <dt>Audit events</dt><dd>@Runtime.Hub.Audit.Events.Count</dd>
+                <dt>Population completed</dt><dd>@(FSM.Context.PopulationCompletedTick >= 0 ? FSM.Context.PopulationCompletedTick.ToString() : "—")</dd>
+            </dl>
+        </div>
+    </section>
 </div>
+
+<style>
+.hub-shell{min-height:100vh;padding:3rem;box-sizing:border-box;background:#020711;color:#eefcff;font-family:Consolas,'Courier New',monospace}
+.hub-header{display:flex;justify-content:space-between;gap:2rem;align-items:end;max-width:1200px;margin:0 auto 2rem}
+.eyebrow{font-size:.72rem;letter-spacing:.22em;opacity:.6}
+h1{font-size:clamp(1.7rem,4vw,3.5rem);margin:.35rem 0}
+h2{font-size:1.15rem;letter-spacing:.08em}
+p{line-height:1.6}
+.hub-header p,.hint,.warning{opacity:.65}
+.state-readout{border:1px solid rgba(0,234,255,.25);padding:1rem;min-width:180px}
+.state-readout span,.telemetry-card span{display:block;font-size:.68rem;letter-spacing:.16em;opacity:.55}
+.state-readout strong{display:block;margin-top:.4rem}
+.telemetry{max-width:1200px;margin:0 auto 2rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,234,255,.15)}
+.telemetry-card{background:#050c18;padding:1.25rem}
+.telemetry-card strong{display:block;font-size:1.6rem;margin:.45rem 0}
+.telemetry-card small{opacity:.5}
+.control-grid{max-width:1200px;margin:auto;display:grid;grid-template-columns:1.25fr .75fr;gap:2rem}
+.control-panel,.architecture-panel{border:1px solid rgba(0,234,255,.16);background:rgba(5,12,24,.82);padding:1.6rem}
+.control-panel label{display:flex;justify-content:space-between;margin:1.05rem 0 .35rem;font-size:.82rem}
+output{opacity:.75}
+input[type=range]{width:100%;accent-color:#00eaff}
+.actions{display:flex;gap:.8rem;margin-top:1.6rem;flex-wrap:wrap}
+button{font:inherit;cursor:pointer;padding:.75rem 1rem;border:1px solid rgba(0,234,255,.35)}
+.primary{background:#00eaff;color:#020711}
+.secondary{background:transparent;color:#eefcff}
+.warning{font-size:.72rem}
+.flow{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;padding:1rem 0;margin:1rem 0;border-block:1px solid rgba(0,234,255,.12)}
+.flow span{font-size:.72rem;letter-spacing:.08em}.flow i{opacity:.4}
+dl{display:grid;grid-template-columns:1fr auto;gap:.65rem;font-size:.8rem}
+dt{opacity:.55}dd{margin:0}
+@media(max-width:850px){.hub-header,.control-grid{grid-template-columns:1fr;display:grid}.telemetry{grid-template-columns:repeat(2,1fr)}.hub-shell{padding:1rem}}
+</style>
+
+@code {
+    private WorkshopPresentationProfile Profile => WorkshopPresentationProfile.Current;
+
+    private void RunAgain()
+    {
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+
+    private void ResetProfile()
+    {
+        Profile.Reset();
+    }
+}
