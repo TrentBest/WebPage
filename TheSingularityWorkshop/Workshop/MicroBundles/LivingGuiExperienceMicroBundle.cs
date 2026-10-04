@@ -1,5 +1,6 @@
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.MicroBundleDomain;
+using TheSingularityWorkshop.Workshop.DeepDive;
 
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
@@ -8,7 +9,9 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// FSM_COS must load the Workshop Moniker before this Experience capability can install.
 /// The actual living organism is then scheduled by the host's FSM_API process groups.
 /// </summary>
-public sealed class LivingGuiExperienceMicroBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
+public sealed class LivingGuiExperienceMicroBundle :
+    TheSingularityWorkshop.FSM_COS.IMicroBundle,
+    IWebPageProviderSource
 {
     public const int BundleId = 2102;
 
@@ -22,12 +25,15 @@ public sealed class LivingGuiExperienceMicroBundle : TheSingularityWorkshop.FSM_
     public IReadOnlyList<BundleRequest> Dependencies { get; } =
         [BundleRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)];
 
+    /// <summary>Acquires an optional provider from the WebPage-only provider collection.</summary>
+    public T? TryGetProvider<T>() where T : class
+        => typeof(T) == typeof(LivingGuiDeepDiveProvider)
+            ? (T)(object)new LivingGuiDeepDiveProvider()
+            : null;
+
     void TheSingularityWorkshop.FSM_COS.IMicroBundle.Load(MicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
-
-        // Composition is intentionally semantic here. The browser manifestation
-        // remains owned by LivingGui.razor; FSM_COS owns the installation order.
     }
 
     bool TheSingularityWorkshop.FSM_COS.IMicroBundle.Arbitrate(
