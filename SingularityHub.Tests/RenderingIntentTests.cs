@@ -30,10 +30,12 @@ public sealed class RenderingIntentTests
         var explore = File.ReadAllText(Path.Combine(
             AppContext.BaseDirectory,
             "..", "..", "..", "..",
-            "TheSingularityWorkshop", "Pages", "Explore.razor"));
+            "TheSingularityWorkshop", "Pages", "Explore3D.razor"));
 
-        Assert.Contains("voxel-substrate-lab.js?v=", explore);
-        Assert.DoesNotContain("voxel-substrate-lab.js?v=166", explore);
+        Assert.Contains("@page "/rendering-lab"", explore);
+        Assert.DoesNotContain("@page "/rendering"", explore);
+        Assert.Contains("voxel-substrate-lab.js?v=178", explore);
+        Assert.DoesNotContain("voxel-substrate-lab.js?v=165", explore);
     }
 
 }
