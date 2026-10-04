@@ -27,9 +27,11 @@ WEBPAGE BOOT
   -> randomly select an available Idler
   -> RUN IDLER (Pong is the first concrete one)
   -> user clicks Enter Workshop
-  -> randomly select an available Flex
-  -> RUN FLEX (Living GUI is the first concrete one)
-  -> present Workshop moniker for 3 seconds
+  -> select the Living GUI Experience
+  -> FSM_COS composes the Experience
+  -> resolve its Moniker MicroBundle dependency first
+  -> start the Living GUI FSM only after composition succeeds
+  -> first reproduction makes the moniker eligible
   -> reveal navigation / page chrome / primary panel
   -> moniker continues in the primary panel
   -> user selects a tab
@@ -46,9 +48,9 @@ LIVING_GUI_IGNITION
        children root
        children grow
        reproduction continues
-  -> exactly 100 nodes
-  -> freeze Living GUI group
-  -> reveal moniker behind GUI
+  -> reproduction continues without a population cap
+  -> reveal moniker behind the living GUI
+  -> freeze only at the explicit Gravity boundary
   -> start preallocated Gravity group
   -> all GUI nodes fall away
   -> begin three-second dissipating phase only after the last node falls
