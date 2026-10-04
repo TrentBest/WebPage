@@ -2,7 +2,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
 /// <summary>
 /// Describes what a provider wants manifested without coupling the bundle to
-/// Blazor, WPF, Unity, CSS, or another presentation technology.
+/// Blazor, WPF, CSS, or another presentation technology.
 /// </summary>
 public sealed class MicroBundleManifestation
 {
