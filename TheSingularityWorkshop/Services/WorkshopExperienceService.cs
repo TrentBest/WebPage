@@ -1,7 +1,6 @@
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.MicroBundles;
-using TheSingularityWorkshop.Workshop.Plant;
 
 namespace TheSingularityWorkshop.Services;
 
@@ -70,9 +69,6 @@ public sealed class WorkshopExperienceService : IDisposable
         if (_disposed || !IsInitialized || CurrentState != "FirstContact") return;
 
         _firstContact.Update();
-
-        if (_firstContact.CurrentState == "HubGrowth" && _firstContact.StateTicks >= 30)
-            _firstContact.SetHubReady();
 
         if (_firstContact.IsLanding)
             SetState("Intro");
