@@ -75,6 +75,24 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.MonikerReady);
     }
 
+    [Fact(DisplayName = "First contact hands Workshop entry to the landing runtime instead of presenting the moniker itself")]
+    public void FirstContact_GatewayEntryHandsOffWithoutMoniker()
+    {
+        using var firstContact = new FirstContactFsm();
+        firstContact.Start();
+
+        for (var i = 0; i < 200 && firstContact.CurrentState != "Gateway"; i++)
+            firstContact.Update();
+
+        Assert.Equal("Gateway", firstContact.CurrentState);
+
+        firstContact.RequestEntry();
+        firstContact.Update();
+
+        Assert.Equal("Landing", firstContact.CurrentState);
+        Assert.NotEqual("Moniker", firstContact.CurrentState);
+    }
+
     [Fact(DisplayName = "Incremental Unit Test 07 — disposing PageFSM unregisters all runtime handles")]
     public void IncrementalUnitTest07_DisposingPageFSMUnregistersRuntimeHandles()
     {
