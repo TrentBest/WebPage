@@ -1,4 +1,5 @@
 @page "/deep-dive/{ExperienceId:long}"
+@using TheSingularityWorkshop.FSM_COS
 @using TheSingularityWorkshop.Services
 @using TheSingularityWorkshop.Workshop.Experiences
 @using TheSingularityWorkshop.Workshop.MicroBundles
@@ -41,8 +42,8 @@
             </article>
             <article>
                 <span>MICROBUNDLE</span>
-                <strong>0x@LivingGuiBundleId:X16</strong>
-                <p>The Living GUI MicroBundle is the capability requested by this Experience.</p>
+                <strong>0x@PrimaryBundleId:X16</strong>
+                <p>The primary MicroBundle is the capability requested by this Experience. The identifier comes from the Experience contract, not from the page route.</p>
             </article>
             <article>
                 <span>DEPENDENCY</span>
@@ -155,7 +156,11 @@ code{display:block;padding:1.4rem;background:#01050a;border:1px solid rgba(255,2
         ? "LIVING GUI"
         : $"EXPERIENCE 0x{ExperienceId:X16}";
 
-    private ulong LivingGuiBundleId => LivingGuiExperienceMicroBundle.BundleId;
+    private IExperience? CurrentExperience => ExperienceId == LivingGuiExperience.ExperienceId
+        ? new LivingGuiExperience()
+        : null;
+
+    private ulong PrimaryBundleId => CurrentExperience?.MicroBundleIds.FirstOrDefault() ?? 0;
 
     private void ReturnToExperience() => Navigation.NavigateTo("/");
     private void GoCreate() => Navigation.NavigateTo("/create");
