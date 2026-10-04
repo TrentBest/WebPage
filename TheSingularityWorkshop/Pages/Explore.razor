@@ -6,15 +6,54 @@
 @using TheSingularityWorkshop.Workshop.MicroBundles
 @using TheSingularityWorkshop.Workshop.MicroBundles.AI
 @using TheSingularityWorkshop.Workshop.Spatial
+@using TheSingularityWorkshop.Workshop.Composition
 @implements IDisposable
 
 <PageTitle>Explore // The Singularity Workshop</PageTitle>
 
 @BuildGui().Build()
 
+@if (!gardenMode && insideRoomId is null && ExperienceCatalog.Experiences.Count > 0)
+{
+    <section class="explore-deep-dives" aria-label="Experience Deep Dives">
+        <div class="explore-deep-dives__header">
+            <span>WORKSHOP // DEEP DIVES</span>
+            <h2>See how the things you can witness here are built.</h2>
+            <p>Explore a working Experience first. Then open its Deep Dive to inspect the ontology, MicroBundles, dependencies, and composition path behind it.</p>
+        </div>
+        <div class="explore-deep-dives__grid">
+            @foreach (var experience in ExperienceCatalog.Experiences.OrderBy(x => x.Id))
+            {
+                <article class="explore-deep-dive-card">
+                    <div class="explore-deep-dive-card__eyebrow">EXPERIENCE 0x@experience.Id:X16</div>
+                    <h3>@experience.Name</h3>
+                    <p>@experience.ProcessingGroups.Count processing groups // @experience.SenseCount sensory systems</p>
+                    <button type="button" @onclick="() => OpenDeepDive(experience.Id)">OPEN DEEP DIVE →</button>
+                </article>
+            }
+        </div>
+    </section>
+}
+
+<style>
+.explore-deep-dives{position:relative;z-index:20;margin:2rem auto 4rem;max-width:1180px;padding:2rem;box-sizing:border-box;background:rgba(2,7,17,.94);border:1px solid rgba(0,234,255,.22);box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:Consolas,'Courier New',monospace;color:#dceaf2}
+.explore-deep-dives__header>span{color:#00eaff;letter-spacing:.18em;font-size:.68rem;font-weight:800}
+.explore-deep-dives__header h2{margin:.7rem 0 .6rem;color:#fff;font-size:clamp(1.8rem,4vw,3.5rem);line-height:1}
+.explore-deep-dives__header p{max-width:760px;color:#91a6b0;line-height:1.7;margin:0}
+.explore-deep-dives__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin-top:1.5rem}
+.explore-deep-dive-card{padding:1.3rem;background:#030a13;border:1px solid rgba(0,234,255,.14)}
+.explore-deep-dive-card__eyebrow{color:#00eaff;font-size:.62rem;letter-spacing:.1em}
+.explore-deep-dive-card h3{margin:.65rem 0;color:#fff;font-size:1.5rem}
+.explore-deep-dive-card p{min-height:2.8rem;color:#8298a2;font-size:.78rem;line-height:1.6}
+.explore-deep-dive-card button{border:1px solid rgba(0,234,255,.55);background:rgba(0,234,255,.06);color:#00eaff;padding:.65rem .8rem;font:800 .65rem Consolas,'Courier New',monospace;letter-spacing:.1em;cursor:pointer}
+.explore-deep-dive-card button:hover{background:rgba(0,234,255,.14)}
+</style>
+
+
 @code {
     [Inject] private IJSRuntime JS { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private WorkshopExperienceCatalog ExperienceCatalog { get; set; } = default!;
 
     private readonly ExploreExperienceMicroBundle Experience;
     private readonly SpatialWorkshopScene Scene = SpatialWorkshopScene.CreateDefault();
@@ -118,6 +157,8 @@
         new("creation", "Creation Bay", "BUILDER SPACE", 34, 72, 34, 88, 34, 88, "The composition boundary. Focused capabilities become MicroBundles, then recipes, then executable Experiences.", "CREATION", "MicroBundles / composition"),
         new("unknown", "Unknown Annex", "UNMAPPED", 79, 76, 79, 90, 79, 90, "Something exists beyond the architecture currently exposed to the visitor. There is no reason to assume it is empty.", "UNKNOWN", "Undisclosed")
     ];
+
+    private void OpenDeepDive(ulong experienceId) => NavigationManager.NavigateTo($"/deep-dive/{experienceId}");
 
     public ExploreExperienceMicroBundle ExperienceForTests => Experience;
     public SpatialSceneStack SceneStackForTests => Router.SceneStack;
