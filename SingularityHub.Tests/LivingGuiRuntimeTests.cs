@@ -29,7 +29,7 @@ public sealed class LivingGuiRuntimeTests
         fsm.RequestEnter();
 
         for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
-            runtime.Update();
+            fsm.Update();
 
         var root = Assert.Single(fsm.Context.LivingNodes);
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
@@ -105,7 +105,7 @@ public sealed class LivingGuiRuntimeTests
 
         ticks = 0;
         while (child.Size < 200 && ticks++ < guard)
-            fsm.Update();
+            runtime.Update();
 
         Assert.True(child.Size >= 200, "Living GUI child did not complete flight and scaling within the scheduler guard.");
         Assert.Equal(200, child.Size);
@@ -116,7 +116,7 @@ public sealed class LivingGuiRuntimeTests
         // descendants. Advance until this specific child reaches reproduction.
         ticks = 0;
         while (child.Size < 400 && ticks++ < guard)
-            fsm.Update();
+            runtime.Update();
 
         Assert.True(child.Size >= 400, "Living GUI child did not receive mature-growth turns within the scheduler guard.");
         Assert.Equal(400, child.Size);
