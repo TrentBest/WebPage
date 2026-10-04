@@ -182,4 +182,25 @@ public sealed class IncrementalVersionTests
             TheSingularityWorkshop.Workshop.WorkshopSurfaceDescriptor.PublicSurfaces.Select(x => x.Title));
     }
 
+    [ArchitectureTest(0, 0, 177)] [Fact(DisplayName = "V0.0.177 — First_Contact_Hands_Off_To_The_100_Node_Living_GUI_And_Persistent_Moniker")]
+    public void V0_0_177FirstContactHandsOffToThe100NodeLivingGuiAndPersistentMoniker()
+    {
+        using var fsm = new TheSingularityWorkshop.Services.PageFSM();
+
+        fsm.RequestEnter();
+        fsm.Update();
+        fsm.Update();
+
+        while (!fsm.Context.LivingGuiFallen)
+            fsm.Update();
+
+        while (fsm.CurrentState != TheSingularityWorkshop.Services.PageFSM.Running)
+            fsm.Update();
+
+        Assert.Equal(100, fsm.Context.LivingNodes.Count);
+        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.True(fsm.Context.MonikerReady);
+        Assert.True(fsm.Context.LivingGuiFallen);
+    }
+
 }
