@@ -12,33 +12,28 @@ namespace TheSingularityWorkshop.Services
     public sealed class PageStateContext : IStateContext
     {
         public const int PopulationObservationThreshold = 100;
-        private const double RootSize = 200;
-        private const double SeedSize = 40;
-        private const double DefaultNodeSize = 200;
-        private const double GrowthStep = 50;
-        private const double MaximumNodeSize = 400;
+        private const double RootSize = 50;
+        private const double SeedSize = 10;
+        private const double DefaultNodeSize = 50;
+        private const double GrowthStep = 20;
+        private const double MaximumNodeSize = 100;
         private const double SeedFlightStep = 4.5;
         private const double SeedScalingStep = 40;
-        private const double ParentRecoveryStep = 200;
+        private const double ParentRecoveryStep = 80;
         private const double MinX = 10;
         private const double MaxX = 90;
         private const double MinY = 10;
         private const double MaxY = 90;
-        private const double RootGrowthStep = 50;
+        private const double RootGrowthStep = 20;
         private const double GravityAcceleration = 1.15;
         private readonly SquirrelRng _random = new(0x50414745u);
         private readonly List<LivingNodeState> _livingNodes = new();
-        private int _matureGrowthCursor;
         private bool _enterRequested;
 
         public string Name { get; set; }
         public bool IsValid { get; set; }
         public object? SingularityHub { get; }
-        public bool EnterRequested
-        {
-            get => _enterRequested;
-            set => _enterRequested = value;
-        }
+        public bool EnterRequested { get => _enterRequested; set => _enterRequested = value; }
         public bool LivingGuiPopulated { get; internal set; }
         public bool MonikerReady { get; internal set; }
         public bool GravityReleased { get; internal set; }
@@ -57,28 +52,15 @@ namespace TheSingularityWorkshop.Services
         public bool NeedsReproduction => _livingNodes.Exists(node => node.Phase == LivingNodePhase.ReproductionPending);
         public bool NeedsParentRecovery => _livingNodes.Exists(node => node.Phase == LivingNodePhase.ParentRecovery);
 
-        public PageStateContext(object? singularityHub = null)
-        {
-            Name = "PageFSMContext";
-            IsValid = true;
-            SingularityHub = singularityHub;
-        }
-
+        public PageStateContext(object? singularityHub = null) { Name = "PageFSMContext"; IsValid = true; SingularityHub = singularityHub; }
         public void ResetStateClock() => StateTicks = 0;
 
         public void BeginLivingGui()
         {
             if (_livingNodes.Count != 0) return;
-            _livingNodes.Add(new LivingNodeState("G:0", 0, 50, 50, RootSize, growthReady: true, seedDoubled: false, isRoot: true, phase: LivingNodePhase.RootGrowth));
-            _matureGrowthCursor = 0;
-            LivingGuiFrozen = false;
-            LivingGuiPopulated = false;
-            MonikerReady = false;
-            GravityReleased = false;
-            LivingGuiFallen = false;
-            NavigationReady = false;
-            PopulationCompletedTick = -1;
-            MonikerPresentationStartTick = -1;
+            _livingNodes.Add(new LivingNodeState("G:0", 0, 50, 50, RootSize, true, false, true, LivingNodePhase.RootGrowth));
+            LivingGuiFrozen = false; LivingGuiPopulated = false; MonikerReady = false; GravityReleased = false; LivingGuiFallen = false; NavigationReady = false;
+            PopulationCompletedTick = -1; MonikerPresentationStartTick = -1;
         }
 
         public void AdvanceRootGrowth()
@@ -100,19 +82,9 @@ namespace TheSingularityWorkshop.Services
             foreach (var node in _livingNodes)
             {
                 if (node.Phase != LivingNodePhase.SeedFlight) continue;
-                var dx = node.TargetX - node.X;
-                var dy = node.TargetY - node.Y;
-                var distance = Math.Sqrt(dx * dx + dy * dy);
-                if (distance <= SeedFlightStep)
-                {
-                    node.X = node.TargetX;
-                    node.Y = node.TargetY;
-                    node.Phase = LivingNodePhase.SeedScaling;
-                    continue;
-                }
-                node.X += dx / distance * SeedFlightStep;
-                node.Y += dy / distance * SeedFlightStep;
-                node.Rotation += 4.0;
+                var dx = node.TargetX - node.X; var dy = node.TargetY - node.Y; var distance = Math.Sqrt(dx * dx + dy * dy);
+                if (distance <= SeedFlightStep) { node.X = node.TargetX; node.Y = node.TargetY; node.Phase = LivingNodePhase.SeedScaling; continue; }
+                node.X += dx / distance * SeedFlightStep; node.Y += dy / distance * SeedFlightStep; node.Rotation += 4.0;
             }
         }
 
@@ -130,54 +102,35 @@ namespace TheSingularityWorkshop.Services
 
         public void AdvanceMatureGrowth()
         {
-            if (LivingGuiFrozen || _livingNodes.Count == 0) return;
-            for (var offset = 0; offset < _livingNodes.Count; offset++)
+            if (LivingGuiFrozen) return;
+            // Growth is continuous across the population. Reproduction remains serialized
+            // so each organism makes its next move at a different moment.
+            foreach (var node in _livingNodes)
             {
-                var index = (_matureGrowthCursor + offset) % _livingNodes.Count;
-                var node = _livingNodes[index];
                 if (node.Phase != LivingNodePhase.MatureGrowth || node.Size >= MaximumNodeSize) continue;
                 node.Size = Math.Min(MaximumNodeSize, node.Size + GrowthStep);
-                if (node.Size >= MaximumNodeSize)
-                {
-                    node.SeedDoubled = true;
-                    node.Phase = LivingNodePhase.ReproductionPending;
-                }
-                _matureGrowthCursor = (index + 1) % _livingNodes.Count;
-                break;
+                if (node.Size >= MaximumNodeSize) { node.SeedDoubled = true; node.Phase = LivingNodePhase.ReproductionPending; }
             }
         }
 
         public void AdvanceReproduction()
         {
             if (LivingGuiFrozen || _livingNodes.Count >= PopulationObservationThreshold) return;
-
-            // One organism reproduces per scheduler turn. The generations therefore
-            // arrive as 1 -> 2 -> 3 -> 4 rather than exploding in a single heartbeat.
-            // That stagger is intentional: the visitor has time to recognize the
-            // pattern before the population becomes overwhelming.
             foreach (var node in _livingNodes)
             {
                 if (node.Phase != LivingNodePhase.ReproductionPending) continue;
-
                 node.OffspringCount++;
                 _livingNodes.Add(CreateSeed(node));
                 node.Phase = LivingNodePhase.ParentRecovery;
                 break;
             }
-
-            // This is an observation boundary, not a population cap. The FSM owns the
-            // actual freeze at the Gravity boundary once the threshold is observed.
             if (_livingNodes.Count >= PopulationObservationThreshold && !LivingGuiPopulated)
             {
-                LivingGuiPopulated = true;
-                PopulationCompletedTick = TotalTicks;
+                LivingGuiPopulated = true; PopulationCompletedTick = TotalTicks;
             }
         }
 
-        public void FreezeLivingGui()
-        {
-            LivingGuiFrozen = true;
-        }
+        public void FreezeLivingGui() => LivingGuiFrozen = true;
 
         public void AdvanceParentRecovery()
         {
@@ -186,12 +139,7 @@ namespace TheSingularityWorkshop.Services
             {
                 if (node.Phase != LivingNodePhase.ParentRecovery) continue;
                 node.Size = Math.Max(DefaultNodeSize, node.Size - ParentRecoveryStep);
-                if (node.Size <= DefaultNodeSize)
-                {
-                    node.Size = DefaultNodeSize;
-                    node.SeedDoubled = false;
-                    node.Phase = LivingNodePhase.MatureGrowth;
-                }
+                if (node.Size <= DefaultNodeSize) { node.Size = DefaultNodeSize; node.SeedDoubled = false; node.Phase = LivingNodePhase.MatureGrowth; }
             }
         }
 
@@ -200,7 +148,7 @@ namespace TheSingularityWorkshop.Services
             var (x, y) = NextSafePosition();
             var lineage = parent.Generation == 0 ? $"G:{parent.OffspringCount}" : $"{parent.Lineage}-{parent.OffspringCount - 1}";
             var rotation = (_random.NextDouble() * 360.0) - 180.0;
-            return new LivingNodeState(lineage, parent.Generation + 1, parent.X, parent.Y, SeedSize, growthReady: false, seedDoubled: false, isRoot: false, phase: LivingNodePhase.SeedFlight, targetX: x, targetY: y, rotation: rotation);
+            return new LivingNodeState(lineage, parent.Generation + 1, parent.X, parent.Y, SeedSize, false, false, false, LivingNodePhase.SeedFlight, x, y, rotation);
         }
 
         private (double X, double Y) NextSafePosition() => (MinX + _random.NextDouble() * (MaxX - MinX), MinY + _random.NextDouble() * (MaxY - MinY));
@@ -208,14 +156,8 @@ namespace TheSingularityWorkshop.Services
         public void AdvanceGravity()
         {
             if (!LivingGuiFrozen) return;
-            foreach (var node in _livingNodes)
-            {
-                node.GravityVelocity += GravityAcceleration;
-                node.Y += node.GravityVelocity;
-                node.Rotation += 2.4;
-            }
-            GravityReleased = true;
-            LivingGuiFallen = _livingNodes.TrueForAll(node => node.Y > 125);
+            foreach (var node in _livingNodes) { node.GravityVelocity += GravityAcceleration; node.Y += node.GravityVelocity; node.Rotation += 2.4; }
+            GravityReleased = true; LivingGuiFallen = _livingNodes.TrueForAll(node => node.Y > 125);
         }
 
         public enum LivingNodePhase { RootGrowth, SeedFlight, SeedScaling, MatureGrowth, ReproductionPending, ParentRecovery }
@@ -223,9 +165,7 @@ namespace TheSingularityWorkshop.Services
         public sealed class LivingNodeState
         {
             internal LivingNodeState(string lineage, int generation, double x, double y, double size, bool growthReady, bool seedDoubled, bool isRoot, LivingNodePhase phase, double targetX = 0, double targetY = 0, double rotation = 0)
-            {
-                Lineage = lineage; Generation = generation; X = x; Y = y; Size = size; GrowthReady = growthReady; SeedDoubled = seedDoubled; IsRoot = isRoot; Phase = phase; TargetX = targetX; TargetY = targetY; Rotation = rotation;
-            }
+            { Lineage = lineage; Generation = generation; X = x; Y = y; Size = size; GrowthReady = growthReady; SeedDoubled = seedDoubled; IsRoot = isRoot; Phase = phase; TargetX = targetX; TargetY = targetY; Rotation = rotation; }
             public string Lineage { get; }
             public int Generation { get; }
             public double X { get; internal set; }
