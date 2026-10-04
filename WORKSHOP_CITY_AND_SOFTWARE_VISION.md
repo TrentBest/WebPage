@@ -222,3 +222,291 @@ The future Software Inc. proves agent-backed software creation.
 Together they form a coherent public argument:
 
 > **The Singularity Workshop is the sandbox and scaffolding. The people who enter it are supposed to build the world.**
+
+
+## Singularity City as a recipe-recovery laboratory
+
+The City is also intended to make the Workshop's composition system observable.
+
+A visitor should eventually be able to encounter a building, Digitens population, transit route, business, neighborhood, or other City feature and ask:
+
+> **How was this made?**
+
+The answer should not be a screenshot or a hidden implementation detail. The Experience should be able to expose the **recipe that composed the thing**.
+
+A City artifact can therefore be understood at several levels:
+
+```text
+OBSERVED ARTIFACT
+       |
+       v
+ENTITY / SEMANTIC IDENTITY
+       |
+       v
+EXPERIENCE COMPOSITION
+       |
+       +-- MicroBundles
+       +-- Manifest
+       +-- Configuration
+       +-- Initial data
+       +-- Arbitration
+       +-- Runtime state
+       |
+       v
+RUNTIME ASSEMBLY
+       |
+       v
+OBSERVABLE BEHAVIOR
+```
+
+The important distinction is between **recipe** and **state**.
+
+The recipe says how an Experience or artifact was composed.
+
+The state says what happened after that composition began running.
+
+A visitor should eventually be able to:
+
+1. inspect an artifact;
+2. inspect the composition that produced it;
+3. distinguish authored configuration from runtime state;
+4. copy the recipe;
+5. modify it;
+6. compose a new artifact or Experience;
+7. observe the difference.
+
+This turns Singularity City into a living library of executable examples.
+
+### The City as a reference implementation
+
+The City should contain examples deliberately chosen to teach the architecture.
+
+A building can demonstrate:
+
+- semantic identity;
+- spatial representation;
+- Event Horizon transitions;
+- persistence;
+- ownership;
+- interaction.
+
+A company can demonstrate:
+
+- organizational ontology;
+- buildings;
+- departments;
+- Digitens;
+- schedules;
+- roles;
+- resources;
+- user-defined behavior.
+
+A transit system can demonstrate:
+
+- routes;
+- stations;
+- scheduling;
+- occupancy;
+- Digitens movement;
+- event-driven state changes.
+
+A shop can demonstrate:
+
+- product ontology;
+- presentation;
+- inventory;
+- transaction intent;
+- City manifestation;
+- Experience-specific manifestation.
+
+A neighborhood can demonstrate:
+
+- multiple independent entities;
+- shared environmental rules;
+- emergent behavior;
+- streaming/residency;
+- observer-relative rendering.
+
+The City therefore becomes more valuable as it grows because every new artifact can become another executable lesson.
+
+### Recipes should be first-class
+
+The long-term goal is not merely to let a visitor inspect a recipe. The recipe itself should be a first-class reusable artifact.
+
+A recipe should eventually be portable between compatible hosts:
+
+```text
+RECIPE
+  |
+  +--> WEBPAGE
+  |
+  +--> ANYAPP
+  |
+  +--> FUTURE HOST
+  |
+  +--> SINGULARITY CITY
+```
+
+That follows the same composition boundary already used elsewhere in the Workshop:
+
+```text
+Manifest
+   |
+MicroBundles
+   |
+FSM_COS
+   |
+RuntimeAssembly
+   |
+Experience
+```
+
+The City becomes the most visible place to prove that this is true.
+
+### Simulation without pretending to be reality
+
+Singularity City is a simulated reality, not a claim that simulation is identical to physical reality.
+
+That distinction matters.
+
+The value of the City is that it gives us a controlled world in which we can observe:
+
+- rules;
+- agents;
+- interactions;
+- persistence;
+- composition;
+- causality;
+- representation;
+- resource constraints;
+- emergence.
+
+When a City phenomenon resembles a real-world phenomenon, the Workshop can then point to the underlying model and explain which parts are physically grounded, which are computational abstractions, and which are deliberately fictional.
+
+The City should therefore teach **how a simulated world is constructed**, not merely convince visitors that it looks real.
+
+### The City as an executable ontology
+
+The Ontology Mall is one expression of a larger idea: ontology does not have to remain documentation.
+
+If an ontology says that something belongs to a category, relates to another category, owns something, contains something, or depends on something, the City can eventually give that relationship spatial or behavioral manifestation.
+
+This creates a useful chain:
+
+```text
+ONTOLOGY
+   |
+   v
+SEMANTIC ENTITY
+   |
+   v
+COMPOSITION
+   |
+   v
+RUNTIME
+   |
+   v
+SPACE / BEHAVIOR
+   |
+   v
+OBSERVATION
+```
+
+The visitor can then walk through the ontology rather than merely reading it.
+
+### Digitens as persistent witnesses
+
+Digitens should not exist merely to make streets look populated.
+
+Their behavior should become evidence.
+
+A Digitens commuter can demonstrate:
+
+- a persistent identity;
+- a role;
+- a schedule;
+- a destination;
+- transit;
+- interruption;
+- interaction;
+- resource consumption;
+- state transitions;
+- autonomous or rule-driven decisions.
+
+As the Digitens population grows, the City becomes a standing stress test for the same computation and rendering architecture being developed elsewhere in the Workshop.
+
+The important performance question is not simply:
+
+> How many Digitens can exist?
+
+It is:
+
+> **How much computation is required to maintain the observable consequences of the Digitens that matter to the current observer?**
+
+That connects City directly to Event Horizons and the Computation architecture.
+
+### City scale is an architectural instrument
+
+A city gives us a natural hierarchy of computational relevance:
+
+```text
+observer
+   |
+   +-- hand / immediate interaction
+   |
+   +-- room
+   |
+   +-- building
+   |
+   +-- neighborhood
+   |
+   +-- city
+   |
+   +-- distant city / horizon
+```
+
+The City therefore gives the Renderer a real environment in which to test observer-relative representation rather than an artificial benchmark alone.
+
+The City can remain populated and causally active without requiring every entity to receive identical computational treatment at every moment.
+
+That is a hypothesis to benchmark, not a marketing claim.
+
+### City creation should expose the recipe
+
+Eventually a visitor should be able to stand in front of a City artifact and choose something like:
+
+```text
+        [ OBSERVE ]
+
+        [ INSPECT ]
+
+        [ SHOW RECIPE ]
+
+        [ COPY ]
+
+        [ MODIFY ]
+
+        [ COMPOSE ]
+```
+
+The final implementation should use the Workshop's semantic GUI machinery rather than hard-coded page controls.
+
+The important part is the transformation:
+
+```text
+SEE IT
+  |
+  v
+UNDERSTAND IT
+  |
+  v
+COPY IT
+  |
+  v
+CHANGE IT
+  |
+  v
+CREATE SOMETHING NEW
+```
+
+That is the mechanism by which Singularity City becomes a generator of new Workshop content rather than merely a destination containing content.
