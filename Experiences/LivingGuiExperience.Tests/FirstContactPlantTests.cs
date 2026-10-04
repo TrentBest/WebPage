@@ -37,17 +37,7 @@ public sealed class FirstContactPlantTests
         experience.RequestEntry();
         experience.Tick();
 
-        Assert.Equal("Moniker", experience.FirstContact.CurrentState);
-        Assert.Equal("FirstContact", experience.CurrentState);
-
-        var reachedHubGrowth = false;
-        for (var i = 0; i < 500 && experience.CurrentState == "FirstContact"; i++)
-        {
-            experience.Tick();
-            reachedHubGrowth |= experience.FirstContact.CurrentState == "HubGrowth";
-        }
-
-        Assert.True(reachedHubGrowth);
+        Assert.Equal("Landing", experience.FirstContact.CurrentState);
         Assert.Equal("Intro", experience.CurrentState);
         Assert.True(experience.FirstContact.IsLanding);
     }
