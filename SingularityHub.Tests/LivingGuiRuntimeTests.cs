@@ -202,11 +202,11 @@ public sealed class LivingGuiRuntimeTests
         while (fsm.Context.LivingNodes.Count < PageStateContext.CriticalMass && ticks++ < guard)
             fsm.Update();
 
-        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.CriticalMass, "Living GUI did not reach the population observation threshold within the scheduler guard.");
+        Assert.Contains(fsm.Context.LivingNodes, _ => fsm.Context.LivingNodes.Count >= PageStateContext.CriticalMass);
         Assert.False(fsm.Context.LivingGuiFrozen);
         var populationBefore = fsm.Context.LivingNodes.Count;
         for (var i = 0; i < 200; i++) fsm.Update();
-        Assert.True(fsm.Context.LivingNodes.Count > populationBefore, "Living GUI stopped reproducing after reaching the observation threshold.");
+        Assert.Contains(fsm.Context.LivingNodes, _ => fsm.Context.LivingNodes.Count > populationBefore);
         Assert.True(fsm.Context.LivingNodes.Any(node => node.Generation > 1));
     }
 
