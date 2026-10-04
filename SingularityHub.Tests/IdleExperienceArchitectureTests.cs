@@ -45,7 +45,11 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.MonikerReady);
         Assert.False(fsm.Context.LivingGuiFrozen);
 
-        // Gravity is the explicit freeze boundary for the living GUI.
+        // Gravity is the explicit freeze boundary for the living GUI. FSM_API applies
+        // state-entry actions on the following heartbeat, so observe the freeze after
+        // that heartbeat rather than assuming entry actions are immediate.
+        fsm.Update();
+        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
