@@ -48,13 +48,10 @@ LIVING_GUI_POPULATING
       | mature node spawns a child
       | child animates parent -> chaotic destination
       | no shared spawn timing boundary is required
-      | living GUI process group stops at exactly 100
-      | NO MONIKER before 100
+      | reproduction continues; there is no population cap
       v
-100 GUI NODES / CRITICAL MASS
+FIRST REPRODUCTION / MONIKER READY
       |
-      | freeze population
-      | set MonikerReady = true
       | moniker is rendered behind the swarm
       v
 MONIKER_REVEAL
@@ -150,10 +147,12 @@ FIRST CONTACT FSM
 LANDING HANDOFF
   |
   v
-PAGE FSM / LIVING GUI
+FSM_COS-COMPOSED EXPERIENCE
   |
-  +-- exactly 100 nodes
-  +-- freeze
+  +-- Living GUI runtime starts
+  +-- first reproduction makes moniker eligible
+  +-- reproduction continues without a cap
+  +-- gravity is the explicit freeze boundary
   +-- moniker behind population
   +-- gravity FSM
   +-- nodes fall away
