@@ -191,4 +191,24 @@ public sealed class IdleExperienceArchitectureTests
         defaultFsm.Update();
         Assert.Equal(PageFSM.NavigationArrival, defaultFsm.CurrentState);
     }
+    [Fact(DisplayName = "Workshop moniker persists after the living GUI falls away")]
+    public void WorkshopMonikerPersistsAfterLivingGuiDissipates()
+    {
+        using var fsm = new PageFSM();
+
+        fsm.RequestEnter();
+        fsm.Update();
+        fsm.Update();
+
+        while (!fsm.Context.LivingGuiFallen)
+            fsm.Update();
+
+        while (fsm.CurrentState != PageFSM.Running)
+            fsm.Update();
+
+        Assert.True(fsm.Context.MonikerReady);
+        Assert.True(fsm.Context.LivingGuiFallen);
+        Assert.Equal(PageFSM.Running, fsm.CurrentState);
+    }
+
 }
