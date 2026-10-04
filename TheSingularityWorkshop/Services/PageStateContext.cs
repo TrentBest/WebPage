@@ -149,24 +149,27 @@ namespace TheSingularityWorkshop.Services
 
         public void AdvanceReproduction()
         {
-            if (LivingGuiFrozen) return;
-            var newborns = new List<LivingNodeState>();
+            if (LivingGuiFrozen || _livingNodes.Count >= PopulationObservationThreshold) return;
+
+            // One organism reproduces per scheduler turn. The generations therefore
+            // arrive as 1 -> 2 -> 3 -> 4 rather than exploding in a single heartbeat.
+            // That stagger is intentional: the visitor has time to recognize the
+            // pattern before the population becomes overwhelming.
             foreach (var node in _livingNodes)
             {
                 if (node.Phase != LivingNodePhase.ReproductionPending) continue;
-                node.OffspringCount++;
-                newborns.Add(CreateSeed(node));
-                node.Phase = LivingNodePhase.ParentRecovery;
-            }
-            _livingNodes.AddRange(newborns);
 
-            // The first offspring marks the end of the opening population phase.
-            // It is a handoff signal, not a population cap: the living GUI continues
-            // reproducing while the moniker is presented.
-            if (newborns.Count > 0 && !LivingGuiPopulated)
+                node.OffspringCount++;
+                _livingNodes.Add(CreateSeed(node));
+                node.Phase = LivingNodePhase.ParentRecovery;
+                break;
+            }
+
+            // This is an observation boundary, not a population cap. The FSM owns the
+            // actual freeze at the Gravity boundary once the threshold is observed.
+            if (_livingNodes.Count >= PopulationObservationThreshold && !LivingGuiPopulated)
             {
                 LivingGuiPopulated = true;
-                MonikerReady = true;
                 PopulationCompletedTick = TotalTicks;
             }
         }
