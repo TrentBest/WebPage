@@ -11,7 +11,7 @@ namespace TheSingularityWorkshop.Services
     /// </summary>
     public sealed class PageStateContext : IStateContext
     {
-        public const int CriticalMass = 100;
+        public const int PopulationObservationThreshold = 100;
         private const double RootSize = 200;
         private const double SeedSize = 40;
         private const double DefaultNodeSize = 200;
@@ -149,7 +149,7 @@ namespace TheSingularityWorkshop.Services
 
         public void AdvanceReproduction()
         {
-            if (LivingGuiFrozen || _livingNodes.Count >= CriticalMass) return;
+            if (LivingGuiFrozen) return;
             var newborns = new List<LivingNodeState>();
             foreach (var node in _livingNodes)
             {
