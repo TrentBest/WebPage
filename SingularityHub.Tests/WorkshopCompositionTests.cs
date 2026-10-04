@@ -12,6 +12,9 @@ public sealed class WorkshopCompositionTests
     {
         using var experience = new WorkshopExperienceService();
         experience.Initialize();
+        AdvanceToGateway(experience);
+        experience.RequestEntry();
+        AdvanceToLanding(experience);
         Assert.NotNull(experience.RuntimeAssembly);
         Assert.Contains(experience.RuntimeAssembly!.Bundles, bundle => bundle.Id == MonikerMicroBundle.BundleId);
         Assert.NotNull(experience.MonikerComposition);
@@ -26,6 +29,9 @@ public sealed class WorkshopCompositionTests
     {
         using var experience = new WorkshopExperienceService();
         experience.Initialize();
+        AdvanceToGateway(experience);
+        experience.RequestEntry();
+        AdvanceToLanding(experience);
 
         var ai = experience.AiExchangeComposition;
         Assert.NotNull(ai);
@@ -44,6 +50,9 @@ public sealed class WorkshopCompositionTests
     {
         using var experience = new WorkshopExperienceService();
         experience.Initialize();
+        AdvanceToGateway(experience);
+        experience.RequestEntry();
+        AdvanceToLanding(experience);
 
         Assert.Contains(
             experience.RuntimeAssembly!.Bundles,
@@ -56,4 +65,20 @@ public sealed class WorkshopCompositionTests
             bundle => bundle.Id == AiExchangeCompositionBundle.BundleId);
     }
 
+    private static void AdvanceToGateway(WorkshopExperienceService service)
+    {
+        for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Gateway"; i++)
+            service.Tick();
+
+        Assert.Equal("Gateway", service.FirstContact.CurrentState);
+    }
+
+    private static void AdvanceToLanding(WorkshopExperienceService service)
+    {
+        for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Landing"; i++)
+            service.Tick();
+
+        Assert.Equal("Landing", service.FirstContact.CurrentState);
+        Assert.Equal("LivingGui", service.CurrentState);
+    }
 }
