@@ -74,9 +74,9 @@ RUNNING
 
 ## Non-negotiable rules
 
-1. **100 nodes is the only reveal threshold.** The moniker must not be visually rendered before the living GUI reaches exactly `PageStateContext.CriticalMass` (currently 100).
-2. **Critical mass opens the gate in the same state mutation.** Do not wait for Gravity to set `MonikerReady`.
-3. **Critical mass stops population work.** The living GUI process group is no longer stepped after `LivingGuiFrozen` becomes true.
+1. **First reproduction is the opening handoff.** The moniker becomes ready when the first child is spawned; there is no population cap or exact node-count reveal threshold.
+2. **The opening handoff does not stop life.** The living GUI continues reproducing while the moniker is presented.
+3. **Gravity is the explicit freeze boundary.** The living GUI process group remains active until the page enters `GRAVITY`, where `LivingGuiFrozen` is set before gravity advances.
 4. **Gravity is separately allocated.** The Gravity FSM handle/process group exists before the reveal and remains dormant until the page enters `GRAVITY`.
 5. **The moniker is behind the swarm.** GUI nodes must visually occlude it while they are falling. Do not change the existing kelp-like moniker motion without an explicit visual request.
 6. **The moniker persists after reveal.** It must not disappear during `MONIKER_REVEAL`, `GRAVITY`, `LIVING_GUI_DISSIPATING`, `NAVIGATION_ARRIVAL`, or `RUNNING`.
