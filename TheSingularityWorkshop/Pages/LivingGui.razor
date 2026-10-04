@@ -1,5 +1,6 @@
 @page "/living-gui"
 @using System
+@using TheSingularityWorkshop.Components
 @using TheSingularityWorkshop.Services
 @inject FSMManagerService FSM
 @implements IDisposable
@@ -7,6 +8,10 @@
 <PageTitle>Living GUI</PageTitle>
 
 <div class="living-experience-panel" aria-label="Living GUI experience">
+    @if (FSM.Context.MonikerReady)
+    {
+        <FirstContactView State="Landing" Ticks="FSM.Context.MonikerPresentationStartTick" />
+    }
     @foreach (var actor in FSM.Context.LivingNodes)
     {
         <label class="living-actor @(actor.IsRoot ? "living-actor-root" : "") @(GravityActive ? "living-actor-gravity" : "")"
