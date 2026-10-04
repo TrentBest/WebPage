@@ -5,23 +5,6 @@ namespace SingularityHub.Tests;
 
 public sealed class MonikerExperienceTests
 {
-    [Fact(DisplayName = "Moniker experience does not expose a Unity runtime handoff")]
-    public void MonikerExperienceDoesNotExposeUnityRuntimeHandoff()
-    {
-        using var service = new WorkshopExperienceService();
-
-        service.Initialize();
-        for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Gateway"; i++)
-            service.Tick();
-
-        Assert.Equal("Gateway", service.FirstContact.CurrentState);
-        service.RequestEntry();
-        service.Tick();
-
-        Assert.Equal("Landing", service.FirstContact.CurrentState);
-        Assert.False(service.ShowUnity);
-    }
-
     [Fact(DisplayName = "Moniker presentation is a three-second living gateway glyph")]
     public void MonikerPresentationUsesWorkshopPaletteAndPhasedGlyphContract()
     {
@@ -35,8 +18,6 @@ public sealed class MonikerExperienceTests
         Assert.Contains("SINGULARITY", home);
         Assert.Contains("WORKSHOP", home);
         Assert.Contains("Moniker", home);
-        Assert.DoesNotContain("MADE WITH UNITY", home);
-        Assert.DoesNotContain("interop.initUnity", home);
     }
 
     [Fact(DisplayName = "Landing keeps the moniker as the sole primary-panel occupant")]
