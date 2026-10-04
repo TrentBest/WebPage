@@ -510,3 +510,49 @@ CREATE SOMETHING NEW
 ```
 
 That is the mechanism by which Singularity City becomes a generator of new Workshop content rather than merely a destination containing content.
+
+
+## User-created companies
+
+A company is a first-class City creation, not merely a shop skin.
+
+A user should eventually be able to define a company, establish its ontology and identity, create one or more buildings, assign departments and capabilities, and staff those locations with Digitens.
+
+```text
+USER
+ |
+ v
+COMPANY
+ |
+ +-- identity
+ +-- ontology
+ +-- buildings
+ +-- departments
+ +-- capabilities
+ +-- policies
+ +-- products/services
+ |
+ v
+DIGITENS
+ |
+ +-- roles
+ +-- schedules
+ +-- workplaces
+ +-- relationships
+ |
+ v
+SINGULARITY CITY
+```
+
+The company can then have multiple manifestations:
+
+- its persistent City presence;
+- its ontology position;
+- its buildings and departments;
+- its appearances in individual Experiences;
+- its eventual commercial storefronts;
+- its future real-world paired products or services.
+
+This is important because the City should demonstrate that **creation is compositional**. A user does not merely place a decorative building. They create a semantic organization whose parts can acquire spatial, behavioral, computational, and commercial manifestations.
+
+The Workshop should make the difficult parts of that process feel simple.
