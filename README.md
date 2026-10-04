@@ -63,7 +63,7 @@ That is not decoration around the technology.
 
 ---
 
-# Current direction — September 2026
+# Current direction — October 2026
 
 The current WebPage is intentionally in motion. Do not interpret every current
 implementation detail as permanent architecture.
@@ -564,3 +564,36 @@ The intended progression is:
 Visual intensity may be paired with original audio and timed presentation beats. This is presentation intensity, not autonomous persuasion: the visitor remains the decision-maker, and every demonstrated capability must correspond to real Workshop behavior or be clearly identified as experimental.
 
 See `WORKSHOP_OPENING_EXPERIENCE.md` for the current contract.
+
+## Public-facing product contract
+
+The WebPage is now being prepared as the publishable public face of the Workshop.
+The visitor should be able to do three things without reading the source code first:
+
+1. **Experience it** — enter the living Workshop and see real behavior, not a mockup.
+2. **Understand it** — follow the path from state and composition through MicroBundles, repositories, semantics, and host manifestations.
+3. **Decide what it means to them** — understand what becomes easier, smaller, more reusable, or more interoperable by using these boundaries.
+
+The public navigation therefore has a deliberate progression:
+
+```text
+FIRST CONTACT
+    |
+    +--> EXPLORE       experience the system
+    +--> RENDERING     see the manifestation research
+    +--> CREATE        inspect the composition vocabulary
+    +--> EDUCATION     see a domain application
+    +--> MADMEN        see another domain application
+    +--> UNDERSTAND    learn the architecture and impact
+```
+
+The **Understand** surface is the canonical explanation of the ecosystem. It should
+stay aligned with the actual repositories and contracts rather than becoming a second
+marketing fiction.
+
+Inventor and Revit are intentionally not part of the current public opening sequence.
+They remain useful future examples of how external data can enter the ecosystem, but
+they are not required to explain the architecture or prove the WebPage itself.
+
+The quality bar is simple: **the public site must be able to demonstrate what it claims,
+and the explanation must describe what the code actually does.**
