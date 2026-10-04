@@ -43,11 +43,13 @@ public sealed class IdleExperienceArchitectureTests
         fsm.Update();
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
-        Assert.True(fsm.Context.LivingGuiFrozen);
+        Assert.False(fsm.Context.LivingGuiFrozen);
 
+        // Gravity is the explicit freeze boundary for the living GUI.
         fsm.Update();
         Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
+        Assert.True(fsm.Context.LivingGuiFrozen);
         Assert.False(fsm.Context.LivingGuiFallen);
 
         const int gravityGuard = 1000;
