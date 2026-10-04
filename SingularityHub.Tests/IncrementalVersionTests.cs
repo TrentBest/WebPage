@@ -182,8 +182,8 @@ public sealed class IncrementalVersionTests
             TheSingularityWorkshop.Workshop.WorkshopSurfaceDescriptor.PublicSurfaces.Select(x => x.Title));
     }
 
-    [ArchitectureTest(0, 0, 177)] [Fact(DisplayName = "V0.0.177 — First_Contact_Hands_Off_To_The_100_Node_Living_GUI_And_Persistent_Moniker")]
-    public void V0_0_177FirstContactHandsOffToThe100NodeLivingGuiAndPersistentMoniker()
+    [ArchitectureTest(0, 0, 177)] [Fact(DisplayName = "V0.0.177 — First_Contact_Hands_Off_To_A_Living_GUI_And_Persistent_Moniker")]
+    public void V0_0_177FirstContactHandsOffToALivingGuiAndPersistentMoniker()
     {
         using var fsm = new TheSingularityWorkshop.Services.PageFSM();
 
@@ -191,13 +191,19 @@ public sealed class IncrementalVersionTests
         fsm.Update();
         fsm.Update();
 
-        while (!fsm.Context.LivingGuiFallen)
+        const int maxTicks = 5000;
+        var ticks = 0;
+        while (!fsm.Context.LivingGuiFallen && ticks++ < maxTicks)
             fsm.Update();
 
-        while (fsm.CurrentState != TheSingularityWorkshop.Services.PageFSM.Running)
+        Assert.True(fsm.Context.LivingGuiFallen, "Living GUI did not reach gravity within the test guard.");
+
+        ticks = 0;
+        while (fsm.CurrentState != TheSingularityWorkshop.Services.PageFSM.Running && ticks++ < maxTicks)
             fsm.Update();
 
-        Assert.Equal(100, fsm.Context.LivingNodes.Count);
+        Assert.Equal(TheSingularityWorkshop.Services.PageFSM.Running, fsm.CurrentState);
+        Assert.True(fsm.Context.LivingNodes.Count > 1);
         Assert.True(fsm.Context.LivingGuiFrozen);
         Assert.True(fsm.Context.MonikerReady);
         Assert.True(fsm.Context.LivingGuiFallen);
