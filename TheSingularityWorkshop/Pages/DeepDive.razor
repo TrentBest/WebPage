@@ -1,11 +1,8 @@
 @page "/deep-dive/{ExperienceId:long}"
 @using TheSingularityWorkshop.SingularityHub
-@using TheSingularityWorkshop.Services
-@using TheSingularityWorkshop.Workshop.Experiences
 @using TheSingularityWorkshop.Workshop.Composition
-@using TheSingularityWorkshop.Workshop.MicroBundles
 @inject NavigationManager Navigation
-@inject WorkshopExperienceCatalog ExperienceCatalog
+@inject WorkshopDeepDiveCatalog DeepDiveCatalog
 
 <PageTitle>Deep Dive // @ExperienceName</PageTitle>
 
@@ -48,6 +45,11 @@
                 <p>The primary MicroBundle is the capability requested by this Experience. The identifier comes from the Experience contract, not from the page route.</p>
             </article>
             <article>
+                <span>ONTOLOGY</span>
+                <strong>@OntologySummary</strong>
+                <p>The Experience's ontological coordinate is the discovery trail. A creator can use the contract to locate the capability without copying its presentation.</p>
+            </article>
+            <article>
                 <span>DEPENDENCY</span>
                 <strong>@DependencySummary</strong>
                 <p>@DependencyDescription</p>
@@ -58,35 +60,30 @@
                 <p>Manifest → dependency closure → load → arbitration → convergence → RuntimeAssembly.
                     The browser renders the result; it does not secretly replace the composition kernel.</p>
             </article>
+            <article>
+                <span>SENSORY SYSTEMS</span>
+                <strong>@SenseCount</strong>
+                <p>@SensorySummary</p>
+            </article>
         </section>
 
         <section class="recipe">
             <div>
                 <span>02 // BUILD RECIPE</span>
-                <h2>How to make your own Moniker</h2>
+                <h2>How to make your own version</h2>
                 <ol>
-                    <li>Define the thing as a capability, not as a special page animation.</li>
-                    <li>Give it a stable ontological identity and version.</li>
-                    <li>Expose the capability through a MicroBundle.</li>
+                    <li>Define the capability as a contract, not as a special page animation.</li>
+                    <li>Give the Experience and its MicroBundles stable ontological identities and versions.</li>
+                    <li>Expose behavior through one or more MicroBundles.</li>
                     <li>Declare dependencies explicitly so composition can resolve them.</li>
-                    <li>Place that MicroBundle in an Experience.</li>
+                    <li>Place the capability MicroBundles in an Experience.</li>
                     <li>Let FSM_COS assemble the runtime.</li>
                     <li>Give the host a sensory/presentation adapter for the assembled state.</li>
                 </ol>
             </div>
             <aside>
                 <div class="terminal">ONTOLOGY QUERY</div>
-                <code>
-Experience
-  └─ MicroBundle
-       ├─ BundleId: @PrimaryBundleId
-       ├─ Version: 1.0.0
-       └─ DependsOn: Moniker
-
-Moniker
-  └─ Composition
-       └─ presentation capability
-                </code>
+                <code>@CompositionGraph</code>
                 <p>
                     The identifiers are the trail. A creator should be able to search the Workshop
                     for the ontology, inspect its contract, and use it without copying this page.
@@ -153,23 +150,34 @@ code{display:block;padding:1.4rem;background:#01050a;border:1px solid rgba(255,2
 @code {
     [Parameter] public long ExperienceId { get; set; }
 
-    private IExperience? CurrentExperience => ExperienceCatalog.TryResolve((ulong)ExperienceId, out var experience)
-        ? experience
-        : null;
+    private WorkshopDeepDiveModel? Model =>
+        DeepDiveCatalog.TryResolve((ulong)ExperienceId, out var model) ? model : null;
+
+    private IExperience? CurrentExperience => Model?.Experience;
 
     private string ExperienceName => CurrentExperience?.Name ?? $"EXPERIENCE 0x{ExperienceId:X16}";
 
-    private ulong PrimaryBundleId => CurrentExperience?.MicroBundleIds.FirstOrDefault() ?? 0;
+    private ulong PrimaryBundleId => Model?.PrimaryBundle?.Id ?? 0;
 
-    private string DependencySummary => CurrentExperience is null
-        ? "UNRESOLVED EXPERIENCE"
-        : PrimaryBundleId == LivingGuiExperience.LivingGuiBundleId
-            ? "MONIKER → LIVING GUI"
-            : "DECLARED MICRO-BUNDLE DEPENDENCY";
+    private string DependencySummary => Model?.DependencySummary ?? "UNRESOLVED EXPERIENCE";
 
-    private string DependencyDescription => CurrentExperience is null
+    private string DependencyDescription => Model?.DependencyDescription
+        ?? "The requested Experience is not currently present in the Workshop Experience catalog.";
+
+    private string OntologySummary => Model?.OntologySummary ?? "UNRESOLVED";
+
+    private int SenseCount => CurrentExperience?.SenseCount ?? 0;
+
+    private string SensorySummary => CurrentExperience is null
         ? "The requested Experience is not currently present in the Workshop Experience catalog."
-        : "Dependencies belong to the MicroBundle contract. FSM_COS resolves them before the assembled runtime is handed to the presentation.";
+        : string.Join(" / ", CurrentExperience.SensorySystems);
+
+    private string CompositionGraph => Model is null
+        ? "Experience 0x{ExperienceId:X16}\n  └─ UNRESOLVED"
+        : $"Experience 0x{Model.Experience.Id:X16}\n"
+          + $"  └─ MicroBundles ({Model.Bundles.Count})\n"
+          + string.Join("\n", Model.Bundles.Select(bundle =>
+              $"       ├─ 0x{bundle.Id:X16}  v{bundle.Descriptor.Version}  deps:{bundle.Dependencies.Count}"));
 
     private void ReturnToExperience() => Navigation.NavigateTo("/");
     private void GoCreate() => Navigation.NavigateTo("/create");
