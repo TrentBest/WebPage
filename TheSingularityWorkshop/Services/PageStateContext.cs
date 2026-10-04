@@ -157,7 +157,6 @@ namespace TheSingularityWorkshop.Services
                 node.OffspringCount++;
                 newborns.Add(CreateSeed(node));
                 node.Phase = LivingNodePhase.ParentRecovery;
-                if (_livingNodes.Count + newborns.Count >= CriticalMass) break;
             }
             _livingNodes.AddRange(newborns);
         }
