@@ -38,7 +38,9 @@ public sealed class FirstContactPlantTests
         experience.Tick();
 
         Assert.Equal("Landing", experience.FirstContact.CurrentState);
-        Assert.Equal("Intro", experience.CurrentState);
+        Assert.Equal("LivingGui", experience.CurrentState);
+        Assert.NotNull(experience.RuntimeAssembly);
+        Assert.NotNull(experience.MonikerComposition);
         Assert.True(experience.FirstContact.IsLanding);
     }
 
