@@ -31,7 +31,7 @@ public sealed class FirstContactFsm : IDisposable
             .Transition("FirstOnly", "FirstFadingSecondComingIn", c => ((FirstContactContext)c).StatementOpacity >= 1d)
             .Transition("FirstFadingSecondComingIn", "SecondOnly", c => ((FirstContactContext)c).QuestionOpacity >= 1d)
             .Transition("SecondOnly", "Gateway", c => ((FirstContactContext)c).QuestionOpacity <= 0d)
-            .Transition("Gateway", "Moniker", c => ((FirstContactContext)c).EntryRequested)
+            .Transition("Gateway", "Landing", c => ((FirstContactContext)c).EntryRequested)
             .Transition("Moniker", "HubGrowth", c => ((FirstContactContext)c).Ticks >= 60)
             .Transition("HubGrowth", "Landing", c => ((FirstContactContext)c).HubReady)
             .WithInitialState("FirstOnly")
