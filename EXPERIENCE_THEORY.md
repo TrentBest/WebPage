@@ -8,7 +8,7 @@ An **Experience** is an environment comprised of MicroBundles.
 
 MicroBundles are the focused units of capability, behavior, content, and sensory contribution. An Experience is the environment in which those MicroBundles coexist and are executed.
 
-An Experience is therefore not synonymous with a Blazor page, a Unity scene, a component, or an idle/screen-saver state. Those are possible manifestations or hosts.
+An Experience is therefore not synonymous with a Blazor page, a host-specific scene, a component, or an idle/screen-saver state. Those are possible manifestations or hosts.
 
 ## Rule 1 — Environment
 
