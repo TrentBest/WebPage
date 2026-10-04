@@ -126,8 +126,8 @@
     {
         FSM.StateChanged += HandleFSMStateChanged;
 
-        if (FSM.CurrentState == PageFSM.Gateway && !FSM.Context.EnterRequested)
-            FSM.RequestEnter();
+        // Entry is authorized by Home only after FSM_COS has composed the
+        // Living GUI Experience and resolved its Moniker dependency.
     }
 
     private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
