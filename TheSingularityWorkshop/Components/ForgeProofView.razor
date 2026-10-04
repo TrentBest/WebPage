@@ -57,6 +57,7 @@
                 .Content(ActionButton("START", StartPreview, "#00eaff"))
                 .Content(ActionButton("TICK", TickPreview, "#ffd34d"))
                 .Content(ActionButton("STOP", StopPreview, "#ff2cff"))
+                .Content(ActionButton("DEEP DIVE", DeepDive, "#ffd34d"))
                 .Content(ActionButton("ENTER FORGE", EnterForge, "#52e05a"))));
 
         foreach (var entry in _preview.Events.TakeLast(5))
@@ -98,6 +99,9 @@
         _preview.Stop();
         StateHasChanged();
     }
+
+    private void DeepDive()
+        => Navigation.NavigateTo($"/deep-dive/{Experience.SelectedExperience?.Id ?? 3002}");
 
     private void EnterForge()
         => Navigation.NavigateTo("/explore");
