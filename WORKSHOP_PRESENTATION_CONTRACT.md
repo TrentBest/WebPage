@@ -21,6 +21,8 @@ PAGE_INITIALIZING
       v
 GATEWAY
       |
+      | label 1
+      | label 2
       | oversized Enter Workshop control
       | exactly 50% viewport width x 50% viewport height
       | avatar is an inscribed circle
@@ -28,6 +30,13 @@ GATEWAY
       v
 GATEWAY_EXIT
       |
+      | visitor has explicitly granted runtime permission
+      v
+FSM_COS_COMPOSE_EXPERIENCE
+      |
+      | resolve Living GUI Experience
+      | resolve Moniker MicroBundle dependency first
+      | only after successful composition may the runtime start
       v
 LIVING_GUI_IGNITION
       |
@@ -83,9 +92,10 @@ RUNNING
 7. **The three-second delay begins after the fall completes.** It is not an arbitrary page-load animation timer.
 8. **Navigation arrival is an eased layout transition.** The browser chrome may remain mounted, but it must not steal layout space until the arrival state; when it arrives, the panel contracts smoothly.
 9. **The UI is not the authority for counting or timing.** Razor renders FSM/context state. It does not own the presentation sequence.
-10. **The gateway does not visually present the moniker.** The button says `Enter Workshop`; the avatar is present, but the branding reveal is earned by critical mass.
-11. **The gateway control is oversized.** On desktop it is 50% of viewport width and 50% of viewport height. The avatar must be clipped as a true circle using equal dimensions and `border-radius: 50%`; no square image inside an oval.
-12. **Do not weaken tests to excuse a wrong sequence.** Fix the state/data flow.
+10. **The gateway does not visually present the moniker.** The first two labels and the warning card establish first contact; the button says `Enter Workshop`. The visitor's click is explicit permission to compose and run the selected Experience.
+11. **FSM_COS owns the Experience handoff.** The Living GUI Experience is composed only after entry permission. Its MicroBundle declares the canonical Moniker dependency, so the Moniker is installed by the composition system before the Living GUI runtime is started.
+12. **The gateway control is oversized.** On desktop it is 50% of viewport width and 50% of viewport height. The avatar must be clipped as a true circle using equal dimensions and `border-radius: 50%`; no square image inside an oval.
+13. **Do not weaken tests to excuse a wrong sequence.** Fix the state/data flow.
 
 ## MicroBundle direction
 
@@ -151,6 +161,6 @@ PAGE FSM / LIVING GUI
   +-- navigation / Hub becomes available
 ```
 
-The first-contact FSM must not own a competing Moniker or Hub-growth lifecycle. The Page FSM owns the Living GUI critical-mass sequence and the persistent Moniker reveal. This prevents two presentation state machines from fighting over the same identity.
+The first-contact FSM owns only the two-label invitation and gateway. It does not compose the Experience or own the Moniker. After explicit entry permission, FSM_COS composes the selected Experience and resolves its MicroBundle dependencies. The Page FSM then owns the Living GUI lifecycle and persistent Moniker reveal. This prevents two presentation state machines from fighting over the same identity.
 
 The two opening statements are presentation content, not implementation claims. They are followed by the explicit human choice to enter the Workshop.
