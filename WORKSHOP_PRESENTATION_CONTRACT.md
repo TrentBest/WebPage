@@ -121,3 +121,36 @@ Do not casually leak `The Singularity Workshop` into initial first-contact metad
 ## Agent proof rule
 
 Every meaningful change must advance the visible incremental version/test marker according to `AGENT_INCREMENTAL_RULE.md`. Report the commit SHA and marker version after repository work.
+
+
+## First-contact boundary
+
+The pre-entry presentation is intentionally separate from the Living GUI lifecycle:
+
+```text
+FIRST CONTACT FSM
+  |
+  +-- "THEY SAY A PICTURE IS WORTH A THOUSAND WORDS."
+  |
+  +-- "HOW MANY WORDS IS A LIVING IMAGE WORTH?"
+  |
+  +-- ENTER THE WORKSHOP + advisory
+  |
+  v
+LANDING HANDOFF
+  |
+  v
+PAGE FSM / LIVING GUI
+  |
+  +-- exactly 100 nodes
+  +-- freeze
+  +-- moniker behind population
+  +-- gravity FSM
+  +-- nodes fall away
+  +-- moniker persists
+  +-- navigation / Hub becomes available
+```
+
+The first-contact FSM must not own a competing Moniker or Hub-growth lifecycle. The Page FSM owns the Living GUI critical-mass sequence and the persistent Moniker reveal. This prevents two presentation state machines from fighting over the same identity.
+
+The two opening statements are presentation content, not implementation claims. They are followed by the explicit human choice to enter the Workshop.
