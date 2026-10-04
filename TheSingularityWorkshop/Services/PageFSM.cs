@@ -100,11 +100,15 @@ namespace TheSingularityWorkshop.Services
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
                 .State(MonikerReveal, Enter(c =>
                 {
-                    c.MonikerPresentationStartTick = c.TotalTicks;
+                    // This is the handoff beat: the population threshold has been
+                    // observed, but Gravity has not yet released the organisms.
+                    c.MonikerPresentationStartTick = -1;
                     behavior?.OnMonikerReveal?.Invoke(c);
                 }), Tick, null)
                 .State(Gravity, Enter(c =>
                 {
+                    c.MonikerPresentationStartTick = c.TotalTicks;
+                    c.MonikerReady = true;
                     c.GravityReleased = false;
                     c.LivingGuiFallen = false;
                     c.FreezeLivingGui();
@@ -123,7 +127,7 @@ namespace TheSingularityWorkshop.Services
                 {
                     var context = (PageStateContext)c;
                     return context.LivingGuiPopulated &&
-                           context.LivingNodes.Count > 1 &&
+                           context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold &&
                            context.PopulationCompletedTick >= 0 &&
                            context.TotalTicks > context.PopulationCompletedTick;
                 })
@@ -168,8 +172,7 @@ namespace TheSingularityWorkshop.Services
             context.TotalTicks++;
             context.StateTicks++;
 
-            if ((stateBeforeTick == LivingGuiPopulating ||
-                 stateBeforeTick == MonikerReveal) &&
+            if (stateBeforeTick == LivingGuiPopulating &&
                 !context.LivingGuiFrozen)
             {
                 _livingGuiRuntime.Update();
