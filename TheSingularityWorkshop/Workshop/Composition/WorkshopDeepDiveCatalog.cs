@@ -1,5 +1,6 @@
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
+using TheSingularityWorkshop.Workshop.DeepDive;
 
 namespace TheSingularityWorkshop.Workshop.Composition;
 
@@ -28,35 +29,38 @@ public sealed class WorkshopDeepDiveCatalog
             return false;
         }
 
-        var bundleIds = experience.MicroBundleIds.ToArray();
-        var bundles = bundleIds
+        var bundles = experience.MicroBundleIds
             .Select(id => _bundles.TryResolve(id, out var bundle) ? bundle : null)
             .Where(bundle => bundle is not null)
             .Cast<IMicroBundle>()
             .ToArray();
+
+        foreach (var microBundle in bundles)
+        {
+            var provider = microBundle.TryGetProvider<IDeepDiveProvider>();
+            if (provider is not null)
+            {
+                model = provider.Execute(experience, bundles);
+                return true;
+            }
+        }
 
         model = new WorkshopDeepDiveModel(experience, bundles);
         return true;
     }
 }
 
-/// <summary>
-/// Immutable educational projection of an Experience composition.
-/// </summary>
+/// <summary>Immutable educational projection of an Experience composition.</summary>
 public sealed class WorkshopDeepDiveModel
 {
-    public WorkshopDeepDiveModel(
-        IExperience experience,
-        IReadOnlyList<IMicroBundle> bundles)
+    public WorkshopDeepDiveModel(IExperience experience, IReadOnlyList<IMicroBundle> bundles)
     {
         Experience = experience;
         Bundles = bundles;
     }
 
     public IExperience Experience { get; }
-
     public IReadOnlyList<IMicroBundle> Bundles { get; }
-
     public IMicroBundle? PrimaryBundle => Bundles.FirstOrDefault();
 
     public int DeclaredDependencyCount =>
@@ -77,9 +81,6 @@ public sealed class WorkshopDeepDiveModel
                 : "The MicroBundle contracts declare these requirements. FSM_COS resolves the dependency closure before the assembled runtime is handed to the host.";
 
     public string OntologySummary =>
-        FormatOntology(Experience.Ontology);
-
-    private static string FormatOntology(OntologySignature ontology)
-        => string.Join(" / ", Enumerable.Range(0, OntologySignature.LayerCount)
-            .Select(layer => ontology[layer]));
+        string.Join(" / ", Enumerable.Range(0, OntologySignature.LayerCount)
+            .Select(layer => Experience.Ontology[layer]));
 }
