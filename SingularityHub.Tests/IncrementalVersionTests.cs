@@ -239,4 +239,14 @@ public sealed class IncrementalVersionTests
     public void V0_0_178RenderingResearchModuleCacheBusterAdvancedAfterVoxelChanges()
         => Assert.Equal("0.0.178", "0.0.178");
 
+
+    [ArchitectureTest(0, 0, 180)] [Fact(DisplayName = "V0.0.180 — Deep_Dive_Is_A_WebPage_Only_MicroBundle_Provider")]
+    public void V0_0_180DeepDiveIsAWebPageOnlyMicroBundleProvider()
+    {
+        var bundle = new TheSingularityWorkshop.Workshop.MicroBundles.LivingGuiExperienceMicroBundle();
+        var provider = bundle.TryGetProvider<TheSingularityWorkshop.Workshop.DeepDive.IDeepDiveProvider>();
+
+        Assert.NotNull(provider);
+        Assert.IsType<TheSingularityWorkshop.Workshop.DeepDive.LivingGuiDeepDiveProvider>(provider);
+    }
 }
