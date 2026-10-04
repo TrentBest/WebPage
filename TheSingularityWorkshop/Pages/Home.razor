@@ -1,6 +1,7 @@
 @page "/"
 @inject IJSRuntime JS
 @inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
+@inject TheSingularityWorkshop.Services.FSMManagerService FSM
 @implements IDisposable
 @using Microsoft.AspNetCore.Components
 @using TheSingularityWorkshop.Services
@@ -42,14 +43,15 @@
         }
         else if (Experience.CurrentState == "Intro")
         {
-            builder.OpenComponent<FirstContactView>(8);
-            builder.AddAttribute(9,"State","Landing");
-            builder.AddAttribute(10,"Ticks",Experience.FirstContact.StateTicks);
+            builder.OpenComponent<LivingGui>(8);
             builder.CloseComponent();
 
-            builder.OpenComponent<ForgeProofView>(11);
-            builder.AddAttribute(12,"Experience",Experience);
-            builder.CloseComponent();
+            if (FSM.CurrentState == PageFSM.Running)
+            {
+                builder.OpenComponent<ForgeProofView>(9);
+                builder.AddAttribute(10,"Experience",Experience);
+                builder.CloseComponent();
+            }
         }
     };
 
@@ -73,6 +75,7 @@
     {
         await JS.InvokeVoidAsync("interop.markWorkshopVisited");
         Experience.RequestEntry();
+        FSM.RequestEnter();
     }
 
     private void Tick(object? sender,System.Timers.ElapsedEventArgs e)
