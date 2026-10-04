@@ -181,10 +181,10 @@ public sealed class LivingGuiRuntimeTests
 
         const int guard = 10_000;
         var ticks = 0;
-        while (fsm.Context.LivingNodes.Count < 100 && ticks++ < guard)
+        while (fsm.Context.LivingNodes.Count < PageStateContext.PopulationObservationThreshold && ticks++ < guard)
             fsm.Update();
 
-        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.CriticalMass);
+        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold);
         Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:0");
         Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:1");
         Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage == "G:2");
@@ -199,10 +199,10 @@ public sealed class LivingGuiRuntimeTests
 
         const int guard = 10_000;
         var ticks = 0;
-        while (fsm.Context.LivingNodes.Count < PageStateContext.CriticalMass && ticks++ < guard)
+        while (fsm.Context.LivingNodes.Count < PageStateContext.PopulationObservationThreshold && ticks++ < guard)
             fsm.Update();
 
-        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.CriticalMass, "Living GUI did not reach the population observation threshold within the scheduler guard.");
+        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold, "Living GUI did not reach the population observation threshold within the scheduler guard.");
         Assert.False(fsm.Context.LivingGuiFrozen);
         var populationBefore = fsm.Context.LivingNodes.Count;
         for (var i = 0; i < 200; i++) fsm.Update();
