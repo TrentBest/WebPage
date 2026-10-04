@@ -207,3 +207,12 @@ The system matches **content to context**, not people to hidden identity categor
 Composition should be inspectable and previewable: the runtime can derive a proposal, explain which bundles contributed to it, and let a human accept or edit the result before a consequential change is committed.
 
 See `WORLD_COMPOSITION_AND_HUMAN_AGENCY.md` for the full world-composition model.
+
+
+## Provider collections and WebPage-only Deep Dive
+
+A MicroBundle should be understood as a collection of optional providers/capabilities, not a monolithic UI object. Providers may cover state, rendering, interaction, persistence, metrics, or host-specific educational capabilities.
+
+The WebPage defines IDeepDiveProvider as a browser-only provider. A MicroBundle may expose it; WebPage discovers the first available provider while building the Deep Dive model.
+
+The provider is intentionally absent from shared runtime contracts. AnyApp, MyVR, and other hosts can resolve the same ontology and MicroBundle identity without carrying WebPage's educational presentation code. Their Deep Dive action should hand off to the user's default browser.
