@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.Services;
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
@@ -24,16 +25,24 @@ public sealed class WorkshopCompositionTests
         Assert.Equal("WORKSHOP", experience.MonikerComposition.Find("workshop").Text);
     }
 
-    [Fact(DisplayName = "Workshop startup composes ProtocolAI and GrammarAI into an extractable exchange")]
-    public void StartupComposesAiExchange()
+    [Fact(DisplayName = "FSM_COS composes ProtocolAI and GrammarAI into an extractable exchange")]
+    public void ExplicitlyComposesAiExchange()
     {
-        using var experience = new WorkshopExperienceService();
-        experience.Initialize();
-        AdvanceToGateway(experience);
-        experience.RequestEntry();
-        AdvanceToLanding(experience);
+        var compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
 
-        var ai = experience.AiExchangeComposition;
+        var runtime = compositionSystem.Execute(new RuntimeManifest(
+            RuntimeId: 4001UL,
+            Bundles: new[]
+            {
+                BundleRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
+            }));
+
+        var ai = runtime.TryGetBundle<AiExchangeCompositionBundle>(
+            AiExchangeCompositionBundle.BundleId,
+            out var aiBundle)
+            ? aiBundle
+            : null;
+
         Assert.NotNull(ai);
         Assert.NotNull(ai!.Protocol);
         Assert.NotNull(ai.Grammar);
@@ -45,24 +54,21 @@ public sealed class WorkshopCompositionTests
         Assert.Equal("ai.submit", ai.Composition.Find("ai-submit").Properties["command"]);
     }
 
-    [Fact(DisplayName = "Workshop composition includes the GUI-facing AI exchange bundle and its dependencies")]
-    public void StartupIncludesAiCompositionClosure()
+    [Fact(DisplayName = "Explicit FSM_COS AI composition includes its dependency closure")]
+    public void ExplicitAiCompositionIncludesClosure()
     {
-        using var experience = new WorkshopExperienceService();
-        experience.Initialize();
-        AdvanceToGateway(experience);
-        experience.RequestEntry();
-        AdvanceToLanding(experience);
+        var compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
 
-        Assert.Contains(
-            experience.RuntimeAssembly!.Bundles,
-            bundle => bundle.Id == AiExchangeCompositionBundle.ProtocolBundleId);
-        Assert.Contains(
-            experience.RuntimeAssembly.Bundles,
-            bundle => bundle.Id == AiExchangeCompositionBundle.GrammarBundleId);
-        Assert.Contains(
-            experience.RuntimeAssembly.Bundles,
-            bundle => bundle.Id == AiExchangeCompositionBundle.BundleId);
+        var runtime = compositionSystem.Execute(new RuntimeManifest(
+            RuntimeId: 4002UL,
+            Bundles: new[]
+            {
+                BundleRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
+            }));
+
+        Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.ProtocolBundleId);
+        Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.GrammarBundleId);
+        Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.BundleId);
     }
 
     private static void AdvanceToGateway(WorkshopExperienceService service)
