@@ -54,8 +54,7 @@ That GUI can reproduce.
 The reproduction can become a swarm.
 
 The swarm can overwhelm the screen, freeze, fall away under gravity, and reveal
-that the visitor is crossing from a Blazor/WebAssembly manifestation into a Unity
-WebGL runtime.
+that the visitor is crossing from the ordinary interface into the Workshop's living runtime.
 
 That is not decoration around the technology.
 
@@ -77,7 +76,7 @@ The durable guideposts are:
 - AI-facing deterministic command boundaries
 - ontology and mapping between human-readable and machine-efficient forms
 - data infrastructure through SingularityWarehouse
-- multiple manifestation domains, including Blazor and Unity/WebGL
+- multiple manifestation domains, including browser, desktop, and future hosts
 - software that can explain and demonstrate itself
 
 The implementation route toward those goals is expected to evolve.
@@ -141,7 +140,7 @@ GRAVITY
      |
      |  everything falls away
      v
-UNITY WEBGL
+MONIKER / WORKSHOP
      |
      v
 SHOWCASE / FORGE
@@ -208,7 +207,7 @@ A useful conceptual model is:
                        +----------+----------+
                        |                     |
                        v                     v
-                 Blazor / Web          Unity / WebGL
+                 Blazor / Web          Desktop / future hosts
 ```
 
 This is a direction, not a claim that every layer is already complete.
@@ -361,8 +360,6 @@ Provider
     |
     +-- Blazor
     +-- WPF
-    +-- Unity
-    +-- WebGL
     +-- other manifestation
 ```
 
@@ -519,7 +516,7 @@ Future articles should explore:
 - MicroBundles
 - deterministic AI command boundaries
 - ProtocolAI / Grammar / CommandAI
-- Unity/WebGL runtime boundaries
+- host and rendering runtime boundaries
 - rebuilding lost systems better than their originals
 - the strange engineering lessons discovered along the way
 
