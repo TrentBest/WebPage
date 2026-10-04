@@ -159,6 +159,21 @@ namespace TheSingularityWorkshop.Services
                 node.Phase = LivingNodePhase.ParentRecovery;
             }
             _livingNodes.AddRange(newborns);
+
+            // The first offspring marks the end of the opening population phase.
+            // It is a handoff signal, not a population cap: the living GUI continues
+            // reproducing while the moniker is presented.
+            if (newborns.Count > 0 && !LivingGuiPopulated)
+            {
+                LivingGuiPopulated = true;
+                MonikerReady = true;
+                PopulationCompletedTick = TotalTicks;
+            }
+        }
+
+        public void FreezeLivingGui()
+        {
+            LivingGuiFrozen = true;
         }
 
         public void AdvanceParentRecovery()
