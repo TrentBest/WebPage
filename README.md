@@ -597,3 +597,23 @@ they are not required to explain the architecture or prove the WebPage itself.
 
 The quality bar is simple: **the public site must be able to demonstrate what it claims,
 and the explanation must describe what the code actually does.**
+
+## WebPage experience architecture
+
+The WebPage is intentionally not a conventional marketing site. It is the **playable public entrance to The Singularity Workshop**.
+
+The visitor path is:
+
+```text
+ARRIVE -> WITNESS -> ENTER -> INHABIT -> UNDERSTAND -> CREATE -> PUBLISH / SHARE
+```
+
+The four primary Workshop surfaces are **Understand**, **Experiences**, **Create**, and **Publish**. Rendering, Education, Madmen, laboratories, and domain-specific destinations are instruments or destinations within that larger model; they do not redefine the Workshop's public identity.
+
+The design rule is:
+
+> **Do not ask the visitor to believe the architecture. Give them something they can touch.**
+
+The page should let people change state, enter environments, inspect composition, alter observer context, and see real consequences. Explanation follows evidence rather than replacing it.
+
+See `WEBPAGE_EXPERIENCE_ARCHITECTURE.md` for the canonical public-experience contract.
