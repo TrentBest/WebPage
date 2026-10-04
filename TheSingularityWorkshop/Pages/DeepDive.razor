@@ -2,8 +2,10 @@
 @using TheSingularityWorkshop.SingularityHub
 @using TheSingularityWorkshop.Services
 @using TheSingularityWorkshop.Workshop.Experiences
+@using TheSingularityWorkshop.Workshop.Composition
 @using TheSingularityWorkshop.Workshop.MicroBundles
 @inject NavigationManager Navigation
+@inject WorkshopExperienceCatalog ExperienceCatalog
 
 <PageTitle>Deep Dive // @ExperienceName</PageTitle>
 
@@ -47,9 +49,8 @@
             </article>
             <article>
                 <span>DEPENDENCY</span>
-                <strong>MONIKER → LIVING GUI</strong>
-                <p>The Living GUI bundle declares the canonical Moniker dependency. FSM_COS resolves
-                    that dependency before the assembled runtime is handed to the presentation.</p>
+                <strong>@DependencySummary</strong>
+                <p>@DependencyDescription</p>
             </article>
             <article>
                 <span>RUNTIME</span>
@@ -78,7 +79,7 @@
                 <code>
 Experience
   └─ MicroBundle
-       ├─ BundleId: @LivingGuiBundleId
+       ├─ BundleId: @PrimaryBundleId
        ├─ Version: 1.0.0
        └─ DependsOn: Moniker
 
@@ -152,15 +153,23 @@ code{display:block;padding:1.4rem;background:#01050a;border:1px solid rgba(255,2
 @code {
     [Parameter] public long ExperienceId { get; set; }
 
-    private string ExperienceName => ExperienceId == (long)new LivingGuiExperience().Id
-        ? "LIVING GUI"
-        : $"EXPERIENCE 0x{ExperienceId:X16}";
-
-    private IExperience? CurrentExperience => ExperienceId == LivingGuiExperience.ExperienceId
-        ? new LivingGuiExperience()
+    private IExperience? CurrentExperience => ExperienceCatalog.TryResolve((ulong)ExperienceId, out var experience)
+        ? experience
         : null;
 
+    private string ExperienceName => CurrentExperience?.Name ?? $"EXPERIENCE 0x{ExperienceId:X16}";
+
     private ulong PrimaryBundleId => CurrentExperience?.MicroBundleIds.FirstOrDefault() ?? 0;
+
+    private string DependencySummary => CurrentExperience is null
+        ? "UNRESOLVED EXPERIENCE"
+        : PrimaryBundleId == LivingGuiExperience.LivingGuiBundleId
+            ? "MONIKER → LIVING GUI"
+            : "DECLARED MICRO-BUNDLE DEPENDENCY";
+
+    private string DependencyDescription => CurrentExperience is null
+        ? "The requested Experience is not currently present in the Workshop Experience catalog."
+        : "Dependencies belong to the MicroBundle contract. FSM_COS resolves them before the assembled runtime is handed to the presentation.";
 
     private void ReturnToExperience() => Navigation.NavigateTo("/");
     private void GoCreate() => Navigation.NavigateTo("/create");
