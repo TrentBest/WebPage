@@ -14,10 +14,12 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
         var grammar = new GrammarAiCompositionBundle();
         var aiExchange = new AiExchangeCompositionBundle();
         var moniker = new MonikerMicroBundle();
+        var livingGui = new LivingGuiExperienceMicroBundle();
 
         _bundles = new Dictionary<ulong, CosMicroBundle>
         {
             [moniker.CosDescriptor.Id] = moniker,
+            [livingGui.Id] = livingGui,
             [protocol.Id] = protocol,
             [grammar.Id] = grammar,
             [aiExchange.Id] = aiExchange
