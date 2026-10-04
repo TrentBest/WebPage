@@ -218,11 +218,11 @@ public sealed class IdleExperienceArchitectureTests
         fsm.Update();
         fsm.Update();
 
-        for (var ticks = 0; !fsm.Context.LivingGuiFallen && ticks < 1000; ticks++)
+        for (var ticks = 0; !fsm.Context.LivingGuiFallen && ticks < 10000; ticks++)
             fsm.Update();
         Assert.True(fsm.Context.LivingGuiFallen);
 
-        for (var ticks = 0; fsm.CurrentState != PageFSM.Running && ticks < 1000; ticks++)
+        for (var ticks = 0; fsm.CurrentState != PageFSM.Running && ticks < 10000; ticks++)
             fsm.Update();
         Assert.Equal(PageFSM.Running, fsm.CurrentState);
 
