@@ -158,15 +158,41 @@ public sealed class IncrementalVersionTests
         using var service = new TheSingularityWorkshop.Services.WorkshopExperienceService();
         service.Initialize(returningVisitor: true);
 
+        Assert.Null(service.RuntimeAssembly);
+        Assert.Null(service.MonikerComposition);
+    }
+
+
+    [ArchitectureTest(0, 0, 179)] [Fact(DisplayName = "V0.0.179 — Enter_Workshop_Composes_Living_GUI_Experience_And_Resolves_Moniker_First")]
+    public void V0_0_179EnterWorkshopComposesLivingGuiExperienceAndResolvesMonikerFirst()
+    {
+        using var service = new TheSingularityWorkshop.Services.WorkshopExperienceService();
+        service.Initialize(returningVisitor: true);
+
+        for (var i = 0; i < 500 && service.FirstContact.CurrentState != "Gateway"; i++)
+            service.Tick();
+
+        Assert.Equal("Gateway", service.FirstContact.CurrentState);
+
+        service.RequestEntry();
+
+        for (var i = 0; i < 20 && service.CurrentState != "LivingGui"; i++)
+            service.Tick();
+
+        Assert.Equal("LivingGui", service.CurrentState);
+        Assert.NotNull(service.SelectedExperience);
+        Assert.Equal("LIVING GUI", service.SelectedExperience!.Name);
         Assert.NotNull(service.RuntimeAssembly);
         Assert.True(service.RuntimeAssembly!.TryGetBundle<TheSingularityWorkshop.Workshop.MicroBundles.MonikerMicroBundle>(
             (ulong)TheSingularityWorkshop.Workshop.MicroBundles.MonikerMicroBundle.BundleId,
             out var moniker));
         Assert.NotNull(moniker);
         Assert.NotNull(moniker!.Composition);
+        Assert.True(service.RuntimeAssembly.TryGetBundle<TheSingularityWorkshop.Workshop.MicroBundles.LivingGuiExperienceMicroBundle>(
+            TheSingularityWorkshop.Workshop.MicroBundles.LivingGuiExperienceMicroBundle.BundleId,
+            out _));
         Assert.Same(moniker.Composition, service.MonikerComposition);
     }
-
 
     [ArchitectureTest(0, 0, 173)] [Fact(DisplayName = "V0.0.173 — Forge_Stock_Ingots_Become_Authored_State_And_Transition_Plates")]
     public void V0_0_173ForgeStockIngotsBecomeAuthoredStateAndTransitionPlates() => Assert.Equal("0.0.173", "0.0.173");
