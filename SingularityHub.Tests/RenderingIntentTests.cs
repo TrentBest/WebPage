@@ -24,6 +24,7 @@ public sealed class RenderingIntentTests
         Assert.Equal("3D", perspective.Domain);
         Assert.Equal("engineering", perspective.TargetId);
     }
+
     [Fact(DisplayName = "Rendering research module uses an explicit cache-busting asset version")]
     public void RenderingResearchModuleUsesExplicitCacheBustingAssetVersion()
     {
@@ -32,10 +33,9 @@ public sealed class RenderingIntentTests
             "..", "..", "..", "..",
             "TheSingularityWorkshop", "Pages", "Explore3D.razor"));
 
-        Assert.Contains("@page "/rendering-lab"", explore);
-        Assert.DoesNotContain("@page "/rendering"", explore);
+        Assert.Contains("@page \"/rendering-lab\"", explore);
+        Assert.DoesNotContain("@page \"/rendering\"", explore);
         Assert.Contains("voxel-substrate-lab.js?v=178", explore);
         Assert.DoesNotContain("voxel-substrate-lab.js?v=165", explore);
     }
-
 }
