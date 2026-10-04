@@ -67,7 +67,7 @@ public sealed class WorkshopDeepDiveModel
             ? "MICRO-BUNDLE NOT RESOLVED"
             : DeclaredDependencyCount == 0
                 ? "NO DECLARED DEPENDENCIES"
-                : $"{DeclaredDependencyCount} DECLARED DEPENDENCY{(DeclaredDependencyCount == 1 ? "" : "IES")}";
+                : $"{DeclaredDependencyCount} DECLARED DEPENDENC{(DeclaredDependencyCount == 1 ? "Y" : "IES")}";
 
     public string DependencyDescription =>
         PrimaryBundle is null
