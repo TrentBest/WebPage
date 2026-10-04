@@ -50,13 +50,15 @@ public sealed class MonikerExperienceTests
             service.Tick();
 
         Assert.Equal("Landing", service.FirstContact.CurrentState);
-        Assert.Equal("Intro", service.CurrentState);
+        Assert.Equal("LivingGui", service.CurrentState);
+        Assert.NotNull(service.RuntimeAssembly);
+        Assert.NotNull(service.MonikerComposition);
 
         for (var i = 0; i < 120; i++)
             service.Tick();
 
         Assert.Equal("Landing", service.FirstContact.CurrentState);
-        Assert.Equal("Intro", service.CurrentState);
+        Assert.Equal("LivingGui", service.CurrentState);
     }
 
     [Fact(DisplayName = "Gateway presentation uses the active first-contact gateway contract")]
