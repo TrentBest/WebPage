@@ -22,8 +22,6 @@ Provider
     |
     +-- Blazor
     +-- WPF
-    +-- Unity
-    +-- WebGL
     +-- other manifestation
 ```
 
@@ -179,7 +177,7 @@ A MicroBundle should have a clear lifecycle. If a behavior becomes a collection 
 
 ### Preserve manifestation portability
 
-Blazor is one manifestation. Unity/WebGL and WPF are other targets. A semantic MicroBundle should not become permanently dependent on its first host.
+Blazor is one manifestation. WPF and future hosts are other targets. A semantic MicroBundle should not become permanently dependent on its first host.
 
 ### Preserve integer identity
 
