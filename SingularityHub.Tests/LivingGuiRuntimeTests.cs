@@ -197,8 +197,8 @@ public sealed class LivingGuiRuntimeTests
         Assert.Contains(context.LivingNodes, node => node.Lineage.StartsWith("G:1-", System.StringComparison.Ordinal));
     }
 
-    [Fact(DisplayName = "Living GUI remains alive after reaching critical mass")]
-    public void LivingGui_RemainsAliveAfterCriticalMass()
+    [Fact(DisplayName = "Living GUI reaches the observation threshold and stops reproducing")]
+    public void LivingGui_ReachesObservationThresholdAndStopsReproducing()
     {
         var context = new PageStateContext();
         context.BeginLivingGui();
@@ -212,10 +212,11 @@ public sealed class LivingGuiRuntimeTests
             runtime.Update();
 
         Assert.True(context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold, "Living GUI did not reach the population observation threshold within the scheduler guard.");
+        Assert.Equal(PageStateContext.PopulationObservationThreshold, context.LivingNodes.Count);
         Assert.False(context.LivingGuiFrozen);
         var populationBefore = context.LivingNodes.Count;
         for (var i = 0; i < 200; i++) runtime.Update();
-        Assert.True(context.LivingNodes.Count > populationBefore, "Living GUI stopped reproducing after reaching the observation threshold.");
+        Assert.Equal(populationBefore, context.LivingNodes.Count);
         Assert.Contains(context.LivingNodes, node => node.Generation > 1);
     }
 
