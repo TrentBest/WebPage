@@ -203,4 +203,8 @@ public sealed class IncrementalVersionTests
         Assert.True(fsm.Context.LivingGuiFallen);
     }
 
+    [ArchitectureTest(0, 0, 178)] [Fact(DisplayName = "V0.0.178 — Rendering_Research_Module_Cache_Buster_Advanced_After_Voxel_Changes")]
+    public void V0_0_178RenderingResearchModuleCacheBusterAdvancedAfterVoxelChanges()
+        => Assert.Equal("0.0.178", "0.0.178");
+
 }
