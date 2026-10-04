@@ -40,6 +40,7 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(50, root.Y);
         Assert.Equal(200, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
+        Assert.Equal(0, root.Rotation);
     }
 
     [Fact(DisplayName = "Living GUI root actor animates from its original size to double before spawning")]
@@ -164,9 +165,6 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
         fsm.Update();
         Assert.Equal(LivingGuiFsm.ReproductionState, fsm.LivingGuiActivePhase);
-
-        fsm.Update();
-        Assert.Equal(LivingGuiFsm.ParentRecoveryState, fsm.LivingGuiActivePhase);
 
         fsm.Update();
         Assert.Equal(LivingGuiFsm.ParentRecoveryState, fsm.LivingGuiActivePhase);
