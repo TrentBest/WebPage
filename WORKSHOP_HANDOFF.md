@@ -62,7 +62,7 @@ LIVING GUI
         | critical mass
         | freeze / collapse / gravity
         v
-UNITY WEBGL
+MONIKER / WORKSHOP
         |
         v
 WORKSHOP / FORGE
@@ -242,7 +242,7 @@ STATE / IDENTITY
 DETERMINISTIC RUNTIME
    |
    +--> Blazor/WebAssembly
-   +--> Unity/WebGL
+   +--> Desktop / future hosts
    +--> WPF / other hosts
 ```
 
