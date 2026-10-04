@@ -11,22 +11,22 @@ namespace TheSingularityWorkshop.Services
     /// </summary>
     public sealed class PageStateContext : IStateContext
     {
-        public const int PopulationObservationThreshold = 100;
+        public static int PopulationObservationThreshold => WorkshopPresentationProfile.Current.PopulationThreshold;
         private const double RootSize = 50;
         private const double SeedSize = 10;
         private const double DefaultNodeSize = 50;
-        private const double GrowthStep = 20;
-        private const double MaximumNodeSize = 100;
-        private const double SeedFlightStep = 4.5;
-        private const double SeedScalingStep = 40;
-        private const double ParentRecoveryStep = 80;
+        private double GrowthStep => _growthStep;
+        private double MaximumNodeSize => _maximumNodeSize;
+        private double SeedFlightStep => _seedFlightStep;
+        private double SeedScalingStep => _seedScalingStep;
+        private double ParentRecoveryStep => _parentRecoveryStep;
         private const double MinX = 10;
         private const double MaxX = 90;
         private const double MinY = 10;
         private const double MaxY = 90;
         private const double RootGrowthStep = 20;
-        private const double GravityAcceleration = 1.15;
-        private readonly SquirrelRng _random = new(0x50414745u);
+        private double GravityAcceleration => _gravityAcceleration;
+        private readonly SquirrelRng _random = new(0x50414745u);\n        private readonly double _growthStep;\n        private readonly double _maximumNodeSize;\n        private readonly double _seedFlightStep;\n        private readonly double _seedScalingStep;\n        private readonly double _parentRecoveryStep;\n        private readonly double _gravityAcceleration;
         private readonly List<LivingNodeState> _livingNodes = new();
         private bool _enterRequested;
 
@@ -52,7 +52,19 @@ namespace TheSingularityWorkshop.Services
         public bool NeedsReproduction => _livingNodes.Exists(node => node.Phase == LivingNodePhase.ReproductionPending);
         public bool NeedsParentRecovery => _livingNodes.Exists(node => node.Phase == LivingNodePhase.ParentRecovery);
 
-        public PageStateContext(object? singularityHub = null) { Name = "PageFSMContext"; IsValid = true; SingularityHub = singularityHub; }
+        public PageStateContext(object? singularityHub = null)
+        {
+            Name = "PageFSMContext";
+            IsValid = true;
+            SingularityHub = singularityHub;
+            var profile = WorkshopPresentationProfile.Current;
+            _growthStep = profile.GrowthStep;
+            _maximumNodeSize = profile.MaximumNodeSize;
+            _seedFlightStep = profile.SeedFlightStep;
+            _seedScalingStep = profile.SeedScalingStep;
+            _parentRecoveryStep = profile.ParentRecoveryStep;
+            _gravityAcceleration = profile.GravityAcceleration;
+        }
         public void ResetStateClock() => StateTicks = 0;
 
         public void BeginLivingGui()
