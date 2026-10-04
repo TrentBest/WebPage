@@ -78,6 +78,8 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(40, child.Size);
         Assert.Equal(50, child.X);
         Assert.Equal(50, child.Y);
+        Assert.InRange(child.Rotation, -180, 180);
+        Assert.NotEqual(0, child.Rotation);
         Assert.InRange(child.TargetX, 10, 90);
         Assert.InRange(child.TargetY, 10, 90);
         Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, child.Phase);
@@ -191,21 +193,23 @@ public sealed class LivingGuiRuntimeTests
         Assert.Contains(fsm.Context.LivingNodes, node => node.Lineage.StartsWith("G:1-", System.StringComparison.Ordinal));
     }
 
-    [Fact(DisplayName = "Living GUI reaches exact critical mass through its isolated scheduler")]
-    public void LivingGui_ReachesExactCriticalMass()
+    [Fact(DisplayName = "Living GUI remains alive after reaching critical mass")]
+    public void LivingGui_RemainsAliveAfterCriticalMass()
     {
         using var fsm = new PageFSM();
         fsm.RequestEnter();
 
         const int guard = 10_000;
         var ticks = 0;
-        while (!fsm.Context.LivingGuiPopulated && ticks++ < guard)
+        while (fsm.Context.LivingNodes.Count < PageStateContext.CriticalMass && ticks++ < guard)
             fsm.Update();
 
-        Assert.True(fsm.Context.LivingGuiPopulated, "Living GUI did not reach critical mass within the scheduler guard.");
-        Assert.True(fsm.Context.LivingGuiFrozen);
-        Assert.Equal(PageStateContext.CriticalMass, fsm.Context.LivingNodes.Count);
-        Assert.True(fsm.Context.MonikerReady);
+        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.CriticalMass, "Living GUI did not reach the population observation threshold within the scheduler guard.");
+        Assert.False(fsm.Context.LivingGuiFrozen);
+        var populationBefore = fsm.Context.LivingNodes.Count;
+        for (var i = 0; i < 200; i++) fsm.Update();
+        Assert.True(fsm.Context.LivingNodes.Count > populationBefore, "Living GUI stopped reproducing after reaching the observation threshold.");
+        Assert.True(fsm.Context.LivingNodes.Any(node => node.Generation > 1));
     }
 
     [Fact(DisplayName = "PageFSM registers its root and nested process groups with the Hub")]
