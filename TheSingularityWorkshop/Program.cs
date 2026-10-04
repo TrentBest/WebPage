@@ -29,6 +29,8 @@ internal class Program
         builder.Services.AddScoped<BlazorFSMIntegration>();
         builder.Services.AddScoped<WorkshopExperienceService>();
         builder.Services.AddSingleton<WorkshopExperienceCatalog>();
+        builder.Services.AddSingleton<WorkshopCompositionCatalog>();
+        builder.Services.AddSingleton<WorkshopDeepDiveCatalog>();
         builder.Services.AddScoped<WorkshopWorldClient>();
         builder.Services.AddScoped<IWorkshopStorage, BrowserWorkshopStorage>();
         builder.Services.AddScoped<WorkshopAssetLibrary>();
