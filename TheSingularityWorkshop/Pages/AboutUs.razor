@@ -1,78 +1,212 @@
-﻿@page "/about-us"
-<PageTitle>About The Singularity Workshop | Forging Software for the Singularity</PageTitle>
+@page "/about-us"
+<PageTitle>Understand The Singularity Workshop</PageTitle>
 
-<div class="container py-5">
-    <header class="text-center mb-5">
-        <div class="mb-4">
-            <img src="/Images/TheSingularityWorkshopLogo.png" alt="The Singularity Workshop Logo" style="max-height: 100px; width: auto;" />
+<div class="workshop-understand">
+    <header class="understand-hero">
+        <div class="understand-kicker">THE SINGULARITY WORKSHOP // UNDERSTAND</div>
+        <h1>We are not building one giant application.</h1>
+        <p class="understand-lede">
+            We are building a set of small, composable pieces that can be assembled into
+            different experiences, run in different hosts, and explained in terms humans can actually follow.
+        </p>
+        <div class="understand-actions">
+            <a class="understand-action primary" href="create">SEE HOW IT COMPOSES</a>
+            <a class="understand-action" href="explore">ENTER AN EXPERIENCE</a>
         </div>
-        <h1 class="display-3 fw-bold text-primary">The Singularity Workshop</h1>
-        <p class="lead text-muted fst-italic">"Forging Software for the Singularity" - Our Mission Unfolds.</p>
     </header>
 
-    <div class="row feature-block align-items-center mb-5 p-4 rounded-3 border border-success shadow-sm bg-light">
-        <div class="col-lg-12 text-center">
-            <h2 class="h4 fw-bold text-success">Phase I: The FSM_API - Core Logic Unbound & Proven</h2>
-            <p class="mb-3">
-                The <strong>Finite State Machine API</strong> is our flagship, engine-agnostic logic framework, rigorously tested and integrated across diverse .NET environments, from Console and WPF applications to this very Blazor webpage. It is the stable, deterministic core designed to manage the complexity of your most ambitious applications.
-            </p>
-            <a href="https://www.nuget.org/packages/TheSingularityWorkshop.FSM_API" target="_blank" class="btn btn-success btn-lg me-3">
-                <span class="oi oi-arrow-circle-right" aria-hidden="true"></span> Integrate FSM_API via NuGet
-            </a>
-            <span class="ms-3 text-muted fw-bold">Unity Asset: Coming Soon (In Submission)</span>
-        </div>
-    </div>
+    <section class="understand-section">
+        <div class="section-kicker">01 // THE PROBLEM</div>
+        <h2>Complex software becomes a monolith surprisingly easily.</h2>
+        <p>
+            A feature starts inside an application because that is the fastest place to prove it.
+            Then another feature needs it. Then another host needs it. Eventually the application
+            knows about the data, the renderer knows about the behavior, the UI knows about the
+            storage, and changing one thing means touching everything.
+        </p>
+        <p class="accent-copy">
+            The Workshop is an attempt to stop that collapse.
+        </p>
+    </section>
 
-    <hr class="my-5" />
+    <section class="understand-section">
+        <div class="section-kicker">02 // THE ARCHITECTURE</div>
+        <h2>Separate the jobs. Compose the result.</h2>
 
-    <div class="text-center mb-4">
-        <h2 class="display-6 fw-bold text-info">Our Technological Pathway</h2>
-        <p class="text-muted">Four distinct, interconnected technologies driving the creation of the next digital era.</p>
-    </div>
-
-    <div class="row g-4">
-        <div class="col-md-6 col-lg-3">
-            <div class="card h-100 bg-dark text-white shadow">
-                <div class="card-body">
-                    <div class="text-warning mb-2"><span class="oi oi-puzzle-piece display-6"></span></div>
-                    <h5 class="card-title fw-bold text-warning">FSM Layer (Phase II)</h5>
-                    <p class="card-text text-small">A vast, commercial library of state-driven systems, packaged as modular Unity assets ($15 - $75). Provides pre-built logic for jobification, serialization, design patterns, and more—a massive component toolbox for creators.</p>
+        <div class="architecture-stack">
+            <article class="architecture-card core">
+                <span class="architecture-index">A</span>
+                <div>
+                    <strong>FSM_API</strong>
+                    <p>State and behavior. Small, deterministic building blocks for lifecycle and execution.</p>
                 </div>
-            </div>
+                <a href="https://github.com/TrentBest/FSM_API" target="_blank" rel="noopener">SOURCE ↗</a>
+            </article>
+
+            <article class="architecture-card compose">
+                <span class="architecture-index">B</span>
+                <div>
+                    <strong>FSM_COS</strong>
+                    <p>Composition. A manifest asks for capabilities; independent MicroBundles are loaded, arbitrated, and sealed into a runtime assembly.</p>
+                </div>
+                <a href="https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS" target="_blank" rel="noopener">SOURCE ↗</a>
+            </article>
+
+            <article class="architecture-card bundle">
+                <span class="architecture-index">C</span>
+                <div>
+                    <strong>MICROBUNDLES</strong>
+                    <p>Capabilities. A bundle can describe behavior or semantic effects without becoming a WebPage, WPF, or Unity application.</p>
+                </div>
+                <a href="https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain" target="_blank" rel="noopener">DOMAIN ↗</a>
+            </article>
+
+            <article class="architecture-card data">
+                <span class="architecture-index">D</span>
+                <div>
+                    <strong>REPOSITORIES + WAREHOUSE</strong>
+                    <p>Artifacts and persistent reality are separate concerns: repositories deliver bundles; SingularityWarehouse carries identity, mappings, provenance, telemetry, and domain data.</p>
+                </div>
+                <a href="https://github.com/TrentBest/SingularityWarehouse" target="_blank" rel="noopener">WAREHOUSE ↗</a>
+            </article>
+
+            <article class="architecture-card semantic">
+                <span class="architecture-index">E</span>
+                <div>
+                    <strong>PROTOCOL + GRAMMAR</strong>
+                    <p>Human-readable meaning can cross a deterministic boundary into compact, machine-addressable identity and structure.</p>
+                </div>
+                <div class="architecture-links">
+                    <a href="https://github.com/TrentBest/TheSingularityWorkshop.ProtocolAi" target="_blank" rel="noopener">PROTOCOL ↗</a>
+                    <a href="https://github.com/TrentBest/TheSingularityWorkshop.GrammarAi" target="_blank" rel="noopener">GRAMMAR ↗</a>
+                </div>
+            </article>
         </div>
 
-        <div class="col-md-6 col-lg-3">
-            <div class="card h-100 shadow">
-                <div class="card-body">
-                    <div class="text-info mb-2"><span class="oi oi-monitor display-6"></span></div>
-                    <h5 class="card-title fw-bold text-info">AnyApp / Experiences (Phase III)</h5>
-                    <p class="card-text text-small">A refactoring of application development into a minimal, self-loading **AnyApp** consuming an **Experience** manifest (any sensory output). This website is evolving to become the sole distributor and controller for these modular digital creations.</p>
-                </div>
-            </div>
+        <div class="assembly-line" aria-label="Workshop composition flow">
+            <span>MANIFEST</span><b>→</b><span>CAPABILITIES</span><b>→</b><span>ARBITRATION</span><b>→</b><span>RUNTIME</span><b>→</b><span>EXPERIENCE</span>
         </div>
+    </section>
 
-        <div class="col-md-6 col-lg-3">
-            <div class="card h-100 bg-secondary text-white shadow">
-                <div class="card-body">
-                    <div class="text-danger mb-2"><span class="oi oi-cloud display-6"></span></div>
-                    <h5 class="card-title fw-bold text-danger">MyVR (Phase IV)</h5>
-                    <p class="card-text text-small">The ultimate cloud-hosted metaverse where AnyApp experiences converge into themed domains (shopping, arts, etc.). Our unique economic model pairs digital content with in-app purchase of real-world goods and accompanying digital copies.</p>
-                </div>
-            </div>
-        </div>
+    <section class="understand-section impact-section">
+        <div class="section-kicker">03 // WHY IT MATTERS</div>
+        <h2>What this changes for you</h2>
 
-        <div class="col-md-6 col-lg-3">
-            <div class="card h-100 shadow">
-                <div class="card-body">
-                    <div class="text-primary mb-2"><span class="oi oi-people display-6"></span></div>
-                    <h5 class="card-title fw-bold text-primary">Publisher & Contact</h5>
-                    <p class="card-text text-small">
-                        We have found some community in <strong>Coder Legion</strong> where we proudly publish articles showcasing our technology, the problems it solves, and how to make use of it..<br />
-                        **Primary Publisher Site:** <a href="https://coderlegion.com" target="_blank">coderlegion.com</a><br />
-                        **Contact:** [au@coderlegion.com]
-                    </p>
-                </div>
-            </div>
+        <div class="impact-grid">
+            <article>
+                <span class="impact-number">01</span>
+                <h3>Developers</h3>
+                <p>Use the small package you actually need instead of adopting an entire application framework.</p>
+            </article>
+            <article>
+                <span class="impact-number">02</span>
+                <h3>Teams</h3>
+                <p>Separate domain work from presentation work. A capability can be developed once and manifested in more than one host.</p>
+            </article>
+            <article>
+                <span class="impact-number">03</span>
+                <h3>AI systems</h3>
+                <p>Give probabilistic intelligence a deterministic vocabulary to operate against instead of asking it to invent executable syntax.</p>
+            </article>
+            <article>
+                <span class="impact-number">04</span>
+                <h3>Data owners</h3>
+                <p>Bring existing data into the ecosystem through adapters and repositories without turning the data source into the composition engine.</p>
+            </article>
+            <article>
+                <span class="impact-number">05</span>
+                <h3>Product builders</h3>
+                <p>Compose an Experience from capabilities instead of rebuilding the same application architecture for every new product.</p>
+            </article>
+            <article>
+                <span class="impact-number">06</span>
+                <h3>Users</h3>
+                <p>Get software that can be assembled around the experience you actually need, rather than navigating a monolith built around somebody else's assumptions.</p>
+            </article>
         </div>
-    </div>
+    </section>
+
+    <section class="understand-section">
+        <div class="section-kicker">04 // THE WEBPAGE YOU ARE IN</div>
+        <h2>The browser is a manifestation, not the architecture.</h2>
+        <p>
+            This WebPage is the public laboratory door. It is where the Workshop can demonstrate
+            living interfaces, spatial experiences, composition, education, rendering research,
+            and other experiments while the underlying packages remain independently useful.
+        </p>
+
+        <div class="manifestation-row">
+            <div><strong>WEBPAGE</strong><span>browser / Blazor</span></div>
+            <div><strong>ANYAPP</strong><span>desktop / local runtime</span></div>
+            <div><strong>MYVR</strong><span>future persistent manifestation</span></div>
+        </div>
+    </section>
+
+    <section class="understand-section examples-section">
+        <div class="section-kicker">05 // PROOF, NOT PROMISES</div>
+        <h2>The site should let you see the machinery.</h2>
+        <div class="example-grid">
+            <a href="explore"><strong>EXPLORE</strong><span>Walk through a living Workshop environment and inspect what the system can become.</span></a>
+            <a href="create"><strong>CREATE</strong><span>See the composition vocabulary: MicroBundles, manifests, arbitration, state, and runtime.</span></a>
+            <a href="education"><strong>EDUCATION</strong><span>See the same substrate applied to a shared lesson with multiple participants.</span></a>
+            <a href="madmen"><strong>MADMEN</strong><span>See a deliberately different domain exercise using the same Workshop style of separation.</span></a>
+        </div>
+        <p class="quiet-note">
+            Inventor and Revit are deliberately not part of this public opening story right now.
+            They remain useful examples of how external data can eventually enter the ecosystem.
+        </p>
+    </section>
+
+    <footer class="understand-footer">
+        <strong>THE WORKSHOP IS THE SYSTEM OF PIECES.</strong>
+        <span>THE EXPERIENCE IS WHAT WE COMPOSE FROM THEM.</span>
+    </footer>
 </div>
+
+<style>
+    .workshop-understand{min-height:100vh;margin:-1rem -1.5rem;padding:clamp(1.25rem,4vw,4rem);box-sizing:border-box;background:radial-gradient(circle at 72% 8%,rgba(0,234,255,.09),transparent 28%),radial-gradient(circle at 18% 62%,rgba(255,44,255,.07),transparent 25%),#020711;color:#eafcff;font-family:Consolas,'Courier New',monospace}
+    .understand-hero{max-width:1100px;margin:0 auto;padding:clamp(2rem,7vw,6rem) 0 5rem}
+    .understand-kicker,.section-kicker{color:#00eaff;font-size:.62rem;letter-spacing:.2em}
+    .understand-hero h1{max-width:1000px;margin:.75rem 0 1.2rem;font-size:clamp(2.5rem,7vw,6.8rem);line-height:.94;letter-spacing:-.055em}
+    .understand-lede{max-width:850px;color:#91aab4;font-family:system-ui,sans-serif;font-size:clamp(1rem,2vw,1.3rem);line-height:1.65}
+    .understand-actions{display:flex;flex-wrap:wrap;gap:.65rem;margin-top:1.8rem}
+    .understand-action{padding:.75rem 1rem;border:1px solid rgba(255,44,255,.4);color:#ff7cff;text-decoration:none;font-size:.62rem;letter-spacing:.1em}
+    .understand-action:hover{color:#fff;border-color:#00eaff;background:rgba(0,234,255,.05)}
+    .understand-action.primary{border-color:rgba(0,234,255,.55);color:#00eaff}
+    .understand-section{max-width:1100px;margin:0 auto;padding:4rem 0;border-top:1px solid rgba(0,234,255,.12)}
+    .understand-section h2{max-width:900px;margin:.65rem 0 1rem;font-size:clamp(1.8rem,4vw,3.7rem);line-height:1}
+    .understand-section>p{max-width:900px;color:#91aab4;font-family:system-ui,sans-serif;line-height:1.7}
+    .accent-copy{color:#fff!important;font:700 clamp(1rem,2vw,1.25rem) Consolas,'Courier New',monospace!important}
+    .architecture-stack{display:grid;gap:.65rem;margin-top:2rem}
+    .architecture-card{display:grid;grid-template-columns:2.2rem 1fr auto;align-items:center;gap:1rem;padding:1rem;border:1px solid rgba(0,234,255,.15);background:rgba(3,12,24,.68)}
+    .architecture-card:hover{border-color:rgba(0,234,255,.42);transform:translateX(4px)}
+    .architecture-index{color:#ff2cff;font-size:.65rem}
+    .architecture-card strong{font-size:.78rem;letter-spacing:.1em}
+    .architecture-card p{margin:.35rem 0 0;color:#718e99;font-family:system-ui,sans-serif;font-size:.83rem;line-height:1.45}
+    .architecture-card a{color:#00eaff;text-decoration:none;font-size:.55rem;letter-spacing:.08em;white-space:nowrap}
+    .architecture-card a:hover{text-decoration:underline}
+    .architecture-links{display:flex;gap:.7rem}
+    .assembly-line{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.7rem;margin-top:1.5rem;padding:1rem;border:1px solid rgba(255,44,255,.16);color:#d8faff;font-size:.58rem;letter-spacing:.08em;background:rgba(255,44,255,.025)}
+    .assembly-line b{color:#ff2cff}
+    .impact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:2rem}
+    .impact-grid article{min-height:180px;padding:1rem;border:1px solid rgba(0,234,255,.12);background:rgba(3,12,24,.55)}
+    .impact-number{color:#ff2cff;font-size:.55rem}
+    .impact-grid h3{margin:.55rem 0;font-size:.82rem;letter-spacing:.08em}
+    .impact-grid p{margin:0;color:#718e99;font-family:system-ui,sans-serif;font-size:.82rem;line-height:1.55}
+    .manifestation-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-top:1.5rem}
+    .manifestation-row div{padding:1.2rem;border:1px solid rgba(255,211,77,.2);background:rgba(255,211,77,.025)}
+    .manifestation-row strong,.manifestation-row span{display:block}
+    .manifestation-row strong{color:#ffd34d;font-size:.75rem}
+    .manifestation-row span{margin-top:.35rem;color:#718e99;font-family:system-ui,sans-serif;font-size:.78rem}
+    .example-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:1.5rem}
+    .example-grid a{display:block;padding:1.1rem;border:1px solid rgba(255,44,255,.15);color:#eafcff;text-decoration:none;background:rgba(3,12,24,.5)}
+    .example-grid a:hover{border-color:#ff2cff;background:rgba(255,44,255,.035)}
+    .example-grid strong,.example-grid span{display:block}
+    .example-grid strong{color:#00eaff;font-size:.7rem;letter-spacing:.1em}
+    .example-grid span{margin-top:.4rem;color:#718e99;font-family:system-ui,sans-serif;font-size:.82rem;line-height:1.5}
+    .quiet-note{margin-top:1.5rem!important;color:#5c737d!important;font-size:.78rem!important}
+    .understand-footer{max-width:1100px;margin:0 auto;padding:2rem 0 4rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;color:#5f7a84;font-size:.55rem;letter-spacing:.12em}
+    .understand-footer strong{color:#00eaff}
+    @@media(max-width:800px){.architecture-card{grid-template-columns:1.8rem 1fr}.architecture-card>a,.architecture-links{grid-column:2}.impact-grid{grid-template-columns:1fr 1fr}.manifestation-row{grid-template-columns:1fr}.understand-hero{padding-bottom:3rem}}
+    @@media(max-width:560px){.impact-grid,.example-grid{grid-template-columns:1fr}.understand-section{padding:2.8rem 0}.architecture-card p{font-size:.76rem}}
+</style>
