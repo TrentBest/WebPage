@@ -18,7 +18,7 @@ public sealed class MonikerExperienceTests
         service.RequestEntry();
         service.Tick();
 
-        Assert.Equal("Moniker", service.FirstContact.CurrentState);
+        Assert.Equal("Landing", service.FirstContact.CurrentState);
         Assert.False(service.ShowUnity);
     }
 
