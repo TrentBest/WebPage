@@ -255,7 +255,6 @@ Eventually the Workshop should demonstrate software constructing software:
 ```text
 Field
  -> Pong
- -> Unity
  -> Workshop
  -> FSM telemetry
  -> Simulation Lab
@@ -292,7 +291,7 @@ Avoid:
 
 `NavMenu.razor` currently contains Home, AI, Demos, Privacy Policy, Vote on Name, About, and LoginStatus.
 
-Earlier versions also contained important Booking and Unity Asset Store/package links. Verify the history/current desired navigation before rewriting this file; do not accidentally delete useful existing destinations while working on AI.
+Earlier versions also contained important Booking and legacy package links. Verify the history/current desired navigation before rewriting this file; do not accidentally delete useful existing destinations while working on AI.
 
 ## Files worth opening first
 
