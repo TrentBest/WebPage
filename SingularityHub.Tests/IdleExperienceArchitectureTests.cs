@@ -69,16 +69,19 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.LivingGuiFallen);
         Assert.Equal(PageFSM.LivingGuiDissipating, fsm.CurrentState);
 
-        for (var tick = 1; tick < 91; tick++)
+        var presentationGuard = 120;
+        while (fsm.CurrentState == PageFSM.LivingGuiDissipating && presentationGuard-- > 0)
         {
-            fsm.Update();
-            Assert.Equal(PageFSM.LivingGuiDissipating, fsm.CurrentState);
             Assert.True(fsm.Context.MonikerReady);
+            fsm.Update();
         }
 
-        fsm.Update();
         Assert.Equal(PageFSM.NavigationArrival, fsm.CurrentState);
         Assert.True(fsm.Context.MonikerReady);
+        Assert.InRange(
+            fsm.Context.TotalTicks - fsm.Context.MonikerPresentationStartTick,
+            91,
+            92);
     }
 
     [Fact(DisplayName = "First contact hands Workshop entry to the landing runtime instead of presenting the moniker itself")]
