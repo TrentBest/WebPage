@@ -25,15 +25,11 @@ public sealed class FirstContactFsm : IDisposable
             .State("FirstFadingSecondComingIn", EnterCrossfade, UpdateCrossfade, null)
             .State("SecondOnly", EnterSecondOnly, UpdateSecondOnly, null)
             .State("Gateway", EnterGateway, UpdateGateway, null)
-            .State("Moniker", EnterState, UpdateClock, null)
-            .State("HubGrowth", EnterState, UpdateClock, null)
             .State("Landing", null, null, null)
             .Transition("FirstOnly", "FirstFadingSecondComingIn", c => ((FirstContactContext)c).StatementOpacity >= 1d)
             .Transition("FirstFadingSecondComingIn", "SecondOnly", c => ((FirstContactContext)c).QuestionOpacity >= 1d)
             .Transition("SecondOnly", "Gateway", c => ((FirstContactContext)c).QuestionOpacity <= 0d)
             .Transition("Gateway", "Landing", c => ((FirstContactContext)c).EntryRequested)
-            .Transition("Moniker", "HubGrowth", c => ((FirstContactContext)c).Ticks >= 60)
-            .Transition("HubGrowth", "Landing", c => ((FirstContactContext)c).HubReady)
             .WithInitialState("FirstOnly")
             .BuildDefinition();
 
@@ -54,7 +50,6 @@ public sealed class FirstContactFsm : IDisposable
 
     public void Start() => _context.Started = true;
     public void RequestEntry() => _context.EntryRequested = true;
-    public void SetHubReady() => _context.HubReady = true;
 
     public void Update()
     {
@@ -71,8 +66,6 @@ public sealed class FirstContactFsm : IDisposable
         {
             "FirstFadingSecondComingIn" => FirstContactSoundCue.DigitalResonance,
             "Gateway" => FirstContactSoundCue.Silence,
-            "Moniker" => FirstContactSoundCue.Water,
-            "HubGrowth" => FirstContactSoundCue.HubArrival,
             "Landing" => FirstContactSoundCue.Silence,
             _ => FirstContactSoundCue.None
         };
@@ -145,11 +138,6 @@ public sealed class FirstContactFsm : IDisposable
         state.GatewayBreath = BreathWave(state.Ticks, 96d);
     }
 
-    private static void EnterState(IStateContext context)
-        => ((FirstContactContext)context).Ticks = 0;
-
-    private static void UpdateClock(IStateContext context)
-        => ((FirstContactContext)context).Ticks++;
 
     private static double FadeWave(double progress)
     {
@@ -188,7 +176,6 @@ public sealed class FirstContactFsm : IDisposable
         public bool Started { get; set; }
         public long Ticks { get; set; }
         public bool EntryRequested { get; set; }
-        public bool HubReady { get; set; }
         public double StatementOpacity { get; set; }
         public double QuestionOpacity { get; set; }
         public double GatewayBreath { get; set; }
