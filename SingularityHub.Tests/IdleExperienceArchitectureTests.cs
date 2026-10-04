@@ -140,8 +140,8 @@ public sealed class IdleExperienceArchitectureTests
         Assert.Equal(PageFSM.Gateway, second.CurrentState);
     }
 
-    [Fact(DisplayName = "Incremental Unit Test 09 — moniker becomes ready at first reproduction")]
-    public void IncrementalUnitTest09_MonikerBecomesReadyAtFirstReproduction()
+    [Fact(DisplayName = "Incremental Unit Test 09 — moniker waits for the population threshold and Gravity") ]
+    public void IncrementalUnitTest09_MonikerWaitsForPopulationThresholdAndGravity()
     {
         using var fsm = new PageFSM();
 
@@ -153,19 +153,26 @@ public sealed class IdleExperienceArchitectureTests
         var ticks = 0;
         while (!fsm.Context.LivingGuiPopulated && ticks++ < guard)
         {
-            Assert.True(fsm.Context.LivingNodes.Count <= 1);
+            Assert.True(fsm.Context.LivingNodes.Count < PageStateContext.PopulationObservationThreshold);
             Assert.False(fsm.Context.MonikerReady);
             fsm.Update();
         }
 
-        Assert.True(ticks < guard, "Living GUI did not reach first reproduction within the test guard.");
-        Assert.True(fsm.Context.LivingNodes.Count > 1);
+        Assert.True(ticks < guard, "Living GUI did not reach the population observation threshold within the test guard.");
+        Assert.True(fsm.Context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold);
         Assert.False(fsm.Context.LivingGuiFrozen);
-        Assert.True(fsm.Context.MonikerReady);
+        Assert.False(fsm.Context.MonikerReady);
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
 
         fsm.Update();
         Assert.Equal(PageFSM.MonikerReveal, fsm.CurrentState);
+        Assert.False(fsm.Context.MonikerReady);
+        Assert.False(fsm.Context.LivingGuiFrozen);
+
+        fsm.Update();
+        Assert.Equal(PageFSM.Gravity, fsm.CurrentState);
+        fsm.Update();
+        Assert.True(fsm.Context.LivingGuiFrozen);
         Assert.True(fsm.Context.MonikerReady);
     }
 
