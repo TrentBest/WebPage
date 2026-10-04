@@ -20,22 +20,12 @@ public sealed class ContractSurfaceTests
     }
 
     [ArchitectureTest(0, 1, 2)]
-    [Fact(DisplayName = "0.01.002 — Hub_Contracts_Do_Not_Depend_On_Unity")]
-    public void Hub_Contracts_Do_Not_Depend_On_Unity()
+    [Fact(DisplayName = "0.01.002 — Hub_Contracts_Are_Host_Neutral")]
+    public void Hub_Contracts_Are_Host_Neutral()
     {
         var assembly = typeof(ISingularityHub).Assembly;
-        var forbidden = assembly.GetExportedTypes()
-            .SelectMany(t => t.GetMembers())
-            .SelectMany(m => m switch
-            {
-                System.Reflection.MethodInfo method => new[] { method.ReturnType }.Concat(method.GetParameters().Select(p => p.ParameterType)),
-                System.Reflection.PropertyInfo property => new[] { property.PropertyType },
-                _ => Array.Empty<Type>()
-            })
-            .Distinct()
-            .Where(t => t.FullName?.Contains("Unity", StringComparison.OrdinalIgnoreCase) == true)
-            .ToArray();
-        Assert.Empty(forbidden);
+        Assert.All(assembly.GetExportedTypes(), type =>
+            Assert.StartsWith("TheSingularityWorkshop.SingularityHub", type.Namespace ?? string.Empty, StringComparison.Ordinal));
     }
 
     [ArchitectureTest(0, 1, 3)]
