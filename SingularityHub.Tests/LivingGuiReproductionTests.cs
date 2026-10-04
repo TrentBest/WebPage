@@ -79,12 +79,6 @@ public sealed class LivingGuiReproductionTests
         Assert.Equal(200, root.Size);
         Assert.Equal(200, seed.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, root.Phase);
-        Assert.Equal(PageStateContext.LivingNodePhase.ParentRecovery, seed.Phase);
-
-        context.AdvanceParentRecovery();
-        Assert.Equal(200, root.Size);
-        Assert.Equal(200, seed.Size);
-        Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, root.Phase);
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, seed.Phase);
     }
 
@@ -108,12 +102,12 @@ public sealed class LivingGuiReproductionTests
 
         using var runtime = new LivingGuiFsm(hub, context, "TestParent");
 
-        Assert.Equal(LivingGuiFsm.MatureGrowthState, runtime.ActivePhase);
+        Assert.Equal(LivingGuiFsm.ParentRecoveryState, runtime.ActivePhase);
         runtime.Update();
 
         Assert.Equal(200, parent.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, parent.Phase);
         Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, seed.Phase);
-        Assert.Equal(LivingGuiFsm.ParentRecoveryState, runtime.ActivePhase);
+        Assert.Equal(LivingGuiFsm.SeedFlightState, runtime.ActivePhase);
     }
 }
