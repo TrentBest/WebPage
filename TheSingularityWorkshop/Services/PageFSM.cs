@@ -27,7 +27,7 @@ namespace TheSingularityWorkshop.Services
 
         public static readonly TimeSpan DefaultMonikerPresentationDuration = TimeSpan.FromSeconds(3);
         private const long GravityReleaseTicks = 1;
-        private const long MonikerPresentationTicks = 91;
+        private long MonikerPresentationTicks => Math.Max(1, (long)Math.Round(MonikerPresentationDuration.TotalMilliseconds / 33.0));
 
         private readonly FSMHandle _handle;
         private readonly LivingGuiFsm _livingGuiRuntime;
