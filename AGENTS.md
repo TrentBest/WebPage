@@ -1,319 +1,171 @@
-# The Singularity Workshop — Agent Instructions
+# The Singularity Workshop — WebPage Agent Instructions
 
-This repository is an active engineering experiment, not a conventional marketing site.
+This repository is an active engineering proving ground.
 
 ## Branch safety
 
-- The repository is intentionally consolidated to two branches:
-- `development` is the active engineering branch.
-- `master` is the stable promotion target.
-- **Do not create another feature branch merely to avoid integration work.** Reconcile the work on `development`.
-- Keep changes coherent and preserve existing behavior before replacing it.
-- Before replacing an existing behavior, inspect its Git history. Strange code may be carrying intentional behavior from an earlier experiment.
+- development is active engineering.
+- master is the stable promotion target.
+- Do not modify master during ordinary development.
+- Preserve valuable behavior before replacing it.
+- Inspect history when unusual code may contain intentional behavior.
 
-## What we are building
+## What this repository is for
 
-The WebPage is becoming a living front door to **The Singularity Workshop**.
+WebPage is the browser proving ground for The Singularity Workshop.
 
-The guiding rule is:
+Its purpose is to demonstrate real behavior, expose architectural boundaries, move reusable functionality into independently owned packages, and document how those packages are used.
 
 > **Use the technology to build the technology.**
 
-The site should demonstrate the Workshop's architecture through its own behavior rather than merely describing it.
-
-The larger architecture connects:
-
-```text
-FSM_API
-   +
-SingularityWarehouse
-   +
-Workshop developer tooling
-   |
-   v
-Deterministic semantics
-   |
-   v
-Protocol AI / Grammar AI / Command AI
-   |
-   v
-Manifestation
-   +---- Blazor / WebAssembly
-   +---- Desktop / future hosts
-   +---- future hosts
-```
-
-## Current landing experience
-
-The landing page is deliberately an experience rather than a static hero.
-
-Current intended sequence:
-
-```text
-GATEWAY
-  |
-  | visitor clicks Enter Workshop
-  v
-GATEWAY_EXIT
-  |
-  v
-LIVING_GUI_IGNITION
-  |
-  | create one centered seed
-  v
-LIVING_GUI_POPULATING
-  |
-  | reproduce / fly / grow
-  | NO MONIKER
-  v
-100 GUI NODES / CRITICAL MASS
-  |
-  | freeze
-  v
-MONIKER_REVEAL
-  |
-  | sequencing boundary only
-  | NO VISIBLE MONIKER FRAME
-  v
-GRAVITY
-  |
-  | visible "The Singularity Workshop"
-  | 91 FSM heartbeats ~= 3 seconds
-  v
-NAVIGATION_ARRIVAL
-  |
-  v
-RUNNING
-```
-
-The detailed executable-vision contract lives in `WORKSHOP_PRESENTATION_CONTRACT.md`.
+WebPage is not the canonical owner of every capability it demonstrates.
+
+## Architectural extraction rule
+
+When a useful feature is discovered inside WebPage:
+
+~~~text
+experiment
+   ↓
+identify responsibility
+   ↓
+identify owner
+   ↓
+extract reusable implementation
+   ↓
+test package
+   ↓
+consume package here
+   ↓
+document the decision
+~~~
 
-### Moniker timing is a hard UX contract
+Do not simply split a monolith into packages while keeping the old WebPage assumptions hidden between them.
 
-The phrase **The Singularity Workshop** must not dominate first contact.
+Ask:
 
-The gateway presents the visitor with the large avatar-backed `Enter Workshop` control. The living GUI then earns the reveal by reaching exactly 100 nodes and freezing. `MONIKER_REVEAL` is an FSM sequencing boundary; the visual moniker is rendered only once `GRAVITY` begins. Gravity owns the approximately three-second presentation window.
+- Is this behavior reusable?
+- Does another host need it?
+- Which package or domain should own its contract?
+- Does it qualify as a MicroBundle participant?
+- What remains genuinely browser-specific?
 
-Do not add the moniker to the initial gateway simply because it appears in a page title, accessibility label, source filename, or browser metadata. Those are not the visual presentation contract.
+A package is not automatically a MicroBundle.
 
-## Important UX facts
-
-- Hovering/mouse movement must not reset or pause the landing timer.
-- Clicking the warning or Workshop button is an explicit interaction that dismisses the Pong experience.
-- Pong must disappear **before** the living GUI is presented. The current `MainLayout.razor` therefore removes the `<PongField>` component instead of relying only on its internal FSM stop state.
-- The landing surface is intended to use the **entire browser viewport**, not the old content column. The point of the chaos is to rapidly overflow the visitor's visual field with living GUI.
-- Do not replace the existing chaos/living GUI with a generic animation. Preserve the behavior and improve its architecture.
-
-## PageFSM / FSM_API ownership
-
-`PageFSM` is a wrapper around one FSM_API live handle. FSM_API stores definitions and instances in process-global processing groups.
-
-Therefore:
-
-- `PageFSM.Update()` advances **its own handle**.
-- It must not call `Interaction.Update(PageFSM.ProcessingGroup)` merely to advance one page instance.
-- `PageFSM.Dispose()` must unregister its live handle.
-- Do not rebuild a process-global definition with instance-bound delegates and assume unrelated handles are isolated.
-
-This is an important architectural distinction: **group-wide ticking belongs to the host/integration loop; an object wrapper's `Update()` belongs to its owned handle.**
-
-## Tests as breadcrumbs
+## Current opening
 
-`SingularityHub.Tests/IdleExperienceArchitectureTests.cs` contains the executable landing breadcrumbs.
+~~~text
+LABEL 1
+   ↓
+LABEL 2
+   ↓
+ENTER THE WORKSHOP + advisory
+   ↓
+explicit visitor entry
+   ↓
+FSM_COS composes LIVING GUI
+   ↓
+Moniker dependency
+   ↓
+living GUI growth / reproduction
+   ↓
+population threshold
+   ↓
+gravity
+   ↓
+Moniker presentation
+   ↓
+Workshop navigation
+~~~
 
-- Incremental Unit Test 04 is the canonical exact presentation sequence.
-- Incremental Unit Test 07 proves disposal unregisters the runtime handle.
-- Incremental Unit Test 08 proves one PageFSM's update does not advance another PageFSM instance.
-- `SingularityHub.Tests/IncrementalVersionTests.cs` provides the visible incremental proof marker.
+Do not describe another host's startup or landing scene as WebPage behavior.
 
-**Do not weaken Unit Test 04 to make an implementation pass. Fix the machine/lifecycle that violates the sequence.**
+## FSM_API ownership
 
-## Pong
+FSM_API is the authoritative state-machine implementation.
 
-`TheSingularityWorkshop/Components/PongField.razor` is an FSM_API-backed Pong experiment.
+WebPage may own wrappers such as PageFSM, but it must not grow a competing FSM.
 
-Current behavior includes:
+- An object wrapper advances its own owned handle.
+- Group-wide ticking belongs to the host/integration loop.
+- Disposed handles must be unregistered.
+- Tests must prove lifecycle ownership.
 
-- `Dormant`, `Manifesting`, `Playing`, and `Stopped` lifecycle states.
-- A 50 ms heartbeat.
-- Cyan player paddle.
-- Magenta autonomous AI paddle.
-- Initial serve toward the AI so the visitor has time to understand the scene.
-- Score tracking.
-- Pure Blazor pointer interaction for paddle dragging; do not introduce JavaScript merely to implement dragging.
-- A temporary full-field drag surface while the player is dragging, allowing the paddle to reach the useful vertical range.
-- Underlying landing controls remain clickable while Pong is visible.
+## FSM_COS ownership
 
-The important architectural lesson is that Pong is not merely a game bolted onto the page. It is a small demonstration that deterministic state machinery can drive an interactive manifestation.
+FSM_COS is the composition boundary.
 
-## Living GUI / chaos
+WebPage should:
 
-`TheSingularityWorkshop/Pages/LivingGui.razor` is the dedicated living GUI presentation surface used by the landing sequence.
+- select an Experience;
+- create a RuntimeManifest;
+- supply a MicroBundle catalog;
+- execute the composition;
+- consume RuntimeAssembly;
+- perform browser presentation after handoff.
 
-The model includes nodes carrying:
+WebPage should not:
 
-- identity
-- generation
-- lineage
-- position
-- scale
-- opacity
-- rotation
-- seed-flight state
+- duplicate dependency closure;
+- implement arbitration;
+- make the composition kernel understand browser concerns;
+- make reusable packages depend upward on WebPage.
 
-The runtime behavior includes reproduction, exact critical mass at 100 nodes, freeze, and gravity/collapse.
+Read FSM_COS_USAGE.md before changing this boundary.
 
-The visual intent is deliberately excessive:
+## Documentation standard
 
-> **ordinary GUI -> GUI with a pulse -> GUI that reproduces -> swarm -> critical mass -> freeze -> gravity**
+Documentation is engineering memory.
 
-Do not replace this with a generic animation.
+Every authoritative document should distinguish:
 
-## Scrolling experience feed
+- Current — implemented behavior;
+- Direction — architecture we are deliberately implementing;
+- Future — not part of today's WebPage contract.
 
-The landing should eventually expose a scrolling list/feed whose text is derived from actual code behavior rather than generic marketing copy.
+Do not put speculative world-building, abandoned platforms, old host experiments, or conversational side visions into current operational documentation.
 
-Truthful observations include:
+If an idea belongs to another repository, document the boundary and link to that repository instead of importing its entire vision.
 
-- Pong is powered by FSM_API.
-- The visitor can interact with the Pong paddle.
-- The living interface can reproduce.
-- Nodes carry generation and lineage.
-- The population reaches critical mass.
-- The machine freezes and then enters gravity.
-- The Workshop moniker appears only after the critical-mass boundary.
+Prefer:
 
-Long-term, prefer a real observable/data model over a pile of hard-coded marketing strings. The GUI should be able to observe the machine it is demonstrating.
+> why the boundary exists → what the code does → how another developer uses it → what proves it
 
-## AI tab
+over a chronological account of conversations.
 
-`TheSingularityWorkshop/Pages/AI.razor` is the `/ai` route.
+## Visual standard
 
-The conceptual pipeline presented there is:
+When a visual behavior matters:
 
-```text
-LLM
- |
- v
-PROTOCOL AI   -- What can the machine say?
- |
- v
-GRAMMAR AI    -- How may it be assembled?
- |
- v
-COMMAND AI    -- What does the machine actually do?
- |
- v
-APP AI        -- What if the application itself is the artifact?
-```
+- show it before explaining it;
+- prefer diagrams over paragraphs when relationships are spatial;
+- keep text truthful to implementation;
+- never use visual effects to imply capabilities that do not exist.
 
-The AI page is currently an architectural presentation, not a claim that every layer is already implemented as a production system.
+## Tests are architectural evidence
 
-The next evolution is to make this tab **come alive using actual Workshop constructs**: real state, context, commands, mappings, execution, and observability instead of a static brochure.
+A meaningful architectural change should have executable proof when practical.
 
-The key research question is:
+Do not weaken a test merely to make an implementation pass. Fix the lifecycle or ownership problem the test exposes.
 
-> **How do you allow probabilistic intelligence to operate a deterministic machine without letting ambiguity leak through the boundary?**
+## Quality bar
 
-Do not make unsupported claims such as being the first person/project ever to implement an idea. Demonstrate the architecture and document its actual lineage instead.
+Before calling work complete:
 
-## Integer-backed FSM / AI mapping direction
+1. build;
+2. run relevant tests;
+3. inspect behavior;
+4. update authoritative documentation;
+5. verify GitHub Actions;
+6. confirm dependency direction;
+7. leave master untouched unless promotion was explicitly requested.
 
-The FSM_API 2.0 work is adding integer-backed state/identity alongside the established string-backed behavior.
+Zero warnings and zero avoidable errors is the target.
 
-The important idea is:
+## Historical notes
 
-```text
-Human-readable concept
-        |
-        v
-String identity / documentation
-        |
-        v
-Mapping
-        |
-        v
-Integer identity
-        |
-        v
-Deterministic runtime / command stream
-```
+Git history and issue history preserve chronology.
 
-For AI-facing grammar, the intended trick is that the LLM can read the human-readable mapping and understand that a token is a keyword, while the generated machine representation can assemble integer identities rather than repeatedly emitting strings. String values still exist where the actual semantic value must be a string.
+Do not turn the main documentation into a fossil record of every intermediate idea.
 
-The next agent should inspect the actual FSM_API 2.0 branch/code before asserting exact API details.
-
-## GUI Forge direction
-
-The longer-term destination is a GUI Forge where the system demonstrates its own ability to construct applications/interfaces from reusable deterministic constructs.
-
-A useful progression is:
-
-```text
-Field
- -> Pong
- -> Living GUI
- -> Workshop
- -> FSM telemetry
- -> Simulation Lab
- -> GUI Forge
- -> Massive World
-```
-
-Examples discussed include thousands of lightweight GUI/tree actors, culling, towns as buttons, and a Dragon Warrior-like GUI/tile world. These are design targets, not necessarily implemented features.
-
-## Visual language
-
-Preserve the current Workshop personality:
-
-- cyan/magenta instrumentation for Pong and technical state
-- gold/orange warning energy
-- breathing controls and borders
-- subtle distortion and scan-line atmosphere
-- glowing but restrained signal details
-- playful, weird, technically literate tone
-
-The visual goal is **mundane magical**, not generic sci-fi decoration.
-
-## Navigation
-
-The AI tab exists and should remain.
-
-Be careful when editing `NavMenu.razor`: earlier navigation included important links such as Booking and legacy package destinations. Do not silently remove existing useful navigation while adding AI. Inspect the current file before rewriting it.
-
-## Engineering/documentation standards
-
-WebPage follows the engineering discipline of FSM_API without pretending to be a NuGet library. In particular:
-
-- FSM_API is the authoritative state-machine implementation; WebPage must not grow a competing FSM.
-- Nullable reference types stay enabled in production projects.
-- Production projects generate XML documentation for public API inspection.
-- Tests and architecture tests are evidence, not decoration.
-- TRX/coverage output is generated data and must not be committed.
-- Documentation must state what is implemented, what is transitional, and what is future design.
-- A meaningful architectural change should update both executable proof and the nearest documentation.
-- README badges describe the engineering environment; do not add NuGet/package badges to WebPage unless the repository actually becomes a package.
-
-## Documentation style
-
-Documentation should be:
-
-- technically honest
-- useful to a developer arriving cold
-- explicit about what is implemented versus experimental
-- playful without becoming vague
-- written so the next agent can continue without reconstructing the entire conversation
-
-The Workshop likes the phrase:
-
-> **Dr. Seuss for software developers.**
-
-## Operational rule
-
-When a task is ambiguous, first inspect the current repository state and recent history. Then make the smallest coherent change that advances the current experiment.
-
-Do not rebuild the site from scratch because a component looks unusual.
-
-Do not optimize away the behavior that makes the Workshop interesting.
-
-Do not modify `master` during ordinary development. Promote to `master` deliberately after the `development` branch has been reconciled, documented, and validated.
+The repository should teach the machine we have, explain the decisions that produced it, and identify the next deliberate boundary.
