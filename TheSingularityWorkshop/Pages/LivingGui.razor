@@ -15,7 +15,7 @@
     @foreach (var actor in FSM.Context.LivingNodes)
     {
         <label class="living-actor @(actor.IsRoot ? "living-actor-root" : "") @(GravityActive ? "living-actor-gravity" : "")"
-               style="left:@ActorLeft(actor);top:@ActorTop(actor);width:@ActorSize(actor);height:@ActorSize(actor);transform:@ActorTransform(actor);opacity:@ActorOpacity(actor);"
+               style="@ActorStyle(actor)"
                aria-label="@actor.Lineage">
             @actor.Lineage
         </label>
@@ -66,10 +66,11 @@
         align-items:center;
         justify-content:center;
         padding:0 12px;
-        border:6px solid #00a8ff;
-        border-radius:14px;
+        border:6px solid var(--flower-color);
+        border-radius:50% 44% 52% 47%;
         background:
-            linear-gradient(145deg,rgba(0,168,255,.16),rgba(255,44,255,.08) 48%,rgba(255,122,0,.12)),
+            radial-gradient(circle at 38% 34%,color-mix(in srgb,var(--flower-color) 34%,transparent),transparent 44%),
+            radial-gradient(circle at 65% 68%,color-mix(in srgb,var(--flower-color) 20%,transparent),transparent 52%),
             rgba(3,6,10,.94);
         color:#fff;
         font:900 .72rem/1 Consolas,"Courier New",monospace;
@@ -79,9 +80,9 @@
         overflow:hidden;
         text-shadow:0 0 9px rgba(255,255,255,.8);
         box-shadow:
-            0 0 12px rgba(0,168,255,.48),
-            0 0 34px rgba(0,168,255,.22),
-            inset 0 0 18px rgba(0,168,255,.12);
+            0 0 12px color-mix(in srgb,var(--flower-color) 72%,transparent),
+            0 0 34px color-mix(in srgb,var(--flower-color) 34%,transparent),
+            inset 0 0 18px color-mix(in srgb,var(--flower-color) 22%,transparent);
         transition:left .16s linear,top .16s linear,width .16s linear,height .16s linear,opacity .16s linear,transform .16s linear;
         will-change:left,top,width,height,transform;
         transform-origin:center;
@@ -115,12 +116,10 @@
 @code {
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
 
-    // The page FSM owns the three-second presentation boundary. The hub is not
-    // a CSS timer or a browser-side animation: it becomes the rendered experience
-    // only after the FSM leaves LIVING_GUI_DISSIPATING for NAVIGATION_ARRIVAL.
-    private string FirstContactState => FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running
-        ? "HubGrowth"
-        : "Landing";
+    // The moniker remains the persistent landing surface. When the page FSM reaches
+    // navigation arrival, MainLayout manifests the Workshop chrome alongside it.
+    // The hub is therefore layout-owned navigation, not a full-stage overlay.
+    private const string FirstContactState = "Landing";
 
     protected override void OnInitialized()
     {
@@ -134,6 +133,9 @@
     private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
 
     private void HandleLivingGuiChanged() => _ = InvokeAsync(StateHasChanged);
+
+    private static string ActorStyle(PageStateContext.LivingNodeState actor)
+        => $"left:{ActorLeft(actor)};top:{ActorTop(actor)};width:{ActorSize(actor)};height:{ActorSize(actor)};transform:{ActorTransform(actor)};opacity:{ActorOpacity(actor):0.###};--flower-color:{ActorColor(actor)};";
 
     private static string ActorLeft(PageStateContext.LivingNodeState actor)
         => $"{actor.X:0.###}%";
@@ -149,6 +151,28 @@
 
     private static double ActorOpacity(PageStateContext.LivingNodeState actor)
         => actor.Y <= 100 ? 1 : Math.Clamp(1 - ((actor.Y - 100) / 30), 0, 1);
+
+    private static string ActorColor(PageStateContext.LivingNodeState actor)
+    {
+        if (actor.IsRoot)
+            return "#ff7a00";
+
+        var hash = 17;
+        foreach (var character in actor.Lineage)
+            hash = unchecked((hash * 31) + character);
+
+        return FlowerPalette[Math.Abs(hash % FlowerPalette.Length)];
+    }
+
+    private static readonly string[] FlowerPalette =
+    {
+        "#ff3030",
+        "#ff7a00",
+        "#ffd34d",
+        "#52e05a",
+        "#00a8ff",
+        "#ff2cff"
+    };
 
     public void Dispose()
     {
