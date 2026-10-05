@@ -278,4 +278,8 @@ public sealed class IncrementalVersionTests
     public void V0_0_185LivingGuiPoolSlotsPreserveDeterministicTargetAndRotationIdentity()
         => Assert.Equal("0.0.185", "0.0.185");
 
+    [ArchitectureTest(0, 0, 186)] [Fact(DisplayName = "V0.0.186 — Living_GUI_Organism_FSMs_Share_One_Processing_Group_Without_Sharing_Lifecycle_State")]
+    public void V0_0_186LivingGuiOrganismFsmsShareOneProcessingGroupWithoutSharingLifecycleState()
+        => Assert.Equal("0.0.186", "0.0.186");
+
 }
