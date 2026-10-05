@@ -1,180 +1,215 @@
 # Workshop Runtime Architecture
 
-This is the current contract for how the WebPage host becomes a Workshop runtime.
+> **This document describes the runtime that exists in WebPage today.**
 
-## Governing rule
+WebPage is a browser proving ground. Reusable behavior is deliberately moving out of the page and into independently owned packages and composition participants.
 
-> **The page is the presentation layer. The Hub is the runtime owner. Experiences and MicroBundles are the content and behavior units.**
+## Ownership
 
-Blazor connects the browser to the Hub and renders what the Hub says is currently present. It must not become a second application runtime.
+~~~text
+FSM_API
+   └── deterministic state-machine behavior
 
-## Bootstrap
+MicroBundleDomain
+   └── MicroBundle runtime contract
 
-```text
-Browser
-  |
-  v
-Blazor host
-  |
-  | load WebPage host manifest
-  v
-Hub boot
-  |
-  +--> connect MicroBundle repository / registry
-  +--> discover available Experiences
-  +--> discover Idler-capable Experiences
-  +--> discover Flex-capable Experiences
-  |
-  v
-select one available Idler
-  |
-  v
-RUN IDLER
-  |
-  | visitor selects Enter Workshop
-  v
-select one available Flex
-  |
-  v
-RUN FLEX
-  |
-  v
-present Workshop moniker for the configured reveal interval
-  |
-  v
-reveal navigation / page chrome / primary panel
-  |
-  v
-moniker remains in primary panel until navigation selection
-  |
-  | visitor selects a tab
-  v
-clear moniker
-  |
-  v
-present selected GUI / Experience
-```
+FSM_COS
+   └── composition / dependency closure / arbitration / convergence
 
-Pong and Living GUI are the first concrete implementations, not protocol keywords. The bootstrap must not require those names to exist.
+Experience layer
+   └── describes what the host wants to compose
 
-## Manifest versus inventory
+WebPage
+   ├── visitor interaction
+   ├── browser presentation
+   ├── discovery / authoring UX
+   └── proving-ground integration
+~~~
 
-The WebPage manifest describes the **host**: registry locations, schema/policy versions, host capabilities, manifestation domains, lifecycle policy, and eventually trust/security requirements.
+> **A visual element being rendered by WebPage does not make WebPage the owner of the underlying capability.**
 
-It must not become a growing list of concrete Experiences. Inventory belongs to the MicroBundle/Experience registry.
+## Current first-contact runtime
 
-## Registry responsibility
+~~~text
+FirstContact
+    ↓
+visitor explicitly requests entry
+    ↓
+select LivingGuiExperience
+    ↓
+RuntimeManifest
+    ↓
+FSM_COS
+    ├── resolve Living GUI
+    ├── resolve Moniker dependency
+    ├── load
+    ├── arbitrate
+    └── converge
+    ↓
+RuntimeAssembly
+    ↓
+Page / Living GUI runtime
+    ↓
+population threshold
+    ↓
+gravity
+    ↓
+Moniker presentation
+    ↓
+Workshop navigation
+~~~
 
-The registry/repository is the discovery boundary. It supplies addressable bundle metadata such as:
+The Experience is not composed during service construction. It is composed only after explicit visitor entry.
 
-- address and version;
-- ontology;
-- capabilities;
-- sensory systems;
-- dependencies;
-- providers/manifests; and
-- integrity/trust information as those layers mature.
+## Host composition catalog
 
-The Hub selects eligible candidates from discovered inventory. The page does not maintain the inventory.
+WorkshopCompositionCatalog implements the FSM_COS catalog boundary.
 
-## Experience responsibility
+It currently supplies the WebPage composition participants, including Moniker, Living GUI Experience, Protocol, Grammar, and AI Exchange.
 
-An Experience is an environment composed of MicroBundles. It describes identity, version, ontology, sensory systems, capabilities, MicroBundle membership, and required process groups.
+The catalog is host infrastructure. FSM_COS does not know whether participants came from an in-memory dictionary, generated registry, cache, or repository-backed resolver.
 
-The Experience does not own the application heartbeat.
+## Experience to manifest
 
-The Hub owns loading, dependency ordering, arbitration, runtime indexing, process-group activation, stepping, lifecycle transitions, and unloading/invalidation.
+WorkshopExperienceService owns the browser-side transition from selected Experience to composition request.
 
-## Idler and Flex
+The essential operation is:
 
-**Idler** and **Flex** are capability/category concepts used by bootstrap policy, not special hardcoded application classes.
+~~~csharp
+RuntimeAssembly = _compositionSystem.Execute(
+    new RuntimeManifest(
+        RuntimeId: SelectedExperience.Id,
+        Bundles: SelectedExperience.MicroBundleIds
+            .Select(BundleRequest.Unconfigured)
+            .ToArray()));
+~~~
 
-The first vertical slice is:
+The host supplies the roots. FSM_COS derives the reachable composition.
 
-```text
-Pong       -> Idler-capable
-Living GUI -> Flex-capable
-```
+## Dependency closure
 
-Future Experiences can provide either, both, or new capabilities without requiring the bootstrap to be rewritten around their names.
+The current Living GUI dependency is:
 
-## Current transitional code
+~~~text
+LivingGuiExperience
+        ↓
+LivingGuiExperienceMicroBundle
+        └── Moniker
+~~~
 
-The branch still contains static `IdleExperienceCatalog` and `FlexExperienceCatalog` definitions and a small `WorkshopDemoBundle`. These are compatibility/composition scaffolding while the registry-driven path is completed.
+The Experience names the root. The MicroBundle names its dependency. FSM_COS closes the graph.
 
-**Do not delete them until their functionality has been located in the Experience/MicroBundle/registry architecture and covered by tests.**
+If a dependency cannot be resolved, composition must fail rather than silently inventing a substitute.
 
-The same rule applies to historical branches: preserve behavior first, relocate it second, delete obsolete implementation last.
+## Installation versus execution
 
-## AI is later, not lost
+A successful RuntimeAssembly means:
 
-AI, Grammar, Protocol, and command-pipeline work remains valuable and should be retained as future architecture. It is deliberately not required for this deterministic bootstrap.
+- requested roots were resolved;
+- dependencies were closed;
+- reachable capabilities were installed;
+- arbitration converged.
 
-The intended future relationship is:
+It does not mean the browser has executed the Experience.
 
-```text
-AI / Grammar / Protocol
-          |
-          v
- deterministic command / selection
-          |
-          v
- Experience + MicroBundle boundary
-          |
-          v
- Hub arbitration / runtime index
-          |
-          v
- FSM_API execution
-```
+After assembly, WebPage performs its host-specific transition into Living GUI presentation and FSM_API-driven behavior.
 
-The runtime must work without AI. AI becomes a future producer of deterministic inputs, not the owner of runtime semantics.
+~~~text
+composition complete
+        ↓
+RuntimeAssembly
+        ↓
+WebPage runtime
+        ↓
+FSM_API behavior
+        ↓
+browser manifestation
+~~~
 
-## Housekeeping rule
+## Runtime state ownership
 
-For every refactor toward this model:
+| State / service | Responsibility |
+|---|---|
+| WorkshopExperienceService | first-contact and Experience selection/composition |
+| RuntimeAssembly | assembled composition result |
+| PageFSM | page-level presentation lifecycle |
+| PageStateContext | Living GUI state/data |
+| FSM_API | deterministic FSM execution machinery |
+| Blazor components | browser manifestation |
 
-1. locate the existing behavior;
-2. identify its intended Experience/MicroBundle/provider boundary;
-3. preserve it with a test;
-4. move or adapt it;
-5. update the explanatory documentation;
-6. only then remove obsolete host-specific code.
+The semantic owner matters more than the exact class name.
 
-The implementation may change dramatically. Functionality must not disappear accidentally.
+## MicroBundles as reusable participants
 
-*The page opens the door. The Hub runs the Workshop.*
+WebPage has local composition participants because this repository is still a proving ground.
 
+The extraction rule is:
 
-## Installation and arbitration contract
+~~~text
+local experiment
+     ↓
+independent responsibility
+     ↓
+package/domain ownership
+     ↓
+MicroBundle when the composition contract fits
+~~~
 
-MicroBundle installation is deliberately two-phase.
+A package is not automatically a MicroBundle. A MicroBundle is a composition participant whose contract is owned by the appropriate domain package.
 
-```
-Available bundle catalog
-        |
-        v
-LoadBundle(IArbitrator)     <-- exactly once
-        |
-        +--> inspect installed bundles
-        +--> inspect available bundles
-        +--> request dependency loads
-        |
-        v
-installation complete
-        |
-        v
-Arbitrate(IArbitrator, round)
-        |
-        +--> inspect installed composition
-        +--> apply conditional mutations
-        +--> converge for at most 10 rounds
-```
+## What this architecture protects
 
-Installation completion order is the default arbitration order. A dependency loaded by a dependent bundle's load hook therefore precedes the dependent. A future Experience manifest can replace that ordering.
+### Composition is not presentation
 
-A missing dependency is never fabricated. It may become available later and participate in later arbitration.
+FSM_COS should not know how a browser presents an assembly.
 
+### Reusable capability is not WebPage infrastructure
+
+If another host can consume a capability, its implementation should be considered for extraction.
+
+### Experience identity is not routing
+
+A Deep Dive route is a WebPage presentation mechanism, not the identity model.
+
+### Proven behavior survives extraction
+
+When code moves from WebPage to a package, the behavior that justified the extraction moves with tests and documentation.
+
+## Verification loop
+
+~~~text
+change code
+   ↓
+build
+   ↓
+run tests
+   ↓
+observe behavior
+   ↓
+update theory / usage documentation
+   ↓
+run CI
+   ↓
+call the boundary complete
+~~~
+
+## Current invariant
+
+~~~text
+Experience
+   ↓
+RuntimeManifest
+   ↓
+FSM_COS
+   ↓
+RuntimeAssembly
+   ↓
+WebPage host
+   ↓
+FSM_API + browser manifestation
+~~~
+
+> **WebPage proves the architecture. It should not quietly become the architecture.**
 
 ## Optional WebPage-only providers
 
