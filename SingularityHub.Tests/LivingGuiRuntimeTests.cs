@@ -46,6 +46,28 @@ public sealed class LivingGuiRuntimeTests
     }
 
     [Fact]
+    public void PageHeartbeatAdvancesOrganismFsmIntoGrowthAndReproduction()
+    {
+        using var fsm = new PageFSM();
+        fsm.RequestEnter();
+
+        for (var ticks = 0; ticks < 100 && fsm.Context.LivingNodes.Count == 0; ticks++)
+            fsm.Update();
+
+        var root = Assert.Single(fsm.Context.LivingNodes);
+        Assert.Equal("G:0", root.Lineage);
+
+        for (var ticks = 0; ticks < 100; ticks++)
+            fsm.Update();
+
+        Assert.True(root.Size > 50d, "The root organism never entered its FSM-driven growth cycle.");
+        Assert.True(root.OffspringCount > 0, "The root organism never entered its FSM-driven reproduction cycle.");
+        Assert.True(
+            fsm.Context.LivingNodes.Count > 1,
+            "The page heartbeat did not produce an independently attached organism.");
+    }
+
+    [Fact]
     public void OrganismsDoNotShareALifecyclePhase()
     {
         using var fsm = new PageFSM();
