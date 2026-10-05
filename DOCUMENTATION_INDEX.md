@@ -8,7 +8,8 @@
 |---|---|---|
 | README.md | Public repository entry point and current product story | public orientation |
 | DOCUMENTATION_STANDARD.md | Rules for writing and maintaining Workshop documentation | documentation policy |
-| WORKSHOP_RUNTIME_ARCHITECTURE.md | WebPage host, Hub, Experience, MicroBundle, and runtime lifecycle | runtime contract |
+| WORKSHOP_RUNTIME_ARCHITECTURE.md | Current WebPage runtime ownership and FSM_COS handoff | runtime contract |
+| FSM_COS_USAGE.md | How WebPage consumes FSM_COS and how reusable functionality is extracted | operational usage |
 | WEBPAGE_EXPERIENCE_ARCHITECTURE.md | What an Experience means in this browser proving ground | WebPage product contract |
 | WORKSHOP_OPENING_EXPERIENCE.md | Current first-contact sequence | presentation contract |
 | EXPERIENCE_THEORY.md | Experience vocabulary and composition model | domain theory |
@@ -28,9 +29,9 @@ WHAT EXPERIENCE IS RUNNING?
           ↓
 WHICH MICROBUNDLES ARE COMPOSED?
           ↓
-WHAT DOES FSM_COS OWN?
+HOW DOES THIS HOST USE FSM_COS?
           ↓
-WHAT DOES THE WEBPAGE HOST OWN?
+WHAT DOES THE WEBPAGE HOST OWN AFTER HANDOFF?
           ↓
 WHAT PROVES THE CLAIM?
 ```
@@ -51,7 +52,7 @@ An implementation detail must not be presented as a permanent contract merely be
 
 WebPage is the browser proving ground. It is not the canonical owner of every Workshop concept.
 
-Shared runtime/domain repositories should remain independent of WebPage. Host-specific educational or presentation behavior belongs here only when it is explicitly a WebPage capability.
+Shared runtime/domain repositories should remain independent of WebPage. Host-specific educational or presentation behavior belongs here only when it is explicitly a WebPage capability. Read FSM_COS_USAGE.md for the concrete integration boundary.
 
 ## Maintenance
 
