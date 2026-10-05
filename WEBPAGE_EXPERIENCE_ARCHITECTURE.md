@@ -138,7 +138,7 @@ They should think:
 > "I am entering this place."
 
 That distinction matters because the same Experience may eventually manifest through
-Blazor, AnyApp, Unity, a future renderer, or another host.
+WebPage, WebApp, AnyApp, MyVR, a future renderer, or another host.
 
 The WebPage is one doorway.
 
@@ -148,7 +148,7 @@ The WebPage is one doorway.
           +-------------+-------------+
           |             |             |
           v             v             v
-        WebPage       AnyApp     other hosts
+        WebPage      WebApp      AnyApp / MyVR
         /Browser      /Desktop
 ```
 
@@ -157,6 +157,38 @@ The route is an implementation detail.
 The Experience is the thing being experienced.
 
 ---
+
+## Current WebPage behavior
+
+The current public proving-ground sequence is deliberately narrower than the larger Workshop vision:
+
+```text
+LABEL 1
+  ↓
+LABEL 2
+  ↓
+ENTER THE WORKSHOP + advisory
+  ↓
+explicit visitor entry
+  ↓
+FSM_COS composes LIVING GUI
+  ↓
+Moniker dependency resolves as part of composition
+  ↓
+living GUI grows and reproduces
+  ↓
+population threshold
+  ↓
+gravity
+  ↓
+Moniker presentation
+  ↓
+Workshop hub / navigation
+```
+
+This repository documents that sequence because it is what the WebPage currently proves. Other world models, social spaces, default environments, or host-specific landing scenes belong to their respective products and are not part of the WebPage opening contract.
+
+The WebPage is also **not the canonical application implementation**. It is the place where working concepts are proven in the browser before the resulting contracts and capabilities are carried into the appropriate canonical or sibling host.
 
 ## The living GUI is architectural evidence
 
@@ -488,7 +520,7 @@ The goal is to make the architecture serve the person.
 
 ## Host symmetry
 
-The WebPage is one host.
+The WebPage is one host and one proving ground.
 
 The same Experience composition should be able to become:
 
