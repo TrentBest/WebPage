@@ -236,7 +236,7 @@ public sealed class LivingGuiRuntimeTests
 
         var context = new PageStateContext();
         Assert.Equal(100, context.PreallocatedLivingNodes.Count);
-        Assert.Equal(100, context.AvailablePopulationSlots);
+        Assert.Equal(0, context.AvailablePopulationSlots);
 
         context.BeginLivingGui();
 
