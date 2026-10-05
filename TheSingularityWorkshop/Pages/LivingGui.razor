@@ -10,7 +10,7 @@
 <div class="living-experience-panel" aria-label="Living GUI experience">
     @if (FSM.Context.MonikerReady)
     {
-        <FirstContactView State="Landing" Ticks="FSM.Context.MonikerPresentationStartTick" />
+        <FirstContactView State="@FirstContactState" Ticks="FSM.Context.MonikerPresentationStartTick" />
     }
     @foreach (var actor in FSM.Context.LivingNodes)
     {
@@ -114,6 +114,13 @@
 
 @code {
     private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
+
+    // The page FSM owns the three-second presentation boundary. The hub is not
+    // a CSS timer or a browser-side animation: it becomes the rendered experience
+    // only after the FSM leaves LIVING_GUI_DISSIPATING for NAVIGATION_ARRIVAL.
+    private string FirstContactState => FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running
+        ? "HubGrowth"
+        : "Landing";
 
     protected override void OnInitialized()
     {
