@@ -114,6 +114,7 @@ public sealed class LivingGuiOrganismFsm : IDisposable
     {
         private readonly PageStateContext _page;
         private readonly Action<PageStateContext.LivingNodeState> _attachChild;
+        private bool _isValid = true;
 
         public LivingGuiOrganismContext(
             PageStateContext page,
@@ -126,8 +127,12 @@ public sealed class LivingGuiOrganismFsm : IDisposable
             Name = $"LivingGuiOrganismContext:{Guid.NewGuid():N}";
         }
 
-        public string Name { get; }
-        public bool IsValid => _page.IsValid;
+        public string Name { get; set; }
+        public bool IsValid
+        {
+            get => _isValid && _page.IsValid;
+            set => _isValid = value;
+        }
 
         public PageStateContext.LivingNodeState Node { get; }
 
