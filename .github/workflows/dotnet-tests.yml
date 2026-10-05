@@ -121,7 +121,7 @@ jobs:
           Console.WriteLine($"PROFILE_ASSEMBLY={profileType.Assembly.Location}");
           Console.WriteLine($"PROFILE_POOL={profileType.GetProperty("PopulationPoolSize")!.GetValue(currentProfile)}");
           Console.WriteLine($"PROFILE_THRESHOLD={profileType.GetProperty("PopulationThreshold")!.GetValue(currentProfile)}");
-          var context = Activator.CreateInstance(type)!;
+          var context = ctor.Invoke(new object?[] { null })!;
           var preallocated = type.GetProperty("PreallocatedLivingNodes")!.GetValue(context)!;
           var preallocatedCount = (int)preallocated.GetType().GetProperty("Count")!.GetValue(preallocated)!;
           Console.WriteLine($"DIRECT_CONSTRUCTOR_PREALLOCATED_COUNT={preallocatedCount}");
