@@ -22,7 +22,7 @@ public sealed class LivingGuiRuntimeTests
         Assert.True(fsm.LivingGuiIsValid);
     }
 
-    [Fact(DisplayName = "Living GUI enters population with a centered 200px root actor")]
+    [Fact(DisplayName = "Living GUI enters population with a centered 50px root actor")]
     public void LivingGui_EntersPopulationWithCenteredRoot()
     {
         using var fsm = new PageFSM();
@@ -38,7 +38,7 @@ public sealed class LivingGuiRuntimeTests
         Assert.True(root.IsRoot);
         Assert.Equal(50, root.X);
         Assert.Equal(50, root.Y);
-        Assert.Equal(200, root.Size);
+        Assert.Equal(50, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
         Assert.Equal(0, root.Rotation);
     }
@@ -55,19 +55,19 @@ public sealed class LivingGuiRuntimeTests
         var root = fsm.Context.LivingNodes[0];
 
         fsm.Update();
-        Assert.Equal(250, root.Size);
+        Assert.Equal(70, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
 
         fsm.Update();
-        Assert.Equal(300, root.Size);
+        Assert.Equal(90, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
 
         fsm.Update();
-        Assert.Equal(350, root.Size);
+        Assert.Equal(100, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
 
         fsm.Update();
-        Assert.Equal(400, root.Size);
+        Assert.Equal(100, root.Size);
         Assert.True(root.SeedDoubled);
         Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, root.Phase);
 
@@ -76,7 +76,7 @@ public sealed class LivingGuiRuntimeTests
         var child = Assert.Single(fsm.Context.LivingNodes, node => node.Lineage == "G:1");
         Assert.Equal(1, child.Generation);
         Assert.False(child.IsRoot);
-        Assert.Equal(40, child.Size);
+        Assert.Equal(10, child.Size);
         Assert.Equal(50, child.X);
         Assert.Equal(50, child.Y);
         Assert.InRange(child.Rotation, -180, 180);
@@ -104,22 +104,22 @@ public sealed class LivingGuiRuntimeTests
         var child = context.LivingNodes[1];
 
         ticks = 0;
-        while (child.Size < 200 && ticks++ < guard)
+        while (child.Size < 50 && ticks++ < guard)
             runtime.Update();
 
-        Assert.True(child.Size >= 200, "Living GUI child did not complete flight and scaling within the scheduler guard.");
-        Assert.Equal(200, child.Size);
+        Assert.True(child.Size >= 50, "Living GUI child did not complete flight and scaling within the scheduler guard.");
+        Assert.Equal(50, child.Size);
         Assert.True(child.GrowthReady);
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, child.Phase);
 
         // Mature growth is intentionally round-robin so the root cannot starve
         // descendants. Advance until this specific child reaches reproduction.
         ticks = 0;
-        while (child.Size < 400 && ticks++ < guard)
+        while (child.Size < 100 && ticks++ < guard)
             runtime.Update();
 
-        Assert.True(child.Size >= 400, "Living GUI child did not receive mature-growth turns within the scheduler guard.");
-        Assert.Equal(400, child.Size);
+        Assert.True(child.Size >= 100, "Living GUI child did not receive mature-growth turns within the scheduler guard.");
+        Assert.Equal(100, child.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, child.Phase);
     }
 
