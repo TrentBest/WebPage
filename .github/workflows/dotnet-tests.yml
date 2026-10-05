@@ -49,6 +49,49 @@ jobs:
         timeout-minutes: 6
         run: |
           set +e
+          echo "=== TheSingularityWorkshop runtime artifact ==="
+          sha256sum TheSingularityWorkshop/bin/Release/net8.0/TheSingularityWorkshop.dll
+          stat -c 'size=%s mtime=%y path=%n' TheSingularityWorkshop/bin/Release/net8.0/TheSingularityWorkshop.dll
+          strings TheSingularityWorkshop/bin/Release/net8.0/TheSingularityWorkshop.dll | grep -E 'POOL:|PopulationPoolSize|PopulationThreshold' || true
+
+          mkdir -p /tmp/assembly-inspector
+          cat > /tmp/assembly-inspector/AssemblyInspector.csproj <<'EOF'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <ImplicitUsings>enable</ImplicitUsings>
+              <Nullable>enable</Nullable>
+            </PropertyGroup>
+          </Project>
+          EOF
+          cat > /tmp/assembly-inspector/Program.cs <<'EOF'
+          using System.Reflection;
+          using System.Runtime.Loader;
+
+          var path = Path.GetFullPath("TheSingularityWorkshop/bin/Release/net8.0/TheSingularityWorkshop.dll");
+          var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+          var type = assembly.GetType("TheSingularityWorkshop.Services.PageStateContext")
+              ?? throw new InvalidOperationException("PageStateContext type was not found.");
+          var ctor = type.GetConstructor(new[] { typeof(object) })
+              ?? throw new InvalidOperationException("PageStateContext(object) constructor was not found.");
+          var body = ctor.GetMethodBody()
+              ?? throw new InvalidOperationException("Constructor has no method body.");
+
+          Console.WriteLine($"LOADED_ASSEMBLY={assembly.FullName}");
+          Console.WriteLine($"LOADED_ASSEMBLY_LOCATION={assembly.Location}");
+          Console.WriteLine($"LOADED_ASSEMBLY_MVID={assembly.ManifestModule.ModuleVersionId}");
+          Console.WriteLine($"CONSTRUCTOR_DECLARING_TYPE={ctor.DeclaringType?.AssemblyQualifiedName}");
+          Console.WriteLine($"CONSTRUCTOR_MAX_STACK={body.MaxStackSize}");
+          Console.WriteLine($"CONSTRUCTOR_LOCAL_COUNT={body.LocalVariables.Count}");
+          foreach (var local in body.LocalVariables)
+              Console.WriteLine($"CONSTRUCTOR_LOCAL={local.LocalIndex}:{local.LocalType.FullName}");
+          Console.WriteLine($"CONSTRUCTOR_IL_LENGTH={body.GetILAsByteArray()?.Length ?? 0}");
+          Console.WriteLine($"CONSTRUCTOR_IL={Convert.ToHexString(body.GetILAsByteArray() ?? Array.Empty<byte>())}");
+          EOF
+          dotnet run --project /tmp/assembly-inspector/AssemblyInspector.csproj --configuration Release --no-restore
+          echo "=== End runtime artifact inspection ==="
+
           dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --filter "FullyQualifiedName~LivingGuiRuntimeTests" --logger "console;verbosity=normal"
           first_status=$?
           echo "SINGULARITYHUB_LIVING_GUI_STATUS_IMMEDIATELY_AFTER_BUILD=$first_status"
