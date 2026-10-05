@@ -81,9 +81,11 @@ public sealed class PageStateContextTests
         context.BeginLivingGui();
         var child = context.CreateOffspring(context.LivingNodes[0]);
         context.InitializeOrganism(child);
-        child.X = child.TargetX;
-        child.Y = child.TargetY;
-        context.AdvanceTravel(child);
+        var travelGuard = 1_000;
+        while (child.Phase == PageStateContext.LivingNodePhase.Traveling && travelGuard-- > 0)
+            context.AdvanceTravel(child);
+
+        Assert.Equal(PageStateContext.LivingNodePhase.Planting, child.Phase);
 
         var guard = 100;
         while (child.Phase == PageStateContext.LivingNodePhase.Planting && guard-- > 0)
