@@ -60,7 +60,7 @@ public sealed class LivingGuiRuntimeTests
 
         fsm.Update();
         Assert.Equal(90, root.Size);
-        Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
+        Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, root.Phase);
 
         fsm.Update();
         Assert.Equal(100, root.Size);
@@ -159,8 +159,6 @@ public sealed class LivingGuiRuntimeTests
         for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
             fsm.Update();
 
-        Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
-        fsm.Update();
         Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
         fsm.Update();
         Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
