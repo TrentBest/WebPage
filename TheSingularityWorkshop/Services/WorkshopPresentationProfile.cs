@@ -2,7 +2,8 @@ namespace TheSingularityWorkshop.Services;
 
 public sealed class WorkshopPresentationProfile
 {
-    public const int DefaultPopulationThreshold = 64;
+    public const int DefaultPopulationThreshold = 100;
+    public const int DefaultPopulationPoolSize = 100;
     public const double DefaultGrowthStep = 20;
     public const double DefaultMaximumNodeSize = 100;
     public const double DefaultSeedFlightStep = 4.5;
@@ -12,6 +13,7 @@ public sealed class WorkshopPresentationProfile
     public const double DefaultMonikerDurationSeconds = 3;
 
     public int PopulationThreshold { get; set; } = DefaultPopulationThreshold;
+    public int PopulationPoolSize { get; set; } = DefaultPopulationPoolSize;
     public double GrowthStep { get; set; } = DefaultGrowthStep;
     public double MaximumNodeSize { get; set; } = DefaultMaximumNodeSize;
     public double SeedFlightStep { get; set; } = DefaultSeedFlightStep;
@@ -25,6 +27,7 @@ public sealed class WorkshopPresentationProfile
     public void Reset()
     {
         PopulationThreshold = DefaultPopulationThreshold;
+        PopulationPoolSize = DefaultPopulationPoolSize;
         GrowthStep = DefaultGrowthStep;
         MaximumNodeSize = DefaultMaximumNodeSize;
         SeedFlightStep = DefaultSeedFlightStep;
