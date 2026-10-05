@@ -53,7 +53,6 @@ public sealed class LivingGuiFsm : IDisposable
         foreach (var node in _context.PreallocatedLivingNodes)
         {
             _organismPool[node] = new LivingGuiOrganismFsm(
-                _hub,
                 _context,
                 node,
                 _processingGroup,
