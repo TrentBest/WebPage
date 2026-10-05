@@ -28,7 +28,7 @@ public sealed class LivingGuiFsm : IDisposable
     private readonly PageStateContext _context;
     private readonly string _processingGroup;
     private readonly List<LivingGuiOrganismFsm> _organisms = new();
-    private readonly HashSet<PageStateContext.LivingNodeState> _attachedNodes = new();
+    private readonly Dictionary<PageStateContext.LivingNodeState, LivingGuiOrganismFsm> _organismPool = new();
     private bool _disposed;
 
     public LivingGuiFsm(HubKernel hub, PageStateContext context, string parentProcessingGroup)
@@ -46,6 +46,18 @@ public sealed class LivingGuiFsm : IDisposable
             .BuildDefinition();
 
         fsm_API.Create.CreateInstance("LivingGuiFSM", context, _processingGroup);
+
+        // Allocate the full organism/FSM population once. Reproduction later only
+        // activates an already-existing slot; it never news another FSM or processing group.
+        foreach (var node in _context.PreallocatedLivingNodes)
+        {
+            _organismPool[node] = new LivingGuiOrganismFsm(
+                _hub,
+                _context,
+                node,
+                _processingGroup,
+                AttachChild);
+        }
     }
 
     public string CurrentState => LifecycleState;
@@ -66,7 +78,8 @@ public sealed class LivingGuiFsm : IDisposable
 
     public bool IsValid =>
         _context.IsValid &&
-        _organisms.All(organism => organism.IsValid);
+        _organismPool.Count == _context.PreallocatedLivingNodes.Count &&
+        _organismPool.Values.All(organism => organism.IsValid);
 
     public int OrganismCount => _organisms.Count;
 
@@ -80,16 +93,13 @@ public sealed class LivingGuiFsm : IDisposable
         if (_disposed || !_context.IsValid || _context.LivingGuiFrozen)
             return;
 
-        // Attach newly created organisms before advancing the population.
-        // Every organism owns its own processing group and its own FSM_API instance.
-        // The population manager deliberately schedules those groups one-by-one;
-        // it never advances organism state itself.
+        // Activate newly acquired pool slots before advancing the population.
+        // Every organism still owns its own FSM_API instance and processing group;
+        // the population manager only decides which preallocated slots are alive.
         AttachUntrackedOrganisms();
 
-        // Snapshot the collection because reproduction can attach a new organism
-        // while an existing organism is being ticked. A newly attached organism is
-        // initialized immediately by its own FSM, but it joins the next heartbeat
-        // for subsequent lifecycle advancement.
+        // Snapshot the active collection because reproduction can activate another
+        // preallocated organism while an existing organism is being ticked.
         foreach (var organism in _organisms.ToArray())
             organism.Update();
 
@@ -103,35 +113,28 @@ public sealed class LivingGuiFsm : IDisposable
     {
         foreach (var node in _context.LivingNodes)
         {
-            if (!_attachedNodes.Add(node))
+            if (_organisms.Any(organism => ReferenceEquals(organism.Node, node)))
                 continue;
 
-            _organisms.Add(new LivingGuiOrganismFsm(
-                _hub,
-                _context,
-                node,
-                _processingGroup,
-                AttachChild));
+            if (!_organismPool.TryGetValue(node, out var organism))
+                throw new InvalidOperationException("A Living GUI node has no preallocated organism FSM.");
+
+            _organisms.Add(organism);
         }
     }
 
     private void AttachChild(PageStateContext.LivingNodeState child)
     {
-        if (_attachedNodes.Contains(child))
+        if (_organisms.Any(organism => ReferenceEquals(organism.Node, child)))
             return;
 
-        _attachedNodes.Add(child);
-        var organism = new LivingGuiOrganismFsm(
-            _hub,
-            _context,
-            child,
-            _processingGroup,
-            AttachChild);
+        if (!_organismPool.TryGetValue(child, out var organism))
+            throw new InvalidOperationException("A Living GUI child has no preallocated organism FSM.");
+
         _organisms.Add(organism);
 
-        // The child was created by an already-running organism FSM. Give the
-        // child's own FSM its first heartbeat now so it cannot remain visually
-        // inert in INITIALIZATION until the next population heartbeat.
+        // The child was activated by an already-running organism FSM. Give the
+        // child's own preallocated FSM its first heartbeat immediately.
         organism.Update();
     }
 
@@ -144,7 +147,11 @@ public sealed class LivingGuiFsm : IDisposable
             organism.Dispose();
 
         _organisms.Clear();
-        _attachedNodes.Clear();
+
+        foreach (var organism in _organismPool.Values)
+            organism.Dispose();
+
+        _organismPool.Clear();
 
         fsm_API.Interaction.DestroyFiniteStateMachine("LivingGuiFSM", _processingGroup);
         _disposed = true;
