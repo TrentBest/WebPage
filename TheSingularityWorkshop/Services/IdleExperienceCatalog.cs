@@ -8,7 +8,7 @@ public sealed record IdleExperienceDefinition(string Id, string DisplayName, str
 
 /// <summary>
 /// Registry boundary for experiences that may be selected by the screen-saver layer.
-/// The registry deliberately knows nothing about Unity, graphics engines, or navigation.
+/// The registry deliberately knows nothing about a rendering engine or navigation.
 /// </summary>
 public static class IdleExperienceCatalog
 {
