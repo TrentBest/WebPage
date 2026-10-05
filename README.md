@@ -110,41 +110,44 @@ The migration is intentionally incremental on `development`. The production `mas
 
 The home page is intentionally **not a conventional marketing hero**.
 
-The intended sequence is:
+The current sequence is:
 
 ```text
-FIRST CONTACT
+LABEL 1
      |
      v
-[ ENTER THE WORKSHOP ]
+LABEL 2
      |
-     |  breathing / reactive / instrumented
      v
-RECOGNIZABLE GUI
+[ ENTER THE WORKSHOP ] + system advisory
      |
-     |  grows
+     |  explicit visitor entry
      v
-GEN 0
+FSM_COS COMPOSES LIVING GUI EXPERIENCE
      |
-     |  reproduces
+     |  canonical Moniker dependency resolves
      v
-GEN 1 -> GEN 2 -> GEN 3 -> ...
+LIVING GUI
      |
-     |  exponential population
+     |  independent organisms grow and reproduce
      v
-"oh shit..."
+POPULATION THRESHOLD
      |
-     |  simultaneous freeze
      v
 GRAVITY
      |
-     |  everything falls away
+     |  population falls away
      v
-MONIKER / WORKSHOP
+MONIKER
      |
+     |  approximately three seconds
      v
-SHOWCASE / FORGE
+WORKSHOP HUB / NAVIGATION
 ```
+
+This is the **current WebPage behavior**, not the specification for every Workshop host or future Experience.
+
+The WebPage deliberately does not define a default social/world landing scene. Host-specific world concepts belong to the host that owns them. The browser proving ground stays focused on demonstrating the runtime and the experiences it currently implements.
 
 The recognizable GUI is important. The purpose is to take something mundane —
 a button or ordinary application control — and make it behave like software that
