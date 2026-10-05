@@ -175,6 +175,25 @@ public sealed class LivingGuiRuntimeTests
     }
 
     [Fact]
+    public void LivingGuiPublishesPopulationChangeAfterFsmAdvance()
+    {
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+        var hub = new HubKernel();
+        hub.RegisterProcessGroup("TestParent");
+
+        using var runtime = new LivingGuiFsm(hub, context, "TestParent");
+        var notifications = 0;
+        runtime.PopulationChanged += () => notifications++;
+
+        runtime.Update();
+
+        Assert.Equal(1, notifications);
+        Assert.Equal(50d, context.LivingNodes[0].Size);
+        Assert.Equal(PageStateContext.LivingNodePhase.Existing, context.LivingNodes[0].Phase);
+    }
+
+    [Fact]
     public void PageFSMRegistersLivingGuiAndGravityGroups()
     {
         using var fsm = new PageFSM();
