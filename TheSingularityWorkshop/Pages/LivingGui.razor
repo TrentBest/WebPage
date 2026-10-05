@@ -118,12 +118,15 @@
     protected override void OnInitialized()
     {
         FSM.StateChanged += HandleFSMStateChanged;
+        FSM.LivingGuiChanged += HandleLivingGuiChanged;
 
         // Entry is authorized by Home only after FSM_COS has composed the
         // Living GUI Experience and resolved its Moniker dependency.
     }
 
     private void HandleFSMStateChanged(string state) => _ = InvokeAsync(StateHasChanged);
+
+    private void HandleLivingGuiChanged() => _ = InvokeAsync(StateHasChanged);
 
     private static string ActorLeft(PageStateContext.LivingNodeState actor)
         => $"{actor.X:0.###}%";
@@ -140,5 +143,9 @@
     private static double ActorOpacity(PageStateContext.LivingNodeState actor)
         => actor.Y <= 100 ? 1 : Math.Clamp(1 - ((actor.Y - 100) / 30), 0, 1);
 
-    public void Dispose() => FSM.StateChanged -= HandleFSMStateChanged;
+    public void Dispose()
+    {
+        FSM.StateChanged -= HandleFSMStateChanged;
+        FSM.LivingGuiChanged -= HandleLivingGuiChanged;
+    }
 }
