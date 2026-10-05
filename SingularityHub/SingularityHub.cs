@@ -62,7 +62,7 @@ public sealed class SingularityHub : ISingularityHub
         foreach(var processGroup in processGroups)RegisterProcessGroup(processGroup); return this;
     }
     /// <summary>Updates all root process groups.</summary>
-    public void Update(){foreach(var registration in _registrations)if(registration.ParentName is null)_update(registration.Name);}
+    public void Update(){foreach(var registration in _registrations.Where(x=>x.ParentName is null).ToArray())_update(registration.Name);}
     /// <summary>Updates direct child process groups under a parent.</summary>
     public void UpdateNestedProcessGroups(string parentProcessGroup)
     {
