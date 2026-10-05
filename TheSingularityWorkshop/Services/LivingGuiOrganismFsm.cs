@@ -81,6 +81,12 @@ public sealed class LivingGuiOrganismFsm : IDisposable
                     if (_node.ReproductionComplete)
                         return;
 
+                    if (_context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold)
+                    {
+                        _context.MarkReproductionComplete(_node);
+                        return;
+                    }
+
                     var child = _context.CreateOffspring(_node);
                     _attachChild(child);
                     _context.MarkReproductionComplete(_node);
