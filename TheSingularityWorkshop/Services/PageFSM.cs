@@ -51,6 +51,7 @@ namespace TheSingularityWorkshop.Services
         public string LivingGuiReproductionProcessingGroup => _livingGuiRuntime.ReproductionProcessingGroup;
         public string LivingGuiParentRecoveryProcessingGroup => _livingGuiRuntime.ParentRecoveryProcessingGroup;
         public string LivingGuiActivePhase => _livingGuiRuntime.ActivePhase;
+        public IReadOnlyList<LivingGuiOrganismFsm> Organisms => _livingGuiRuntime.Organisms;
         public string GravityProcessingGroup => _gravityProcessingGroup;
         public TimeSpan MonikerPresentationDuration { get; }
         public event Action<string>? StateChanged;
