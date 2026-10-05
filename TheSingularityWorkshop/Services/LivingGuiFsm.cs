@@ -133,10 +133,6 @@ public sealed class LivingGuiFsm : IDisposable
             throw new InvalidOperationException("A Living GUI child has no preallocated organism FSM.");
 
         _organisms.Add(organism);
-
-        // The child was activated by an already-running organism FSM. Give the
-        // child's own preallocated FSM its first heartbeat immediately.
-        organism.Update();
     }
 
     public void Dispose()
