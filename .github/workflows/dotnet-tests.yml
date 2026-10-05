@@ -69,10 +69,37 @@ jobs:
           using System.Reflection;
           using System.Runtime.Loader;
 
+          var testOutput = Path.GetFullPath("SingularityHub.Tests/bin/Release/net8.0");
+          Console.WriteLine($"TEST_OUTPUT={testOutput}");
+          foreach (var candidate in Directory.EnumerateFiles(testOutput, "*.dll"))
+          {
+              try
+              {
+                  var candidateAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(candidate);
+                  var candidateType = candidateAssembly.GetType("TheSingularityWorkshop.Services.PageStateContext");
+                  if (candidateType is not null)
+                  {
+                      Console.WriteLine($"PAGE_STATE_CONTEXT_ASSEMBLY={candidateAssembly.FullName}");
+                      Console.WriteLine($"PAGE_STATE_CONTEXT_ASSEMBLY_LOCATION={candidateAssembly.Location}");
+                      Console.WriteLine($"PAGE_STATE_CONTEXT_ASSEMBLY_MVID={candidateAssembly.ManifestModule.ModuleVersionId}");
+                  }
+              }
+              catch (Exception ex)
+              {
+                  Console.WriteLine($"ASSEMBLY_INSPECT_ERROR={Path.GetFileName(candidate)}:{ex.GetType().Name}:{ex.Message}");
+              }
+          }
+
           var path = Path.GetFullPath("TheSingularityWorkshop/bin/Release/net8.0/TheSingularityWorkshop.dll");
           var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
-          var type = assembly.GetType("TheSingularityWorkshop.Services.PageStateContext")
-              ?? throw new InvalidOperationException("PageStateContext type was not found.");
+          Console.WriteLine($"DIRECT_WORKSHOP_ASSEMBLY={assembly.FullName}");
+          Console.WriteLine($"DIRECT_WORKSHOP_TYPE_COUNT={assembly.GetTypes().Length}");
+          var type = assembly.GetType("TheSingularityWorkshop.Services.PageStateContext");
+          if (type is null)
+          {
+              Console.WriteLine("DIRECT_WORKSHOP_PAGE_STATE_CONTEXT=NOT_FOUND");
+              return;
+          }
           var ctor = type.GetConstructor(new[] { typeof(object) })
               ?? throw new InvalidOperationException("PageStateContext(object) constructor was not found.");
           var body = ctor.GetMethodBody()
