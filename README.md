@@ -2,223 +2,126 @@
 
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![FSM_API](https://img.shields.io/badge/FSM_API-1.0.13-00A98F?style=flat-square)](https://github.com/TrentBest/FSM_API)
-[![FSM_Serialization](https://img.shields.io/badge/FSM_Serialization-0.1.0--alpha.2-8A2BE2?style=flat-square)](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization)
-[![NuGet](https://img.shields.io/nuget/v/TheSingularityWorkshop.FSM_Serialization.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/)
-[![Repository](https://img.shields.io/badge/repository-private-6e7781?style=flat-square&logo=github)](https://github.com/TrentBest/WebPage)
-[![Tests](https://img.shields.io/badge/tests-manual%20CI-f39c12?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/TrentBest/WebPage/actions)
+[![Tests](https://img.shields.io/badge/tests-GitHub%20Actions-f39c12?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/TrentBest/WebPage/actions)
+[![Repository](https://img.shields.io/badge/repository-public-238636?style=flat-square&logo=github)](https://github.com/TrentBest/WebPage)
 
+> **The page opens the door. The Experience gives you somewhere to stand. The machinery lets you look underneath it.**
 
-## What this repository actually is
+## What this repository is
 
-This is the **ephemeral WebPage project** for The Singularity Workshop.
+WebPage is the public browser proving ground for The Singularity Workshop.
 
-That distinction matters.
+It is a real Workshop host, not a screenshot gallery and not the canonical home of every runtime contract. It exists to make the architecture observable: visitors can witness real behavior, Experiences can be composed from MicroBundles, FSM_COS can assemble the selected runtime, and Deep Dives can explain what was just witnessed.
 
-The long-term thing being built is **The Singularity Workshop**: a body of software,
-architecture, experiments, tools, runtime infrastructure, and ideas aimed at
-**Forging Software for the Singularity**.
+> **Show the behavior. Preserve the semantics. Explain the machinery.**
 
-This repository is one manifestation of that larger system — the public-facing web
-surface, publisher presence, demonstration environment, and experimental proving
-ground.
+## First contact
 
-The road to the long-term architecture is deliberately allowed to change.
-The destination is comparatively stable; the implementation path is not.
+The current opening is deliberately experiential rather than a conventional marketing hero:
 
-> **The Workshop is the vision. This WebPage is one of the experiments we use to
-> discover how to get there.**
+ARRIVE → LABEL 1 → LABEL 2 → ENTER THE WORKSHOP → explicit entry → FSM_COS composition → LIVING GUI → population threshold → gravity → Moniker → Workshop navigation.
 
-And because this is software, the experiment is allowed to become part of the
-software it is demonstrating.
+This is current WebPage behavior. It is not a specification for other Workshop hosts or future Experiences.
 
----
+## Runtime boundary
 
-## The guiding principle
-
-> **Make the mundane magical. Then show the machinery that made it possible.**
-
-The Workshop should not merely *tell* a visitor that the underlying technology is
-interesting. The interface should occasionally behave in a way that makes the
-visitor wonder what the hell they are looking at.
-
-A button can be a button.
-
-Or a button can breathe.
-
-It can react to the pointer.
-
-It can reveal a living GUI.
-
-That GUI can reproduce.
-
-The reproduction can become a swarm.
-
-The swarm can overwhelm the screen, freeze, fall away under gravity, and reveal
-that the visitor is crossing from the ordinary interface into the Workshop's living runtime.
-
-That is not decoration around the technology.
-
-**That is the technology becoming the demonstration.**
-
----
-
-# Current direction — October 2026
-
-The current WebPage is intentionally in motion. Do not interpret every current
-implementation detail as permanent architecture.
-
-The durable guideposts are:
-
-- deterministic state-driven behavior
-- separation of semantics from manifestation
-- lightweight runtime infrastructure
-- reusable state/identity concepts
-- AI-facing deterministic command boundaries
-- ontology and mapping between human-readable and machine-efficient forms
-- data infrastructure through SingularityWarehouse
-- multiple manifestation domains, including browser, desktop, and future hosts
-- software that can explain and demonstrate itself
-
-The implementation route toward those goals is expected to evolve.
-
-## GUI architecture proving ground
-
-The WebPage is the first practical proving ground for [TheSingularityWorkshop.GUI](https://github.com/TrentBest/TheSingularityWorkshop.GUI).
-
-The intended boundary is:
-
-```
-WebPage experience
-      |
-      v
-semantic GUI model
-      |
-      v
-Blazor adapter
-      |
-      v
-browser manifestation
-```
-
-The WebPage should demonstrate the architecture by using the GUI repository to construct its reusable presentation layer while keeping Workshop-specific domain meaning in this repository.
-
-This separation matters because the WebPage is not merely documentation for the GUI. It is a real consumer of it. A developer evaluating the GUI should eventually be able to run the WebPage, observe the resulting experience, and then inspect the same boundary in source code.
-
-The migration is intentionally incremental on `development`. The production `master` manifestation remains a separate concern until the development slice is ready.
-
-## The current landing experience
-
-The home page is intentionally **not a conventional marketing hero**.
-
-The current sequence is:
+WebPage owns browser presentation, visitor interaction, discovery, authoring UX, and proving-ground behavior. FSM_COS owns composition, dependency closure, loading, arbitration, convergence, and RuntimeAssembly. MicroBundles own focused capabilities. Experiences describe composed environments. The renderer owns rendering computation rather than becoming a WebPage identity.
 
 ```text
-LABEL 1
-     |
-     v
-LABEL 2
-     |
-     v
-[ ENTER THE WORKSHOP ] + system advisory
-     |
-     |  explicit visitor entry
-     v
-FSM_COS COMPOSES LIVING GUI EXPERIENCE
-     |
-     |  canonical Moniker dependency resolves
-     v
-LIVING GUI
-     |
-     |  independent organisms grow and reproduce
-     v
-POPULATION THRESHOLD
-     |
-     v
-GRAVITY
-     |
-     |  population falls away
-     v
-MONIKER
-     |
-     |  approximately three seconds
-     v
-WORKSHOP HUB / NAVIGATION
+Visitor
+  ↓
+WebPage / Blazor
+  ↓
+Experience
+  ↓
+FSM_COS
+  ↓
+RuntimeAssembly
+  ↓
+WebPage manifestation
 ```
 
-This is the **current WebPage behavior**, not the specification for every Workshop host or future Experience.
+Shared runtime layers must not acquire a dependency on WebPage merely because this is the most visible host.
 
-The WebPage deliberately does not define a default social/world landing scene. Host-specific world concepts belong to the host that owns them. The browser proving ground stays focused on demonstrating the runtime and the experiences it currently implements.
+## MicroBundles and Deep Dives
 
-The recognizable GUI is important. The purpose is to take something mundane —
-a button or ordinary application control — and make it behave like software that
-has acquired a life of its own.
+MicroBundles are focused capability units and increasingly act as collections of optional providers. WebPage currently acquires a WebPage-only Deep Dive provider from a composed MicroBundle when one is available.
 
-### Visual language is part of the architecture
+Deep Dive is the Workshop's educational unit:
 
-The current Workshop language includes:
+WITNESS → WONDER → DEEP DIVE → UNDERSTAND → CREATE → RUN → PUBLISH
 
-- electric cyan and magenta instrumentation
-- gold/orange warning energy
-- breathing borders
-- breathing typography
-- scan-line effects
-- subtle horizontal/vertical environmental distortion
-- orbital traces
-- small signal dots
-- spark-like details
-- glowing controls
-- GUI elements that become the actors in the demonstration
+> **Don't copy the trick. Use the machinery.**
 
-These effects are not sacred implementations. They **are** sacred intent.
+See [DEEP_DIVE_PROVIDER_ARCHITECTURE.md](DEEP_DIVE_PROVIDER_ARCHITECTURE.md).
 
-A future developer may replace the CSS animation with a canvas, a shader, a
-MicroBundle provider, another renderer, or something we have not invented yet.
-What must survive is the feeling and the underlying behavior.
+## Identity
 
-If a refactor turns the Workshop into a generic SaaS landing page, it is almost
-certainly a regression.
+The Workshop keeps Experience ID, MicroBundle ID, and Ontology Signature distinct. Experience identity answers what is running; MicroBundle identity answers what capability is composed; ontology answers what the thing is structurally. WebPage proves these ideas but does not own the canonical runtime contracts.
 
----
+## Rendering
 
-# Architecture: destination stable, road ephemeral
+> **REMOVE THE CUBES. RENDER WHAT REMAINS.**
 
-There is an important distinction between **the architecture we are trying to
-reach** and **the implementation currently carrying us there**.
+The renderer direction explores observer-relative detail, Event Horizons, representation policy, computation/workload separation, and state-driven manifestation. WebPage demonstrates the work; the renderer remains a separate architectural concern.
 
-The Workshop is not a single finished application. It is an evolving ecosystem.
+## Public surfaces
 
-A useful conceptual model is:
+Explore · Rendering · Create · Education · MadMen · About Us · Consult
 
-```text
-                         THE SINGULARITY WORKSHOP
-                                  |
-              +-------------------+-------------------+
-              |                   |                   |
-              v                   v                   v
-       FSM_API / Runtime   SingularityWarehouse   Developer Tools
-              |                   |                   |
-              +-------------------+-------------------+
-                                  |
-                                  v
-                         Deterministic Semantics
-                                  |
-                                  v
-                    AI / Command / Grammar Boundary
-                                  |
-                                  v
-                         Manifestation Domains
-                       +----------+----------+
-                       |                     |
-                       v                     v
-                 Blazor / Web          Desktop / future hosts
+These are different doors into one Workshop. See [PUBLIC_WORKSHOP_TABS.md](PUBLIC_WORKSHOP_TABS.md).
+
+## Documentation
+
+Start with [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md) and [DOCUMENTATION_STANDARD.md](DOCUMENTATION_STANDARD.md). The documentation standard requires every document to distinguish current behavior, architectural direction, and future work. Documentation is engineering memory, not marketing fiction.
+
+Key contracts:
+
+- [WORKSHOP_RUNTIME_ARCHITECTURE.md](WORKSHOP_RUNTIME_ARCHITECTURE.md)
+- [WEBPAGE_EXPERIENCE_ARCHITECTURE.md](WEBPAGE_EXPERIENCE_ARCHITECTURE.md)
+- [WORKSHOP_OPENING_EXPERIENCE.md](WORKSHOP_OPENING_EXPERIENCE.md)
+- [EXPERIENCE_THEORY.md](EXPERIENCE_THEORY.md)
+- [MICROBUNDLE_ARBITRATION_MAP.md](MICROBUNDLE_ARBITRATION_MAP.md)
+- [CURRENT_VERTICAL_SLICE.md](CURRENT_VERTICAL_SLICE.md)
+
+## Platform integration
+
+WebPage is browser-first. The separate Unity integration maintained by the Workshop is [FSM_UnityIntegrationAdvanced](https://github.com/TrentBest/FSM_UnityIntegrationAdvanced). It is not part of this WebPage runtime architecture.
+
+## Development
+
+```bash
+git clone https://github.com/TrentBest/WebPage.git
+cd WebPage
+dotnet restore
+dotnet run
 ```
 
-This is a direction, not a claim that every layer is already complete.
+Active engineering occurs on development. Before calling a change complete: build it, run the relevant tests, inspect the behavior, update the documentation, and verify GitHub Actions.
 
-The architecture should become more coherent as the experiments accumulate.
+## Workshop quality bar
+
+- zero warnings and zero avoidable errors;
+- explicit lifecycle and state ownership;
+- clean dependency direction;
+- XML documentation for public contracts;
+- tests that prove architectural intent;
+- visual evidence for visual behavior;
+- documentation that describes what the code actually does;
+- incremental, inspectable changes;
+- preserve valuable behavior before deleting or simplifying it.
+
+> **Can a visitor experience it, can an engineer explain it, and can the architecture tell us who owns it?**
+
+## The larger idea
+
+The Singularity Workshop is not claiming that the Singularity has arrived. We are building machinery that makes increasingly strange software possible to compose, observe, understand, and create.
+
+*This way leads to the Singularity.*
+
+*Built by The Singularity Workshop.*
 
 ---
-
 # FSM_API
 
 `FSM_API` is the core state technology behind much of the Workshop.
