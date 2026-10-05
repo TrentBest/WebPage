@@ -115,6 +115,21 @@ jobs:
               Console.WriteLine($"CONSTRUCTOR_LOCAL={local.LocalIndex}:{local.LocalType.FullName}");
           Console.WriteLine($"CONSTRUCTOR_IL_LENGTH={body.GetILAsByteArray()?.Length ?? 0}");
           Console.WriteLine($"CONSTRUCTOR_IL={Convert.ToHexString(body.GetILAsByteArray() ?? Array.Empty<byte>())}");
+          var profileType = assembly.GetType("TheSingularityWorkshop.Services.WorkshopPresentationProfile")!;
+          var currentProperty = profileType.GetProperty("Current", BindingFlags.Public | BindingFlags.Static)!;
+          var currentProfile = currentProperty.GetValue(null)!;
+          Console.WriteLine($"PROFILE_ASSEMBLY={profileType.Assembly.Location}");
+          Console.WriteLine($"PROFILE_POOL={profileType.GetProperty("PopulationPoolSize")!.GetValue(currentProfile)}");
+          Console.WriteLine($"PROFILE_THRESHOLD={profileType.GetProperty("PopulationThreshold")!.GetValue(currentProfile)}");
+          var context = Activator.CreateInstance(type)!;
+          var preallocated = type.GetProperty("PreallocatedLivingNodes")!.GetValue(context)!;
+          var preallocatedCount = (int)preallocated.GetType().GetProperty("Count")!.GetValue(preallocated)!;
+          Console.WriteLine($"DIRECT_CONSTRUCTOR_PREALLOCATED_COUNT={preallocatedCount}");
+          var poolField = type.GetField("_preallocatedNodes", BindingFlags.Instance | BindingFlags.NonPublic)!;
+          var poolValue = poolField.GetValue(context)!;
+          Console.WriteLine($"DIRECT_CONSTRUCTOR_PRIVATE_POOL_COUNT={poolValue.GetType().GetProperty("Count")!.GetValue(poolValue)}");
+          var poolSize = type.GetField("_maximumNodeSize", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(context);
+          Console.WriteLine($"DIRECT_CONSTRUCTOR_MAX_NODE_SIZE={poolSize}");
           EOF
           dotnet restore /tmp/assembly-inspector/AssemblyInspector.csproj && dotnet run --project /tmp/assembly-inspector/AssemblyInspector.csproj --configuration Release --no-restore
           echo "=== End runtime artifact inspection ==="
