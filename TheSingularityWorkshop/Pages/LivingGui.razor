@@ -27,6 +27,7 @@
        The panel is the coordinate space. The experience contributes actors;
        it does not create a second GUI, diagnostic overlay, or coordinate plane. */
     .living-experience-panel {
+        container-type:size;
         position:relative;
         width:100%;
         height:100%;
@@ -85,6 +86,9 @@
             inset 0 0 18px color-mix(in srgb,var(--flower-color) 22%,transparent);
         transition:left .16s linear,top .16s linear,width .16s linear,height .16s linear,opacity .16s linear,transform .16s linear;
         will-change:left,top,width,height,transform;
+        --actor-logical-size:50;
+        width:clamp(10px,calc(var(--actor-logical-size) * .10cqmin),18cqmin)!important;
+        height:clamp(10px,calc(var(--actor-logical-size) * .10cqmin),18cqmin)!important;
         transform-origin:center;
         z-index:20;
     }
@@ -135,16 +139,13 @@
     private void HandleLivingGuiChanged() => _ = InvokeAsync(StateHasChanged);
 
     private static string ActorStyle(PageStateContext.LivingNodeState actor)
-        => $"left:{ActorLeft(actor)};top:{ActorTop(actor)};width:{ActorSize(actor)};height:{ActorSize(actor)};transform:{ActorTransform(actor)};opacity:{ActorOpacity(actor):0.###};--flower-color:{ActorColor(actor)};";
+        => $"left:{ActorLeft(actor)};top:{ActorTop(actor)};--actor-logical-size:{actor.Size:0.##};transform:{ActorTransform(actor)};opacity:{ActorOpacity(actor):0.###};--flower-color:{ActorColor(actor)};";
 
     private static string ActorLeft(PageStateContext.LivingNodeState actor)
         => $"{actor.X:0.###}%";
 
     private static string ActorTop(PageStateContext.LivingNodeState actor)
         => $"{actor.Y:0.###}%";
-
-    private static string ActorSize(PageStateContext.LivingNodeState actor)
-        => $"{actor.Size:0.##}px";
 
     private static string ActorTransform(PageStateContext.LivingNodeState actor)
         => $"translate(-50%,-50%) rotate({actor.Rotation:0.##}deg)";
