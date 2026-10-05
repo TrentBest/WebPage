@@ -1,6 +1,5 @@
 using System;
 using TheSingularityWorkshop.FSM_API;
-using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 
 namespace TheSingularityWorkshop.Services;
@@ -19,7 +18,6 @@ public sealed class LivingGuiOrganismFsm : IDisposable
     public const string ReproducingState = "REPRODUCING";
     public const string ReducingState = "REDUCING";
 
-    private readonly HubKernel _hub;
     private readonly PageStateContext _context;
     private readonly PageStateContext.LivingNodeState _node;
     private readonly Action<PageStateContext.LivingNodeState> _attachChild;
@@ -29,7 +27,6 @@ public sealed class LivingGuiOrganismFsm : IDisposable
     private bool _disposed;
 
     public LivingGuiOrganismFsm(
-        HubKernel hub,
         PageStateContext context,
         PageStateContext.LivingNodeState node,
         string parentProcessingGroup,
@@ -122,12 +119,6 @@ public sealed class LivingGuiOrganismFsm : IDisposable
     public string CurrentState => _handle.CurrentState;
     public string ProcessingGroup => _processingGroup;
     public bool IsValid => _context.IsValid && _handle.IsValid;
-
-    public void Update()
-    {
-        // The population manager advances the shared processing group once per heartbeat.
-        // This method intentionally does not step the group independently.
-    }
 
     public void Dispose()
     {
