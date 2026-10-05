@@ -83,7 +83,13 @@ public sealed class LivingGuiRuntimeTests
             .Distinct()
             .ToArray();
 
+        var fsmStates = fsm.Organisms
+            .Select(organism => organism.CurrentState)
+            .Distinct()
+            .ToArray();
+
         Assert.True(phases.Length >= 2, "The population collapsed into one shared lifecycle phase.");
+        Assert.True(fsmStates.Length >= 2, "The organism FSM instances collapsed into one shared FSM state.");
     }
 
     [Fact]
