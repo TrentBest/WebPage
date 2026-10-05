@@ -87,7 +87,7 @@ public sealed class LivingGuiRuntimeTests
     }
 
     [Fact]
-    public void EachOrganismGetsItsOwnFsmAndOwnProcessingGroup()
+    public void EachOrganismGetsItsOwnFsmOnOneSharedProcessingGroup()
     {
         var context = new PageStateContext();
         context.BeginLivingGui();
@@ -111,20 +111,18 @@ public sealed class LivingGuiRuntimeTests
         Assert.True(runtime.OrganismCount >= 5);
         Assert.Equal(context.LivingNodes.Count, runtime.OrganismCount);
 
-        var groups = context.LivingNodes
-            .Select((_, index) => index)
-            .Select(index => hub.ProcessGroups
-                .Where(group => group.Name.Contains("LivingGui:Organism:"))
-                .Select(group => group.Name)
-                .Distinct()
-                .ElementAt(index))
+        var organismGroups = runtime.Organisms
+            .Select(organism => organism.ProcessingGroup)
+            .Distinct()
             .ToArray();
 
-        Assert.Equal(groups.Length, groups.Distinct().Count());
+        Assert.Single(organismGroups);
+        Assert.Equal(runtime.ProcessingGroup, organismGroups[0]);
+        Assert.DoesNotContain(hub.ProcessGroups, group => group.Name.Contains("LivingGui:Organism:"));
     }
 
     [Fact]
-    public void OrganismsAdvanceIndependentlyThroughTheirOwnFsmGroups()
+    public void OrganismsAdvanceIndependentlyThroughTheirOwnFsmInstances()
     {
         var context = new PageStateContext();
         context.BeginLivingGui();
@@ -138,6 +136,7 @@ public sealed class LivingGuiRuntimeTests
 
         var children = context.LivingNodes.Where(node => !node.IsRoot).Take(2).ToArray();
         Assert.Equal(2, children.Length);
+        Assert.Equal(1, runtime.Organisms.Select(organism => organism.ProcessingGroup).Distinct().Count());
 
         for (var ticks = 0; ticks < 5; ticks++)
             runtime.Update();
