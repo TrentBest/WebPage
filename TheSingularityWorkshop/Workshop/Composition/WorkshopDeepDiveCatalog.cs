@@ -61,7 +61,7 @@ public sealed class WorkshopDeepDiveModel
     }
 
     public IExperience Experience { get; }
-    public IReadOnlyList<IMicroBundle> Bundles { get; }
+    public IReadOnlyList<CosMicroBundle> Bundles { get; }
     public CosMicroBundle? PrimaryBundle => Bundles.FirstOrDefault();
 
     public int DeclaredDependencyCount =>
