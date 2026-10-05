@@ -19,16 +19,6 @@
 
             <div id="paypal-donate-button-container" class="my-4 p-3 border rounded" aria-live="polite">Preparing the donation gate…</div>
 
-@code {
-    private bool _donationInitialized;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender || _donationInitialized) return;
-        _donationInitialized = true;
-        await JS.InvokeVoidAsync("workshopPayments.renderDonation");
-    }
-}
             <div id="donation-celebration" class="alert alert-success mt-4" hidden aria-live="polite"><strong>✦ SIGNAL RECEIVED ✦</strong><div id="donation-celebration-detail" class="mt-2">Thank you. The Workshop has noticed your kindness.</div><div class="mt-2 fw-bold">THE WORKSHOP CONTINUES.</div></div>
             <p class="small text-muted">A donation supports development; it does not purchase access, ownership, or a promised feature.</p>
             <a href="mailto:thesingularityworkshop@gmail.com" class="btn btn-primary btn-lg mb-4">
@@ -51,3 +41,14 @@
         </p>
     </div>
 </div>
+
+@code {
+    private bool _donationInitialized;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _donationInitialized) return;
+        _donationInitialized = true;
+        await JS.InvokeVoidAsync("workshopPayments.renderDonation");
+    }
+}
