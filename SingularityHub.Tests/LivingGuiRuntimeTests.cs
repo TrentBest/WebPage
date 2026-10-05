@@ -236,6 +236,7 @@ public sealed class LivingGuiRuntimeTests
 
         Assert.Equal(WorkshopPresentationProfile.DefaultPopulationPoolSize, profile.PopulationPoolSize);
         Assert.Equal(WorkshopPresentationProfile.DefaultPopulationThreshold, profile.PopulationThreshold);
+        Assert.True(profile.PopulationPoolSize > 0, "Diagnostic: profile pool size must be positive before PageStateContext construction.");
 
         var context = new PageStateContext();
         Assert.Equal(100, context.PreallocatedLivingNodes.Count);
