@@ -60,16 +60,16 @@ public sealed class LivingGuiRuntimeTests
 
         fsm.Update();
         Assert.Equal(90, root.Size);
-        Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, root.Phase);
-
-        fsm.Update();
-        Assert.Equal(100, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
 
         fsm.Update();
         Assert.Equal(100, root.Size);
-        Assert.True(root.SeedDoubled);
         Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, root.Phase);
+
+        fsm.Update();
+        Assert.Equal(100, root.Size);
+        Assert.True(root.SeedDoubled);
+        Assert.Equal(PageStateContext.LivingNodePhase.ParentRecovery, root.Phase);
 
         fsm.Update();
 
@@ -112,8 +112,7 @@ public sealed class LivingGuiRuntimeTests
         Assert.True(child.GrowthReady);
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, child.Phase);
 
-        // Mature growth is intentionally round-robin so the root cannot starve
-        // descendants. Advance until this specific child reaches reproduction.
+        // Mature organisms advance from their own lifecycle phase. Advance until this specific child reaches reproduction.
         ticks = 0;
         while (child.Size < 100 && ticks++ < guard)
             runtime.Update();
