@@ -5,9 +5,9 @@ using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 namespace TheSingularityWorkshop.Services;
 
 /// <summary>
-/// One independent FSM instance for one Living GUI organism. All organism instances
-/// share the Living GUI processing group; the instance owns lifecycle and behavior.
-/// The organism owns its own lifecycle; the population never chooses a global phase.
+/// One independent FSM_API instance for one Living GUI organism. The FSM definition is
+/// shared because FSM_API defines behavior once and instantiates it many times; each
+/// organism still owns a distinct FSMHandle and a distinct organism context.
 /// </summary>
 public sealed class LivingGuiOrganismFsm : IDisposable
 {
@@ -18,9 +18,7 @@ public sealed class LivingGuiOrganismFsm : IDisposable
     public const string ReproducingState = "REPRODUCING";
     public const string ReducingState = "REDUCING";
 
-    private readonly PageStateContext _context;
-    private readonly PageStateContext.LivingNodeState _node;
-    private readonly Action<PageStateContext.LivingNodeState> _attachChild;
+    private readonly LivingGuiOrganismContext _organismContext;
     private readonly string _processingGroup;
     private readonly string _fsmName;
     private readonly FSMHandle _handle;
@@ -32,99 +30,165 @@ public sealed class LivingGuiOrganismFsm : IDisposable
         string parentProcessingGroup,
         Action<PageStateContext.LivingNodeState> attachChild)
     {
-        _context = context;
-        _node = node;
-        _attachChild = attachChild;
         _processingGroup = parentProcessingGroup;
-        _fsmName = $"LivingGuiOrganismFSM:{Guid.NewGuid():N}";
+        _fsmName = DefinitionNameForGroup(parentProcessingGroup);
+        _organismContext = new LivingGuiOrganismContext(context, node, attachChild);
 
-        // All organism FSM instances share the population's single processing group.
-        // The FSM instance and its node remain the independent unit of behavior.
+        EnsureDefinition(_fsmName, _processingGroup);
 
-        fsm_API.Create.CreateFiniteStateMachine(_fsmName, -1, _processingGroup)
-            .State(
-                InitializationState,
-                onEnter: _ => _context.InitializeOrganism(_node),
-                onUpdate: null,
-                onExit: null)
-            .State(
-                TravelingState,
-                onEnter: _ => _node.Phase = PageStateContext.LivingNodePhase.Traveling,
-                onUpdate: _ => _context.AdvanceTravel(_node),
-                onExit: null)
-            .State(
-                PlantingState,
-                onEnter: _ =>
-                {
-                    _node.Phase = PageStateContext.LivingNodePhase.Planting;
-                    _node.GrowthReady = false;
-                },
-                onUpdate: _ => _context.AdvancePlanting(_node),
-                onExit: null)
-            .State(
-                ExistingState,
-                onEnter: _ =>
-                {
-                    _node.Phase = PageStateContext.LivingNodePhase.Existing;
-                    _node.ReproductionComplete = false;
-                },
-                onUpdate: _ => _context.AdvanceExisting(_node),
-                onExit: null)
-            .State(
-                ReproducingState,
-                onEnter: _ => _node.Phase = PageStateContext.LivingNodePhase.Reproducing,
-                onUpdate: _ =>
-                {
-                    if (_node.ReproductionComplete)
-                        return;
-
-                    if (_context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold)
-                    {
-                        _context.MarkReproductionComplete(_node);
-                        return;
-                    }
-
-                    var child = _context.CreateOffspring(_node);
-                    _attachChild(child);
-                    _context.MarkReproductionComplete(_node);
-                },
-                onExit: null)
-            .State(
-                ReducingState,
-                onEnter: _ =>
-                {
-                    _node.Phase = PageStateContext.LivingNodePhase.Reducing;
-                    _node.ReproductionComplete = false;
-                },
-                onUpdate: _ => _context.AdvanceReducing(_node),
-                onExit: null)
-            .WithInitialState(InitializationState)
-            .Transition(InitializationState, ExistingState, _ => _node.IsRoot)
-            .Transition(InitializationState, TravelingState, _ => !_node.IsRoot)
-            .Transition(TravelingState, PlantingState, _ => _context.IsTravelComplete(_node))
-            .Transition(PlantingState, ExistingState, _ => _context.IsPlantingComplete(_node))
-            .Transition(ExistingState, ReproducingState, _ => _context.IsExistingComplete(_node))
-            .Transition(ReproducingState, ReducingState, _ => _context.IsReproductionComplete(_node))
-            .Transition(ReducingState, ExistingState, _ => _context.IsReducingComplete(_node))
-            .BuildDefinition();
-
-        _handle = fsm_API.Create.CreateInstance(_fsmName, context, _processingGroup);
+        _handle = fsm_API.Create.CreateInstance(_fsmName, _organismContext, _processingGroup);
 
         if (!IsValid)
             throw new InvalidOperationException("Living GUI organism FSM was created with an invalid context or handle.");
     }
 
-    public PageStateContext.LivingNodeState Node => _node;
+    public static string DefinitionNameForGroup(string processingGroup)
+        => $"LivingGuiOrganismFSM:{processingGroup}";
+
+    private static void EnsureDefinition(string fsmName, string processingGroup)
+    {
+        if (fsm_API.Interaction.Exists(fsmName, processingGroup))
+            return;
+
+        fsm_API.Create.CreateFiniteStateMachine(fsmName, -1, processingGroup)
+            .State(
+                InitializationState,
+                onEnter: ctx => GetContext(ctx).Initialize(),
+                onUpdate: null,
+                onExit: null)
+            .State(
+                TravelingState,
+                onEnter: ctx => GetContext(ctx).EnterTraveling(),
+                onUpdate: ctx => GetContext(ctx).AdvanceTravel(),
+                onExit: null)
+            .State(
+                PlantingState,
+                onEnter: ctx => GetContext(ctx).EnterPlanting(),
+                onUpdate: ctx => GetContext(ctx).AdvancePlanting(),
+                onExit: null)
+            .State(
+                ExistingState,
+                onEnter: ctx => GetContext(ctx).EnterExisting(),
+                onUpdate: ctx => GetContext(ctx).AdvanceExisting(),
+                onExit: null)
+            .State(
+                ReproducingState,
+                onEnter: ctx => GetContext(ctx).EnterReproducing(),
+                onUpdate: ctx => GetContext(ctx).AdvanceReproduction(),
+                onExit: null)
+            .State(
+                ReducingState,
+                onEnter: ctx => GetContext(ctx).EnterReducing(),
+                onUpdate: ctx => GetContext(ctx).AdvanceReducing(),
+                onExit: null)
+            .WithInitialState(InitializationState)
+            .Transition(InitializationState, ExistingState, ctx => GetContext(ctx).Node.IsRoot)
+            .Transition(InitializationState, TravelingState, ctx => !GetContext(ctx).Node.IsRoot)
+            .Transition(TravelingState, PlantingState, ctx => GetContext(ctx).IsTravelComplete())
+            .Transition(PlantingState, ExistingState, ctx => GetContext(ctx).IsPlantingComplete())
+            .Transition(ExistingState, ReproducingState, ctx => GetContext(ctx).IsExistingComplete())
+            .Transition(ReproducingState, ReducingState, ctx => GetContext(ctx).IsReproductionComplete())
+            .Transition(ReducingState, ExistingState, ctx => GetContext(ctx).IsReducingComplete())
+            .BuildDefinition();
+    }
+
+    private static LivingGuiOrganismContext GetContext(IStateContext context)
+        => context as LivingGuiOrganismContext
+            ?? throw new InvalidOperationException("Living GUI organism FSM received an unexpected context type.");
+
+    public PageStateContext.LivingNodeState Node => _organismContext.Node;
     public string CurrentState => _handle.CurrentState;
     public string ProcessingGroup => _processingGroup;
-    public bool IsValid => _context.IsValid && _handle.IsValid;
+    public bool IsValid => !_disposed && _organismContext.IsValid && _handle.IsValid;
 
     public void Dispose()
     {
         if (_disposed)
             return;
 
-        fsm_API.Interaction.DestroyFiniteStateMachine(_fsmName, _processingGroup);
+        fsm_API.Interaction.DestroyInstance(_handle);
         _disposed = true;
+    }
+
+    private sealed class LivingGuiOrganismContext : IStateContext
+    {
+        private readonly PageStateContext _page;
+        private readonly Action<PageStateContext.LivingNodeState> _attachChild;
+
+        public LivingGuiOrganismContext(
+            PageStateContext page,
+            PageStateContext.LivingNodeState node,
+            Action<PageStateContext.LivingNodeState> attachChild)
+        {
+            _page = page;
+            Node = node;
+            _attachChild = attachChild;
+            Name = $"LivingGuiOrganismContext:{Guid.NewGuid():N}";
+        }
+
+        public string Name { get; }
+        public bool IsValid => _page.IsValid;
+
+        public PageStateContext.LivingNodeState Node { get; }
+
+        public void Initialize() => _page.InitializeOrganism(Node);
+
+        public void EnterTraveling()
+            => Node.Phase = PageStateContext.LivingNodePhase.Traveling;
+
+        public void AdvanceTravel() => _page.AdvanceTravel(Node);
+
+        public bool IsTravelComplete() => _page.IsTravelComplete(Node);
+
+        public void EnterPlanting()
+        {
+            Node.Phase = PageStateContext.LivingNodePhase.Planting;
+            Node.GrowthReady = false;
+        }
+
+        public void AdvancePlanting() => _page.AdvancePlanting(Node);
+
+        public bool IsPlantingComplete() => _page.IsPlantingComplete(Node);
+
+        public void EnterExisting()
+        {
+            Node.Phase = PageStateContext.LivingNodePhase.Existing;
+            Node.ReproductionComplete = false;
+        }
+
+        public void AdvanceExisting() => _page.AdvanceExisting(Node);
+
+        public bool IsExistingComplete() => _page.IsExistingComplete(Node);
+
+        public void EnterReproducing()
+            => Node.Phase = PageStateContext.LivingNodePhase.Reproducing;
+
+        public void AdvanceReproduction()
+        {
+            if (Node.ReproductionComplete)
+                return;
+
+            if (_page.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold)
+            {
+                _page.MarkReproductionComplete(Node);
+                return;
+            }
+
+            var child = _page.CreateOffspring(Node);
+            _attachChild(child);
+            _page.MarkReproductionComplete(Node);
+        }
+
+        public bool IsReproductionComplete() => _page.IsReproductionComplete(Node);
+
+        public void EnterReducing()
+        {
+            Node.Phase = PageStateContext.LivingNodePhase.Reducing;
+            Node.ReproductionComplete = false;
+        }
+
+        public void AdvanceReducing() => _page.AdvanceReducing(Node);
+
+        public bool IsReducingComplete() => _page.IsReducingComplete(Node);
     }
 }
