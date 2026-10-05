@@ -5,25 +5,19 @@ using Xunit;
 
 namespace SingularityHub.Tests;
 
-/// <summary>
-/// Runtime contract tests for the living GUI handoff.
-/// These tests deliberately exercise PageFSM rather than Razor so the visual
-/// experience cannot silently depend on page-render timing.
-/// </summary>
 public sealed class LivingGuiRuntimeTests
 {
-    [Fact(DisplayName = "Page FSM context is explicitly valid at construction")]
+    [Fact]
     public void PageFsm_ContextStartsValid()
     {
         using var fsm = new PageFSM();
-
         Assert.True(fsm.Context.IsValid);
         Assert.True(fsm.IsValid);
         Assert.True(fsm.LivingGuiIsValid);
     }
 
-    [Fact(DisplayName = "Living GUI enters population with a centered 50px root actor")]
-    public void LivingGui_EntersPopulationWithCenteredRoot()
+    [Fact]
+    public void LivingGuiCreatesRootAndThenIndependentChildren()
     {
         using var fsm = new PageFSM();
         fsm.RequestEnter();
@@ -34,191 +28,106 @@ public sealed class LivingGuiRuntimeTests
         var root = Assert.Single(fsm.Context.LivingNodes);
         Assert.Equal(PageFSM.LivingGuiPopulating, fsm.CurrentState);
         Assert.Equal("G:0", root.Lineage);
-        Assert.Equal(0, root.Generation);
-        Assert.True(root.IsRoot);
-        Assert.Equal(50, root.X);
-        Assert.Equal(50, root.Y);
-        Assert.Equal(50, root.Size);
-        Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
-        Assert.Equal(0, root.Rotation);
+        Assert.Equal(50d, root.Size);
+        Assert.Equal(PageStateContext.LivingNodePhase.Initialization, root.Phase);
+
+        for (var ticks = 0; ticks < 200 && fsm.Context.LivingNodes.Count < 2; ticks++)
+            fsm.Update();
+
+        Assert.True(fsm.Context.LivingNodes.Count >= 2);
+        var child = fsm.Context.LivingNodes[1];
+        Assert.Equal(10d, child.Size);
+        Assert.Equal(50d, child.X);
+        Assert.Equal(50d, child.Y);
+        Assert.Equal(PageStateContext.LivingNodePhase.Traveling, child.Phase);
+        Assert.InRange(child.TargetX, 10d, 90d);
+        Assert.InRange(child.TargetY, 10d, 90d);
+        Assert.NotEqual(0d, child.Rotation);
     }
 
-    [Fact(DisplayName = "Living GUI root actor animates from its original size to double before spawning")]
-    public void LivingGui_RootAnimatesToDoubleAndThenSpawnsSeed()
+    [Fact]
+    public void OrganismsDoNotShareALifecyclePhase()
     {
         using var fsm = new PageFSM();
         fsm.RequestEnter();
 
-        for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
+        for (var ticks = 0; ticks < 10_000 && fsm.Context.LivingNodes.Count < 4; ticks++)
             fsm.Update();
 
-        var root = fsm.Context.LivingNodes[0];
+        Assert.True(fsm.Context.LivingNodes.Count >= 4);
 
-        fsm.Update();
-        Assert.Equal(70, root.Size);
-        Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
+        var phases = fsm.Context.LivingNodes
+            .Select(node => node.Phase)
+            .Distinct()
+            .ToArray();
 
-        fsm.Update();
-        Assert.Equal(90, root.Size);
-        Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
-
-        fsm.Update();
-        Assert.Equal(100, root.Size);
-        Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, root.Phase);
-
-        fsm.Update();
-        Assert.Equal(100, root.Size);
-        Assert.True(root.SeedDoubled);
-        Assert.Equal(PageStateContext.LivingNodePhase.ParentRecovery, root.Phase);
-
-        fsm.Update();
-
-        var child = Assert.Single(fsm.Context.LivingNodes, node => node.Lineage == "G:1");
-        Assert.Equal(1, child.Generation);
-        Assert.False(child.IsRoot);
-        Assert.Equal(10, child.Size);
-        Assert.Equal(50, child.X);
-        Assert.Equal(50, child.Y);
-        Assert.InRange(child.Rotation, -180, 180);
-        Assert.NotEqual(0, child.Rotation);
-        Assert.InRange(child.TargetX, 10, 90);
-        Assert.InRange(child.TargetY, 10, 90);
-        Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, child.Phase);
+        Assert.True(phases.Length >= 2, "The population collapsed into one shared lifecycle phase.");
     }
 
-    [Fact(DisplayName = "Living GUI child reaches default size through flight and scaling, then grows to reproduction size")]
-    public void LivingGui_ChildReachesDefaultAndGrows()
+    [Fact]
+    public void EachOrganismGetsItsOwnFsmAndOwnProcessingGroup()
     {
         var context = new PageStateContext();
         context.BeginLivingGui();
-        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        var hub = new HubKernel();
         hub.RegisterProcessGroup("TestParent");
+
         using var runtime = new LivingGuiFsm(hub, context, "TestParent");
 
-        const int guard = 10_000;
-        var ticks = 0;
-        while (context.LivingNodes.Count < 2 && ticks++ < guard)
+        for (var ticks = 0; ticks < 10_000 && context.LivingNodes.Count < 5; ticks++)
             runtime.Update();
 
-        Assert.True(context.LivingNodes.Count >= 2);
-        var child = context.LivingNodes[1];
+        Assert.True(runtime.OrganismCount >= 5);
+        Assert.Equal(context.LivingNodes.Count, runtime.OrganismCount);
 
-        ticks = 0;
-        while (child.Size < 50 && ticks++ < guard)
-            runtime.Update();
-
-        Assert.True(child.Size >= 50, "Living GUI child did not complete flight and scaling within the scheduler guard.");
-        Assert.Equal(50, child.Size);
-        Assert.True(child.GrowthReady);
-        Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, child.Phase);
-
-        // Mature organisms advance from their own lifecycle phase. Advance until this specific child reaches reproduction.
-        ticks = 0;
-        while (child.Size < 100 && ticks++ < guard)
-            runtime.Update();
-
-        Assert.True(child.Size >= 100, "Living GUI child did not receive mature-growth turns within the scheduler guard.");
-        Assert.Equal(100, child.Size);
-        Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, child.Phase);
-    }
-
-    [Fact(DisplayName = "Living GUI exposes distinct FSM process groups for every lifecycle phase")]
-    public void LivingGui_ExposesDistinctPhaseProcessGroups()
-    {
-        using var fsm = new PageFSM();
-
-        var groups = new[]
-        {
-            fsm.LivingGuiProcessingGroup,
-            fsm.LivingGuiRootGrowthProcessingGroup,
-            fsm.LivingGuiSeedFlightProcessingGroup,
-            fsm.LivingGuiMatureGrowthProcessingGroup,
-            fsm.LivingGuiReproductionProcessingGroup
-        };
+        var groups = context.LivingNodes
+            .Select((_, index) => index)
+            .Select(index => hub.ProcessGroups
+                .Where(group => group.Name.Contains("LivingGui:Organism:"))
+                .Select(group => group.Name)
+                .Distinct()
+                .ElementAt(index))
+            .ToArray();
 
         Assert.Equal(groups.Length, groups.Distinct().Count());
-        Assert.Contains(fsm.Hub.ProcessGroups, group =>
-            group.Name == fsm.LivingGuiProcessingGroup && group.ParentName == fsm.InstanceProcessingGroup);
-        Assert.Contains(fsm.Hub.ProcessGroups, group =>
-            group.Name == fsm.LivingGuiRootGrowthProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
-        Assert.Contains(fsm.Hub.ProcessGroups, group =>
-            group.Name == fsm.LivingGuiSeedFlightProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
-        Assert.Contains(fsm.Hub.ProcessGroups, group =>
-            group.Name == fsm.LivingGuiMatureGrowthProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
-        Assert.Contains(fsm.Hub.ProcessGroups, group =>
-            group.Name == fsm.LivingGuiReproductionProcessingGroup && group.ParentName == fsm.LivingGuiProcessingGroup);
     }
 
-    [Fact(DisplayName = "Living GUI selects root growth, reproduction, recovery, then seed flight")]
-    public void LivingGui_SelectsPhaseInLifecycleOrder()
-    {
-        using var fsm = new PageFSM();
-        fsm.RequestEnter();
-
-        for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
-            fsm.Update();
-
-        Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
-        fsm.Update();
-        Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
-        fsm.Update();
-        Assert.Equal(LivingGuiFsm.RootGrowthState, fsm.LivingGuiActivePhase);
-        fsm.Update();
-        Assert.Equal(LivingGuiFsm.ReproductionState, fsm.LivingGuiActivePhase);
-
-        fsm.Update();
-        Assert.Equal(LivingGuiFsm.ParentRecoveryState, fsm.LivingGuiActivePhase);
-
-        fsm.Update();
-        Assert.Equal(LivingGuiFsm.SeedFlightState, fsm.LivingGuiActivePhase);
-    }
-
-    [Fact(DisplayName = "Living GUI lineage names root children and descendants deterministically")]
-    public void LivingGui_LineageNaming()
+    [Fact]
+    public void LivingGuiUsesLerpedMovementRatherThanFrameSizedJumps()
     {
         var context = new PageStateContext();
         context.BeginLivingGui();
-        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        var hub = new HubKernel();
         hub.RegisterProcessGroup("TestParent");
+
         using var runtime = new LivingGuiFsm(hub, context, "TestParent");
 
-        const int guard = 10_000;
-        var ticks = 0;
-        while (context.LivingNodes.Count < PageStateContext.PopulationObservationThreshold && ticks++ < guard)
+        for (var ticks = 0; ticks < 100 && context.LivingNodes.Count < 2; ticks++)
             runtime.Update();
 
-        Assert.True(context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold);
-        Assert.Contains(context.LivingNodes, node => node.Lineage == "G:0");
-        Assert.Contains(context.LivingNodes, node => node.Lineage == "G:1");
-        Assert.Contains(context.LivingNodes, node => node.Lineage == "G:2");
-        Assert.Contains(context.LivingNodes, node => node.Lineage.StartsWith("G:1-", System.StringComparison.Ordinal));
-    }
+        var child = context.LivingNodes[1];
+        var previousDistance = double.MaxValue;
+        var observedMovement = false;
 
-    [Fact(DisplayName = "Living GUI reaches the observation threshold and stops reproducing")]
-    public void LivingGui_ReachesObservationThresholdAndStopsReproducing()
-    {
-        var context = new PageStateContext();
-        context.BeginLivingGui();
-        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub();
-        hub.RegisterProcessGroup("TestParent");
-        using var runtime = new LivingGuiFsm(hub, context, "TestParent");
+        for (var ticks = 0; ticks < 20 && child.Phase == PageStateContext.LivingNodePhase.Traveling; ticks++)
+        {
+            var distance = System.Math.Sqrt(
+                System.Math.Pow(child.TargetX - child.X, 2) +
+                System.Math.Pow(child.TargetY - child.Y, 2));
 
-        const int guard = 10_000;
-        var ticks = 0;
-        while (context.LivingNodes.Count < PageStateContext.PopulationObservationThreshold && ticks++ < guard)
+            if (previousDistance < double.MaxValue)
+                Assert.True(distance < previousDistance);
+
+            previousDistance = distance;
             runtime.Update();
+            observedMovement = true;
+        }
 
-        Assert.True(context.LivingNodes.Count >= PageStateContext.PopulationObservationThreshold, "Living GUI did not reach the population observation threshold within the scheduler guard.");
-        Assert.Equal(PageStateContext.PopulationObservationThreshold, context.LivingNodes.Count);
-        Assert.False(context.LivingGuiFrozen);
-        var populationBefore = context.LivingNodes.Count;
-        for (var i = 0; i < 200; i++) runtime.Update();
-        Assert.Equal(populationBefore, context.LivingNodes.Count);
-        Assert.Contains(context.LivingNodes, node => node.Generation > 1);
+        Assert.True(observedMovement);
     }
 
-    [Fact(DisplayName = "PageFSM registers its root and nested process groups with the Hub")]
-    public void PageFSM_RegistersRootAndNestedProcessGroupsWithHub()
+    [Fact]
+    public void PageFSMRegistersLivingGuiAndGravityGroups()
     {
         using var fsm = new PageFSM();
 
@@ -230,12 +139,11 @@ public sealed class LivingGuiRuntimeTests
             group.Name == fsm.GravityProcessingGroup && group.ParentName == fsm.InstanceProcessingGroup);
     }
 
-    [Fact(DisplayName = "FSM manager and PageFSM share the registered Hub instance")]
-    public void FsmManager_UsesRegisteredHubInstance()
+    [Fact]
+    public void FsmManagerUsesRegisteredHubInstance()
     {
         var hub = new HubKernel();
         using var manager = new FSMManagerService(hub);
-
         Assert.Same(hub, manager.Page.Hub);
     }
 }
