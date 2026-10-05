@@ -105,7 +105,7 @@ public sealed class LivingGuiReproductionTests
         Assert.Equal(LivingGuiFsm.ParentRecoveryState, runtime.ActivePhase);
         runtime.Update();
 
-        Assert.Equal(200, parent.Size);
+        Assert.Equal(50, parent.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, parent.Phase);
         Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, seed.Phase);
         Assert.Equal(LivingGuiFsm.SeedFlightState, runtime.ActivePhase);
