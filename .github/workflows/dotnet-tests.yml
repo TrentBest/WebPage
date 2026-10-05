@@ -89,8 +89,16 @@ jobs:
           Console.WriteLine($"CONSTRUCTOR_IL_LENGTH={body.GetILAsByteArray()?.Length ?? 0}");
           Console.WriteLine($"CONSTRUCTOR_IL={Convert.ToHexString(body.GetILAsByteArray() ?? Array.Empty<byte>())}");
           EOF
-          dotnet run --project /tmp/assembly-inspector/AssemblyInspector.csproj --configuration Release --no-restore
+          dotnet restore /tmp/assembly-inspector/AssemblyInspector.csproj && dotnet run --project /tmp/assembly-inspector/AssemblyInspector.csproj --configuration Release --no-restore
           echo "=== End runtime artifact inspection ==="
+          echo "=== Forced TheSingularityWorkshop rebuild ==="
+          dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore -t:Rebuild
+          sha256sum TheSingularityWorkshop/bin/Release/net8.0/TheSingularityWorkshop.dll
+          strings TheSingularityWorkshop/bin/Release/net8.0/TheSingularityWorkshop.dll | grep -E 'POOL:|PopulationPoolSize|PopulationThreshold' || true
+          dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --filter "FullyQualifiedName~LivingGuiRuntimeTests" --logger "console;verbosity=normal"
+          forced_status=$?
+          echo "SINGULARITYHUB_LIVING_GUI_STATUS_AFTER_FORCED_REBUILD=$forced_status"
+          echo "=== End forced rebuild diagnostic ==="
 
           dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --filter "FullyQualifiedName~LivingGuiRuntimeTests" --logger "console;verbosity=normal"
           first_status=$?
