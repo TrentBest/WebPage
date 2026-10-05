@@ -129,7 +129,8 @@ public sealed class IdleExperienceArchitectureTests
             gravityGroup = fsm.GravityProcessingGroup;
 
             Assert.Equal(1, fsm_API.Internal.GetFSMHandleCountInGroup(pageGroup));
-            Assert.Equal(1, fsm_API.Internal.GetFSMHandleCountInGroup(livingGuiGroup));
+            // One manager FSM plus one preallocated FSM_API instance per population slot.
+            Assert.Equal(101, fsm_API.Internal.GetFSMHandleCountInGroup(livingGuiGroup));
             Assert.Equal(1, fsm_API.Internal.GetFSMHandleCountInGroup(gravityGroup));
         }
 
