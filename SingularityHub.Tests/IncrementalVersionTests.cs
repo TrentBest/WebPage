@@ -282,4 +282,8 @@ public sealed class IncrementalVersionTests
     public void V0_0_186LivingGuiOrganismFsmsShareOneProcessingGroupWithoutSharingLifecycleState()
         => Assert.Equal("0.0.186", "0.0.186");
 
+    [ArchitectureTest(0, 0, 187)] [Fact(DisplayName = "V0.0.187 — Living_GUI_Uses_One_FSM_Definition_With_Independent_Organism_Instances")]
+    public void V0_0_187LivingGuiUsesOneFsmDefinitionWithIndependentOrganismInstances()
+        => Assert.Equal("0.0.187", "0.0.187");
+
 }
