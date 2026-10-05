@@ -48,7 +48,7 @@ LIVING_GUI_POPULATING
       | mature node spawns a child
       | child animates parent -> chaotic destination
       | no shared spawn timing boundary is required
-      | reproduction continues; there is no population cap
+      | reproduction continues until the configured critical-mass threshold of 64 organisms
       v
 FIRST REPRODUCTION / MONIKER READY
       |
@@ -80,7 +80,7 @@ RUNNING
 
 ## Non-negotiable rules
 
-1. **First reproduction is the opening handoff.** The moniker becomes ready when the first child is spawned; there is no population cap or exact node-count reveal threshold.
+1. **Critical mass is the opening handoff.** The living GUI reaches the configured 64-organism observation threshold before the moniker can be revealed.
 2. **The opening handoff does not stop life.** The living GUI continues reproducing while the moniker is presented.
 3. **Gravity is the explicit freeze boundary.** The living GUI process group remains active until the page enters `GRAVITY`, where `LivingGuiFrozen` is set before gravity advances.
 4. **Gravity is separately allocated.** The Gravity FSM handle/process group exists before the reveal and remains dormant until the page enters `GRAVITY`.
