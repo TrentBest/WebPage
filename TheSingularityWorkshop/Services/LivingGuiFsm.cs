@@ -70,6 +70,9 @@ public sealed class LivingGuiFsm : IDisposable
 
     public int OrganismCount => _organisms.Count;
 
+    /// <summary>Raised after the independently ticking population has advanced.</summary>
+    public event Action? PopulationChanged;
+
     public IReadOnlyList<LivingGuiOrganismFsm> Organisms => _organisms;
 
     public void Update()
@@ -88,6 +91,11 @@ public sealed class LivingGuiFsm : IDisposable
         // the next population heartbeat, just like a newly registered process.
         foreach (var organism in _organisms.ToArray())
             organism.Update();
+
+        // This is an observation signal only. FSM_API remains the authority that
+        // changed each organism; the event merely tells the presentation boundary
+        // that its bound state is ready to be rendered.
+        PopulationChanged?.Invoke();
     }
 
     private void AttachUntrackedOrganisms()
