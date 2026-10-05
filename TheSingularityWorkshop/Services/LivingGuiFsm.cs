@@ -87,8 +87,9 @@ public sealed class LivingGuiFsm : IDisposable
         AttachUntrackedOrganisms();
 
         // Snapshot the collection because reproduction can attach a new organism
-        // while an existing organism is being ticked. The new organism starts on
-        // the next population heartbeat, just like a newly registered process.
+        // while an existing organism is being ticked. A newly attached organism is
+        // initialized immediately by its own FSM, but it joins the next heartbeat
+        // for subsequent lifecycle advancement.
         foreach (var organism in _organisms.ToArray())
             organism.Update();
 
@@ -120,12 +121,18 @@ public sealed class LivingGuiFsm : IDisposable
             return;
 
         _attachedNodes.Add(child);
-        _organisms.Add(new LivingGuiOrganismFsm(
+        var organism = new LivingGuiOrganismFsm(
             _hub,
             _context,
             child,
             _processingGroup,
-            AttachChild));
+            AttachChild);
+        _organisms.Add(organism);
+
+        // The child was created by an already-running organism FSM. Give the
+        // child's own FSM its first heartbeat now so it cannot remain visually
+        // inert in INITIALIZATION until the next population heartbeat.
+        organism.Update();
     }
 
     public void Dispose()
