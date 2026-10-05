@@ -18,23 +18,23 @@ public sealed class LivingGuiReproductionTests
 
         var root = context.LivingNodes[0];
         Assert.Equal(PageStateContext.LivingNodePhase.RootGrowth, root.Phase);
-        Assert.Equal(200, root.Size);
+        Assert.Equal(50, root.Size);
 
         for (var i = 0; i < 4; i++)
             context.AdvanceRootGrowth();
 
-        Assert.Equal(400, root.Size);
+        Assert.Equal(100, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, root.Phase);
 
         context.AdvanceReproduction();
 
         Assert.Equal(2, context.LivingNodes.Count);
-        Assert.Equal(400, root.Size);
+        Assert.Equal(100, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.ParentRecovery, root.Phase);
 
         var seed = context.LivingNodes[1];
         Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, seed.Phase);
-        Assert.Equal(40, seed.Size);
+        Assert.Equal(10, seed.Size);
         Assert.Equal(1, seed.Generation);
         Assert.Equal(root.X, seed.X);
         Assert.Equal(root.Y, seed.Y);
@@ -53,31 +53,31 @@ public sealed class LivingGuiReproductionTests
         Assert.Equal(PageStateContext.LivingNodePhase.SeedScaling, seed.Phase);
         Assert.Equal(seed.TargetX, seed.X);
         Assert.Equal(seed.TargetY, seed.Y);
-        Assert.Equal(40, seed.Size);
+        Assert.Equal(10, seed.Size);
 
         for (var i = 0; i < 10 && seed.Phase == PageStateContext.LivingNodePhase.SeedScaling; i++)
             context.AdvanceSeedScaling();
 
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, seed.Phase);
-        Assert.Equal(200, seed.Size);
+        Assert.Equal(50, seed.Size);
         Assert.True(seed.GrowthReady);
 
         for (var i = 0; i < 10 && seed.Phase == PageStateContext.LivingNodePhase.MatureGrowth; i++)
             context.AdvanceMatureGrowth();
 
-        Assert.Equal(400, seed.Size);
+        Assert.Equal(100, seed.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.ReproductionPending, seed.Phase);
 
         context.AdvanceReproduction();
 
         Assert.Equal(3, context.LivingNodes.Count);
-        Assert.Equal(400, seed.Size);
+        Assert.Equal(100, seed.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.ParentRecovery, seed.Phase);
         Assert.Equal(PageStateContext.LivingNodePhase.SeedFlight, context.LivingNodes[2].Phase);
 
         context.AdvanceParentRecovery();
-        Assert.Equal(200, root.Size);
-        Assert.Equal(200, seed.Size);
+        Assert.Equal(50, root.Size);
+        Assert.Equal(50, seed.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, root.Phase);
         Assert.Equal(PageStateContext.LivingNodePhase.MatureGrowth, seed.Phase);
     }
