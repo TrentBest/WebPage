@@ -103,6 +103,20 @@ public sealed class LivingGuiOrganismFsm : IDisposable
         => context as LivingGuiOrganismContext
             ?? throw new InvalidOperationException("Living GUI organism FSM received an unexpected context type.");
 
+    /// <summary>
+    /// Activates this preallocated organism by transitioning its own FSM from DORMANT
+    /// into INITIALIZATION. The transition executes the organism's initialization action;
+    /// the shared processing group remains responsible for subsequent lifecycle ticks.
+    /// </summary>
+    public void Activate()
+    {
+        if (_disposed || !_handle.IsValid)
+            throw new InvalidOperationException("Cannot activate an invalid Living GUI organism FSM.");
+
+        if (_handle.CurrentState == DormantState)
+            _handle.TransitionTo(InitializationState);
+    }
+
     public PageStateContext.LivingNodeState Node => _organismContext.Node;
     public string CurrentState => _handle.CurrentState;
     public string ProcessingGroup => _processingGroup;
