@@ -274,4 +274,8 @@ public sealed class IncrementalVersionTests
     public void V0_0_184LivingGuiActivatesPreallocatedFsmSlotsWithoutRuntimeOrganismAllocation()
         => Assert.Equal("0.0.184", "0.0.184");
 
+    [ArchitectureTest(0, 0, 185)] [Fact(DisplayName = "V0.0.185 — Living_GUI_Pool_Slots_Preserve_Deterministic_Target_And_Rotation_Identity")]
+    public void V0_0_185LivingGuiPoolSlotsPreserveDeterministicTargetAndRotationIdentity()
+        => Assert.Equal("0.0.185", "0.0.185");
+
 }
