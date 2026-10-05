@@ -122,400 +122,80 @@ The Singularity Workshop is not claiming that the Singularity has arrived. We ar
 *Built by The Singularity Workshop.*
 
 ---
-# FSM_API
+# Runtime foundations
 
-`FSM_API` is the core state technology behind much of the Workshop.
+## FSM_API
 
-The goal is not simply to have another finite-state-machine library. The larger
-purpose is to establish a small, deterministic state vocabulary that can be used
-across otherwise unrelated systems.
+FSM_API provides the deterministic state vocabulary used by the Workshop. The important boundary is explicit state ownership: intent enters a stateful runtime, behavior executes there, and presentation observes the result.
 
-That makes state a useful boundary between:
+See [FSM_API](https://github.com/TrentBest/FSM_API) for the canonical package and benchmarks.
 
-- intent
-- behavior
-- runtime
-- UI
-- engines
-- tools
-- AI commands
+## FSM_COS
 
-The current FSM_API work includes both the established string-backed implementation
-and the evolving integer-backed implementation.
+FSM_COS is the composition boundary. A manifest identifies requested capabilities; FSM_COS resolves dependencies, loads bundles, arbitrates the composition, converges it, and exposes a RuntimeAssembly.
 
-The integer-backed direction matters because strings are excellent for humans but
-are not always the representation we want on a hot path or inside an AI command
-stream.
+WebPage consumes that assembly. WebPage does not redefine the composition algorithm.
 
-The intended progression is roughly:
+See [TheSingularityWorkshop.FSM_COS](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS).
 
-```text
-Human-readable authoring
-        |
-        v
-String identity / documentation
-        |
-        v
-Integer identity / compact transport
-        |
-        v
-Deterministic runtime state
-```
+## SingularityWarehouse
 
-The exact API and representation are still evolving. Documentation should describe
-what is currently true rather than pretending the future design is already finished.
+SingularityWarehouse is the data/infrastructure direction behind persistent artifacts, identity, ontology, relationships, and runtime-addressable content.
 
----
+WebPage may prove concepts against that ecosystem, but storage ownership belongs to the repository/service responsible for the data.
 
-# SingularityWarehouse
+## AI and deterministic boundaries
 
-The **SingularityWarehouse** is the larger data/infrastructure experiment behind
-another major part of the Workshop.
-
-The interesting question is not merely:
-
-> "Where do I store this object?"
-
-It is:
-
-> **"How does software know what this thing is, what it relates to, what identity
-> it carries, and how it participates in the runtime?"**
-
-That leads naturally toward:
+Protocol, Grammar, and future command-oriented AI work remain part of the Workshop's direction. They are producers of deterministic inputs, not owners of runtime semantics.
 
 ```text
-DATA
-  |
-  v
-IDENTITY
-  |
-  v
-ONTOLOGY
-  |
-  v
-RELATIONSHIP
-  |
-  v
-STATE
-  |
-  v
-RUNTIME
+Probabilistic intelligence
+        ↓
+Grammar / Protocol
+        ↓
+deterministic command
+        ↓
+Experience / MicroBundle
+        ↓
+FSM_COS
 ```
 
-The Warehouse work is therefore connected to the same larger problem as FSM_API:
-how do we create a deterministic vocabulary that software — and eventually AI — can
-operate on without continuously paying the cost of ambiguous human-readable text?
+## Renderer boundary
 
-This is still an evolving body of work. Preserve that distinction in future docs.
+The Workshop renderer is a separate runtime concern. WebPage can demonstrate renderer behavior, but rendering research should not quietly become a browser-specific architecture.
 
----
+## Development discipline
 
-# AI / Protocol / Grammar / CommandAI direction
+Work on development. Keep master stable.
 
-Another thread of the Workshop grew out of an earlier C# AI execution environment.
+Every meaningful change should answer:
 
-The useful lesson was not "make an AI chatbot."
+1. What does the visitor experience?
+2. What capability does it prove?
+3. Which runtime boundary owns it?
+4. Which Experience or MicroBundle composes it?
+5. What test proves the intended behavior?
+6. Which document explains the result?
+7. Can another appropriate host eventually consume the same semantics?
 
-It was:
+Do not publish packages or releases without explicit approval.
 
-> **How do you let probabilistic intelligence operate a deterministic machine
-> without allowing ambiguity to leak through the boundary?**
+## Documentation discipline
 
-The evolving conceptual stack is:
+Documentation must be:
 
-```text
-LLM
- |
- v
-CommandAI
- |
- v
-Grammar
- |
- v
-ProtocolAI
- |
- v
-Deterministic execution
-```
+- current rather than historical by accident;
+- explicit about what is implemented versus intended;
+- free of obsolete platform claims;
+- anchored to real repository contracts;
+- visual when a diagram communicates more than prose;
+- honest about transitional code;
+- written so a new engineer can find the owner of a behavior.
 
-The names and boundaries may change as the work progresses.
-The problem being attacked is the durable part.
-
-The eventual integer-backed mapping work extends this idea: let the AI understand
-human-readable concepts while giving the runtime compact, deterministic identities.
-
----
-
-# MicroBundles
-
-MicroBundles are a concrete experiment in separating **behavior** from
-**manifestation**.
-
-The current model is:
-
-```text
-MicroBundle
-    |
-    +-- state / lifecycle
-    |
-    +-- semantic effects
-    |
-    v
-Provider
-    |
-    +-- Blazor
-    +-- WPF
-    +-- other manifestation
-```
-
-A MicroBundle should describe what is happening without needing to know whether
-that behavior eventually appears as HTML, CSS, a host object, sound, speech, or
-something else.
-
-See:
-
-`TheSingularityWorkshop/Workshop/MicroBundles/README.md`
-
-for the current implementation-level notes.
-
----
-
-# Development guideposts
-
-These are more important than any particular class name.
-
-## 1. Preserve intent before replacing implementation
-
-The Workshop has a long history of experiments. Before replacing something that
-looks strange, inspect its history.
-
-A simpler implementation may be technically cleaner while accidentally destroying
-the behavior that made the experiment valuable.
-
-## 2. The visual behavior is evidence
-
-The living landing page is not just presentation.
-It is an observable experiment.
-
-If something breathes, reproduces, collapses, or crosses a runtime boundary, that
-behavior should eventually have a clear architectural explanation.
-
-## 3. Prefer deterministic state over event spaghetti
-
-Timers, CSS animation, browser events, and rendering loops are implementation
-mechanisms.
-
-Meaningful lifecycle should have explicit state and ownership.
-
-The long-term direction is for FSM_API to carry that meaning wherever practical.
-
-## 4. Keep semantics independent from manifestation
-
-Do not let a behavior become permanently coupled to Blazor simply because Blazor
-was the first place we demonstrated it.
-
-## 5. Performance is part of the design
-
-The Workshop should be able to create the *impression* of overwhelming complexity
-without actually allocating an absurd amount of unnecessary work.
-
-Exponential visual behavior is useful precisely because the system can represent
-many actors while keeping each actor lightweight.
-
-## 6. Document the road, not just the destination
-
-The implementation will change.
-
-That is expected.
-
-README files should therefore record:
-
-- what currently exists
-- what problem it solves
-- why it exists
-- what direction it is moving
-- what is experimental
-- what should not be casually removed
-
-Do not turn temporary implementation details into false architectural promises.
-
-## 7. Use history as engineering memory
-
-Git history is part of the documentation.
-
-When recovering or refactoring Workshop behavior, inspect earlier versions before
-assuming that the current version contains the whole story.
-
-## 8. A successful build is necessary, not sufficient
-
-The Workshop is an architectural proving ground.
-
-A feature is successful when its behavior is understandable, deterministic where it
-needs to be, portable where it should be, performant enough for its purpose, and
-consistent with the larger direction.
-
----
-
-# Current repository role
-
-This WebPage repository provides:
-
-- the public Workshop presence
-- publisher/compliance pages
-- demonstrations
-- the living landing experiment
-- WebAssembly/Blazor runtime integration
-- Workshop-facing developer infrastructure
-- a place to make the larger architecture visible
-
-It is **not** the entirety of The Singularity Workshop.
-
-Think of it as the public laboratory door.
-
-Behind that door are the other repositories and experiments.
-
----
-
-# Local development
-
-```bash
-git clone https://github.com/TrentBest/WebPage.git
-cd WebPage
-dotnet restore
-dotnet run
-```
-
-The HTTPS/HTTP port is determined by the project's launch settings.
-
-For active development, work on `development`. The repository is deliberately consolidated
-to two branches: `master` is the stable promotion target and `development` is the active
-engineering branch. Do not create a new feature branch merely to avoid reconciling an
-architectural problem; consolidate the work on `development` instead.
-
-Do not introduce OneDrive-specific assumptions into the project or documentation.
-The repository should remain portable to an ordinary local development workspace
-and CI environment.
-
----
-
-# Documentation and articles
-
-The Workshop should document itself while it is being built.
-
-The intended writing style is technical, honest, playful, and occasionally absurd.
-
-Or, more simply:
-
-> **Dr. Seuss for software developers.**
-
-The writing should be capable of explaining a difficult architecture without
-pretending software is less weird than it actually is.
-
-Future articles should explore:
-
-- SingularityWarehouse
-- ontology and identity
-- integer-backed mappings
-- FSM_API design and performance
-- MicroBundles
-- deterministic AI command boundaries
-- ProtocolAI / Grammar / CommandAI
-- host and rendering runtime boundaries
-- rebuilding lost systems better than their originals
-- the strange engineering lessons discovered along the way
-
-The articles are not merely marketing.
-They are the public engineering log of the Workshop becoming itself.
-
----
-
-# The larger idea
-
-We are not claiming to have reached the Singularity.
-
-We're building the machinery that might make the journey interesting.
-
-The destination remains recognizable even when the road changes.
-
-And the road **will** change.
-
-That's the point of a workshop.
+See [DOCUMENTATION_STANDARD.md](DOCUMENTATION_STANDARD.md).
 
 ---
 
 *This way leads to the Singularity.*
 
 *Built by The Singularity Workshop.*
-
-
-## Opening experience: perception before explanation
-
-The landing page is a **perception boundary**, not merely a signpost.
-
-The current gateway now expresses its semantic structure through `WorkshopGatewayGuiBuilder`. The next evolution is an authored opening sequence that demonstrates the Workshop before asking the visitor to understand it intellectually.
-
-The design principle is:
-
-> **Show me why. Don't make me read why.**
-
-The intended progression is:
-
-`ARRIVAL → IDENTITY → TENSION → SHOW → INVITATION → WORKSHOP`
-
-Visual intensity may be paired with original audio and timed presentation beats. This is presentation intensity, not autonomous persuasion: the visitor remains the decision-maker, and every demonstrated capability must correspond to real Workshop behavior or be clearly identified as experimental.
-
-See `WORKSHOP_OPENING_EXPERIENCE.md` for the current contract.
-
-## Public-facing product contract
-
-The WebPage is now being prepared as the publishable public face of the Workshop.
-The visitor should be able to do three things without reading the source code first:
-
-1. **Experience it** — enter the living Workshop and see real behavior, not a mockup.
-2. **Understand it** — follow the path from state and composition through MicroBundles, repositories, semantics, and host manifestations.
-3. **Decide what it means to them** — understand what becomes easier, smaller, more reusable, or more interoperable by using these boundaries.
-
-The public navigation therefore has a deliberate progression:
-
-```text
-FIRST CONTACT
-    |
-    +--> EXPLORE       experience the system
-    +--> RENDERING     see the manifestation research
-    +--> CREATE        inspect the composition vocabulary
-    +--> EDUCATION     see a domain application
-    +--> MADMEN        see another domain application
-    +--> UNDERSTAND    learn the architecture and impact
-```
-
-The **Understand** surface is the canonical explanation of the ecosystem. It should
-stay aligned with the actual repositories and contracts rather than becoming a second
-marketing fiction.
-
-Inventor and Revit are intentionally not part of the current public opening sequence.
-They remain useful future examples of how external data can enter the ecosystem, but
-they are not required to explain the architecture or prove the WebPage itself.
-
-The quality bar is simple: **the public site must be able to demonstrate what it claims,
-and the explanation must describe what the code actually does.**
-
-## WebPage experience architecture
-
-The WebPage is intentionally not a conventional marketing site. It is the **playable public entrance to The Singularity Workshop**.
-
-The visitor path is:
-
-```text
-ARRIVE -> WITNESS -> ENTER -> INHABIT -> UNDERSTAND -> CREATE -> PUBLISH / SHARE
-```
-
-The four primary Workshop surfaces are **Understand**, **Experiences**, **Create**, and **Publish**. Rendering, Education, Madmen, laboratories, and domain-specific destinations are instruments or destinations within that larger model; they do not redefine the Workshop's public identity.
-
-The design rule is:
-
-> **Do not ask the visitor to believe the architecture. Give them something they can touch.**
-
-The page should let people change state, enter environments, inspect composition, alter observer context, and see real consequences. Explanation follows evidence rather than replacing it.
-
-See `WEBPAGE_EXPERIENCE_ARCHITECTURE.md` for the canonical public-experience contract.
