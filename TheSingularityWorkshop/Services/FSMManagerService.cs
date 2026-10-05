@@ -25,6 +25,7 @@ namespace TheSingularityWorkshop.Services
         public string LivingGuiState => Page.LivingGuiState;
         public string LivingGuiActivePhase => Page.LivingGuiActivePhase;
         public bool LivingGuiIsValid => Page.LivingGuiIsValid;
+        public TimeSpan MonikerPresentationDuration => Page.MonikerPresentationDuration;
 
         public event Action<string>? StateChanged
         {
