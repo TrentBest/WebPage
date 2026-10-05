@@ -234,6 +234,9 @@ public sealed class LivingGuiRuntimeTests
         var profile = WorkshopPresentationProfile.Current;
         profile.Reset();
 
+        Assert.Equal(WorkshopPresentationProfile.DefaultPopulationPoolSize, profile.PopulationPoolSize);
+        Assert.Equal(WorkshopPresentationProfile.DefaultPopulationThreshold, profile.PopulationThreshold);
+
         var context = new PageStateContext();
         Assert.Equal(100, context.PreallocatedLivingNodes.Count);
         Assert.Equal(100, context.AvailablePopulationSlots);
