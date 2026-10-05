@@ -77,10 +77,11 @@ public sealed class LivingGuiFsm : IDisposable
         if (_disposed || !_context.IsValid || _context.LivingGuiFrozen)
             return;
 
-        // Attachment is the only orchestration performed here. FSM_API owns
-        // execution through the Hub heartbeat; each organism's processing group
-        // is independently advanced exactly once by that heartbeat.
+        // Attach newly created organisms before asking the Hub to advance the
+        // organism groups. FSM_API remains the execution authority; the Hub
+        // selects the registered groups to tick.
         AttachUntrackedOrganisms();
+        _hub.UpdateNestedProcessGroups(_processingGroup);
     }
 
     private void AttachUntrackedOrganisms()
