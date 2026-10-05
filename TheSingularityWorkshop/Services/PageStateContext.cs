@@ -89,8 +89,9 @@ namespace TheSingularityWorkshop.Services
             _livingNodes.Clear();
             _availableNodes.Clear();
 
-            foreach (var node in _preallocatedNodes)
+            for (var index = _preallocatedNodes.Count - 1; index >= 0; index--)
             {
+                var node = _preallocatedNodes[index];
                 node.Generation = 0;
                 node.OffspringCount = 0;
                 node.GrowthReady = false;
