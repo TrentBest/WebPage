@@ -92,7 +92,9 @@ RUNNING
 10. **The gateway does not visually present the moniker.** The first two labels and the warning card establish first contact; the button says `Enter Workshop`. The visitor's click is explicit permission to compose and run the selected Experience.
 11. **FSM_COS owns the Experience handoff.** The Living GUI Experience is composed only after entry permission. Its MicroBundle declares the canonical Moniker dependency, so the Moniker is installed by the composition system before the Living GUI runtime is started.
 12. **The gateway control is oversized.** On desktop it is 50% of viewport width and 50% of viewport height. The avatar must be clipped as a true circle using equal dimensions and `border-radius: 50%`; no square image inside an oval.
-13. **Do not weaken tests to excuse a wrong sequence.** Fix the state/data flow.
+13. **The population is preallocated.** The default presentation reserves 100 organism nodes and 100 independent FSM/processing-group slots before population begins; inactive slots are invisible and do not tick.
+14. **Placement is deterministic and stratified.** The 100 target positions cover a 10 x 10 field with bounded Squirrel Noise jitter rather than accumulating in screen quadrants.
+15. **Do not weaken tests to excuse a wrong sequence.** Fix the state/data flow.
 
 ## MicroBundle direction
 
@@ -151,7 +153,8 @@ FSM_COS-COMPOSED EXPERIENCE
   |
   +-- Living GUI runtime starts
   +-- first reproduction makes moniker eligible
-  +-- reproduction continues without a cap
+  +-- the 100-slot organism pool is already allocated
+  +-- reproduction activates preallocated slots without runtime FSM allocation
   +-- gravity is the explicit freeze boundary
   +-- moniker behind population
   +-- gravity FSM
