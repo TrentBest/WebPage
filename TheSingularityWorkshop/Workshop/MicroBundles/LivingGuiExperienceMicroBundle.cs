@@ -27,7 +27,7 @@ public sealed class LivingGuiExperienceMicroBundle :
 
     /// <summary>Acquires an optional provider from the WebPage-only provider collection.</summary>
     public T? TryGetProvider<T>() where T : class
-        => typeof(T) == typeof(LivingGuiDeepDiveProvider)
+        => typeof(T) == typeof(LivingGuiDeepDiveProvider) || typeof(T) == typeof(IDeepDiveProvider)
             ? (T)(object)new LivingGuiDeepDiveProvider()
             : null;
 
