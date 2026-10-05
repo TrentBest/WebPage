@@ -9,8 +9,8 @@ namespace TheSingularityWorkshop.Services;
 
 /// <summary>
 /// Runtime manager for the Living GUI population.
-/// Each organism owns an independent LivingGuiOrganismFsm. This manager only
-/// attaches new organisms, ticks every organism once per frame, and owns disposal.
+/// Each organism owns an independent LivingGuiOrganismFsm. All organism FSM instances
+/// share one processing group; this manager activates pool slots and advances that group once per heartbeat.
 /// </summary>
 public sealed class LivingGuiFsm : IDisposable
 {
@@ -49,7 +49,7 @@ public sealed class LivingGuiFsm : IDisposable
         fsm_API.Create.CreateInstance("LivingGuiFSM", context, _processingGroup);
 
         // Allocate the full organism/FSM population once. Reproduction later only
-        // activates an already-existing slot; it never news another FSM or processing group.
+        // activates an already-existing slot; it never news another FSM instance or processing group.
         foreach (var node in _context.PreallocatedLivingNodes)
         {
             _organismPool[node] = new LivingGuiOrganismFsm(
@@ -96,14 +96,14 @@ public sealed class LivingGuiFsm : IDisposable
             return;
 
         // Activate newly acquired pool slots before advancing the population.
-        // Every organism still owns its own FSM_API instance and processing group;
-        // the population manager only decides which preallocated slots are alive.
+        // Every organism still owns its own FSM_API instance and lifecycle state;
+        // the processing group is the shared scheduling boundary.
         AttachUntrackedOrganisms();
 
-        // Snapshot the active collection because reproduction can activate another
-        // preallocated organism while an existing organism is being ticked.
-        foreach (var organism in _organisms.ToArray())
-            organism.Update();
+        // One group update advances every FSM instance registered in this population.
+        // Do not update organism instances individually: doing so would step the same
+        // shared processing group repeatedly in one heartbeat.
+        _hub.UpdateProcessGroup(_processingGroup);
 
         // This is an observation signal only. FSM_API remains the authority that
         // changed each organism; the event merely tells the presentation boundary
