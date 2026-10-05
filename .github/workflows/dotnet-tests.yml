@@ -50,6 +50,29 @@ jobs:
         run: |
           dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --blame-hang --blame-hang-timeout 2m --blame-hang-dump-type mini --collect:"XPlat Code Coverage" --results-directory ./TestResults/SingularityHub --logger "trx;LogFileName=SingularityHub.Tests.trx"
 
+      - name: Diagnose SingularityHub assembly before and after experience builds
+        timeout-minutes: 6
+        run: |
+          set +e
+          dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --filter "FullyQualifiedName~LivingGuiRuntimeTests" --logger "console;verbosity=normal"
+          first_status=$?
+          echo "SINGULARITYHUB_LIVING_GUI_STATUS_IMMEDIATELY_AFTER_BUILD=$first_status"
+
+          dotnet build Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-restore
+          dotnet build Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-restore
+
+          dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --filter "FullyQualifiedName~LivingGuiRuntimeTests" --logger "console;verbosity=normal"
+          second_status=$?
+          echo "SINGULARITYHUB_LIVING_GUI_STATUS_AFTER_ALL_EXPERIENCE_BUILDS=$second_status"
+
+          if [ "$first_status" -ne "$second_status" ]; then
+            echo "BUILD_ORDER_CHANGED_TEST_RESULT=true"
+          else
+            echo "BUILD_ORDER_CHANGED_TEST_RESULT=false"
+          fi
+
+          exit 1
+
       - name: Test LivingGui Experience with TRX and coverage
         timeout-minutes: 5
         run: |
