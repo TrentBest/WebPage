@@ -54,6 +54,7 @@ namespace TheSingularityWorkshop.Services
         public string GravityProcessingGroup => _gravityProcessingGroup;
         public TimeSpan MonikerPresentationDuration { get; }
         public event Action<string>? StateChanged;
+        public event Action? LivingGuiChanged;
 
         public sealed class Behavior
         {
@@ -146,6 +147,7 @@ namespace TheSingularityWorkshop.Services
 
             _handle = fsm_API.Create.CreateInstance("PageFSM", Context, _processingGroup);
             _livingGuiRuntime = new LivingGuiFsm(_hub, Context, _processingGroup);
+            _livingGuiRuntime.PopulationChanged += HandleLivingGuiChanged;
 
             fsm_API.Create.CreateFiniteStateMachine("GravityFSM", -1, _gravityProcessingGroup)
                 .State("Falling", onEnter: null, onUpdate: _ => Context.AdvanceGravity(), onExit: null)
@@ -199,6 +201,8 @@ namespace TheSingularityWorkshop.Services
         public void SignalMonikerReady() => Context.MonikerReady = true;
         public void SignalGravityReleased() => Context.GravityReleased = true;
         public void SignalLivingGuiFallen() => Context.LivingGuiFallen = true;
+
+        private void HandleLivingGuiChanged() => LivingGuiChanged?.Invoke();
         public void SignalNavigationReady() => Context.NavigationReady = true;
 
         public void Shutdown()
@@ -219,6 +223,7 @@ namespace TheSingularityWorkshop.Services
         {
             if (_disposed) return;
 
+            _livingGuiRuntime.PopulationChanged -= HandleLivingGuiChanged;
             _livingGuiRuntime.Dispose();
             fsm_API.Interaction.DestroyFiniteStateMachine("PageFSM", _processingGroup);
             fsm_API.Interaction.DestroyFiniteStateMachine("GravityFSM", _gravityProcessingGroup);
