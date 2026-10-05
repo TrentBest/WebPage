@@ -222,7 +222,7 @@ namespace TheSingularityWorkshop.Services
             child.IsRoot = false;
             child.ReproductionComplete = false;
             child.GravityVelocity = 0;
-            child.Rotation = 0;
+            child.Rotation = child.InitialRotation;
             child.Phase = LivingNodePhase.Initialization;
 
             _livingNodes.Add(child);
@@ -297,7 +297,8 @@ namespace TheSingularityWorkshop.Services
 
             node.TargetX = MinX + ((column + 0.5 + (jitterX * DistributionJitter)) * cellWidth);
             node.TargetY = MinY + ((row + 0.5 + (jitterY * DistributionJitter)) * cellHeight);
-            node.Rotation = ToUnit(SquirrelRng.Noise((slot * 2) + 2, 0x524F5445u)) * 360.0 - 180.0;
+            node.InitialRotation = ToUnit(SquirrelRng.Noise((slot * 2) + 2, 0x524F5445u)) * 360.0 - 180.0;
+            node.Rotation = node.InitialRotation;
         }
 
         private static double ToUnit(uint value) => value / 4294967296d;
@@ -359,6 +360,7 @@ namespace TheSingularityWorkshop.Services
             public bool ReproductionComplete { get; internal set; }
             public double GravityVelocity { get; internal set; }
             public double Rotation { get; internal set; }
+            public double InitialRotation { get; internal set; }
             public LivingNodePhase Phase { get; internal set; }
             public double TargetX { get; internal set; }
             public double TargetY { get; internal set; }
