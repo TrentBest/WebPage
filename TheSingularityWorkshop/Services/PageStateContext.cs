@@ -26,7 +26,13 @@ namespace TheSingularityWorkshop.Services
         private const double MaxY = 90;
         private const double RootGrowthStep = 20;
         private double GravityAcceleration => _gravityAcceleration;
-        private readonly SquirrelRng _random = new(0x50414745u);\n        private readonly double _growthStep;\n        private readonly double _maximumNodeSize;\n        private readonly double _seedFlightStep;\n        private readonly double _seedScalingStep;\n        private readonly double _parentRecoveryStep;\n        private readonly double _gravityAcceleration;
+        private readonly SquirrelRng _random = new(0x50414745u);
+        private readonly double _growthStep;
+        private readonly double _maximumNodeSize;
+        private readonly double _seedFlightStep;
+        private readonly double _seedScalingStep;
+        private readonly double _parentRecoveryStep;
+        private readonly double _gravityAcceleration;
         private readonly List<LivingNodeState> _livingNodes = new();
         private bool _enterRequested;
 
