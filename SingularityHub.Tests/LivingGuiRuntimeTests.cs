@@ -213,4 +213,51 @@ public sealed class LivingGuiRuntimeTests
         using var manager = new FSMManagerService(hub);
         Assert.Same(hub, manager.Page.Hub);
     }
+
+    [Fact]
+    public void LivingGuiPreallocatesTheFull100SlotPopulation()
+    {
+        var profile = WorkshopPresentationProfile.Current;
+        profile.Reset();
+
+        var context = new PageStateContext();
+        Assert.Equal(100, context.PreallocatedLivingNodes.Count);
+        Assert.Equal(100, context.AvailablePopulationSlots);
+
+        context.BeginLivingGui();
+
+        Assert.Single(context.LivingNodes);
+        Assert.Equal(99, context.AvailablePopulationSlots);
+        Assert.Equal(PageStateContext.LivingNodePhase.Initialization, context.LivingNodes[0].Phase);
+        Assert.All(
+            context.PreallocatedLivingNodes.Skip(1),
+            node => Assert.Equal(PageStateContext.LivingNodePhase.Dormant, node.Phase));
+    }
+
+    [Fact]
+    public void LivingGuiTargetsUseStratifiedDistributionAcrossTheWholeViewport()
+    {
+        var context = new PageStateContext();
+
+        var targets = context.PreallocatedLivingNodes
+            .Select(node => (node.TargetX, node.TargetY))
+            .ToArray();
+
+        Assert.Equal(100, targets.Length);
+        Assert.Equal(100, targets.Distinct().Count());
+        Assert.All(targets, target =>
+        {
+            Assert.InRange(target.TargetX, 10d, 90d);
+            Assert.InRange(target.TargetY, 10d, 90d);
+        });
+
+        var quadrants = targets
+            .Skip(1)
+            .GroupBy(target => (target.TargetX >= 50d ? 1 : 0) + (target.TargetY >= 50d ? 2 : 0))
+            .ToDictionary(group => group.Key, group => group.Count());
+
+        Assert.Equal(4, quadrants.Count);
+        Assert.All(quadrants.Values, count => Assert.InRange(count, 24, 25));
+    }
+
 }
