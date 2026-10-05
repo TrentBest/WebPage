@@ -45,11 +45,6 @@ jobs:
           dotnet build Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-restore
 
-      - name: Test SingularityHub with TRX, coverage, and hang diagnostics
-        timeout-minutes: 6
-        run: |
-          dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --blame-hang --blame-hang-timeout 2m --blame-hang-dump-type mini --collect:"XPlat Code Coverage" --results-directory ./TestResults/SingularityHub --logger "trx;LogFileName=SingularityHub.Tests.trx"
-
       - name: Diagnose SingularityHub assembly before and after experience builds
         timeout-minutes: 6
         run: |
@@ -72,6 +67,11 @@ jobs:
           fi
 
           exit 1
+
+      - name: Test SingularityHub with TRX, coverage, and hang diagnostics
+        timeout-minutes: 6
+        run: |
+          dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --blame-hang --blame-hang-timeout 2m --blame-hang-dump-type mini --collect:"XPlat Code Coverage" --results-directory ./TestResults/SingularityHub --logger "trx;LogFileName=SingularityHub.Tests.trx"
 
       - name: Test LivingGui Experience with TRX and coverage
         timeout-minutes: 5
