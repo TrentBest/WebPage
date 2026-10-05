@@ -11,6 +11,7 @@ namespace TheSingularityWorkshop.Services;
 /// </summary>
 public sealed class LivingGuiOrganismFsm : IDisposable
 {
+    public const string DormantState = "DORMANT";
     public const string InitializationState = "INITIALIZATION";
     public const string TravelingState = "TRAVELING";
     public const string PlantingState = "PLANTING";
@@ -52,6 +53,11 @@ public sealed class LivingGuiOrganismFsm : IDisposable
 
         fsm_API.Create.CreateFiniteStateMachine(fsmName, -1, processingGroup)
             .State(
+                DormantState,
+                onEnter: null,
+                onUpdate: null,
+                onExit: null)
+            .State(
                 InitializationState,
                 onEnter: ctx => GetContext(ctx).Initialize(),
                 onUpdate: null,
@@ -81,7 +87,8 @@ public sealed class LivingGuiOrganismFsm : IDisposable
                 onEnter: ctx => GetContext(ctx).EnterReducing(),
                 onUpdate: ctx => GetContext(ctx).AdvanceReducing(),
                 onExit: null)
-            .WithInitialState(InitializationState)
+            .WithInitialState(DormantState)
+            .Transition(DormantState, InitializationState, ctx => GetContext(ctx).Node.Phase != PageStateContext.LivingNodePhase.Dormant)
             .Transition(InitializationState, ExistingState, ctx => GetContext(ctx).Node.IsRoot)
             .Transition(InitializationState, TravelingState, ctx => !GetContext(ctx).Node.IsRoot)
             .Transition(TravelingState, PlantingState, ctx => GetContext(ctx).IsTravelComplete())
