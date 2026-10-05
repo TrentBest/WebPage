@@ -123,3 +123,42 @@ A meaningful implementation change is not complete until:
 6. the commit can be understood by the next engineer.
 
 *If the documentation lies, the Workshop has already begun to drift.*
+
+
+## Package extraction
+
+WebPage is allowed to be the fastest place to prove a capability. It is not automatically the permanent owner.
+
+When behavior moves into a reusable package, documentation should move with it:
+
+~~~text
+WebPage proof
+   ↓
+package contract
+   ↓
+package usage
+   ↓
+theory / decision
+   ↓
+WebPage integration proof
+~~~
+
+The WebPage repository should explain how it consumes the package and why the boundary exists. The package repository should explain how developers consume the reusable capability.
+
+Do not copy an entire package's theory into WebPage. Link to the package's authoritative documentation and document only the WebPage integration.
+
+## FSM_COS usage
+
+If a WebPage feature crosses the composition boundary, the authoritative local guide is FSM_COS_USAGE.md.
+
+That document should answer:
+
+- what Experience is selected;
+- which MicroBundles are requested;
+- how the catalog resolves them;
+- how the RuntimeManifest is constructed;
+- what FSM_COS owns;
+- what RuntimeAssembly means;
+- what WebPage does after handoff.
+
+This is the operational companion to the deeper FSM_COS theory.
