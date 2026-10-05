@@ -235,6 +235,13 @@ public sealed class LivingGuiRuntimeTests
         profile.Reset();
 
         var context = new PageStateContext();
+        Console.WriteLine($"XUNIT_PAGE_CONTEXT_ASSEMBLY={typeof(PageStateContext).Assembly.Location}");
+        Console.WriteLine($"XUNIT_PAGE_CONTEXT_MVID={typeof(PageStateContext).Assembly.ManifestModule.ModuleVersionId}");
+        Console.WriteLine($"XUNIT_PROFILE_ASSEMBLY={typeof(WorkshopPresentationProfile).Assembly.Location}");
+        Console.WriteLine($"XUNIT_PROFILE_POOL={WorkshopPresentationProfile.Current.PopulationPoolSize}");
+        var xunitPoolField = typeof(PageStateContext).GetField("_preallocatedNodes", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        var xunitPool = xunitPoolField?.GetValue(context);
+        Console.WriteLine($"XUNIT_PRIVATE_POOL_COUNT={xunitPool?.GetType().GetProperty("Count")?.GetValue(xunitPool)}");
         Assert.Equal(100, context.PreallocatedLivingNodes.Count);
         Assert.Equal(100, context.AvailablePopulationSlots);
 
