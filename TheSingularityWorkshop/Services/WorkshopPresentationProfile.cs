@@ -2,7 +2,7 @@ namespace TheSingularityWorkshop.Services;
 
 public sealed class WorkshopPresentationProfile
 {
-    public const int DefaultPopulationThreshold = 100;
+    public const int DefaultPopulationThreshold = 64;
     public const double DefaultGrowthStep = 20;
     public const double DefaultMaximumNodeSize = 100;
     public const double DefaultSeedFlightStep = 4.5;
