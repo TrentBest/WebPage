@@ -55,6 +55,21 @@ public sealed class LivingGuiReproductionTests
         Assert.Equal(PageStateContext.LivingNodePhase.Existing, child.Phase);
         Assert.NotSame(child, context.LivingNodes[0]);
         Assert.NotEqual(child.Lineage, root.Lineage);
+
+        // The same organism must be able to repeat the complete life cycle:
+        // maximum size -> immediate reproduction -> reduction -> default size -> growth.
+        var offspringBeforeSecondPeak = child.OffspringCount;
+        guard = 2_000;
+        while (child.Phase != PageStateContext.LivingNodePhase.Reproducing && guard-- > 0)
+            runtime.Update();
+
+        Assert.True(guard > 0);
+        Assert.Equal(100d, child.Size);
+
+        runtime.Update();
+
+        Assert.True(child.OffspringCount > offspringBeforeSecondPeak);
+        Assert.Equal(PageStateContext.LivingNodePhase.Reducing, child.Phase);
     }
 
     [Fact(DisplayName = "Reproduction attaches a new FSM without moving the existing parent lifecycle")]
