@@ -1,6 +1,7 @@
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
+using CosMicroBundle = TheSingularityWorkshop.FSM_COS.IMicroBundle;
 
 namespace TheSingularityWorkshop.Workshop.DeepDive;
 
@@ -15,5 +16,5 @@ public interface IDeepDiveProvider
     /// </summary>
     WorkshopDeepDiveModel Execute(
         IExperience experience,
-        IReadOnlyList<IMicroBundle> microBundles);
+        IReadOnlyList<CosMicroBundle> microBundles);
 }
