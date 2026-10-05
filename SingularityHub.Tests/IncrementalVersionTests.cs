@@ -260,12 +260,13 @@ public sealed class IncrementalVersionTests
         Assert.Contains("DOCUMENTATION_INDEX.md", readme);
         Assert.Contains("DOCUMENTATION_STANDARD.md", readme);
         Assert.Contains("The page opens the door.", readme);
-    
+    }
+
     [ArchitectureTest(0, 0, 182)] [Fact(DisplayName = "V0.0.182 — Living_GUI_Uses_64_Organism_Critical_Mass_And_Colorful_Independent_Flowers")]
     public void V0_0_182LivingGuiUses64OrganismCriticalMassAndColorfulIndependentFlowers()
         => Assert.Equal("0.0.182", "0.0.182");
 
-    [ArchitectureTest(0, 0, 183)] [Fact(DisplayName = "V0.0.183 — Living_GUI_Preallocates_100_Organisms_And_Uses_Stratifed_Distribution")]
+    [ArchitectureTest(0, 0, 183)] [Fact(DisplayName = "V0.0.183 — Living_GUI_Preallocates_100_Organisms_And_Uses_Stratified_Distribution")]
     public void V0_0_183LivingGuiPreallocates100OrganismsAndUsesStratifiedDistribution()
         => Assert.Equal("0.0.183", "0.0.183");
 
