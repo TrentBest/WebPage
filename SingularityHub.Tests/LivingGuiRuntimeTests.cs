@@ -96,6 +96,15 @@ public sealed class LivingGuiRuntimeTests
 
         using var runtime = new LivingGuiFsm(hub, context, "TestParent");
 
+        Assert.Equal(100, runtime.PreallocatedOrganismCount);
+        Assert.Equal(0, runtime.OrganismCount);
+
+        context.BeginLivingGui();
+        runtime.Update();
+
+        Assert.Equal(100, runtime.PreallocatedOrganismCount);
+        Assert.Equal(1, runtime.OrganismCount);
+
         for (var ticks = 0; ticks < 10_000 && context.LivingNodes.Count < 5; ticks++)
             runtime.Update();
 
