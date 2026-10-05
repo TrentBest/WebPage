@@ -77,11 +77,17 @@ public sealed class LivingGuiFsm : IDisposable
         if (_disposed || !_context.IsValid || _context.LivingGuiFrozen)
             return;
 
-        // Attach newly created organisms before asking the Hub to advance the
-        // organism groups. FSM_API remains the execution authority; the Hub
-        // selects the registered groups to tick.
+        // Attach newly created organisms before advancing the population.
+        // Every organism owns its own processing group and its own FSM_API instance.
+        // The population manager deliberately schedules those groups one-by-one;
+        // it never advances organism state itself.
         AttachUntrackedOrganisms();
-        _hub.UpdateNestedProcessGroups(_processingGroup);
+
+        // Snapshot the collection because reproduction can attach a new organism
+        // while an existing organism is being ticked. The new organism starts on
+        // the next population heartbeat, just like a newly registered process.
+        foreach (var organism in _organisms.ToArray())
+            organism.Update();
     }
 
     private void AttachUntrackedOrganisms()
