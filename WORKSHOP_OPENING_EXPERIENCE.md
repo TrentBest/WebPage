@@ -16,30 +16,53 @@ A large `ENTER THE WORKSHOP` button is an invitation, but it is not a propositio
 
 The opening must create curiosity before it asks for commitment.
 
-## Perception sequence
+## Current behavior
 
-The intended opening progression is:
+The implementation on `development` is the source of truth for the opening sequence. The current WebPage behaves as follows:
 
 ```text
-ARRIVAL
+LABEL 1
    |
    v
-IDENTITY
+LABEL 2
    |
    v
-TENSION
+ENTER THE WORKSHOP + SYSTEM ADVISORY
+   |
+   | visitor explicitly clicks
+   v
+ENTRY PERMISSION
    |
    v
-SHOW
+FSM_COS COMPOSES THE SELECTED EXPERIENCE
+   |
+   +--> resolve Living GUI MicroBundle
+   +--> resolve its canonical Moniker dependency
    |
    v
-INVITATION
+LIVING GUI RUNTIME
+   |
+   | organisms grow and reproduce independently
+   v
+POPULATION THRESHOLD
    |
    v
-ENTER WORKSHOP
+GRAVITY
+   |
+   | living GUI population falls away
+   v
+MONIKER REVEALED / PRESENTATION HANDOFF
+   |
+   | approximately three seconds
+   v
+WORKSHOP HUB / NAVIGATION
 ```
 
-The visitor should encounter a short, authored sequence of visual and auditory evidence rather than a paragraph of product explanation.
+The opening therefore proves a real composition boundary before the visitor reaches the Workshop hub. The Living GUI is not a CSS-only animation: the page-level runtime is started only after the selected Experience has been composed successfully.
+
+The current implementation is intentionally a **WebPage proving-ground experience**. It should be documented as behavior that exists today, not as a promise about another host or a future world model.
+
+The visitor should encounter a short, authored sequence of visual evidence rather than a paragraph of product explanation.
 
 The design principle is:
 
