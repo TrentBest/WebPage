@@ -83,6 +83,7 @@ public sealed class LivingGuiFsm : IDisposable
         _organismPool.Values.All(organism => organism.IsValid);
 
     public int OrganismCount => _organisms.Count;
+    public int PreallocatedOrganismCount => _organismPool.Count;
 
     /// <summary>Raised after the independently ticking population has advanced.</summary>
     public event Action? PopulationChanged;
