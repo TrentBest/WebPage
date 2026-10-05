@@ -6,7 +6,8 @@ using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
 namespace TheSingularityWorkshop.Services;
 
 /// <summary>
-/// One independently ticking FSM for one Living GUI organism.
+/// One independent FSM instance for one Living GUI organism. All organism instances
+/// share the Living GUI processing group; the instance owns lifecycle and behavior.
 /// The organism owns its own lifecycle; the population never chooses a global phase.
 /// </summary>
 public sealed class LivingGuiOrganismFsm : IDisposable
@@ -38,11 +39,11 @@ public sealed class LivingGuiOrganismFsm : IDisposable
         _context = context;
         _node = node;
         _attachChild = attachChild;
-        _processingGroup = $"LivingGui:Organism:{Guid.NewGuid():N}";
+        _processingGroup = parentProcessingGroup;
         _fsmName = $"LivingGuiOrganismFSM:{Guid.NewGuid():N}";
 
-        fsm_API.Create.CreateProcessingGroup(_processingGroup);
-        _hub.RegisterProcessGroup(_processingGroup, parentProcessingGroup);
+        // All organism FSM instances share the population's single processing group.
+        // The FSM instance and its node remain the independent unit of behavior.
 
         fsm_API.Create.CreateFiniteStateMachine(_fsmName, -1, _processingGroup)
             .State(
@@ -124,10 +125,8 @@ public sealed class LivingGuiOrganismFsm : IDisposable
 
     public void Update()
     {
-        if (_disposed || !_context.IsValid || _context.LivingGuiFrozen)
-            return;
-
-        _hub.UpdateProcessGroup(_processingGroup);
+        // The population manager advances the shared processing group once per heartbeat.
+        // This method intentionally does not step the group independently.
     }
 
     public void Dispose()
