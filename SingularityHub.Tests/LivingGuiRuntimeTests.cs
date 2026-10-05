@@ -142,7 +142,7 @@ public sealed class LivingGuiRuntimeTests
 
         var children = context.LivingNodes.Where(node => !node.IsRoot).Take(2).ToArray();
         Assert.Equal(2, children.Length);
-        Assert.Equal(1, runtime.Organisms.Select(organism => organism.ProcessingGroup).Distinct().Count());
+        Assert.Single(runtime.Organisms.Select(organism => organism.ProcessingGroup).Distinct());
 
         for (var ticks = 0; ticks < 5; ticks++)
             runtime.Update();
