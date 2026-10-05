@@ -32,7 +32,6 @@ public sealed class LivingGuiOrganismFsm : IDisposable
         string parentProcessingGroup,
         Action<PageStateContext.LivingNodeState> attachChild)
     {
-        _hub = hub;
         _context = context;
         _node = node;
         _attachChild = attachChild;
