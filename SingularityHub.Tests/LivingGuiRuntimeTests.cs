@@ -265,13 +265,23 @@ public sealed class LivingGuiRuntimeTests
             Assert.InRange(target.TargetY, 10d, 90d);
         });
 
+        // The population should cover all four directions without being forced
+        // into the old row-major 10x10 launch pattern.
         var quadrants = targets
             .Skip(1)
             .GroupBy(target => (target.TargetX >= 50d ? 1 : 0) + (target.TargetY >= 50d ? 2 : 0))
             .ToDictionary(group => group.Key, group => group.Count());
 
         Assert.Equal(4, quadrants.Count);
-        Assert.All(quadrants.Values, count => Assert.InRange(count, 24, 25));
+        Assert.All(quadrants.Values, count => Assert.InRange(count, 12, 38));
+
+        var rowMajorLike = targets
+            .Skip(1)
+            .Select(target => Math.Round(target.TargetY, 1))
+            .GroupBy(y => y)
+            .Count(group => group.Count() >= 6);
+
+        Assert.InRange(rowMajorLike, 0, 1);
     }
 
 }
