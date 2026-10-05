@@ -120,6 +120,7 @@ public sealed class LivingGuiFsm : IDisposable
             if (!_organismPool.TryGetValue(node, out var organism))
                 throw new InvalidOperationException("A Living GUI node has no preallocated organism FSM.");
 
+            organism.Activate();
             _organisms.Add(organism);
         }
     }
@@ -132,6 +133,7 @@ public sealed class LivingGuiFsm : IDisposable
         if (!_organismPool.TryGetValue(child, out var organism))
             throw new InvalidOperationException("A Living GUI child has no preallocated organism FSM.");
 
+        organism.Activate();
         _organisms.Add(organism);
     }
 
