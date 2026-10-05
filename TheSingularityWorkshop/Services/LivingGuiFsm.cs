@@ -140,17 +140,16 @@ public sealed class LivingGuiFsm : IDisposable
         if (_disposed)
             return;
 
-        foreach (var organism in _organisms)
+        foreach (var organism in _organismPool.Values)
             organism.Dispose();
 
         _organisms.Clear();
         _attachedNodes.Clear();
-
-        foreach (var organism in _organismPool.Values)
-            organism.Dispose();
-
         _organismPool.Clear();
 
+        fsm_API.Interaction.DestroyFiniteStateMachine(
+            LivingGuiOrganismFsm.DefinitionNameForGroup(_processingGroup),
+            _processingGroup);
         fsm_API.Interaction.DestroyFiniteStateMachine("LivingGuiFSM", _processingGroup);
         _disposed = true;
     }
