@@ -24,7 +24,6 @@ namespace TheSingularityWorkshop.Services
         private const double MaxX = 90;
         private const double MinY = 10;
         private const double MaxY = 90;
-        private const double DistributionJitter = 0.30;
         private readonly double _maximumNodeSize;
         private readonly double _gravityAcceleration;
         private readonly List<LivingNodeState> _livingNodes = new();
@@ -285,19 +284,18 @@ namespace TheSingularityWorkshop.Services
                 return;
             }
 
-            const int columns = 10;
-            const int rows = 10;
-            var cell = slot;
-            var column = cell % columns;
-            var row = cell / columns;
-            var cellWidth = (MaxX - MinX) / columns;
-            var cellHeight = (MaxY - MinY) / rows;
-            var jitterX = ToUnit(SquirrelRng.Noise((slot * 2) + 0, 0x50414745u)) - 0.5;
-            var jitterY = ToUnit(SquirrelRng.Noise((slot * 2) + 1, 0x50414745u)) - 0.5;
+            // Do not lay the population out as a row-major grid. That makes the
+            // population visibly launch "up, then down" in deterministic rows.
+            // Each preallocated slot receives an independent, deterministic flight
+            // target instead. Squirrel noise keeps the result reproducible for tests
+            // while giving every organism its own direction and destination.
+            var x = ToUnit(SquirrelRng.Noise((slot * 3) + 0, 0x50414745u));
+            var y = ToUnit(SquirrelRng.Noise((slot * 3) + 1, 0x50414745u));
+            var angle = ToUnit(SquirrelRng.Noise((slot * 3) + 2, 0x524F5445u)) * (Math.PI * 2.0);
 
-            node.TargetX = MinX + ((column + 0.5 + (jitterX * DistributionJitter)) * cellWidth);
-            node.TargetY = MinY + ((row + 0.5 + (jitterY * DistributionJitter)) * cellHeight);
-            node.InitialRotation = ToUnit(SquirrelRng.Noise((slot * 2) + 2, 0x524F5445u)) * 360.0 - 180.0;
+            node.TargetX = MinX + (x * (MaxX - MinX));
+            node.TargetY = MinY + (y * (MaxY - MinY));
+            node.InitialRotation = (angle * (180.0 / Math.PI)) - 180.0;
             node.Rotation = node.InitialRotation;
         }
 
