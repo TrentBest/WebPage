@@ -249,4 +249,17 @@ public sealed class IncrementalVersionTests
         Assert.NotNull(provider);
         Assert.IsType<TheSingularityWorkshop.Workshop.DeepDive.LivingGuiDeepDiveProvider>(provider);
     }
+    [ArchitectureTest(0, 0, 181)] [Fact(DisplayName = "V0.0.181 — Workshop_Documentation_Index_And_Standard_Are_Publicly_Linked")]
+    public void V0_0_181WorkshopDocumentationIndexAndStandardArePubliclyLinked()
+    {
+        var readme = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "README.md"));
+
+        Assert.Contains("DOCUMENTATION_INDEX.md", readme);
+        Assert.Contains("DOCUMENTATION_STANDARD.md", readme);
+        Assert.Contains("The page opens the door.", readme);
+    }
+
 }
