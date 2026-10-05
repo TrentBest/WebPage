@@ -241,6 +241,12 @@ public sealed class LivingGuiRuntimeTests
         Console.WriteLine($"XUNIT_PROFILE_POOL={WorkshopPresentationProfile.Current.PopulationPoolSize}");
         var xunitPoolField = typeof(PageStateContext).GetField("_preallocatedNodes", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         var xunitPool = xunitPoolField?.GetValue(context);
+        var xunitPreallocatedProperty = typeof(PageStateContext).GetProperty("PreallocatedLivingNodes")!;
+        var xunitPropertyValue = xunitPreallocatedProperty.GetValue(context)!;
+        Console.WriteLine($"XUNIT_PREALLOCATED_PROPERTY_TYPE={xunitPropertyValue.GetType().FullName}");
+        Console.WriteLine($"XUNIT_PREALLOCATED_PROPERTY_COUNT={xunitPropertyValue.GetType().GetProperty("Count")?.GetValue(xunitPropertyValue)}");
+        Console.WriteLine($"XUNIT_PREALLOCATED_REFERENCE_EQUALS_PRIVATE={ReferenceEquals(xunitPropertyValue, xunitPool)}");
+        Console.WriteLine($"XUNIT_PREALLOCATED_GETTER_IL={Convert.ToHexString(xunitPreallocatedProperty.GetMethod!.GetMethodBody()!.GetILAsByteArray() ?? Array.Empty<byte>())}");
         Console.WriteLine($"XUNIT_PRIVATE_POOL_COUNT={xunitPool?.GetType().GetProperty("Count")?.GetValue(xunitPool)}");
         Assert.Equal(100, context.PreallocatedLivingNodes.Count);
         Assert.Equal(100, context.AvailablePopulationSlots);
