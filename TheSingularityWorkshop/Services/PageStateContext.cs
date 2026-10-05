@@ -12,6 +12,7 @@ namespace TheSingularityWorkshop.Services
     public sealed class PageStateContext : IStateContext
     {
         public static int PopulationObservationThreshold => WorkshopPresentationProfile.Current.PopulationThreshold;
+
         private const double RootSize = 50;
         private const double SeedSize = 10;
         private const double DefaultNodeSize = 50;
@@ -19,13 +20,16 @@ namespace TheSingularityWorkshop.Services
         private const double GrowthLerp = 0.22;
         private const double TravelLerp = 0.16;
         private const double RotationStep = 24;
-        private const double RootGrowthStep = 20;
-        private double MaximumNodeSize => _maximumNodeSize;
-        private double GravityAcceleration => _gravityAcceleration;
-        private readonly SquirrelRng _random = new(0x50414745u);
+        private const double MinX = 10;
+        private const double MaxX = 90;
+        private const double MinY = 10;
+        private const double MaxY = 90;
+        private const double DistributionJitter = 0.30;
         private readonly double _maximumNodeSize;
         private readonly double _gravityAcceleration;
         private readonly List<LivingNodeState> _livingNodes = new();
+        private readonly List<LivingNodeState> _preallocatedNodes;
+        private readonly Stack<LivingNodeState> _availableNodes = new();
         private bool _enterRequested;
 
         public string Name { get; set; }
@@ -43,15 +47,37 @@ namespace TheSingularityWorkshop.Services
         public long TotalTicks { get; set; }
         public bool LivingGuiFrozen { get; private set; }
         public IReadOnlyList<LivingNodeState> LivingNodes => _livingNodes;
+        public IReadOnlyList<LivingNodeState> PreallocatedLivingNodes => _preallocatedNodes;
+        public int AvailablePopulationSlots => _availableNodes.Count;
 
         public PageStateContext(object? singularityHub = null)
         {
             Name = "PageFSMContext";
             IsValid = true;
             SingularityHub = singularityHub;
+
             var profile = WorkshopPresentationProfile.Current;
             _maximumNodeSize = profile.MaximumNodeSize;
             _gravityAcceleration = profile.GravityAcceleration;
+
+            var poolSize = Math.Max(profile.PopulationPoolSize, profile.PopulationThreshold);
+            _preallocatedNodes = new List<LivingNodeState>(poolSize);
+            for (var index = 0; index < poolSize; index++)
+            {
+                var node = new LivingNodeState(
+                    $"POOL:{index}",
+                    0,
+                    50,
+                    50,
+                    SeedSize,
+                    false,
+                    false,
+                    index == 0,
+                    LivingNodePhase.Dormant);
+
+                SetDistributionTarget(node, index);
+                _preallocatedNodes.Add(node);
+            }
         }
 
         public void ResetStateClock() => StateTicks = 0;
@@ -60,9 +86,37 @@ namespace TheSingularityWorkshop.Services
         {
             if (_livingNodes.Count != 0) return;
 
-            _livingNodes.Add(new LivingNodeState(
-                "G:0", 0, 50, 50, RootSize, true, false, true,
-                LivingNodePhase.Initialization));
+            _livingNodes.Clear();
+            _availableNodes.Clear();
+
+            foreach (var node in _preallocatedNodes)
+            {
+                node.Generation = 0;
+                node.OffspringCount = 0;
+                node.GrowthReady = false;
+                node.SeedDoubled = false;
+                node.ReproductionComplete = false;
+                node.GravityVelocity = 0;
+                node.Rotation = 0;
+                node.X = 50;
+                node.Y = 50;
+                node.Size = SeedSize;
+                node.Lineage = string.Empty;
+                node.IsRoot = false;
+                node.Phase = LivingNodePhase.Dormant;
+                _availableNodes.Push(node);
+            }
+
+            var root = _availableNodes.Pop();
+            root.Lineage = "G:0";
+            root.Generation = 0;
+            root.X = 50;
+            root.Y = 50;
+            root.Size = RootSize;
+            root.GrowthReady = true;
+            root.IsRoot = true;
+            root.Phase = LivingNodePhase.Initialization;
+            _livingNodes.Add(root);
 
             LivingGuiFrozen = false;
             LivingGuiPopulated = false;
@@ -82,9 +136,10 @@ namespace TheSingularityWorkshop.Services
                 return;
             }
 
-            node.TargetX = MinX + _random.NextDouble() * (MaxX - MinX);
-            node.TargetY = MinY + _random.NextDouble() * (MaxY - MinY);
-            node.Rotation = (_random.NextDouble() * 360.0) - 180.0;
+            // Targets are precomputed when the 100-slot population is allocated.
+            // No RNG object or random stream is created during reproduction.
+            node.X = 50;
+            node.Y = 50;
             node.Phase = LivingNodePhase.Traveling;
         }
 
@@ -132,35 +187,42 @@ namespace TheSingularityWorkshop.Services
         {
             if (LivingGuiFrozen || node.Phase != LivingNodePhase.Existing) return;
 
-            node.Size = Lerp(node.Size, MaximumNodeSize, GrowthLerp);
-            if (Math.Abs(node.Size - MaximumNodeSize) <= 0.5)
+            node.Size = Lerp(node.Size, _maximumNodeSize, GrowthLerp);
+            if (Math.Abs(node.Size - _maximumNodeSize) <= 0.5)
             {
-                node.Size = MaximumNodeSize;
+                node.Size = _maximumNodeSize;
                 node.SeedDoubled = true;
                 node.Phase = LivingNodePhase.Reproducing;
             }
         }
 
         public bool IsExistingComplete(LivingNodeState node)
-            => node.Size >= MaximumNodeSize - 0.5;
+            => node.Size >= _maximumNodeSize - 0.5;
 
         public LivingNodeState CreateOffspring(LivingNodeState parent)
         {
+            if (_availableNodes.Count == 0)
+                throw new InvalidOperationException("The Living GUI population pool is exhausted.");
+
             parent.OffspringCount++;
             parent.ReproductionComplete = false;
 
-            var child = new LivingNodeState(
-                parent.Generation == 0
-                    ? $"G:{parent.OffspringCount}"
-                    : $"{parent.Lineage}-{parent.OffspringCount - 1}",
-                parent.Generation + 1,
-                parent.X,
-                parent.Y,
-                SeedSize,
-                false,
-                false,
-                false,
-                LivingNodePhase.Initialization);
+            var child = _availableNodes.Pop();
+            child.Lineage = parent.Generation == 0
+                ? $"G:{parent.OffspringCount}"
+                : $"{parent.Lineage}-{parent.OffspringCount - 1}";
+            child.Generation = parent.Generation + 1;
+            child.X = parent.X;
+            child.Y = parent.Y;
+            child.Size = SeedSize;
+            child.OffspringCount = 0;
+            child.GrowthReady = false;
+            child.SeedDoubled = false;
+            child.IsRoot = false;
+            child.ReproductionComplete = false;
+            child.GravityVelocity = 0;
+            child.Rotation = 0;
+            child.Phase = LivingNodePhase.Initialization;
 
             _livingNodes.Add(child);
             return child;
@@ -204,7 +266,7 @@ namespace TheSingularityWorkshop.Services
 
             foreach (var node in _livingNodes)
             {
-                node.GravityVelocity += GravityAcceleration;
+                node.GravityVelocity += _gravityAcceleration;
                 node.Y += node.GravityVelocity;
                 node.Rotation += 2.4;
             }
@@ -212,6 +274,32 @@ namespace TheSingularityWorkshop.Services
             GravityReleased = true;
             LivingGuiFallen = _livingNodes.TrueForAll(node => node.Y > 125);
         }
+
+        private static void SetDistributionTarget(LivingNodeState node, int slot)
+        {
+            if (slot == 0)
+            {
+                node.TargetX = 50;
+                node.TargetY = 50;
+                return;
+            }
+
+            const int columns = 10;
+            const int rows = 10;
+            var cell = slot;
+            var column = cell % columns;
+            var row = cell / columns;
+            var cellWidth = (MaxX - MinX) / columns;
+            var cellHeight = (MaxY - MinY) / rows;
+            var jitterX = ToUnit(SquirrelRng.Noise((slot * 2) + 0, 0x50414745u)) - 0.5;
+            var jitterY = ToUnit(SquirrelRng.Noise((slot * 2) + 1, 0x50414745u)) - 0.5;
+
+            node.TargetX = MinX + ((column + 0.5 + (jitterX * DistributionJitter)) * cellWidth);
+            node.TargetY = MinY + ((row + 0.5 + (jitterY * DistributionJitter)) * cellHeight);
+            node.Rotation = ToUnit(SquirrelRng.Noise((slot * 2) + 2, 0x524F5445u)) * 360.0 - 180.0;
+        }
+
+        private static double ToUnit(uint value) => value / 4294967296d;
 
         private static double Lerp(double current, double target, double amount)
             => current + ((target - current) * amount);
@@ -223,13 +311,9 @@ namespace TheSingularityWorkshop.Services
             return Math.Sqrt((dx * dx) + (dy * dy));
         }
 
-        private const double MinX = 10;
-        private const double MaxX = 90;
-        private const double MinY = 10;
-        private const double MaxY = 90;
-
         public enum LivingNodePhase
         {
+            Dormant,
             Initialization,
             Traveling,
             Planting,
@@ -262,15 +346,15 @@ namespace TheSingularityWorkshop.Services
                 Phase = phase;
             }
 
-            public string Lineage { get; }
-            public int Generation { get; }
+            public string Lineage { get; internal set; }
+            public int Generation { get; internal set; }
             public double X { get; internal set; }
             public double Y { get; internal set; }
             public double Size { get; internal set; }
             public int OffspringCount { get; internal set; }
             public bool GrowthReady { get; internal set; }
             public bool SeedDoubled { get; internal set; }
-            public bool IsRoot { get; }
+            public bool IsRoot { get; internal set; }
             public bool ReproductionComplete { get; internal set; }
             public double GravityVelocity { get; internal set; }
             public double Rotation { get; internal set; }
