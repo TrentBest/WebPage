@@ -70,18 +70,16 @@ public sealed class LivingGuiFsm : IDisposable
 
     public int OrganismCount => _organisms.Count;
 
+    public IReadOnlyList<LivingGuiOrganismFsm> Organisms => _organisms;
+
     public void Update()
     {
         if (_disposed || !_context.IsValid || _context.LivingGuiFrozen)
             return;
 
-        AttachUntrackedOrganisms();
-
-        // Every organism receives exactly one FSM update per page frame.
-        // No population-wide phase selector is allowed to serialize their lifecycle.
-        foreach (var organism in _organisms.ToArray())
-            organism.Update();
-
+        // Attachment is the only orchestration performed here. FSM_API owns
+        // execution through the Hub heartbeat; each organism's processing group
+        // is independently advanced exactly once by that heartbeat.
         AttachUntrackedOrganisms();
     }
 
