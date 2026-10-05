@@ -33,6 +33,12 @@ namespace TheSingularityWorkshop.Services
             remove => Page.StateChanged -= value;
         }
 
+        public event Action? LivingGuiChanged
+        {
+            add => Page.LivingGuiChanged += value;
+            remove => Page.LivingGuiChanged -= value;
+        }
+
         /// <summary>
         /// Creates the page FSM against the application's registered Hub.
         /// This is the critical composition boundary: PageFSM and LivingGuiFsm must
