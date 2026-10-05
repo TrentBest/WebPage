@@ -7,6 +7,17 @@ namespace SingularityHub.Tests;
 
 public sealed class IdleExperienceArchitectureTests
 {
+    [Fact(DisplayName = "Living GUI defaults to a 64-organism critical-mass threshold")]
+    public void LivingGui_DefaultsTo64Organisms()
+    {
+        var profile = WorkshopPresentationProfile.Current;
+        profile.Reset();
+
+        Assert.Equal(64, WorkshopPresentationProfile.DefaultPopulationThreshold);
+        Assert.Equal(64, profile.PopulationThreshold);
+        Assert.Equal(64, PageStateContext.PopulationObservationThreshold);
+    }
+
     [Fact(DisplayName = "Unit 04 — PageFSM follows exact presentation sequence")]
     public void PageFSM_FollowsExactPresentationSequence()
     {
