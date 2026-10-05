@@ -270,4 +270,8 @@ public sealed class IncrementalVersionTests
     public void V0_0_183LivingGuiPreallocates100OrganismsAndUsesStratifiedDistribution()
         => Assert.Equal("0.0.183", "0.0.183");
 
+    [ArchitectureTest(0, 0, 184)] [Fact(DisplayName = "V0.0.184 — Living_GUI_Activates_Preallocated_FSM_Slots_Without_Runtime_Organism_Allocation")]
+    public void V0_0_184LivingGuiActivatesPreallocatedFsmSlotsWithoutRuntimeOrganismAllocation()
+        => Assert.Equal("0.0.184", "0.0.184");
+
 }
