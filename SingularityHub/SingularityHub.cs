@@ -67,7 +67,7 @@ public sealed class SingularityHub : ISingularityHub
     public void UpdateNestedProcessGroups(string parentProcessGroup)
     {
         if(string.IsNullOrWhiteSpace(parentProcessGroup))throw new ArgumentException("A parent process group name is required.",nameof(parentProcessGroup));
-        foreach(var registration in _registrations)if(registration.ParentName==parentProcessGroup)_update(registration.Name);
+        foreach(var registration in _registrations.Where(x=>x.ParentName==parentProcessGroup).ToArray())_update(registration.Name);
     }
     /// <summary>Updates one registered process group.</summary>
     public void UpdateProcessGroup(string processGroup)
