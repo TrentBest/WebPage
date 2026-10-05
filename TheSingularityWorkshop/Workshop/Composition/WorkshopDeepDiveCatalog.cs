@@ -1,6 +1,7 @@
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.DeepDive;
+using CosMicroBundle = TheSingularityWorkshop.FSM_COS.IMicroBundle;
 
 namespace TheSingularityWorkshop.Workshop.Composition;
 
@@ -32,7 +33,7 @@ public sealed class WorkshopDeepDiveCatalog
         var bundles = experience.MicroBundleIds
             .Select(id => _bundles.TryResolve(id, out var bundle) ? bundle : null)
             .Where(bundle => bundle is not null)
-            .Cast<IMicroBundle>()
+            .Cast<CosMicroBundle>()
             .ToArray();
 
         foreach (var microBundle in bundles)
@@ -53,7 +54,7 @@ public sealed class WorkshopDeepDiveCatalog
 /// <summary>Immutable educational projection of an Experience composition.</summary>
 public sealed class WorkshopDeepDiveModel
 {
-    public WorkshopDeepDiveModel(IExperience experience, IReadOnlyList<IMicroBundle> bundles)
+    public WorkshopDeepDiveModel(IExperience experience, IReadOnlyList<CosMicroBundle> bundles)
     {
         Experience = experience;
         Bundles = bundles;
@@ -61,7 +62,7 @@ public sealed class WorkshopDeepDiveModel
 
     public IExperience Experience { get; }
     public IReadOnlyList<IMicroBundle> Bundles { get; }
-    public IMicroBundle? PrimaryBundle => Bundles.FirstOrDefault();
+    public CosMicroBundle? PrimaryBundle => Bundles.FirstOrDefault();
 
     public int DeclaredDependencyCount =>
         Bundles.Sum(bundle => bundle.Dependencies.Count);
