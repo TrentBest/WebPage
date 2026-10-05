@@ -29,6 +29,7 @@ public sealed class LivingGuiFsm : IDisposable
     private readonly string _processingGroup;
     private readonly List<LivingGuiOrganismFsm> _organisms = new();
     private readonly Dictionary<PageStateContext.LivingNodeState, LivingGuiOrganismFsm> _organismPool = new();
+    private readonly HashSet<PageStateContext.LivingNodeState> _attachedNodes = new();
     private bool _disposed;
 
     public LivingGuiFsm(HubKernel hub, PageStateContext context, string parentProcessingGroup)
@@ -113,7 +114,7 @@ public sealed class LivingGuiFsm : IDisposable
     {
         foreach (var node in _context.LivingNodes)
         {
-            if (_organisms.Any(organism => ReferenceEquals(organism.Node, node)))
+            if (!_attachedNodes.Add(node))
                 continue;
 
             if (!_organismPool.TryGetValue(node, out var organism))
@@ -125,7 +126,7 @@ public sealed class LivingGuiFsm : IDisposable
 
     private void AttachChild(PageStateContext.LivingNodeState child)
     {
-        if (_organisms.Any(organism => ReferenceEquals(organism.Node, child)))
+        if (!_attachedNodes.Add(child))
             return;
 
         if (!_organismPool.TryGetValue(child, out var organism))
@@ -147,6 +148,7 @@ public sealed class LivingGuiFsm : IDisposable
             organism.Dispose();
 
         _organisms.Clear();
+        _attachedNodes.Clear();
 
         foreach (var organism in _organismPool.Values)
             organism.Dispose();
