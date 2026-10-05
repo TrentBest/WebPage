@@ -26,5 +26,5 @@ public sealed class WorkshopExperienceCatalog
         => _experiences.TryGetValue(experienceId, out experience);
 
     /// <summary>Returns Experiences currently discoverable by the Workshop host.</summary>
-    public IReadOnlyCollection<IExperience> Experiences => _experiences.Values;
+    public IReadOnlyCollection<IExperience> Experiences => _experiences.Values.ToArray();
 }
