@@ -93,6 +93,32 @@ public sealed class LivingGuiRuntimeTests
     }
 
     [Fact]
+    public void OrganismsAdvanceIndependentlyThroughTheirOwnFsmGroups()
+    {
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+        var hub = new HubKernel();
+        hub.RegisterProcessGroup("TestParent");
+
+        using var runtime = new LivingGuiFsm(hub, context, "TestParent");
+
+        for (var ticks = 0; ticks < 2_000 && context.LivingNodes.Count < 3; ticks++)
+            runtime.Update();
+
+        var children = context.LivingNodes.Where(node => !node.IsRoot).Take(2).ToArray();
+        Assert.Equal(2, children.Length);
+
+        for (var ticks = 0; ticks < 5; ticks++)
+            runtime.Update();
+
+        Assert.True(
+            children[0].X != children[1].X ||
+            children[0].Y != children[1].Y ||
+            children[0].Rotation != children[1].Rotation,
+            "Independent organism FSMs collapsed into identical kinematics.");
+    }
+
+    [Fact]
     public void LivingGuiUsesLerpedMovementRatherThanFrameSizedJumps()
     {
         var context = new PageStateContext();
