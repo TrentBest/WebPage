@@ -50,6 +50,7 @@
         const workshopLanding = window.location.pathname === "/" || window.location.pathname === "";
         if (workshopLanding) document.documentElement.classList.add("workshop-splash-locked");
     </script>
+    <script src="https://www.paypal.com/donate/sdk/donate-sdk.js" charset="UTF-8"></script>
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script>
         Blazor.start({
@@ -131,6 +132,37 @@
             workshopRumbleMaster.gain.exponentialRampToValueAtTime(.0001,now+1.2);
             window.setTimeout(()=>{for(const source of workshopRumbleSources){try{source.stop();}catch{}}try{context.close();}catch{}workshopRumbleContext=null;workshopRumbleMaster=null;workshopRumbleSources=[];},1300);
         }
+        window.workshopPayments = {
+            renderDonation: function () {
+                const container = document.getElementById('paypal-donate-button-container');
+                if (!container) return;
+                if (!window.PayPal || !window.PayPal.Donation || !window.PayPal.Donation.Button) {
+                    container.textContent = 'PayPal is still loading. Refresh if the donation button does not appear.';
+                    return;
+                }
+                container.innerHTML = '';
+                window.PayPal.Donation.Button({
+                    env: 'production',
+                    hosted_button_id: '3Z7263LCQMV9J',
+                    image: {
+                        src: 'https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif',
+                        title: 'PayPal - Support The Singularity Workshop',
+                        alt: 'Donate with PayPal'
+                    },
+                    onComplete: function (params) {
+                        const celebration = document.getElementById('donation-celebration');
+                        const detail = document.getElementById('donation-celebration-detail');
+                        if (!celebration || !detail) return;
+                        const amount = params && params.amt && params.cc ? String(params.amt) + ' ' + String(params.cc) : 'your kindness';
+                        const status = params && params.st ? ' PayPal reported: ' + String(params.st) + '.' : '';
+                        detail.textContent = 'Thank you for supporting the Workshop with ' + amount + '.' + status + ' The machinery has noticed.';
+                        celebration.hidden = false;
+                        celebration.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }).render('#paypal-donate-button-container');
+            }
+        };
+
         window.interop = {
             workshopVisited:function(){ return localStorage.getItem("WorkshopVisited") === "true"; },
             playFirstContactSound:function(){
