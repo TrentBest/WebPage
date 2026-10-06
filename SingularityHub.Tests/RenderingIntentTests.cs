@@ -7,6 +7,29 @@ namespace SingularityHub.Tests;
 public sealed class RenderingIntentTests
 {
     [Fact]
+    public void RenderingObservation_Produces_RestrictedSemanticDescription()
+    {
+        var observation = new RenderingObservation(
+            "workshop-scene",
+            "ISO / HYBRID",
+            RenderingCameraBehavior.Frame,
+            "CLOSE",
+            TimeSpan.FromMilliseconds(66),
+            new[]
+            {
+                "A visible structure occupies the current focus.",
+                "A hidden world-state value must not be exposed."
+            });
+
+        var text = observation.ToAiText();
+
+        Assert.Contains("TARGET: workshop-scene", text, StringComparison.Ordinal);
+        Assert.Contains("PERCEPTION_BAND: CLOSE", text, StringComparison.Ordinal);
+        Assert.Contains("- A visible structure occupies the current focus.", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("HIDDEN_STATE=", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void RenderingIntent_Clamps_Dimension_And_Exposes_Visual_Domain()
     {
         var plan = new RenderingIntent("hull", -1d, RenderingCameraBehavior.Frame);
