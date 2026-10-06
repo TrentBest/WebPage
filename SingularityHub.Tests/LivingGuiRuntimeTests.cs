@@ -43,6 +43,33 @@ public sealed class LivingGuiRuntimeTests
         Assert.InRange(child.TargetX, 10d, 90d);
         Assert.InRange(child.TargetY, 10d, 90d);
         Assert.NotEqual(0d, child.Rotation);
+        Assert.Equal(1, fsm.SeedlingCount);
+        Assert.Equal(LivingGuiOrganismFsm.DormantState, fsm.Organisms[1].CurrentState);
+        Assert.False(fsm.Organisms[1].IsValid);
+    }
+
+    [Fact]
+    public void SeedlingFsmIsRemovedWhenTheChildPlantsAndMatureFsmBecomesValid()
+    {
+        using var fsm = new PageFSM();
+        fsm.RequestEnter();
+
+        for (var ticks = 0; ticks < 10_000 && fsm.Context.LivingNodes.Count < 2; ticks++)
+            fsm.Update();
+
+        var child = fsm.Context.LivingNodes[1];
+        Assert.Equal(PageStateContext.LivingNodePhase.Traveling, child.Phase);
+        Assert.Equal(1, fsm.SeedlingCount);
+        Assert.Equal(LivingGuiOrganismFsm.DormantState, fsm.Organisms[1].CurrentState);
+        Assert.False(fsm.Organisms[1].IsValid);
+
+        for (var ticks = 0; ticks < 10_000 && fsm.SeedlingCount != 0; ticks++)
+            fsm.Update();
+
+        Assert.Equal(PageStateContext.LivingNodePhase.Existing, child.Phase);
+        Assert.Equal(0, fsm.SeedlingCount);
+        Assert.Equal(LivingGuiOrganismFsm.ExistingState, fsm.Organisms[1].CurrentState);
+        Assert.True(fsm.Organisms[1].IsValid);
     }
 
     [Fact]
@@ -274,6 +301,15 @@ public sealed class LivingGuiRuntimeTests
 
         Assert.Equal(4, quadrants.Count);
         Assert.All(quadrants.Values, count => Assert.InRange(count, 12, 38));
+
+        var firstFourQuadrants = targets
+            .Skip(1)
+            .Take(4)
+            .Select(target => (target.TargetX >= 50d ? 1 : 0) + (target.TargetY >= 50d ? 2 : 0))
+            .Distinct()
+            .Count();
+
+        Assert.Equal(4, firstFourQuadrants);
 
         var rowMajorLike = targets
             .Skip(1)
