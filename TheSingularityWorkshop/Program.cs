@@ -11,6 +11,7 @@ using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.IO;
 using TheSingularityWorkshop.Workshop.Composition;
+using TheSingularityWorkshop.Workshop.Configuration;
 
 internal class Program
 {
@@ -38,7 +39,15 @@ internal class Program
         // The WebPage hosts the concrete Hub but owns no Hub mechanics.
         builder.Services.AddSingleton<SingularityHub>();
         builder.Services.AddSingleton<HubRuntime>();
+        builder.Services.AddSingleton<WorkshopManifestStore>();
+        builder.Services.AddSingleton<WorkshopManifestLoader>();
 
-        await builder.Build().RunAsync();
+        var host = builder.Build();
+        var manifestStore = host.Services.GetRequiredService<WorkshopManifestStore>();
+        var manifestLoader = host.Services.GetRequiredService<WorkshopManifestLoader>();
+        manifestStore.Set(await manifestLoader.LoadAsync());
+        host.Services.GetRequiredService<HubRuntime>().Configure(manifestStore.Manifest);
+
+        await host.RunAsync();
     }
 }
