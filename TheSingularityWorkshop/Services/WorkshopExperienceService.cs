@@ -19,7 +19,6 @@ public sealed class WorkshopExperienceService : IDisposable
     private readonly HubRuntime _hubRuntime;
     private bool _disposed;
     private bool _manifestLoaded;
-    private bool _startupPrepared;
     private Stopwatch? _monikerClock;
 
     public event Action? StateChanged;
@@ -96,25 +95,24 @@ public sealed class WorkshopExperienceService : IDisposable
         if (PrimaryManifestExperience is null || PrimaryManifestExperience.MicroBundleIds.Count == 0)
             throw new InvalidOperationException("The manifest-selected primary Experience has no MicroBundles.");
 
-        // Request only the primary Experience roots. LivingGuiExperienceMicroBundle
-        // declares the canonical Workshop Moniker as an FSM_COS dependency, so FSM_COS
-        // resolves the Moniker exactly once as part of the same runtime assembly.
+        // The manifest supplies only the primary Experience root. Its MicroBundle
+        // declares the canonical Moniker dependency, so FSM_COS closes the graph.
         RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
             RuntimeId: 1,
             Bundles: PrimaryManifestExperience.MicroBundleIds
                 .Select(BundleRequest.Unconfigured)
                 .ToArray()));
 
-        _startupPrepared = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
+        var hasMoniker = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
-            out _)
-            && RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
-                LivingGuiExperienceMicroBundle.BundleId,
-                out _);
+            out _);
+        var hasPrimary = RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
+            LivingGuiExperienceMicroBundle.BundleId,
+            out _);
 
-        if (!_startupPrepared)
+        if (!hasMoniker || !hasPrimary)
             throw new InvalidOperationException(
-                "FSM_COS did not compose both the manifest-selected primary Experience and its canonical Moniker dependency.");
+                "FSM_COS did not compose the manifest-selected primary Experience and its canonical Moniker dependency.");
 
         if (RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
                 (ulong)MonikerMicroBundle.BundleId,
@@ -138,7 +136,7 @@ public sealed class WorkshopExperienceService : IDisposable
             _monikerClock.Elapsed >= TimeSpan.FromSeconds(CurrentManifestExperience.PresentationSeconds))
         {
             _monikerClock.Stop();
-            SetState("Hub");
+            ActivatePrimaryExperience();
         }
     }
 
@@ -147,8 +145,16 @@ public sealed class WorkshopExperienceService : IDisposable
         if (CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase))
         {
             _monikerClock?.Stop();
-            SetState("Hub");
+            ActivatePrimaryExperience();
         }
+    }
+
+    private void ActivatePrimaryExperience()
+    {
+        if (PrimaryManifestExperience is null)
+            throw new InvalidOperationException("No primary Experience is available in the WebPage manifest.");
+
+        SetState("LivingGui");
     }
 
     public async Task RestartFromManifestAsync(bool deepDive)
