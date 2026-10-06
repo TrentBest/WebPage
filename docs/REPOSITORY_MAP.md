@@ -6,7 +6,7 @@ The repository is intentionally split by responsibility. When code appears to du
 
 ## Read the repository in this order
 
-1. README.md — why WebPage exists.
+1. ../README.md — why WebPage exists.
 2. LEARNING_PATH.md — how to learn the technology from the repository and the running site.
 3. WORKSHOP_RUNTIME_ARCHITECTURE.md — who owns runtime responsibilities.
 4. FSM_COS_USAGE.md — how this host actually composes a runtime.
@@ -33,7 +33,7 @@ The repository is intentionally split by responsibility. When code appears to du
 | SingularityHub | WebPage Hub proving implementation | Host-facing orchestration, not an FSM_COS replacement |
 | Experiences/* | Experience-specific test projects | Prove concrete Experience behavior |
 | SingularityHub.Tests | Cross-cutting architecture and integration tests | Executable architectural evidence |
-| root Markdown files | Architecture, theory, usage and handoff documentation | Keep current/direction/future explicit |
+| docs/ | Architecture, theory, usage and handoff documentation | Keep current/direction/future explicit |
 
 ## Dependency direction
 
