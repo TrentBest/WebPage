@@ -37,6 +37,18 @@
             </section>
         }
     </main>
+
+    <section id="anyapp-handoff" class="anyapp-handoff" hidden aria-live="polite">
+        <div class="anyapp-handoff-moniker" aria-label="The Singularity Workshop">
+            <div>THE</div>
+            <div>SINGULARITY</div>
+            <div>WORKSHOP</div>
+        </div>
+        <div class="anyapp-handoff-state">DESKTOP HUB MANIFESTED // BROWSER HUB RELEASED</div>
+        <button type="button" class="anyapp-handoff-return" onclick="window.anyAppHandoff.returnHub()">
+            RETURN HUB TO BROWSER
+        </button>
+    </section>
 </div>
 
 @code {
@@ -181,3 +193,48 @@
     .world-event-source{margin-top:.9rem;font-size:.67rem;letter-spacing:.14em;color:#ffe04a}
     @@keyframes world-event-arrival{from{opacity:0;transform:translateX(-50%) scale(.96);filter:blur(8px)}to{opacity:1;transform:translateX(-50%) scale(1);filter:blur(0)}}
 </style>
+
+
+<style>
+.anyapp-handoff{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.08),transparent 32%),#020711;color:#fff;font-family:Consolas,'Courier New',monospace}.anyapp-handoff[hidden]{display:none}.anyapp-handoff-moniker{text-align:center;font-size:clamp(2.5rem,9vw,8rem);font-weight:900;line-height:.86;letter-spacing:.07em;text-shadow:0 0 24px rgba(0,234,255,.22);animation:anyappMonikerBreath 3.8s ease-in-out infinite}.anyapp-handoff-moniker div:nth-child(1){color:#00a8ff}.anyapp-handoff-moniker div:nth-child(2){color:#ff2cff}.anyapp-handoff-moniker div:nth-child(3){color:#ff7a00}.anyapp-handoff-state{font-size:.62rem;letter-spacing:.16em;color:#7e9aa5;text-align:center}.anyapp-handoff-return{margin-top:.4rem;padding:.8rem 1.2rem;border:1px solid #00eaff;background:#04121e;color:#fff;font:800 .68rem Consolas,'Courier New',monospace;letter-spacing:.13em;cursor:pointer}.anyapp-handoff-return:hover{border-color:#ff2cff;box-shadow:0 0 18px rgba(255,44,255,.16)}@keyframes anyappMonikerBreath{0%,100%{transform:scale(1) rotate(-1deg);filter:brightness(.95)}50%{transform:scale(1.018) rotate(1deg);filter:brightness(1.1)}}
+</style>
+
+<script>
+window.anyAppHandoff = {
+    timer: null,
+    active: false,
+    start() {
+        if (this.timer) return;
+        const poll = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:48156/state', { cache: 'no-store' });
+                if (!response.ok) throw new Error();
+                const state = await response.json();
+                const handoff = document.getElementById('anyapp-handoff');
+                if (!handoff) return;
+                const shouldShow = !!state.hubVisible;
+                handoff.hidden = !shouldShow;
+                document.querySelector('.page')?.classList.toggle('anyapp-handoff-active', shouldShow);
+                this.active = shouldShow;
+            } catch {
+                const handoff = document.getElementById('anyapp-handoff');
+                if (handoff) handoff.hidden = true;
+                document.querySelector('.page')?.classList.remove('anyapp-handoff-active');
+                this.active = false;
+            }
+        };
+        poll();
+        this.timer = window.setInterval(poll, 1000);
+    },
+    async returnHub() {
+        try {
+            await fetch('http://127.0.0.1:48156/command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command: 'return-hub' })
+            });
+        } catch { }
+    }
+};
+window.setTimeout(() => window.anyAppHandoff.start(), 0);
+</script>
