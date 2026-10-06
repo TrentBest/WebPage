@@ -2,6 +2,7 @@
 @inject IJSRuntime JS
 @inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
+@inject NavigationManager Navigation
 @implements IDisposable
 @using Microsoft.AspNetCore.Components
 @using TheSingularityWorkshop.Services
@@ -10,6 +11,7 @@
 @BuildRootGui()
 
 <style>
+.manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker div:nth-child(1){color:#00a8ff}.manifest-moniker div:nth-child(2){color:#ff2cff}.manifest-moniker div:nth-child(3){color:#ff7a00}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
 .landing-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;overflow:hidden;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711}
 .landing-aura{position:absolute;width:60vw;height:60vw;border:1px solid rgba(0,234,255,.08);border-radius:50%;box-shadow:0 0 100px rgba(0,234,255,.04);pointer-events:none}
 </style>
@@ -17,6 +19,7 @@
 @code {
     private readonly System.Timers.Timer heartbeat = new(50);
     private bool firstRender;
+    private bool navigatedToHub;
     private FirstContactFsm.FirstContactSoundCue lastSoundCue = FirstContactFsm.FirstContactSoundCue.None;
 
     private RenderFragment BuildRootGui()
@@ -29,17 +32,16 @@
 
     private RenderFragment BuildExperienceContent() => builder =>
     {
-        if (Experience.CurrentState == "FirstContact")
+        if (Experience.CurrentState == "Moniker")
         {
-            builder.OpenComponent<FirstContactView>(0);
-            builder.AddAttribute(1,"State",Experience.FirstContact.CurrentState);
-            builder.AddAttribute(2,"Ticks",Experience.FirstContact.StateTicks);
-            builder.AddAttribute(3,"PresentationProgress",Experience.FirstContact.PresentationProgress);
-            builder.AddAttribute(4,"StatementOpacity",Experience.FirstContact.StatementOpacity);
-            builder.AddAttribute(5,"QuestionOpacity",Experience.FirstContact.QuestionOpacity);
-            builder.AddAttribute(6,"GatewayBreathValue",Experience.FirstContact.GatewayBreath);
-            builder.AddAttribute(7,"OnEntryRequested",EventCallback.Factory.Create(this,EnterWorkshop));
-            builder.CloseComponent();
+            builder.OpenElement(0, "section");
+            builder.AddAttribute(1, "class", "manifest-moniker");
+            builder.AddAttribute(2, "aria-label", "The Singularity Workshop");
+            builder.OpenElement(3, "div"); builder.AddContent(4, "THE"); builder.CloseElement();
+            builder.OpenElement(5, "div"); builder.AddContent(6, "SINGULARITY"); builder.CloseElement();
+            builder.OpenElement(7, "div"); builder.AddContent(8, "WORKSHOP"); builder.CloseElement();
+            builder.OpenElement(9, "small"); builder.AddContent(10, $"MANIFEST // {Experience.Manifest?.ManifestId ?? "UNKNOWN"}"); builder.CloseElement();
+            builder.CloseElement();
         }
         else if (Experience.CurrentState is "ExperienceLoading" or "LivingGui" or "CriticalMass")
         {
@@ -66,9 +68,8 @@
         if(!firstRender || this.firstRender)return;
         this.firstRender=true;
         var returningVisitor=await JS.InvokeAsync<bool>("interop.workshopVisited");
-        Experience.Initialize(returningVisitor);
+        await Experience.InitializeAsync(returningVisitor);
         heartbeat.Start();
-        if(Experience.CurrentState=="FirstContact")await JS.InvokeVoidAsync("interop.firstContactSound","pressure");
     }
 
     private async Task EnterWorkshop()
@@ -88,8 +89,11 @@
 
     private void ExperienceChanged()
     {
-        if (Experience.CurrentState == "LivingGui" && FSM.CurrentState == PageFSM.Gateway)
-            FSM.RequestEnter();
+        if (Experience.CurrentState == "Hub" && !navigatedToHub)
+        {
+            navigatedToHub = true;
+            _ = InvokeAsync(() => Navigation.NavigateTo("/hub"));
+        }
 
         _ = InvokeAsync(StateHasChanged);
     }
