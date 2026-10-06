@@ -22,8 +22,8 @@ public sealed class RenderingMicroBundle : IMicroBundle
             "0.1.0",
             new[]
             {
-                new MicroBundleDependency(AiExchangeCompositionBundle.ProtocolBundleId),
-                new MicroBundleDependency(AiExchangeCompositionBundle.GrammarBundleId)
+                new MicroBundleDependency(ProtocolAiCompositionBundle.BundleId),
+                new MicroBundleDependency(GrammarAiCompositionBundle.BundleId)
             });
     }
 
@@ -32,8 +32,8 @@ public sealed class RenderingMicroBundle : IMicroBundle
 
     public IReadOnlyList<MicroBundleDependencyRequest> Dependencies { get; } =
     [
-        MicroBundleDependencyRequest.Unconfigured(AiExchangeCompositionBundle.ProtocolBundleId),
-        MicroBundleDependencyRequest.Unconfigured(AiExchangeCompositionBundle.GrammarBundleId)
+        MicroBundleDependencyRequest.Unconfigured(ProtocolAiCompositionBundle.BundleId),
+        MicroBundleDependencyRequest.Unconfigured(GrammarAiCompositionBundle.BundleId)
     ];
 
     public RenderingIntent Intent { get; private set; } =
