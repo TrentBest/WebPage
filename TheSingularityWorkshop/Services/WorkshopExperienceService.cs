@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Net.Http.Json;
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
@@ -8,16 +10,26 @@ namespace TheSingularityWorkshop.Services;
 
 public sealed class WorkshopExperienceService : IDisposable
 {
-    public event Action? StateChanged;
+    private const string ManifestPath = "Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json";
+
+    private readonly HttpClient _httpClient;
     private readonly FirstContactFsm _firstContact = new();
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
     private bool _disposed;
-    private bool _entryRequested;
-    private bool _experienceComposed;
+    private bool _manifestLoaded;
+    private bool _startupPrepared;
+    private bool _preloadPrepared;
+    private Stopwatch? _monikerClock;
 
-    public string CurrentState { get; private set; } = "Intro";
+    public event Action? StateChanged;
+
+    public string CurrentState { get; private set; } = "ManifestLoading";
     public bool IsFirstVisit { get; private set; }
     public bool IsInitialized { get; private set; }
+    public bool IsDeepDive { get; private set; }
+    public WebPageHostManifest? Manifest { get; private set; }
+    public WebPageManifestExperience? CurrentManifestExperience { get; private set; }
+    public WebPageManifestExperience? PreloadedManifestExperience { get; private set; }
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public IExperience? SelectedExperience { get; private set; }
     public FirstContactFsm FirstContact => _firstContact;
@@ -37,71 +49,114 @@ public sealed class WorkshopExperienceService : IDisposable
             ? ai
             : null;
 
-    public void Initialize(bool returningVisitor = false)
+    public WorkshopExperienceService(HttpClient httpClient)
     {
-        if (IsInitialized) return;
+        _httpClient = httpClient;
+    }
+
+    public async Task InitializeAsync(bool returningVisitor = false)
+    {
+        if (IsInitialized)
+            return;
 
         IsInitialized = true;
         IsFirstVisit = !returningVisitor;
-        CurrentState = "FirstContact";
-        _firstContact.Start();
-        StateChanged?.Invoke();
+        SetState("ManifestLoading");
+
+        Manifest = await _httpClient.GetFromJsonAsync<WebPageHostManifest>(ManifestPath)
+            ?? throw new InvalidOperationException("The WebPage host manifest could not be loaded.");
+
+        if (Manifest.Startup.Count == 0)
+            throw new InvalidOperationException("The WebPage host manifest contains no startup Experience.");
+
+        CurrentManifestExperience = Manifest.Startup[0];
+        ComposeCurrentStartup();
+        PrepareNextStartup();
+
+        _monikerClock = Stopwatch.StartNew();
+        SetState(CurrentManifestExperience.Kind.Equals("Moniker", StringComparison.OrdinalIgnoreCase)
+            ? "Moniker"
+            : CurrentManifestExperience.Kind);
+
+        _manifestLoaded = true;
     }
 
-    public void MarkVisited() { }
-
-    /// <summary>
-    /// Records the visitor's explicit permission to leave first contact.
-    /// The actual Experience is not composed until the first-contact FSM reaches Landing.
-    /// </summary>
-    public void RequestEntry()
+    private void ComposeCurrentStartup()
     {
-        if (CurrentState != "FirstContact" || _firstContact.CurrentState != "Gateway") return;
+        if (CurrentManifestExperience is null || CurrentManifestExperience.MicroBundleIds.Count == 0)
+            return;
 
-        SelectedFlexExperience = FlexExperienceCatalog.SelectDefault();
-        SelectedExperience = new LivingGuiExperience();
-        _entryRequested = true;
-        _firstContact.RequestEntry();
-        StateChanged?.Invoke();
+        RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
+            RuntimeId: 1,
+            Bundles: CurrentManifestExperience.MicroBundleIds
+                .Select(BundleRequest.Unconfigured)
+                .ToArray()));
+
+        _startupPrepared = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
+            (ulong)MonikerMicroBundle.BundleId,
+            out _);
+        if (!_startupPrepared)
+            throw new InvalidOperationException("The manifest-selected Moniker could not be composed by FSM_COS.");
+    }
+
+    private void PrepareNextStartup()
+    {
+        if (Manifest is null || Manifest.Startup.Count < 2)
+            return;
+
+        PreloadedManifestExperience = Manifest.Startup[1];
+
+        // The Hub is the WebPage's Experience, so an empty MicroBundle list means
+        // the host itself is already the next executable surface. For a future
+        // Experience, its MicroBundles are composed here while the Moniker presents.
+        if (PreloadedManifestExperience.MicroBundleIds.Count == 0)
+        {
+            _preloadPrepared = true;
+            return;
+        }
+
+        var preloadAssembly = _compositionSystem.Execute(new RuntimeManifest(
+            RuntimeId: 2,
+            Bundles: PreloadedManifestExperience.MicroBundleIds
+                .Select(BundleRequest.Unconfigured)
+                .ToArray()));
+
+        _preloadPrepared = preloadAssembly.Bundles.Count > 0;
     }
 
     public void Tick()
     {
-        if (_disposed || !IsInitialized || CurrentState != "FirstContact") return;
-
-        _firstContact.Update();
-
-        if (_firstContact.IsLanding)
-            ActivateSelectedExperience();
-    }
-
-    private void ActivateSelectedExperience()
-    {
-        if (!_entryRequested || _experienceComposed || SelectedExperience is null)
+        if (_disposed || !IsInitialized || !_manifestLoaded)
             return;
 
-        SetState("ExperienceLoading");
-
-        // The Experience asks for its Living GUI MicroBundle. FSM_COS resolves
-        // that bundle's Moniker dependency before loading the Experience capability.
-        RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
-            RuntimeId: SelectedExperience.Id,
-            Bundles: SelectedExperience.MicroBundleIds
-                .Select(BundleRequest.Unconfigured)
-                .ToArray()));
-
-        _experienceComposed = RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
-            LivingGuiExperienceMicroBundle.BundleId,
-            out _);
-
-        if (!_experienceComposed)
+        if (CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase) &&
+            _monikerClock is not null &&
+            CurrentManifestExperience is not null &&
+            _monikerClock.Elapsed >= TimeSpan.FromSeconds(CurrentManifestExperience.PresentationSeconds))
         {
-            SetState("FirstContact");
-            throw new InvalidOperationException(
-                "The Living GUI Experience could not be composed by FSM_COS.");
+            _monikerClock.Stop();
+            SetState("Hub");
         }
+    }
 
-        SetState("LivingGui");
+    public void RequestEntry()
+    {
+        if (CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase))
+        {
+            _monikerClock?.Stop();
+            SetState("Hub");
+        }
+    }
+
+    public async Task RestartFromManifestAsync(bool deepDive)
+    {
+        if (Manifest is null)
+            await InitializeAsync();
+
+        IsDeepDive = deepDive;
+        _monikerClock?.Restart();
+        CurrentManifestExperience = Manifest!.Startup[0];
+        SetState("Moniker");
     }
 
     public void SetCriticalMassReached() => SetState("CriticalMass");
@@ -110,7 +165,8 @@ public sealed class WorkshopExperienceService : IDisposable
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(state);
 
-        if (CurrentState == state) return;
+        if (CurrentState == state)
+            return;
 
         CurrentState = state;
         StateChanged?.Invoke();
@@ -118,7 +174,8 @@ public sealed class WorkshopExperienceService : IDisposable
 
     public void Dispose()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
 
         _firstContact.Dispose();
         _disposed = true;
