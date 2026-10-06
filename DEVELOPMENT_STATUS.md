@@ -25,7 +25,9 @@ present Moniker
    ↓
 activate primary Experience
    ↓
-FSM_API-driven Living GUI
+RuntimeAssembly is composed
+   ↓
+transitional WebPage PageFSM/LivingGuiFsm currently drives browser execution
 ~~~
 
 ## Current public surface
@@ -67,6 +69,12 @@ Do not introduce a local copy when the package is the canonical owner.
 - RuntimeAssembly contains the closed composition;
 - browser transitions from Moniker to the primary Experience;
 - CI is clean.
+
+## Function-preservation gate
+
+The composition migration is real, but the execution migration is not complete. The browser still consumes the transitional `FSMManagerService → PageFSM → LivingGuiFsm → PageStateContext` path. Do not delete that path until its behavior has been moved and proven through the canonical Experience/MicroBundle runtime.
+
+The behavior contract is recorded in [`FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md).
 
 ## Review point
 
