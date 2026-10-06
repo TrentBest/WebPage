@@ -77,20 +77,20 @@
             not the hidden state of the simulation. A strategy opponent can therefore receive a changing
             description of what it currently perceives and still be surprised by something outside that perception.
         </p>
-        @if (Rendering is not null)
+        @if (RenderingBundle is not null)
         {
             <div class="ai-observation-grid">
                 <div class="ai-observation-card">
                     <span class="ai-label">AI OBSERVATION</span>
-                    <pre>@Rendering.AiObservationText</pre>
+                    <pre>@RenderingBundle.AiObservationText</pre>
                 </div>
                 <div class="ai-observation-card">
                     <span class="ai-label">PROTOCOL</span>
-                    <pre>@Rendering.Protocol?.Describe()</pre>
+                    <pre>@RenderingBundle.Protocol?.Describe()</pre>
                 </div>
                 <div class="ai-observation-card">
                     <span class="ai-label">GRAMMAR</span>
-                    <pre>@Rendering.Grammar?.Describe()</pre>
+                    <pre>@RenderingBundle.Grammar?.Describe()</pre>
                 </div>
             </div>
         }
@@ -143,7 +143,7 @@
 </style>
 
 @code {
-    private RenderingMicroBundle? Rendering =>
+    private RenderingMicroBundle? RenderingBundle =>
         Experience.HubRuntimeAssemblies.TryGetValue("Rendering", out var assembly) &&
         assembly.TryGetBundle<RenderingMicroBundle>(RenderingMicroBundle.BundleId, out var bundle)
             ? bundle
