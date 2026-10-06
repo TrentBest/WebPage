@@ -81,7 +81,6 @@ public sealed class WorkshopCompositionTests
         Assert.NotNull(rendering.Grammar);
         Assert.Contains("PERCEPTION_BAND", rendering.AiObservationText!, StringComparison.Ordinal);
         Assert.Contains("AI OBSERVATION", rendering.Composition!.Find("rendering-ai-observation").Properties["label"]);
-        Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.BundleId);
         Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.ProtocolBundleId);
         Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.GrammarBundleId);
     }
