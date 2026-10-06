@@ -10,7 +10,7 @@ namespace TheSingularityWorkshop.Workshop.Composition;
 /// Composes the first host-facing ProtocolAI + GrammarAI exchange surface.
 /// Transport, clipboard access, credentials, and provider calls remain host concerns.
 /// </summary>
-public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.FSM_COS.TheSingularityWorkshop.FSM_COS.IMicroBundle
+public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
 {
     public const ulong BundleId = 0x1003UL;
     public const ulong ProtocolBundleId = 0x1001_0001UL;
