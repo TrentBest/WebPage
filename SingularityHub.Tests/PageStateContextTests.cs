@@ -23,8 +23,8 @@ public sealed class PageStateContextTests
         Assert.Equal("G:0", root.Lineage);
         Assert.Equal(0, root.Generation);
         Assert.True(root.IsRoot);
-        Assert.Equal(50d, root.X);
-        Assert.Equal(50d, root.Y);
+        Assert.Equal(0d, root.X);
+        Assert.Equal(0d, root.Y);
         Assert.Equal(50d, root.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.Initialization, root.Phase);
     }
@@ -52,12 +52,12 @@ public sealed class PageStateContextTests
         context.InitializeOrganism(child);
 
         Assert.Equal(2, context.LivingNodes.Count);
-        Assert.Equal(50d, child.X);
-        Assert.Equal(50d, child.Y);
+        Assert.Equal(0d, child.X);
+        Assert.Equal(0d, child.Y);
         Assert.Equal(10d, child.Size);
         Assert.Equal(PageStateContext.LivingNodePhase.Traveling, child.Phase);
-        Assert.InRange(child.TargetX, 10d, 90d);
-        Assert.InRange(child.TargetY, 10d, 90d);
+        Assert.InRange(child.TargetX, -40d, 40d);
+        Assert.InRange(child.TargetY, -40d, 40d);
     }
 
     [Fact] public void TravelMovesTowardTargetWithoutJumping()
