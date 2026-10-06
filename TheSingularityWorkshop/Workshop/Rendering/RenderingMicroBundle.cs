@@ -22,7 +22,8 @@ public sealed class RenderingMicroBundle : IMicroBundle
             "0.1.0",
             new[]
             {
-                new MicroBundleDependency(AiExchangeCompositionBundle.BundleId)
+                new MicroBundleDependency(AiExchangeCompositionBundle.ProtocolBundleId),
+                new MicroBundleDependency(AiExchangeCompositionBundle.GrammarBundleId)
             });
     }
 
@@ -31,7 +32,8 @@ public sealed class RenderingMicroBundle : IMicroBundle
 
     public IReadOnlyList<MicroBundleDependencyRequest> Dependencies { get; } =
     [
-        MicroBundleDependencyRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
+        MicroBundleDependencyRequest.Unconfigured(AiExchangeCompositionBundle.ProtocolBundleId),
+        MicroBundleDependencyRequest.Unconfigured(AiExchangeCompositionBundle.GrammarBundleId)
     ];
 
     public RenderingIntent Intent { get; private set; } =
@@ -54,18 +56,21 @@ public sealed class RenderingMicroBundle : IMicroBundle
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        var aiExchange = context.Bundles
-            .OfType<AiExchangeCompositionBundle>()
+        var protocolBundle = context.Bundles
+            .OfType<ProtocolAiCompositionBundle>()
+            .FirstOrDefault();
+        var grammarBundle = context.Bundles
+            .OfType<GrammarAiCompositionBundle>()
             .FirstOrDefault();
 
-        if (aiExchange is null)
+        if (protocolBundle is null || grammarBundle is null)
             return false;
 
-        var changed = !ReferenceEquals(Protocol, aiExchange.Protocol) ||
-                      !ReferenceEquals(Grammar, aiExchange.Grammar);
+        var changed = !ReferenceEquals(Protocol, protocolBundle.Protocol) ||
+                      !ReferenceEquals(Grammar, grammarBundle.Grammar);
 
-        Protocol = aiExchange.Protocol;
-        Grammar = aiExchange.Grammar;
+        Protocol = protocolBundle.Protocol;
+        Grammar = grammarBundle.Grammar;
 
         if (Protocol is null || Grammar is null)
             return changed;
