@@ -8,9 +8,7 @@
 
 ## Why WebPage exists now
 
-WebPage started as a practical website around an earlier distribution requirement. It became much more useful than that.
-
-It is now the browser proving ground and public learning resource for The Singularity Workshop.
+WebPage is the browser proving ground and public learning resource for The Singularity Workshop.
 
 There are two valid ways to enter:
 
@@ -23,7 +21,7 @@ Those two paths should teach the same architecture.
 
 ## The first lesson: the host is not the machinery
 
-WebPage is a host. It should consume the Workshop's reusable packages rather than quietly becoming a second implementation of them.
+WebPage is a host. It consumes the Workshop's reusable packages rather than becoming a second implementation of them.
 
 ~~~text
 FSM_API
@@ -69,46 +67,39 @@ FSM_API-driven behavior
 browser manifestation
 ~~~
 
-The current manifest requests LivingGuiExperienceMicroBundle 2102 as the primary root.
+The current manifest and active Experience composition are documented in [Current Vertical Slice](docs/CURRENT_VERTICAL_SLICE.md).
 
-That MicroBundle declares MonikerMicroBundle 2110 as its dependency.
+## Documentation and theory
 
-Therefore the correct FSM_COS request is:
+The repository deliberately separates the public orientation from the engineering documentation.
+
+- [Documentation Index](docs/DOCUMENTATION_INDEX.md) — complete map.
+- [Learning Path](docs/LEARNING_PATH.md) — progressive route through the repository.
+- [Repository Map](docs/REPOSITORY_MAP.md) — where responsibilities live.
+- [Usage](docs/USAGE.md) — how to run and consume WebPage.
+- [Theory](docs/THEORY.md) — concepts and architectural reasoning behind WebPage.
+- [Architecture](docs/WEBPAGE_EXPERIENCE_ARCHITECTURE.md) — host and Experience model.
+- [Runtime Architecture](docs/WORKSHOP_RUNTIME_ARCHITECTURE.md) — runtime responsibility boundaries.
+- [FSM_COS Usage](docs/FSM_COS_USAGE.md) — how WebPage consumes the external composition package.
+- [Package Ecosystem](docs/PACKAGE_ECOSYSTEM.md) — what WebPage consumes and why.
+- [Documentation Standard](docs/DOCUMENTATION_STANDARD.md) — how this repository keeps documentation useful and honest.
+
+### External abstractions
+
+WebPage documents **how it uses** an external abstraction, not the external abstraction's entire domain.
+
+For example, WebPage explains its use of FSM_API, FSM_COS, GUI, ProtocolAi, GrammarAi, and MicroBundleDomain at the integration boundary. The authoritative theory and API documentation for those packages remains in their own repositories.
 
 ~~~text
-RuntimeManifest
-    root = 2102
-        ↓
-FSM_COS
-    ↓
-dependency closure
-    ↓
-2110 + 2102
-    ↓
-RuntimeAssembly
+WebPage
+  │
+  ├── documents its own domain
+  │
+  ├── documents how external packages are configured/consumed
+  │
+  └── points to the owning package for that package's
+      complete documentation and theory
 ~~~
-
-WebPage must not manually request the Moniker as a second root merely because the browser presents it first.
-
-That is the lesson.
-
-## What to learn
-
-Start with LEARNING_PATH.md, then use REPOSITORY_MAP.md to navigate the source.
-
-| Question | Start here |
-|---|---|
-| Why does WebPage exist? | this README |
-| How do I learn the architecture? | LEARNING_PATH.md |
-| Where is everything? | REPOSITORY_MAP.md |
-| Who owns what? | WORKSHOP_RUNTIME_ARCHITECTURE.md |
-| How does WebPage call FSM_COS? | FSM_COS_USAGE.md |
-| What is an Experience? | EXPERIENCE_THEORY.md |
-| How does MicroBundle arbitration work? | MICROBUNDLE_ARBITRATION_MAP.md |
-| What is currently being proven? | CURRENT_VERTICAL_SLICE.md |
-| How do we keep docs honest? | DOCUMENTATION_STANDARD.md |
-
-The full index remains DOCUMENTATION_INDEX.md.
 
 ## The extraction rule
 
@@ -136,11 +127,11 @@ This keeps WebPage from becoming a giant application that merely happens to cont
 
 ## Current / Direction / Future
 
-Every document and major code path must distinguish:
+Every document and major code path should distinguish:
 
-- Current — implemented and observable.
-- Direction — actively being migrated or established.
-- Future — deliberately not part of today's contract.
+- **Current** — implemented and observable.
+- **Direction** — actively being migrated or established.
+- **Future** — deliberately not part of today's contract.
 
 Old experiments remain useful evidence, but they are not automatically architecture.
 
