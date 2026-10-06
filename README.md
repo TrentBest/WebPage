@@ -4,184 +4,147 @@
 [![FSM_API](https://img.shields.io/badge/FSM_API-1.0.13-00A98F?style=flat-square)](https://github.com/TrentBest/FSM_API)
 [![Tests](https://img.shields.io/badge/tests-GitHub%20Actions-f39c12?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/TrentBest/WebPage/actions)
 
-> **The page opens the door. The Experience gives you somewhere to stand. The machinery lets you look underneath it.**
+> The page opens the door. The Experience gives you somewhere to stand. The machinery lets you look underneath it.
 
-## What this repository is
+## Why WebPage exists now
 
-WebPage is the browser proving ground for The Singularity Workshop.
+WebPage started as a practical website around an earlier distribution requirement. It became much more useful than that.
 
-It exists to build a real host around reusable Workshop machinery, make that machinery observable and interactive, and document how another developer can use the underlying packages without copying the WebPage.
+It is now the browser proving ground and public learning resource for The Singularity Workshop.
 
-This repository is therefore both a working browser application and scaffolding for operational documentation.
+There are two valid ways to enter:
 
-> **Show the behavior. Preserve the semantics. Explain the machinery.**
+- Visit the WebPage to witness the technology working.
+- Visit the repository to understand how and why it works.
 
-## The architectural decision
+Those two paths should teach the same architecture.
 
-Useful functionality originally accumulated inside this application because WebPage was the fastest place to prove it. That experimental history is valuable, but it is not the desired permanent boundary.
+> Show the behavior. Preserve the semantics. Explain the machinery.
 
-When a capability proves reusable, we move it into the appropriately owned NuGet package or domain repository. WebPage then becomes the consumer, adapter, and proving ground.
+## The first lesson: the host is not the machinery
+
+WebPage is a host. It should consume the Workshop's reusable packages rather than quietly becoming a second implementation of them.
+
+~~~text
+FSM_API
+   ↓
+state execution
+
+MicroBundleDomain
+   ↓
+MicroBundle contract
+
+FSM_COS
+   ↓
+composition / dependency closure / arbitration
+
+WebPage
+   ↓
+manifest + browser host + presentation
+
+browser / renderer
+   ↓
+visible Experience
+~~~
+
+When a capability becomes reusable, the implementation belongs in the package or domain that owns it. WebPage consumes that result and proves it in a real browser.
+
+## The current startup proof
+
+The host manifest is the startup authority.
+
+~~~text
+WebPage loads manifest
+        ↓
+startup Experience(s)
+        ↓
+Workshop Moniker
+        ↓
+primary running Experience
+        ↓
+Living GUI
+        ↓
+FSM_API-driven behavior
+        ↓
+browser manifestation
+~~~
+
+The current manifest requests LivingGuiExperienceMicroBundle 2102 as the primary root.
+
+That MicroBundle declares MonikerMicroBundle 2110 as its dependency.
+
+Therefore the correct FSM_COS request is:
+
+~~~text
+RuntimeManifest
+    root = 2102
+        ↓
+FSM_COS
+    ↓
+dependency closure
+    ↓
+2110 + 2102
+    ↓
+RuntimeAssembly
+~~~
+
+WebPage must not manually request the Moniker as a second root merely because the browser presents it first.
+
+That is the lesson.
+
+## What to learn
+
+Start with LEARNING_PATH.md, then use REPOSITORY_MAP.md to navigate the source.
+
+| Question | Start here |
+|---|---|
+| Why does WebPage exist? | this README |
+| How do I learn the architecture? | LEARNING_PATH.md |
+| Where is everything? | REPOSITORY_MAP.md |
+| Who owns what? | WORKSHOP_RUNTIME_ARCHITECTURE.md |
+| How does WebPage call FSM_COS? | FSM_COS_USAGE.md |
+| What is an Experience? | EXPERIENCE_THEORY.md |
+| How does MicroBundle arbitration work? | MICROBUNDLE_ARBITRATION_MAP.md |
+| What is currently being proven? | CURRENT_VERTICAL_SLICE.md |
+| How do we keep docs honest? | DOCUMENTATION_STANDARD.md |
+
+The full index remains DOCUMENTATION_INDEX.md.
+
+## The extraction rule
+
+Useful functionality will naturally appear in a proving ground first.
+
+That is fine.
+
+The permanent path is:
 
 ~~~text
 experiment in WebPage
         ↓
 identify reusable responsibility
         ↓
-extract to owning package/domain
+move implementation to owning package/domain
         ↓
 test and document the package
         ↓
-WebPage consumes the package
+consume the package here
         ↓
-prove it in a real browser
+prove the integration
 ~~~
 
-Some reusable packages may eventually become MicroBundles when their semantics fit the composition model. A package is not automatically a MicroBundle merely because WebPage references it.
+This keeps WebPage from becoming a giant application that merely happens to contain the Workshop's technology.
 
-## FSM_COS is the composition boundary
+## Current / Direction / Future
 
-WebPage uses [FSM_COS](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS) rather than implementing a second composition system.
+Every document and major code path must distinguish:
 
-~~~text
-Experience
-    │
-    │ MicroBundle IDs
-    ▼
-RuntimeManifest
-    │
-    ▼
-FSM_COS
-    │
-    ├── resolve roots
-    ├── close dependencies
-    ├── carry configuration
-    ├── install / load
-    ├── arbitrate
-    └── require convergence
-    │
-    ▼
-RuntimeAssembly
-    │
-    ▼
-WebPage host
-    │
-    └── presentation / interaction
-~~~
+- Current — implemented and observable.
+- Direction — actively being migrated or established.
+- Future — deliberately not part of today's contract.
 
-> **FSM_COS assembles. WebPage manifests and presents.**
+Old experiments remain useful evidence, but they are not automatically architecture.
 
-For the concrete integration, read [FSM_COS_USAGE.md](FSM_COS_USAGE.md). For the kernel's own theory and API contract, read the [FSM_COS repository](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS).
-
-## Current first contact
-
-~~~text
-LABEL 1
-   ↓
-LABEL 2
-   ↓
-ENTER THE WORKSHOP + advisory
-   ↓
-explicit visitor entry
-   ↓
-FSM_COS composes LIVING GUI
-   ↓
-Moniker dependency resolves as part of composition
-   ↓
-living GUI grows / reproduces
-   ↓
-population threshold
-   ↓
-gravity
-   ↓
-Moniker presentation
-   ↓
-Workshop navigation
-~~~
-
-This is current WebPage behavior, not a universal startup contract for other hosts.
-
-The Living GUI is useful because it makes composition observable: the visitor sees behavior that did not exist until the Experience was explicitly composed.
-
-## Experiences and MicroBundles
-
-An Experience describes an environment to be composed. Its MicroBundle IDs identify the focused capabilities required for that environment.
-
-~~~text
-LivingGuiExperience
-        │
-        └── LivingGuiExperienceMicroBundle
-                    │
-                    └── Moniker dependency
-~~~
-
-The Experience does not manually walk its dependency graph. The MicroBundle declares its dependency and FSM_COS resolves the closure.
-
-See [EXPERIENCE_THEORY.md](EXPERIENCE_THEORY.md), [WORKSHOP_RUNTIME_ARCHITECTURE.md](WORKSHOP_RUNTIME_ARCHITECTURE.md), and [MicroBundleDomain](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain).
-
-## Deep Dives
-
-A Deep Dive is the educational surface that follows a working proof:
-
-~~~text
-WITNESS → WONDER → DEEP DIVE → UNDERSTAND → CREATE → RUN → PUBLISH
-~~~
-
-The purpose is not to teach a developer to copy a WebPage implementation. It is to show the Experience, MicroBundle, dependency, ontology, and FSM_COS boundaries so the developer can use the machinery correctly.
-
-WebPage-only educational providers remain on the host side. Shared runtime packages do not depend upward on WebPage.
-
-See [DEEP_DIVE_PROVIDER_ARCHITECTURE.md](DEEP_DIVE_PROVIDER_ARCHITECTURE.md).
-
-## Identity
-
-The Workshop keeps these concepts distinct:
-
-| Identity | Answers |
-|---|---|
-| Experience ID | What Experience is being run? |
-| MicroBundle ID | What capability is being composed? |
-| Ontology Signature | What is the thing structurally? |
-
-WebPage can prove and display these distinctions. The canonical contracts remain in their owning runtime/domain layers.
-
-## Rendering
-
-> **REMOVE THE CUBES. RENDER WHAT REMAINS.**
-
-Rendering is a separate architectural concern. WebPage is a place to observe renderer work, not the owner of the renderer's general runtime contract.
-
-## Documentation philosophy
-
-The strongest Workshop repositories do two jobs:
-
-- **theory** explains why a boundary exists and which decisions should remain invariant;
-- **usage documentation** shows a developer how to cross that boundary correctly.
-
-Start with [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md).
-
-Then use:
-
-- [FSM_COS_USAGE.md](FSM_COS_USAGE.md) — how this host actually uses FSM_COS;
-- [WORKSHOP_RUNTIME_ARCHITECTURE.md](WORKSHOP_RUNTIME_ARCHITECTURE.md) — current runtime ownership;
-- [EXPERIENCE_THEORY.md](EXPERIENCE_THEORY.md) — current Experience decisions;
-- [MICROBUNDLE_ARBITRATION_MAP.md](MICROBUNDLE_ARBITRATION_MAP.md) — composition flow;
-- [DEEP_DIVE_PROVIDER_ARCHITECTURE.md](DEEP_DIVE_PROVIDER_ARCHITECTURE.md) — host-only educational capability;
-- [CURRENT_VERTICAL_SLICE.md](CURRENT_VERTICAL_SLICE.md) — implementation state and proof work;
-- [DOCUMENTATION_STANDARD.md](DOCUMENTATION_STANDARD.md) — documentation rules.
-
-### Current / Direction / Future
-
-Every document should make this distinction visible.
-
-**Current** is code and behavior that exists.
-
-**Direction** is architecture we are deliberately implementing.
-
-**Future** is not part of the current WebPage contract.
-
-Side conversations, abandoned platforms, speculative host worlds, and historical implementation ideas belong in issue history or the repository that owns them—not in the operational WebPage architecture.
-
-## Development
+## Build it
 
 ~~~bash
 git clone https://github.com/TrentBest/WebPage.git
@@ -192,35 +155,20 @@ dotnet run
 
 Active engineering occurs on development. master is the stable promotion target.
 
-Before calling a change complete:
-
-1. preserve or explicitly relocate existing functionality;
-2. build it;
-3. run relevant tests;
-4. inspect behavior;
-5. document the architectural decision;
-6. verify GitHub Actions.
-
 Do not publish packages or releases without explicit approval.
 
 ## Quality bar
 
-- zero warnings and zero avoidable errors;
-- explicit lifecycle and state ownership;
-- clean dependency direction;
-- public contracts documented;
-- tests prove architectural intent;
-- visual behavior has visual evidence;
-- reusable functionality moves to the correct package when justified;
-- WebPage does not become a dumping ground for package responsibilities;
-- documentation explains both how and why;
-- current behavior is not confused with future architecture.
+- FSM_API owns meaningful state-machine execution.
+- FSM_COS owns composition, dependency closure, arbitration, and RuntimeAssembly creation.
+- NuGet packages own reusable capabilities.
+- WebPage owns browser-specific presentation and integration.
+- Tests prove architectural claims.
+- Visual behavior has visual evidence.
+- Documentation explains both how and why.
+- Zero warnings and zero avoidable errors is the target.
 
-> **Can a visitor experience it, can a developer use it, and can the architecture tell us who owns it?**
-
-## Platform integration
-
-WebPage is browser-first. The Workshop's separate [FSM_UnityIntegrationAdvanced](https://github.com/TrentBest/FSM_UnityIntegrationAdvanced) package is the appropriate pointer for developers who specifically need that integration. It is not part of this WebPage runtime architecture.
+> Can a visitor experience it, can a developer understand it, and can the architecture tell us who owns it?
 
 ---
 
