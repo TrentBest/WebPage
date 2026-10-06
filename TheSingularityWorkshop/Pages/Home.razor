@@ -78,9 +78,9 @@
         }
     };
 
-    private static void BuildManifestHub(RenderTreeBuilder builder)
+    private void BuildManifestHub(RenderTreeBuilder builder)
     {
-        var manifest = ExperienceManifestForRender;
+        var manifest = Experience.Manifest;
         if (manifest is null || manifest.Hub.Count == 0)
         {
             builder.OpenElement(0, "section");
@@ -160,8 +160,6 @@
         builder.CloseElement();
         builder.CloseElement();
     };
-
-    private static WebPageHostManifest? ExperienceManifestForRender => null;
 
     protected override void OnInitialized()
     {
