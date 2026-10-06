@@ -310,17 +310,56 @@ namespace TheSingularityWorkshop.Services
                     MinY + ((row + 0.5 + jitterY) * cellHeight)));
             }
 
-            // Fisher-Yates with Squirrel Noise: deterministic for tests, but the
-            // population's activation order is no longer tied to row-major cells.
-            for (var index = targets.Count - 1; index > 0; index--)
+            // A plain Fisher-Yates shuffle is random, but randomness alone can still
+            // make the first visible wave look clustered. Build the activation order
+            // with a deterministic farthest-point pass so every early seed is visibly
+            // separated from the seeds that came before it. Squirrel Noise still supplies
+            // the jitter and deterministic tie-breaking; it is not being used as a
+            // statistical guarantee of spatial coverage.
+            var firstIndex = (int)(SquirrelRng.Noise(targetCount, 0x53485546u) % (uint)targets.Count);
+            var orderedTargets = new List<(double X, double Y)>(targetCount);
+            var remaining = new List<(double X, double Y)>(targets);
+
+            orderedTargets.Add(remaining[firstIndex]);
+            remaining.RemoveAt(firstIndex);
+
+            while (remaining.Count > 0)
             {
-                var swapIndex = (int)(SquirrelRng.Noise(index, 0x53485546u) % (uint)(index + 1));
-                (targets[index], targets[swapIndex]) = (targets[swapIndex], targets[index]);
+                var bestIndex = 0;
+                var bestScore = double.MinValue;
+                var bestNoise = uint.MaxValue;
+
+                for (var candidateIndex = 0; candidateIndex < remaining.Count; candidateIndex++)
+                {
+                    var candidate = remaining[candidateIndex];
+                    var nearestDistanceSquared = double.MaxValue;
+
+                    foreach (var selected in orderedTargets)
+                    {
+                        var dx = candidate.X - selected.X;
+                        var dy = candidate.Y - selected.Y;
+                        var distanceSquared = (dx * dx) + (dy * dy);
+                        if (distanceSquared < nearestDistanceSquared)
+                            nearestDistanceSquared = distanceSquared;
+                    }
+
+                    var tieNoise = SquirrelRng.Noise(candidateIndex + orderedTargets.Count, 0x53485546u);
+                    if (nearestDistanceSquared > bestScore ||
+                        (Math.Abs(nearestDistanceSquared - bestScore) < double.Epsilon && tieNoise < bestNoise))
+                    {
+                        bestScore = nearestDistanceSquared;
+                        bestNoise = tieNoise;
+                        bestIndex = candidateIndex;
+                    }
+                }
+
+                orderedTargets.Add(remaining[bestIndex]);
+                remaining.RemoveAt(bestIndex);
             }
 
             for (var index = 1; index < nodes.Count; index++)
             {
-                var target = targets[index - 1];
+                var target = orderedTargets[index - 1];
                 nodes[index].TargetX = target.X;
                 nodes[index].TargetY = target.Y;
 
