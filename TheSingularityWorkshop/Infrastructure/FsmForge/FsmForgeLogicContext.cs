@@ -1,4 +1,4 @@
-using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 namespace TheSingularityWorkshop.Infrastructure.FsmForge;
 public sealed class FsmForgeLogicContext : FsmForgePreviewContext
 {
