@@ -77,7 +77,7 @@ public sealed class MonikerExperienceTests
             BaseAddress = new Uri("https://webpage.test/")
         };
 
-        return new WorkshopExperienceService(client, new HubRuntime(new SingularityHub()));
+        return new WorkshopExperienceService(client, new HubRuntime(new TheSingularityWorkshop.SingularityHub.SingularityHub()));
     }
 
     private sealed class ManifestHandler : HttpMessageHandler
