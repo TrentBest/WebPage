@@ -74,9 +74,10 @@ namespace TheSingularityWorkshop.Services
                     index == 0,
                     LivingNodePhase.Dormant);
 
-                SetDistributionTarget(node, index);
                 _preallocatedNodes.Add(node);
             }
+
+            AssignDistributionTargets(_preallocatedNodes);
         }
 
         public void ResetStateClock() => StateTicks = 0;
@@ -275,28 +276,58 @@ namespace TheSingularityWorkshop.Services
             LivingGuiFallen = _livingNodes.TrueForAll(node => node.Y > 125);
         }
 
-        private static void SetDistributionTarget(LivingNodeState node, int slot)
+        private static void AssignDistributionTargets(IList<LivingNodeState> nodes)
         {
-            if (slot == 0)
-            {
-                node.TargetX = 50;
-                node.TargetY = 50;
+            if (nodes.Count == 0)
                 return;
+
+            nodes[0].TargetX = 50;
+            nodes[0].TargetY = 50;
+
+            var targetCount = nodes.Count - 1;
+            if (targetCount == 0)
+                return;
+
+            // Generate random-looking destinations across the whole viewport, then
+            // randomize their activation order. The spatial cells prevent a perfectly
+            // valid pseudo-random sequence from accidentally launching its first wave
+            // from one side of the screen.
+            var columns = Math.Max(1, (int)Math.Ceiling(Math.Sqrt(targetCount)));
+            var rows = Math.Max(1, (int)Math.Ceiling(targetCount / (double)columns));
+            var cellWidth = (MaxX - MinX) / columns;
+            var cellHeight = (MaxY - MinY) / rows;
+            var targets = new List<(double X, double Y)>(targetCount);
+
+            for (var index = 0; index < targetCount; index++)
+            {
+                var column = index % columns;
+                var row = index / columns;
+                var jitterX = (ToUnit(SquirrelRng.Noise((index * 2) + 0, 0x50414745u)) - 0.5) * 0.60;
+                var jitterY = (ToUnit(SquirrelRng.Noise((index * 2) + 1, 0x50414745u)) - 0.5) * 0.60;
+
+                targets.Add((
+                    MinX + ((column + 0.5 + jitterX) * cellWidth),
+                    MinY + ((row + 0.5 + jitterY) * cellHeight)));
             }
 
-            // Do not lay the population out as a row-major grid. That makes the
-            // population visibly launch "up, then down" in deterministic rows.
-            // Each preallocated slot receives an independent, deterministic flight
-            // target instead. Squirrel noise keeps the result reproducible for tests
-            // while giving every organism its own direction and destination.
-            var x = ToUnit(SquirrelRng.Noise((slot * 3) + 0, 0x50414745u));
-            var y = ToUnit(SquirrelRng.Noise((slot * 3) + 1, 0x50414745u));
-            var angle = ToUnit(SquirrelRng.Noise((slot * 3) + 2, 0x524F5445u)) * (Math.PI * 2.0);
+            // Fisher-Yates with Squirrel Noise: deterministic for tests, but the
+            // population's activation order is no longer tied to row-major cells.
+            for (var index = targets.Count - 1; index > 0; index--)
+            {
+                var swapIndex = (int)(SquirrelRng.Noise(index, 0x53485546u) % (uint)(index + 1));
+                (targets[index], targets[swapIndex]) = (targets[swapIndex], targets[index]);
+            }
 
-            node.TargetX = MinX + (x * (MaxX - MinX));
-            node.TargetY = MinY + (y * (MaxY - MinY));
-            node.InitialRotation = (angle * (180.0 / Math.PI)) - 180.0;
-            node.Rotation = node.InitialRotation;
+            for (var index = 1; index < nodes.Count; index++)
+            {
+                var target = targets[index - 1];
+                nodes[index].TargetX = target.X;
+                nodes[index].TargetY = target.Y;
+
+                var angle = ToUnit(SquirrelRng.Noise((index * 3) + 2, 0x524F5445u)) * (Math.PI * 2.0);
+                nodes[index].InitialRotation = (angle * (180.0 / Math.PI)) - 180.0;
+                nodes[index].Rotation = nodes[index].InitialRotation;
+            }
         }
 
         private static double ToUnit(uint value) => value / 4294967296d;
