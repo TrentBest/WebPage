@@ -100,3 +100,45 @@ Before calling work complete:
 7. leave master untouched unless promotion was explicitly requested.
 
 Zero warnings and zero avoidable errors is the target.
+## Host-only rule
+
+WebPage is the ultimate host/orchestrator for Workshop Experiences. Its responsibility is limited to:
+
+- loading and validating the host manifest;
+- selecting startup/running Experiences as declared by that manifest;
+- invoking FSM_COS to assemble the requested RuntimeAssembly;
+- providing browser-environment concerns such as navigation, viewport/client sizing, browser events, user input transport, authentication/session handoff, and browser persistence/data adapters;
+- presenting state and capabilities produced by Workshop packages through GUI.Blazor or other canonical package surfaces;
+- exposing learning/deep-dive views that observe real package/runtime state.
+
+WebPage must not own reusable domain behavior, autonomous entity behavior, MicroBundle lifecycle semantics, composition/arbitration semantics, rendering-engine semantics, or a second application/game heartbeat.
+
+If WebPage currently contains such behavior, treat it as migration debt:
+
+1. identify the canonical Workshop NuGet package that should own it;
+2. preserve the existing behavior with an architectural test or runtime proof;
+3. replace the WebPage implementation with the package contract/runtime;
+4. move only browser-specific manifestation/input/data adaptation into WebPage;
+5. remove the duplicate implementation after proof;
+6. update the learning documentation so the browser demonstrates the package rather than pretending WebPage invented it.
+
+### Browser boundary
+
+The browser is an environment, not the Workshop runtime. Browser concerns include DOM/rendering manifestation, viewport measurement, pointer/keyboard/touch input, navigation, authentication/session state, local/browser storage, network transport, and user-facing presentation. Those concerns may be implemented in WebPage or through canonical GUI/browser packages.
+
+Everything that can exist independently of a browser should be pulled downward into a Workshop package and consumed here.
+
+### Current migration targets
+
+The following WebPage-owned implementations are explicitly transitional and must not become new foundations:
+
+- Services/PageFSM.cs
+- Services/LivingGuiFsm.cs
+- Services/PageStateContext.cs
+- Services/FSMManagerService.cs
+- Services/BlazorFSMIntegration.cs
+- Workshop/MicroBundles/MicroBundle.cs and its companion local lifecycle contracts
+- any Razor component that directly advances those runtimes rather than observing a manifest-selected RuntimeAssembly
+
+Do not delete these blindly. First identify the package/runtime replacement and preserve proof of the behavior being migrated.
+
