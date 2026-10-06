@@ -4,11 +4,11 @@ using TheSingularityWorkshop.MicroBundleDomain;
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
 /// <summary>
-/// Composition capability for the original Foxes & Dogs instructional demonstration.
+/// Composition capability for the original Foxes &amp; Dogs instructional demonstration.
 /// The demonstration itself remains implemented by the FSM_API agent contexts; this
 /// MicroBundle makes that capability discoverable through FSM_COS.
 /// </summary>
-public sealed class FoxesAndDogsMicroBundle : IMicroBundle
+public sealed class FoxesAndDogsMicroBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
 {
     public const int BundleId = 2101;
 
