@@ -1,6 +1,7 @@
 using TheSingularityWorkshop.FSM_COS;
 using DomainMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
 using TheSingularityWorkshop.Workshop.MicroBundles;
+using TheSingularityWorkshop.Workshop.Rendering;
 
 
 namespace TheSingularityWorkshop.Workshop.Composition;
