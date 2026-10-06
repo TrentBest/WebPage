@@ -15,7 +15,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 public sealed class MonikerMicroBundle :
     IMicroBundle,
     TheSingularityWorkshop.SingularityHub.IMicroBundle,
-    TheSingularityWorkshop.MicroBundleDomain.IMicroBundle,
+    TheSingularityWorkshop.FSM_COS.IMicroBundle,
     IDisposable
 {
     public const int BundleId = 2110;
@@ -72,14 +72,14 @@ public sealed class MonikerMicroBundle :
     /// <summary>Descriptor used by FSM_COS for composition identity and versioning.</summary>
     public MicroBundleDescriptor CosDescriptor { get; }
 
-    MicroBundleDescriptor TheSingularityWorkshop.MicroBundleDomain.IMicroBundle.Descriptor => CosDescriptor;
+    MicroBundleDescriptor TheSingularityWorkshop.FSM_COS.IMicroBundle.Descriptor => CosDescriptor;
 
-    ulong TheSingularityWorkshop.MicroBundleDomain.IMicroBundle.Id => (ulong)BundleId;
+    ulong TheSingularityWorkshop.FSM_COS.IMicroBundle.Id => (ulong)BundleId;
 
-    IReadOnlyList<MicroBundleDependencyRequest> TheSingularityWorkshop.MicroBundleDomain.IMicroBundle.Dependencies =>
-        Array.Empty<MicroBundleDependencyRequest>();
+    IReadOnlyList<BundleRequest> TheSingularityWorkshop.FSM_COS.IMicroBundle.Dependencies =>
+        Array.Empty<BundleRequest>();
 
-    void TheSingularityWorkshop.MicroBundleDomain.IMicroBundle.Load(IMicroBundleLoadContext context)
+    void TheSingularityWorkshop.FSM_COS.IMicroBundle.Load(MicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -91,8 +91,8 @@ public sealed class MonikerMicroBundle :
             .Build();
     }
 
-    bool TheSingularityWorkshop.MicroBundleDomain.IMicroBundle.Arbitrate(
-        IMicroBundleArbitrationContext context,
+    bool TheSingularityWorkshop.FSM_COS.IMicroBundle.Arbitrate(
+        ArbitrationContext context,
         int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
