@@ -13,11 +13,15 @@ public sealed class WorkshopExperienceCatalog
 
     public WorkshopExperienceCatalog()
     {
+        var moniker = new MonikerExperience();
         var livingGui = new LivingGuiExperience();
+        var pong = new PongExperience();
 
         _experiences = new Dictionary<ulong, IExperience>
         {
-            [livingGui.Id] = livingGui
+            [moniker.Id] = moniker,
+            [livingGui.Id] = livingGui,
+            [pong.Id] = pong
         };
     }
 
