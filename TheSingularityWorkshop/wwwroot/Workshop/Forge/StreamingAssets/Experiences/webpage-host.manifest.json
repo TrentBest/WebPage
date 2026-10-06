@@ -1,12 +1,22 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
       "kind": "Moniker",
       "microBundleIds": [],
       "presentationSeconds": 3
+    }
+  ],
+  "hub": [
+    {
+      "name": "AnyApp",
+      "kind": "DesktopHost",
+      "description": "AnyApp is the Workshop's desktop proving ground: the same Experience can move between the browser and a native Windows host while preserving the Workshop identity and runtime model.",
+      "deploymentUrl": "https://github.com/TrentBest/AnyApp/releases",
+      "aboutUrl": "/about-us",
+      "bridgeEndpoint": "http://127.0.0.1:48156/"
     }
   ],
   "running": [
