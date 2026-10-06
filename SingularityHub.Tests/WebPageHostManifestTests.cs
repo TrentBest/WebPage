@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.Services;
+using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
 namespace SingularityHub.Tests;
