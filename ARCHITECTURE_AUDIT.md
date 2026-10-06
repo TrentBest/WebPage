@@ -34,6 +34,7 @@ WebPage presentation
 - FSM_COS owns composition, dependency closure, arbitration, convergence, and RuntimeAssembly creation.
 - MicroBundleDomain owns the MicroBundle domain contract.
 - WebPage owns browser presentation, manifest loading, host adapters, and proving-ground integration.
+- The active branch has **not** yet completed the execution migration: `PageFSM`/`LivingGuiFsm` still drive the browser manifestation.
 - Reusable capabilities are consumed through Workshop NuGet packages when a package already owns them.
 - WebPage explicitly references `FSM_API`, `FSM_COS`, and `MicroBundleDomain`; package versions must remain on published versions unless a newer package is explicitly released and approved.
 - The Living GUI primary MicroBundle declares the canonical Moniker dependency.
@@ -67,6 +68,12 @@ For each:
 5. verify package/runtime behavior;
 6. remove duplicate code.
 
+## Function-preservation gate
+
+The existing Living GUI runtime is not disposable scaffolding. Its tests define behavior that must survive extraction. See [`FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md).
+
+The audit must not be marked complete merely because the old classes compile or because they have been deleted. Completion requires the same observable behavior under the canonical package/runtime path.
+
 ## Known cleanup targets
 
 1. Old gateway/first-contact lifecycle documentation.
@@ -75,8 +82,9 @@ For each:
 4. Duplicate host lifecycle state where FSM_API already owns the behavior.
 5. `Workshop/MicroBundles/MicroBundle.cs` and its local `IMicroBundle`/context/manifestation scaffolding: historical lifecycle machinery that must not become a second MicroBundle runtime. Migrate concrete demos to the published FSM_COS + MicroBundleDomain contracts as their capabilities become current.
 6. Local catalogs/providers that duplicate package-owned MicroBundle discovery or composition responsibilities.
-7. Stale platform-specific documentation.
-8. Root-level documentation duplication.
+7. Transitional Living GUI runtime once its canonical package replacement is proven.
+8. Stale platform-specific documentation.
+9. Root-level documentation duplication.
 
 ## Documentation rule
 
