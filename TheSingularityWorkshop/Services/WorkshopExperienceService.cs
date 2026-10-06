@@ -32,6 +32,12 @@ public sealed class WorkshopExperienceService : IDisposable
     public IExperience? SelectedExperience { get; private set; }
     public RuntimeAssembly? RuntimeAssembly { get; private set; }
 
+    private readonly Dictionary<string, RuntimeAssembly> _hubRuntimeAssemblies =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>FSM_COS assemblies for the manifest-declared active hub MicroBundles.</summary>
+    public IReadOnlyDictionary<string, RuntimeAssembly> HubRuntimeAssemblies => _hubRuntimeAssemblies;
+
     public GuiNode? MonikerComposition =>
         RuntimeAssembly?.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
@@ -81,6 +87,7 @@ public sealed class WorkshopExperienceService : IDisposable
         PrimaryManifestExperience = Manifest.Running[0];
 
         ComposePrimaryExperience();
+        ComposeManifestHubBundles();
 
         SetState("Moniker");
         _ = PresentMonikerAsync(_presentationCancellation = new CancellationTokenSource());
@@ -119,6 +126,27 @@ public sealed class WorkshopExperienceService : IDisposable
         }
 
         _hubRuntime.ArbitrateManifest();
+    }
+
+    private void ComposeManifestHubBundles()
+    {
+        _hubRuntimeAssemblies.Clear();
+
+        var hubItems = Manifest?.Hub ?? Array.Empty<WebPageManifestHubItem>();
+        for (var index = 0; index < hubItems.Count; index++)
+        {
+            var item = hubItems[index];
+            if (item.MicroBundleIds.Count == 0)
+                continue;
+
+            var assembly = _compositionSystem.Execute(new RuntimeManifest(
+                RuntimeId: 100UL + (ulong)index,
+                Bundles: item.MicroBundleIds
+                    .Select(MicroBundleDependencyRequest.Unconfigured)
+                    .ToArray()));
+
+            _hubRuntimeAssemblies[item.Name] = assembly;
+        }
     }
 
     private async Task PresentMonikerAsync(CancellationTokenSource cancellation)
