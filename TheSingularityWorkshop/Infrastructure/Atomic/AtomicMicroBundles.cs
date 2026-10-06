@@ -12,7 +12,7 @@ public static class AtomicBundleIds
 
 public sealed record AtomicElement(int AtomicNumber, string Symbol, string Name, double AtomicMass);
 
-public sealed class AtomicCoreBundle : IMicroBundle
+public sealed class AtomicCoreBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
 {
     public MicroBundleDescriptor Descriptor { get; } = new(AtomicBundleIds.Core, "0.1.0");
     public ulong Id => AtomicBundleIds.Core;
