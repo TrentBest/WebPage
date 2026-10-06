@@ -143,16 +143,16 @@
         => $"left:{ActorLeft(actor)};top:{ActorTop(actor)};--actor-logical-size:{actor.Size:0.##};transform:{ActorTransform(actor)};opacity:{ActorOpacity(actor):0.###};--flower-color:{ActorColor(actor)};";
 
     private static string ActorLeft(PageStateContext.LivingNodeState actor)
-        => $"{actor.X:0.###}%";
+        => $"calc(50% + {actor.X:0.###}%)";
 
     private static string ActorTop(PageStateContext.LivingNodeState actor)
-        => $"{actor.Y:0.###}%";
+        => $"calc(50% + {actor.Y:0.###}%)";
 
     private static string ActorTransform(PageStateContext.LivingNodeState actor)
         => $"translate(-50%,-50%) rotate({actor.Rotation:0.##}deg)";
 
     private static double ActorOpacity(PageStateContext.LivingNodeState actor)
-        => actor.Y <= 100 ? 1 : Math.Clamp(1 - ((actor.Y - 100) / 30), 0, 1);
+        => actor.Y <= 40 ? 1 : Math.Clamp(1 - ((actor.Y - 40) / 30), 0, 1);
 
     private static string ActorColor(PageStateContext.LivingNodeState actor)
     {
