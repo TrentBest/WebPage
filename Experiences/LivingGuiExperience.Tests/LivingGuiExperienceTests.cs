@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
@@ -27,7 +28,7 @@ public sealed class LivingGuiExperienceTests
         var bundle = new LivingGuiExperienceMicroBundle();
 
         Assert.Contains(
-            BundleRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId),
+            MicroBundleDependencyRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId),
             bundle.Dependencies);
         Assert.Equal("1.0.0", bundle.Descriptor.Version);
     }
