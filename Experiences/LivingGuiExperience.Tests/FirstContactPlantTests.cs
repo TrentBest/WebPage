@@ -23,7 +23,7 @@ public sealed class FirstContactPlantTests
     }
 
     [Fact]
-    public async Task ManifestStartup_ComposesMonikerDependency_ThenEntersLivingGui()
+    public async Task ManifestStartup_ComposesMonikerDependency_ThenEntersHub()
     {
         const string manifestJson = """
         {
@@ -51,7 +51,7 @@ public sealed class FirstContactPlantTests
 
         experience.RequestEntry();
 
-        Assert.Equal("LivingGui", experience.CurrentState);
+        Assert.Equal("Hub", experience.CurrentState);
     }
 
     private sealed class ManifestHandler : HttpMessageHandler
