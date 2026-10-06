@@ -5,6 +5,7 @@ using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Workshop.Composition;
+using TheSingularityWorkshop.Workshop.Rendering;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
