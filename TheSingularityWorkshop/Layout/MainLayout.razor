@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
+@inject TheSingularityWorkshop.Infrastructure.Hub.HubRuntime HubRuntime
 @inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 @inject TheSingularityWorkshop.World.WorkshopWorldClient World
 @inject IJSRuntime JS
@@ -59,18 +60,14 @@
     {
         get
         {
-            var path = Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
-            return path.ToLowerInvariant() switch
-            {
-                "" => "THE WORKSHOP",
-                "explore" => "EXPLORE",
-                "create" => "CREATE",
-                "about-us" => "UNDERSTAND",
-                "about" => "UNDERSTAND",
-                "privacypolicy" => "PRIVACY POLICY",
-                "naming-poll" => "VOTE ON NAME",
-                _ => path.Replace('-', ' ').ToUpperInvariant()
-            };
+            var path = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
+            var tab = HubRuntime.Hub.Configuration.Hubs
+                .SelectMany(hub => hub.Tabs)
+                .FirstOrDefault(candidate =>
+                    string.Equals(candidate.Route.TrimEnd('/'), path.TrimEnd('/'), StringComparison.OrdinalIgnoreCase));
+
+            return tab?.Label.ToUpperInvariant()
+                ?? (path == "/" ? "THE WORKSHOP" : path.Trim('/').Replace('-', ' ').ToUpperInvariant());
         }
     }
 
