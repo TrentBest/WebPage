@@ -30,9 +30,9 @@ public sealed class AiExchangeCompositionBundle : IMicroBundle
 
     public MicroBundleDescriptor Descriptor { get; }
     public ulong Id => BundleId;
-    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies => new[]
+    public IReadOnlyList<BundleRequest> Dependencies => new[]
     {
-        MicroBundleDependencyRequest.Unconfigured(ProtocolBundleId),
+        BundleRequest.Unconfigured(ProtocolBundleId),
         BundleRequest.Unconfigured(GrammarBundleId)
     };
 
@@ -41,7 +41,7 @@ public sealed class AiExchangeCompositionBundle : IMicroBundle
     public GrammarDefinition? Grammar { get; private set; }
     public string? ExchangeText { get; private set; }
 
-    public void Load(IMicroBundleLoadContext context)
+    public void Load(MicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -67,11 +67,11 @@ public sealed class AiExchangeCompositionBundle : IMicroBundle
             .Build();
     }
 
-    public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex)
+    public bool Arbitrate(ArbitrationContext context, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        var protocolBundle = context.Bundles
+        var protocolBundle = context.LoadedBundles
             .OfType<ProtocolAiCompositionBundle>()
             .FirstOrDefault();
 
@@ -135,7 +135,7 @@ public sealed class ProtocolAiCompositionBundle : IMicroBundle
 
     public MicroBundleDescriptor Descriptor { get; }
     public ulong Id => BundleId;
-    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies => Array.Empty<MicroBundleDependencyRequest>();
+    public IReadOnlyList<BundleRequest> Dependencies => Array.Empty<BundleRequest>();
     public ProtocolDefinition Protocol { get; } = new ProtocolBuilder(0x2001UL, "WorkshopAI")
         .Define(0x2101UL, "Extract", "extract")
         .Define(0x2102UL, "Submit", "submit")
