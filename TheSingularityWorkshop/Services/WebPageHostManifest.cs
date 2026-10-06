@@ -2,15 +2,15 @@ using System.Text.Json;
 
 namespace TheSingularityWorkshop.Services;
 
-/// <summary>Manifest supplied by the WebPage host. It describes startup order and preload intent.</summary>
+/// <summary>Manifest supplied by the WebPage host. It describes startup presentations and the primary running Experience.</summary>
 public sealed record WebPageHostManifest(
     string ManifestId,
     string Version,
     IReadOnlyList<WebPageManifestExperience> Startup,
-    IReadOnlyList<WebPageManifestExperience> Preload,
+    IReadOnlyList<WebPageManifestExperience> Running,
     WebPageDeepDiveManifest DeepDive);
 
-/// <summary>One manifest-selected startup or preload Experience.</summary>
+/// <summary>One manifest-selected startup or running Experience.</summary>
 public sealed record WebPageManifestExperience(
     string Name,
     string Kind,
