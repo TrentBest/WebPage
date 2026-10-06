@@ -1,10 +1,9 @@
-using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.Workshop.Gui;
 
 namespace TheSingularityWorkshop.Workshop.Composition;
 
-public sealed class MonikerCompositionBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
+public sealed class MonikerCompositionBundle : TheSingularityWorkshop.MicroBundleDomain.IMicroBundle
 {
     public const ulong BundleId = 0x1001UL;
 
@@ -15,10 +14,10 @@ public sealed class MonikerCompositionBundle : TheSingularityWorkshop.FSM_COS.IM
 
     public MicroBundleDescriptor Descriptor { get; }
     public ulong Id => BundleId;
-    public IReadOnlyList<BundleRequest> Dependencies => Array.Empty<BundleRequest>();
+    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies => Array.Empty<MicroBundleDependencyRequest>();
     public GuiNode? Composition { get; private set; }
 
-    public void Load(MicroBundleLoadContext context)
+    public void Load(IMicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -30,7 +29,7 @@ public sealed class MonikerCompositionBundle : TheSingularityWorkshop.FSM_COS.IM
             .Build();
     }
 
-    public bool Arbitrate(ArbitrationContext context, int roundIndex)
+    public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
         return false;
