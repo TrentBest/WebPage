@@ -2,6 +2,10 @@
 
 > Documentation is engineering memory. It should teach the machine we have, the boundaries we are changing, and the proof behind both.
 
+## Package ownership
+
+- [PACKAGE_ECOSYSTEM.md](PACKAGE_ECOSYSTEM.md) — map each active capability to the Workshop package that owns it and identify WebPage-only responsibilities.
+
 ## Start here
 
 | Order | Document | Purpose |
