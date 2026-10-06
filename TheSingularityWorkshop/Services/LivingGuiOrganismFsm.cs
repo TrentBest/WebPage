@@ -88,9 +88,9 @@ public sealed class LivingGuiOrganismFsm : IDisposable
                 onUpdate: ctx => GetContext(ctx).AdvanceReducing(),
                 onExit: null)
             .WithInitialState(DormantState)
-            .Transition(DormantState, InitializationState, ctx => GetContext(ctx).Node.Phase != PageStateContext.LivingNodePhase.Dormant)
+            .Transition(DormantState, InitializationState, ctx => GetContext(ctx).Node.IsRoot && GetContext(ctx).Node.Phase != PageStateContext.LivingNodePhase.Dormant)
+            .Transition(DormantState, ExistingState, ctx => GetContext(ctx).IsValid && !GetContext(ctx).Node.IsRoot && GetContext(ctx).Node.Phase == PageStateContext.LivingNodePhase.Existing)
             .Transition(InitializationState, ExistingState, ctx => GetContext(ctx).Node.IsRoot)
-            .Transition(InitializationState, TravelingState, ctx => !GetContext(ctx).Node.IsRoot)
             .Transition(TravelingState, PlantingState, ctx => GetContext(ctx).IsTravelComplete())
             .Transition(PlantingState, ExistingState, ctx => GetContext(ctx).IsPlantingComplete())
             .Transition(ExistingState, ReproducingState, ctx => GetContext(ctx).IsExistingComplete())
