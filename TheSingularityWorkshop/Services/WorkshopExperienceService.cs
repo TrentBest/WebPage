@@ -136,7 +136,7 @@ public sealed class WorkshopExperienceService : IDisposable
         for (var index = 0; index < hubItems.Count; index++)
         {
             var item = hubItems[index];
-            if (item.MicroBundleIds.Count == 0)
+            if (item.MicroBundleIds is null || item.MicroBundleIds.Count == 0)
                 continue;
 
             var assembly = _compositionSystem.Execute(new RuntimeManifest(
