@@ -3,7 +3,6 @@ using System.Net.Http;
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.Services;
-using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
@@ -84,7 +83,7 @@ public sealed class WorkshopCompositionTests
             BaseAddress = new Uri("https://webpage.test/")
         };
 
-        return new WorkshopExperienceService(client, new HubRuntime(new SingularityHub()));
+        return new WorkshopExperienceService(client, new HubRuntime(new TheSingularityWorkshop.SingularityHub.SingularityHub()));
     }
 
     private sealed class ManifestHandler : HttpMessageHandler
