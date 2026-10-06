@@ -20,7 +20,6 @@ public sealed class WorkshopExperienceService : IDisposable
     private bool _disposed;
     private bool _manifestLoaded;
     private bool _startupPrepared;
-    private bool _preloadPrepared;
     private Stopwatch? _monikerClock;
 
     public event Action? StateChanged;
@@ -31,7 +30,7 @@ public sealed class WorkshopExperienceService : IDisposable
     public bool IsDeepDive { get; private set; }
     public WebPageHostManifest? Manifest { get; private set; }
     public WebPageManifestExperience? CurrentManifestExperience { get; private set; }
-    public WebPageManifestExperience? PreloadedManifestExperience { get; private set; }
+    public WebPageManifestExperience? PrimaryManifestExperience { get; private set; }
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public IExperience? SelectedExperience { get; private set; }
     public FirstContactFsm FirstContact => _firstContact;
@@ -42,6 +41,13 @@ public sealed class WorkshopExperienceService : IDisposable
             (ulong)MonikerMicroBundle.BundleId,
             out var moniker) == true
             ? moniker!.Composition
+            : null;
+
+    public LivingGuiExperienceMicroBundle? PrimaryExperienceComposition =>
+        RuntimeAssembly?.TryGetBundle<LivingGuiExperienceMicroBundle>(
+            (ulong)LivingGuiExperienceMicroBundle.BundleId,
+            out var primary) == true
+            ? primary
             : null;
 
     public AiExchangeCompositionBundle? AiExchangeComposition =>
@@ -72,63 +78,53 @@ public sealed class WorkshopExperienceService : IDisposable
         if (Manifest.Startup.Count == 0)
             throw new InvalidOperationException("The WebPage host manifest contains no startup Experience.");
 
+        if (Manifest.Running.Count == 0)
+            throw new InvalidOperationException("The WebPage host manifest contains no primary running Experience.");
+
         CurrentManifestExperience = Manifest.Startup[0];
-        ComposeCurrentStartup();
-        PrepareNextStartup();
+        PrimaryManifestExperience = Manifest.Running[0];
+
+        ComposePrimaryExperience();
 
         _monikerClock = Stopwatch.StartNew();
-        SetState(CurrentManifestExperience.Kind.Equals("Moniker", StringComparison.OrdinalIgnoreCase)
-            ? "Moniker"
-            : CurrentManifestExperience.Kind);
-
+        SetState("Moniker");
         _manifestLoaded = true;
     }
 
-    private void ComposeCurrentStartup()
+    private void ComposePrimaryExperience()
     {
-        if (CurrentManifestExperience is null || CurrentManifestExperience.MicroBundleIds.Count == 0)
-            return;
+        if (PrimaryManifestExperience is null || PrimaryManifestExperience.MicroBundleIds.Count == 0)
+            throw new InvalidOperationException("The manifest-selected primary Experience has no MicroBundles.");
 
+        // Request only the primary Experience roots. LivingGuiExperienceMicroBundle
+        // declares the canonical Workshop Moniker as an FSM_COS dependency, so FSM_COS
+        // resolves the Moniker exactly once as part of the same runtime assembly.
         RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
             RuntimeId: 1,
-            Bundles: CurrentManifestExperience.MicroBundleIds
+            Bundles: PrimaryManifestExperience.MicroBundleIds
                 .Select(BundleRequest.Unconfigured)
                 .ToArray()));
 
         _startupPrepared = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
-            out var moniker);
-        if (_startupPrepared && moniker is TheSingularityWorkshop.SingularityHub.IMicroBundle hubBundle)
-            _hubRuntime.Hub.LoadBundle(hubBundle);
-        if (_startupPrepared)
-            _hubRuntime.ArbitrateManifest();
+            out _)
+            && RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
+                LivingGuiExperienceMicroBundle.BundleId,
+                out _);
+
         if (!_startupPrepared)
-            throw new InvalidOperationException("The manifest-selected Moniker could not be composed by FSM_COS.");
-    }
+            throw new InvalidOperationException(
+                "FSM_COS did not compose both the manifest-selected primary Experience and its canonical Moniker dependency.");
 
-    private void PrepareNextStartup()
-    {
-        if (Manifest is null || Manifest.Startup.Count < 2)
-            return;
-
-        PreloadedManifestExperience = Manifest.Startup[1];
-
-        // The Hub is the WebPage's Experience, so an empty MicroBundle list means
-        // the host itself is already the next executable surface. For a future
-        // Experience, its MicroBundles are composed here while the Moniker presents.
-        if (PreloadedManifestExperience.MicroBundleIds.Count == 0)
+        if (RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
+                (ulong)MonikerMicroBundle.BundleId,
+                out var moniker) &&
+            moniker is TheSingularityWorkshop.SingularityHub.IMicroBundle hubBundle)
         {
-            _preloadPrepared = true;
-            return;
+            _hubRuntime.Hub.LoadBundle(hubBundle);
         }
 
-        var preloadAssembly = _compositionSystem.Execute(new RuntimeManifest(
-            RuntimeId: 2,
-            Bundles: PreloadedManifestExperience.MicroBundleIds
-                .Select(BundleRequest.Unconfigured)
-                .ToArray()));
-
-        _preloadPrepared = preloadAssembly.Bundles.Count > 0;
+        _hubRuntime.ArbitrateManifest();
     }
 
     public void Tick()
@@ -163,6 +159,7 @@ public sealed class WorkshopExperienceService : IDisposable
         IsDeepDive = deepDive;
         _monikerClock?.Restart();
         CurrentManifestExperience = Manifest!.Startup[0];
+        PrimaryManifestExperience = Manifest.Running[0];
         SetState("Moniker");
     }
 
