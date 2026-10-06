@@ -45,7 +45,7 @@ public sealed class FsmForgePreview
         builder.BuildDefinition();
         _handle=FsmApi.Create.CreateInstance(name,_context,"ForgePreview");
     }
-    public void AttachBundle(TheSingularityWorkshop.FSM_COS.IMicroBundle bundle)=>_context?.AttachBundle(bundle);
+    public void AttachBundle(TheSingularityWorkshop.MicroBundleDomain.IMicroBundle bundle)=>_context?.AttachBundle(bundle);
     public void SetSignal(string signal,bool enabled=true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(signal);
