@@ -1,6 +1,6 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
@@ -11,13 +11,14 @@
   ],
   "hub": [
     {
-      "name": "Explore",
-      "kind": "Experience",
-      "description": "Enter the Workshop's living spatial Experience: working MicroBundles, nested capability families, cities, laboratories, creation tools, and deep dives into how the pieces compose.",
+      "name": "Rendering",
+      "kind": "MicroBundle",
+      "description": "See the Workshop renderer's current capability surface and the semantic description we can expose to an AI without giving the AI privileged knowledge of the world.",
       "deploymentUrl": null,
-      "aboutUrl": "/about-us",
+      "aboutUrl": "/rendering",
       "bridgeEndpoint": null,
-      "route": "/explore"
+      "route": "/rendering",
+      "microBundleIds": [4100]
     }
   ],
   "running": [
