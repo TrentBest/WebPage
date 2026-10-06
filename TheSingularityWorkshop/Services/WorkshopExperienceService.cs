@@ -101,7 +101,7 @@ public sealed class WorkshopExperienceService : IDisposable
         RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
             RuntimeId: 1,
             Bundles: PrimaryManifestExperience.MicroBundleIds
-                .Select(MicroBundleDependencyRequest.Unconfigured)
+                .Select(BundleRequest.Unconfigured)
                 .ToArray()));
 
         var hasMoniker = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
