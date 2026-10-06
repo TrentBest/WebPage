@@ -30,6 +30,7 @@ public sealed class LivingGuiFsm : IDisposable
     private readonly List<LivingGuiOrganismFsm> _organisms = new();
     private readonly Dictionary<PageStateContext.LivingNodeState, LivingGuiOrganismFsm> _organismPool = new();
     private readonly HashSet<PageStateContext.LivingNodeState> _attachedNodes = new();
+    private readonly Dictionary<PageStateContext.LivingNodeState, LivingGuiSeedlingFsm> _seedlings = new();
     private bool _disposed;
 
     public LivingGuiFsm(HubKernel hub, PageStateContext context, string parentProcessingGroup)
@@ -77,12 +78,13 @@ public sealed class LivingGuiFsm : IDisposable
                 .Select(organism => organism.CurrentState));
 
     public bool IsValid =>
+        !_disposed &&
         _context.IsValid &&
-        _organismPool.Count == _context.PreallocatedLivingNodes.Count &&
-        _organismPool.Values.All(organism => organism.IsValid);
+        _organismPool.Count == _context.PreallocatedLivingNodes.Count;
 
     public int OrganismCount => _organisms.Count;
     public int PreallocatedOrganismCount => _organismPool.Count;
+    public int SeedlingCount => _seedlings.Count;
 
     /// <summary>Raised after the independently ticking population has advanced.</summary>
     public event Action? PopulationChanged;
@@ -103,6 +105,21 @@ public sealed class LivingGuiFsm : IDisposable
         // Do not update organism instances individually: doing so would step the same
         // shared processing group repeatedly in one heartbeat.
         _hub.UpdateProcessGroup(_processingGroup);
+
+        // A seedling is a temporary composition layer. Once its own FSM has
+        // completed planting, remove it and authorize the preallocated mature
+        // organism FSM to become valid and take over the lifecycle.
+        foreach (var pair in _seedlings.ToArray())
+        {
+            if (!pair.Value.IsPlanted)
+                continue;
+
+            pair.Value.Dispose();
+            _seedlings.Remove(pair.Key);
+
+            if (_organismPool.TryGetValue(pair.Key, out var organism))
+                organism.Activate();
+        }
 
         // This is an observation signal only. FSM_API remains the authority that
         // changed each organism; the event merely tells the presentation boundary
@@ -133,8 +150,8 @@ public sealed class LivingGuiFsm : IDisposable
         if (!_organismPool.TryGetValue(child, out var organism))
             throw new InvalidOperationException("A Living GUI child has no preallocated organism FSM.");
 
-        organism.Activate();
         _organisms.Add(organism);
+        _seedlings.Add(child, new LivingGuiSeedlingFsm(_context, child, _processingGroup));
     }
 
     public void Dispose()
@@ -142,9 +159,13 @@ public sealed class LivingGuiFsm : IDisposable
         if (_disposed)
             return;
 
+        foreach (var seedling in _seedlings.Values)
+            seedling.Dispose();
+
         foreach (var organism in _organismPool.Values)
             organism.Dispose();
 
+        _seedlings.Clear();
         _organisms.Clear();
         _attachedNodes.Clear();
         _organismPool.Clear();
