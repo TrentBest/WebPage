@@ -16,7 +16,6 @@
 </style>
 
 @code {
-    private readonly System.Timers.Timer heartbeat = new(50);
     private bool firstRender;
 
     private RenderFragment BuildRootGui()
@@ -67,27 +66,14 @@
         this.firstRender = true;
         var returningVisitor = await JS.InvokeAsync<bool>("interop.workshopVisited");
         await Experience.InitializeAsync(returningVisitor);
-        heartbeat.Elapsed += Tick;
-        heartbeat.Start();
     }
 
-    private void Tick(object? sender, System.Timers.ElapsedEventArgs e)
-    {
-        if (!Experience.IsInitialized)
-            return;
-
-        Experience.Tick();
-        _ = InvokeAsync(StateHasChanged);
-    }
 
     private void ExperienceChanged()
         => _ = InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
-        heartbeat.Stop();
-        heartbeat.Elapsed -= Tick;
         Experience.StateChanged -= ExperienceChanged;
-        heartbeat.Dispose();
     }
 }
