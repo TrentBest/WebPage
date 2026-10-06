@@ -1,4 +1,3 @@
-using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.Workshop.DeepDive;
 
@@ -10,7 +9,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// The actual living organism is then scheduled by the host's FSM_API process groups.
 /// </summary>
 public sealed class LivingGuiExperienceMicroBundle :
-    TheSingularityWorkshop.FSM_COS.IMicroBundle,
+    TheSingularityWorkshop.MicroBundleDomain.IMicroBundle,
     IWebPageProviderSource
 {
     public const int BundleId = 2102;
@@ -22,8 +21,8 @@ public sealed class LivingGuiExperienceMicroBundle :
     /// The Experience cannot be installed without the canonical Workshop Moniker.
     /// This is the architectural ordering guarantee requested for the first runtime.
     /// </summary>
-    public IReadOnlyList<BundleRequest> Dependencies { get; } =
-        [BundleRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)];
+    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies { get; } =
+        [MicroBundleDependencyRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)];
 
     /// <summary>Acquires an optional provider from the WebPage-only provider collection.</summary>
     public T? TryGetProvider<T>() where T : class
@@ -31,13 +30,13 @@ public sealed class LivingGuiExperienceMicroBundle :
             ? (T)(object)new LivingGuiDeepDiveProvider()
             : null;
 
-    void TheSingularityWorkshop.FSM_COS.IMicroBundle.Load(MicroBundleLoadContext context)
+    public void Load(IMicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
     }
 
-    bool TheSingularityWorkshop.FSM_COS.IMicroBundle.Arbitrate(
-        ArbitrationContext context,
+    public bool Arbitrate(
+        IMicroBundleArbitrationContext context,
         int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
