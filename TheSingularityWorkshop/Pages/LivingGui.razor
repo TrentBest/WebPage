@@ -60,13 +60,13 @@
     /* The actor is the GUI element of the experience. Its FSM position is a
        percentage of the supplied panel, so 50,50 is the exact panel center. */
     .living-actor {
-        position:absolute;
+        position:absolute!important;
         box-sizing:border-box;
         min-width:10px;
         min-height:10px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
+        display:block;
+        line-height:1;
+        text-align:center;
         padding:0 12px;
         border:6px solid var(--flower-color);
         border-radius:50% 44% 52% 47%;
@@ -140,13 +140,18 @@
     private void HandleLivingGuiChanged() => _ = InvokeAsync(StateHasChanged);
 
     private static string ActorStyle(PageStateContext.LivingNodeState actor)
-        => $"left:{ActorLeft(actor)};top:{ActorTop(actor)};--actor-logical-size:{actor.Size:0.##};transform:{ActorTransform(actor)};opacity:{ActorOpacity(actor):0.###};--flower-color:{ActorColor(actor)};";
+        => $"position:absolute!important;left:{ActorLeft(actor)}!important;top:{ActorTop(actor)}!important;--actor-logical-size:{actor.Size:0.##};transform:{ActorTransform(actor)}!important;opacity:{ActorOpacity(actor):0.###};--flower-color:{ActorColor(actor)};";
 
     private static string ActorLeft(PageStateContext.LivingNodeState actor)
-        => $"calc(50% + {actor.X:0.###}%)";
+        => CenteredCoordinate(actor.X);
 
     private static string ActorTop(PageStateContext.LivingNodeState actor)
-        => $"calc(50% + {actor.Y:0.###}%)";
+        => CenteredCoordinate(actor.Y);
+
+    private static string CenteredCoordinate(double value)
+        => value < 0
+            ? $"calc(50% - {Math.Abs(value):0.###}%)"
+            : $"calc(50% + {value:0.###}%)";
 
     private static string ActorTransform(PageStateContext.LivingNodeState actor)
         => $"translate(-50%,-50%) rotate({actor.Rotation:0.##}deg)";
