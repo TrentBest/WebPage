@@ -12,10 +12,10 @@
     private string _llmResponse = string.Empty;
     private string _status = "READY";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (!Experience.IsInitialized)
-            Experience.Initialize();
+            await Experience.InitializeAsync();
     }
 
     private AiExchangeCompositionBundle? Exchange =>
