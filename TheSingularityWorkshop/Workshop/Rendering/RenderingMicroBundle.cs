@@ -94,7 +94,6 @@ public sealed class RenderingMicroBundle : IMicroBundle
         IReadOnlyList<string> visibleFacts)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(targetId);
-        ArgumentNullException.ThrowIfNull(band);
         ArgumentNullException.ThrowIfNull(visibleFacts);
 
         var facts = visibleFacts.Count == 0
