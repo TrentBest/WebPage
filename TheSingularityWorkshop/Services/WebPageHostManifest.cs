@@ -23,9 +23,10 @@ public sealed record WebPageManifestHubItem(
     string Name,
     string Kind,
     string Description,
-    string DeploymentUrl,
+    string? DeploymentUrl,
     string AboutUrl,
-    string? BridgeEndpoint);
+    string? BridgeEndpoint,
+    string? Route);
 
 /// <summary>Manifest-defined diagnostic restart contract.</summary>
 public sealed record WebPageDeepDiveManifest(
