@@ -1,16 +1,125 @@
-﻿@page "/anyapp"
-<PageTitle>AnyApp: The Local Host</PageTitle>
+@page "/anyapp"
+@inject IJSRuntime JS
+<PageTitle>AnyApp: The Desktop Workshop</PageTitle>
 
-<h1>Experience: The Local Host</h1>
+<section class="anyapp-page">
+    <header class="anyapp-hero">
+        <div class="anyapp-kicker">THE SINGULARITY WORKSHOP // DESKTOP HOST</div>
+        <h1>AnyApp</h1>
+        <p class="anyapp-lead">
+            AnyApp is the local host for an Experience. The same manifest that describes what enters
+            the Workshop can be handed to a native desktop runtime, where FSM_COS composes the
+            requested MicroBundles and the host manifests them locally.
+        </p>
+    </header>
 
-<p>
-    An "Experience" is anything that presents one or more sensory outputs (e.g., a game, an interactive
-    tool, a simulation). The Experience layer is the local application that consumes the FSM Layer
-    micro-packages to host and run the defined FSM behaviors. It is the runtime composition layer.
-</p>
+    <section class="anyapp-grid">
+        <article class="anyapp-card anyapp-card-primary">
+            <div class="card-kicker">01 // GET THE HOST</div>
+            <h2>Install AnyApp</h2>
+            <p>
+                Download the current AnyApp source and build/publish the Windows desktop host.
+                The production installer/release channel will become the one-click path; until a
+                signed release exists, this points directly at the public repository.
+            </p>
+            <div class="anyapp-actions">
+                <a class="anyapp-button primary"
+                   href="https://github.com/TrentBest/AnyApp/archive/refs/heads/master.zip"
+                   target="_blank"
+                   rel="noopener">
+                    DOWNLOAD ANYAPP
+                </a>
+                <button class="anyapp-button secondary" type="button" @onclick="LaunchAnyApp">
+                    LAUNCH ANYAPP
+                </button>
+            </div>
+        </article>
 
-<h2>Key Role</h2>
-<p>
-    AnyApp consumes the FSM Layer to host locally what we call an "Experience," providing the
-    runtime environment and necessary external service integrations.
-</p>
+        <article class="anyapp-card">
+            <div class="card-kicker">02 // THE MANIFEST</div>
+            <h2>One Experience. Two hosts.</h2>
+            <p>
+                The demonstration manifest carries the MicroBundle request and its host configuration.
+                That configuration contains the localhost bridge endpoint used only for coordination
+                between the browser and the running desktop host.
+            </p>
+            <pre>{
+  "experience": "Moniker",
+  "runtime": "FSM_COS",
+  "bridge": "127.0.0.1:48156"
+}</pre>
+        </article>
+
+        <article class="anyapp-card">
+            <div class="card-kicker">03 // THE DESKTOP PROOF</div>
+            <h2>Moniker → Hub → Flex</h2>
+            <p>
+                AnyApp begins with the same three-second Workshop moniker presentation. The hub then
+                appears on the desktop. Entering it exposes the native living demonstration, with
+                <strong>2,056 independently instantiated FSM_API actors</strong> sharing a processing group.
+            </p>
+            <div id="anyapp-bridge-status" class="bridge-status">
+                DESKTOP HOST: NOT DETECTED
+            </div>
+        </article>
+
+        <article class="anyapp-card">
+            <div class="card-kicker">04 // THE HANDOFF</div>
+            <h2>The hub can move.</h2>
+            <p>
+                When the desktop host manifests its hub, the browser yields its own hub presentation
+                and returns to the Workshop moniker. The single control below the moniker sends the
+                hub back to the browser.
+            </p>
+            <div class="handoff-diagram">
+                <span>BROWSER</span><b>⇄</b><span>ANYAPP</span>
+            </div>
+        </article>
+    </section>
+</section>
+
+<style>
+.anyapp-page{min-height:100%;box-sizing:border-box;padding:clamp(1.5rem,4vw,4rem);background:radial-gradient(circle at 72% 8%,rgba(0,234,255,.08),transparent 30%),#050a14;color:#eaf7ff;font-family:Consolas,'Courier New',monospace}
+.anyapp-hero{max-width:980px;margin:0 auto 2rem}.anyapp-kicker,.card-kicker{font-size:.65rem;letter-spacing:.2em;color:#00eaff;font-weight:800}.anyapp-hero h1{margin:.45rem 0;font-size:clamp(3rem,8vw,7rem);line-height:.9;letter-spacing:.08em;color:#fff;text-shadow:0 0 24px rgba(0,234,255,.25)}.anyapp-lead{max-width:820px;font-size:clamp(.9rem,1.6vw,1.1rem);line-height:1.7;color:#9eb4c0}
+.anyapp-grid{max-width:980px;margin:0 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.anyapp-card{padding:1.35rem;border:1px solid rgba(0,234,255,.18);background:rgba(2,7,17,.82);box-shadow:inset 0 0 28px rgba(0,234,255,.025)}.anyapp-card-primary{border-color:rgba(255,44,255,.35)}.anyapp-card h2{margin:.45rem 0 .7rem;font-size:1.2rem;color:#fff}.anyapp-card p{margin:0;color:#8fa7b4;line-height:1.65;font-size:.78rem}.anyapp-card pre{margin:1rem 0 0;padding:1rem;overflow:auto;color:#dffcff;background:#020711;border:1px solid rgba(0,234,255,.12);font-size:.72rem}
+.anyapp-actions{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.2rem}.anyapp-button{display:inline-flex;align-items:center;justify-content:center;padding:.75rem 1rem;border:1px solid #00eaff;background:#04121e;color:#fff;text-decoration:none;font:800 .7rem Consolas,'Courier New',monospace;letter-spacing:.12em;cursor:pointer}.anyapp-button.primary{border-color:#ff2cff}.anyapp-button:hover{box-shadow:0 0 18px rgba(0,234,255,.16);transform:translateY(-1px)}.anyapp-button.primary:hover{box-shadow:0 0 18px rgba(255,44,255,.16)}
+.bridge-status{margin-top:1rem;padding:.65rem;border-left:2px solid #617784;color:#617784;font-size:.62rem;letter-spacing:.1em}.bridge-status.connected{border-left-color:#52e05a;color:#52e05a}.handoff-diagram{display:flex;align-items:center;justify-content:center;gap:1.2rem;margin-top:1.2rem;padding:1rem;border:1px solid rgba(255,255,255,.08);color:#dffcff;font-size:.7rem}.handoff-diagram b{color:#ff2cff;font-size:1.2rem}
+@media(max-width:760px){.anyapp-grid{grid-template-columns:1fr}}
+</style>
+
+<script>
+window.anyAppPageBridge = {
+    timer: null,
+    start() {
+        if (this.timer) return;
+        const poll = async () => {
+            const status = document.getElementById('anyapp-bridge-status');
+            try {
+                const response = await fetch('http://127.0.0.1:48156/state', { cache: 'no-store' });
+                if (!response.ok) throw new Error();
+                const state = await response.json();
+                if (status) {
+                    status.textContent = 'DESKTOP HOST: ' + String(state.state || 'CONNECTED').toUpperCase();
+                    status.classList.add('connected');
+                }
+            } catch {
+                if (status) {
+                    status.textContent = 'DESKTOP HOST: NOT DETECTED';
+                    status.classList.remove('connected');
+                }
+            }
+        };
+        poll();
+        this.timer = window.setInterval(poll, 1000);
+    },
+    launch() {
+        window.location.href = 'anyapp://workshop';
+    }
+};
+window.setTimeout(() => window.anyAppPageBridge.start(), 0);
+</script>
+
+@code {
+    private async Task LaunchAnyApp()
+        => await JS.InvokeVoidAsync("anyAppPageBridge.launch");
+}
