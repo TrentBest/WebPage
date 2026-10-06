@@ -61,7 +61,7 @@ public sealed class MonikerExperienceTests
         await service.InitializeAsync();
         service.RequestEntry();
 
-        Assert.Equal("LivingGui", service.CurrentState);
+        Assert.Equal("Hub", service.CurrentState);
         Assert.True(service.RuntimeAssembly!.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
             out _));
