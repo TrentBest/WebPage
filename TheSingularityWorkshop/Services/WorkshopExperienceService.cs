@@ -19,6 +19,7 @@ public sealed class WorkshopExperienceService : IDisposable
     private bool _disposed;
     private bool _manifestLoaded;
     private Stopwatch? _monikerClock;
+    private CancellationTokenSource? _presentationCancellation;
 
     public event Action? StateChanged;
 
@@ -86,6 +87,7 @@ public sealed class WorkshopExperienceService : IDisposable
         _monikerClock = Stopwatch.StartNew();
         SetState("Moniker");
         _manifestLoaded = true;
+        _ = PresentMonikerAsync(_presentationCancellation = new CancellationTokenSource());
     }
 
     private void ComposePrimaryExperience()
@@ -123,18 +125,21 @@ public sealed class WorkshopExperienceService : IDisposable
         _hubRuntime.ArbitrateManifest();
     }
 
-    public void Tick()
+    private async Task PresentMonikerAsync(CancellationTokenSource cancellation)
     {
-        if (_disposed || !IsInitialized || !_manifestLoaded)
-            return;
-
-        if (CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase) &&
-            _monikerClock is not null &&
-            CurrentManifestExperience is not null &&
-            _monikerClock.Elapsed >= TimeSpan.FromSeconds(CurrentManifestExperience.PresentationSeconds))
+        try
         {
-            _monikerClock.Stop();
-            ActivatePrimaryExperience();
+            var seconds = Math.Max(0, CurrentManifestExperience?.PresentationSeconds ?? 0);
+            await Task.Delay(TimeSpan.FromSeconds(seconds), cancellation.Token);
+            if (!_disposed && CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase))
+            {
+                _monikerClock?.Stop();
+                ActivatePrimaryExperience();
+            }
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
+            // Presentation was interrupted by explicit entry or restart.
         }
     }
 
@@ -143,6 +148,7 @@ public sealed class WorkshopExperienceService : IDisposable
         if (CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase))
         {
             _monikerClock?.Stop();
+            _presentationCancellation?.Cancel();
             ActivatePrimaryExperience();
         }
     }
@@ -161,10 +167,13 @@ public sealed class WorkshopExperienceService : IDisposable
             await InitializeAsync();
 
         IsDeepDive = deepDive;
+        _presentationCancellation?.Cancel();
+        _presentationCancellation = new CancellationTokenSource();
         _monikerClock?.Restart();
         CurrentManifestExperience = Manifest!.Startup[0];
         PrimaryManifestExperience = Manifest.Running[0];
         SetState("Moniker");
+        _ = PresentMonikerAsync(_presentationCancellation);
     }
 
     public void SetCriticalMassReached() => SetState("CriticalMass");
@@ -186,5 +195,7 @@ public sealed class WorkshopExperienceService : IDisposable
             return;
 
         _disposed = true;
+        _presentationCancellation?.Cancel();
+        _presentationCancellation?.Dispose();
     }
 }
