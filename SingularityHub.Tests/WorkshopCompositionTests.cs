@@ -29,6 +29,12 @@ public sealed class WorkshopCompositionTests
             out _));
         Assert.NotNull(moniker?.Composition);
         Assert.Same(moniker!.Composition, experience.MonikerComposition);
+        Assert.True(experience.HubRuntimeAssemblies.TryGetValue("Rendering", out var renderingAssembly));
+        Assert.True(renderingAssembly!.TryGetBundle<RenderingMicroBundle>(
+            RenderingMicroBundle.BundleId,
+            out var renderingBundle));
+        Assert.NotNull(renderingBundle?.Protocol);
+        Assert.NotNull(renderingBundle?.Grammar);
     }
 
     [Fact(DisplayName = "FSM_COS composes ProtocolAI and GrammarAI into an extractable exchange")]
