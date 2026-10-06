@@ -15,10 +15,10 @@ public sealed class MonikerCompositionBundle : IMicroBundle
 
     public MicroBundleDescriptor Descriptor { get; }
     public ulong Id => BundleId;
-    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies => Array.Empty<MicroBundleDependencyRequest>();
+    public IReadOnlyList<BundleRequest> Dependencies => Array.Empty<BundleRequest>();
     public GuiNode? Composition { get; private set; }
 
-    public void Load(IMicroBundleLoadContext context)
+    public void Load(MicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -30,7 +30,7 @@ public sealed class MonikerCompositionBundle : IMicroBundle
             .Build();
     }
 
-    public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex)
+    public bool Arbitrate(ArbitrationContext context, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
         return false;
