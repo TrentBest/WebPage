@@ -10,7 +10,7 @@
 
 | Order | Document | Purpose |
 |---:|---|---|
-| 1 | README.md | Public purpose and architectural orientation |
+| 1 | ../README.md | Public purpose and architectural orientation |
 | 2 | LEARNING_PATH.md | Visitor and developer curriculum |
 | 3 | REPOSITORY_MAP.md | Source-tree ownership and dependency direction |
 | 4 | WORKSHOP_RUNTIME_ARCHITECTURE.md | Runtime ownership and host boundary |
