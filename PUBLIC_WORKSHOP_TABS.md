@@ -1,5 +1,22 @@
 # Public Workshop Tabs
 
+## Current manifest activation
+
+The public host manifest currently activates **Rendering only**.
+
+Each top-level tab is represented by a manifest MicroBundleIds collection. The host may expose many tab MicroBundles in the future, but the active manifest deliberately exposes only one while the renderer/AI perception vertical slice is being proven.
+
+Current dependency direction:
+
+WEBPAGE HOST MANIFEST
+  -> Rendering tab
+    -> RenderingMicroBundle (4100)
+      -> AiExchange
+        -> ProtocolAi
+        -> GrammarAi
+
+This is an intentional proving-ground configuration, not a claim that the future Workshop has only one tab.
+
 ## Navigation principle
 
 The top-level tabs are not merely site sections. Each one represents a distinct relationship a visitor can have with the living Workshop.
