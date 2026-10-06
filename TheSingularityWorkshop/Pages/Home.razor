@@ -138,10 +138,13 @@
             builder.OpenElement(sequence++, "div"); builder.AddAttribute(sequence++, "class", "manifest-hub-actions");
             builder.OpenElement(sequence++, "a");
             builder.AddAttribute(sequence++, "class", "manifest-hub-action");
-            builder.AddAttribute(sequence++, "href", item.DeploymentUrl);
-            builder.AddAttribute(sequence++, "target", "_blank");
-            builder.AddAttribute(sequence++, "rel", "noopener noreferrer");
-            builder.AddContent(sequence++, "DEPLOY ANYAPP");
+            builder.AddAttribute(sequence++, "href", item.Route ?? item.DeploymentUrl ?? item.AboutUrl);
+            if (string.IsNullOrWhiteSpace(item.Route))
+            {
+                builder.AddAttribute(sequence++, "target", "_blank");
+                builder.AddAttribute(sequence++, "rel", "noopener noreferrer");
+            }
+            builder.AddContent(sequence++, string.IsNullOrWhiteSpace(item.Route) ? "OPEN DESTINATION" : "ENTER EXPERIENCE");
             builder.CloseElement();
 
             builder.OpenElement(sequence++, "a");
@@ -153,7 +156,9 @@
 
             builder.OpenElement(sequence++, "div");
             builder.AddAttribute(sequence++, "class", "manifest-hub-note");
-            builder.AddContent(sequence++, "Deployment is user-approved. The browser does not search for or execute arbitrary local .exe files. The production path will resolve to a signed Windows package, then AnyApp establishes the local browser↔desktop bridge.");
+            builder.AddContent(sequence++, string.IsNullOrWhiteSpace(item.Route)
+                ? "This destination is externally hosted and opens only when the visitor chooses it."
+                : "This destination is hosted by the Workshop and is composed from the Experience's MicroBundle hierarchy.");
             builder.CloseElement();
             builder.CloseElement();
         }
