@@ -12,7 +12,7 @@ public static class AtomicBundleIds
 
 public sealed record AtomicElement(int AtomicNumber, string Symbol, string Name, double AtomicMass);
 
-public sealed class AtomicCoreBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
+public sealed class AtomicCoreBundle : TheSingularityWorkshop.FSM_COS.TheSingularityWorkshop.FSM_COS.IMicroBundle
 {
     public MicroBundleDescriptor Descriptor { get; } = new(AtomicBundleIds.Core, "0.1.0");
     public ulong Id => AtomicBundleIds.Core;
@@ -23,7 +23,7 @@ public sealed class AtomicCoreBundle : TheSingularityWorkshop.FSM_COS.IMicroBund
     public bool Arbitrate(ArbitrationContext context, int roundIndex) => false;
 }
 
-public sealed class AtomicThermalBundle : IMicroBundle
+public sealed class AtomicThermalBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
 {
     public MicroBundleDescriptor Descriptor { get; } = new(
         AtomicBundleIds.Thermal,
@@ -39,7 +39,7 @@ public sealed class AtomicThermalBundle : IMicroBundle
     public bool Arbitrate(ArbitrationContext context, int roundIndex) => false;
 }
 
-public sealed class AtomicMaterialPhysicsBundle : IMicroBundle
+public sealed class AtomicMaterialPhysicsBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
 {
     public MicroBundleDescriptor Descriptor { get; } = new(
         AtomicBundleIds.MaterialPhysics,
