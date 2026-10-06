@@ -1,5 +1,9 @@
-using TheSingularityWorkshop.Services;
+using System.Net;
+using System.Net.Http;
 using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.Infrastructure.Hub;
+using TheSingularityWorkshop.Services;
+using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
@@ -8,21 +12,23 @@ namespace SingularityHub.Tests;
 
 public sealed class WorkshopCompositionTests
 {
-    [Fact(DisplayName = "Workshop startup assembles the zeroth Moniker composition through FSM_COS")]
-    public void StartupAssemblesMonikerComposition()
+    [Fact(DisplayName = "Manifest startup composes the primary Experience and its Moniker dependency")]
+    public async Task ManifestStartupComposesPrimaryExperienceAndDependency()
     {
-        using var experience = new WorkshopExperienceService();
-        experience.Initialize();
-        AdvanceToGateway(experience);
-        experience.RequestEntry();
-        AdvanceToLanding(experience);
+        using var experience = CreateService();
+
+        await experience.InitializeAsync();
+
+        Assert.Equal("Moniker", experience.CurrentState);
         Assert.NotNull(experience.RuntimeAssembly);
-        Assert.Contains(experience.RuntimeAssembly!.Bundles, bundle => bundle.Id == MonikerMicroBundle.BundleId);
-        Assert.NotNull(experience.MonikerComposition);
-        Assert.Equal("Moniker", experience.MonikerComposition!.Properties["composition"]);
-        Assert.Equal("THE", experience.MonikerComposition.Find("the").Text);
-        Assert.Equal("SINGULARITY", experience.MonikerComposition.Find("singularity").Text);
-        Assert.Equal("WORKSHOP", experience.MonikerComposition.Find("workshop").Text);
+        Assert.True(experience.RuntimeAssembly!.TryGetBundle<MonikerMicroBundle>(
+            (ulong)MonikerMicroBundle.BundleId,
+            out var moniker));
+        Assert.True(experience.RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
+            LivingGuiExperienceMicroBundle.BundleId,
+            out _));
+        Assert.NotNull(moniker?.Composition);
+        Assert.Same(moniker!.Composition, experience.MonikerComposition);
     }
 
     [Fact(DisplayName = "FSM_COS composes ProtocolAI and GrammarAI into an extractable exchange")]
@@ -71,20 +77,44 @@ public sealed class WorkshopCompositionTests
         Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.BundleId);
     }
 
-    private static void AdvanceToGateway(WorkshopExperienceService service)
+    private static WorkshopExperienceService CreateService()
     {
-        for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Gateway"; i++)
-            service.Tick();
+        var client = new HttpClient(new ManifestHandler())
+        {
+            BaseAddress = new Uri("https://webpage.test/")
+        };
 
-        Assert.Equal("Gateway", service.FirstContact.CurrentState);
+        return new WorkshopExperienceService(client, new HubRuntime(new SingularityHub()));
     }
 
-    private static void AdvanceToLanding(WorkshopExperienceService service)
+    private sealed class ManifestHandler : HttpMessageHandler
     {
-        for (var i = 0; i < 200 && service.FirstContact.CurrentState != "Landing"; i++)
-            service.Tick();
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            const string manifest = """
+            {
+              "manifestId": "webpage-host",
+              "version": "1.0.0",
+              "startup": [
+                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }
+              ],
+              "running": [
+                { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
+              ],
+              "deepDive": {
+                "experience": "LIVING GUI",
+                "restartFromManifest": true,
+                "telemetry": true
+              }
+            }
+            """;
 
-        Assert.Equal("Landing", service.FirstContact.CurrentState);
-        Assert.Equal("LivingGui", service.CurrentState);
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(manifest)
+            });
+        }
     }
 }
