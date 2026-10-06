@@ -90,9 +90,11 @@ RuntimeAssembly
       ↓
 primary Experience activation
       ↓
-FSM_API process groups / lifecycle
+**current:** transitional WebPage PageFSM/LivingGuiFsm execution
       ↓
 browser manifestation
+
+**target:** canonical Experience/MicroBundle runtime → FSM_API process groups → browser manifestation
 ~~~
 
 ## Hub ownership
@@ -154,3 +156,7 @@ A Deep Dive is a WebPage educational capability.
 It may inspect a composed Experience and explain it, but shared runtime packages must not depend upward on WebPage's Deep Dive provider.
 
 > WebPage proves the architecture. It should not quietly become the architecture.
+
+## Important current-state distinction
+
+The RuntimeAssembly is currently a real composition artifact, but it is not yet the sole source of Living GUI execution state. The active WebPage still contains a transitional PageFSM/LivingGuiFsm implementation with extensive behavior tests. That implementation is migration debt and must be replaced only after the behavior contract in [`FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md) is proven under the canonical package boundary.
