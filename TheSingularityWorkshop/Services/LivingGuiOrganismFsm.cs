@@ -13,8 +13,6 @@ public sealed class LivingGuiOrganismFsm : IDisposable
 {
     public const string DormantState = "DORMANT";
     public const string InitializationState = "INITIALIZATION";
-    public const string TravelingState = "TRAVELING";
-    public const string PlantingState = "PLANTING";
     public const string ExistingState = "EXISTING";
     public const string ReproducingState = "REPRODUCING";
     public const string ReducingState = "REDUCING";
@@ -63,16 +61,6 @@ public sealed class LivingGuiOrganismFsm : IDisposable
                 onUpdate: null,
                 onExit: null)
             .State(
-                TravelingState,
-                onEnter: ctx => GetContext(ctx).EnterTraveling(),
-                onUpdate: ctx => GetContext(ctx).AdvanceTravel(),
-                onExit: null)
-            .State(
-                PlantingState,
-                onEnter: ctx => GetContext(ctx).EnterPlanting(),
-                onUpdate: ctx => GetContext(ctx).AdvancePlanting(),
-                onExit: null)
-            .State(
                 ExistingState,
                 onEnter: ctx => GetContext(ctx).EnterExisting(),
                 onUpdate: ctx => GetContext(ctx).AdvanceExisting(),
@@ -91,8 +79,6 @@ public sealed class LivingGuiOrganismFsm : IDisposable
             .Transition(DormantState, InitializationState, ctx => GetContext(ctx).Node.IsRoot && GetContext(ctx).Node.Phase != PageStateContext.LivingNodePhase.Dormant)
             .Transition(DormantState, ExistingState, ctx => GetContext(ctx).IsValid && !GetContext(ctx).Node.IsRoot && GetContext(ctx).Node.Phase == PageStateContext.LivingNodePhase.Existing)
             .Transition(InitializationState, ExistingState, ctx => GetContext(ctx).Node.IsRoot)
-            .Transition(TravelingState, PlantingState, ctx => GetContext(ctx).IsTravelComplete())
-            .Transition(PlantingState, ExistingState, ctx => GetContext(ctx).IsPlantingComplete())
             .Transition(ExistingState, ReproducingState, ctx => GetContext(ctx).IsExistingComplete())
             .Transition(ReproducingState, ReducingState, ctx => GetContext(ctx).IsReproductionComplete())
             .Transition(ReducingState, ExistingState, ctx => GetContext(ctx).IsReducingComplete())
@@ -105,8 +91,8 @@ public sealed class LivingGuiOrganismFsm : IDisposable
 
     /// <summary>
     /// Activates this preallocated organism by transitioning its own FSM from DORMANT
-    /// into INITIALIZATION. The transition executes the organism's initialization action;
-    /// the shared processing group remains responsible for subsequent lifecycle ticks.
+    /// into its mature EXISTING state. Root activation performs initialization; child
+    /// activation is authorized only after its temporary seedling FSM has planted it.
     /// </summary>
     public void Activate()
     {
@@ -168,23 +154,6 @@ public sealed class LivingGuiOrganismFsm : IDisposable
         public PageStateContext.LivingNodeState Node { get; }
 
         public void Initialize() => _page.InitializeOrganism(Node);
-
-        public void EnterTraveling()
-            => Node.Phase = PageStateContext.LivingNodePhase.Traveling;
-
-        public void AdvanceTravel() => _page.AdvanceTravel(Node);
-
-        public bool IsTravelComplete() => _page.IsTravelComplete(Node);
-
-        public void EnterPlanting()
-        {
-            Node.Phase = PageStateContext.LivingNodePhase.Planting;
-            Node.GrowthReady = false;
-        }
-
-        public void AdvancePlanting() => _page.AdvancePlanting(Node);
-
-        public bool IsPlantingComplete() => _page.IsPlantingComplete(Node);
 
         public void EnterExisting()
         {
