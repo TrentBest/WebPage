@@ -287,3 +287,4 @@ public sealed class IncrementalVersionTests
         => Assert.Equal("0.0.187", "0.0.187");
 
 }
+    [ArchitectureTest(0, 0, 188)] [Fact(DisplayName = "V0.0.188 — WebPage_Startup_Is_Driven_By_Manifest_And_Hub_Follows_Moniker")] public void V0_0_188_WebPageStartupIsDrivenByManifestAndHubFollowsMoniker() => Assert.Equal("0.0.188", "0.0.188");
