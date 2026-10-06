@@ -35,7 +35,6 @@ public sealed class LivingGuiSeedlingFsm : IDisposable
         Context = new SeedlingContext(page, node);
         _handle = fsm_API.Create.CreateInstance(definitionName, Context, processingGroup);
 
-        Activate();
     }
 
     private static void EnsureDefinition(string definitionName, string processingGroup)
@@ -62,12 +61,6 @@ public sealed class LivingGuiSeedlingFsm : IDisposable
     private static SeedlingContext GetContext(IStateContext context)
         => context as SeedlingContext
             ?? throw new InvalidOperationException("Living GUI seedling FSM received an unexpected context type.");
-
-    private void Activate()
-    {
-        _node.Phase = PageStateContext.LivingNodePhase.Traveling;
-        _handle.TransitionTo(TravelingState);
-    }
 
     public static string DefinitionNameForGroup(string processingGroup)
         => $"LivingGuiSeedlingFSM:{processingGroup}";
