@@ -1,6 +1,6 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
@@ -11,12 +11,13 @@
   ],
   "hub": [
     {
-      "name": "AnyApp",
-      "kind": "DesktopHost",
-      "description": "AnyApp is the Workshop's desktop proving ground: the same Experience can move between the browser and a native Windows host while preserving the Workshop identity and runtime model.",
-      "deploymentUrl": "https://github.com/TrentBest/AnyApp/releases",
+      "name": "Explore",
+      "kind": "Experience",
+      "description": "Enter the Workshop's living spatial Experience: working MicroBundles, nested capability families, cities, laboratories, creation tools, and deep dives into how the pieces compose.",
+      "deploymentUrl": null,
       "aboutUrl": "/about-us",
-      "bridgeEndpoint": "http://127.0.0.1:48156/"
+      "bridgeEndpoint": null,
+      "route": "/explore"
     }
   ],
   "running": [
