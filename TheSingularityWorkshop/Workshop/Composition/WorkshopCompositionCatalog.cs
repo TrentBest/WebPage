@@ -19,7 +19,7 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
 
         _bundles = new Dictionary<ulong, DomainMicroBundle>
         {
-            [moniker.CosDescriptor.Id] = moniker,
+            [moniker.Descriptor.Id] = moniker,
             [livingGui.Id] = livingGui,
             [protocol.Id] = protocol,
             [grammar.Id] = grammar,
