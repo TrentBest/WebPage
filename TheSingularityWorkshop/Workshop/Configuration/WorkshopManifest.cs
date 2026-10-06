@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Net.Http.Json;
 using TheSingularityWorkshop.SingularityHub;
 
 namespace TheSingularityWorkshop.Workshop.Configuration;
