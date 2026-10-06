@@ -1,4 +1,7 @@
 @page "/rendering"
+@using TheSingularityWorkshop.Services
+@using TheSingularityWorkshop.Workshop.Rendering
+@inject WorkshopExperienceService Experience
 <PageTitle>Rendering Research // The Singularity Workshop</PageTitle>
 
 <div class="rendering-research">
@@ -53,6 +56,7 @@
         </div>
     </section>
 
+    
     <section class="rendering-section">
         <div class="rendering-kicker">04 // CURRENT STATUS</div>
         <h2>Research, not mythology.</h2>
@@ -63,6 +67,39 @@
             <li><strong>Future experiment:</strong> mixed visual languages where different composed capabilities can legitimately have different presentation styles.</li>
             <li><strong>Not claimed here:</strong> a finished universal renderer, finished AI camera, or production-ready level-of-detail system.</li>
         </ul>
+    </section>
+
+    <section class="rendering-section ai-perception-surface">
+        <div class="rendering-kicker">05 // WHAT THE AI GETS</div>
+        <h2>The renderer can describe what is visible without revealing the world.</h2>
+        <p>
+            This is the boundary we want to make visible: the renderer reports semantic observations,
+            not the hidden state of the simulation. A strategy opponent can therefore receive a changing
+            description of what it currently perceives and still be surprised by something outside that perception.
+        </p>
+        @if (Rendering is not null)
+        {
+            <div class="ai-observation-grid">
+                <div class="ai-observation-card">
+                    <span class="ai-label">AI OBSERVATION</span>
+                    <pre>@Rendering.AiObservationText</pre>
+                </div>
+                <div class="ai-observation-card">
+                    <span class="ai-label">PROTOCOL</span>
+                    <pre>@Rendering.Protocol?.Describe()</pre>
+                </div>
+                <div class="ai-observation-card">
+                    <span class="ai-label">GRAMMAR</span>
+                    <pre>@Rendering.Grammar?.Describe()</pre>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="ai-observation-card unavailable">
+                RENDERING MICRO BUNDLE HAS NOT BEEN COMPOSED BY THE ACTIVE MANIFEST.
+            </div>
+        }
     </section>
 
     <footer class="rendering-footer">
@@ -97,9 +134,10 @@
     .research-list{display:grid;gap:.65rem;margin:1.5rem 0 0;padding:0;list-style:none}
     .research-list li{padding:1rem;border-left:2px solid #00eaff;background:rgba(0,234,255,.025);color:#91aab4;font-family:system-ui,sans-serif;line-height:1.55}
     .research-list strong{color:#eafcff}
+    .ai-observation-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:.6rem;margin-top:1.5rem}.ai-observation-card{min-width:0;padding:1rem;border:1px solid rgba(0,234,255,.18);background:rgba(0,234,255,.025)}.ai-observation-card.unavailable{color:#ffd34d}.ai-label{display:block;color:#00eaff;font-size:.55rem;letter-spacing:.16em;margin-bottom:.6rem}.ai-observation-card pre{margin:0;white-space:pre-wrap;color:#c8d9df;font:500 .72rem/1.55 Consolas,'Courier New',monospace}
     .rendering-footer{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:2rem 0 4rem}
     .rendering-footer a{color:#00eaff;text-decoration:none;font-size:.58rem;letter-spacing:.1em}
     .rendering-footer a:hover{color:#ff2cff}
     @@media(max-width:900px){.detail-flow{grid-template-columns:1fr 1fr}.detail-flow>b{display:none}.horizon-grid,.provider-row{grid-template-columns:1fr 1fr}}
-    @@media(max-width:560px){.horizon-grid,.provider-row,.detail-flow{grid-template-columns:1fr}.rendering-section{padding:2.8rem 0}}
+    @@media(max-width:560px){.horizon-grid,.provider-row,.detail-flow,.ai-observation-grid{grid-template-columns:1fr}.rendering-section{padding:2.8rem 0}}
 </style>
