@@ -100,6 +100,8 @@ public sealed class WorkshopExperienceService : IDisposable
             out var moniker);
         if (_startupPrepared && moniker is TheSingularityWorkshop.SingularityHub.IMicroBundle hubBundle)
             _hubRuntime.Hub.LoadBundle(hubBundle);
+        if (_startupPrepared)
+            _hubRuntime.ArbitrateManifest();
         if (!_startupPrepared)
             throw new InvalidOperationException("The manifest-selected Moniker could not be composed by FSM_COS.");
     }
