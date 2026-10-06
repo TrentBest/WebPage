@@ -14,7 +14,6 @@ public sealed class WorkshopExperienceService : IDisposable
     private const string ManifestPath = "Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json";
 
     private readonly HttpClient _httpClient;
-    private readonly FirstContactFsm _firstContact = new();
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
     private readonly HubRuntime _hubRuntime;
     private bool _disposed;
@@ -32,7 +31,6 @@ public sealed class WorkshopExperienceService : IDisposable
     public WebPageManifestExperience? PrimaryManifestExperience { get; private set; }
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
     public IExperience? SelectedExperience { get; private set; }
-    public FirstContactFsm FirstContact => _firstContact;
     public RuntimeAssembly? RuntimeAssembly { get; private set; }
 
     public GuiNode? MonikerComposition =>
@@ -187,7 +185,6 @@ public sealed class WorkshopExperienceService : IDisposable
         if (_disposed)
             return;
 
-        _firstContact.Dispose();
         _disposed = true;
     }
 }
