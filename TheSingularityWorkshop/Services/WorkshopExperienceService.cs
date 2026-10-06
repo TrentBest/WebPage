@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net.Http.Json;
 using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.Experiences;
@@ -15,6 +16,7 @@ public sealed class WorkshopExperienceService : IDisposable
     private readonly HttpClient _httpClient;
     private readonly FirstContactFsm _firstContact = new();
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
+    private readonly HubRuntime _hubRuntime;
     private bool _disposed;
     private bool _manifestLoaded;
     private bool _startupPrepared;
@@ -49,9 +51,10 @@ public sealed class WorkshopExperienceService : IDisposable
             ? ai
             : null;
 
-    public WorkshopExperienceService(HttpClient httpClient)
+    public WorkshopExperienceService(HttpClient httpClient, HubRuntime hubRuntime)
     {
         _httpClient = httpClient;
+        _hubRuntime = hubRuntime;
     }
 
     public async Task InitializeAsync(bool returningVisitor = false)
@@ -94,7 +97,9 @@ public sealed class WorkshopExperienceService : IDisposable
 
         _startupPrepared = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
-            out _);
+            out var moniker);
+        if (_startupPrepared && moniker is TheSingularityWorkshop.SingularityHub.IMicroBundle hubBundle)
+            _hubRuntime.Hub.LoadBundle(hubBundle);
         if (!_startupPrepared)
             throw new InvalidOperationException("The manifest-selected Moniker could not be composed by FSM_COS.");
     }
