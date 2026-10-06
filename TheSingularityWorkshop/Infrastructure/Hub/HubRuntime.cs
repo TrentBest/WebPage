@@ -1,4 +1,5 @@
 using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
+using TheSingularityWorkshop.SingularityHub;
 
 using TheSingularityWorkshop.Workshop.Configuration;
 
