@@ -20,10 +20,10 @@ namespace TheSingularityWorkshop.Services
         private const double GrowthLerp = 0.22;
         private const double TravelLerp = 0.16;
         private const double RotationStep = 24;
-        private const double MinX = 10;
-        private const double MaxX = 90;
-        private const double MinY = 10;
-        private const double MaxY = 90;
+        private const double MinX = -40;
+        private const double MaxX = 40;
+        private const double MinY = -40;
+        private const double MaxY = 40;
         private readonly double _maximumNodeSize;
         private readonly double _gravityAcceleration;
         private readonly List<LivingNodeState> _livingNodes = new();
@@ -111,8 +111,8 @@ namespace TheSingularityWorkshop.Services
             var root = _availableNodes.Pop();
             root.Lineage = "G:0";
             root.Generation = 0;
-            root.X = 50;
-            root.Y = 50;
+            root.X = 0;
+            root.Y = 0;
             root.Size = RootSize;
             root.GrowthReady = true;
             root.IsRoot = true;
@@ -139,8 +139,8 @@ namespace TheSingularityWorkshop.Services
 
             // Targets are precomputed when the 100-slot population is allocated.
             // No RNG object or random stream is created during reproduction.
-            node.X = 50;
-            node.Y = 50;
+            node.X = 0;
+            node.Y = 0;
             node.Phase = LivingNodePhase.Traveling;
         }
 
@@ -273,7 +273,7 @@ namespace TheSingularityWorkshop.Services
             }
 
             GravityReleased = true;
-            LivingGuiFallen = _livingNodes.TrueForAll(node => node.Y > 125);
+            LivingGuiFallen = _livingNodes.TrueForAll(node => node.Y > 75);
         }
 
         private static void AssignDistributionTargets(IList<LivingNodeState> nodes)
@@ -281,8 +281,8 @@ namespace TheSingularityWorkshop.Services
             if (nodes.Count == 0)
                 return;
 
-            nodes[0].TargetX = 50;
-            nodes[0].TargetY = 50;
+            nodes[0].TargetX = 0;
+            nodes[0].TargetY = 0;
 
             var targetCount = nodes.Count - 1;
             if (targetCount == 0)
