@@ -4,7 +4,7 @@ using TheSingularityWorkshop.Workshop.Gui;
 
 namespace TheSingularityWorkshop.Workshop.Composition;
 
-public sealed class MonikerCompositionBundle : IMicroBundle
+public sealed class MonikerCompositionBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
 {
     public const ulong BundleId = 0x1001UL;
 
