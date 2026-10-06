@@ -16,9 +16,9 @@ public sealed class LivingGuiFsm : IDisposable
 {
     public const string LifecycleState = "ALIVE";
     public const string RootGrowthState = LivingGuiOrganismFsm.ExistingState;
-    public const string SeedFlightState = LivingGuiOrganismFsm.TravelingState;
-    public const string ChildRootingState = SeedFlightState;
-    public const string SeedScalingState = LivingGuiOrganismFsm.PlantingState;
+    public const string SeedFlightState = LivingGuiSeedlingFsm.TravelingState;
+    public const string ChildRootingState = LivingGuiSeedlingFsm.TravelingState;
+    public const string SeedScalingState = LivingGuiSeedlingFsm.PlantingState;
     public const string MatureGrowthState = LivingGuiOrganismFsm.ExistingState;
     public const string ReproductionState = LivingGuiOrganismFsm.ReproducingState;
     public const string ParentRecoveryState = LivingGuiOrganismFsm.ReducingState;
