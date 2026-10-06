@@ -39,15 +39,26 @@
     </main>
 
     <section id="anyapp-handoff" class="anyapp-handoff" hidden aria-live="polite">
-        <div class="anyapp-handoff-moniker" aria-label="The Singularity Workshop">
+        <div class="anyapp-handoff-moniker anyapp-handoff-whole" aria-label="The Singularity Workshop">
             <div>THE</div>
             <div>SINGULARITY</div>
             <div>WORKSHOP</div>
         </div>
+        <div class="anyapp-handoff-split" aria-label="Split Workshop moniker">
+            <div class="anyapp-handoff-split-window">
+                <div class="anyapp-handoff-split-full">
+                    <div>THE</div>
+                    <div>SINGULARITY</div>
+                    <div>WORKSHOP</div>
+                </div>
+            </div>
+        </div>
         <div class="anyapp-handoff-state">DESKTOP HUB MANIFESTED // BROWSER HUB RELEASED</div>
-        <button type="button" class="anyapp-handoff-return" onclick="window.anyAppHandoff.returnHub()">
-            RETURN HUB TO BROWSER
-        </button>
+        <div id="anyapp-handoff-split-state" class="anyapp-handoff-split-state"></div>
+        <div class="anyapp-handoff-actions">
+            <button type="button" class="anyapp-handoff-return" onclick="window.anyAppHandoff.flipMoniker()">FLIP HALVES</button>
+            <button type="button" class="anyapp-handoff-return" onclick="window.anyAppHandoff.returnHub()">RETURN HUB TO BROWSER</button>
+        </div>
     </section>
 </div>
 
@@ -196,7 +207,8 @@
 
 
 <style>
-.anyapp-handoff{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.08),transparent 32%),#020711;color:#fff;font-family:Consolas,'Courier New',monospace}.anyapp-handoff[hidden]{display:none}.anyapp-handoff-moniker{text-align:center;font-size:clamp(2.5rem,9vw,8rem);font-weight:900;line-height:.86;letter-spacing:.07em;text-shadow:0 0 24px rgba(0,234,255,.22);animation:anyappMonikerBreath 3.8s ease-in-out infinite}.anyapp-handoff-moniker div:nth-child(1){color:#00a8ff}.anyapp-handoff-moniker div:nth-child(2){color:#ff2cff}.anyapp-handoff-moniker div:nth-child(3){color:#ff7a00}.anyapp-handoff-state{font-size:.62rem;letter-spacing:.16em;color:#7e9aa5;text-align:center}.anyapp-handoff-return{margin-top:.4rem;padding:.8rem 1.2rem;border:1px solid #00eaff;background:#04121e;color:#fff;font:800 .68rem Consolas,'Courier New',monospace;letter-spacing:.13em;cursor:pointer}.anyapp-handoff-return:hover{border-color:#ff2cff;box-shadow:0 0 18px rgba(255,44,255,.16)}@keyframes anyappMonikerBreath{0%,100%{transform:scale(1) rotate(-1deg);filter:brightness(.95)}50%{transform:scale(1.018) rotate(1deg);filter:brightness(1.1)}}
+.anyapp-handoff{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.08),transparent 32%),#020711;color:#fff;font-family:Consolas,'Courier New',monospace}.anyapp-handoff[hidden]{display:none}.anyapp-handoff-moniker{text-align:center;font-size:clamp(2.5rem,9vw,8rem);font-weight:900;line-height:.86;letter-spacing:.07em;text-shadow:0 0 24px rgba(0,234,255,.22);animation:anyappMonikerBreath 3.8s ease-in-out infinite}.anyapp-handoff-moniker div:nth-child(1){color:#00a8ff}.anyapp-handoff-moniker div:nth-child(2){color:#ff2cff}.anyapp-handoff-moniker div:nth-child(3){color:#ff7a00}.anyapp-handoff-state{font-size:.62rem;letter-spacing:.16em;color:#7e9aa5;text-align:center}.anyapp-handoff-return{margin-top:.4rem;padding:.8rem 1.2rem;border:1px solid #00eaff;background:#04121e;color:#fff;font:800 .68rem Consolas,'Courier New',monospace;letter-spacing:.13em;cursor:pointer}.anyapp-handoff-return:hover{border-color:#ff2cff;box-shadow:0 0 18px rgba(255,44,255,.16)}.anyapp-handoff-split{display:none;width:min(70vw,700px);height:300px;overflow:hidden}.anyapp-handoff-split-window{width:50%;height:100%;overflow:hidden;margin:auto}.anyapp-handoff-split-full{width:200%;height:100%;display:flex;flex-direction:column;justify-content:center;transform:translateX(0);font-size:clamp(2rem,6vw,5rem);font-weight:900;line-height:.86;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22)}.anyapp-handoff-split-full div{width:100%}.anyapp-handoff-split-full div:nth-child(1){color:#00a8ff}.anyapp-handoff-split-full div:nth-child(2){color:#ff2cff}.anyapp-handoff-split-full div:nth-child(3){color:#ff7a00}.anyapp-handoff.split-mode .anyapp-handoff-whole{display:none}.anyapp-handoff.split-mode .anyapp-handoff-split{display:block}.anyapp-handoff.split-mode .anyapp-handoff-split-full.flip-right{transform:translateX(-50%)}.anyapp-handoff-split-state{min-height:1em;font-size:.62rem;letter-spacing:.14em;color:#52e05a;text-align:center}.anyapp-handoff-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem}.anyapp-handoff.split-mode .anyapp-handoff-state{color:#ff2cff}
+@keyframes anyappMonikerBreath{0%,100%{transform:scale(1) rotate(-1deg);filter:brightness(.95)}50%{transform:scale(1.018) rotate(1deg);filter:brightness(1.1)}}
 </style>
 
 <script>
@@ -214,6 +226,16 @@ window.anyAppHandoff = {
                 if (!handoff) return;
                 const shouldShow = !!state.hubVisible;
                 handoff.hidden = !shouldShow;
+                handoff.classList.toggle('split-mode', !!state.splitMoniker);
+                const splitFull = handoff.querySelector('.anyapp-handoff-split-full');
+                const browserHalf = String(state.browserHalf || 'left').toLowerCase();
+                splitFull?.classList.toggle('flip-right', browserHalf === 'right');
+                const splitState = document.getElementById('anyapp-handoff-split-state');
+                if (splitState) {
+                    splitState.textContent = state.splitMoniker
+                        ? 'MONIKER SPLIT // BROWSER: ' + browserHalf.toUpperCase() + ' HALF // ANYAPP: ' + (browserHalf === 'left' ? 'RIGHT' : 'LEFT') + ' HALF'
+                        : '';
+                }
                 document.querySelector('.page')?.classList.toggle('anyapp-handoff-active', shouldShow);
                 this.active = shouldShow;
             } catch {
@@ -225,6 +247,15 @@ window.anyAppHandoff = {
         };
         poll();
         this.timer = window.setInterval(poll, 1000);
+    },
+    async flipMoniker() {
+        try {
+            await fetch('http://127.0.0.1:48156/command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command: 'flip-moniker' })
+            });
+        } catch { }
     },
     async returnHub() {
         try {
