@@ -44,6 +44,9 @@ public sealed class RenderingMicroBundle : IMicroBundle
     public ProtocolDefinition? Protocol { get; private set; }
     public GrammarDefinition? Grammar { get; private set; }
     public string? AiObservationText { get; private set; }
+
+    /// <summary>Current renderer-facing perception state exposed to the semantic observer.</summary>
+    public RenderingObservation? CurrentObservation { get; private set; }
     public GuiNode? Composition { get; private set; }
 
     public void Load(IMicroBundleLoadContext context)
@@ -75,15 +78,22 @@ public sealed class RenderingMicroBundle : IMicroBundle
         if (Protocol is null || Grammar is null)
             return changed;
 
-        AiObservationText = DescribeObservation(
-            "workshop-scene",
-            Perception.Resolve(3d),
-            new[]
-            {
+        var perceptionBand = Perception.Resolve(3d);
+        CurrentObservation = new RenderingObservation(
+            Intent.TargetId,
+            Intent.Domain,
+            Intent.CameraBehavior,
+            perceptionBand.Name,
+            perceptionBand.UpdateInterval,
+            [
                 "The Workshop renderer is active.",
-                "A semantic scene is available to the observer.",
-                "The observer has not been given privileged knowledge of hidden world state."
-            });
+                $"The current presentation target is {Intent.TargetId}.",
+                $"The renderer is operating in {Intent.Domain} mode with {Intent.CameraBehavior} camera behavior.",
+                $"The observer currently receives the {perceptionBand.Name} perception band.",
+                "Hidden world state is not included in the observation."
+            ]);
+
+        AiObservationText = CurrentObservation.ToAiText();
 
         Composition = BuildComposition();
         return changed;
@@ -133,4 +143,28 @@ public sealed class RenderingMicroBundle : IMicroBundle
 
         return panel.Build();
     }
+}
+
+
+/// <summary>
+/// Semantic snapshot supplied to an observer instead of the renderer's hidden world state.
+/// </summary>
+public sealed record RenderingObservation(
+    string TargetId,
+    string Domain,
+    RenderingCameraBehavior CameraBehavior,
+    string PerceptionBand,
+    TimeSpan UpdateInterval,
+    IReadOnlyList<string> VisibleFacts)
+{
+    public string ToAiText() =>
+        string.Join(
+            Environment.NewLine,
+            $"TARGET: {TargetId}",
+            $"DOMAIN: {Domain}",
+            $"CAMERA: {CameraBehavior}",
+            $"PERCEPTION_BAND: {PerceptionBand}",
+            $"DETAIL_BUDGET_MS: {UpdateInterval.TotalMilliseconds:0}",
+            "VISIBLE_FACTS:",
+            string.Join(Environment.NewLine, VisibleFacts.Select(fact => $"- {fact}")));
 }
