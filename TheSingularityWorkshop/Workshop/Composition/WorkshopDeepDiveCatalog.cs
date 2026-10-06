@@ -1,7 +1,6 @@
-using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.DeepDive;
-using CosMicroBundle = TheSingularityWorkshop.FSM_COS.IMicroBundle;
+using CosMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
 
 namespace TheSingularityWorkshop.Workshop.Composition;
 
