@@ -91,13 +91,17 @@ Living GUI root 2102
              RuntimeAssembly
 ```
 
-The remaining work is to make the browser manifestation consume that runtime instead of continuing to run the older WebPage-owned PageFSM/LivingGui runtime beside it.
+The remaining work is to make the browser manifestation consume that runtime instead of continuing to run the older WebPage-owned PageFSM/LivingGui runtime beside it. This is a functionality-preserving migration: the old runtime remains until its behavior has a canonical replacement and executable proof.
 
 ## Current / Direction / Future
 
 ### Current
 
-WebPage has a working manifest → FSM_COS → RuntimeAssembly proof, but legacy page/runtime services still coexist with it.
+WebPage has a working manifest → FSM_COS → RuntimeAssembly proof, but legacy page/runtime services still coexist with it. The browser therefore has two architectural layers: canonical composition and transitional execution. The latter is migration debt, not yet safe to delete.
+
+### Function-preservation gate
+
+The complete Living GUI behavior contract is recorded in [`FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md). It must be preserved during extraction; reducing WebPage line count is not considered progress if the experience stops growing, reproducing, moving independently, falling, or presenting its navigation handoff.
 
 ### Direction
 
