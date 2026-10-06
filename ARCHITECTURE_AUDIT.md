@@ -35,6 +35,7 @@ WebPage presentation
 - MicroBundleDomain owns the MicroBundle domain contract.
 - WebPage owns browser presentation, manifest loading, host adapters, and proving-ground integration.
 - Reusable capabilities are consumed through Workshop NuGet packages when a package already owns them.
+- WebPage explicitly references `FSM_API`, `FSM_COS`, and `MicroBundleDomain`; package versions must remain on published versions unless a newer package is explicitly released and approved.
 - The Living GUI primary MicroBundle declares the canonical Moniker dependency.
 
 ## Current composition proof
@@ -72,9 +73,10 @@ For each:
 2. Static Idler/Flex selection scaffolding.
 3. WorkshopDemoBundle bootstrap scaffolding.
 4. Duplicate host lifecycle state where FSM_API already owns the behavior.
-5. Local editor/runtime models that duplicate a published package contract.
-6. Stale platform-specific documentation.
-7. Root-level documentation duplication.
+5. `Workshop/MicroBundles/MicroBundle.cs` and its local `IMicroBundle`/context/manifestation scaffolding: historical lifecycle machinery that must not become a second MicroBundle runtime. Migrate concrete demos to the published FSM_COS + MicroBundleDomain contracts as their capabilities become current.
+6. Local catalogs/providers that duplicate package-owned MicroBundle discovery or composition responsibilities.
+7. Stale platform-specific documentation.
+8. Root-level documentation duplication.
 
 ## Documentation rule
 
