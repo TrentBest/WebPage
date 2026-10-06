@@ -141,3 +141,11 @@
     @@media(max-width:900px){.detail-flow{grid-template-columns:1fr 1fr}.detail-flow>b{display:none}.horizon-grid,.provider-row{grid-template-columns:1fr 1fr}}
     @@media(max-width:560px){.horizon-grid,.provider-row,.detail-flow,.ai-observation-grid{grid-template-columns:1fr}.rendering-section{padding:2.8rem 0}}
 </style>
+
+@code {
+    private RenderingMicroBundle? Rendering =>
+        Experience.HubRuntimeAssemblies.TryGetValue("Rendering", out var assembly) &&
+        assembly.TryGetBundle<RenderingMicroBundle>(RenderingMicroBundle.BundleId, out var bundle)
+            ? bundle
+            : null;
+}
