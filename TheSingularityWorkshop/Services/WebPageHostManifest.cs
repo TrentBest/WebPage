@@ -26,7 +26,8 @@ public sealed record WebPageManifestHubItem(
     string? DeploymentUrl,
     string AboutUrl,
     string? BridgeEndpoint,
-    string? Route);
+    string? Route,
+    IReadOnlyList<ulong> MicroBundleIds);
 
 /// <summary>Manifest-defined diagnostic restart contract.</summary>
 public sealed record WebPageDeepDiveManifest(
