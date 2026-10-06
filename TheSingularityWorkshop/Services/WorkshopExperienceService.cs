@@ -153,7 +153,7 @@ public sealed class WorkshopExperienceService : IDisposable
         if (PrimaryManifestExperience is null)
             throw new InvalidOperationException("No primary Experience is available in the WebPage manifest.");
 
-        SetState("LivingGui");
+        SetState("Hub");
     }
 
     public async Task RestartFromManifestAsync(bool deepDive)
