@@ -36,7 +36,7 @@ public sealed record HubTabDefinition
     /// <summary>Creates a Hub tab definition.</summary>
     public HubTabDefinition(
         ulong id, string label, int order, HubTabTargetKind targetKind,
-        string route, ulong? targetId = null, HubTabAcquisition? acquisition = null)
+        string route, ulong? targetId = null, HubTabAcquisition? acquisition = null, string? icon = null, string? tone = null)
     {
         if (id == 0) throw new ArgumentException("A Hub tab requires a stable identity.", nameof(id));
         if (string.IsNullOrWhiteSpace(label)) throw new ArgumentException("A Hub tab requires a label.", nameof(label));
@@ -54,6 +54,7 @@ public sealed record HubTabDefinition
 
         Id = id; Label = label; Order = order; TargetKind = targetKind;
         Route = route; TargetId = targetId; Acquisition = acquisition;
+        Icon = icon; Tone = tone;
     }
 
     /// <summary>Gets the stable tab identity.</summary>
@@ -72,6 +73,10 @@ public sealed record HubTabDefinition
     public HubTabAcquisition? Acquisition { get; }
     /// <summary>Gets whether this tab targets another Hub level.</summary>
     public bool IsNestedHub => TargetKind == HubTabTargetKind.Hub;
+    /// <summary>Gets the optional icon token supplied by the manifest.</summary>
+    public string? Icon { get; }
+    /// <summary>Gets the optional presentation tone supplied by the manifest.</summary>
+    public string? Tone { get; }
     /// <summary>Gets whether this tab acquires its content from a provider.</summary>
     public bool IsAcquired => Acquisition.HasValue;
 }
