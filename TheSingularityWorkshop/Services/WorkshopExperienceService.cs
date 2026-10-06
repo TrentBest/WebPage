@@ -17,7 +17,6 @@ public sealed class WorkshopExperienceService : IDisposable
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
     private readonly HubRuntime _hubRuntime;
     private bool _disposed;
-    private bool _manifestLoaded;
     private CancellationTokenSource? _presentationCancellation;
 
     public event Action? StateChanged;
