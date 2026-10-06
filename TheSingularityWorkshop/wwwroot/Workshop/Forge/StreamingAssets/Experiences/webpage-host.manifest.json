@@ -1,0 +1,31 @@
+{
+  "manifestId": "webpage-host",
+  "version": "1.0.0",
+  "startup": [
+    {
+      "name": "THE SINGULARITY WORKSHOP",
+      "kind": "Moniker",
+      "microBundleIds": [2110],
+      "presentationSeconds": 3
+    },
+    {
+      "name": "WORKSHOP HUB",
+      "kind": "Hub",
+      "microBundleIds": [],
+      "presentationSeconds": 0
+    }
+  ],
+  "preload": [
+    {
+      "name": "WORKSHOP HUB",
+      "kind": "Hub",
+      "microBundleIds": [],
+      "presentationSeconds": 0
+    }
+  ],
+  "deepDive": {
+    "experience": "WORKSHOP HUB",
+    "restartFromManifest": true,
+    "telemetry": true
+  }
+}
