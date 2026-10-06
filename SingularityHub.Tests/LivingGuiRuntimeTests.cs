@@ -37,11 +37,11 @@ public sealed class LivingGuiRuntimeTests
         Assert.True(fsm.Context.LivingNodes.Count >= 2);
         var child = fsm.Context.LivingNodes[1];
         Assert.Equal(10d, child.Size);
-        Assert.Equal(50d, child.X);
-        Assert.Equal(50d, child.Y);
+        Assert.Equal(0d, child.X);
+        Assert.Equal(0d, child.Y);
         Assert.Equal(PageStateContext.LivingNodePhase.Traveling, child.Phase);
-        Assert.InRange(child.TargetX, 10d, 90d);
-        Assert.InRange(child.TargetY, 10d, 90d);
+        Assert.InRange(child.TargetX, -40d, 40d);
+        Assert.InRange(child.TargetY, -40d, 40d);
         Assert.NotEqual(0d, child.Rotation);
         Assert.Equal(1, fsm.SeedlingCount);
         Assert.Equal(LivingGuiOrganismFsm.DormantState, fsm.Organisms[1].CurrentState);
@@ -288,15 +288,15 @@ public sealed class LivingGuiRuntimeTests
         Assert.Equal(100, targets.Distinct().Count());
         Assert.All(targets, target =>
         {
-            Assert.InRange(target.TargetX, 10d, 90d);
-            Assert.InRange(target.TargetY, 10d, 90d);
+            Assert.InRange(target.TargetX, -40d, 40d);
+            Assert.InRange(target.TargetY, -40d, 40d);
         });
 
         // The population should cover all four directions without being forced
         // into the old row-major 10x10 launch pattern.
         var quadrants = targets
             .Skip(1)
-            .GroupBy(target => (target.TargetX >= 50d ? 1 : 0) + (target.TargetY >= 50d ? 2 : 0))
+            .GroupBy(target => (target.TargetX >= 0d ? 1 : 0) + (target.TargetY >= 0d ? 2 : 0))
             .ToDictionary(group => group.Key, group => group.Count());
 
         Assert.Equal(4, quadrants.Count);
