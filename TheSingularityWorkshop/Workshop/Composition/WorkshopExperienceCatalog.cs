@@ -13,10 +13,15 @@ public sealed class WorkshopExperienceCatalog
 
     public WorkshopExperienceCatalog()
     {
+        var foxesAndDogs = new FoxesAndDogsExperience();
         var livingGui = new LivingGuiExperience();
 
         _experiences = new Dictionary<ulong, IExperience>
         {
+            // The original FSM_API instructional demonstration is the first
+            // discoverable Experience. It is the historical proof of the
+            // independent-agent model used by the newer Experiences.
+            [foxesAndDogs.Id] = foxesAndDogs,
             [livingGui.Id] = livingGui
         };
     }
