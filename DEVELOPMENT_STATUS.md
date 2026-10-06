@@ -1,39 +1,75 @@
-# Development status
+# WebPage Development Status
 
-Branch: `development`
+## Current state
 
-The current landing slice is an engineering handoff, not a finished feature.
+The repository is in a consolidation pass.
 
-## Known browser failures
+WebPage began as a website wrapper and has become the browser proving ground and public learning resource for The Singularity Workshop.
 
-- Living GUI is visibly dead.
-- Living GUI root remains in the upper-left instead of the center of its panel.
-- The six-color panel breathing animation exists in `TheSingularityWorkshop/Pages/LivingGui.razor`, but host CSS in `TheSingularityWorkshop/wwwroot/css/app.css` has important static border and shadow declarations that can override it.
-- Idle activates during the deliberate Living GUI Flex path; selection/lifecycle ownership still needs tracing.
+The current priority is not adding more site sections. It is making the existing host explain and execute the correct architecture.
 
-## Intended lifecycle
+## Active startup model
 
-`PAGE_INITIALIZING -> GATEWAY -> GATEWAY_EXIT -> LIVING_GUI_IGNITION -> LIVING_GUI_POPULATING -> 100 -> FREEZE -> MONIKER_REVEAL -> GRAVITY -> DISSIPATING -> NAVIGATION_ARRIVAL -> RUNNING`
+~~~text
+WEBPAGE BOOT
+   ↓
+load manifest
+   ↓
+compose primary root through FSM_COS
+   ↓
+2102 Living GUI
+   ↓
+2110 Moniker dependency is resolved automatically
+   ↓
+present Moniker
+   ↓
+activate primary Experience
+   ↓
+FSM_API-driven Living GUI
+~~~
 
-## Architectural truths
+## Current public surface
 
-- FSM_API is the meaningful lifecycle execution mechanism.
-- Hub owns runtime lifecycle/heartbeat responsibilities.
-- Razor renders authoritative state; it does not own the lifecycle.
-- Pong is the first Idler-capable Experience.
-- Living GUI is the first Flex-capable Experience.
-- Idler and Flex are capabilities, not concrete bootstrap identities.
-- The moniker is earned at exactly 100 nodes and freeze.
+AnyApp is the active cross-host demonstration.
 
-## Recovery rule
+The repository documentation is the deeper learning surface while the runtime architecture is being stabilized.
 
-Before simplifying anything, locate the behavior, identify its owner, preserve it with a focused test, then move or adapt it. Historical implementations are evidence.
+## Known transitional code
 
-## Recent checkpoints
+The repository still contains:
 
-- `f4e02a96643d5735f13bf56a8c4ef19fdb86f859` — Hub-driven landing lifecycle merged into `development`.
-- `9303146eaab0236f785c7cb67f065d9d6f9f8a76` — Living GUI runtime tests.
-- `0ee2ba8234c7533d5611369f4ea7d9093ee32055` — six-color panel breathing animation.
-- `06a97a22751ab7cca0faa4fcb770259548e23f60` — handoff notes.
+- older first-contact/page-FSM code;
+- older Idler/Flex catalogs;
+- demo/bootstrap scaffolding;
+- older exploratory pages;
+- duplicated presentation/runtime assumptions.
 
-Master remains at `4cf613a19126548264e4f9e610f17528030532e6` and must not be modified for this work.
+These remain until their behavior has been located, tested, replaced, and proven elsewhere.
+
+## Package boundary
+
+The WebPage application consumes:
+
+- TheSingularityWorkshop.FSM_API;
+- TheSingularityWorkshop.FSM_COS;
+- TheSingularityWorkshop.MicroBundleDomain;
+- GUI packages;
+- other Workshop packages where they own reusable capabilities.
+
+Do not introduce a local copy when the package is the canonical owner.
+
+## Current proof obligations
+
+- manifest loads and parses;
+- startup and running entries remain distinct;
+- primary root is 2102;
+- 2102 resolves 2110 through FSM_COS dependency closure;
+- RuntimeAssembly contains the closed composition;
+- browser transitions from Moniker to the primary Experience;
+- CI is clean.
+
+## Review point
+
+The next human review should be visual: run the WebPage at multiple client sizes and confirm the manifest Moniker and Living GUI both fit the client rather than assuming fixed viewport geometry.
+
+Master remains untouched.
