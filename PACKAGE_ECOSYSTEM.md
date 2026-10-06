@@ -95,3 +95,81 @@ Ideas that are not yet implemented belong under **Direction** or **Future**, not
 6. **Read ProtocolAi / GrammarAi** — see how semantic capabilities can be composed independently.
 
 WebPage is therefore a map into the Workshop ecosystem as much as it is an application.
+## Repository-backed MicroBundles
+
+The long-term runtime source for non-bootstrap MicroBundles is the
+`TheSingularityWorkshop.MicroBundleRepository` artifact boundary.
+
+The intended host path is:
+
+```text
+WebPage manifest
+      |
+      v
+immutable MicroBundle address
+      |
+      v
+MicroBundleRepository
+      |
+      v
+verified artifact bytes
+      |
+      v
+FSM_COS MicroBundle catalog
+      |
+      v
+RuntimeAssembly
+```
+
+The Workshop Moniker Experience is the deliberate bootstrap exception. Its
+required MicroBundles may be resident in the WebPage bootstrap cache so that
+the Workshop can establish its identity before repository-backed content is
+available.
+
+**This is not yet the active WebPage execution path.** The current WebPage
+branch is pinned to the published FSM_COS alpha.4 contract, while the
+repository-backed catalog is built against the newer `MicroBundleDomain`
+boundary. Until the compatible FSM_COS package boundary is available to
+WebPage, do not add a local compatibility adapter that recreates the old
+composition contract.
+
+The target invariant is:
+
+> **Bootstrap the Workshop Moniker locally; retrieve everything else as an
+> immutable MicroBundle artifact and let FSM_COS compose it.**
+
+This also establishes the path for visitor-created content. A visitor-created
+MicroBundle should eventually be just another immutable artifact address. An
+Experience manifest can select it without WebPage acquiring a special case for
+the creator.
+
+### Visitor-created content
+
+The future creation path is intentionally repository-shaped:
+
+```text
+Visitor creates MicroBundle
+        |
+        v
+validate / package / sign
+        |
+        v
+immutable artifact
+        |
+        v
+MicroBundleRepository
+        |
+        v
+visitor Experience manifest
+        |
+        v
+FSM_COS
+        |
+        v
+WebPage / AnyApp / other manifestation
+```
+
+Creation, validation, publication policy, identity, and capability/resource
+requirements must remain separate concerns. WebPage will eventually provide
+the creator-facing experience, but it must not become the MicroBundle storage
+or composition engine.
