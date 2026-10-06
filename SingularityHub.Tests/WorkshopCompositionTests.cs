@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http;
 using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Workshop.Composition;
@@ -39,7 +40,7 @@ public sealed class WorkshopCompositionTests
             RuntimeId: 4001UL,
             Bundles: new[]
             {
-                BundleRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
+                MicroBundleDependencyRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
             }));
 
         var ai = runtime.TryGetBundle<AiExchangeCompositionBundle>(
@@ -68,7 +69,7 @@ public sealed class WorkshopCompositionTests
             RuntimeId: 4002UL,
             Bundles: new[]
             {
-                BundleRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
+                MicroBundleDependencyRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
             }));
 
         Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.ProtocolBundleId);
