@@ -286,5 +286,29 @@ public sealed class IncrementalVersionTests
     public void V0_0_187LivingGuiUsesOneFsmDefinitionWithIndependentOrganismInstances()
         => Assert.Equal("0.0.187", "0.0.187");
 
+    [ArchitectureTest(0, 0, 188)] [Fact(DisplayName = "V0.0.188 — WebPage_Startup_Is_Driven_By_Manifest")]
+    public void V0_0_188WebPageStartupIsDrivenByManifest()
+    {
+        var manifest = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "wwwroot", "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
+
+        Assert.Contains("\"startup\"", manifest);
+        Assert.Contains("\"running\"", manifest);
+        Assert.Contains("\"microBundleIds\": [2102]", manifest);
+    }
+
+    [ArchitectureTest(0, 0, 189)] [Fact(DisplayName = "V0.0.189 — WebPage_Manifest_Distinguishes_Startup_From_Primary_Experience")]
+    public void V0_0_189WebPageManifestDistinguishesStartupFromPrimaryExperience()
+    {
+        var manifest = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "wwwroot", "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
+
+        Assert.Contains("\"kind\": \"Moniker\"", manifest);
+        Assert.Contains("\"kind\": \"Primary\"", manifest);
+        Assert.Contains("\"experience\": \"LIVING GUI\"", manifest);
+    }
 }
-    [ArchitectureTest(0, 0, 188)] [Fact(DisplayName = "V0.0.188 — WebPage_Startup_Is_Driven_By_Manifest_And_Hub_Follows_Moniker")] public void V0_0_188_WebPageStartupIsDrivenByManifestAndHubFollowsMoniker() => Assert.Equal("0.0.188", "0.0.188");
