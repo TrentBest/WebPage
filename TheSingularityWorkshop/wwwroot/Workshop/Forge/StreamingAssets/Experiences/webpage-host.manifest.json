@@ -5,26 +5,20 @@
     {
       "name": "THE SINGULARITY WORKSHOP",
       "kind": "Moniker",
-      "microBundleIds": [2110],
-      "presentationSeconds": 3
-    },
-    {
-      "name": "WORKSHOP HUB",
-      "kind": "Hub",
       "microBundleIds": [],
-      "presentationSeconds": 0
+      "presentationSeconds": 3
     }
   ],
-  "preload": [
+  "running": [
     {
-      "name": "WORKSHOP HUB",
-      "kind": "Hub",
-      "microBundleIds": [],
+      "name": "LIVING GUI",
+      "kind": "Primary",
+      "microBundleIds": [2102],
       "presentationSeconds": 0
     }
   ],
   "deepDive": {
-    "experience": "WORKSHOP HUB",
+    "experience": "LIVING GUI",
     "restartFromManifest": true,
     "telemetry": true
   }
