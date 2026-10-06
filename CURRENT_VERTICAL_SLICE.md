@@ -4,13 +4,25 @@ Read this before changing the active landing experience.
 
 ## Working branch
 
-`development`
+`development` is the integration branch.
 
 `master` remains the protected promotion target. Do not modify it during active development.
 
+Short-lived exploratory branches are created from `development`, merged back into `development` only after proof/CI, and then deleted by the repository owner. Do not accumulate long-lived feature branches.
+
 ## Current objective
 
-Build a deterministic, FSM_API-driven Workshop landing experience in which the **host is generic and the content is discovered**.
+Build a deterministic, FSM_API-driven Workshop landing experience in which the **host manifest is the startup authority**.
+
+The Azure-served WebPage manifest is loaded first, parsed without page-specific Experience selection, and executed as an ordered startup sequence:
+
+1. compose and present the user's Moniker;
+2. while the Moniker is presenting, prepare the next startup Experience;
+3. transition to the WebPage's Experience: the Hub itself;
+4. expose only the AnyApp tab from the Workshop navigation;
+5. allow the Hub to restart the same manifest in Deep Dive mode, preserving the lifecycle while exposing execution telemetry.
+
+The Hub is therefore not a page decoration around the Experience. It is the WebPage Experience and the GUI manifestation of execution.
 
 The page launches the Hub with a WebPage host manifest. The Hub uses that manifest to locate the MicroBundle/Experience registry, discovers eligible Experiences, selects an Idler, and later selects a Flex when the visitor enters the Workshop.
 
