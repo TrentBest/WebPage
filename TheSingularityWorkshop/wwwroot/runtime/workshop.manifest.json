@@ -1,0 +1,23 @@
+{
+  "runtimeId": 4000,
+  "experiences": {
+    "startup": [2001],
+    "transitioning": [],
+    "running": [3002],
+    "requiredCapabilities": [5569061799661207809]
+  },
+  "hub": {
+    "id": 1000,
+    "path": "/",
+    "title": "THE WORKSHOP",
+    "tabs": [
+      { "id": 1, "label": "Understand", "order": 0, "targetKind": "Tool", "route": "/about-us", "targetId": 5001, "icon": "info", "tone": "magenta" },
+      { "id": 2, "label": "Experiences", "order": 1, "targetKind": "Experience", "route": "/explore", "targetId": 3002, "icon": "eye", "tone": "cyan" },
+      { "id": 3, "label": "Create", "order": 2, "targetKind": "Tool", "route": "/create", "targetId": 5003, "icon": "wrench", "tone": "yellow" },
+      { "id": 4, "label": "Rendering", "order": 3, "targetKind": "Tool", "route": "/rendering", "targetId": 5004, "icon": "globe", "tone": "cyan" },
+      { "id": 5, "label": "Education", "order": 4, "targetKind": "Tool", "route": "/education", "targetId": 5005, "tone": "green" },
+      { "id": 6, "label": "MadMen", "order": 5, "targetKind": "Tool", "route": "/madmen", "targetId": 5006, "tone": "orange" },
+      { "id": 7, "label": "Support", "order": 6, "targetKind": "Tool", "route": "/support", "targetId": 5007, "icon": "heart", "tone": "red" }
+    ]
+  }
+}
