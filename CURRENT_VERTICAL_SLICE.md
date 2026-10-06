@@ -40,7 +40,9 @@ present startup Moniker
    ↓
 activate primary Experience
    ↓
-Living GUI executes through FSM_API
+RuntimeAssembly is handed to the host
+   ↓
+**Current gap:** browser manifestation still consumes the transitional WebPage PageFSM/LivingGuiFsm runtime
 ~~~
 
 The critical architectural point is:
@@ -119,6 +121,7 @@ The active proof for this slice must establish:
 4. the composed RuntimeAssembly contains both;
 5. the browser transitions from Moniker to the primary Experience;
 6. CI build and tests pass.
+7. the functionality-preservation ledger remains green for every behavior being migrated.
 
 ## Important files
 
@@ -132,7 +135,7 @@ The active proof for this slice must establish:
 | TheSingularityWorkshop/Workshop/Composition/WorkshopCompositionCatalog.cs | FSM_COS catalog |
 | TheSingularityWorkshop/Workshop/MicroBundles/LivingGuiExperienceMicroBundle.cs | Primary root + Moniker dependency |
 | TheSingularityWorkshop/Workshop/MicroBundles/MonikerMicroBundle.cs | Canonical startup capability |
-| TheSingularityWorkshop/Pages/Home.razor | Browser manifestation |
+| TheSingularityWorkshop/Pages/Home.razor | Browser manifestation; currently bridges to transitional runtime |
 | TheSingularityWorkshop/Layout/MainLayout.razor | Browser chrome |
 | SingularityHub.Tests/WebPageHostManifestTests.cs | Manifest/composition contract tests |
 | SingularityHub.Tests/IncrementalVersionTests.cs | Incremental proof ledger |
@@ -149,3 +152,7 @@ The active proof for this slice must establish:
 8. leave master untouched unless promotion is explicitly requested.
 
 Do not publish packages or releases without explicit approval.
+
+## Function-preservation gate
+
+See [`FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md). The active refactor must preserve the existing Living GUI behavior—100-slot population, independent organism FSMs on one processing group, travel/planting/growth/reproduction/reduction, deterministic target distribution, and gravity—while moving its authority out of WebPage.
