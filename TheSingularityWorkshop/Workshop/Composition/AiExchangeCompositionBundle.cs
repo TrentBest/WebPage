@@ -1,4 +1,3 @@
-using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.GrammarAi;
 using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.ProtocolAi;
@@ -10,7 +9,7 @@ namespace TheSingularityWorkshop.Workshop.Composition;
 /// Composes the first host-facing ProtocolAI + GrammarAI exchange surface.
 /// Transport, clipboard access, credentials, and provider calls remain host concerns.
 /// </summary>
-public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
+public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.MicroBundleDomain.IMicroBundle
 {
     public const ulong BundleId = 0x1003UL;
     public const ulong ProtocolBundleId = 0x1001_0001UL;
@@ -30,10 +29,10 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.FSM_COS
 
     public MicroBundleDescriptor Descriptor { get; }
     public ulong Id => BundleId;
-    public IReadOnlyList<BundleRequest> Dependencies => new[]
+    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies => new[]
     {
-        BundleRequest.Unconfigured(ProtocolBundleId),
-        BundleRequest.Unconfigured(GrammarBundleId)
+        MicroBundleDependencyRequest.Unconfigured(ProtocolBundleId),
+        MicroBundleDependencyRequest.Unconfigured(GrammarBundleId)
     };
 
     public GuiNode? Composition { get; private set; }
@@ -41,7 +40,7 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.FSM_COS
     public GrammarDefinition? Grammar { get; private set; }
     public string? ExchangeText { get; private set; }
 
-    public void Load(MicroBundleLoadContext context)
+    public void Load(IMicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -67,15 +66,15 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.FSM_COS
             .Build();
     }
 
-    public bool Arbitrate(ArbitrationContext context, int roundIndex)
+    public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        var protocolBundle = context.LoadedBundles
+        var protocolBundle = context.Bundles
             .OfType<ProtocolAiCompositionBundle>()
             .FirstOrDefault();
 
-        var grammarBundle = context.LoadedBundles
+        var grammarBundle = context.Bundles
             .OfType<GrammarAiCompositionBundle>()
             .FirstOrDefault();
 
@@ -124,7 +123,7 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.FSM_COS
 }
 
 /// <summary>ProtocolAI vocabulary contributed to the composed runtime.</summary>
-public sealed class ProtocolAiCompositionBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
+public sealed class ProtocolAiCompositionBundle : TheSingularityWorkshop.MicroBundleDomain.IMicroBundle
 {
     public const ulong BundleId = AiExchangeCompositionBundle.ProtocolBundleId;
 
@@ -135,7 +134,7 @@ public sealed class ProtocolAiCompositionBundle : TheSingularityWorkshop.FSM_COS
 
     public MicroBundleDescriptor Descriptor { get; }
     public ulong Id => BundleId;
-    public IReadOnlyList<BundleRequest> Dependencies => Array.Empty<BundleRequest>();
+    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies => Array.Empty<MicroBundleDependencyRequest>();
     public ProtocolDefinition Protocol { get; } = new ProtocolBuilder(0x2001UL, "WorkshopAI")
         .Define(0x2101UL, "Extract", "extract")
         .Define(0x2102UL, "Submit", "submit")
@@ -143,9 +142,9 @@ public sealed class ProtocolAiCompositionBundle : TheSingularityWorkshop.FSM_COS
         .Define(0x2104UL, "Grammar", "grammar")
         .Build();
 
-    public void Load(MicroBundleLoadContext context) => ArgumentNullException.ThrowIfNull(context);
+    public void Load(IMicroBundleLoadContext context) => ArgumentNullException.ThrowIfNull(context);
 
-    public bool Arbitrate(ArbitrationContext context, int roundIndex)
+    public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
         return false;
@@ -153,7 +152,7 @@ public sealed class ProtocolAiCompositionBundle : TheSingularityWorkshop.FSM_COS
 }
 
 /// <summary>GrammarAI structure contributed to the composed runtime.</summary>
-public sealed class GrammarAiCompositionBundle : TheSingularityWorkshop.FSM_COS.IMicroBundle
+public sealed class GrammarAiCompositionBundle : TheSingularityWorkshop.MicroBundleDomain.IMicroBundle
 {
     public const ulong BundleId = AiExchangeCompositionBundle.GrammarBundleId;
 
@@ -167,9 +166,9 @@ public sealed class GrammarAiCompositionBundle : TheSingularityWorkshop.FSM_COS.
 
     public MicroBundleDescriptor Descriptor { get; }
     public ulong Id => BundleId;
-    public IReadOnlyList<BundleRequest> Dependencies => new[]
+    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies => new[]
     {
-        BundleRequest.Unconfigured(ProtocolAiCompositionBundle.BundleId)
+        MicroBundleDependencyRequest.Unconfigured(ProtocolAiCompositionBundle.BundleId)
     };
 
     public GrammarDefinition Grammar { get; } = new GrammarBuilder(0x3001UL, "WorkshopAIGrammar", 0x3101UL)
@@ -183,9 +182,9 @@ public sealed class GrammarAiCompositionBundle : TheSingularityWorkshop.FSM_COS.
             GrammarSymbol.Terminal(new GrammarProtocolReference(0x2001UL, 0x2101UL)))
         .Build();
 
-    public void Load(MicroBundleLoadContext context) => ArgumentNullException.ThrowIfNull(context);
+    public void Load(IMicroBundleLoadContext context) => ArgumentNullException.ThrowIfNull(context);
 
-    public bool Arbitrate(ArbitrationContext context, int roundIndex)
+    public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);
         return false;
