@@ -39,8 +39,8 @@ public sealed class LivingGuiOrganismFsm : IDisposable
 
         _handle = fsm_API.Create.CreateInstance(_fsmName, _organismContext, _processingGroup);
 
-        if (!IsValid)
-            throw new InvalidOperationException("Living GUI organism FSM was created with an invalid context or handle.");
+        if (!_handle.IsValid)
+            throw new InvalidOperationException("Living GUI organism FSM was created with an invalid FSM handle.");
     }
 
     public static string DefinitionNameForGroup(string processingGroup)
@@ -113,8 +113,17 @@ public sealed class LivingGuiOrganismFsm : IDisposable
         if (_disposed || !_handle.IsValid)
             throw new InvalidOperationException("Cannot activate an invalid Living GUI organism FSM.");
 
-        if (_handle.CurrentState == DormantState)
+        _organismContext.IsValid = true;
+
+        if (_handle.CurrentState != DormantState)
+            return;
+
+        if (_organismContext.Node.IsRoot)
             _handle.TransitionTo(InitializationState);
+        else if (_organismContext.Node.Phase == PageStateContext.LivingNodePhase.Existing)
+            _handle.TransitionTo(ExistingState);
+        else
+            throw new InvalidOperationException("A non-root Living GUI organism cannot activate before its seedling has planted.");
     }
 
     public PageStateContext.LivingNodeState Node => _organismContext.Node;
@@ -135,7 +144,7 @@ public sealed class LivingGuiOrganismFsm : IDisposable
     {
         private readonly PageStateContext _page;
         private readonly Action<PageStateContext.LivingNodeState> _attachChild;
-        private bool _isValid = true;
+        private bool _isValid;
 
         public LivingGuiOrganismContext(
             PageStateContext page,
@@ -146,6 +155,7 @@ public sealed class LivingGuiOrganismFsm : IDisposable
             Node = node;
             _attachChild = attachChild;
             Name = $"LivingGuiOrganismContext:{Guid.NewGuid():N}";
+            _isValid = node.IsRoot;
         }
 
         public string Name { get; set; }
