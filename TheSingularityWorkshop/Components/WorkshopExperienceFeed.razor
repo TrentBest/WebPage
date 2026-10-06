@@ -6,11 +6,13 @@
    WorkshopExperience/fact model; for now these observations are kept close to the manifestation.
    ================================================================================================= *@
 
+@inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
+
 <div class="workshop-experience-feed" aria-label="Workshop experience observations">
     <div class="experience-feed-label">WORKSHOP // OBSERVATIONS</div>
     <div class="experience-feed-window">
         <div class="experience-feed-track">
-            @foreach (var fact in Facts)
+            @foreach (var fact in RuntimeFacts)
             {
                 <div class="experience-fact">
                     <span class="experience-marker">&gt;</span>
@@ -19,7 +21,7 @@
             }
 
             @* Duplicate the sequence so the CSS loop can be continuous. *@
-            @foreach (var fact in Facts)
+            @foreach (var fact in RuntimeFacts)
             {
                 <div class="experience-fact" aria-hidden="true">
                     <span class="experience-marker">&gt;</span>
@@ -113,27 +115,32 @@
 </style>
 
 @code {
-    private static readonly string[] Facts =
+    private IReadOnlyList<string> RuntimeFacts
     {
-        "WAIT 10 SECONDS WITHOUT CLICKING. PONG WILL START.",
-        "PONG STARTS AFTER 200 HEARTBEATS.",
-        "EACH PONG HEARTBEAT IS 50 MILLISECONDS.",
-        "PONG IS DRIVEN BY FSM_API.",
-        "CYAN = VISITOR.",
-        "MAGENTA = MACHINE.",
-        "THE FIRST SERVE GOES TOWARD THE MACHINE.",
-        "THE MACHINE KEEPS SCORE.",
-        "CLICKING THE LANDING ENDS THE PONG PHASE.",
-        "THE PONG COMPONENT IS REMOVED BY THE LAYOUT.",
-        "THE INTERFACE CONTINUES.",
-        "THE GUI CAN REPRODUCE.",
-        "A NODE CARRIES ITS GENERATION.",
-        "A NODE CARRIES ITS LINEAGE.",
-        "CHAOS TICKS EVERY 100 MILLISECONDS.",
-        "A NODE REPRODUCES AFTER GROWING PAST SIZE 180.",
-        "CRITICAL MASS IS 100 ACTIVE NODES.",
-        "CRITICAL MASS FREEZES THE SWARM.",
-        "THE MACHINE FALLS AWAY UNDER GRAVITY.",
-        "THIS IS ONLY THE FRONT DOOR."
-    };
+        get
+        {
+            var assembly = Experience.RuntimeAssembly;
+            if (assembly is null)
+                return ["RUNTIME ASSEMBLY NOT LOADED."];
+
+            var facts = new List<string>
+            {
+                $"EXPERIENCE: {Experience.SelectedExperience?.Name ?? "UNNAMED"}",
+                $"EXPERIENCE ID: {Experience.SelectedExperience?.Id ?? 0}",
+                $"EXPERIENCE VERSION: {FormatVersion(Experience.SelectedExperience?.Version)}",
+                $"RUNTIME BUNDLES LOADED: {assembly.Bundles.Count}"
+            };
+
+            facts.AddRange(
+                assembly.Bundles
+                    .OrderBy(bundle => bundle.Id)
+                    .Select(bundle => $"MICROBUNDLE LOADED: {bundle.Id}"));
+
+            facts.Add($"PROCESSING GROUPS: {string.Join(", ", Experience.SelectedExperience?.ProcessingGroups ?? Array.Empty<string>())}");
+            return facts;
+        }
+    }
+
+    private static string FormatVersion(TheSingularityWorkshop.SingularityHub.BundleVersion? version)
+        => version is null ? "UNKNOWN" : $"{version.Value.Major}.{version.Value.Minor}.{version.Value.Patch}";
 }
