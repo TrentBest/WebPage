@@ -60,6 +60,32 @@ public sealed class WorkshopCompositionTests
         Assert.Equal("ai.submit", ai.Composition.Find("ai-submit").Properties["command"]);
     }
 
+    [Fact(DisplayName = "FSM_COS composes the Rendering tab and its AI semantic dependencies")]
+    public void RenderingTabComposesSemanticAiBoundary()
+    {
+        var compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
+
+        var runtime = compositionSystem.Execute(new RuntimeManifest(
+            RuntimeId: 4100UL,
+            Bundles: new[]
+            {
+                MicroBundleDependencyRequest.Unconfigured(RenderingMicroBundle.BundleId)
+            }));
+
+        Assert.True(runtime.TryGetBundle<RenderingMicroBundle>(
+            RenderingMicroBundle.BundleId,
+            out var rendering));
+
+        Assert.NotNull(rendering);
+        Assert.NotNull(rendering!.Protocol);
+        Assert.NotNull(rendering.Grammar);
+        Assert.Contains("PERCEPTION_BAND", rendering.AiObservationText!, StringComparison.Ordinal);
+        Assert.Contains("AI OBSERVATION", rendering.Composition!.Find("rendering-ai-observation").Properties["label"]);
+        Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.BundleId);
+        Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.ProtocolBundleId);
+        Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.GrammarBundleId);
+    }
+
     [Fact(DisplayName = "Explicit FSM_COS AI composition includes its dependency closure")]
     public void ExplicitAiCompositionIncludesClosure()
     {
