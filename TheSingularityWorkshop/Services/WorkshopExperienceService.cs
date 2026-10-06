@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Net.Http.Json;
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Infrastructure.Hub;
@@ -18,7 +17,6 @@ public sealed class WorkshopExperienceService : IDisposable
     private readonly HubRuntime _hubRuntime;
     private bool _disposed;
     private bool _manifestLoaded;
-    private Stopwatch? _monikerClock;
     private CancellationTokenSource? _presentationCancellation;
 
     public event Action? StateChanged;
@@ -84,7 +82,6 @@ public sealed class WorkshopExperienceService : IDisposable
 
         ComposePrimaryExperience();
 
-        _monikerClock = Stopwatch.StartNew();
         SetState("Moniker");
         _manifestLoaded = true;
         _ = PresentMonikerAsync(_presentationCancellation = new CancellationTokenSource());
@@ -133,7 +130,6 @@ public sealed class WorkshopExperienceService : IDisposable
             await Task.Delay(TimeSpan.FromSeconds(seconds), cancellation.Token);
             if (!_disposed && CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase))
             {
-                _monikerClock?.Stop();
                 ActivatePrimaryExperience();
             }
         }
@@ -147,7 +143,6 @@ public sealed class WorkshopExperienceService : IDisposable
     {
         if (CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase))
         {
-            _monikerClock?.Stop();
             _presentationCancellation?.Cancel();
             ActivatePrimaryExperience();
         }
@@ -169,7 +164,6 @@ public sealed class WorkshopExperienceService : IDisposable
         IsDeepDive = deepDive;
         _presentationCancellation?.Cancel();
         _presentationCancellation = new CancellationTokenSource();
-        _monikerClock?.Restart();
         CurrentManifestExperience = Manifest!.Startup[0];
         PrimaryManifestExperience = Manifest.Running[0];
         SetState("Moniker");
