@@ -1,154 +1,93 @@
 # The Singularity Workshop — WebPage Agent Instructions
 
-This repository is an active engineering proving ground.
+This repository is an active engineering proving ground and public learning resource.
 
 ## Branch safety
 
 - development is active engineering.
 - master is the stable promotion target.
 - Do not modify master during ordinary development.
+- Short-lived exploratory branches start from development, merge after proof/CI, then get deleted.
 - Preserve valuable behavior before replacing it.
-- Inspect history when unusual code may contain intentional behavior.
 
-## What this repository is for
+## Package-first rule
 
-WebPage is the browser proving ground for The Singularity Workshop.
+Before adding a local implementation, check the canonical Workshop packages.
 
-Its purpose is to demonstrate real behavior, expose architectural boundaries, move reusable functionality into independently owned packages, and document how those packages are used.
+Use:
 
-> **Use the technology to build the technology.**
+- FSM_API for meaningful FSM behavior;
+- FSM_COS for composition, dependency closure, arbitration, and RuntimeAssembly;
+- MicroBundleDomain for the MicroBundle contract;
+- the appropriate GUI package for reusable GUI behavior;
+- other Workshop NuGet packages when they own the capability.
 
-WebPage is not the canonical owner of every capability it demonstrates.
+WebPage may provide browser adapters and proving-ground implementations. It must not silently fork reusable package responsibilities.
 
-## Architectural extraction rule
+## Startup contract
 
-When a useful feature is discovered inside WebPage:
-
-~~~text
-experiment
-   ↓
-identify responsibility
-   ↓
-identify owner
-   ↓
-extract reusable implementation
-   ↓
-test package
-   ↓
-consume package here
-   ↓
-document the decision
-~~~
-
-Do not simply split a monolith into packages while keeping the old WebPage assumptions hidden between them.
-
-Ask:
-
-- Is this behavior reusable?
-- Does another host need it?
-- Which package or domain should own its contract?
-- Does it qualify as a MicroBundle participant?
-- What remains genuinely browser-specific?
-
-A package is not automatically a MicroBundle.
-
-## Current opening
+The host manifest is the startup authority.
 
 ~~~text
-LABEL 1
+manifest
    ↓
-LABEL 2
+startup Experience(s)
    ↓
-ENTER THE WORKSHOP + advisory
-   ↓
-explicit visitor entry
-   ↓
-FSM_COS composes LIVING GUI
-   ↓
-Moniker dependency
-   ↓
-living GUI growth / reproduction
-   ↓
-population threshold
-   ↓
-gravity
-   ↓
-Moniker presentation
-   ↓
-Workshop navigation
+primary running Experience
 ~~~
 
-Do not describe another host's startup or landing scene as WebPage behavior.
+The current primary root is LivingGuiExperienceMicroBundle 2102.
+
+Its canonical Moniker dependency is 2110.
+
+The host requests the primary root. FSM_COS resolves the dependency closure.
+
+Do not manually compose the Moniker as a second root.
 
 ## FSM_API ownership
 
 FSM_API is the authoritative state-machine implementation.
 
-WebPage may own wrappers such as PageFSM, but it must not grow a competing FSM.
-
-- An object wrapper advances its own owned handle.
-- Group-wide ticking belongs to the host/integration loop.
-- Disposed handles must be unregistered.
+- State semantics belong to FSM_API.
+- Processing-group ownership must remain explicit.
+- UI components observe state; they do not become the state machine.
+- Avoid anonymous timers for meaningful lifecycle transitions.
 - Tests must prove lifecycle ownership.
 
 ## FSM_COS ownership
 
 FSM_COS is the composition boundary.
 
-WebPage should:
+WebPage may load the manifest, create RuntimeManifest, provide the MicroBundle catalog, execute FSM_COS, consume RuntimeAssembly, and present the result in the browser.
 
-- select an Experience;
-- create a RuntimeManifest;
-- supply a MicroBundle catalog;
-- execute the composition;
-- consume RuntimeAssembly;
-- perform browser presentation after handoff.
-
-WebPage should not:
-
-- duplicate dependency closure;
-- implement arbitration;
-- make the composition kernel understand browser concerns;
-- make reusable packages depend upward on WebPage.
-
-Read FSM_COS_USAGE.md before changing this boundary.
+WebPage must not duplicate dependency traversal, implement a second arbitration engine, make FSM_COS understand browser concerns, or make reusable packages depend upward on WebPage.
 
 ## Documentation standard
 
-Documentation is engineering memory.
-
-Every authoritative document should distinguish:
-
-- Current — implemented behavior;
-- Direction — architecture we are deliberately implementing;
-- Future — not part of today's WebPage contract.
-
-Do not put speculative world-building, abandoned platforms, old host experiments, or conversational side visions into current operational documentation.
-
-If an idea belongs to another repository, document the boundary and link to that repository instead of importing its entire vision.
+Every authoritative document distinguishes Current, Direction, and Future.
 
 Prefer:
 
 > why the boundary exists → what the code does → how another developer uses it → what proves it
 
-over a chronological account of conversations.
+Do not turn current documentation into a fossil record of every experiment.
 
 ## Visual standard
 
-When a visual behavior matters:
+When visual behavior matters:
 
 - show it before explaining it;
-- prefer diagrams over paragraphs when relationships are spatial;
-- keep text truthful to implementation;
-- never use visual effects to imply capabilities that do not exist.
+- use diagrams for relationships;
+- keep the visual claim truthful;
+- inspect responsive behavior across client sizes.
 
 ## Tests are architectural evidence
 
-A meaningful architectural change should have executable proof when practical.
+Do not weaken tests to make a patch pass.
 
-Do not weaken a test merely to make an implementation pass. Fix the lifecycle or ownership problem the test exposes.
+When a lifecycle or ownership contract changes, update its proof.
 
-## Quality bar
+## Completion bar
 
 Before calling work complete:
 
@@ -161,11 +100,3 @@ Before calling work complete:
 7. leave master untouched unless promotion was explicitly requested.
 
 Zero warnings and zero avoidable errors is the target.
-
-## Historical notes
-
-Git history and issue history preserve chronology.
-
-Do not turn the main documentation into a fossil record of every intermediate idea.
-
-The repository should teach the machine we have, explain the decisions that produced it, and identify the next deliberate boundary.
