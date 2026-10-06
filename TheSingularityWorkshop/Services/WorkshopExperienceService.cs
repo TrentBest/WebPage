@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
@@ -97,7 +98,7 @@ public sealed class WorkshopExperienceService : IDisposable
         RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
             RuntimeId: 1,
             Bundles: PrimaryManifestExperience.MicroBundleIds
-                .Select(BundleRequest.Unconfigured)
+                .Select(MicroBundleDependencyRequest.Unconfigured)
                 .ToArray()));
 
         var hasMoniker = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
