@@ -11,9 +11,8 @@ Current dependency direction:
 WEBPAGE HOST MANIFEST
   -> Rendering tab
     -> RenderingMicroBundle (4100)
-      -> AiExchange
-        -> ProtocolAi
-        -> GrammarAi
+      -> ProtocolAi
+      -> GrammarAi
 
 This is an intentional proving-ground configuration, not a claim that the future Workshop has only one tab.
 
