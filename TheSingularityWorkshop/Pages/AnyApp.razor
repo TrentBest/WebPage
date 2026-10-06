@@ -64,7 +64,19 @@
         </article>
 
         <article class="anyapp-card">
-            <div class="card-kicker">04 // THE HANDOFF</div>
+            <div class="card-kicker">04 // THE TWO-HOST MONIKER</div>
+            <h2>Choose both screens.</h2>
+            <p>Put one literal half of the Workshop moniker in the browser and the other half in AnyApp. Then flip the assignment.</p>
+            <div class="anyapp-actions">
+                <button class="anyapp-button primary" type="button" onclick="window.anyAppPageBridge.splitMoniker()">SPLIT MONIKER</button>
+                <button class="anyapp-button secondary" type="button" onclick="window.anyAppPageBridge.flipMoniker()">FLIP HALVES</button>
+                <button class="anyapp-button secondary" type="button" onclick="window.anyAppPageBridge.wholeMoniker()">RESTORE WHOLE</button>
+            </div>
+            <div id="anyapp-split-status" class="split-status">MONIKER: WHOLE</div>
+        </article>
+
+        <article class="anyapp-card">
+            <div class="card-kicker">05 // THE HANDOFF</div>
             <h2>The hub can move.</h2>
             <p>
                 When the desktop host manifests its hub, the browser yields its own hub presentation
@@ -83,7 +95,7 @@
 .anyapp-hero{max-width:980px;margin:0 auto 2rem}.anyapp-kicker,.card-kicker{font-size:.65rem;letter-spacing:.2em;color:#00eaff;font-weight:800}.anyapp-hero h1{margin:.45rem 0;font-size:clamp(3rem,8vw,7rem);line-height:.9;letter-spacing:.08em;color:#fff;text-shadow:0 0 24px rgba(0,234,255,.25)}.anyapp-lead{max-width:820px;font-size:clamp(.9rem,1.6vw,1.1rem);line-height:1.7;color:#9eb4c0}
 .anyapp-grid{max-width:980px;margin:0 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.anyapp-card{padding:1.35rem;border:1px solid rgba(0,234,255,.18);background:rgba(2,7,17,.82);box-shadow:inset 0 0 28px rgba(0,234,255,.025)}.anyapp-card-primary{border-color:rgba(255,44,255,.35)}.anyapp-card h2{margin:.45rem 0 .7rem;font-size:1.2rem;color:#fff}.anyapp-card p{margin:0;color:#8fa7b4;line-height:1.65;font-size:.78rem}.anyapp-card pre{margin:1rem 0 0;padding:1rem;overflow:auto;color:#dffcff;background:#020711;border:1px solid rgba(0,234,255,.12);font-size:.72rem}
 .anyapp-actions{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.2rem}.anyapp-button{display:inline-flex;align-items:center;justify-content:center;padding:.75rem 1rem;border:1px solid #00eaff;background:#04121e;color:#fff;text-decoration:none;font:800 .7rem Consolas,'Courier New',monospace;letter-spacing:.12em;cursor:pointer}.anyapp-button.primary{border-color:#ff2cff}.anyapp-button:hover{box-shadow:0 0 18px rgba(0,234,255,.16);transform:translateY(-1px)}.anyapp-button.primary:hover{box-shadow:0 0 18px rgba(255,44,255,.16)}
-.bridge-status{margin-top:1rem;padding:.65rem;border-left:2px solid #617784;color:#617784;font-size:.62rem;letter-spacing:.1em}.bridge-status.connected{border-left-color:#52e05a;color:#52e05a}.handoff-diagram{display:flex;align-items:center;justify-content:center;gap:1.2rem;margin-top:1.2rem;padding:1rem;border:1px solid rgba(255,255,255,.08);color:#dffcff;font-size:.7rem}.handoff-diagram b{color:#ff2cff;font-size:1.2rem}
+.bridge-status{margin-top:1rem;padding:.65rem;border-left:2px solid #617784;color:#617784;font-size:.62rem;letter-spacing:.1em}.bridge-status.connected{border-left-color:#52e05a;color:#52e05a}.split-status{margin-top:.7rem;font-size:.6rem;letter-spacing:.12em;color:#617784}.split-status.connected{color:#52e05a}.handoff-diagram{display:flex;align-items:center;justify-content:center;gap:1.2rem;margin-top:1.2rem;padding:1rem;border:1px solid rgba(255,255,255,.08);color:#dffcff;font-size:.7rem}.handoff-diagram b{color:#ff2cff;font-size:1.2rem}
 @media(max-width:760px){.anyapp-grid{grid-template-columns:1fr}}
 </style>
 
@@ -98,6 +110,13 @@ window.anyAppPageBridge = {
                 const response = await fetch('http://127.0.0.1:48156/state', { cache: 'no-store' });
                 if (!response.ok) throw new Error();
                 const state = await response.json();
+                const split = document.getElementById('anyapp-split-status');
+                if (split) {
+                    split.textContent = state.splitMoniker
+                        ? 'MONIKER: SPLIT // BROWSER ' + String(state.browserHalf || 'left').toUpperCase()
+                        : 'MONIKER: WHOLE';
+                    split.classList.toggle('connected', !!state.splitMoniker);
+                }
                 if (status) {
                     status.textContent = 'DESKTOP HOST: ' + String(state.state || 'CONNECTED').toUpperCase();
                     status.classList.add('connected');
@@ -112,6 +131,18 @@ window.anyAppPageBridge = {
         poll();
         this.timer = window.setInterval(poll, 1000);
     },
+    async command(command) {
+        try {
+            await fetch('http://127.0.0.1:48156/command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command })
+            });
+        } catch { }
+    },
+    splitMoniker() { return this.command('split-moniker'); },
+    flipMoniker() { return this.command('flip-moniker'); },
+    wholeMoniker() { return this.command('whole-moniker'); },
     launch() {
         window.location.href = 'anyapp://workshop';
     }
