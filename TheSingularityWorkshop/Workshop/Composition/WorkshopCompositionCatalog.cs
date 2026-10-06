@@ -16,11 +16,13 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
         var aiExchange = new AiExchangeCompositionBundle();
         var moniker = new MonikerMicroBundle();
         var livingGui = new LivingGuiExperienceMicroBundle();
+        var rendering = new RenderingMicroBundle();
 
         _bundles = new Dictionary<ulong, DomainMicroBundle>
         {
             [moniker.Descriptor.Id] = moniker,
             [livingGui.Id] = livingGui,
+            [rendering.Id] = rendering,
             [protocol.Id] = protocol,
             [grammar.Id] = grammar,
             [aiExchange.Id] = aiExchange
