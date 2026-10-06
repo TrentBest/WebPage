@@ -42,7 +42,7 @@ After the opening, ask:
 
 ### 3. Explore
 
-The public navigation is intentionally narrow while the host architecture is being stabilized. AnyApp is the active cross-host proof surface.
+The public navigation is intentionally narrow while the host architecture is being stabilized. Rendering is the current active proof surface for the renderer → perception → semantic-observation boundary.
 
 Future educational surfaces can be added as Experiences rather than turning navigation into a pile of static documentation pages.
 
