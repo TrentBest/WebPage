@@ -1,3 +1,4 @@
+using System.Text.Json;
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Configuration;
@@ -7,6 +8,25 @@ namespace SingularityHub.Tests;
 
 public sealed class WorkshopManifestTests
 {
+    [Fact(DisplayName = "The shipped Workshop manifest is valid JSON and declares the same Hub contract")]
+    public void ShippedManifestLoads()
+    {
+        var path = Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "wwwroot", "runtime", "workshop.manifest.json");
+
+        var manifest = JsonSerializer.Deserialize<WorkshopManifestDocument>(
+            File.ReadAllText(path),
+            WorkshopManifestJson.Options);
+
+        Assert.NotNull(manifest);
+        Assert.Equal(4000UL, manifest!.RuntimeId);
+        Assert.Contains(WorkshopManifestDefaults.MonikerExperienceId, manifest.Experiences.Startup);
+        Assert.Equal(7, manifest.Hub.Tabs.Length);
+        Assert.Equal("Experiences", manifest.Hub.Tabs[1].Label);
+    }
+
     [Fact(DisplayName = "The Workshop default manifest loads the moniker as a startup Experience")]
     public void MonikerIsDeclaredAsStartupExperience()
     {
