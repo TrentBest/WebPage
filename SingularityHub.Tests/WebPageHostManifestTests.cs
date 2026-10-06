@@ -6,21 +6,20 @@ namespace SingularityHub.Tests;
 public sealed class WebPageHostManifestTests
 {
     [Fact]
-    public void ManifestParserPreservesStartupOrderAndPreloadIntent()
+    public void ManifestParserPreservesStartupAndPrimaryExperience()
     {
         const string json = """
         {
           "manifestId": "webpage-host",
           "version": "1.0.0",
           "startup": [
-            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [2110], "presentationSeconds": 3 },
-            { "name": "WORKSHOP HUB", "kind": "Hub", "microBundleIds": [], "presentationSeconds": 0 }
+            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }
           ],
-          "preload": [
-            { "name": "WORKSHOP HUB", "kind": "Hub", "microBundleIds": [], "presentationSeconds": 0 }
+          "running": [
+            { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
           ],
           "deepDive": {
-            "experience": "WORKSHOP HUB",
+            "experience": "LIVING GUI",
             "restartFromManifest": true,
             "telemetry": true
           }
@@ -30,29 +29,31 @@ public sealed class WebPageHostManifestTests
         var manifest = WebPageHostManifestParser.Parse(json);
 
         Assert.Equal("webpage-host", manifest.ManifestId);
+        Assert.Single(manifest.Startup);
         Assert.Equal("Moniker", manifest.Startup[0].Kind);
-        Assert.Equal(2110UL, manifest.Startup[0].MicroBundleIds[0]);
-        Assert.Equal("Hub", manifest.Startup[1].Kind);
+        Assert.Empty(manifest.Startup[0].MicroBundleIds);
+        Assert.Single(manifest.Running);
+        Assert.Equal("Primary", manifest.Running[0].Kind);
+        Assert.Equal(2102UL, manifest.Running[0].MicroBundleIds[0]);
         Assert.True(manifest.DeepDive.RestartFromManifest);
         Assert.True(manifest.DeepDive.Telemetry);
     }
 
     [Fact]
-    public void ManifestDefinesHubAsTheWebPageExperienceAfterMoniker()
+    public void PrimaryExperienceIsRequestedAsTheFsmCosRoot()
     {
         const string json = """
         {
           "manifestId": "webpage-host",
           "version": "1.0.0",
           "startup": [
-            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [2110], "presentationSeconds": 3 },
-            { "name": "WORKSHOP HUB", "kind": "Hub", "microBundleIds": [], "presentationSeconds": 0 }
+            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }
           ],
-          "preload": [
-            { "name": "WORKSHOP HUB", "kind": "Hub", "microBundleIds": [], "presentationSeconds": 0 }
+          "running": [
+            { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
           ],
           "deepDive": {
-            "experience": "WORKSHOP HUB",
+            "experience": "LIVING GUI",
             "restartFromManifest": true,
             "telemetry": true
           }
@@ -61,9 +62,7 @@ public sealed class WebPageHostManifestTests
 
         var manifest = WebPageHostManifestParser.Parse(json);
 
-        Assert.Equal("Moniker", manifest.Startup[0].Kind);
-        Assert.Equal("Hub", manifest.Startup[1].Kind);
-        Assert.Equal("WORKSHOP HUB", manifest.DeepDive.Experience);
-        Assert.Equal(3, manifest.Startup[0].PresentationSeconds);
+        Assert.Equal(new[] { 2102UL }, manifest.Running[0].MicroBundleIds);
+        Assert.Equal(2110UL, (ulong)MonikerMicroBundle.BundleId);
     }
 }
