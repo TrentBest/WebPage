@@ -83,7 +83,6 @@ public sealed class WorkshopExperienceService : IDisposable
         ComposePrimaryExperience();
 
         SetState("Moniker");
-        _manifestLoaded = true;
         _ = PresentMonikerAsync(_presentationCancellation = new CancellationTokenSource());
     }
 
