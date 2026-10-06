@@ -132,6 +132,18 @@ public sealed class WorkshopCompositionTests
               "startup": [
                 { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }
               ],
+              "hub": [
+                {
+                  "name": "Rendering",
+                  "kind": "MicroBundle",
+                  "description": "Rendering research",
+                  "deploymentUrl": null,
+                  "aboutUrl": "/rendering",
+                  "bridgeEndpoint": null,
+                  "route": "/rendering",
+                  "microBundleIds": [4100]
+                }
+              ],
               "running": [
                 { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
               ],
