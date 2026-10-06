@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using TheSingularityWorkshop.FSM_API;
-using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Gui;
@@ -13,9 +12,8 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// The same bundle is now consumable by the FSM_COS runtime composition boundary.
 /// </summary>
 public sealed class MonikerMicroBundle :
-    IMicroBundle,
+    TheSingularityWorkshop.MicroBundleDomain.IMicroBundle,
     TheSingularityWorkshop.SingularityHub.IMicroBundle,
-    TheSingularityWorkshop.FSM_COS.IMicroBundle,
     IDisposable
 {
     public const int BundleId = 2110;
@@ -35,7 +33,7 @@ public sealed class MonikerMicroBundle :
 
         Text = text;
         Context = new MonikerContext(text);
-        CosDescriptor = new MicroBundleDescriptor((ulong)BundleId, "1.0.0");
+        Descriptor = new MicroBundleDescriptor((ulong)BundleId, "1.0.0");
 
         FSM_API.FSM_API.Create.CreateProcessingGroup(_processingGroup);
         FSM_API.FSM_API.Create.CreateFiniteStateMachine(_fsmName, -1, _processingGroup)
@@ -70,16 +68,12 @@ public sealed class MonikerMicroBundle :
     public GuiNode? Composition { get; private set; }
 
     /// <summary>Descriptor used by FSM_COS for composition identity and versioning.</summary>
-    public MicroBundleDescriptor CosDescriptor { get; }
+    public MicroBundleDescriptor Descriptor { get; }
 
-    MicroBundleDescriptor TheSingularityWorkshop.FSM_COS.IMicroBundle.Descriptor => CosDescriptor;
+    public IReadOnlyList<MicroBundleDependencyRequest> Dependencies { get; } =
+        Array.Empty<MicroBundleDependencyRequest>();
 
-    ulong TheSingularityWorkshop.FSM_COS.IMicroBundle.Id => (ulong)BundleId;
-
-    IReadOnlyList<BundleRequest> TheSingularityWorkshop.FSM_COS.IMicroBundle.Dependencies =>
-        Array.Empty<BundleRequest>();
-
-    void TheSingularityWorkshop.FSM_COS.IMicroBundle.Load(MicroBundleLoadContext context)
+    public void Load(IMicroBundleLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -91,8 +85,8 @@ public sealed class MonikerMicroBundle :
             .Build();
     }
 
-    bool TheSingularityWorkshop.FSM_COS.IMicroBundle.Arbitrate(
-        ArbitrationContext context,
+    public bool Arbitrate(
+        IMicroBundleArbitrationContext context,
         int roundIndex)
     {
         ArgumentNullException.ThrowIfNull(context);

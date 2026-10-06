@@ -172,4 +172,34 @@ public sealed class ExploreExperienceMicroBundleTests
         Assert.Same(experience.SoftwarePatterns, experience.SoftwarePatternsAnnotation.Patterns);
         Assert.Equal(8, experience.SoftwarePatterns.Patterns.Count);
     }
+    [Fact]
+    public void ExploreExperience_ExposesNestedContentDomainsAndFocusedLeaves()
+    {
+        using var experience = new ExploreExperienceMicroBundle();
+
+        Assert.Equal((ulong)ExploreContentMicroBundle.BundleId, (ulong)experience.Content.Id);
+        Assert.Equal(6, experience.Content.Domains.Count);
+
+        Assert.Equal("SPATIAL WORKSHOP", experience.Content.Spatial.Name);
+        Assert.Equal("AEC", experience.Content.Aec.Name);
+        Assert.Equal("SINGULARITY LABORATORY", experience.Content.Laboratory.Name);
+        Assert.Equal("SINGULARITY CITY", experience.Content.City.Name);
+        Assert.Equal("CREATION", experience.Content.Creation.Name);
+        Assert.Equal("AI / LANGUAGE", experience.Content.Ai.Name);
+
+        Assert.Contains(experience.Content.Aec.Leaves, leaf => leaf.Name == "BIM");
+        Assert.Contains(experience.Content.Laboratory.Leaves, leaf => leaf.Name == "SECURITY");
+        Assert.Contains(experience.Content.City.Leaves, leaf => leaf.Name == "TRANSIT");
+        Assert.Contains(experience.Content.Creation.Leaves, leaf => leaf.Name == "FSM FORGE");
+        Assert.Contains(experience.Content.Ai.Leaves, leaf => leaf.Name == "WORKSHOP AI TERMINAL");
+
+        Assert.Equal(
+            experience.Content.Spatial.Id,
+            ((MicroBundleContext)experience.Content.Spatial.Leaves[0].Context).ParentId);
+
+        Assert.All(
+            experience.Content.Leaves,
+            leaf => Assert.True(leaf.Id > experience.Content.Id));
+    }
+
 }

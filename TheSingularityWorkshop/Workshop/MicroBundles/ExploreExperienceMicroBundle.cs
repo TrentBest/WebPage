@@ -27,6 +27,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         Forge = new FsmForgeMicroBundle();
         SoftwarePatterns = new SoftwarePatternsMicroBundle();
         SoftwarePatternsAnnotation = new SoftwarePatternsAnnotationMicroBundle(SoftwarePatterns);
+        Content = new ExploreContentMicroBundle();
         Moniker = GetOrLoadMoniker();
     }
 
@@ -47,6 +48,13 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     public SoftwarePatternsMicroBundle SoftwarePatterns { get; }
     public SoftwarePatternsAnnotationMicroBundle SoftwarePatternsAnnotation { get; }
 
+    /// <summary>
+    /// Nested content hierarchy for the Explore surface. The page is still the
+    /// browser presentation host, but every major content family now has a
+    /// stable MicroBundle identity and lifecycle boundary.
+    /// </summary>
+    public ExploreContentMicroBundle Content { get; }
+
     /// <summary>Advances the composed capability lifecycles without owning the shared moniker lifecycle.</summary>
     public void Update()
     {
@@ -58,6 +66,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
         Forge.Update();
         SoftwarePatterns.Update();
         SoftwarePatternsAnnotation.Update();
+        Content.Update();
     }
 
     public void Invalidate() => _lifecycle.Invalidate();
@@ -65,6 +74,7 @@ public sealed class ExploreExperienceMicroBundle : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
+        Content.Dispose();
         SoftwarePatternsAnnotation.Dispose();
         SoftwarePatterns.Dispose();
         Forge.Dispose();

@@ -1,171 +1,158 @@
-# Current Vertical Slice — Manifest → Hub → Idler → Flex
+# Current Vertical Slice — Manifest → Moniker → Primary Experience
 
-Read this before changing the active landing experience.
+Read this before changing the active WebPage startup.
 
-## Working branch
+## Branch discipline
 
-`development`
-
-`master` remains the protected promotion target. Do not modify it during active development.
+- development is the integration branch.
+- master is the stable promotion target.
+- Short-lived exploratory branches start from development, merge after proof/CI, then get deleted.
+- Do not accumulate long-lived feature branches.
 
 ## Current objective
 
-Build a deterministic, FSM_API-driven Workshop landing experience in which the **host is generic and the content is discovered**.
+Make the WebPage host manifest the startup authority and make the repository explain the same architecture it executes.
 
-The page launches the Hub with a WebPage host manifest. The Hub uses that manifest to locate the MicroBundle/Experience registry, discovers eligible Experiences, selects an Idler, and later selects a Flex when the visitor enters the Workshop.
+The current manifest contains:
 
-The first concrete implementations are Pong and Living GUI. They are examples of the protocol, not hardcoded protocol names.
+- one startup Moniker presentation;
+- one primary running Experience: Living GUI;
+- Deep Dive restart/telemetry intent.
 
-## Intended presentation sequence
+The model permits more than one startup Experience. The concrete sample currently uses one.
 
-```text
+## Startup sequence
+
+~~~text
 WEBPAGE BOOT
-  -> load host manifest
-  -> start Hub
-  -> connect MicroBundle / Experience registry
-  -> discover available Idlers and Flexes
-  -> randomly select an available Idler
-  -> RUN IDLER (Pong is the first concrete one)
-  -> user clicks Enter Workshop
-  -> select the Living GUI Experience
-  -> FSM_COS composes the Experience
-  -> resolve its Moniker MicroBundle dependency first
-  -> start the Living GUI FSM only after composition succeeds
-  -> first reproduction makes the moniker eligible
-  -> reveal navigation / page chrome / primary panel
-  -> moniker continues in the primary panel
-  -> user selects a tab
-  -> clear moniker
-  -> present selected GUI / Experience
-```
+   ↓
+load host manifest
+   ↓
+compose primary root through FSM_COS
+   ↓
+FSM_COS resolves 2102
+   ↓
+2102 declares 2110 Moniker dependency
+   ↓
+RuntimeAssembly contains the closed composition
+   ↓
+present startup Moniker
+   ↓
+activate primary Experience
+   ↓
+RuntimeAssembly is handed to the host
+   ↓
+**Current gap:** browser manifestation still consumes the transitional WebPage PageFSM/LivingGuiFsm runtime
+~~~
 
-The exact visual Living GUI lifecycle remains an important demonstration inside that larger Experience lifecycle. Its internal sequence is:
+The critical architectural point is:
 
-```text
-LIVING_GUI_IGNITION
-  -> LIVING_GUI_POPULATING
-       root grows
-       children root
-       children grow
-       reproduction continues
-  -> reproduction continues without a population cap
-  -> reveal moniker behind the living GUI
-  -> freeze only at the explicit Gravity boundary
-  -> start preallocated Gravity group
-  -> all GUI nodes fall away
-  -> begin three-second dissipating phase only after the last node falls
-  -> ease navigation/page chrome into existence
-```
+> Startup order is a presentation concern. Dependency order is an FSM_COS composition concern.
 
-## Non-negotiable architectural rules
+The host must not confuse the two by requesting the same dependency twice.
 
-1. The WebPage manifest describes the host, not the concrete Experience inventory.
-2. The Hub discovers MicroBundles/Experiences through the registry boundary.
-3. Idler and Flex are capabilities/categories, not special hardcoded classes.
-4. The first implementations are Pong as Idler and Living GUI as Flex; replacing either must not require rewriting the bootstrap contract.
-5. The Hub owns runtime lifecycle and the application heartbeat.
-6. Experiences expose process groups; they do not independently step the global runtime.
-7. Blazor components render authoritative Hub/FSM state; they do not become the state machine.
-8. FSM_API remains the execution mechanism for meaningful lifecycle/state behavior.
-9. Do not replace a working capability with a simpler implementation until the behavior has been located and preserved elsewhere.
-10. AI/Grammar/Protocol work remains retained future architecture, but the runtime must operate without it.
+## Current primary Experience
 
-## Current transitional implementation
+The current primary root is 2102 — LivingGuiExperienceMicroBundle.
 
-The branch still contains static `IdleExperienceCatalog`, `FlexExperienceCatalog`, and `WorkshopDemoBundle` scaffolding. These are not yet the final registry-driven content boundary.
+Its declared dependency is 2110 — MonikerMicroBundle.
 
-Do not delete them merely because they are hardcoded. First move their functionality into the Experience/MicroBundle/registry model, prove the replacement, and only then remove the obsolete implementation.
+The manifest names 2102. FSM_COS discovers 2110 through the MicroBundle dependency contract.
+
+## Current browser responsibilities
+
+WebPage owns:
+
+- fetching/parsing the host manifest;
+- providing the WebPage composition catalog;
+- consuming the RuntimeAssembly;
+- browser presentation;
+- navigation/chrome;
+- WebPage-only Deep Dive presentation.
+
+WebPage does not own:
+
+- FSM state-machine semantics;
+- FSM_COS dependency traversal;
+- FSM_COS arbitration;
+- reusable package implementation.
+
+## Current public navigation
+
+The navigation is intentionally small while this host is being stabilized.
+
+AnyApp is the current cross-host demonstration.
+
+The repository is the deeper learning resource.
+
+Future educational Experiences should be added through the Experience/manifest model rather than by turning the navigation menu into a static encyclopedia.
+
+## Transitional work
+
+The repository still contains historical and transitional code, including older first-contact/page-FSM paths and older demonstration scaffolding.
+
+Do not delete these by aesthetic judgment.
+
+Use:
+
+~~~text
+locate behavior
+  ↓
+identify owner
+  ↓
+preserve with tests
+  ↓
+replace
+  ↓
+prove
+  ↓
+remove duplicate
+~~~
+
+## Proof obligations
+
+Every architectural change must have executable evidence when practical.
+
+The active proof for this slice must establish:
+
+1. the manifest contains startup and running entries;
+2. the primary root is 2102;
+3. 2102 declares 2110 as an FSM_COS dependency;
+4. the composed RuntimeAssembly contains both;
+5. the browser transitions from Moniker to the primary Experience;
+6. CI build and tests pass.
+7. the functionality-preservation ledger remains green for every behavior being migrated.
 
 ## Important files
 
 | File | Responsibility |
 |---|---|
-| `WORKSHOP_RUNTIME_ARCHITECTURE.md` | Canonical host/manifest/registry/Hub workflow |
-| `EXPERIENCE_THEORY.md` | Experience definition and runtime contract |
-| `TheSingularityWorkshop/Workshop/MicroBundles/README.md` | MicroBundle lifecycle/addressing/provider theory |
-| `TheSingularityWorkshop/Workshop/Experiences/IExperience.cs` | Experience contract |
-| `TheSingularityWorkshop/Services/IdleExperienceCatalog.cs` | Transitional Idler catalog; replace through registry |
-| `TheSingularityWorkshop/Services/FlexExperienceCatalog.cs` | Transitional Flex catalog; replace through registry |
-| `TheSingularityWorkshop/Infrastructure/Hub/HubRuntime.cs` | Web host composition adapter for Hub |
-| `TheSingularityWorkshop/Infrastructure/Hub/WorkshopDemoBundle.cs` | Transitional Hub composition proof |
-| `TheSingularityWorkshop/Services/PageStateContext.cs` | Living population, critical mass, gravity state |
-| `TheSingularityWorkshop/Services/PageFSM.cs` | Transitional page/landing orchestration |
-| `TheSingularityWorkshop/Services/FSMManagerService.cs` | Application heartbeat |
-| `TheSingularityWorkshop/Pages/Home.razor` | Landing presentation adapter |
-| `TheSingularityWorkshop/Pages/LivingGui.razor` | Living GUI manifestation |
-| `SingularityHub.Abstractions/MicroBundleAddress.cs` | Ontology + integer variant address |
-| `SingularityHub/MicroBundleRegistry.cs` | Runtime uniqueness boundary |
-| `SingularityHub.Tests/IncrementalVersionTests.cs` | Visible incremental proof marker |
-| `AGENT_INCREMENTAL_RULE.md` | Mandatory change/proof rule |
+| LEARNING_PATH.md | Visitor/developer curriculum |
+| REPOSITORY_MAP.md | Source ownership and dependency map |
+| WORKSHOP_RUNTIME_ARCHITECTURE.md | Runtime boundary |
+| FSM_COS_USAGE.md | Operational composition guide |
+| TheSingularityWorkshop/Services/WorkshopExperienceService.cs | Manifest loading and primary composition |
+| TheSingularityWorkshop/Workshop/Composition/WorkshopCompositionCatalog.cs | FSM_COS catalog |
+| TheSingularityWorkshop/Workshop/MicroBundles/LivingGuiExperienceMicroBundle.cs | Primary root + Moniker dependency |
+| TheSingularityWorkshop/Workshop/MicroBundles/MonikerMicroBundle.cs | Canonical startup capability |
+| TheSingularityWorkshop/Pages/Home.razor | Browser manifestation; currently bridges to transitional runtime |
+| TheSingularityWorkshop/Layout/MainLayout.razor | Browser chrome |
+| SingularityHub.Tests/WebPageHostManifestTests.cs | Manifest/composition contract tests |
+| SingularityHub.Tests/IncrementalVersionTests.cs | Incremental proof ledger |
 
-## Registry direction
+## Mandatory completion loop
 
-The desired runtime boundary is:
+1. make the requested change;
+2. add or update meaningful test proof;
+3. build;
+4. run relevant tests;
+5. inspect visual behavior when presentation changes;
+6. verify CI;
+7. update authoritative documentation;
+8. leave master untouched unless promotion is explicitly requested.
 
-```text
-WebPage host manifest
-        |
-        v
-      Hub
-        |
-        v
-MicroBundle / Experience registry
-        |
-        +--> discover
-        +--> filter by capability
-        +--> select
-        +--> resolve version/dependencies
-        +--> load
-        +--> arbitrate
-        v
-Experience runtime
-        |
-        v
-FSM_API execution
-```
+Do not publish packages or releases without explicit approval.
 
-The registry may initially be local/test-backed. The architectural contract should not assume that it is. The eventual public catalog can live behind the same address and manifest boundary.
+## Function-preservation gate
 
-## AI direction
-
-AI is deliberately held for a later development phase. Keep the AI/Grammar/Protocol work and its documentation; do not make it a prerequisite for the landing runtime.
-
-The future pipeline is expected to feed deterministic commands/selections into the Experience/MicroBundle boundary rather than replacing Hub ownership of runtime semantics.
-
-## Functionality preservation ledger
-
-Before housekeeping removes or relocates code, use this matrix. The rule is **locate behavior -> identify boundary -> preserve with tests -> move/adapt -> document -> delete obsolete duplication**.
-
-| Area | Current implementation | Intended boundary | Status |
-|---|---|---|---|
-| Experience contract | `Workshop/Experiences/IExperience.cs` | Experience model | **Retain; evolve** |
-| Experience theory | `EXPERIENCE_THEORY.md` | Architectural contract | **Retain; reconcile documentation drift** |
-| MicroBundle contract/composition | `Workshop/MicroBundles/IMicroBundle.cs`, `MicroBundle.cs`, `MicroBundleContext.cs`, `MicroBundleManifestation.cs` | Focused runtime capability | **Retain; inspect** |
-| Provider boundary | `IMicroBundleProvider.cs`, `WebMicroBundleProvider.cs` | Provider/registry boundary | **Retain; inspect** |
-| Pong | `PongMicroBundle.cs` | First concrete Idler | **Retain; migrate selection into registry** |
-| Registry | `SingularityHub/MicroBundleRegistry.cs`, `MicroBundleAddress.cs` | Discovery/inventory | **Retain; make canonical** |
-| Idle catalog | `Services/IdleExperienceCatalog.cs` | Capability selection facade | **Transitional; preserve behavior before replacement** |
-| Flex catalog | `Services/FlexExperienceCatalog.cs` | Capability selection facade | **Transitional; preserve behavior before replacement** |
-| Demo bundle | `Infrastructure/Hub/WorkshopDemoBundle.cs` | Host bootstrap proof | **Transitional; retain until registry parity** |
-| Hub host runtime | `Infrastructure/Hub/HubRuntime.cs` | Host -> Hub lifecycle | **Retain; remove direct demo load after replacement** |
-| FSM manager | `Infrastructure/FSM/FSMManagerService.cs` | Host adapter to Hub scheduler | **Retain; reduce page ownership** |
-| Page FSM | `Infrastructure/FSM/PageFSM.cs` | Presentation/lifecycle adapter | **Transitional; preserve lifecycle semantics** |
-| Living GUI FSM/state | `Infrastructure/FSM/LivingGuiFsm.cs`, `PageStateContext.cs` | First concrete Flex runtime | **Retain; attach to Experience/Flex** |
-| Blazor landing/hosts | `Home.razor`, `IdleExperienceHost.razor`, `FlexExperienceHost.razor`, `WorkshopExperienceFeed.razor` | Presentation adapters | **Retain; remove hardcoded selection** |
-| Moniker lifecycle | Landing/PageFSM | Hub-selected Flex presentation state | **Preserve; move authority toward Hub** |
-| AI/Grammar/Protocol | Historical work/branches | Future deterministic producer pipeline | **Retain; deferred** |
-
-The concrete Experience tests and Living GUI runtime tests are the preservation anchors. No item above is a deletion candidate until its replacement behavior is proven.
-
-## Mandatory agent behavior
-
-Every meaningful repository change must:
-
-1. make the actual requested change;
-2. add/update an incremental visible unit-test/version proof;
-3. append the next sequential versioned proof to `IncrementalVersionTests.cs`;
-4. keep the assertion meaningful;
-5. report the commit SHA and version;
-6. verify the current CI/test result before claiming success.
-
-Do not change `master`.
+See [`FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md). The active refactor must preserve the existing Living GUI behavior—100-slot population, independent organism FSMs on one processing group, travel/planting/growth/reproduction/reduction, deterministic target distribution, and gravity—while moving its authority out of WebPage.

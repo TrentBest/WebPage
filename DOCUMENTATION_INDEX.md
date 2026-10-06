@@ -1,63 +1,69 @@
 # WebPage Documentation Index
 
-> **Documentation is engineering memory. It describes the machine we actually have, the architecture we are deliberately moving toward, and the experiments we have not finished.**
+> Documentation is engineering memory. It should teach the machine we have, the boundaries we are changing, and the proof behind both.
+
+## Package ownership
+
+- [PACKAGE_ECOSYSTEM.md](PACKAGE_ECOSYSTEM.md) — map each active capability to the Workshop package that owns it and identify WebPage-only responsibilities.
 
 ## Start here
 
-| Document | Purpose | Authority |
-|---|---|---|
-| README.md | Public repository entry point and current product story | public orientation |
-| DOCUMENTATION_STANDARD.md | Rules for writing and maintaining Workshop documentation | documentation policy |
-| WORKSHOP_RUNTIME_ARCHITECTURE.md | Current WebPage runtime ownership and FSM_COS handoff | runtime contract |
-| FSM_COS_USAGE.md | How WebPage consumes FSM_COS and how reusable functionality is extracted | operational usage |
-| WEBPAGE_EXPERIENCE_ARCHITECTURE.md | What an Experience means in this browser proving ground | WebPage product contract |
-| WORKSHOP_OPENING_EXPERIENCE.md | Current first-contact sequence | presentation contract |
-| EXPERIENCE_THEORY.md | Experience vocabulary and composition model | domain theory |
-| MICROBUNDLE_ARBITRATION_MAP.md | Installation and arbitration flow | composition explanation |
-| DEEP_DIVE_PROVIDER_ARCHITECTURE.md | WebPage-only Deep Dive provider boundary | host capability contract |
-| CURRENT_VERTICAL_SLICE.md | Current implementation state, transitional work, and proof obligations | engineering handoff |
-| PUBLIC_WORKSHOP_TABS.md | Explore/Create/Education/MadMen/About/Consult information architecture | public UX direction |
+| Order | Document | Purpose |
+|---:|---|---|
+| 1 | README.md | Public purpose and architectural orientation |
+| 2 | LEARNING_PATH.md | Visitor and developer curriculum |
+| 3 | REPOSITORY_MAP.md | Source-tree ownership and dependency direction |
+| 4 | WORKSHOP_RUNTIME_ARCHITECTURE.md | Runtime ownership and host boundary |
+| 5 | FSM_COS_USAGE.md | Concrete WebPage → FSM_COS integration |
+| 6 | EXPERIENCE_THEORY.md | Experience vocabulary and composition model |
+| 7 | MICROBUNDLE_ARBITRATION_MAP.md | Loading and arbitration flow |
+| 8 | WORKSHOP_OPENING_EXPERIENCE.md | Browser perception/startup contract |
+| 9 | DEEP_DIVE_PROVIDER_ARCHITECTURE.md | WebPage-only educational provider boundary |
+| 10 | CURRENT_VERTICAL_SLICE.md | Active implementation and proof obligations |
+| 11 | DOCUMENTATION_STANDARD.md | Documentation maintenance rules |
 
-## How to read the architecture
+## Read architecture as a chain
 
-Use the documents in this order when investigating a feature:
-
-```text
+~~~text
 WHAT DOES THE VISITOR SEE?
           ↓
 WHAT EXPERIENCE IS RUNNING?
           ↓
-WHICH MICROBUNDLES ARE COMPOSED?
+WHICH MICROBUNDLES ARE REQUESTED?
           ↓
-HOW DOES THIS HOST USE FSM_COS?
+WHAT DEPENDENCIES DOES FSM_COS RESOLVE?
           ↓
-WHAT DOES THE WEBPAGE HOST OWN AFTER HANDOFF?
+WHAT DOES RuntimeAssembly CONTAIN?
+          ↓
+WHAT DOES WEBPAGE PRESENT?
           ↓
 WHAT PROVES THE CLAIM?
-```
+~~~
 
-Do not infer runtime ownership from where a visual element happens to be rendered.
+Do not infer ownership from the file that happens to render something.
 
-## Current versus future
+## Current / Direction / Future
 
-Every document should clearly separate:
+Every authoritative document must separate:
 
-- **Current** — behavior or code that exists now.
-- **Direction** — architecture we are deliberately moving toward.
-- **Future** — useful ideas that are not yet implemented.
+- Current — code or behavior that exists now.
+- Direction — architecture actively being implemented.
+- Future — not part of the current contract.
 
-An implementation detail must not be presented as a permanent contract merely because it exists today.
+Historical experiments belong in history or their owning repository, not in current architecture claims.
 
-## Host boundaries
+## Package boundary
 
-WebPage is the browser proving ground. It is not the canonical owner of every Workshop concept.
+WebPage documentation should explain how the host consumes a package.
 
-Shared runtime/domain repositories should remain independent of WebPage. Host-specific educational or presentation behavior belongs here only when it is explicitly a WebPage capability. Read FSM_COS_USAGE.md for the concrete integration boundary.
+The package repository should explain the package's canonical API and theory.
 
-## Maintenance
+This repository should link to FSM_API, FSM_COS, MicroBundleDomain, GUI packages, and other Workshop packages instead of copying their manuals.
 
-When code changes ownership or behavior, update the smallest set of authoritative documents that describe that contract. Do not copy the same architecture into five documents just to make it appear documented.
+## Maintenance rule
 
-If two documents disagree, reconcile them rather than choosing whichever sounds newer.
+When code changes ownership or behavior, update the smallest authoritative set of documents that describes that contract.
+
+If two documents disagree, reconcile them. Do not preserve contradictory architecture because both documents are old.
 
 *The documentation should let the machine explain itself.*

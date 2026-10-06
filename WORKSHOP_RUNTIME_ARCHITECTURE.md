@@ -1,231 +1,162 @@
 # Workshop Runtime Architecture
 
-> **This document describes the runtime that exists in WebPage today.**
-
-WebPage is a browser proving ground. Reusable behavior is deliberately moving out of the page and into independently owned packages and composition participants.
+> This document describes the runtime boundary WebPage is proving.
 
 ## Ownership
 
 ~~~text
 FSM_API
-   └── deterministic state-machine behavior
+   └── deterministic state-machine execution
 
 MicroBundleDomain
-   └── MicroBundle runtime contract
+   └── MicroBundle contract and meaning
 
 FSM_COS
-   └── composition / dependency closure / arbitration / convergence
+   └── dependency closure / loading / arbitration / convergence / RuntimeAssembly
 
-Experience layer
-   └── describes what the host wants to compose
+Experience
+   └── describes the environment being requested
 
 WebPage
-   ├── visitor interaction
-   ├── browser presentation
-   ├── discovery / authoring UX
-   └── proving-ground integration
+   ├── loads the host manifest
+   ├── selects startup and primary Experience entries
+   ├── supplies the FSM_COS catalog
+   ├── consumes RuntimeAssembly
+   └── manifests the result in the browser
 ~~~
 
-> **A visual element being rendered by WebPage does not make WebPage the owner of the underlying capability.**
+## Current startup contract
 
-## Current first-contact runtime
+The host manifest is loaded before the running Experience is presented.
 
 ~~~text
-FirstContact
-    ↓
-visitor explicitly requests entry
-    ↓
-select LivingGuiExperience
-    ↓
-RuntimeManifest
-    ↓
-FSM_COS
-    ├── resolve Living GUI
-    ├── resolve Moniker dependency
-    ├── load
-    ├── arbitrate
-    └── converge
-    ↓
-RuntimeAssembly
-    ↓
-Page / Living GUI runtime
-    ↓
-population threshold
-    ↓
-gravity
-    ↓
-Moniker presentation
-    ↓
-Workshop navigation
+webpage-host.manifest.json
+        |
+        +--> startup[]
+        |      |
+        |      +--> Workshop Moniker
+        |
+        +--> running[]
+               |
+               +--> Living GUI
+                      |
+                      +--> Moniker dependency
 ~~~
 
-The Experience is not composed during service construction. It is composed only after explicit visitor entry.
+The manifest separates presentation startup from the primary running Experience.
 
-## Host composition catalog
+The current primary root is MicroBundle 2102.
 
-WorkshopCompositionCatalog implements the FSM_COS catalog boundary.
+## FSM_COS composition
 
-It currently supplies the WebPage composition participants, including Moniker, Living GUI Experience, Protocol, Grammar, and AI Exchange.
-
-The catalog is host infrastructure. FSM_COS does not know whether participants came from an in-memory dictionary, generated registry, cache, or repository-backed resolver.
-
-## Experience to manifest
-
-WorkshopExperienceService owns the browser-side transition from selected Experience to composition request.
-
-The essential operation is:
+WebPage requests only the primary root:
 
 ~~~csharp
 RuntimeAssembly = _compositionSystem.Execute(
     new RuntimeManifest(
-        RuntimeId: SelectedExperience.Id,
-        Bundles: SelectedExperience.MicroBundleIds
+        RuntimeId: 1,
+        Bundles: PrimaryManifestExperience.MicroBundleIds
             .Select(BundleRequest.Unconfigured)
             .ToArray()));
 ~~~
 
-The host supplies the roots. FSM_COS derives the reachable composition.
-
-## Dependency closure
-
-The current Living GUI dependency is:
+The primary MicroBundle declares its own dependency:
 
 ~~~text
-LivingGuiExperience
-        ↓
-LivingGuiExperienceMicroBundle
-        └── Moniker
+2102 LivingGuiExperienceMicroBundle
+        |
+        +--> 2110 MonikerMicroBundle
 ~~~
 
-The Experience names the root. The MicroBundle names its dependency. FSM_COS closes the graph.
+FSM_COS closes that graph.
 
-If a dependency cannot be resolved, composition must fail rather than silently inventing a substitute.
+WebPage does not manually recreate dependency traversal and does not request the Moniker as an unrelated second root.
 
-## Installation versus execution
+## RuntimeAssembly versus execution
 
-A successful RuntimeAssembly means:
+A RuntimeAssembly proves composition:
 
 - requested roots were resolved;
-- dependencies were closed;
-- reachable capabilities were installed;
+- dependency closure succeeded;
+- reachable capabilities were loaded;
 - arbitration converged.
 
-It does not mean the browser has executed the Experience.
+It does not mean the browser has finished executing the Experience.
 
-After assembly, WebPage performs its host-specific transition into Living GUI presentation and FSM_API-driven behavior.
+After assembly:
 
 ~~~text
-composition complete
-        ↓
 RuntimeAssembly
-        ↓
-WebPage runtime
-        ↓
-FSM_API behavior
-        ↓
+      ↓
+primary Experience activation
+      ↓
+**current:** transitional WebPage PageFSM/LivingGuiFsm execution
+      ↓
 browser manifestation
+
+**target:** canonical Experience/MicroBundle runtime → FSM_API process groups → browser manifestation
 ~~~
 
-## Runtime state ownership
+## Hub ownership
 
-| State / service | Responsibility |
-|---|---|
-| WorkshopExperienceService | first-contact and Experience selection/composition |
-| RuntimeAssembly | assembled composition result |
-| PageFSM | page-level presentation lifecycle |
-| PageStateContext | Living GUI state/data |
-| FSM_API | deterministic FSM execution machinery |
-| Blazor components | browser manifestation |
+The WebPage Hub remains a host orchestration boundary.
 
-The semantic owner matters more than the exact class name.
+It is not fabricated as another FSM_COS Experience merely to create a navigation destination.
 
-## MicroBundles as reusable participants
+The running Experience is the manifest's primary Experience.
 
-WebPage has local composition participants because this repository is still a proving ground.
+The Hub may provide orchestration, arbitration, discovery, and presentation infrastructure around that Experience without changing the Experience identity.
 
-The extraction rule is:
+## Package-first implementation rule
+
+WebPage may contain proving-ground MicroBundles and host adapters.
+
+When a capability is reusable:
 
 ~~~text
-local experiment
-     ↓
-independent responsibility
-     ↓
-package/domain ownership
-     ↓
-MicroBundle when the composition contract fits
+WebPage experiment
+      ↓
+identify canonical owner
+      ↓
+extract/package
+      ↓
+test package
+      ↓
+WebPage consumes package
+      ↓
+browser proves integration
 ~~~
 
-A package is not automatically a MicroBundle. A MicroBundle is a composition participant whose contract is owned by the appropriate domain package.
-
-## What this architecture protects
-
-### Composition is not presentation
-
-FSM_COS should not know how a browser presents an assembly.
-
-### Reusable capability is not WebPage infrastructure
-
-If another host can consume a capability, its implementation should be considered for extraction.
-
-### Experience identity is not routing
-
-A Deep Dive route is a WebPage presentation mechanism, not the identity model.
-
-### Proven behavior survives extraction
-
-When code moves from WebPage to a package, the behavior that justified the extraction moves with tests and documentation.
+FSM_API and FSM_COS are consumed as NuGet packages. Reusable Workshop functionality should follow the same direction.
 
 ## Verification loop
 
 ~~~text
-change code
-   ↓
+change
+  ↓
 build
-   ↓
-run tests
-   ↓
-observe behavior
-   ↓
-update theory / usage documentation
-   ↓
-run CI
-   ↓
-call the boundary complete
+  ↓
+tests
+  ↓
+observe
+  ↓
+documentation
+  ↓
+CI
+  ↓
+boundary complete
 ~~~
 
-## Current invariant
+The proof must agree with the documentation.
 
-~~~text
-Experience
-   ↓
-RuntimeManifest
-   ↓
-FSM_COS
-   ↓
-RuntimeAssembly
-   ↓
-WebPage host
-   ↓
-FSM_API + browser manifestation
-~~~
+## Deep Dive boundary
 
-> **WebPage proves the architecture. It should not quietly become the architecture.**
+A Deep Dive is a WebPage educational capability.
 
-## Optional WebPage-only providers
+It may inspect a composed Experience and explain it, but shared runtime packages must not depend upward on WebPage's Deep Dive provider.
 
-MicroBundles are provider collections. A composed MicroBundle may expose optional providers to the host that is executing it. WebPage uses one such optional capability: IDeepDiveProvider.
+> WebPage proves the architecture. It should not quietly become the architecture.
 
-The WebPage acquisition pattern is:
+## Important current-state distinction
 
-~~~csharp
-foreach (var microBundle in microBundles)
-{
-    var provider = microBundle.TryGetProvider<IDeepDiveProvider>();
-    if (provider is not null)
-        return provider.Execute(experience, microBundles);
-}
-~~~
-
-IDeepDiveProvider is deliberately defined inside WebPage. FSM_COS, MicroBundleDomain, AnyApp, and other runtime hosts do not depend on it. Ontology and runtime identity remain portable; the Workshop's educational Deep Dive remains a WebPage capability.
-
-A native host that wants the Deep Dive should hand the Experience identity to the user's default browser and open /deep-dive/{ExperienceId}. Browser-tab reuse is host/browser-specific and cannot be promised as a portable OS primitive.
+The RuntimeAssembly is currently a real composition artifact, but it is not yet the sole source of Living GUI execution state. The active WebPage still contains a transitional PageFSM/LivingGuiFsm implementation with extensive behavior tests. That implementation is migration debt and must be replaced only after the behavior contract in [`FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md) is proven under the canonical package boundary.

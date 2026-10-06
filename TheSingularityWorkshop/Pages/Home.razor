@@ -4,20 +4,41 @@
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
 @implements IDisposable
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Rendering
 @using TheSingularityWorkshop.Services
 <PageTitle>The Singularity Workshop</PageTitle>
 
 @BuildRootGui()
 
 <style>
+.manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker div:nth-child(1){color:#00a8ff}.manifest-moniker div:nth-child(2){color:#ff2cff}.manifest-moniker div:nth-child(3){color:#ff7a00}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
+.manifest-hub{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(1rem,4vw,4rem);overflow:auto;background:radial-gradient(circle at 18% 28%,rgba(0,168,255,.10),transparent 28%),radial-gradient(circle at 82% 72%,rgba(255,44,255,.07),transparent 30%),#020711}
+.manifest-hub-shell{width:min(1100px,100%);display:grid;gap:clamp(1rem,2vw,2rem)}
+.manifest-hub-header{display:flex;align-items:end;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.manifest-hub-kicker{font-size:clamp(.65rem,1.2vw,.9rem);letter-spacing:.2em;color:#6d8795}
+.manifest-hub-title{margin:.25rem 0 0;font-size:clamp(2rem,6vw,5rem);line-height:.9;letter-spacing:.04em}
+.manifest-hub-version{font-size:.7rem;letter-spacing:.14em;color:#536873}
+.manifest-hub-tabs{display:flex;gap:.75rem;overflow:auto;padding:.25rem 0}
+.manifest-hub-tab{border:1px solid rgba(0,234,255,.45);border-radius:999px;padding:.65rem 1.1rem;background:rgba(0,234,255,.08);color:#fff;font:700 .8rem Consolas,'Courier New',monospace;letter-spacing:.12em;white-space:nowrap}
+.manifest-hub-card{position:relative;border:1px solid rgba(0,234,255,.18);border-radius:1.25rem;padding:clamp(1.25rem,3vw,2.5rem);background:linear-gradient(145deg,rgba(10,25,38,.94),rgba(3,8,17,.94));box-shadow:0 30px 100px rgba(0,0,0,.35);overflow:hidden}
+.manifest-hub-card::before{content:"";position:absolute;inset:-50%;background:radial-gradient(circle,rgba(0,234,255,.07),transparent 35%);animation:hubPulse 5s ease-in-out infinite;pointer-events:none}
+.manifest-hub-card>*{position:relative}
+.manifest-hub-status{display:flex;align-items:center;gap:.6rem;font-size:.7rem;letter-spacing:.16em;color:#83a5b4}
+.manifest-hub-pulse{width:.55rem;height:.55rem;border-radius:50%;background:#00eaff;box-shadow:0 0 16px #00eaff;animation:hubDot 1.8s ease-in-out infinite}
+.manifest-hub-description{max-width:75ch;margin:1.25rem 0 1.5rem;color:#c3d0d6;font-size:clamp(1rem,1.7vw,1.25rem);line-height:1.65}
+.manifest-hub-actions{display:flex;gap:.8rem;flex-wrap:wrap}
+.manifest-hub-action{display:inline-flex;align-items:center;justify-content:center;min-height:3.7rem;padding:.8rem 1.5rem;border-radius:.8rem;border:1px solid rgba(0,234,255,.5);background:linear-gradient(135deg,rgba(0,234,255,.18),rgba(0,168,255,.08));color:#fff;text-decoration:none;font:900 .95rem Consolas,'Courier New',monospace;letter-spacing:.1em;transition:transform .2s ease,box-shadow .2s ease}
+.manifest-hub-action:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(0,234,255,.14)}
+.manifest-hub-secondary{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.04)}
+.manifest-hub-note{margin-top:1rem;color:#718792;font-size:.75rem;line-height:1.5}
+@@keyframes hubPulse{0%,100%{transform:scale(.8);opacity:.25}50%{transform:scale(1);opacity:.55}}
+@@keyframes hubDot{0%,100%{transform:scale(.8);opacity:.55}50%{transform:scale(1.25);opacity:1}}
 .landing-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;overflow:hidden;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711}
 .landing-aura{position:absolute;width:60vw;height:60vw;border:1px solid rgba(0,234,255,.08);border-radius:50%;box-shadow:0 0 100px rgba(0,234,255,.04);pointer-events:none}
 </style>
 
 @code {
-    private readonly System.Timers.Timer heartbeat = new(50);
     private bool firstRender;
-    private FirstContactFsm.FirstContactSoundCue lastSoundCue = FirstContactFsm.FirstContactSoundCue.None;
 
     private RenderFragment BuildRootGui()
     {
@@ -29,17 +50,20 @@
 
     private RenderFragment BuildExperienceContent() => builder =>
     {
-        if (Experience.CurrentState == "FirstContact")
+        if (Experience.CurrentState == "Moniker")
         {
-            builder.OpenComponent<FirstContactView>(0);
-            builder.AddAttribute(1,"State",Experience.FirstContact.CurrentState);
-            builder.AddAttribute(2,"Ticks",Experience.FirstContact.StateTicks);
-            builder.AddAttribute(3,"PresentationProgress",Experience.FirstContact.PresentationProgress);
-            builder.AddAttribute(4,"StatementOpacity",Experience.FirstContact.StatementOpacity);
-            builder.AddAttribute(5,"QuestionOpacity",Experience.FirstContact.QuestionOpacity);
-            builder.AddAttribute(6,"GatewayBreathValue",Experience.FirstContact.GatewayBreath);
-            builder.AddAttribute(7,"OnEntryRequested",EventCallback.Factory.Create(this,EnterWorkshop));
-            builder.CloseComponent();
+            builder.OpenElement(0, "section");
+            builder.AddAttribute(1, "class", "manifest-moniker");
+            builder.AddAttribute(2, "aria-label", "The Singularity Workshop");
+            builder.OpenElement(3, "div"); builder.AddContent(4, "THE"); builder.CloseElement();
+            builder.OpenElement(5, "div"); builder.AddContent(6, "SINGULARITY"); builder.CloseElement();
+            builder.OpenElement(7, "div"); builder.AddContent(8, "WORKSHOP"); builder.CloseElement();
+            builder.OpenElement(9, "small"); builder.AddContent(10, $"MANIFEST // {Experience.Manifest?.ManifestId ?? "UNKNOWN"}"); builder.CloseElement();
+            builder.CloseElement();
+        }
+        else if (Experience.CurrentState == "Hub")
+        {
+            BuildManifestHub(builder);
         }
         else if (Experience.CurrentState is "ExperienceLoading" or "LivingGui" or "CriticalMass")
         {
@@ -49,53 +73,120 @@
             if (FSM.CurrentState == PageFSM.Running)
             {
                 builder.OpenComponent<ForgeProofView>(9);
-                builder.AddAttribute(10,"Experience",Experience);
+                builder.AddAttribute(10, "Experience", Experience);
                 builder.CloseComponent();
             }
         }
     };
 
+    private void BuildManifestHub(RenderTreeBuilder builder)
+    {
+        var manifest = Experience.Manifest;
+        if (manifest is null || manifest.Hub.Count == 0)
+        {
+            builder.OpenElement(0, "section");
+            builder.AddAttribute(1, "class", "manifest-hub");
+            builder.OpenElement(2, "div");
+            builder.AddAttribute(3, "class", "manifest-hub-card");
+            builder.OpenElement(4, "div");
+            builder.AddContent(5, "THE WORKSHOP MANIFEST HAS NO HUB DESTINATIONS.");
+            builder.CloseElement();
+            builder.CloseElement();
+            builder.CloseElement();
+            return;
+        }
+
+        builder.OpenElement(0, "section");
+        builder.AddAttribute(1, "class", "manifest-hub");
+        builder.OpenElement(2, "div");
+        builder.AddAttribute(3, "class", "manifest-hub-shell");
+
+        builder.OpenElement(4, "header");
+        builder.AddAttribute(5, "class", "manifest-hub-header");
+        builder.OpenElement(6, "div");
+        builder.OpenElement(7, "div"); builder.AddAttribute(8, "class", "manifest-hub-kicker"); builder.AddContent(9, "THE SINGULARITY WORKSHOP // HUB"); builder.CloseElement();
+        builder.OpenElement(10, "h1"); builder.AddAttribute(11, "class", "manifest-hub-title"); builder.AddContent(12, "WELCOME"); builder.CloseElement();
+        builder.CloseElement();
+        builder.OpenElement(13, "div"); builder.AddAttribute(14, "class", "manifest-hub-version"); builder.AddContent(15, $"MANIFEST {manifest.ManifestId} // {manifest.Version}"); builder.CloseElement();
+        builder.CloseElement();
+
+        builder.OpenElement(16, "nav");
+        builder.AddAttribute(17, "class", "manifest-hub-tabs");
+        var sequence = 20;
+        foreach (var item in manifest.Hub)
+        {
+            builder.OpenElement(sequence++, "span");
+            builder.AddAttribute(sequence++, "class", "manifest-hub-tab");
+            builder.AddContent(sequence++, item.Name.ToUpperInvariant());
+            builder.CloseElement();
+        }
+        builder.CloseElement();
+
+        foreach (var item in manifest.Hub)
+        {
+            builder.OpenElement(sequence++, "article");
+            builder.AddAttribute(sequence++, "class", "manifest-hub-card");
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "manifest-hub-status");
+            builder.OpenElement(sequence++, "span"); builder.AddAttribute(sequence++, "class", "manifest-hub-pulse"); builder.CloseElement();
+            builder.AddContent(sequence++, $"MANIFEST DESTINATION // {item.Kind.ToUpperInvariant()}");
+            builder.CloseElement();
+
+            builder.OpenElement(sequence++, "h2"); builder.AddContent(sequence++, item.Name); builder.CloseElement();
+            builder.OpenElement(sequence++, "p"); builder.AddAttribute(sequence++, "class", "manifest-hub-description"); builder.AddContent(sequence++, item.Description); builder.CloseElement();
+
+            builder.OpenElement(sequence++, "div"); builder.AddAttribute(sequence++, "class", "manifest-hub-actions");
+            builder.OpenElement(sequence++, "a");
+            builder.AddAttribute(sequence++, "class", "manifest-hub-action");
+            builder.AddAttribute(sequence++, "href", item.Route ?? item.DeploymentUrl ?? item.AboutUrl);
+            if (string.IsNullOrWhiteSpace(item.Route))
+            {
+                builder.AddAttribute(sequence++, "target", "_blank");
+                builder.AddAttribute(sequence++, "rel", "noopener noreferrer");
+            }
+            builder.AddContent(sequence++, string.IsNullOrWhiteSpace(item.Route) ? "OPEN DESTINATION" : "ENTER EXPERIENCE");
+            builder.CloseElement();
+
+            builder.OpenElement(sequence++, "a");
+            builder.AddAttribute(sequence++, "class", "manifest-hub-action manifest-hub-secondary");
+            builder.AddAttribute(sequence++, "href", item.AboutUrl);
+            builder.AddContent(sequence++, "ABOUT THE WORKSHOP");
+            builder.CloseElement();
+            builder.CloseElement();
+
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "manifest-hub-note");
+            builder.AddContent(sequence++, string.IsNullOrWhiteSpace(item.Route)
+                ? "This destination is externally hosted and opens only when the visitor chooses it."
+                : "This destination is hosted by the Workshop and is composed from the Experience's MicroBundle hierarchy.");
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+    }
+
     protected override void OnInitialized()
     {
-        heartbeat.Elapsed += Tick;
         Experience.StateChanged += ExperienceChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(!firstRender || this.firstRender)return;
-        this.firstRender=true;
-        var returningVisitor=await JS.InvokeAsync<bool>("interop.workshopVisited");
-        Experience.Initialize(returningVisitor);
-        heartbeat.Start();
-        if(Experience.CurrentState=="FirstContact")await JS.InvokeVoidAsync("interop.firstContactSound","pressure");
-    }
+        if (!firstRender || this.firstRender)
+            return;
 
-    private async Task EnterWorkshop()
-    {
-        await JS.InvokeVoidAsync("interop.markWorkshopVisited");
-        Experience.RequestEntry();
-    }
-
-    private void Tick(object? sender,System.Timers.ElapsedEventArgs e)
-    {
-        if(!Experience.IsInitialized)return;
-        Experience.Tick();
-        var cue=Experience.FirstContact.LastSoundCue;
-        if(cue!=lastSoundCue){lastSoundCue=cue;_=InvokeAsync(()=>JS.InvokeVoidAsync("interop.firstContactSound",cue.ToString()));}
-        _=InvokeAsync(StateHasChanged);
+        this.firstRender = true;
+        var returningVisitor = await JS.InvokeAsync<bool>("interop.workshopVisited");
+        await Experience.InitializeAsync(returningVisitor);
     }
 
     private void ExperienceChanged()
-    {
-        if (Experience.CurrentState == "LivingGui" && FSM.CurrentState == PageFSM.Gateway)
-            FSM.RequestEnter();
-
-        _ = InvokeAsync(StateHasChanged);
-    }
+        => _ = InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
-        heartbeat.Stop(); heartbeat.Elapsed-=Tick; Experience.StateChanged-=ExperienceChanged; heartbeat.Dispose(); Experience.Dispose();
+        Experience.StateChanged -= ExperienceChanged;
     }
 }

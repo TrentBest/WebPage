@@ -1,12 +1,13 @@
 using TheSingularityWorkshop.FSM_COS;
+using DomainMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
 using TheSingularityWorkshop.Workshop.MicroBundles;
-using CosMicroBundle = TheSingularityWorkshop.FSM_COS.IMicroBundle;
+
 
 namespace TheSingularityWorkshop.Workshop.Composition;
 
 public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
 {
-    private readonly IReadOnlyDictionary<ulong, CosMicroBundle> _bundles;
+    private readonly IReadOnlyDictionary<ulong, DomainMicroBundle> _bundles;
 
     public WorkshopCompositionCatalog()
     {
@@ -16,9 +17,9 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
         var moniker = new MonikerMicroBundle();
         var livingGui = new LivingGuiExperienceMicroBundle();
 
-        _bundles = new Dictionary<ulong, CosMicroBundle>
+        _bundles = new Dictionary<ulong, DomainMicroBundle>
         {
-            [moniker.CosDescriptor.Id] = moniker,
+            [moniker.Descriptor.Id] = moniker,
             [livingGui.Id] = livingGui,
             [protocol.Id] = protocol,
             [grammar.Id] = grammar,
@@ -26,6 +27,6 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
         };
     }
 
-    public bool TryResolve(ulong bundleId, out CosMicroBundle? bundle) =>
+    public bool TryResolve(ulong bundleId, out DomainMicroBundle? bundle) =>
         _bundles.TryGetValue(bundleId, out bundle);
 }

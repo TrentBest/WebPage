@@ -1,4 +1,4 @@
-using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 
 namespace TheSingularityWorkshop.Workshop.DeepDive;
 
@@ -17,7 +17,7 @@ public interface IWebPageProviderSource
 public static class WebPageProviderExtensions
 {
     public static T? TryGetProvider<T>(
-        this IMicroBundle microBundle)
+        this TheSingularityWorkshop.MicroBundleDomain.IMicroBundle microBundle)
         where T : class
         => microBundle is IWebPageProviderSource source
             ? source.TryGetProvider<T>()

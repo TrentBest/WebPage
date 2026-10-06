@@ -4,6 +4,7 @@
 @inject HubRuntime Runtime
 @inject FSMManagerService FSM
 @inject NavigationManager Navigation
+@inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 
 <PageTitle>Singularity Hub // Living Presentation</PageTitle>
 
@@ -60,7 +61,12 @@
             <div class="actions">
                 <button class="primary" @onclick="RunAgain">REBUILD PRESENTATION</button>
                 <button class="secondary" @onclick="ResetProfile">RESET PARAMETERS</button>
+                <button class="secondary" @onclick="DeepDiveRestart">DEEP DIVE // RESTART FROM MANIFEST</button>
             </div>
+            @if (Experience.IsDeepDive)
+            {
+                <p class="deep-dive-banner">DEEP DIVE ACTIVE // MANIFEST RESTART // TELEMETRY ENABLED</p>
+            }
             <p class="warning">Changing the profile does not rewrite the current organisms. REBUILD starts a fresh runtime with the selected parameters.</p>
         </div>
 
@@ -105,7 +111,7 @@ input[type=range]{width:100%;accent-color:#00eaff}
 button{font:inherit;cursor:pointer;padding:.75rem 1rem;border:1px solid rgba(0,234,255,.35)}
 .primary{background:#00eaff;color:#020711}
 .secondary{background:transparent;color:#eefcff}
-.warning{font-size:.72rem}
+.warning{font-size:.72rem}.deep-dive-banner{font-size:.68rem;letter-spacing:.13em;color:#52e05a}
 .flow{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;padding:1rem 0;margin:1rem 0;border-block:1px solid rgba(0,234,255,.12)}
 .flow span{font-size:.72rem;letter-spacing:.08em}.flow i{opacity:.4}
 dl{display:grid;grid-template-columns:1fr auto;gap:.65rem;font-size:.8rem}
@@ -124,5 +130,11 @@ dt{opacity:.55}dd{margin:0}
     private void ResetProfile()
     {
         Profile.Reset();
+    }
+
+    private async Task DeepDiveRestart()
+    {
+        await Experience.RestartFromManifestAsync(true);
+        Navigation.NavigateTo("/");
     }
 }

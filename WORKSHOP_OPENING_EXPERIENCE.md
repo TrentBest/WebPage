@@ -1,225 +1,99 @@
 # Workshop Opening Experience
 
-The public landing page is the Workshop's **perception boundary**.
+The public landing page is the Workshop's perception boundary.
 
-The current gateway is functional: it presents the visitor with a breathing identity control and an advisory before entering the runtime. That is not yet the intended opening experience.
+It is also the first practical lesson in how the architecture works.
 
-The next presentation layer is deliberately **show, do not explain**.
+## Current opening contract
 
-## The problem
+The host manifest is loaded first.
 
-A visitor arriving at the URL does not yet know why they should care.
+~~~text
+WEBPAGE BOOT
+   ↓
+manifest
+   ↓
+primary composition through FSM_COS
+   ↓
+startup Moniker
+   ↓
+primary running Experience
+   ↓
+Living GUI
+~~~
 
-A large `ENTER THE WORKSHOP` button is an invitation, but it is not a proposition. A warning card that explains implementation details is interesting to an engineer but does not answer the visitor's immediate question:
+The manifest currently contains one startup Moniker and one primary running Experience.
 
-> **What is this, and why should I enter?**
+The model permits multiple startup Experiences. They are presentation surfaces. The primary running Experience remains a separate manifest concern.
 
-The opening must create curiosity before it asks for commitment.
+## Why this matters
 
-## Current behavior
+The Moniker is visible first, but WebPage does not manually compose the Moniker as an unrelated root.
 
-The implementation on `development` is the source of truth for the opening sequence. The current WebPage behaves as follows:
+The primary root is LivingGuiExperienceMicroBundle 2102.
 
-```text
-LABEL 1
-   |
-   v
-LABEL 2
-   |
-   v
-ENTER THE WORKSHOP + SYSTEM ADVISORY
-   |
-   | visitor explicitly clicks
-   v
-ENTRY PERMISSION
-   |
-   v
-FSM_COS COMPOSES THE SELECTED EXPERIENCE
-   |
-   +--> resolve Living GUI MicroBundle
-   +--> resolve its canonical Moniker dependency
-   |
-   v
-LIVING GUI RUNTIME
-   |
-   | organisms grow and reproduce independently
-   v
-POPULATION THRESHOLD
-   |
-   v
-GRAVITY
-   |
-   | living GUI population falls away
-   v
-MONIKER REVEALED / PRESENTATION HANDOFF
-   |
-   | approximately three seconds
-   v
-WORKSHOP HUB / NAVIGATION
-```
+That MicroBundle declares MonikerMicroBundle 2110 as a dependency.
 
-The opening therefore proves a real composition boundary before the visitor reaches the Workshop hub. The Living GUI is not a CSS-only animation: the page-level runtime is started only after the selected Experience has been composed successfully.
+Therefore:
 
-The current implementation is intentionally a **WebPage proving-ground experience**. It should be documented as behavior that exists today, not as a promise about another host or a future world model.
+~~~text
+manifest
+   ↓
+2102
+   ↓
+FSM_COS dependency closure
+   ↓
+2110
+   ↓
+RuntimeAssembly
+   ↓
+Moniker presentation
+   ↓
+Living GUI execution
+~~~
 
-The visitor should encounter a short, authored sequence of visual evidence rather than a paragraph of product explanation.
+This is an architectural demonstration, not just a startup animation.
 
-The design principle is:
+## FSM_API presentation rule
 
-> **Do not spend the visitor's attention explaining the Workshop when the Workshop can demonstrate itself.**
+Meaningful lifecycle behavior belongs to FSM_API.
 
-A picture communicates more than prose in the right context. A moving, timed, spatial, and auditory manifestation can communicate more than a static picture.
+GUI builders describe semantic presentation.
 
-## Shock and awe, responsibly
+CSS and browser APIs manifest that presentation.
 
-"Shock and awe" here means **presentation intensity**, not manipulation.
+~~~text
+FSM_API
+   ↓
+state / timing / lifecycle
 
-The opening may use:
+GUI builder
+   ↓
+semantic structure
 
-- scale changes;
-- synchronized motion;
-- strong typography;
-- spatial depth;
-- rapidly changing manifestations;
-- controlled silence followed by impact;
-- original sound design;
-- environmental audio;
-- a short sequence of concrete Workshop capabilities.
+browser / CSS
+   ↓
+visual manifestation
+~~~
 
-It must not:
+A timer in a Razor component is not an acceptable replacement for a runtime lifecycle state machine merely because the timer is convenient.
 
-- hide consequential behavior;
-- imply capabilities that do not exist;
-- pressure a visitor into a consequential action;
-- silently make decisions on the visitor's behalf.
+## Visitor-facing principle
 
-The visitor remains the human decision-maker.
+> Show the behavior before asking the visitor to understand the machinery.
 
-## Audio
-
-The opening should eventually have an original audio identity with the dramatic weight of a major game opening.
-
-The reference point is **energy and orchestration**, not reproduction of Warcraft music or another copyrighted work.
-
-The audio architecture should be:
-
-```text
-Opening state
-    |
-    +--> visual cue
-    |
-    +--> audio cue
-    |
-    v
-presentation beat
-    |
-    v
-next state
-```
-
-Audio is therefore part of the presentation state, not an unrelated page effect.
-
-Browser autoplay restrictions must be respected. The system should treat audio as an enhancement that begins after an explicit user gesture when required by the browser.
-
-## Architecture
-
-The opening gateway is represented by:
-
-`TheSingularityWorkshop/Gui/WorkshopGatewayGuiBuilder.cs`
-
-The builder owns the semantic structure:
-
-- gateway
-- identity image
-- invitation
-- advisory
-- opening context
-
-CSS remains responsible for manifestation:
-
-- color
-- glow
-- breathing
-- scan lines
-- motion
-- responsive layout
-
-This is an intentional boundary:
-
-```text
-GUI BUILDER
-    |
-    | semantic recursive structure
-    v
-RENDERER / BLAZOR
-    |
-    | manifestation
-    v
-CSS + browser primitives
-```
-
-The goal is **not** to eliminate CSS. The goal is to stop CSS and raw Razor markup from becoming the architecture.
-
-## FSM_API alignment
-
-The opening sequence should eventually have explicit lifecycle states owned by FSM_API rather than a collection of unrelated timers and boolean flags.
-
-A future presentation state machine may resemble:
-
-```text
-Arrival
-  |
-  v
-Awaken
-  |
-  v
-Reveal
-  |
-  v
-Demonstrate
-  |
-  v
-Invite
-  |
-  v
-Workshop
-```
-
-The state machine owns *when* the presentation is in each phase.
-
-The GUI builder owns *what* each phase manifests.
-
-CSS and audio are manifestations of those states.
-
-This preserves the project's existing architectural direction:
-
-> **FSM_API owns behavior. GUI Builders own semantic presentation. CSS and browser APIs manifest it.**
+The page should demonstrate real Workshop technology first. The repository and Deep Dive surfaces then explain why the demonstration works.
 
 ## Evidence boundary
 
-The opening is a showcase, not a claim generator.
+Every public claim should correspond to executable code, a test, a manifest, a RuntimeAssembly inspection, a benchmark, or an explicitly labeled future direction.
 
-Every dramatic visual should ultimately correspond to something the Workshop actually contains:
-
-- FSM_API-driven behavior;
-- recursive GUI builders;
-- MicroBundles;
-- Experiences;
-- spatial exploration;
-- procedural composition;
-- Unity/WebGL boundaries;
-- the persistent-world model.
-
-If a future presentation beat is not implemented, it should be clearly treated as a teaser or experiment rather than presented as an existing capability.
+If a presentation beat is not implemented, call it a direction or experiment.
 
 ## Human agency
 
-The opening exists to reduce cognitive friction and make exploration inviting.
+The opening should invite curiosity without silently making consequential decisions for the visitor.
 
-It does not replace human judgment.
+The visitor decides what to enter, create, change, publish, or commit.
 
-The Workshop may propose, demonstrate, compose, or guide.
-
-The person decides what to enter, create, change, publish, or commit.
-
-That distinction remains a runtime boundary throughout the system.
+*The browser is the manifestation. The architecture is underneath it.*

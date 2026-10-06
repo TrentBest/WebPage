@@ -23,25 +23,52 @@ public sealed class FirstContactPlantTests
     }
 
     [Fact]
-    public void FirstContact_Presents_Question_Then_Requires_Gateway_Entry_Before_Landing()
+    public async Task ManifestStartup_ComposesMonikerDependency_ThenEntersHub()
     {
-        using var experience = new WorkshopExperienceService();
-        experience.Initialize(returningVisitor: false);
+        const string manifestJson = """
+        {
+          "manifestId": "webpage-host",
+          "version": "1.0.0",
+          "startup": [{ "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }],
+          "running": [{ "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }],
+          "deepDive": { "experience": "LIVING GUI", "restartFromManifest": true, "telemetry": true }
+        }
+        """;
 
-        for (var i = 0; i < 200 && experience.FirstContact.CurrentState != "Gateway"; i++)
-            experience.Tick();
+        using var httpClient = new HttpClient(new ManifestHandler(manifestJson)) { BaseAddress = new Uri("https://test.local/") };
+        using var experience = new WorkshopExperienceService(
+            httpClient,
+            new TheSingularityWorkshop.Infrastructure.Hub.HubRuntime(
+                new TheSingularityWorkshop.SingularityHub.SingularityHub()));
 
-        Assert.Equal("Gateway", experience.FirstContact.CurrentState);
-        Assert.Equal("FirstContact", experience.CurrentState);
+        await experience.InitializeAsync();
 
-        experience.RequestEntry();
-        experience.Tick();
-
-        Assert.Equal("Landing", experience.FirstContact.CurrentState);
-        Assert.Equal("LivingGui", experience.CurrentState);
+        Assert.Equal("Moniker", experience.CurrentState);
+        Assert.Equal("LIVING GUI", experience.PrimaryManifestExperience!.Name);
         Assert.NotNull(experience.RuntimeAssembly);
         Assert.NotNull(experience.MonikerComposition);
-        Assert.True(experience.FirstContact.IsLanding);
+        Assert.NotNull(experience.PrimaryExperienceComposition);
+
+        experience.RequestEntry();
+
+        Assert.Equal("Hub", experience.CurrentState);
+    }
+
+    private sealed class ManifestHandler : HttpMessageHandler
+    {
+        private readonly string _manifestJson;
+
+        public ManifestHandler(string manifestJson) => _manifestJson = manifestJson;
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new StringContent(_manifestJson, System.Text.Encoding.UTF8, "application/json")
+            });
+        }
     }
 
     [Fact]

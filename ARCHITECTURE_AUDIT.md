@@ -1,83 +1,104 @@
-# Architecture Audit — September 2026
+# Architecture Audit — October 2026
 
 ## Reference standard
 
-FSM_API is the reference implementation for deterministic lifecycle behavior, unit-test discipline, coverage collection, documentation, and release hygiene.
+FSM_API is the reference implementation for deterministic lifecycle behavior.
 
-WebPage consumes FSM_API; it should not grow a competing state-management framework.
+WebPage consumes FSM_API and the other Workshop packages through their published/package boundaries. It must not grow competing runtime kernels.
 
-## Current findings
+## Current architectural position
 
-### Already aligned
+The repository is being rehabilitated from its original website-wrapper purpose into a browser proving ground and public learning resource.
 
-- MicroBundle lifecycle is backed by FSM_API.
-- Page-level lifecycle has a dedicated PageFSM.
-- Hub arbitration is bounded to ten rounds.
-- Runtime ontology uses nine integer layers.
-- GUI construction is increasingly routed through recursive GUI builders.
-- Experiences are explicitly defined as environments composed from MicroBundles.
-- Test projects are separate from application projects.
+The authoritative direction is:
 
-### Transitional architecture to migrate
+~~~text
+host manifest
+    ↓
+startup presentation Experience(s)
+    ↓
+primary running Experience
+    ↓
+FSM_COS RuntimeManifest
+    ↓
+dependency closure / arbitration / RuntimeAssembly
+    ↓
+FSM_API execution
+    ↓
+WebPage presentation
+~~~
 
-1. **Static Idler/Flex catalogs** — concrete inventory still lives in `IdleExperienceCatalog` and `FlexExperienceCatalog`. Target: registry discovery.
-2. **WorkshopDemoBundle** — useful proof, but target is normal registry/manifest composition.
-3. **WorkshopExperienceService** — string lifecycle states should become FSM/API context state.
-4. **MainLayout startup timer** — presentation timing currently participates in lifecycle signaling; FSM_API should own the transition.
-5. **FlexExperienceHost** — owns a timer and generation progression; target is an Experience/MicroBundle FSM.
-6. **IdleExperienceHost** — Pong is a MicroBundle, but the host still calls its update directly; target is Hub-owned heartbeat.
-7. **Explore.razor** — contains substantial movement, transit, maze, mansion, lab, and scene orchestration; target is Experience/MicroBundle + FSM_API contexts.
-8. **CSS and inline styles** — builders exist, but semantic GUI construction still leaks into Razor components; CSS should remain manifestation styling.
+## Confirmed aligned boundaries
 
-## Target dependency direction
+- FSM_API owns meaningful state-machine execution.
+- FSM_COS owns composition, dependency closure, arbitration, convergence, and RuntimeAssembly creation.
+- MicroBundleDomain owns the MicroBundle domain contract.
+- WebPage owns browser presentation, manifest loading, host adapters, and proving-ground integration.
+- The active branch has **not** yet completed the execution migration: `PageFSM`/`LivingGuiFsm` still drive the browser manifestation.
+- Reusable capabilities are consumed through Workshop NuGet packages when a package already owns them.
+- WebPage explicitly references `FSM_API`, `FSM_COS`, and `MicroBundleDomain`; package versions must remain on published versions unless a newer package is explicitly released and approved.
+- The Living GUI primary MicroBundle declares the canonical Moniker dependency.
 
-WebPage host → Hub → Experience registry → MicroBundles → FSM_API
+## Current composition proof
 
-Not:
+The current manifest requests primary root 2102.
 
-Razor page → bespoke state → bespoke timer → bespoke domain logic.
+~~~text
+2102 LivingGuiExperienceMicroBundle
+        ↓
+declared dependency
+        ↓
+2110 MonikerMicroBundle
+~~~
 
-## Arbitration model
+WebPage must not request 2110 separately just because it is presented before the primary Experience.
 
-1. Register available MicroBundles.
-2. Install with `LoadBundle(IArbitrator)` exactly once.
-3. During load, inspect installed/available bundles and request dependency loading.
-4. Preserve installation completion order.
-5. Run `Arbitrate(IArbitrator, roundIndex)` for at most ten rounds.
-6. Each round can inspect the current installed composition and conditionally mutate other bundles.
-7. Never fabricate a missing bundle.
-8. If a bundle arrives later, later arbitration can see it.
+## Transitional areas
 
-This supports Magic modifying Elements only when Elements exists, or Weapons receiving a Singing Sword when its provider bundle exists.
+The repository still contains older page-FSM, first-contact, catalog, demo, and exploration implementations.
 
-## Physics direction
+These are migration candidates, not automatically deletion candidates.
 
-The Elements bundle should become the reusable material/physics boundary: every physical thing gets a material integer, that integer resolves to physics data, and users can opt out or override applicable behavior.
+For each:
 
-## Workshop arbitration
+1. locate behavior;
+2. identify canonical owner;
+3. preserve with executable proof;
+4. replace the host implementation;
+5. verify package/runtime behavior;
+6. remove duplicate code.
 
-The Workshop itself should become a composition participant. Buildings, tools, GUI builders, Experiences, and MicroBundles should be discoverable and arbiter-visible rather than page-owned.
+## Function-preservation gate
 
-## Migration rule
+The existing Living GUI runtime is not disposable scaffolding. Its tests define behavior that must survive extraction. See [`FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md).
 
-For every transitional subsystem: locate behavior → identify its MicroBundle/Experience boundary → cover it → migrate it → remove obsolete host code.
+The audit must not be marked complete merely because the old classes compile or because they have been deleted. Completion requires the same observable behavior under the canonical package/runtime path.
 
-## Opening perception boundary
+## Known cleanup targets
 
-The landing gateway has now been moved from hand-authored Razor structure into `WorkshopGatewayGuiBuilder`. This establishes the intended semantic boundary for the public opening.
+1. Old gateway/first-contact lifecycle documentation.
+2. Static Idler/Flex selection scaffolding.
+3. WorkshopDemoBundle bootstrap scaffolding.
+4. Duplicate host lifecycle state where FSM_API already owns the behavior.
+5. `Workshop/MicroBundles/MicroBundle.cs` and its local `IMicroBundle`/context/manifestation scaffolding: historical lifecycle machinery that must not become a second MicroBundle runtime. Migrate concrete demos to the published FSM_COS + MicroBundleDomain contracts as their capabilities become current.
+6. Local catalogs/providers that duplicate package-owned MicroBundle discovery or composition responsibilities.
+7. Transitional Living GUI runtime once its canonical package replacement is proven.
+8. Stale platform-specific documentation.
+9. Root-level documentation duplication.
 
-The remaining inline CSS is treated as manifestation rather than GUI architecture. The next migration should move the landing presentation lifecycle onto FSM_API.
+## Documentation rule
 
-### Confirmed divergence
+A document is current only when its claims match code and tests.
 
-`PageFSM` is the stronger architectural implementation: it already uses FSM_API to model Gateway → GatewayExit → Living GUI → Moniker → Gravity → Navigation → Running.
+Historical ideas may remain, but they must be labeled historical or future and must not be presented as the active runtime contract.
 
-`WorkshopExperienceService`, by contrast, still exposes string states such as `Intro`, `FlexHello`, and `Living`, while `Home.razor` also owns a timer and local FSM-backed node population. This is duplicate lifecycle ownership.
+## Completion standard
 
-Therefore the audit decision is:
+The audit is satisfied when:
 
-> **PageFSM/FSM_API is the target authority. WorkshopExperienceService and the Home-local lifecycle are transitional compatibility surfaces.**
-
-The migration rule is to preserve observable presentation while moving ownership into PageFSM/FSM_API, then remove the duplicate state/timer path rather than maintaining two competing models.
-
-See `WORKSHOP_OPENING_EXPERIENCE.md` for the perception contract.
+- package ownership is explicit;
+- manifest startup and primary Experience semantics are unambiguous;
+- FSM_COS is the only composition engine;
+- FSM_API is the lifecycle authority;
+- browser components are manifestations, not hidden runtime owners;
+- current documentation agrees with tests and running behavior.
