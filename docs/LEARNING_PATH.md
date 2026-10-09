@@ -40,10 +40,8 @@ After the opening, ask:
 - Which composition belongs to FSM_COS?
 - Which pieces are only browser presentation?
 
-When the hub appears, choose **SHOW DEEP DIVE** to open the educational view for the Experience named by the host manifest. The current Living GUI Deep Dive explains the Experience identity, MicroBundle contract, ontology, and dependency intent. Its bundle list is currently catalog-based rather than a projection of the exact startup RuntimeAssembly; that integration is a documented next step, not a completed claim.
+When the hub appears, choose **SHOW DEEP DIVE** to open the educational view for the Experience named by the host manifest. From the running hub, the view uses the actual startup `RuntimeAssembly`: requested roots are shown separately from resolved MicroBundles, along with the runtime ID and arbitration-round count. If a visitor opens the route directly before startup has produced an assembly, the page labels its catalog-based fallback instead of presenting it as a live runtime snapshot.
 
-
-After the opening, ask:
 
 - What Experience am I seeing?
 - Which MicroBundles make it possible?
