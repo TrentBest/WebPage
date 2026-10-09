@@ -1,5 +1,6 @@
 @using TheSingularityWorkshop.Workshop.Plant
 @using TheSingularityWorkshop.Gui
+@using TheSingularityWorkshop.Workshop.Gui
 
 <section class="first-contact-stage @(State == "Moniker" || State == "HubGrowth" || State == "Landing" ? "living" : "")" aria-live="polite">
     @if (State == "FirstOnly" || State == "FirstFadingSecondComingIn" || State == "SecondOnly")
@@ -23,9 +24,9 @@
         {
             <section class="flex-hello @(State == "Landing" ? "hub-moniker-panel" : "")" aria-label="The Singularity Workshop">
                 <div class="hello-moniker">
-                    <div class="hello-line">@RenderMonikerLine("THE", 0, 1d)</div>
-                    <div class="hello-line">@RenderMonikerLine("SINGULARITY", 3, 5d)</div>
-                    <div class="hello-line">@RenderMonikerLine("WORKSHOP", 14, 3.5d)</div>
+                    <div class="hello-line">@RenderMonikerLine(MonikerWord("the", "THE"), 0, 1d)</div>
+                    <div class="hello-line">@RenderMonikerLine(MonikerWord("singularity", "SINGULARITY"), 3, 5d)</div>
+                    <div class="hello-line">@RenderMonikerLine(MonikerWord("workshop", "WORKSHOP"), 14, 3.5d)</div>
                 </div>
             </section>
         }
@@ -76,6 +77,10 @@
     [Parameter] public double QuestionOpacity { get; set; }
     [Parameter] public double GatewayBreathValue { get; set; } = 0.5d;
     [Parameter] public PlantGrowthMicroBundle? Plant { get; set; }
+    [Parameter] public GuiNode? MonikerComposition { get; set; }
+
+    private string MonikerWord(string nodeId, string fallback)
+        => MonikerComposition?.Find(nodeId).Text ?? fallback;
 
     private static string LabelStyle(double opacity)
     {
