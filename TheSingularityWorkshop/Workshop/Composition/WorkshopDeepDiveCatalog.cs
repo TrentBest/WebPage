@@ -23,7 +23,13 @@ public sealed class WorkshopDeepDiveCatalog
     }
 
     public bool TryResolve(ulong experienceId, out WorkshopDeepDiveModel? model)
-        => TryResolve(experienceId, runtimeAssembly: null, out model);
+        => TryResolve(experienceId, runtimeAssembly: null, requestedRootIds: null, out model);
+
+    public bool TryResolve(
+        ulong experienceId,
+        RuntimeAssembly? runtimeAssembly,
+        out WorkshopDeepDiveModel? model)
+        => TryResolve(experienceId, runtimeAssembly, requestedRootIds: null, out model);
 
     /// <summary>
     /// Resolves educational metadata, preferring the actual FSM_COS assembly when the host
@@ -33,6 +39,7 @@ public sealed class WorkshopDeepDiveCatalog
     public bool TryResolve(
         ulong experienceId,
         RuntimeAssembly? runtimeAssembly,
+        IReadOnlyList<ulong>? requestedRootIds,
         out WorkshopDeepDiveModel? model)
     {
         if (!_experiences.TryResolve(experienceId, out var experience) || experience is null)
@@ -41,8 +48,10 @@ public sealed class WorkshopDeepDiveCatalog
             return false;
         }
 
+        var requestedRoots = requestedRootIds ?? experience.MicroBundleIds;
+
         if (runtimeAssembly is not null &&
-            !experience.MicroBundleIds.All(id => runtimeAssembly.TryGetBundle(id, out _)))
+            !requestedRoots.All(id => runtimeAssembly.TryGetBundle(id, out _)))
         {
             // Never attach an unrelated runtime snapshot to an Experience's Deep Dive.
             runtimeAssembly = null;
@@ -60,12 +69,12 @@ public sealed class WorkshopDeepDiveCatalog
             var provider = microBundle.TryGetProvider<IDeepDiveProvider>();
             if (provider is not null)
             {
-                model = provider.Execute(experience, bundles, runtimeAssembly);
+                model = provider.Execute(experience, bundles, runtimeAssembly, requestedRoots);
                 return true;
             }
         }
 
-        model = new WorkshopDeepDiveModel(experience, bundles, runtimeAssembly);
+        model = new WorkshopDeepDiveModel(experience, bundles, runtimeAssembly, requestedRoots);
         return true;
     }
 }
@@ -76,21 +85,23 @@ public sealed class WorkshopDeepDiveModel
     public WorkshopDeepDiveModel(
         IExperience experience,
         IReadOnlyList<CosMicroBundle> bundles,
-        RuntimeAssembly? runtimeAssembly = null)
+        RuntimeAssembly? runtimeAssembly = null,
+        IReadOnlyList<ulong>? requestedRootIds = null)
     {
         Experience = experience;
         Bundles = bundles;
         RuntimeAssembly = runtimeAssembly;
+        RequestedBundleIds = requestedRootIds ?? experience.MicroBundleIds;
     }
 
     public IExperience Experience { get; }
     public IReadOnlyList<CosMicroBundle> Bundles { get; }
     public RuntimeAssembly? RuntimeAssembly { get; }
     public bool IsRuntimeAssemblyBacked => RuntimeAssembly is not null;
-    public IReadOnlyList<ulong> RequestedBundleIds => Experience.MicroBundleIds;
+    public IReadOnlyList<ulong> RequestedBundleIds { get; }
     public int ResolvedBundleCount => Bundles.Count;
     public CosMicroBundle? PrimaryBundle =>
-        Experience.MicroBundleIds
+        RequestedBundleIds
             .Select(id => Bundles.FirstOrDefault(bundle => bundle.Id == id))
             .FirstOrDefault(bundle => bundle is not null);
 
