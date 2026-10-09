@@ -58,6 +58,35 @@ WebPage
 
 The user can therefore discover what an Experience is without requiring every host to reproduce the Workshop's educational machinery.
 
+## Current entry point and data boundary
+
+### Current
+
+The WebPage hub now exposes **SHOW DEEP DIVE** for the Experience named by the host manifest's `deepDive.experience` field. The link is resolved against the registered Experience catalog and navigates to:
+
+```text
+/deep-dive/{ExperienceId}
+```
+
+For the current manifest, the target is Living GUI (Experience ID `3002`). The route is a browser presentation feature; FSM_COS and MicroBundleDomain do not know that this route exists.
+
+The current `WorkshopDeepDiveCatalog` resolves the Experience and its directly declared MicroBundle IDs from the WebPage catalogs. It does **not yet use the actual `RuntimeAssembly` produced during startup**, so the displayed bundle list must not be described as the complete dependency-closed runtime graph. The declared dependency summary and the composition explanation are educational context, not proof that the page is inspecting the exact assembly instance.
+
+### Direction
+
+The next deep-dive integration step is to pass the real `RuntimeAssembly` (or a deliberately safe, immutable projection of it) into the WebPage educational model. The page should then distinguish:
+
+- **Requested roots** — what the manifest asked FSM_COS to compose.
+- **Resolved composition** — what the returned RuntimeAssembly actually contains.
+- **Declared dependencies** — what the MicroBundle contracts state.
+- **Browser manifestation** — what WebPage renders from the runtime.
+
+This avoids reimplementing dependency traversal inside the Deep Dive and gives the visitor a trustworthy, inspectable explanation of the running system.
+
+### Future
+
+A Deep Dive should be discoverable from any manifest-declared Experience with an educational provider, not only from a hard-coded page or route. A missing provider should produce an honest general-purpose view or a clear unavailable state; it should not prevent the Experience from running.
+
 ## Provider collection
 
 MicroBundles should be understood as collections of providers/capabilities rather than monolithic application objects.
