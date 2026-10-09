@@ -1,4 +1,5 @@
 using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.Experiences;
 using TheSingularityWorkshop.Workshop.MicroBundles;
@@ -38,9 +39,7 @@ public sealed class WorkshopDeepDiveCatalogTests
             RuntimeId: 42,
             Bundles:
             [
-                new MicroBundleManifestEntry(
-                    LivingGuiExperienceMicroBundle.BundleId,
-                    "1.0.0")
+                MicroBundleDependencyRequest.Unconfigured(LivingGuiExperienceMicroBundle.BundleId)
             ]));
 
         Assert.True(deepDiveCatalog.TryResolve(experience.Id, runtimeAssembly, out var model));
@@ -63,9 +62,7 @@ public sealed class WorkshopDeepDiveCatalogTests
             RuntimeId: 43,
             Bundles:
             [
-                new MicroBundleManifestEntry(
-                    (ulong)MonikerMicroBundle.BundleId,
-                    "1.0.0")
+                MicroBundleDependencyRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)
             ]));
 
         Assert.True(deepDiveCatalog.TryResolve(experience.Id, unrelatedAssembly, out var model));
