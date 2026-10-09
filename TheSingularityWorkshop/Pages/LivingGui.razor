@@ -3,6 +3,7 @@
 @using TheSingularityWorkshop.Components
 @using TheSingularityWorkshop.Services
 @inject FSMManagerService FSM
+@inject WorkshopExperienceService Experience
 @implements IDisposable
 
 <PageTitle>Living GUI</PageTitle>
@@ -10,7 +11,7 @@
 <div class="living-experience-panel" aria-label="Living GUI experience">
     @if (FSM.Context.MonikerReady)
     {
-        <FirstContactView State="@FirstContactState" Ticks="FSM.Context.MonikerPresentationStartTick" />
+        <FirstContactView State="@FirstContactState" Ticks="FSM.Context.MonikerPresentationStartTick" MonikerComposition="@Experience.MonikerComposition" />
     }
     @foreach (var actor in FSM.Context.LivingNodes)
     {
