@@ -207,4 +207,15 @@ public sealed class IncrementalVersionTests
         Assert.Contains('.Style("height", "50vh")', firstContact);
         Assert.DoesNotContain("PresentMonikerAsync", experience);
     }
+
+    [ArchitectureTest(0, 0, 191)] [Fact(DisplayName = "V0.0.191 — Living_GUI_Interleaves_Early_Spawn_Targets_Across_The_Viewport")]
+    public void V0_0_191LivingGuiInterleavesEarlySpawnTargetsAcrossViewport()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var context = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "PageStateContext.cs"));
+        var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "PageStateContextTests.cs"));
+
+        Assert.Contains("(slot * 37) % (columns * rows)", context);
+        Assert.Contains("EarlyPopulationTargetsSpanTheViewportInsteadOfFillingTopRows", tests);
+    }
 }
