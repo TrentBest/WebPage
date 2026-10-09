@@ -21,5 +21,21 @@
         "Content-Type": "application/octet-stream"
       }
     }
-  ]
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/_framework/*",
+      "/css/*",
+      "/Images/*",
+      "/Workshop/*",
+      "/*.css",
+      "/*.js",
+      "/*.json",
+      "/*.png",
+      "/*.ico",
+      "/*.svg",
+      "/*.webmanifest"
+    ]
+  }
 }
