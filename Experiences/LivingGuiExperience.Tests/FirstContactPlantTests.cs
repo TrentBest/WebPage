@@ -29,8 +29,8 @@ public sealed class FirstContactPlantTests
         {
           "manifestId": "webpage-host",
           "version": "1.0.0",
-          "startup": [{ "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }],
-          "running": [{ "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }],
+          "startup": [{ "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }],
+          "running": [{ "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }],
           "deepDive": { "experience": "LIVING GUI", "restartFromManifest": true, "telemetry": true }
         }
         """;
