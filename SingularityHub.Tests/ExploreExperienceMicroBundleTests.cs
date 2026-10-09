@@ -202,4 +202,37 @@ public sealed class ExploreExperienceMicroBundleTests
             leaf => Assert.True(leaf.Id > experience.Content.Id));
     }
 
+    [Fact]
+    public void ExploreContent_UsesUniqueIdsAndExplicitParentGenerationLineage()
+    {
+        using var experience = new ExploreExperienceMicroBundle();
+        var content = experience.Content;
+        var allBundles = new List<MicroBundleContext>
+        {
+            (MicroBundleContext)content.Context
+        };
+
+        allBundles.AddRange(content.Domains.Select(domain => (MicroBundleContext)domain.Context));
+        allBundles.AddRange(content.Leaves.Select(leaf => (MicroBundleContext)leaf.Context));
+
+        Assert.Equal(allBundles.Count, allBundles.Select(bundle => bundle.Id).Distinct().Count());
+
+        Assert.Equal(0, ((MicroBundleContext)content.Context).Generation);
+        Assert.Equal(-1, ((MicroBundleContext)content.Context).ParentId);
+
+        foreach (var domain in content.Domains)
+        {
+            var domainContext = (MicroBundleContext)domain.Context;
+            Assert.Equal(content.Id, domainContext.ParentId);
+            Assert.Equal(1, domainContext.Generation);
+
+            foreach (var leaf in domain.Leaves)
+            {
+                var leafContext = (MicroBundleContext)leaf.Context;
+                Assert.Equal(domain.Id, leafContext.ParentId);
+                Assert.Equal(2, leafContext.Generation);
+            }
+        }
+    }
+
 }
