@@ -34,9 +34,14 @@ public sealed class WorkshopExperienceService : IDisposable
 
     private readonly Dictionary<string, RuntimeAssembly> _hubRuntimeAssemblies =
         new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, RuntimeAssembly> _capabilityRuntimeAssemblies =
+        new(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>FSM_COS assemblies for the manifest-declared active hub MicroBundles.</summary>
+    /// <summary>FSM_COS assemblies for the manifest-declared hub destinations.</summary>
     public IReadOnlyDictionary<string, RuntimeAssembly> HubRuntimeAssemblies => _hubRuntimeAssemblies;
+
+    /// <summary>FSM_COS assemblies for supporting capabilities that are not top-level hub destinations.</summary>
+    public IReadOnlyDictionary<string, RuntimeAssembly> CapabilityRuntimeAssemblies => _capabilityRuntimeAssemblies;
 
     public GuiNode? MonikerComposition =>
         RuntimeAssembly?.TryGetBundle<MonikerMicroBundle>(
@@ -88,6 +93,7 @@ public sealed class WorkshopExperienceService : IDisposable
 
         ComposePrimaryExperience();
         ComposeManifestHubBundles();
+        ComposeManifestCapabilities();
 
         SetState("Moniker");
         _ = PresentMonikerAsync(_presentationCancellation = new CancellationTokenSource());
@@ -146,6 +152,26 @@ public sealed class WorkshopExperienceService : IDisposable
                     .ToArray()));
 
             _hubRuntimeAssemblies[item.Name] = assembly;
+        }
+    }
+
+    private void ComposeManifestCapabilities()
+    {
+        _capabilityRuntimeAssemblies.Clear();
+
+        var capabilities = Manifest?.Capabilities ?? Array.Empty<WebPageManifestCapability>();
+        foreach (var capability in capabilities)
+        {
+            if (capability.MicroBundleIds is null || capability.MicroBundleIds.Count == 0)
+                continue;
+
+            var assembly = _compositionSystem.Execute(new RuntimeManifest(
+                RuntimeId: (ulong)(200UL + (ulong)_capabilityRuntimeAssemblies.Count),
+                Bundles: capability.MicroBundleIds
+                    .Select(MicroBundleDependencyRequest.Unconfigured)
+                    .ToArray()));
+
+            _capabilityRuntimeAssemblies[capability.Name] = assembly;
         }
     }
 
