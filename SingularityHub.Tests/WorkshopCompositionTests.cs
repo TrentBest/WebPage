@@ -38,6 +38,20 @@ public sealed class WorkshopCompositionTests
         Assert.NotNull(renderingBundle?.Grammar);
     }
 
+    [Fact(DisplayName = "Manifest composition does not advance the PageFSM landing lifecycle")]
+    public async Task ManifestCompositionDoesNotAdvanceLandingLifecycle()
+    {
+        using var experience = CreateService();
+
+        await experience.InitializeAsync();
+        Assert.Equal("Moniker", experience.CurrentState);
+
+        experience.RequestEntry();
+
+        Assert.Equal("Moniker", experience.CurrentState);
+        Assert.NotNull(experience.RuntimeAssembly);
+    }
+
     [Fact(DisplayName = "FSM_COS composes ProtocolAI and GrammarAI into an extractable exchange")]
     public void ExplicitlyComposesAiExchange()
     {
