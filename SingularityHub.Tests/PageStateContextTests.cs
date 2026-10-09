@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TheSingularityWorkshop.Services;
 using Xunit;
 
@@ -127,6 +128,21 @@ public sealed class PageStateContextTests
         Assert.Equal(PageStateContext.PopulationObservationThreshold, context.LivingNodes.Count);
         Assert.Contains(context.LivingNodes, node => node.Generation > 1);
         Assert.False(context.LivingGuiFrozen);
+    }
+
+    [Fact]
+    public void EarlyPopulationTargetsSpanTheViewportInsteadOfFillingTopRows()
+    {
+        var context = new PageStateContext();
+        var earlyTargets = context.PreallocatedLivingNodes
+            .Skip(1)
+            .Take(20)
+            .Select(node => node.TargetY)
+            .ToArray();
+
+        Assert.True(earlyTargets.Min() < 30d, "Early organisms should reach the upper region.");
+        Assert.True(earlyTargets.Max() > 70d, "Early organisms should reach the lower region.");
+        Assert.InRange(earlyTargets.Average(), 35d, 65d);
     }
 
     [Fact] public void ResetStateClockClearsOnlyStateTicks()
