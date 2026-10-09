@@ -44,7 +44,7 @@ Reference: [FSM_COS Pause Point](https://github.com/TrentBest/TheSingularityWork
 - [ ] Visually inspect the public experience at desktop and narrow/mobile viewport sizes. The layout has responsive rules and the source build passed before the supporting-capability follow-up, but a live browser viewport check has not been completed in this session.
 - [x] Verified the development deployment workflow is configured to publish a prebuilt WebPage and uses the existing Azure token secret reference without exposing its value. Development deployment is gated by an explicit `[deploy-public]` commit marker; ordinary development pushes do not deploy.
 - [x] Confirmed the last successful public deployment was from `master` SHA `725536d375eb2fe5f9bf5a4088b32b57bd082fe5` on 2026-10-04. Azure reported the site at https://lemon-ground-09f542010.1.azurestaticapps.net. The current development code has not yet been deployed.
-- [ ] Produce a short public launch checklist and a truthful Brave1 submission summary grounded in the working site and actual package architecture.
+- [x] Created [BRAVE1_SUBMISSION.md](BRAVE1_SUBMISSION.md), a truthful technical submission draft that distinguishes implemented behavior from ongoing work and avoids unsupported performance/mission claims. The draft still needs adaptation to the actual Brave1 form before submission.
 
 ### P1 — Make RuntimeAssembly the real Experience authority
 
@@ -89,7 +89,7 @@ Reference: [FSM_COS Pause Point](https://github.com/TrentBest/TheSingularityWork
 
 ## Immediate next action
 
-The user explicitly authorized getting WebPage public today. A first deployment succeeded from `development` SHA `271e93e` in [Azure run 37980337029](https://github.com/TrentBest/WebPage/actions/runs/37980337029), at https://lemon-ground-09f542010.1.azurestaticapps.net. Since that deployment, the manifest/schema/service have been extended to separate supporting capabilities from hub destinations so Rendering remains composed without adding another hub tab. Current source head `5fc44be76d45cca42cda36bc8904885ea5df5c05` passed [.NET Tests run 37980715414](https://github.com/TrentBest/WebPage/actions/runs/37980715414). This task-list-only commit carries the explicit `[deploy-public]` marker to publish that tested follow-up. Verify the second Azure deployment and record its SHA/URL. Do not merge the diverged development branch into master and do not publish NuGet.
+The user explicitly authorized getting WebPage public today. The current public site deployment succeeded from `development` SHA `30a396130afd3e0ded75e8a8a5c878d323d85407` in [Azure run 37980896257](https://github.com/TrentBest/WebPage/actions/runs/37980896257), at https://lemon-ground-09f542010.1.azurestaticapps.net. That deployed version includes the single AnyApp hub, moniker rendering from the composed MicroBundle GUI tree, route fallback, and a separately declared Rendering supporting capability. The deployed source passed [.NET Tests run 37980715414](https://github.com/TrentBest/WebPage/actions/runs/37980715414); a second test run [37980896380](https://github.com/TrentBest/WebPage/actions/runs/37980896380) also passed on deployment SHA `30a396`. A documentation-only Brave1 draft was added afterward at commit `6659a2c`. Do not merge the diverged development branch into master and do not publish NuGet.
 
 ## Session-end update template
 
