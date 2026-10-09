@@ -78,6 +78,31 @@ public sealed class WorkshopDeepDiveCatalogTests
     }
 
     [Fact]
+    public void DeepDiveDoesNotAcceptAnAssemblyForRootsThatBelongToAnotherExperience()
+    {
+        var experienceCatalog = new WorkshopExperienceCatalog();
+        var compositionCatalog = new WorkshopCompositionCatalog();
+        var deepDiveCatalog = new WorkshopDeepDiveCatalog(experienceCatalog, compositionCatalog);
+        var experience = Assert.Single(experienceCatalog.Experiences);
+        var assembly = new FsmCos(compositionCatalog).Execute(new RuntimeManifest(
+            RuntimeId: 44,
+            Bundles:
+            [
+                MicroBundleDependencyRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)
+            ]));
+
+        // The supplied root exists in the assembly, but is not a root declared by Living GUI.
+        Assert.True(deepDiveCatalog.TryResolve(
+            experience.Id,
+            assembly,
+            [(ulong)MonikerMicroBundle.BundleId],
+            out var model));
+        Assert.NotNull(model);
+        Assert.False(model!.IsRuntimeAssemblyBacked);
+        Assert.Equal((ulong)LivingGuiExperienceMicroBundle.BundleId, model.PrimaryBundle!.Id);
+    }
+
+    [Fact]
     public void DeepDiveCatalogDoesNotInventAnExperienceForAnUnknownIdentity()
     {
         var deepDiveCatalog = new WorkshopDeepDiveCatalog(
