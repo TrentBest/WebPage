@@ -35,5 +35,13 @@
     "experience": "LIVING GUI",
     "restartFromManifest": true,
     "telemetry": true
-  }
+  },
+  "capabilities": [
+    {
+      "name": "Rendering",
+      "microBundleIds": [
+        4100
+      ]
+    }
+  ]
 }
