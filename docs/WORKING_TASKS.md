@@ -28,12 +28,12 @@ Reference: [FSM_COS Pause Point](https://github.com/TrentBest/TheSingularityWork
 
 ### P0 — Finish the FSM_COS pause gate, then stop broadening the kernel
 
-- [ ] Check CI for the latest `TrentBest/TheSingularityWorkshop.FSM_COS` `development` commit, including the duplicate-root and conflicting-version regression tests.
-- [ ] If CI has not run, trigger/enable the appropriate verification path or run the available checks; do not mark the gate complete until current code is verified.
-- [ ] Confirm repeated requests for the same root ID/version load once.
-- [ ] Confirm conflicting versions for the same root ID fail before any bundle loads.
-- [ ] Confirm NuGet publishing remains explicitly disabled by the `&& false` gate.
-- [ ] Record the verified pause-gate result in the FSM_COS pause document. Then only fix correctness blockers; defer unrelated features.
+- [x] FSM_COS regression suite passed in [run 37979475866](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/actions/runs/37979475866) for source head `e721e0b52fecbbd0aaafc84a8c8e5e1e2bd4f440`, including the root deduplication and conflicting-version tests.
+- [x] CI was triggered by the development push and completed successfully; `build-and-test` passed.
+- [x] Same root ID/version deduplication is covered by the passing FSM_COS regression suite.
+- [x] Conflicting versions for the same root ID are rejected before loading, covered by the passing FSM_COS regression suite.
+- [x] Verified the workflow retains `inputs.publish == true && false`; the `publish_nuget` job was skipped.
+- [x] Recorded the passing gate in [FSM_COS PAUSE_POINT.md](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/docs/PAUSE_POINT.md). FSM_COS is now paused for broad feature work; only correctness blockers or narrow WebPage-unblocking fixes should reopen it.
 
 ### P0 — Prepare WebPage for a truthful public launch
 
@@ -81,8 +81,8 @@ Reference: [FSM_COS Pause Point](https://github.com/TrentBest/TheSingularityWork
 
 ## Latest verified snapshot (2026-10-09)
 
-- WebPage `development` head at task-list creation: [`2ee3d21`](https://github.com/TrentBest/WebPage/commit/2ee3d21dbb2799f2343b36bc441027161645deb1); its `.NET Tests` run [37979446695](https://github.com/TrentBest/WebPage/actions/runs/37979446695) was **in progress** when checked. Verify its final conclusion before claiming green.
-- FSM_COS `development` head at pause-doc update: [`e721e0b`](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/commit/e721e0b52fecbbd0aaafc84a8c8e5e1e2bd4f440); its `Pack and publish` run [37979475866](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/actions/runs/37979475866) was **in progress** when checked. Publish job remains gated by `inputs.publish == true && false`; no NuGet publish is authorized.
+- WebPage commit [`2ee3d21`](https://github.com/TrentBest/WebPage/commit/2ee3d21dbb2799f2343b36bc441027161645deb1) passed [.NET Tests run 37979446695](https://github.com/TrentBest/WebPage/actions/runs/37979446695). A later task-list-only commit `9c241702867a3d0a3eaae69814bb63df25fd8b42` triggered another run; check that run before treating the latest branch head as verified.
+- FSM_COS source/tests at [`e721e0b`](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/commit/e721e0b52fecbbd0aaafc84a8c8e5e1e2bd4f440) passed [run 37979475866](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/actions/runs/37979475866): build-and-test succeeded; publish job was skipped. The pause-gate documentation update is [`a575f18`](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/commit/a575f18987da399e1f1a0ea184c63d01cc48ede7). No NuGet publish is authorized.
 - WebPage repo is public. Azure Static Web Apps workflow deploys on `master`, not `development`. No verified deployment URL/status has yet been established in this session.
 - `Home.razor` renders the manifest moniker, then the manifest hub. Its hub cards are manifest-driven; the current only card is Rendering. The Rendering page includes an interactive distance/perception probe and explicitly labels itself research, not a finished universal renderer. `/anyapp` exists but is presently a static explanatory page.
 - Architecture gap remains: FSM_COS produces a `RuntimeAssembly`, but active Living GUI browser behavior still goes through the transitional WebPage-local FSM path. This is documented migration debt, not a reason to block all public launch work.
