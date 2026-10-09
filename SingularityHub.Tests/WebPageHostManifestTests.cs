@@ -1,5 +1,7 @@
 using System.Text.Json;
 using TheSingularityWorkshop.Services;
+using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
@@ -39,13 +41,13 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("webpage-host", manifest.ManifestId);
         Assert.Single(manifest.Startup);
         Assert.Equal("Moniker", manifest.Startup[0].Kind);
-        Assert.Empty(manifest.Startup[0].MicroBundles);
+        Assert.Empty(manifest.Startup[0].MicroBundles!);
         Assert.Single(manifest.Hub);
         Assert.Equal("AnyApp", manifest.Hub[0].Name);
         Assert.Equal("Host", manifest.Hub[0].Kind);
         Assert.Equal("/anyapp", manifest.Hub[0].Route);
         Assert.Null(manifest.Hub[0].DeploymentUrl);
-        Assert.Empty(manifest.Hub[0].MicroBundles);
+        Assert.Empty(manifest.Hub[0].MicroBundles!);
         Assert.Equal("/about-us", manifest.Hub[0].AboutUrl);
         Assert.NotNull(manifest.Capabilities);
         Assert.Equal(4100UL, Assert.Single(manifest.Capabilities!).MicroBundles![0].BundleId);
@@ -71,7 +73,7 @@ public sealed class WebPageHostManifestTests
         var hub = Assert.Single(manifest.Hub);
         Assert.Equal("AnyApp", hub.Name);
         Assert.Equal("/anyapp", hub.Route);
-        Assert.Empty(hub.MicroBundles);
+        Assert.Empty(hub.MicroBundles!);
 
         Assert.NotNull(manifest.Capabilities);
         var rendering = Assert.Single(manifest.Capabilities!);
@@ -83,6 +85,23 @@ public sealed class WebPageHostManifestTests
             Path.Combine(wwwroot, "staticwebapp.config.json")));
         var fallback = config.RootElement.GetProperty("navigationFallback");
         Assert.Equal("/index.html", fallback.GetProperty("rewrite").GetString());
+    }
+
+    [Fact]
+    public void FsmCosComposesVersionedPrimaryRootAndCanonicalMonikerDependency()
+    {
+        var catalog = new WorkshopCompositionCatalog();
+        var assembly = new FsmCos(catalog).Execute(
+            new RuntimeManifest(
+                900,
+                new[] { new MicroBundleManifestEntry(2102, "1.0.0") }));
+
+        Assert.Equal(new ulong[] { 2110, 2102 }, assembly.Bundles.Select(bundle => bundle.Id));
+        Assert.True(assembly.TryGetBundle<LivingGuiExperienceMicroBundle>(2102, out _));
+        Assert.True(assembly.TryGetBundle<MonikerMicroBundle>(2110, out var moniker));
+        Assert.False(catalog.TryResolve(2102, "9.9.9", out _));
+
+        moniker!.Dispose();
     }
 
     [Fact]
