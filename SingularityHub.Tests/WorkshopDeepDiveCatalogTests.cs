@@ -42,11 +42,16 @@ public sealed class WorkshopDeepDiveCatalogTests
                 MicroBundleDependencyRequest.Unconfigured(LivingGuiExperienceMicroBundle.BundleId)
             ]));
 
-        Assert.True(deepDiveCatalog.TryResolve(experience.Id, runtimeAssembly, out var model));
+        Assert.True(deepDiveCatalog.TryResolve(
+            experience.Id,
+            runtimeAssembly,
+            [LivingGuiExperienceMicroBundle.BundleId],
+            out var model));
         Assert.NotNull(model);
         Assert.True(model!.IsRuntimeAssemblyBacked);
         Assert.Equal((ulong)42, model.RuntimeAssembly!.RuntimeId);
         Assert.Equal(2, model.ResolvedBundleCount);
+        Assert.Equal([LivingGuiExperienceMicroBundle.BundleId], model.RequestedBundleIds);
         Assert.Equal((ulong)LivingGuiExperienceMicroBundle.BundleId, model.PrimaryBundle!.Id);
         Assert.Contains(model.Bundles, bundle => bundle.Id == (ulong)MonikerMicroBundle.BundleId);
     }
