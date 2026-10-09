@@ -23,6 +23,7 @@
 | 10 | CURRENT_VERTICAL_SLICE.md | Active implementation and proof obligations |
 | 11 | PROVING_GROUND_MIGRATION.md | Extraction plan and architecture ownership contract |
 | 12 | DOCUMENTATION_STANDARD.md | Documentation maintenance rules |
+| 13 | MULTI_SURFACE_WORKSHOP_ARCHITECTURE.md | Manifest-driven Hub, distinct destinations, startup boundaries, and implementation sequence |
 
 ## Read architecture as a chain
 
