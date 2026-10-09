@@ -48,12 +48,16 @@ public sealed class WorkshopDeepDiveCatalog
             return false;
         }
 
-        var requestedRoots = requestedRootIds ?? experience.MicroBundleIds;
+        var experienceRoots = experience.MicroBundleIds;
+        var requestedRoots = requestedRootIds ?? experienceRoots;
 
         if (runtimeAssembly is not null &&
-            !requestedRoots.All(id => runtimeAssembly.TryGetBundle(id, out _)))
+            (requestedRoots.Count == 0 ||
+             requestedRoots.Any(id => !experienceRoots.Contains(id)) ||
+             !requestedRoots.All(id => runtimeAssembly.TryGetBundle(id, out _))))
         {
-            // Never attach an unrelated runtime snapshot to an Experience's Deep Dive.
+            // A runtime must contain roots that belong to this Experience, not merely
+            // any valid bundle IDs. Otherwise a different Experience could be misrepresented.
             runtimeAssembly = null;
         }
 
