@@ -41,6 +41,13 @@ public sealed class WorkshopDeepDiveCatalog
             return false;
         }
 
+        if (runtimeAssembly is not null &&
+            !experience.MicroBundleIds.All(id => runtimeAssembly.TryGetBundle(id, out _)))
+        {
+            // Never attach an unrelated runtime snapshot to an Experience's Deep Dive.
+            runtimeAssembly = null;
+        }
+
         var bundles = runtimeAssembly?.Bundles
             ?? experience.MicroBundleIds
                 .Select(id => _bundles.TryResolve(id, out var bundle) ? bundle : null)
