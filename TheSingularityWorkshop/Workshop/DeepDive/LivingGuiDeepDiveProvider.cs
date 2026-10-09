@@ -15,6 +15,7 @@ public sealed class LivingGuiDeepDiveProvider : IDeepDiveProvider
     public WorkshopDeepDiveModel Execute(
         IExperience experience,
         IReadOnlyList<CosMicroBundle> microBundles,
-        RuntimeAssembly? runtimeAssembly = null)
-        => new(experience, microBundles, runtimeAssembly);
+        RuntimeAssembly? runtimeAssembly = null,
+        IReadOnlyList<ulong>? requestedRootIds = null)
+        => new(experience, microBundles, runtimeAssembly, requestedRootIds);
 }
