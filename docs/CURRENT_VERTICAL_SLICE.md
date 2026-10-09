@@ -16,7 +16,8 @@ Make the WebPage host manifest the startup authority and make the repository exp
 The current manifest contains:
 
 - one startup Moniker presentation;
-- one primary running Experience: Living GUI;
+- one primary running Experience: Living GUI, requested as MicroBundle `2102@1.0.0`;
+- one supporting Rendering capability, requested as `4100@0.1.0`;
 - Deep Dive restart/telemetry intent.
 
 The model permits more than one startup Experience. The concrete sample currently uses one.
@@ -30,9 +31,9 @@ load host manifest
    ↓
 compose primary root through FSM_COS
    ↓
-FSM_COS resolves 2102
+FSM_COS resolves 2102@1.0.0
    ↓
-2102 declares 2110 Moniker dependency
+2102 declares 2110@1.0.0 Moniker dependency
    ↓
 RuntimeAssembly contains the closed composition
    ↓
@@ -53,9 +54,9 @@ The host must not confuse the two by requesting the same dependency twice.
 
 ## Current primary Experience
 
-The current primary root is 2102 — LivingGuiExperienceMicroBundle.
+The current primary root is `2102@1.0.0` — LivingGuiExperienceMicroBundle.
 
-Its declared dependency is 2110 — MonikerMicroBundle.
+Its declared dependency is `2110@1.0.0` — MonikerMicroBundle. The host manifest now carries explicit root versions, and the WebPage catalog resolves the requested ID/version pair rather than silently resolving an ID alone.
 
 The manifest names 2102. FSM_COS discovers 2110 through the MicroBundle dependency contract.
 
