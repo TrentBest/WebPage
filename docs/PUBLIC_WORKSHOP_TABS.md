@@ -14,11 +14,13 @@ WEBPAGE HOST MANIFEST
   ├─ running: Living GUI root (2102)
   │    └─ declared dependency: Moniker (2110)
   │         └─ FSM_COS → RuntimeAssembly
-  └─ hub: AnyApp (one destination)
-       └─ /anyapp — host/composition architecture and honest implementation status
+  ├─ hub: AnyApp (one destination)
+  │    └─ /anyapp — host/composition architecture and honest implementation status
+  └─ supporting capability: Rendering (4100)
+       └─ /rendering — research surface, not a second hub tab
 ```
 
-AnyApp is a host concept, not itself a MicroBundle, so its hub item has no MicroBundle IDs. The active Living GUI Experience is still composed through FSM_COS. Rendering research remains available at `/rendering` as a secondary research page, not as a second hub tab. Do not describe that route as a finished universal renderer or imply that a desktop installer is available.
+AnyApp is a host concept, not itself a MicroBundle, so its hub item has no MicroBundle IDs. The active Living GUI Experience is still composed through FSM_COS. Supporting capabilities are declared separately from navigation: the manifest's `capabilities` collection composes Rendering (4100) without adding a second hub tab. The `/rendering` page can therefore inspect the composed Rendering capability while the public hub stays focused on AnyApp. Do not describe that route as a finished universal renderer or imply that a desktop installer is available.
 
 The browser Living GUI's execution/presentation lifecycle still contains transitional WebPage-owned FSM logic after composition. That migration is documented in [FUNCTIONALITY_PRESERVATION.md](FUNCTIONALITY_PRESERVATION.md) and must not be represented as complete.
 
