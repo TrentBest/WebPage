@@ -203,8 +203,8 @@ public sealed class IncrementalVersionTests
         Assert.Contains("FSM.RequestEnter();", home);
         Assert.Contains("FSM.CurrentState == PageFSM.Running", home);
         Assert.Contains("PageFSM.NavigationArrival", layout);
-        Assert.Contains('.Style("width", "50vw")', firstContact);
-        Assert.Contains('.Style("height", "50vh")', firstContact);
+        Assert.Contains(".Style(\"width\", \"50vw\")", firstContact);
+        Assert.Contains(".Style(\"height\", \"50vh\")", firstContact);
         Assert.DoesNotContain("PresentMonikerAsync", experience);
     }
 
