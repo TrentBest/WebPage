@@ -44,9 +44,10 @@
     private bool IsCreatePage => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Equals("create", StringComparison.OrdinalIgnoreCase);
     private bool IsSpatialExplorePage => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Equals("explore", StringComparison.OrdinalIgnoreCase);
 
-    // The Hub remains host infrastructure. The manifest's primary Experience
-    // owns the running surface; chrome appears when that Experience is active.
-    private bool ShowWorkshopChrome => !IsWorkshopLanding || Experience.CurrentState is "LivingGui" or "CriticalMass" || (Experience.CurrentState == "LivingGui" && FSM.CurrentState == TheSingularityWorkshop.Services.PageFSM.Running);
+    // PageFSM owns the landing sequence. Manifest composition must not release
+    // browser chrome early just because its independent loading/presentation state changed.
+    private bool ShowWorkshopChrome => !IsWorkshopLanding ||
+        FSM.CurrentState is TheSingularityWorkshop.Services.PageFSM.NavigationArrival or TheSingularityWorkshop.Services.PageFSM.Running;
 
     private bool _chromeReleased;
     private bool _worldAnnouncementVisible;
