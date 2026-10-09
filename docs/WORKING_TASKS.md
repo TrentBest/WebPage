@@ -39,19 +39,19 @@ Reference: [FSM_COS Pause Point](https://github.com/TrentBest/TheSingularityWork
 
 - [x] Inspect current manifest, startup sequence, hub configuration, deployment workflow, repository visibility, and current CI state. The manifest is `TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json`; Azure deploys only on `master`; WebPage and FSM_COS CI runs for the task-list commits were still in progress at the last check.
 - [x] Confirm the host service loads the manifest, composes the Living GUI primary root (2102) with its Moniker dependency through FSM_COS, composes hub MicroBundles separately, and transitions from Moniker to Hub. The current hub item is `Rendering` (4100), so the active destination still needs to be reconciled with the intended initial AnyApp-first public plan.
-- [ ] Resolve the initial-hub choice and update both manifest and documentation consistently. The actual manifest currently exposes only `Rendering` (4100), while the intended initial public plan has been AnyApp-first/one tab. Do not swap it to `/anyapp` until that route provides a useful, honest destination; its current page is mostly static explanatory copy.
-- [ ] Build and test the current WebPage branch; fix launch-blocking errors, responsive layout defects, broken assets/manifest paths, and misleading or nonfunctional controls.
-- [ ] Check the public experience at desktop and narrow/mobile viewport sizes where runtime tooling permits. Keep the moniker readable and the hub usable.
-- [ ] Verify the Azure Static Web Apps deployment configuration and required secret *presence/status only*; never print or expose secret values.
-- [ ] Confirm what is currently live, if anything, and whether a deployment from `master` is needed. Do not claim a launch or deployment until the deployment run and public URL are verified.
+- [x] Resolved the initial-hub mismatch: manifest and `PUBLIC_WORKSHOP_TABS.md` now agree on a single AnyApp hub destination. `/anyapp` is now a responsive, honest architecture demo; it explicitly says no public installer is currently offered and links to the source and Rendering research.
+- [x] Build and test the current WebPage code. The latest source head [`f1c586f`](https://github.com/TrentBest/WebPage/commit/f1c586fd2d7ee6ce179511fab0dbe02aa3750c65) passed [`.NET Tests` run 37980195235](https://github.com/TrentBest/WebPage/actions/runs/37980195235); the run includes a zero-warning/error build and the three configured test suites.
+- [ ] Visually inspect the public experience at desktop and narrow/mobile viewport sizes. The layout has responsive rules and the build is green, but a live browser viewport check has not been completed in this session.
+- [x] Verified the development deployment workflow is configured to publish a prebuilt WebPage and uses the existing Azure token secret reference without exposing its value. Development deployment is gated by an explicit `[deploy-public]` commit marker; ordinary development pushes do not deploy.
+- [x] Confirmed the last successful public deployment was from `master` SHA `725536d375eb2fe5f9bf5a4088b32b57bd082fe5` on 2026-10-04. Azure reported the site at https://lemon-ground-09f542010.1.azurestaticapps.net. The current development code has not yet been deployed.
 - [ ] Produce a short public launch checklist and a truthful Brave1 submission summary grounded in the working site and actual package architecture.
 
 ### P1 — Make RuntimeAssembly the real Experience authority
 
-- [ ] Trace the complete path from manifest → FSM_COS → `RuntimeAssembly` → Experience behavior → browser presentation.
-- [ ] Current documented gap: `Home.razor` / `LivingGui.razor` still rely on `FSMManagerService → PageFSM → LivingGuiFsm → PageStateContext` after composition. Do not claim the migration is complete.
+- [x] Traced manifest → FSM_COS → `RuntimeAssembly` and the transitional browser presentation path. The moniker is now rendered from `RuntimeAssembly`'s composed `GuiNode` via `BlazorGuiRenderer`; the broader Living GUI execution path remains transitional.
+- [x] Confirmed and documented the gap: `LivingGui.razor` still relies on `FSMManagerService → PageFSM → LivingGuiFsm → PageStateContext` after composition. Do not claim the migration is complete.
 - [ ] Identify the smallest behavior that can be driven directly by the composed Experience/MicroBundle now, without breaking the existing proven Living GUI lifecycle.
-- [ ] Add executable tests before migrating ownership; preserve independent FSM instances, deterministic Squirrel-based distribution, growth/reproduction, gravity, moniker timing, and responsive panel-relative positioning.
+- [ ] Add/extend executable parity tests before migrating Living GUI ownership; preserve independent FSM instances, deterministic Squirrel-based distribution, growth/reproduction, gravity, moniker timing, and responsive panel-relative positioning.
 - [ ] Keep browser-only rendering/input in WebPage and reusable domain behavior in the canonical Experience/MicroBundle owner. Do not delete transitional code until parity is proven.
 
 ### P1 — Keep the MicroBundle/package boundary disciplined
@@ -81,11 +81,15 @@ Reference: [FSM_COS Pause Point](https://github.com/TrentBest/TheSingularityWork
 
 ## Latest verified snapshot (2026-10-09)
 
-- WebPage commit [`2ee3d21`](https://github.com/TrentBest/WebPage/commit/2ee3d21dbb2799f2343b36bc441027161645deb1) passed [.NET Tests run 37979446695](https://github.com/TrentBest/WebPage/actions/runs/37979446695). A later task-list-only commit `9c241702867a3d0a3eaae69814bb63df25fd8b42` triggered another run; check that run before treating the latest branch head as verified.
+- WebPage source head [`f1c586f`](https://github.com/TrentBest/WebPage/commit/f1c586fd2d7ee6ce179511fab0dbe02aa3750c65) passed [.NET Tests run 37980195235](https://github.com/TrentBest/WebPage/actions/runs/37980195235). The suite initially caught a brittle test that assumed JSON arrays were single-line; the assertion was corrected to ignore whitespace, and the updated suite passed.
 - FSM_COS source/tests at [`e721e0b`](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/commit/e721e0b52fecbbd0aaafc84a8c8e5e1e2bd4f440) passed [run 37979475866](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/actions/runs/37979475866): build-and-test succeeded; publish job was skipped. The pause-gate documentation update is [`a575f18`](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/commit/a575f18987da399e1f1a0ea184c63d01cc48ede7). No NuGet publish is authorized.
-- WebPage repo is public. Azure Static Web Apps workflow deploys on `master`, not `development`. No verified deployment URL/status has yet been established in this session.
-- `Home.razor` renders the manifest moniker, then the manifest hub. Its hub cards are manifest-driven; the current only card is Rendering. The Rendering page includes an interactive distance/perception probe and explicitly labels itself research, not a finished universal renderer. `/anyapp` exists but is presently a static explanatory page.
-- Architecture gap remains: FSM_COS produces a `RuntimeAssembly`, but active Living GUI browser behavior still goes through the transitional WebPage-local FSM path. This is documented migration debt, not a reason to block all public launch work.
+- WebPage repo is public. Last confirmed live URL is https://lemon-ground-09f542010.1.azurestaticapps.net (successful deployment from `master` SHA `725536d` on Oct 4). Current `development` and `master` are substantially diverged (`development` was 1,692 commits ahead and 56 behind, with 300 changed files at comparison time); **do not merge the whole branch or open a giant PR**. Public rollout is being done from `development` via the explicitly gated `[deploy-public]` marker instead.
+- `Home.razor` renders the moniker from the composed MicroBundle GUI tree, then the manifest hub. The only hub destination is now AnyApp. `/anyapp` is a responsive architecture/status demo; `/rendering` remains a secondary research page with an interactive distance/perception probe and explicitly does not claim a finished universal renderer.
+- Architecture gap remains: FSM_COS produces a `RuntimeAssembly` and the moniker now uses its composed GUI tree, but active Living GUI browser behavior still goes through the transitional WebPage-local FSM path. This is documented migration debt, not a reason to block all public launch work.
+
+## Immediate next action
+
+The user explicitly authorized getting WebPage public today. The latest code head `f1c586f` passed the configured tests. The deployment workflow has been updated to deploy from `development` only when a push commit message contains `[deploy-public]`; ordinary development pushes skip deployment. Make a **documentation/task-list-only** commit whose message contains `[deploy-public]` to deploy this already-tested code to the public Azure Static Web App. Then verify the Azure deployment run reaches success and record the exact deployed SHA and URL. If deployment fails, inspect logs and fix only the blocker. Do not merge the diverged development branch into master and do not publish NuGet.
 
 ## Session-end update template
 
