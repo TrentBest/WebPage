@@ -37,9 +37,9 @@ Reference: [FSM_COS Pause Point](https://github.com/TrentBest/TheSingularityWork
 
 ### P0 — Prepare WebPage for a truthful public launch
 
-- [ ] Inspect current manifest, startup sequence, hub configuration, deployment workflow, repository visibility/settings, and latest CI state.
-- [ ] Confirm the first-run flow and primary manifest Experience agree with the intended public story: moniker first, then the hub; keep the initial public surface deliberately small (one useful, honest primary entry point rather than a gallery of unimplemented tabs).
-- [ ] Resolve any mismatch between the actual active manifest and public-tab documentation. Current docs have described Rendering as the only active tab, while the host service composes a Living GUI primary Experience plus Moniker; verify the actual manifest before changing either.
+- [x] Inspect current manifest, startup sequence, hub configuration, deployment workflow, repository visibility, and current CI state. The manifest is `TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json`; Azure deploys only on `master`; WebPage and FSM_COS CI runs for the task-list commits were still in progress at the last check.
+- [x] Confirm the host service loads the manifest, composes the Living GUI primary root (2102) with its Moniker dependency through FSM_COS, composes hub MicroBundles separately, and transitions from Moniker to Hub. The current hub item is `Rendering` (4100), so the active destination still needs to be reconciled with the intended initial AnyApp-first public plan.
+- [ ] Resolve the initial-hub choice and update both manifest and documentation consistently. The actual manifest currently exposes only `Rendering` (4100), while the intended initial public plan has been AnyApp-first/one tab. Do not swap it to `/anyapp` until that route provides a useful, honest destination; its current page is mostly static explanatory copy.
 - [ ] Build and test the current WebPage branch; fix launch-blocking errors, responsive layout defects, broken assets/manifest paths, and misleading or nonfunctional controls.
 - [ ] Check the public experience at desktop and narrow/mobile viewport sizes where runtime tooling permits. Keep the moniker readable and the hub usable.
 - [ ] Verify the Azure Static Web Apps deployment configuration and required secret *presence/status only*; never print or expose secret values.
@@ -78,6 +78,14 @@ Reference: [FSM_COS Pause Point](https://github.com/TrentBest/TheSingularityWork
 - Keep the creator story honest: future discoverability/distribution/monetization are aspirations unless implemented.
 - Use `master` and `development`; avoid introducing `main`.
 - User's `@GitHub` means continue independently and make concrete progress. Ask only when a real decision/approval is required.
+
+## Latest verified snapshot (2026-10-09)
+
+- WebPage `development` head at task-list creation: [`2ee3d21`](https://github.com/TrentBest/WebPage/commit/2ee3d21dbb2799f2343b36bc441027161645deb1); its `.NET Tests` run [37979446695](https://github.com/TrentBest/WebPage/actions/runs/37979446695) was **in progress** when checked. Verify its final conclusion before claiming green.
+- FSM_COS `development` head at pause-doc update: [`e721e0b`](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/commit/e721e0b52fecbbd0aaafc84a8c8e5e1e2bd4f440); its `Pack and publish` run [37979475866](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/actions/runs/37979475866) was **in progress** when checked. Publish job remains gated by `inputs.publish == true && false`; no NuGet publish is authorized.
+- WebPage repo is public. Azure Static Web Apps workflow deploys on `master`, not `development`. No verified deployment URL/status has yet been established in this session.
+- `Home.razor` renders the manifest moniker, then the manifest hub. Its hub cards are manifest-driven; the current only card is Rendering. The Rendering page includes an interactive distance/perception probe and explicitly labels itself research, not a finished universal renderer. `/anyapp` exists but is presently a static explanatory page.
+- Architecture gap remains: FSM_COS produces a `RuntimeAssembly`, but active Living GUI browser behavior still goes through the transitional WebPage-local FSM path. This is documented migration debt, not a reason to block all public launch work.
 
 ## Session-end update template
 
