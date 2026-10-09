@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: TrentBest/TheSingularityWorkshop.FSM_COS
-          ref: c0de28513c9007d64501a400b994a2d5bbba4829
+          ref: 77c05d68d70159e6f4ffb53bd2209a5ed6ed0abc
           path: _dependencies/FSM_COS
 
       - name: Build FSM_COS candidate against public dependencies
