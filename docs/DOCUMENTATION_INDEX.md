@@ -10,6 +10,8 @@
 
 ## Start here
 
+- [Brave1 Public Demonstration](BRAVE1_PUBLIC_DEMONSTRATION.md) — the public-facing MVP story, claim boundaries, and pre-submission deployment checklist.
+
 | Order | Document | Purpose |
 |---:|---|---|
 | 1 | ../README.md | Public purpose and architectural orientation |
