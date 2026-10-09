@@ -70,18 +70,20 @@ The WebPage hub now exposes **SHOW DEEP DIVE** for the Experience named by the h
 
 For the current manifest, the target is Living GUI (Experience ID `3002`). The route is a browser presentation feature; FSM_COS and MicroBundleDomain do not know that this route exists.
 
-The current `WorkshopDeepDiveCatalog` resolves the Experience and its directly declared MicroBundle IDs from the WebPage catalogs. It does **not yet use the actual `RuntimeAssembly` produced during startup**, so the displayed bundle list must not be described as the complete dependency-closed runtime graph. The declared dependency summary and the composition explanation are educational context, not proof that the page is inspecting the exact assembly instance.
+The `WorkshopExperienceService` retains the `RuntimeAssembly` returned by FSM_COS. When the visitor opens the Deep Dive from the running hub, `WorkshopDeepDiveCatalog` now passes that assembly into the educational model and provider. The page distinguishes manifest-requested roots from the resolved MicroBundles, and shows the assembly's runtime ID and arbitration-round count.
+
+A direct link opened without an initialized startup assembly uses a catalog-based fallback. The page labels that fallback explicitly; it does **not** claim that catalog declarations prove the complete dependency-closed runtime graph. The catalog also checks that the assembly contains the Experience's requested roots before associating the two, so an unrelated assembly is not silently presented as the requested Experience.
 
 ### Direction
 
-The next deep-dive integration step is to pass the real `RuntimeAssembly` (or a deliberately safe, immutable projection of it) into the WebPage educational model. The page should then distinguish:
+The current implementation is a first truthful inspection surface, not yet a universal runtime debugger. Next improvements should keep these concepts separate:
 
-- **Requested roots** — what the manifest asked FSM_COS to compose.
+- **Requested roots** — what the host manifest asked FSM_COS to compose.
 - **Resolved composition** — what the returned RuntimeAssembly actually contains.
-- **Declared dependencies** — what the MicroBundle contracts state.
+- **Declared dependencies** — what each MicroBundle contract states.
 - **Browser manifestation** — what WebPage renders from the runtime.
 
-This avoids reimplementing dependency traversal inside the Deep Dive and gives the visitor a trustworthy, inspectable explanation of the running system.
+The page consumes the assembly produced by FSM_COS; it does not reimplement dependency traversal. A later improvement can make the requested roots and resolved bundle details more interactive without changing that ownership boundary.
 
 ### Future
 
