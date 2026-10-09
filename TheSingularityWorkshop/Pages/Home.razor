@@ -2,6 +2,7 @@
 @inject IJSRuntime JS
 @inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
+@inject TheSingularityWorkshop.Workshop.Composition.WorkshopExperienceCatalog ExperienceCatalog
 @implements IDisposable
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Rendering
@@ -31,6 +32,7 @@
 .manifest-hub-action:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(0,234,255,.14)}
 .manifest-hub-secondary{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.04)}
 .manifest-hub-note{margin-top:1rem;color:#718792;font-size:.75rem;line-height:1.5}
+.manifest-deep-dive{margin-top:1rem;padding:clamp(1.25rem,3vw,2.5rem);border:1px solid rgba(255,211,77,.28);border-radius:1rem;background:linear-gradient(135deg,rgba(255,211,77,.06),rgba(3,8,17,.92))}.manifest-deep-dive h2{margin:.7rem 0;color:#fff;font-size:clamp(1.5rem,3vw,2.4rem);letter-spacing:.02em}.manifest-deep-dive p{max-width:70ch;color:#9fb0b8;line-height:1.7}
 @@keyframes hubPulse{0%,100%{transform:scale(.8);opacity:.25}50%{transform:scale(1);opacity:.55}}
 @@keyframes hubDot{0%,100%{transform:scale(.8);opacity:.55}50%{transform:scale(1.25);opacity:1}}
 .landing-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;overflow:hidden;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711}
@@ -159,6 +161,36 @@
             builder.AddContent(sequence++, string.IsNullOrWhiteSpace(item.Route)
                 ? "This destination is externally hosted and opens only when the visitor chooses it."
                 : "This destination is hosted by the Workshop and is composed from the Experience's MicroBundle hierarchy.");
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+
+        var deepDiveName = manifest.DeepDive?.Experience;
+        var deepDiveExperience = ExperienceCatalog.Experiences.FirstOrDefault(experience =>
+            string.Equals(experience.Name, deepDiveName, StringComparison.OrdinalIgnoreCase));
+
+        if (deepDiveExperience is not null)
+        {
+            builder.OpenElement(sequence++, "section");
+            builder.AddAttribute(sequence++, "class", "manifest-deep-dive");
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "manifest-hub-kicker");
+            builder.AddContent(sequence++, "AFTER THE EXPERIENCE // DEEP DIVE");
+            builder.CloseElement();
+
+            builder.OpenElement(sequence++, "h2");
+            builder.AddContent(sequence++, $"SEE HOW {deepDiveExperience.Name} IS BUILT");
+            builder.CloseElement();
+
+            builder.OpenElement(sequence++, "p");
+            builder.AddContent(sequence++,
+                "Inspect the Experience identity, MicroBundle contract, ontology, declared dependencies, and the composition boundary.");
+            builder.CloseElement();
+
+            builder.OpenElement(sequence++, "a");
+            builder.AddAttribute(sequence++, "class", "manifest-hub-action");
+            builder.AddAttribute(sequence++, "href", $"/deep-dive/{deepDiveExperience.Id}");
+            builder.AddContent(sequence++, "SHOW DEEP DIVE");
             builder.CloseElement();
             builder.CloseElement();
         }
