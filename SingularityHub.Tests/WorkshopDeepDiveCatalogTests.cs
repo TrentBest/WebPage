@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.Experiences;
 using TheSingularityWorkshop.Workshop.MicroBundles;
@@ -24,6 +25,54 @@ public sealed class WorkshopDeepDiveCatalogTests
         Assert.Equal("LIVING GUI", model.Experience.Name);
         Assert.Equal((ulong)LivingGuiExperienceMicroBundle.BundleId, model.PrimaryBundle!.Id);
         Assert.Equal("1 DECLARED DEPENDENCY", model.DependencySummary);
+    }
+
+    [Fact]
+    public void DeepDiveUsesTheActualResolvedRuntimeAssemblyWhenItContainsTheRequestedRoot()
+    {
+        var experienceCatalog = new WorkshopExperienceCatalog();
+        var compositionCatalog = new WorkshopCompositionCatalog();
+        var deepDiveCatalog = new WorkshopDeepDiveCatalog(experienceCatalog, compositionCatalog);
+        var experience = Assert.Single(experienceCatalog.Experiences);
+        var runtimeAssembly = new FsmCos(compositionCatalog).Execute(new RuntimeManifest(
+            RuntimeId: 42,
+            Bundles:
+            [
+                new MicroBundleManifestEntry(
+                    LivingGuiExperienceMicroBundle.BundleId,
+                    "1.0.0")
+            ]));
+
+        Assert.True(deepDiveCatalog.TryResolve(experience.Id, runtimeAssembly, out var model));
+        Assert.NotNull(model);
+        Assert.True(model!.IsRuntimeAssemblyBacked);
+        Assert.Equal((ulong)42, model.RuntimeAssembly!.RuntimeId);
+        Assert.Equal(2, model.ResolvedBundleCount);
+        Assert.Equal((ulong)LivingGuiExperienceMicroBundle.BundleId, model.PrimaryBundle!.Id);
+        Assert.Contains(model.Bundles, bundle => bundle.Id == (ulong)MonikerMicroBundle.BundleId);
+    }
+
+    [Fact]
+    public void DeepDiveDoesNotAttachAnUnrelatedRuntimeAssembly()
+    {
+        var experienceCatalog = new WorkshopExperienceCatalog();
+        var compositionCatalog = new WorkshopCompositionCatalog();
+        var deepDiveCatalog = new WorkshopDeepDiveCatalog(experienceCatalog, compositionCatalog);
+        var experience = Assert.Single(experienceCatalog.Experiences);
+        var unrelatedAssembly = new FsmCos(compositionCatalog).Execute(new RuntimeManifest(
+            RuntimeId: 43,
+            Bundles:
+            [
+                new MicroBundleManifestEntry(
+                    (ulong)MonikerMicroBundle.BundleId,
+                    "1.0.0")
+            ]));
+
+        Assert.True(deepDiveCatalog.TryResolve(experience.Id, unrelatedAssembly, out var model));
+        Assert.NotNull(model);
+        Assert.False(model!.IsRuntimeAssemblyBacked);
+        Assert.Equal(1, model.ResolvedBundleCount);
+        Assert.Equal((ulong)LivingGuiExperienceMicroBundle.BundleId, model.PrimaryBundle!.Id);
     }
 
     [Fact]
