@@ -1,4 +1,6 @@
-# Workshop Documentation Standard
+# WebPage Documentation Standard
+
+> **Shared standard:** The cross-repository README and visual-writing standard is maintained in [FSM_COS — Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md). This page records how WebPage applies that standard at the browser-host and proving-ground boundary; when wording overlaps, keep the shared rule and local application aligned.
 
 ## Purpose
 
