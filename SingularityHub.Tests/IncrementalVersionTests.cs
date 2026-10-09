@@ -173,7 +173,7 @@ public sealed class IncrementalVersionTests
 
         Assert.Contains("\"startup\"", manifest);
         Assert.Contains("\"running\"", manifest);
-        Assert.Contains("\"microBundleIds\": [2102]", manifest);
+        Assert.Matches("\"microBundleIds\"\\s*:\\s*\\[\\s*2102\\s*\\]", manifest);
     }
 
     [ArchitectureTest(0, 0, 189)] [Fact(DisplayName = "V0.0.189 — WebPage_Manifest_Distinguishes_Startup_From_Primary_Experience")]
