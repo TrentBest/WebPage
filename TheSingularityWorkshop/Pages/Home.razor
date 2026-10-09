@@ -7,12 +7,13 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Rendering
 @using TheSingularityWorkshop.Services
+@using TheSingularityWorkshop.Workshop.Gui
 <PageTitle>The Singularity Workshop</PageTitle>
 
 @BuildRootGui()
 
 <style>
-.manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker div:nth-child(1){color:#00a8ff}.manifest-moniker div:nth-child(2){color:#ff2cff}.manifest-moniker div:nth-child(3){color:#ff7a00}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
+.manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker #the{color:#00a8ff}.manifest-moniker #singularity{color:#ff2cff}.manifest-moniker #workshop{color:#ff7a00}.manifest-moniker #moniker-composition{display:flex;flex-direction:column;align-items:center;gap:.15em}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
 .manifest-hub{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(1rem,4vw,4rem);overflow:auto;background:radial-gradient(circle at 18% 28%,rgba(0,168,255,.10),transparent 28%),radial-gradient(circle at 82% 72%,rgba(255,44,255,.07),transparent 30%),#020711}
 .manifest-hub-shell{width:min(1100px,100%);display:grid;gap:clamp(1rem,2vw,2rem)}
 .manifest-hub-header{display:flex;align-items:end;justify-content:space-between;gap:1rem;flex-wrap:wrap}
@@ -57,10 +58,20 @@
             builder.OpenElement(0, "section");
             builder.AddAttribute(1, "class", "manifest-moniker");
             builder.AddAttribute(2, "aria-label", "The Singularity Workshop");
-            builder.OpenElement(3, "div"); builder.AddContent(4, "THE"); builder.CloseElement();
-            builder.OpenElement(5, "div"); builder.AddContent(6, "SINGULARITY"); builder.CloseElement();
-            builder.OpenElement(7, "div"); builder.AddContent(8, "WORKSHOP"); builder.CloseElement();
-            builder.OpenElement(9, "small"); builder.AddContent(10, $"MANIFEST // {Experience.Manifest?.ManifestId ?? "UNKNOWN"}"); builder.CloseElement();
+            if (Experience.MonikerComposition is { } monikerComposition)
+            {
+                builder.AddContent(3, BlazorGuiRenderer.Render(monikerComposition));
+            }
+            else
+            {
+                builder.OpenElement(4, "p");
+                builder.AddAttribute(5, "role", "alert");
+                builder.AddContent(6, "MONIKER COMPOSITION UNAVAILABLE");
+                builder.CloseElement();
+            }
+            builder.OpenElement(7, "small");
+            builder.AddContent(8, $"MANIFEST // {Experience.Manifest?.ManifestId ?? "UNKNOWN"}");
+            builder.CloseElement();
             builder.CloseElement();
         }
         else if (Experience.CurrentState == "Hub")
