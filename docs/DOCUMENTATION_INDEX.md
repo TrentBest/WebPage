@@ -6,6 +6,7 @@
 
 - [PACKAGE_ECOSYSTEM.md](PACKAGE_ECOSYSTEM.md) — map each active capability to the Workshop package that owns it and identify WebPage-only responsibilities.
 - [PROVING_GROUND_MIGRATION.md](PROVING_GROUND_MIGRATION.md) — explicit WebPage-to-package extraction contract, FSM_COS startup boundary, and branch consolidation rules.
+- [WEBAPP_HOST_MIGRATION.md](WEBAPP_HOST_MIGRATION.md) — target ASP.NET Core Razor Components host, staged conversion plan, behavior-preservation gates, and release discipline.
 
 ## Start here
 
@@ -22,7 +23,8 @@
 | 9 | DEEP_DIVE_PROVIDER_ARCHITECTURE.md | WebPage-only educational provider boundary |
 | 10 | CURRENT_VERTICAL_SLICE.md | Active implementation and proof obligations |
 | 11 | PROVING_GROUND_MIGRATION.md | Extraction plan and architecture ownership contract |
-| 12 | DOCUMENTATION_STANDARD.md | Documentation maintenance rules |
+| 12 | WEBAPP_HOST_MIGRATION.md | WebApp-adjacent host migration and acceptance gates |
+| 13 | DOCUMENTATION_STANDARD.md | Documentation maintenance rules |
 
 ## Read architecture as a chain
 
