@@ -17,7 +17,6 @@ public sealed class WorkshopExperienceService : IDisposable
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
     private readonly HubRuntime _hubRuntime;
     private bool _disposed;
-    private CancellationTokenSource? _presentationCancellation;
 
     public event Action? StateChanged;
 
@@ -95,8 +94,9 @@ public sealed class WorkshopExperienceService : IDisposable
         ComposeManifestHubBundles();
         ComposeManifestCapabilities();
 
+        // This is composition metadata, not a presentation clock. PageFSM owns
+        // gateway, population, reveal, gravity, and navigation timing.
         SetState("Moniker");
-        _ = PresentMonikerAsync(_presentationCancellation = new CancellationTokenSource());
     }
 
     private void ComposePrimaryExperience()
@@ -175,52 +175,26 @@ public sealed class WorkshopExperienceService : IDisposable
         }
     }
 
-    private async Task PresentMonikerAsync(CancellationTokenSource cancellation)
-    {
-        try
-        {
-            var seconds = Math.Max(0, CurrentManifestExperience?.PresentationSeconds ?? 0);
-            await Task.Delay(TimeSpan.FromSeconds(seconds), cancellation.Token);
-            if (!_disposed && CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase))
-            {
-                ActivatePrimaryExperience();
-            }
-        }
-        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
-        {
-            // Presentation was interrupted by explicit entry or restart.
-        }
-    }
-
+    /// <summary>
+    /// Compatibility entry point. The actual landing transition is owned by
+    /// FSMManagerService/PageFSM; this service only composes manifest capabilities.
+    /// </summary>
     public void RequestEntry()
     {
-        if (CurrentState.Equals("Moniker", StringComparison.OrdinalIgnoreCase))
-        {
-            _presentationCancellation?.Cancel();
-            ActivatePrimaryExperience();
-        }
+        if (Manifest is null)
+            throw new InvalidOperationException("The Workshop manifest must be composed before entry.");
     }
 
-    private void ActivatePrimaryExperience()
-    {
-        if (PrimaryManifestExperience is null)
-            throw new InvalidOperationException("No primary Experience is available in the WebPage manifest.");
-
-        SetState("Hub");
-    }
-
-    public async Task RestartFromManifestAsync(bool deepDive)
+    public Task RestartFromManifestAsync(bool deepDive)
     {
         if (Manifest is null)
-            await InitializeAsync();
+            throw new InvalidOperationException("The Workshop manifest must be composed before restarting.");
 
         IsDeepDive = deepDive;
-        _presentationCancellation?.Cancel();
-        _presentationCancellation = new CancellationTokenSource();
-        CurrentManifestExperience = Manifest!.Startup[0];
+        CurrentManifestExperience = Manifest.Startup[0];
         PrimaryManifestExperience = Manifest.Running[0];
         SetState("Moniker");
-        _ = PresentMonikerAsync(_presentationCancellation);
+        return Task.CompletedTask;
     }
 
     public void SetCriticalMassReached() => SetState("CriticalMass");
@@ -242,7 +216,5 @@ public sealed class WorkshopExperienceService : IDisposable
             return;
 
         _disposed = true;
-        _presentationCancellation?.Cancel();
-        _presentationCancellation?.Dispose();
     }
 }
