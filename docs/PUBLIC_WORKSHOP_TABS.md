@@ -2,19 +2,25 @@
 
 ## Current manifest activation
 
-The public host manifest currently activates **Rendering only**.
+The public host manifest currently exposes **AnyApp as the one and only hub destination**. The host manifest is intentionally narrow while the architecture is being made public and verifiable.
 
-Each top-level tab is represented by a manifest MicroBundleIds collection. The host may expose many tab MicroBundles in the future, but the active manifest deliberately exposes only one while the renderer/AI perception vertical slice is being proven.
+The startup experience is the Workshop moniker. After the moniker presentation, the hub offers one destination: AnyApp, which explains the host/composition boundary and links to the source. The primary running Experience remains Living GUI (bundle 2102), whose declared Moniker dependency (bundle 2110) is resolved by FSM_COS.
 
-Current dependency direction:
+Current path:
 
+```text
 WEBPAGE HOST MANIFEST
-  -> Rendering tab
-    -> RenderingMicroBundle (4100)
-      -> ProtocolAi
-      -> GrammarAi
+  ├─ startup: Workshop Moniker presentation
+  ├─ running: Living GUI root (2102)
+  │    └─ declared dependency: Moniker (2110)
+  │         └─ FSM_COS → RuntimeAssembly
+  └─ hub: AnyApp (one destination)
+       └─ /anyapp — host/composition architecture and honest implementation status
+```
 
-This is an intentional proving-ground configuration, not a claim that the future Workshop has only one tab.
+AnyApp is a host concept, not itself a MicroBundle, so its hub item has no MicroBundle IDs. The active Living GUI Experience is still composed through FSM_COS. Rendering research remains available at `/rendering` as a secondary research page, not as a second hub tab. Do not describe that route as a finished universal renderer or imply that a desktop installer is available.
+
+The browser Living GUI's execution/presentation lifecycle still contains transitional WebPage-owned FSM logic after composition. That migration is documented in [FUNCTIONALITY_PRESERVATION.md](FUNCTIONALITY_PRESERVATION.md) and must not be represented as complete.
 
 ## Navigation principle
 
