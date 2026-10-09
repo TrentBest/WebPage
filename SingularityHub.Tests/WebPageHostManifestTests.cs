@@ -1,3 +1,4 @@
+using System.Text.Json;
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
@@ -48,6 +49,27 @@ public sealed class WebPageHostManifestTests
         Assert.Equal(2102UL, manifest.Running[0].MicroBundleIds[0]);
         Assert.True(manifest.DeepDive.RestartFromManifest);
         Assert.True(manifest.DeepDive.Telemetry);
+    }
+
+    [Fact]
+    public void PublicHostAssetsExposeOnlyTheAnyAppHubAndSupportClientRoutes()
+    {
+        var repositoryRoot = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var wwwroot = Path.Combine(repositoryRoot, "TheSingularityWorkshop", "wwwroot");
+        var manifestJson = File.ReadAllText(Path.Combine(
+            wwwroot, "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
+        var manifest = WebPageHostManifestParser.Parse(manifestJson);
+
+        var hub = Assert.Single(manifest.Hub);
+        Assert.Equal("AnyApp", hub.Name);
+        Assert.Equal("/anyapp", hub.Route);
+        Assert.Empty(hub.MicroBundleIds);
+
+        using var config = JsonDocument.Parse(File.ReadAllText(
+            Path.Combine(wwwroot, "staticwebapp.config.json")));
+        var fallback = config.RootElement.GetProperty("navigationFallback");
+        Assert.Equal("/index.html", fallback.GetProperty("rewrite").GetString());
     }
 
     [Fact]
