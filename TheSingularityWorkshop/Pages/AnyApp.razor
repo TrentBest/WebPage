@@ -1,16 +1,87 @@
-﻿@page "/anyapp"
-<PageTitle>AnyApp: The Local Host</PageTitle>
+@page "/anyapp"
+<PageTitle>AnyApp // The Local Host</PageTitle>
 
-<h1>Experience: The Local Host</h1>
+<div class="anyapp-page">
+    <header class="anyapp-hero">
+        <div class="anyapp-kicker">THE SINGULARITY WORKSHOP // ANYAPP</div>
+        <h1>One host.<br /><span>Many Experiences.</span></h1>
+        <p class="anyapp-lede">
+            AnyApp is the desktop host for Experiences assembled from small, independent capabilities.
+            The host selects a manifest; FSM_COS composes its MicroBundles into a RuntimeAssembly;
+            the host then presents that Experience.
+        </p>
+        <div class="anyapp-actions">
+            <a class="anyapp-action primary" href="https://github.com/TrentBest/AnyApp" target="_blank" rel="noopener noreferrer">EXPLORE THE ANYAPP SOURCE ↗</a>
+            <a class="anyapp-action" href="/rendering">SEE THE RENDERING RESEARCH</a>
+        </div>
+        <p class="anyapp-note">Research prototype — no public installer or one-click desktop download is currently offered.</p>
+    </header>
 
-<p>
-    An "Experience" is anything that presents one or more sensory outputs (e.g., a game, an interactive
-    tool, a simulation). The Experience layer is the local application that consumes the FSM Layer
-    micro-packages to host and run the defined FSM behaviors. It is the runtime composition layer.
-</p>
+    <section class="anyapp-section">
+        <div class="anyapp-kicker">01 // THE COMPOSITION PATH</div>
+        <h2>The host is not the Experience.</h2>
+        <div class="anyapp-flow" aria-label="AnyApp runtime composition path">
+            <article><span>01</span><strong>MANIFEST</strong><p>Selects the Experience and its requested capabilities.</p></article>
+            <b aria-hidden="true">→</b>
+            <article><span>02</span><strong>FSM_COS</strong><p>Resolves dependencies and composes the requested bundle graph.</p></article>
+            <b aria-hidden="true">→</b>
+            <article><span>03</span><strong>RUNTIME ASSEMBLY</strong><p>Provides the composed result for the host to consume.</p></article>
+            <b aria-hidden="true">→</b>
+            <article><span>04</span><strong>HOST</strong><p>Supplies the platform-specific presentation and interaction.</p></article>
+        </div>
+    </section>
 
-<h2>Key Role</h2>
-<p>
-    AnyApp consumes the FSM Layer to host locally what we call an "Experience," providing the
-    runtime environment and necessary external service integrations.
-</p>
+    <section class="anyapp-section anyapp-proof">
+        <div class="anyapp-kicker">02 // WHAT THIS WEB DEMONSTRATION PROVES</div>
+        <h2>A real composition path, with migration work still visible.</h2>
+        <p>
+            This WebPage host reads its Experience manifest and asks FSM_COS to compose the Living GUI
+            root (bundle 2102) together with its declared Moniker dependency (bundle 2110). The host
+            receives a RuntimeAssembly instead of hard-coding that dependency closure.
+        </p>
+        <p>
+            The browser's Living GUI lifecycle still includes transitional WebPage-owned FSM code.
+            Moving that execution authority fully into the reusable Experience runtime is active work,
+            not a completed claim. The source and tests are available for inspection.
+        </p>
+        <div class="anyapp-status-grid">
+            <article><span class="status-mark">✓</span><strong>Manifest-selected composition</strong><small>Implemented in WebPage</small></article>
+            <article><span class="status-mark">✓</span><strong>FSM_COS dependency closure</strong><small>Covered by FSM_COS tests</small></article>
+            <article><span class="status-mark pending">↻</span><strong>Experience-owned execution</strong><small>Migration in progress</small></article>
+        </div>
+        <div class="anyapp-actions">
+            <a class="anyapp-action primary" href="https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS" target="_blank" rel="noopener noreferrer">INSPECT FSM_COS ↗</a>
+            <a class="anyapp-action" href="https://github.com/TrentBest/WebPage" target="_blank" rel="noopener noreferrer">INSPECT THE WEB HOST ↗</a>
+        </div>
+    </section>
+</div>
+
+<style>
+.anyapp-page{min-height:100%;overflow:auto;background:radial-gradient(circle at 82% 6%,rgba(255,44,255,.08),transparent 28%),radial-gradient(circle at 12% 25%,rgba(0,234,255,.10),transparent 30%),#020711;color:#f4f8fb;font-family:Consolas,'Courier New',monospace;padding:clamp(1.25rem,5vw,4.5rem)}
+.anyapp-hero,.anyapp-section{width:min(1100px,100%);margin:0 auto}
+.anyapp-hero{padding:clamp(1.5rem,5vw,4rem) 0 3rem}
+.anyapp-kicker{font-size:.72rem;letter-spacing:.2em;color:#6b9aaa}
+.anyapp-hero h1{margin:1.2rem 0;font-size:clamp(2.7rem,8vw,6.6rem);line-height:.92;letter-spacing:-.055em}
+.anyapp-hero h1 span{color:#00dff5}
+.anyapp-lede{max-width:72ch;font-family:system-ui,sans-serif;font-size:clamp(1.05rem,2vw,1.35rem);line-height:1.7;color:#bdcbd2}
+.anyapp-actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.6rem}
+.anyapp-action{display:inline-flex;align-items:center;justify-content:center;min-height:3.25rem;padding:.85rem 1.1rem;border:1px solid rgba(189,214,225,.28);border-radius:.65rem;color:#eaf8fc;text-decoration:none;font-size:.76rem;font-weight:800;letter-spacing:.07em}
+.anyapp-action:hover{border-color:#00dff5;transform:translateY(-1px)}
+.anyapp-action.primary{border-color:rgba(0,223,245,.55);background:linear-gradient(120deg,rgba(0,223,245,.17),rgba(0,135,255,.1))}
+.anyapp-note{margin-top:1rem;color:#80949e;font: .8rem/1.6 system-ui,sans-serif}
+.anyapp-section{padding:2rem 0 3.5rem;border-top:1px solid rgba(129,176,194,.15)}
+.anyapp-section h2{font-size:clamp(1.7rem,4vw,3rem);line-height:1.05;letter-spacing:-.03em;margin:1rem 0}
+.anyapp-section>p{max-width:82ch;font:1rem/1.75 system-ui,sans-serif;color:#b8c8d0}
+.anyapp-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:stretch;gap:.65rem;margin-top:1.5rem}
+.anyapp-flow article{min-width:0;border:1px solid rgba(0,223,245,.18);border-radius:.8rem;padding:1rem;background:rgba(6,20,31,.72)}
+.anyapp-flow article span{display:block;color:#00dff5;font-size:.7rem;margin-bottom:1rem}
+.anyapp-flow article strong{display:block;font-size:.78rem;letter-spacing:.06em}
+.anyapp-flow article p{font: .88rem/1.55 system-ui,sans-serif;color:#9fb3bd}
+.anyapp-flow>b{align-self:center;color:#5d8796}
+.anyapp-proof{margin-bottom:2rem}
+.anyapp-status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;margin:1.5rem 0}
+.anyapp-status-grid article{display:grid;grid-template-columns:auto 1fr;gap:.2rem .7rem;align-content:start;padding:1rem;border:1px solid rgba(129,176,194,.2);border-radius:.75rem;background:rgba(6,20,31,.6)}
+.status-mark{grid-row:span 2;color:#00e5bd;font-size:1.1rem}.status-mark.pending{color:#ffcb67}
+.anyapp-status-grid strong{font-size:.82rem;line-height:1.4}.anyapp-status-grid small{color:#8fa7b2;font: .75rem/1.5 system-ui,sans-serif}
+@media(max-width:760px){.anyapp-flow{grid-template-columns:1fr}.anyapp-flow>b{transform:rotate(90deg);justify-self:center}.anyapp-status-grid{grid-template-columns:1fr}.anyapp-hero{padding-top:1rem}.anyapp-action{width:100%}}
+</style>
