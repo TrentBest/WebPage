@@ -46,7 +46,7 @@ The host currently consumes:
 
 ~~~xml
 <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" />
-<PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.4" />
+<PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.6" />
 ~~~
 
 The responsibilities are separate:
@@ -54,6 +54,8 @@ The responsibilities are separate:
 - FSM_API — deterministic state-machine behavior.
 - FSM_COS — composition.
 - WebPage — browser presentation and visitor interaction.
+
+> **Candidate integration note:** the `integration/fsm-cos-alpha6` branch intentionally builds the unpublished alpha.6 candidate from its source into a local NuGet feed for CI. This is not the default WebPage development pin and must remain isolated until alpha.6 is actually published or the owner chooses another route.
 
 ## 1. Supply a catalog
 
@@ -66,6 +68,10 @@ Conceptually:
 ~~~csharp
 public bool TryResolve(ulong bundleId, out CosMicroBundle? bundle) =>
     _bundles.TryGetValue(bundleId, out bundle);
+
+public bool TryResolve(ulong bundleId, string version, out CosMicroBundle? bundle) =>
+    _bundles.TryGetValue(bundleId, out bundle) &&
+    string.Equals(bundle.Descriptor.Version, version, StringComparison.Ordinal);
 ~~~
 
 FSM_COS does not care whether the catalog is backed by an in-memory dictionary, cache, generated registry, or repository-backed resolver.
@@ -91,9 +97,9 @@ The Experience does not manually instantiate its dependency graph.
 The Living GUI MicroBundle declares Moniker as a dependency:
 
 ~~~csharp
-public IReadOnlyList<BundleRequest> Dependencies { get; } =
+public IReadOnlyList<MicroBundleDependencyRequest> Dependencies { get; } =
 [
-    BundleRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)
+    MicroBundleDependencyRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)
 ];
 ~~~
 
@@ -116,9 +122,12 @@ The host turns the selected Experience into a RuntimeManifest:
 RuntimeAssembly = _compositionSystem.Execute(
     new RuntimeManifest(
         RuntimeId: SelectedExperience.Id,
-        Bundles: SelectedExperience.MicroBundleIds
-            .Select(BundleRequest.Unconfigured)
-            .ToArray()));
+        Bundles:
+        [
+            new MicroBundleManifestEntry(
+                (ulong)LivingGuiExperienceMicroBundle.BundleId,
+                "1.0.0")
+        ]));
 ~~~
 
 The composition boundary is therefore:
