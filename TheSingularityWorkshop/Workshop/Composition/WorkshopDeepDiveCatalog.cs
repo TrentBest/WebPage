@@ -59,6 +59,7 @@ public sealed class WorkshopDeepDiveCatalog
             // A runtime must contain roots that belong to this Experience, not merely
             // any valid bundle IDs. Otherwise a different Experience could be misrepresented.
             runtimeAssembly = null;
+            requestedRoots = experienceRoots;
         }
 
         var bundles = runtimeAssembly?.Bundles
