@@ -40,6 +40,17 @@ After the opening, ask:
 - Which composition belongs to FSM_COS?
 - Which pieces are only browser presentation?
 
+When the hub appears, choose **SHOW DEEP DIVE** to open the educational view for the Experience named by the host manifest. The current Living GUI Deep Dive explains the Experience identity, MicroBundle contract, ontology, and dependency intent. Its bundle list is currently catalog-based rather than a projection of the exact startup RuntimeAssembly; that integration is a documented next step, not a completed claim.
+
+
+After the opening, ask:
+
+- What Experience am I seeing?
+- Which MicroBundles make it possible?
+- Which behavior belongs to FSM_API?
+- Which composition belongs to FSM_COS?
+- Which pieces are only browser presentation?
+
 ### 3. Explore
 
 The public navigation is intentionally narrow while the host architecture is being stabilized. Rendering is the current active proof surface for the renderer → perception → semantic-observation boundary.
