@@ -32,7 +32,7 @@ Useful source repositories:
 - [WebPage host and public demonstration](https://github.com/TrentBest/WebPage)
 - [FSM_COS composition kernel](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS)
 - [FSM_API](https://github.com/TrentBest/FSM_API)
-- [MicroBundleDomain](https://github.com/TrentBest/MicroBundleDomain)
+- [MicroBundleDomain](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain)
 - [AnyApp desktop host prototype](https://github.com/TrentBest/AnyApp)
 
 ## Potential evaluation areas
