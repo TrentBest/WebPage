@@ -92,6 +92,28 @@ Do not invent a second competing manifest schema if an existing canonical Experi
 
 If a capability is reusable beyond WebPage, implement and document it at its canonical owner, then consume and prove it here. Avoid introducing a dependency from a lower-level package back into WebPage or FSM_COS.
 
+## Package-first extraction and the zeroth artifact
+
+WebPage is a proving ground, not the permanent home of reusable behavior. When a capability has already been built in the host, the default next step is to identify its semantic owner, extract the behavior/state into a reusable MicroBundle or package, add contract and behavior tests, and make WebPage consume that canonical capability. Keep only host-specific orchestration, browser presentation, and genuinely WebPage-only behavior in the host.
+
+The Moniker is the zeroth proving case. Its current local implementation is useful for tests, but it is not proof that the artifact has been stored in Azure or can be retrieved and bound by another host. The first end-to-end delivery proof must distinguish these stages:
+
+```text
+canonical Moniker source
+  -> versioned immutable artifact + SHA-256
+  -> MicroBundle Repository contract
+  -> Azure Blob write
+  -> GET by complete artifact address
+  -> hash verification
+  -> composition-side materialization/binding
+  -> FSM_COS RuntimeAssembly
+  -> WebPage consumes retrieved artifact
+```
+
+Track this receiving-repository request at [MicroBundleRepository #20](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleRepository/issues/20), titled `WebPage-0001: Publish and retrieve the zeroth Moniker MicroBundle`. The request is stored with the capability owner, and its name identifies the requester and request sequence. Do not report the Azure path as complete until an actual round trip and binding are observed. Never publish a package without explicit approval.
+
+After the zeroth artifact path is proven, continue extracting existing WebPage behavior in bounded slices. In particular, Explore's nested MicroBundle hierarchy must become real ownership boundaries for behavior and state—not merely IDs wrapping a still-monolithic Razor page. Preserve visible behavior with tests while moving stateful lifecycle scheduling to FSM_API, composition to FSM_COS, and GUI construction to the presentation layer. The visitor experience should remain stable during extraction.
+
 ## Agent-to-agent repository requests
 
 When an agent needs a capability or direct usage example from another repository, deposit the request in the repository that owns the requested capability. Name the request using the requesting repository and a unique request identifier, for example `WebPage-0001-usage-example.md`. The containing repository already identifies the recipient; the request body must not redundantly state that repository as its location.
@@ -103,14 +125,17 @@ This convention is a coordination mechanism, not a new runtime dependency or a r
 ## Implementation sequence
 
 1. Preserve and verify the current opening sequence and functionality-preservation ledger.
-2. Inventory the existing manifest, registry/catalog, Hub, and route/presentation mechanisms before adding new abstractions.
-3. Define the smallest destination contract using existing canonical types wherever possible.
-4. Make the Hub enumerate only destinations backed by the manifest/registry and clearly represent their lifecycle state.
-5. Connect one additional real destination end-to-end as the vertical proof; do not seed a static menu of fictional features.
-6. Ensure entering/leaving a destination preserves host identity and does not duplicate FSM_COS composition or FSM execution.
-7. Add contract tests for discovery, unavailable destinations, identity, and entry/exit; add browser-level visual evidence for the transition.
-8. Update the smallest authoritative documents and prove the build/tests/CI.
-9. Consolidate temporary branches after proof. Keep `master` untouched unless promotion is explicitly requested.
+2. Prove the zeroth artifact path for Moniker through actual Azure write, GET, hash verification, composition-side binding, and FSM_COS inclusion; the local test implementation alone is not completion.
+3. Inventory existing host behavior and assign each responsibility to its canonical package/MicroBundle owner before adding abstractions.
+4. Extract already-built reusable behavior and state in bounded slices, preserving the visitor experience with tests. Start with the current Explore hierarchy so leaf identities become real behavior/state boundaries rather than labels over page-local logic.
+5. Inventory the existing manifest, registry/catalog, Hub, and route/presentation mechanisms before adding new abstractions.
+6. Define the smallest destination contract using existing canonical types wherever possible.
+7. Make the Hub enumerate only destinations backed by the manifest/registry and clearly represent their lifecycle state.
+8. Connect one additional real destination end-to-end; do not seed a static menu of fictional features.
+9. Ensure entering/leaving a destination preserves host identity and does not duplicate FSM_COS composition or FSM execution.
+10. Add contract tests for discovery, unavailable destinations, identity, entry/exit, and extracted behavior; add browser-level visual evidence for presentation transitions.
+11. Update the smallest authoritative documents and prove the build/tests/CI.
+12. Consolidate temporary branches after proof. Keep `master` untouched unless promotion is explicitly requested.
 
 ## Acceptance criteria
 
