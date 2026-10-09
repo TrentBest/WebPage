@@ -218,4 +218,18 @@ public sealed class IncrementalVersionTests
         Assert.Contains("(slot * 37) % (columns * rows)", context);
         Assert.Contains("EarlyPopulationTargetsSpanTheViewportInsteadOfFillingTopRows", tests);
     }
+
+    [ArchitectureTest(0, 0, 192)] [Fact(DisplayName = "V0.0.192 — Moniker_Reveal_Uses_The_Composed_MicroBundle_While_Preserving_Glyph_Motion")]
+    public void V0_0_192MonikerRevealUsesComposedMicroBundle()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var livingGui = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "LivingGui.razor"));
+        var firstContact = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
+
+        Assert.Contains("MonikerComposition=\"@Experience.MonikerComposition\"", livingGui);
+        Assert.Contains("MonikerWord(\"the\", \"THE\")", firstContact);
+        Assert.Contains("MonikerWord(\"singularity\", \"SINGULARITY\")", firstContact);
+        Assert.Contains("MonikerWord(\"workshop\", \"WORKSHOP\")", firstContact);
+        Assert.Contains("helloGlyphWave", firstContact);
+    }
 }
