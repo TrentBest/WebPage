@@ -83,6 +83,7 @@ The repository deliberately separates the public orientation from the engineerin
 - [FSM_COS Usage](docs/FSM_COS_USAGE.md) — how WebPage consumes the external composition package.
 - [Package Ecosystem](docs/PACKAGE_ECOSYSTEM.md) — what WebPage consumes and why.
 - [Documentation Standard](docs/DOCUMENTATION_STANDARD.md) — how this repository keeps documentation useful and honest.
+- [FSM_COS Proving-Ground Migration](docs/PROVING_GROUND_MIGRATION.md) — extraction rules, responsibility boundaries, startup flow, and branch discipline.
 
 ### External abstractions
 
