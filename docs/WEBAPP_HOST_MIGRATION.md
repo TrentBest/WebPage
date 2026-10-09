@@ -37,18 +37,20 @@ AnyApp is a sibling manifestation for desktop experiences. WebPage and WebApp mu
 
 - The main WebPage project uses `Microsoft.NET.Sdk.BlazorWebAssembly`.
 - It directly references FSM_API 1.0.13, MicroBundleDomain 1.0.1, FSM_COS 0.1.0-alpha.5, GUI.Blazor 0.1.0-alpha.8, ProtocolAi, and GrammarAi.
+- The host manifest contract already describes startup Experiences, hub destinations, running Experiences, supporting capabilities, and Deep Dive behavior; tests cover parsing and important manifest invariants.
+- The public Forge code already contains an FSM workbench, executable definition model, preview runtime, condition/signal support, and scaffolding, with tests for authoring and preview lifecycle. This is real FSM authoring capability, but it is not yet a general webpage artifact editor or a demonstrated bridge from Forge output to a page consumed by WebApp.
 - Startup manifest composition resolves the Living GUI root (2102) and its declared Moniker dependency (2110) through FSM_COS.
 - The composed `RuntimeAssembly` exists, but browser execution still depends on the transitional `FSMManagerService → PageFSM → LivingGuiFsm → PageStateContext` path.
 - The sibling `TrentBest/TheSingularityWorkshop.WebApp` repository has a real .NET 8 ASP.NET Core Razor Components host on its `development` branch, using Interactive Server rendering. Its startup registers `WebAppMicroBundleCatalog`, `WebAppCosRuntime`, and `WebAppExperienceRuntime`.
 - `WebAppCosRuntime` composes a `RuntimeManifest` through `FsmCos` and verifies that the host-owned Moniker bundle is present in the resulting `RuntimeAssembly`. This proves an actual FSM_COS startup path, but the Moniker bundle is still a temporary local compatibility bundle (BundleId 3101), not yet a verified published Experiences artifact.
 - `WebAppExperienceRuntime` defines the Gateway → LivingGui → Moniker → Gravity → Running lifecycle and independently instantiated living actors driven through FSM_API. `Components/Pages/Home.razor` presents that runtime and renders the composed Moniker through `BlazorGuiRenderer`.
-- WebApp's current vertical slice is a working implementation direction, not yet evidence that it can author arbitrary pages: its host still constructs a fixed landing Experience, its MicroBundle catalog resolves only the local Moniker bundle, and its roadmap explicitly defers Forge authoring until artifact and manifest boundaries stabilize.
-- WebApp's own roadmap identifies authoring/Forge as a later phase. WebPage's next task is therefore to define and prove the page-artifact authoring boundary, then connect that artifact to WebApp's presentation path without copying runtime behavior.
+- WebApp's current vertical slice is a working browser manifestation, not yet evidence that it can author arbitrary pages: its host still constructs a fixed landing Experience, its MicroBundle catalog resolves only the local Moniker bundle, and its roadmap defers Forge integration until artifact and manifest boundaries stabilize.
+- WebPage already owns two important pieces of the eventual authoring story—the host/page manifest contract and FSM Forge authoring/preview. The missing proof is the bridge between them: a page artifact produced from authoring inputs, composed through the canonical runtime boundary, then consumed and presented by WebApp without host-specific duplicate behavior.
 - The current WebPage deployment workflow uploads published `wwwroot` to Azure Static Web Apps. This describes today's WebPage deployment path only; it does not define the WebApp architecture.
 
 ### Direction — next implementation slices
 
-1. **Turn inspection into an integration contract.** The WebApp project, startup, FSM_COS composition path, GUI rendering, fixed landing Experience, and roadmap have now been inspected. Next, inspect the exact public APIs and tests around those paths, then identify the smallest contract WebPage can author and WebApp can consume. Do not claim arbitrary page authoring exists merely because the fixed landing Experience is manifest/composition-aware.
+1. **Connect existing authoring to the browser manifestation.** WebPage already has `WebPageHostManifest`, FSM Forge definitions/workbench/preview/scaffolding, and tests. WebApp already has FSM_COS composition and GUI.Blazor presentation, but only for a fixed landing Experience. Define the smallest explicit artifact contract that bridges these existing pieces; do not rebuild FSM Forge or pretend the fixed WebApp landing page is already a general page builder.
 2. **Dependency/release checkpoint.** Verify the HeadlessAi candidate's exact branch, tests, package contents, documentation, and disabled publication gate. Verify the MicroBundleDomain and FSM_COS contracts WebPage intends to consume. Do not infer package readiness from an open PR or an older green run.
 3. **Define the webpage artifact contract.** Establish what a created page consists of: manifest, configuration, selected Experiences/MicroBundles, presentation metadata/assets, and any required routing or sharing metadata. Reuse existing contracts where they exist; do not invent APIs in a package that does not own them.
 4. **Prove author → compose → preview.** Start with one small, manifest-driven page authored through the Workshop path. Prove the manifest is the source of composition, FSM_COS resolves the intended dependency closure, and the browser presents the composed Experience.
@@ -59,7 +61,7 @@ AnyApp is a sibling manifestation for desktop experiences. WebPage and WebApp mu
 
 ### Future — not yet claimed
 
-- WebPage can author and configure a page artifact from Workshop-owned manifests and capabilities.
+- WebPage's existing manifest and Forge authoring tools are connected to a page artifact that WebApp can consume and configure.
 - A created page can be previewed and presented by WebApp without hand-written host-specific runtime behavior.
 - The browser is fully driven by canonical Experience runtime state rather than transitional WebPage lifecycle classes.
 - A completed author → compose → preview → publish → share flow.
