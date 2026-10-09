@@ -17,5 +17,6 @@ public interface IDeepDiveProvider
     WorkshopDeepDiveModel Execute(
         IExperience experience,
         IReadOnlyList<CosMicroBundle> microBundles,
-        RuntimeAssembly? runtimeAssembly = null);
+        RuntimeAssembly? runtimeAssembly = null,
+        IReadOnlyList<ulong>? requestedRootIds = null);
 }
