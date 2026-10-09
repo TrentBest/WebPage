@@ -101,15 +101,15 @@ public sealed class WorkshopExperienceService : IDisposable
 
     private void ComposePrimaryExperience()
     {
-        if (PrimaryManifestExperience is null || PrimaryManifestExperience.MicroBundleIds.Count == 0)
+        if (PrimaryManifestExperience is null || PrimaryManifestExperience.MicroBundles is null || PrimaryManifestExperience.MicroBundles.Count == 0)
             throw new InvalidOperationException("The manifest-selected primary Experience has no MicroBundles.");
 
         // The manifest supplies only the primary Experience root. Its MicroBundle
         // declares the canonical Moniker dependency, so FSM_COS closes the graph.
         RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
             RuntimeId: 1,
-            Bundles: PrimaryManifestExperience.MicroBundleIds
-                .Select(MicroBundleDependencyRequest.Unconfigured)
+            Bundles: PrimaryManifestExperience.MicroBundles
+                .Select(root => root.ToRuntimeManifestEntry())
                 .ToArray()));
 
         var hasMoniker = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
@@ -142,13 +142,13 @@ public sealed class WorkshopExperienceService : IDisposable
         for (var index = 0; index < hubItems.Count; index++)
         {
             var item = hubItems[index];
-            if (item.MicroBundleIds is null || item.MicroBundleIds.Count == 0)
+            if (item.MicroBundles is null || item.MicroBundles.Count == 0)
                 continue;
 
             var assembly = _compositionSystem.Execute(new RuntimeManifest(
                 RuntimeId: 100UL + (ulong)index,
-                Bundles: item.MicroBundleIds
-                    .Select(MicroBundleDependencyRequest.Unconfigured)
+                Bundles: item.MicroBundles
+                    .Select(root => root.ToRuntimeManifestEntry())
                     .ToArray()));
 
             _hubRuntimeAssemblies[item.Name] = assembly;
@@ -162,13 +162,13 @@ public sealed class WorkshopExperienceService : IDisposable
         var capabilities = Manifest?.Capabilities ?? Array.Empty<WebPageManifestCapability>();
         foreach (var capability in capabilities)
         {
-            if (capability.MicroBundleIds is null || capability.MicroBundleIds.Count == 0)
+            if (capability.MicroBundles is null || capability.MicroBundles.Count == 0)
                 continue;
 
             var assembly = _compositionSystem.Execute(new RuntimeManifest(
                 RuntimeId: (ulong)(200UL + (ulong)_capabilityRuntimeAssemblies.Count),
-                Bundles: capability.MicroBundleIds
-                    .Select(MicroBundleDependencyRequest.Unconfigured)
+                Bundles: capability.MicroBundles
+                    .Select(root => root.ToRuntimeManifestEntry())
                     .ToArray()));
 
             _capabilityRuntimeAssemblies[capability.Name] = assembly;
