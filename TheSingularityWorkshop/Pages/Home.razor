@@ -39,6 +39,12 @@
 @@keyframes hubDot{0%,100%{transform:scale(.8);opacity:.55}50%{transform:scale(1.25);opacity:1}}
 .landing-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;overflow:hidden;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711}
 .landing-aura{position:absolute;width:60vw;height:60vw;border:1px solid rgba(0,234,255,.08);border-radius:50%;box-shadow:0 0 100px rgba(0,234,255,.04);pointer-events:none}
+.workshop-running-surface{position:absolute;inset:0;display:grid;grid-template-columns:minmax(180px,.72fr) minmax(0,1.28fr);min-width:0;min-height:0;overflow:hidden;background:#020711}
+.workshop-running-moniker{position:relative;min-width:0;min-height:0;overflow:hidden;border-right:1px solid rgba(0,234,255,.2)}
+.workshop-running-hub{position:relative;min-width:0;min-height:0;overflow:auto}
+.workshop-running-hub .manifest-hub{position:relative;inset:auto;min-height:100%;box-sizing:border-box;align-items:flex-start}
+.workshop-running-hub .manifest-hub-shell{width:100%}
+@media(max-width:700px){.workshop-running-surface{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(150px,.48fr) minmax(0,1fr)}.workshop-running-moniker{border-right:0;border-bottom:1px solid rgba(0,234,255,.2)}.workshop-running-moniker .living-experience-panel{position:absolute;inset:0}}
 </style>
 
 @code {
@@ -54,44 +60,56 @@
 
     private RenderFragment BuildExperienceContent() => builder =>
     {
-        if (Experience.CurrentState == "Moniker")
+        if (Experience.Manifest is null)
         {
             builder.OpenElement(0, "section");
-            builder.AddAttribute(1, "class", "manifest-moniker");
-            builder.AddAttribute(2, "aria-label", "The Singularity Workshop");
-            if (Experience.MonikerComposition is { } monikerComposition)
-            {
-                builder.AddContent(3, BlazorGuiRenderer.Render(monikerComposition));
-            }
-            else
-            {
-                builder.OpenElement(4, "p");
-                builder.AddAttribute(5, "role", "alert");
-                builder.AddContent(6, "MONIKER COMPOSITION UNAVAILABLE");
-                builder.CloseElement();
-            }
-            builder.OpenElement(7, "small");
-            builder.AddContent(8, $"MANIFEST // {Experience.Manifest?.ManifestId ?? "UNKNOWN"}");
+            builder.AddAttribute(1, "class", "landing-stage");
+            builder.OpenElement(2, "p");
+            builder.AddAttribute(3, "role", "status");
+            builder.AddContent(4, "COMPOSING WORKSHOP EXPERIENCE…");
             builder.CloseElement();
             builder.CloseElement();
+            return;
         }
-        else if (Experience.CurrentState == "Hub")
-        {
-            BuildManifestHub(builder);
-        }
-        else if (Experience.CurrentState is "ExperienceLoading" or "LivingGui" or "CriticalMass")
-        {
-            builder.OpenComponent<LivingGui>(8);
-            builder.CloseComponent();
 
-            if (FSM.CurrentState == PageFSM.Running)
-            {
-                builder.OpenComponent<ForgeProofView>(9);
-                builder.AddAttribute(10, "Experience", Experience);
-                builder.CloseComponent();
-            }
+        if (FSM.CurrentState == PageFSM.Gateway)
+        {
+            builder.OpenComponent<TheSingularityWorkshop.Components.FirstContactView>(0);
+            builder.AddAttribute(1, "State", "Gateway");
+            builder.AddAttribute(2, "OnEntryRequested", EventCallback.Factory.Create(this, EnterWorkshop));
+            builder.CloseComponent();
+            return;
         }
+
+        if (FSM.CurrentState == PageFSM.Running)
+        {
+            builder.OpenElement(0, "section");
+            builder.AddAttribute(1, "class", "workshop-running-surface");
+
+            builder.OpenElement(2, "div");
+            builder.AddAttribute(3, "class", "workshop-running-moniker");
+            builder.OpenComponent<LivingGui>(4);
+            builder.CloseComponent();
+            builder.CloseElement();
+
+            builder.OpenElement(5, "div");
+            builder.AddAttribute(6, "class", "workshop-running-hub");
+            BuildManifestHub(builder);
+            builder.CloseElement();
+
+            builder.CloseElement();
+            return;
+        }
+
+        builder.OpenComponent<LivingGui>(0);
+        builder.CloseComponent();
     };
+
+    private async Task EnterWorkshop()
+    {
+        await JS.InvokeVoidAsync("interop.markWorkshopVisited");
+        FSM.RequestEnter();
+    }
 
     private void BuildManifestHub(RenderTreeBuilder builder)
     {
