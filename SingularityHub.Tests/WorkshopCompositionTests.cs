@@ -47,7 +47,7 @@ public sealed class WorkshopCompositionTests
             RuntimeId: 4001UL,
             Bundles: new[]
             {
-                MicroBundleDependencyRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
+                new MicroBundleManifestEntry(AiExchangeCompositionBundle.BundleId, "0.1.0")
             }));
 
         var ai = runtime.TryGetBundle<AiExchangeCompositionBundle>(
@@ -76,7 +76,7 @@ public sealed class WorkshopCompositionTests
             RuntimeId: 4100UL,
             Bundles: new[]
             {
-                MicroBundleDependencyRequest.Unconfigured(RenderingMicroBundle.BundleId)
+                new MicroBundleManifestEntry(RenderingMicroBundle.BundleId, "0.1.0")
             }));
 
         Assert.True(runtime.TryGetBundle<RenderingMicroBundle>(
@@ -101,7 +101,7 @@ public sealed class WorkshopCompositionTests
             RuntimeId: 4002UL,
             Bundles: new[]
             {
-                MicroBundleDependencyRequest.Unconfigured(AiExchangeCompositionBundle.BundleId)
+                new MicroBundleManifestEntry(AiExchangeCompositionBundle.BundleId, "0.1.0")
             }));
 
         Assert.Contains(runtime.Bundles, bundle => bundle.Id == AiExchangeCompositionBundle.ProtocolBundleId);
@@ -130,7 +130,7 @@ public sealed class WorkshopCompositionTests
               "manifestId": "webpage-host",
               "version": "1.0.0",
               "startup": [
-                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }
+                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
               ],
               "hub": [
                 {
@@ -141,17 +141,17 @@ public sealed class WorkshopCompositionTests
                   "aboutUrl": "/about-us",
                   "bridgeEndpoint": null,
                   "route": "/anyapp",
-                  "microBundleIds": []
+                  "microBundles": []
                 }
               ],
               "capabilities": [
                 {
                   "name": "Rendering",
-                  "microBundleIds": [4100]
+                  "microBundles": [{ "bundleId": 4100, "version": "0.1.0" }]
                 }
               ],
               "running": [
-                { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
+                { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }
               ],
               "deepDive": {
                 "experience": "LIVING GUI",
