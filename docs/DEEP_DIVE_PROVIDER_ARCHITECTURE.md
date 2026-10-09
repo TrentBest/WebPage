@@ -6,19 +6,25 @@ A Deep Dive is an educational capability of the **WebPage**, not a universal run
 
 A MicroBundle may provide a WebPage-specific Deep Dive provider. If it does, WebPage can acquire that provider from the composed MicroBundle set.
 
-Conceptually:
+The current catalog performs this lookup after it has selected the Experience and established whether the available bundles come from a real runtime assembly or the catalog fallback:
 
 ```csharp
-foreach (var microBundle in microBundles)
+foreach (var microBundle in bundles)
 {
     var provider = microBundle.TryGetProvider<IDeepDiveProvider>();
 
     if (provider is not null)
-        return provider.Execute(experience, microBundles);
+    {
+        return provider.Execute(
+            experience,
+            bundles,
+            runtimeAssembly,
+            requestedRoots);
+    }
 }
 ```
 
-The exact provider plumbing may evolve, but the architectural rule does not.
+Here, `runtimeAssembly` is the actual FSM_COS result when one is available, and `requestedRoots` are the Experience's requested MicroBundle IDs. The provider receives both the request and the resolved bundle set; it must not infer that every resolved bundle was a direct root. The catalog owns resolution and fallback decisions, while the provider builds the educational projection.
 
 ## Why the provider belongs to WebPage
 
