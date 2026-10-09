@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.DeepDive;
 using CosMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
@@ -22,6 +23,17 @@ public sealed class WorkshopDeepDiveCatalog
     }
 
     public bool TryResolve(ulong experienceId, out WorkshopDeepDiveModel? model)
+        => TryResolve(experienceId, runtimeAssembly: null, out model);
+
+    /// <summary>
+    /// Resolves educational metadata, preferring the actual FSM_COS assembly when the host
+    /// can supply it. The catalog fallback is useful for direct links, but is not presented
+    /// as proof of the runtime's resolved dependency closure.
+    /// </summary>
+    public bool TryResolve(
+        ulong experienceId,
+        RuntimeAssembly? runtimeAssembly,
+        out WorkshopDeepDiveModel? model)
     {
         if (!_experiences.TryResolve(experienceId, out var experience) || experience is null)
         {
@@ -29,23 +41,24 @@ public sealed class WorkshopDeepDiveCatalog
             return false;
         }
 
-        var bundles = experience.MicroBundleIds
-            .Select(id => _bundles.TryResolve(id, out var bundle) ? bundle : null)
-            .Where(bundle => bundle is not null)
-            .Cast<CosMicroBundle>()
-            .ToArray();
+        var bundles = runtimeAssembly?.Bundles
+            ?? experience.MicroBundleIds
+                .Select(id => _bundles.TryResolve(id, out var bundle) ? bundle : null)
+                .Where(bundle => bundle is not null)
+                .Cast<CosMicroBundle>()
+                .ToArray();
 
         foreach (var microBundle in bundles)
         {
             var provider = microBundle.TryGetProvider<IDeepDiveProvider>();
             if (provider is not null)
             {
-                model = provider.Execute(experience, bundles);
+                model = provider.Execute(experience, bundles, runtimeAssembly);
                 return true;
             }
         }
 
-        model = new WorkshopDeepDiveModel(experience, bundles);
+        model = new WorkshopDeepDiveModel(experience, bundles, runtimeAssembly);
         return true;
     }
 }
@@ -53,18 +66,28 @@ public sealed class WorkshopDeepDiveCatalog
 /// <summary>Immutable educational projection of an Experience composition.</summary>
 public sealed class WorkshopDeepDiveModel
 {
-    public WorkshopDeepDiveModel(IExperience experience, IReadOnlyList<CosMicroBundle> bundles)
+    public WorkshopDeepDiveModel(
+        IExperience experience,
+        IReadOnlyList<CosMicroBundle> bundles,
+        RuntimeAssembly? runtimeAssembly = null)
     {
         Experience = experience;
         Bundles = bundles;
+        RuntimeAssembly = runtimeAssembly;
     }
 
     public IExperience Experience { get; }
     public IReadOnlyList<CosMicroBundle> Bundles { get; }
-    public CosMicroBundle? PrimaryBundle => Bundles.FirstOrDefault();
+    public RuntimeAssembly? RuntimeAssembly { get; }
+    public bool IsRuntimeAssemblyBacked => RuntimeAssembly is not null;
+    public IReadOnlyList<ulong> RequestedBundleIds => Experience.MicroBundleIds;
+    public int ResolvedBundleCount => Bundles.Count;
+    public CosMicroBundle? PrimaryBundle =>
+        Experience.MicroBundleIds
+            .Select(id => Bundles.FirstOrDefault(bundle => bundle.Id == id))
+            .FirstOrDefault(bundle => bundle is not null);
 
-    public int DeclaredDependencyCount =>
-        Bundles.Sum(bundle => bundle.Dependencies.Count);
+    public int DeclaredDependencyCount => PrimaryBundle?.Dependencies.Count ?? 0;
 
     public string DependencySummary =>
         PrimaryBundle is null
