@@ -188,4 +188,20 @@ public sealed class IncrementalVersionTests
         Assert.Contains("\"kind\": \"Primary\"", manifest);
         Assert.Contains("\"experience\": \"LIVING GUI\"", manifest);
     }
+
+    [ArchitectureTest(0, 0, 190)] [Fact(DisplayName = "V0.0.190 — Landing_Uses_PageFSM_And_Preserves_The_Gateway_Before_The_Hub")]
+    public void V0_0_190LandingUsesPageFsmAndPreservesGatewayBeforeHub()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
+        var layout = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "MainLayout.razor"));
+        var experience = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs"));
+
+        Assert.Contains("FirstContactView", home);
+        Assert.Contains("FSM.CurrentState == PageFSM.Gateway", home);
+        Assert.Contains("FSM.RequestEnter();", home);
+        Assert.Contains("FSM.CurrentState == PageFSM.Running", home);
+        Assert.Contains("PageFSM.NavigationArrival", layout);
+        Assert.DoesNotContain("PresentMonikerAsync", experience);
+    }
 }
