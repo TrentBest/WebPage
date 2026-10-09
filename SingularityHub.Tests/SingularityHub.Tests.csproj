@@ -15,7 +15,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" />
-    <PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.5" />
+    <PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.6" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
       <PrivateAssets>all</PrivateAssets>
