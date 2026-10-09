@@ -1,8 +1,10 @@
 @page "/deep-dive/{ExperienceId:long}"
 @using TheSingularityWorkshop.SingularityHub
 @using TheSingularityWorkshop.Workshop.Composition
+@using TheSingularityWorkshop.Services
 @inject NavigationManager Navigation
 @inject WorkshopDeepDiveCatalog DeepDiveCatalog
+@inject WorkshopExperienceService ExperienceService
 
 <PageTitle>Deep Dive // @ExperienceName</PageTitle>
 
@@ -56,9 +58,8 @@
             </article>
             <article>
                 <span>RUNTIME</span>
-                <strong>FSM_COS</strong>
-                <p>Manifest → dependency closure → load → arbitration → convergence → RuntimeAssembly.
-                    The browser renders the result; it does not secretly replace the composition kernel.</p>
+                <strong>@RuntimeSummary</strong>
+                <p>@RuntimeDescription</p>
             </article>
             <article>
                 <span>SENSORY SYSTEMS</span>
@@ -151,7 +152,17 @@ code{display:block;padding:1.4rem;background:#01050a;border:1px solid rgba(255,2
     [Parameter] public long ExperienceId { get; set; }
 
     private WorkshopDeepDiveModel? Model =>
-        DeepDiveCatalog.TryResolve((ulong)ExperienceId, out var model) ? model : null;
+        DeepDiveCatalog.TryResolve((ulong)ExperienceId, ExperienceService.RuntimeAssembly, out var model)
+            ? model
+            : null;
+
+    private string RuntimeSummary => Model?.RuntimeAssembly is { } assembly
+        ? $"ASSEMBLY {assembly.RuntimeId} // {assembly.Bundles.Count} BUNDLES"
+        : "FSM_COS // CATALOG VIEW";
+
+    private string RuntimeDescription => Model?.RuntimeAssembly is { } assembly
+        ? $"This view is backed by the actual RuntimeAssembly returned by FSM_COS. It contains {assembly.Bundles.Count} resolved MicroBundles and converged after {assembly.ArbitrationRounds} arbitration rounds. Requested roots and resolved bundles are shown separately below."
+        : "This page was opened without an available startup RuntimeAssembly. The fallback view describes catalog declarations only; it is not evidence of the dependency-closed runtime. Return to the hub and open SHOW DEEP DIVE to inspect the running assembly.";
 
     private IExperience? CurrentExperience => Model?.Experience;
 
@@ -173,11 +184,13 @@ code{display:block;padding:1.4rem;background:#01050a;border:1px solid rgba(255,2
         : string.Join(" / ", CurrentExperience.SensorySystems);
 
     private string CompositionGraph => Model is null
-        ? "Experience 0x{ExperienceId:X16}\n  └─ UNRESOLVED"
-        : $"Experience 0x{Model.Experience.Id:X16}\n"
-          + $"  └─ MicroBundles ({Model.Bundles.Count})\n"
-          + string.Join("\n", Model.Bundles.Select(bundle =>
-              $"       ├─ 0x{bundle.Id:X16}  v{bundle.Descriptor.Version}  deps:{bundle.Dependencies.Count}"));
+        ? $"Experience 0x{ExperienceId:X16}\n  └─ UNRESOLVED"
+        : $"Experience 0x{Model.Experience.Id:X16} // {Model.Experience.Name}\n"
+          + "  ├─ REQUESTED ROOTS\n"
+          + string.Join("\n", Model.RequestedBundleIds.Select(id => $"  │  └─ 0x{id:X16}")) + "\n"
+          + (Model.IsRuntimeAssemblyBacked ? "  └─ RESOLVED RUNTIME ASSEMBLY\n" : "  └─ CATALOG DECLARATIONS (NOT A RUNTIME SNAPSHOT)\n")
+          + string.Join("\n", Model.Bundles.Select((bundle, index) =>
+              $"     {(index == Model.Bundles.Count - 1 ? "└" : "├")}─ 0x{bundle.Id:X16}  v{bundle.Descriptor.Version}  declared-deps:{bundle.Dependencies.Count}"));
 
     private void ReturnToExperience() => Navigation.NavigateTo("/");
     private void GoCreate() => Navigation.NavigateTo("/create");
