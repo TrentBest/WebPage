@@ -14,18 +14,20 @@ A good document lets a reader answer three questions:
 
 ## The progressive-invitation rule
 
-A README is not a manual compressed into one page. It is the front door to a learning journey. Order its content so that each section answers the next question a curious reader is likely to ask.
+WebPage follows the shared opening sequence in the [FSM_COS Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md). The first six sections are a guided reader journey, not a requirement to turn every README into a long manual:
 
-The standard reader journey is:
+1. **00 — Title and identity:** put a vivid marker before the number; use the bright asterisk ✳️, never a low-contrast gray circle.
+2. **Money-shot visual:** place an informative, truthful project visual directly under the title/badges.
+3. **01 — Problem and short response:** state the problem plainly, then explain the package's big-picture response.
+4. **02 — Workshop documentation context:** explain the repository ecosystem, the role of README versus focused guides, and any deliberate local variance.
+5. **03 — Deeper explanation:** expand the problem, solution, boundaries, and mental model.
+6. **04 — See it in a minute:** provide the shortest meaningful, verified proof with prerequisites and expected results.
+7. **05 — Documentation and theory:** give navigable links to the authoritative guides and say what each helps the reader learn.
 
-1. **Recognize — What is this?** Give the package a plain-language definition and a memorable, specific promise. A reader should not need to know Workshop vocabulary to understand the opening.
-2. **Care — Why use it?** Name the problem, the cost or friction it removes, the people or systems it helps, and the situations where it is a good fit. Explain outcomes rather than presenting an unexplained feature inventory.
-3. **Believe — Can I see it work?** Offer a runnable “first proof” that a reader can complete in about one minute after prerequisites are available. Show expected output or visible behavior. If the package cannot sensibly run alone, link to a real working demonstration and explain exactly what it proves.
-4. **Understand — How does it work?** Introduce the smallest useful mental model, a readable diagram, the normal workflow, and the key contracts. Explain unfamiliar terms when first used.
-5. **Evaluate — What do I get and what are the limits?** Describe capabilities, boundaries, configuration, compatibility, performance evidence, limitations, and trade-offs.
-6. **Continue — Where do I go next?** Link to focused usage guides, API reference, architecture/theory, tutorials for non-coders, examples, contribution guidance, and support.
+The visual marker goes **before** the number. Use vivid, consistent semantic markers, but never rely on color alone to convey meaning. GitHub Markdown does not provide dependable arbitrary heading colors, so use the marker/number/text consistently and test light, dark, and narrow-screen readability.
 
-This sequence is progressive disclosure, not a ban on depth. A skimming reader should get the promise; a practical reader should reach a first success quickly; an engineer should be able to evaluate the contract; a learner should have a route into the underlying ideas. Let readers choose their depth after the value is clear.
+This sequence is intentional: it gives the reader a reason to care before a deep architecture tour, explains where the documentation fits, then expands the explanation before asking the reader to try the package. It is progressive disclosure, not a reason to hide a meaningful demo or weaken the technical detail.
+
 
 ### The first-minute proof
 
