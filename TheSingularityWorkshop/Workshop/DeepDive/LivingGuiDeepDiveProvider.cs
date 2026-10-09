@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
 using CosMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
@@ -13,6 +14,7 @@ public sealed class LivingGuiDeepDiveProvider : IDeepDiveProvider
 {
     public WorkshopDeepDiveModel Execute(
         IExperience experience,
-        IReadOnlyList<CosMicroBundle> microBundles)
-        => new(experience, microBundles);
+        IReadOnlyList<CosMicroBundle> microBundles,
+        RuntimeAssembly? runtimeAssembly = null)
+        => new(experience, microBundles, runtimeAssembly);
 }
