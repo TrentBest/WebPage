@@ -9,7 +9,8 @@ public sealed record WebPageHostManifest(
     IReadOnlyList<WebPageManifestExperience> Startup,
     IReadOnlyList<WebPageManifestHubItem> Hub,
     IReadOnlyList<WebPageManifestExperience> Running,
-    WebPageDeepDiveManifest DeepDive);
+    WebPageDeepDiveManifest DeepDive,
+    IReadOnlyList<WebPageManifestCapability>? Capabilities = null);
 
 /// <summary>One manifest-selected startup or running Experience.</summary>
 public sealed record WebPageManifestExperience(
@@ -28,6 +29,11 @@ public sealed record WebPageManifestHubItem(
     string? BridgeEndpoint,
     string? Route,
     IReadOnlyList<ulong> MicroBundleIds = null!);
+
+/// <summary>A manifest-declared supporting capability that is composed without becoming a top-level hub destination.</summary>
+public sealed record WebPageManifestCapability(
+    string Name,
+    IReadOnlyList<ulong> MicroBundleIds);
 
 /// <summary>Manifest-defined diagnostic restart contract.</summary>
 public sealed record WebPageDeepDiveManifest(
