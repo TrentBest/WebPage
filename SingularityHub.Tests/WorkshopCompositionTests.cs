@@ -30,7 +30,7 @@ public sealed class WorkshopCompositionTests
             out _));
         Assert.NotNull(moniker?.Composition);
         Assert.Same(moniker!.Composition, experience.MonikerComposition);
-        Assert.True(experience.HubRuntimeAssemblies.TryGetValue("Rendering", out var renderingAssembly));
+        Assert.True(experience.CapabilityRuntimeAssemblies.TryGetValue("Rendering", out var renderingAssembly));
         Assert.True(renderingAssembly!.TryGetBundle<RenderingMicroBundle>(
             RenderingMicroBundle.BundleId,
             out var renderingBundle));
@@ -134,13 +134,19 @@ public sealed class WorkshopCompositionTests
               ],
               "hub": [
                 {
-                  "name": "Rendering",
-                  "kind": "MicroBundle",
-                  "description": "Rendering research",
+                  "name": "AnyApp",
+                  "kind": "Host",
+                  "description": "Desktop host architecture",
                   "deploymentUrl": null,
-                  "aboutUrl": "/rendering",
+                  "aboutUrl": "/about-us",
                   "bridgeEndpoint": null,
-                  "route": "/rendering",
+                  "route": "/anyapp",
+                  "microBundleIds": []
+                }
+              ],
+              "capabilities": [
+                {
+                  "name": "Rendering",
                   "microBundleIds": [4100]
                 }
               ],
