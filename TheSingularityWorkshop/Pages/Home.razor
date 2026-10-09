@@ -20,6 +20,7 @@
 .manifest-hub-kicker{font-size:clamp(.65rem,1.2vw,.9rem);letter-spacing:.2em;color:#6d8795}
 .manifest-hub-title{margin:.25rem 0 0;font-size:clamp(2rem,6vw,5rem);line-height:.9;letter-spacing:.04em}
 .manifest-hub-version{font-size:.7rem;letter-spacing:.14em;color:#536873}
+.manifest-public-brief{border:1px solid rgba(255,44,255,.24);border-radius:1rem;padding:clamp(1.2rem,2.6vw,2rem);background:linear-gradient(120deg,rgba(0,168,255,.08),rgba(255,44,255,.045),rgba(3,8,17,.92));}.manifest-public-brief h2{margin:.65rem 0;color:#fff;font-size:clamp(1.45rem,3.3vw,2.5rem);line-height:1.05;}.manifest-public-brief p{max-width:78ch;color:#c3d0d6;line-height:1.65;margin:.8rem 0;}.manifest-public-brief .brief-status{color:#ffb15c;font-size:.68rem;letter-spacing:.15em;font-weight:800;}.manifest-public-brief .brief-flow{display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;margin:1.1rem 0;color:#9bdfea;font-size:.72rem;letter-spacing:.07em;}.manifest-public-brief .brief-flow b{color:#ff2cff;}.manifest-public-brief .manifest-hub-actions{margin-top:1rem;}
 .manifest-hub-tabs{display:flex;gap:.75rem;overflow:auto;padding:.25rem 0}
 .manifest-hub-tab{border:1px solid rgba(0,234,255,.45);border-radius:999px;padding:.65rem 1.1rem;background:rgba(0,234,255,.08);color:#fff;font:700 .8rem Consolas,'Courier New',monospace;letter-spacing:.12em;white-space:nowrap}
 .manifest-hub-card{position:relative;border:1px solid rgba(0,234,255,.18);border-radius:1.25rem;padding:clamp(1.25rem,3vw,2.5rem);background:linear-gradient(145deg,rgba(10,25,38,.94),rgba(3,8,17,.94));box-shadow:0 30px 100px rgba(0,0,0,.35);overflow:hidden}
@@ -123,7 +124,49 @@
         builder.OpenElement(13, "div"); builder.AddAttribute(14, "class", "manifest-hub-version"); builder.AddContent(15, $"MANIFEST {manifest.ManifestId} // {manifest.Version}"); builder.CloseElement();
         builder.CloseElement();
 
-        builder.OpenElement(16, "nav");
+        builder.OpenElement(16, "section");
+        builder.AddAttribute(17, "class", "manifest-public-brief");
+        builder.OpenElement(18, "div");
+        builder.AddAttribute(19, "class", "brief-status");
+        builder.AddContent(20, "PUBLIC DEMONSTRATION // ACTIVE PROTOTYPE");
+        builder.CloseElement();
+        builder.OpenElement(21, "h2");
+        builder.AddContent(22, "A public window into composable software.");
+        builder.CloseElement();
+        builder.OpenElement(23, "p");
+        builder.AddContent(24, "The Singularity Workshop is an independent software laboratory exploring how complex applications can be assembled from small, reusable capabilities instead of being built as one inseparable block. This page is a working demonstration of that architecture—not a finished commercial product.");
+        builder.CloseElement();
+        builder.OpenElement(25, "div");
+        builder.AddAttribute(26, "class", "brief-flow");
+        builder.AddContent(27, "FSM_API — behavior and state");
+        builder.OpenElement(28, "b"); builder.AddContent(29, "→"); builder.CloseElement();
+        builder.AddContent(30, "FSM_COS — composition");
+        builder.OpenElement(31, "b"); builder.AddContent(32, "→"); builder.CloseElement();
+        builder.AddContent(33, "MICROBUNDLES — capabilities");
+        builder.OpenElement(34, "b"); builder.AddContent(35, "→"); builder.CloseElement();
+        builder.AddContent(36, "BROWSER EXPERIENCE");
+        builder.CloseElement();
+        builder.OpenElement(37, "p");
+        builder.AddContent(38, "What you can verify here: a manifest-selected Workshop Experience, a MicroBundle dependency resolved through FSM_COS, and a living graphical demonstration driven by state-machine technology. Some browser lifecycle behavior is still transitional; the source and architecture pages distinguish working proof from ongoing migration.");
+        builder.CloseElement();
+        builder.OpenElement(39, "div");
+        builder.AddAttribute(40, "class", "manifest-hub-actions");
+        builder.OpenElement(41, "a");
+        builder.AddAttribute(42, "class", "manifest-hub-action");
+        builder.AddAttribute(43, "href", "/about-us");
+        builder.AddContent(44, "HOW THE TECHNOLOGY WORKS");
+        builder.CloseElement();
+        builder.OpenElement(45, "a");
+        builder.AddAttribute(46, "class", "manifest-hub-action manifest-hub-secondary");
+        builder.AddAttribute(47, "href", "https://github.com/TrentBest/WebPage");
+        builder.AddAttribute(48, "target", "_blank");
+        builder.AddAttribute(49, "rel", "noopener noreferrer");
+        builder.AddContent(50, "INSPECT THE SOURCE");
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.CloseElement();
+
+        builder.OpenElement(51, "nav");
         builder.AddAttribute(17, "class", "manifest-hub-tabs");
         var sequence = 20;
         foreach (var item in manifest.Hub)
