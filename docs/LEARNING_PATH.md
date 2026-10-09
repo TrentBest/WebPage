@@ -34,12 +34,6 @@ The browser is the manifestation. It should show that a real Experience is being
 
 After the opening, ask:
 
-- What Experience am I seeing?
-- Which MicroBundles make it possible?
-- Which behavior belongs to FSM_API?
-- Which composition belongs to FSM_COS?
-- Which pieces are only browser presentation?
-
 When the hub appears, choose **SHOW DEEP DIVE** to open the educational view for the Experience named by the host manifest. From the running hub, the view uses the actual startup `RuntimeAssembly`: requested roots are shown separately from resolved MicroBundles, along with the runtime ID and arbitration-round count. If a visitor opens the route directly before startup has produced an assembly, the page labels its catalog-based fallback instead of presenting it as a live runtime snapshot.
 
 
