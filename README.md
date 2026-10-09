@@ -69,6 +69,10 @@ browser manifestation
 
 The current manifest and active Experience composition are documented in [Current Vertical Slice](docs/CURRENT_VERTICAL_SLICE.md).
 
+## Public demonstration / Brave1 MVP
+
+The public landing experience should explain the technology before asking visitors to inspect the repository. The [Brave1 Public Demonstration guide](docs/BRAVE1_PUBLIC_DEMONSTRATION.md) defines the evaluator journey, current-versus-future claim boundary, and the checks required before submitting a deployed URL.
+
 ## Documentation and theory
 
 The repository deliberately separates the public orientation from the engineering documentation.
