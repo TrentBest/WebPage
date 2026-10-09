@@ -287,7 +287,10 @@ namespace TheSingularityWorkshop.Services
 
             const int columns = 10;
             const int rows = 10;
-            var cell = slot;
+            // Interleave the 10x10 cells so the first organisms spread across the
+            // viewport instead of filling the top rows before reaching the bottom.
+            // 37 is coprime with 100, so this visits each cell exactly once.
+            var cell = (slot * 37) % (columns * rows);
             var column = cell % columns;
             var row = cell / columns;
             var cellWidth = (MaxX - MinX) / columns;
