@@ -189,7 +189,7 @@
             });
 
     private RenderingMicroBundle? RenderingBundle =>
-        Experience.HubRuntimeAssemblies.TryGetValue("Rendering", out var assembly) &&
+        Experience.CapabilityRuntimeAssemblies.TryGetValue("Rendering", out var assembly) &&
         assembly.TryGetBundle<RenderingMicroBundle>(RenderingMicroBundle.BundleId, out var bundle)
             ? bundle
             : null;
