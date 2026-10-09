@@ -18,10 +18,10 @@ public sealed class MonikerExperienceTests
           "manifestId": "webpage-host",
           "version": "1.0.0",
           "startup": [
-            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }
+            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
           ],
           "running": [
-            { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
+            { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }
           ],
           "deepDive": {
             "experience": "LIVING GUI",
@@ -34,7 +34,7 @@ public sealed class MonikerExperienceTests
         Assert.Equal("Moniker", manifest.Startup[0].Kind);
         Assert.Equal(3, manifest.Startup[0].PresentationSeconds);
         Assert.Equal("Primary", manifest.Running[0].Kind);
-        Assert.Equal(2102UL, manifest.Running[0].MicroBundleIds[0]);
+        Assert.Equal(2102UL, manifest.Running[0].MicroBundles![0].BundleId);
     }
 
     [Fact(DisplayName = "Primary Experience resolves the canonical Moniker dependency and enters the Hub")]
@@ -91,10 +91,10 @@ public sealed class MonikerExperienceTests
               "manifestId": "webpage-host",
               "version": "1.0.0",
               "startup": [
-                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }
+                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
               ],
               "running": [
-                { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
+                { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }
               ],
               "deepDive": {
                 "experience": "LIVING GUI",
