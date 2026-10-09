@@ -78,7 +78,7 @@ For the current manifest, the target is Living GUI (Experience ID `3002`). The r
 
 The `WorkshopExperienceService` retains the `RuntimeAssembly` returned by FSM_COS. When the visitor opens the Deep Dive from the running hub, `WorkshopDeepDiveCatalog` now passes that assembly into the educational model and provider. The page distinguishes manifest-requested roots from the resolved MicroBundles, and shows the assembly's runtime ID and arbitration-round count.
 
-A direct link opened without an initialized startup assembly uses a catalog-based fallback. The page labels that fallback explicitly; it does **not** claim that catalog declarations prove the complete dependency-closed runtime graph. The catalog also checks that the assembly contains the Experience's requested roots before associating the two, so an unrelated assembly is not silently presented as the requested Experience.
+A direct link opened without an initialized startup assembly uses a catalog-based fallback. The page labels that fallback explicitly; it does **not** claim that catalog declarations prove the complete dependency-closed runtime graph. The catalog also checks that the supplied roots belong to the selected Experience contract and are present in the assembly before associating the two. A bundle ID merely existing in an assembly is not enough: a root from a different Experience must not make that assembly look like the requested Experience.
 
 ### Direction
 
