@@ -20,6 +20,9 @@ public sealed class WebPageHostManifestTests
           "hub": [
             { "name": "AnyApp", "kind": "Host", "description": "Desktop host architecture", "deploymentUrl": null, "aboutUrl": "/about-us", "bridgeEndpoint": null, "route": "/anyapp", "microBundleIds": [] }
           ],
+          "capabilities": [
+            { "name": "Rendering", "microBundleIds": [4100] }
+          ],
           "running": [
             { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
           ],
@@ -44,6 +47,8 @@ public sealed class WebPageHostManifestTests
         Assert.Null(manifest.Hub[0].DeploymentUrl);
         Assert.Empty(manifest.Hub[0].MicroBundleIds);
         Assert.Equal("/about-us", manifest.Hub[0].AboutUrl);
+        Assert.NotNull(manifest.Capabilities);
+        Assert.Equal(new[] { 4100UL }, Assert.Single(manifest.Capabilities!).MicroBundleIds);
         Assert.Single(manifest.Running);
         Assert.Equal("Primary", manifest.Running[0].Kind);
         Assert.Equal(2102UL, manifest.Running[0].MicroBundleIds[0]);
@@ -65,6 +70,11 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("AnyApp", hub.Name);
         Assert.Equal("/anyapp", hub.Route);
         Assert.Empty(hub.MicroBundleIds);
+
+        Assert.NotNull(manifest.Capabilities);
+        var rendering = Assert.Single(manifest.Capabilities!);
+        Assert.Equal("Rendering", rendering.Name);
+        Assert.Equal(new[] { 4100UL }, rendering.MicroBundleIds);
 
         using var config = JsonDocument.Parse(File.ReadAllText(
             Path.Combine(wwwroot, "staticwebapp.config.json")));
