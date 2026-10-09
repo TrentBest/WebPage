@@ -196,12 +196,15 @@ public sealed class IncrementalVersionTests
         var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
         var layout = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "MainLayout.razor"));
         var experience = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs"));
+        var firstContact = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
         Assert.Contains("FirstContactView", home);
         Assert.Contains("FSM.CurrentState == PageFSM.Gateway", home);
         Assert.Contains("FSM.RequestEnter();", home);
         Assert.Contains("FSM.CurrentState == PageFSM.Running", home);
         Assert.Contains("PageFSM.NavigationArrival", layout);
+        Assert.Contains('.Style("width", "50vw")', firstContact);
+        Assert.Contains('.Style("height", "50vh")', firstContact);
         Assert.DoesNotContain("PresentMonikerAsync", experience);
     }
 }
