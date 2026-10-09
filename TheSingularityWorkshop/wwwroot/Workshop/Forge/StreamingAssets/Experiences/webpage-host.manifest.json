@@ -1,6 +1,6 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
@@ -11,21 +11,23 @@
   ],
   "hub": [
     {
-      "name": "Rendering",
-      "kind": "MicroBundle",
-      "description": "See the Workshop renderer's current capability surface and the semantic description we can expose to an AI without giving the AI privileged knowledge of the world.",
+      "name": "AnyApp",
+      "kind": "Host",
+      "description": "See how the Workshop separates a host from the Experiences it composes. Inspect the manifest → FSM_COS → RuntimeAssembly path, the current desktop-host prototype, and the migration status of the browser demonstration.",
       "deploymentUrl": null,
-      "aboutUrl": "/rendering",
+      "aboutUrl": "/about-us",
       "bridgeEndpoint": null,
-      "route": "/rendering",
-      "microBundleIds": [4100]
+      "route": "/anyapp",
+      "microBundleIds": []
     }
   ],
   "running": [
     {
       "name": "LIVING GUI",
       "kind": "Primary",
-      "microBundleIds": [2102],
+      "microBundleIds": [
+        2102
+      ],
       "presentationSeconds": 0
     }
   ],
