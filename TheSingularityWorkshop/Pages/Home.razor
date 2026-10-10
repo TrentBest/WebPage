@@ -285,9 +285,13 @@
         builder.CloseElement();
     }
 
+    private string _lastRenderedPageState = string.Empty;
+
     protected override void OnInitialized()
     {
+        _lastRenderedPageState = FSM.CurrentState;
         Experience.StateChanged += ExperienceChanged;
+        FSM.StateChanged += PageStateChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -303,8 +307,21 @@
     private void ExperienceChanged()
         => _ = InvokeAsync(StateHasChanged);
 
+    private void PageStateChanged(string _)
+    {
+        // PageFSM reports every heartbeat as well as transitions. Re-render this
+        // parent only when the state used by BuildExperienceContent actually changes.
+        var currentState = FSM.CurrentState;
+        if (string.Equals(currentState, _lastRenderedPageState, StringComparison.Ordinal))
+            return;
+
+        _lastRenderedPageState = currentState;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
     public void Dispose()
     {
         Experience.StateChanged -= ExperienceChanged;
+        FSM.StateChanged -= PageStateChanged;
     }
 }
