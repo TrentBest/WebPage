@@ -1,170 +1,164 @@
-# The Singularity Workshop — WebPage
+# ✳️ 00 — The Singularity Workshop: WebPage
 
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![FSM_API](https://img.shields.io/badge/FSM_API-1.0.13-00A98F?style=flat-square)](https://github.com/TrentBest/FSM_API)
 [![Tests](https://img.shields.io/badge/tests-GitHub%20Actions-f39c12?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/TrentBest/WebPage/actions)
+[![Code Coverage](https://codecov.io/gh/TrentBest/WebPage/graph/badge.svg)](https://codecov.io/gh/TrentBest/WebPage)
 
-> The page opens the door. The Experience gives you somewhere to stand. The machinery lets you look underneath it.
+> **The page opens the door. The Experience gives you somewhere to stand. The machinery lets you look underneath it.**
 
-## Why WebPage exists now
+WebPage is the browser host, public learning surface, and proving ground for [The Singularity Workshop](https://github.com/TrentBest). It lets people witness Workshop behavior in a browser, then follow the evidence into the code and theory.
 
-WebPage is the browser proving ground and public learning resource for The Singularity Workshop.
+```mermaid
+flowchart TD
+    M[Host manifest + configuration] --> C[FSM_COS]
+    C --> R[RuntimeAssembly]
+    R --> H[WebPage host]
+    H --> P[Browser presentation]
+    P --> V[Visible Experience]
+    A[FSM_API] --> E[Stateful behavior]
+    E --> C
+```
 
-There are two valid ways to enter:
+*The intended boundary: describe the Experience in data, compose its capabilities, then let the host present the result.*
 
-- Visit the WebPage to witness the technology working.
-- Visit the repository to understand how and why it works.
+## 🟦 01 — The problem, and our response
 
-Those two paths should teach the same architecture.
+A browser demo can easily become a second application framework: hard-coded experiences, duplicated lifecycle rules, and explanations that drift away from the running software.
 
-> Show the behavior. Preserve the semantics. Explain the machinery.
+WebPage is meant to prove the Workshop's reusable technology—not absorb it. The host loads its manifest and configuration, asks FSM_COS to compose the declared capabilities, and presents the result. Reusable behavior belongs in the package that owns it; browser-specific presentation belongs here.
 
-## The first lesson: the host is not the machinery
+**The guiding rule: manifest and configuration describe the request; FSM_COS composes; WebPage manifests the result.**
 
-WebPage is a host. It consumes the Workshop's reusable packages rather than becoming a second implementation of them.
+## 🟣 02 — How to read this repository
 
-~~~text
-FSM_API
-   ↓
-state execution
+The Workshop's repositories explain different responsibilities. This README is the front door—not a compressed copy of every manual.
 
-MicroBundleDomain
-   ↓
-MicroBundle contract
+- **WebPage** explains the browser-host boundary and provides a visible integration proving ground.
+- **FSM_COS** explains composition, dependency closure, arbitration, and the RuntimeAssembly handoff.
+- **FSM_API** explains state-machine behavior and execution.
+- **MicroBundleDomain** owns the canonical MicroBundle contract.
+- Other packages document their own domains; WebPage links to their authoritative explanations instead of redefining them.
 
-FSM_COS
-   ↓
-composition / dependency closure / arbitration
+The shared [FSM_COS Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md) defines the Workshop README journey. This repository applies it to a browser host. Deeper explanations belong in the focused guides linked in section 05.
 
-WebPage
-   ↓
-manifest + browser host + presentation
+## 🩵 03 — The problem and solution in depth
 
-browser / renderer
-   ↓
-visible Experience
-~~~
+### One request, one composition boundary
 
-When a capability becomes reusable, the implementation belongs in the package or domain that owns it. WebPage consumes that result and proves it in a real browser.
+```text
+host manifest + configuration
+            |
+            v
+      WebPage host
+            |
+            | requests declared roots
+            v
+          FSM_COS
+            |
+            | resolves dependencies, loads, arbitrates
+            v
+      RuntimeAssembly
+            |
+            v
+     WebPage presentation
+            |
+            v
+      browser Experience
+```
 
-## The current startup proof
+Think of the manifest as the itinerary, FSM_COS as the assembly crew, and WebPage as the place where the assembled result is encountered. The analogy has a limit: FSM_COS performs a concrete, tested composition operation; it is not a person making subjective choices.
 
-The host manifest is the startup authority.
+| Responsibility | Owner |
+|---|---|
+| State-machine semantics and execution primitives | [FSM_API](https://github.com/TrentBest/FSM_API) |
+| MicroBundle identity and contract | [MicroBundleDomain](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain) |
+| Dependency closure, loading, arbitration, convergence, RuntimeAssembly | [FSM_COS](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS) |
+| Artifact discovery or persistence, where configured | Repository/provider boundary |
+| Browser chrome, routes, visual presentation, WebPage-only Deep Dive | WebPage |
 
-~~~text
-WebPage loads manifest
-        ↓
-startup Experience(s)
-        ↓
-Workshop Moniker
-        ↓
-primary running Experience
-        ↓
-Living GUI
-        ↓
-FSM_API-driven behavior
-        ↓
-browser manifestation
-~~~
+A host may supply a catalog that knows how to resolve available MicroBundles. That does not make the host the owner of dependency traversal or arbitration. Nor should the host build a parallel lifecycle just because it currently bridges to older presentation code.
 
-The current manifest and active Experience composition are documented in [Current Vertical Slice](docs/CURRENT_VERTICAL_SLICE.md).
+### Current, Direction, Future
 
-## Public demonstration / Brave1 MVP
+- **Current:** the host reads `webpage-host.manifest.json`; the sample declares a Workshop Moniker startup presentation and Living GUI primary Experience. The primary composition is requested through FSM_COS.
+- **Direction:** make the manifest and configuration the straightforward source of host composition, and have browser presentation consume the resulting runtime without duplicating FSM_COS responsibilities.
+- **Current limitation:** browser manifestation still uses transitional WebPage `PageFSM` / `LivingGuiFsm` paths. The RuntimeAssembly is real composition evidence, but it is not yet the sole authority for all visible execution.
+- **Future:** additional manifest-driven Experiences and richer hub content, added when their purpose and visitor journey are clear—not as a hard-coded catalogue of speculative features.
 
-The public landing experience should explain the technology before asking visitors to inspect the repository. The [Brave1 Public Demonstration guide](docs/BRAVE1_PUBLIC_DEMONSTRATION.md) defines the evaluator journey, current-versus-future claim boundary, and the checks required before submitting a deployed URL.
+Old experiments are evidence, not automatic architecture. Preserve behavior with tests before removing a transitional implementation.
 
-## Documentation and theory
+## 🟢 04 — See it in a minute
 
-The repository deliberately separates the public orientation from the engineering documentation.
+This is the shortest local path to the browser-host proof. It assumes the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) is installed.
 
-- [Documentation Index](docs/DOCUMENTATION_INDEX.md) — complete map.
-- [Learning Path](docs/LEARNING_PATH.md) — progressive route through the repository.
-- [Repository Map](docs/REPOSITORY_MAP.md) — where responsibilities live.
-- [Usage](docs/USAGE.md) — how to run and consume WebPage.
-- [Theory](docs/THEORY.md) — concepts and architectural reasoning behind WebPage.
-- [Architecture](docs/WEBPAGE_EXPERIENCE_ARCHITECTURE.md) — host and Experience model.
-- [Runtime Architecture](docs/WORKSHOP_RUNTIME_ARCHITECTURE.md) — runtime responsibility boundaries.
-- [FSM_COS Usage](docs/FSM_COS_USAGE.md) — how WebPage consumes the external composition package.
-- [Package Ecosystem](docs/PACKAGE_ECOSYSTEM.md) — what WebPage consumes and why.
-- [Documentation Standard](docs/DOCUMENTATION_STANDARD.md) — how this repository keeps documentation useful and honest.
-- [FSM_COS Proving-Ground Migration](docs/PROVING_GROUND_MIGRATION.md) — extraction rules, responsibility boundaries, startup flow, and branch discipline.
-
-### External abstractions
-
-WebPage documents **how it uses** an external abstraction, not the external abstraction's entire domain.
-
-For example, WebPage explains its use of FSM_API, FSM_COS, GUI, ProtocolAi, GrammarAi, and MicroBundleDomain at the integration boundary. The authoritative theory and API documentation for those packages remains in their own repositories.
-
-~~~text
-WebPage
-  │
-  ├── documents its own domain
-  │
-  ├── documents how external packages are configured/consumed
-  │
-  └── points to the owning package for that package's
-      complete documentation and theory
-~~~
-
-## The extraction rule
-
-Useful functionality will naturally appear in a proving ground first.
-
-That is fine.
-
-The permanent path is:
-
-~~~text
-experiment in WebPage
-        ↓
-identify reusable responsibility
-        ↓
-move implementation to owning package/domain
-        ↓
-test and document the package
-        ↓
-consume the package here
-        ↓
-prove the integration
-~~~
-
-This keeps WebPage from becoming a giant application that merely happens to contain the Workshop's technology.
-
-## Current / Direction / Future
-
-Every document and major code path should distinguish:
-
-- **Current** — implemented and observable.
-- **Direction** — actively being migrated or established.
-- **Future** — deliberately not part of today's contract.
-
-Old experiments remain useful evidence, but they are not automatically architecture.
-
-## Build it
-
-~~~bash
+```bash
 git clone https://github.com/TrentBest/WebPage.git
 cd WebPage
+git switch development
 dotnet restore
 dotnet run
-~~~
+```
 
-Active engineering occurs on development. master is the stable promotion target.
+Open the local URL printed by the ASP.NET Core host. Observe the Workshop opening and the current startup-to-Experience flow.
 
-Do not publish packages or releases without explicit approval.
+**What this proves:** the WebPage host can be run locally and used to inspect its browser presentation.
 
-## Quality bar
+**What it does not prove:** that every visible behavior is already driven solely by RuntimeAssembly, that every manifest entry is dynamically interchangeable, or that a public deployment is available. Those remain explicit migration and release checks. For exact current startup roots and test obligations, see [Current Vertical Slice](docs/CURRENT_VERTICAL_SLICE.md).
 
-- FSM_API owns meaningful state-machine execution.
-- FSM_COS owns composition, dependency closure, arbitration, and RuntimeAssembly creation.
-- NuGet packages own reusable capabilities.
-- WebPage owns browser-specific presentation and integration.
-- Tests prove architectural claims.
-- Visual behavior has visual evidence.
-- Documentation explains both how and why.
-- Zero warnings and zero avoidable errors is the target.
+## 🟪 05 — Documentation and theory
 
-> Can a visitor experience it, can a developer understand it, and can the architecture tell us who owns it?
+Choose the guide that answers your question; the README stays an orientation and map.
+
+- [**Learning Path**](docs/LEARNING_PATH.md) — a visitor and developer route from witnessing the Experience to inspecting its proof.
+- [**Repository Map**](docs/REPOSITORY_MAP.md) — where source responsibilities live and how dependencies should point.
+- [**Current Vertical Slice**](docs/CURRENT_VERTICAL_SLICE.md) — the current manifest, startup sequence, known gap, and proof obligations.
+- [**FSM_COS Usage**](docs/FSM_COS_USAGE.md) — how WebPage requests composition and consumes the RuntimeAssembly.
+- [**Workshop Runtime Architecture**](docs/WORKSHOP_RUNTIME_ARCHITECTURE.md) — the boundary between runtime behavior and browser host.
+- [**Experience Theory**](docs/EXPERIENCE_THEORY.md) — the Workshop meaning of an Experience and how it relates to composition.
+- [**Package Ecosystem**](docs/PACKAGE_ECOSYSTEM.md) — package ownership and why each external dependency is present.
+- [**Usage**](docs/USAGE.md) — local setup and the host's runtime shape.
+- [**Brave1 Public Demonstration**](docs/BRAVE1_PUBLIC_DEMONSTRATION.md) — the public MVP story, claim boundaries, and pre-submission checks.
+- [**Documentation Index**](docs/DOCUMENTATION_INDEX.md) — the broader guide catalogue.
+- [**Documentation Standard**](docs/DOCUMENTATION_STANDARD.md) — how WebPage applies the shared Workshop documentation rules.
+
+Canonical external documentation: [FSM_COS](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS), [FSM_API](https://github.com/TrentBest/FSM_API), and [MicroBundleDomain](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain).
+
+---
+
+## Architecture in one minute
+
+**The host is not the machinery.**
+
+```text
+Experience       = what is being composed
+MicroBundle      = a focused capability
+FSM_COS          = composition and RuntimeAssembly
+FSM_API          = state-machine behavior
+WebPage          = browser presentation and proving ground
+```
+
+When a capability becomes reusable, move its implementation and authoritative documentation to its owning package, prove the integration here, and remove duplication only after equivalent behavior is tested.
+
+## Build and verify
+
+```bash
+dotnet restore
+dotnet build --no-restore
+dotnet test --no-build
+```
+
+These commands are the local build/test path; use [GitHub Actions](https://github.com/TrentBest/WebPage/actions) for the repository's CI result. A README command is not a substitute for checking the current CI status.
+
+## Development and release discipline
+
+- `development` is the active integration branch; `master` is the stable promotion target.
+- Keep the persistent branch model to those two branches; short-lived work should be merged or discarded and then removed.
+- Do not publish NuGet packages or deploy a release without explicit approval.
+- Architecture claims require tests or observable behavior. Visual claims require visual evidence; performance claims require measurements.
+- Keep documentation aligned with the code, and distinguish current behavior from migration direction and future intent.
+
+> **Can a visitor experience it, can a developer understand it, and can the architecture tell us who owns it?**
 
 ---
 
