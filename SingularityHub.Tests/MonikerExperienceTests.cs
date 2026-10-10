@@ -37,8 +37,8 @@ public sealed class MonikerExperienceTests
         Assert.Equal(2102UL, manifest.Running[0].MicroBundleIds[0]);
     }
 
-    [Fact(DisplayName = "Primary Experience resolves the canonical Moniker dependency and enters the Hub")]
-    public async Task PrimaryExperienceResolvesCanonicalMonikerDependency()
+    [Fact(DisplayName = "Primary Experience resolves the canonical Moniker dependency without advancing host lifecycle")]
+    public async Task PrimaryExperienceResolvesCanonicalMonikerDependencyWithoutAdvancingHostLifecycle()
     {
         using var service = CreateService();
 
@@ -49,19 +49,23 @@ public sealed class MonikerExperienceTests
 
         service.RequestEntry();
 
-        Assert.Equal("Hub", service.CurrentState);
+        // The service owns manifest composition, not the presentation clock.
+        // PageFSM alone advances Gateway -> Moniker -> Hub.
+        Assert.Equal("Moniker", service.CurrentState);
         Assert.NotNull(service.PrimaryExperienceComposition);
     }
 
-    [Fact(DisplayName = "The primary Experience hands off to the Hub after startup presentation")]
-    public async Task PrimaryExperienceRemainsActiveAfterStartupPresentation()
+    [Fact(DisplayName = "The primary Experience remains composed while PageFSM owns startup presentation")]
+    public async Task PrimaryExperienceRemainsComposedWhilePageFsmOwnsStartupPresentation()
     {
         using var service = CreateService();
 
         await service.InitializeAsync();
         service.RequestEntry();
 
-        Assert.Equal("Hub", service.CurrentState);
+        // Composition remains available across startup presentation; this
+        // compatibility entry point must not advance the host lifecycle.
+        Assert.Equal("Moniker", service.CurrentState);
         Assert.True(service.RuntimeAssembly!.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
             out _));
