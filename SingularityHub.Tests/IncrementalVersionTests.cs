@@ -244,4 +244,15 @@ public sealed class IncrementalVersionTests
         Assert.Contains("Assert.Equal(50d, root.X)", contextTests);
         Assert.Contains("Assert.Equal(50d, root.Y)", contextTests);
     }
+
+    [ArchitectureTest(0, 0, 194)] [Fact(DisplayName = "V0.0.194 — Navigation_Arrival_Contracts_The_Moniker_Panel_Before_Hub_Manifestation")]
+    public void V0_0_194NavigationArrivalContractsMonikerPanelBeforeHub()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
+
+        Assert.Contains("FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running", home);
+        Assert.Contains("WORKSHOP HUB ARRIVING", home);
+        Assert.Contains("if (FSM.CurrentState == PageFSM.Running)", home);
+    }
 }
