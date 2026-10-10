@@ -100,6 +100,10 @@ public sealed class WebPageHostManifestTests
         Assert.True(assembly.TryGetBundle<LivingGuiExperienceMicroBundle>(2102, out _));
         Assert.True(assembly.TryGetBundle<MonikerMicroBundle>(2110, out var moniker));
         Assert.False(catalog.TryResolve(2102, "9.9.9", out _));
+        Assert.Throws<InvalidOperationException>(() => new FsmCos(catalog).Execute(
+            new RuntimeManifest(
+                901,
+                new[] { new MicroBundleManifestEntry(2102, "9.9.9") })));
 
         moniker!.Dispose();
     }
