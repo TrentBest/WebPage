@@ -188,4 +188,71 @@ public sealed class IncrementalVersionTests
         Assert.Contains("\"kind\": \"Primary\"", manifest);
         Assert.Contains("\"experience\": \"LIVING GUI\"", manifest);
     }
+
+    [ArchitectureTest(0, 0, 190)] [Fact(DisplayName = "V0.0.190 — Landing_Uses_PageFSM_And_Preserves_The_Gateway_Before_The_Hub")]
+    public void V0_0_190LandingUsesPageFsmAndPreservesGatewayBeforeHub()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
+        var layout = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "MainLayout.razor"));
+        var experience = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs"));
+        var firstContact = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
+
+        Assert.Contains("FirstContactView", home);
+        Assert.Contains("FSM.CurrentState == PageFSM.Gateway", home);
+        Assert.Contains("FSM.RequestEnter();", home);
+        Assert.Contains("FSM.CurrentState == PageFSM.Running", home);
+        Assert.Contains("PageFSM.NavigationArrival", layout);
+        Assert.Contains(".Style(\"width\", \"50vw\")", firstContact);
+        Assert.Contains(".Style(\"height\", \"50vh\")", firstContact);
+        Assert.DoesNotContain("PresentMonikerAsync", experience);
+    }
+
+    [ArchitectureTest(0, 0, 191)] [Fact(DisplayName = "V0.0.191 — Living_GUI_Interleaves_Early_Spawn_Targets_Across_The_Viewport")]
+    public void V0_0_191LivingGuiInterleavesEarlySpawnTargetsAcrossViewport()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var context = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "PageStateContext.cs"));
+        var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "PageStateContextTests.cs"));
+
+        Assert.Contains("(slot * 37) % (columns * rows)", context);
+        Assert.Contains("EarlyPopulationTargetsSpanTheViewportInsteadOfFillingTopRows", tests);
+    }
+
+    [ArchitectureTest(0, 0, 192)] [Fact(DisplayName = "V0.0.192 — Moniker_Reveal_Uses_The_Composed_MicroBundle_While_Preserving_Glyph_Motion")]
+    public void V0_0_192MonikerRevealUsesComposedMicroBundle()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var livingGui = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "LivingGui.razor"));
+        var firstContact = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
+
+        Assert.Contains("MonikerComposition=\"@Experience.MonikerComposition\"", livingGui);
+        Assert.Contains("MonikerWord(\"the\", \"THE\")", firstContact);
+        Assert.Contains("MonikerWord(\"singularity\", \"SINGULARITY\")", firstContact);
+        Assert.Contains("MonikerWord(\"workshop\", \"WORKSHOP\")", firstContact);
+        Assert.Contains("helloGlyphWave", firstContact);
+    }
+
+    [ArchitectureTest(0, 0, 193)] [Fact(DisplayName = "V0.0.193 — Living_GUI_Coordinate_Space_Is_Anchored_To_The_Layout_Panel")]
+    public void V0_0_193LivingGuiCoordinateSpaceIsAnchoredToLayoutPanel()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
+        var contextTests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "PageStateContextTests.cs"));
+
+        Assert.Contains(".Style(\"position\",\"absolute\").Style(\"inset\",\"0\")", home);
+        Assert.Contains("Assert.Equal(50d, root.X)", contextTests);
+        Assert.Contains("Assert.Equal(50d, root.Y)", contextTests);
+    }
+
+    [ArchitectureTest(0, 0, 194)] [Fact(DisplayName = "V0.0.194 — Navigation_Arrival_Contracts_The_Moniker_Panel_Before_Hub_Manifestation")]
+    public void V0_0_194NavigationArrivalContractsMonikerPanelBeforeHub()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
+
+        Assert.Contains("FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running", home);
+        Assert.Contains("WORKSHOP HUB ARRIVING", home);
+        Assert.Contains("if (FSM.CurrentState == PageFSM.Running)", home);
+    }
 }
