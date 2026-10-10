@@ -24,6 +24,17 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      # Keep browser automation isolated from the application's .NET dependency graph.
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+
       # Source-based integration proof for the unpublished FSM_COS alpha.6 candidate.
       # This branch intentionally builds against the exact candidate commit instead of
       # silently depending on a package that is not yet published.
