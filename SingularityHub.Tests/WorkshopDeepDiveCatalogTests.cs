@@ -39,7 +39,7 @@ public sealed class WorkshopDeepDiveCatalogTests
             RuntimeId: 42,
             Bundles:
             [
-                MicroBundleDependencyRequest.Unconfigured(LivingGuiExperienceMicroBundle.BundleId)
+                new MicroBundleManifestEntry(LivingGuiExperienceMicroBundle.BundleId, "1.0.0")
             ]));
 
         Assert.True(deepDiveCatalog.TryResolve(
@@ -67,7 +67,7 @@ public sealed class WorkshopDeepDiveCatalogTests
             RuntimeId: 43,
             Bundles:
             [
-                MicroBundleDependencyRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)
+                new MicroBundleManifestEntry((ulong)MonikerMicroBundle.BundleId, "1.0.0")
             ]));
 
         Assert.True(deepDiveCatalog.TryResolve(experience.Id, unrelatedAssembly, out var model));
