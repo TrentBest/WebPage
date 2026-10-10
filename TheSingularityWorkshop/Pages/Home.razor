@@ -44,6 +44,7 @@
 .workshop-running-hub{position:relative;min-width:0;min-height:0;overflow:auto}
 .workshop-running-hub .manifest-hub{position:relative;inset:auto;min-height:100%;box-sizing:border-box;align-items:flex-start}
 .workshop-running-hub .manifest-hub-shell{width:100%}
+.manifest-hub-arrival{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:.8rem;color:#83a5b4;font-size:.75rem;letter-spacing:.18em}
 @media(max-width:700px){.workshop-running-surface{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(150px,.48fr) minmax(0,1fr)}.workshop-running-moniker{border-right:0;border-bottom:1px solid rgba(0,234,255,.2)}.workshop-running-moniker .living-experience-panel{position:absolute;inset:0}}
 </style>
 
@@ -81,7 +82,7 @@
             return;
         }
 
-        if (FSM.CurrentState == PageFSM.Running)
+        if (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)
         {
             builder.OpenElement(0, "section");
             builder.AddAttribute(1, "class", "workshop-running-surface");
@@ -94,7 +95,20 @@
 
             builder.OpenElement(5, "div");
             builder.AddAttribute(6, "class", "workshop-running-hub");
-            BuildManifestHub(builder);
+            if (FSM.CurrentState == PageFSM.Running)
+            {
+                BuildManifestHub(builder);
+            }
+            else
+            {
+                builder.OpenElement(7, "div");
+                builder.AddAttribute(8, "class", "manifest-hub-arrival");
+                builder.OpenElement(9, "span");
+                builder.AddAttribute(10, "class", "manifest-hub-pulse");
+                builder.CloseElement();
+                builder.AddContent(11, "WORKSHOP HUB ARRIVING");
+                builder.CloseElement();
+            }
             builder.CloseElement();
 
             builder.CloseElement();
