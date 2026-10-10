@@ -32,4 +32,9 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
 
     public bool TryResolve(ulong bundleId, out DomainMicroBundle? bundle) =>
         _bundles.TryGetValue(bundleId, out bundle);
+
+    public bool TryResolve(ulong bundleId, string version, out DomainMicroBundle? bundle) =>
+        _bundles.TryGetValue(bundleId, out bundle) &&
+        bundle.Descriptor is not null &&
+        string.Equals(bundle.Descriptor.Version, version, StringComparison.Ordinal);
 }
