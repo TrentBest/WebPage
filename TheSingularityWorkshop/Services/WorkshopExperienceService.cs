@@ -101,14 +101,15 @@ public sealed class WorkshopExperienceService : IDisposable
 
     private void ComposePrimaryExperience()
     {
-        if (PrimaryManifestExperience is null || PrimaryManifestExperience.MicroBundles.Count == 0)
+        var primaryExperience = PrimaryManifestExperience;
+        if (primaryExperience is null || primaryExperience.MicroBundles.Count == 0)
             throw new InvalidOperationException("The manifest-selected primary Experience has no MicroBundles.");
 
         // The manifest supplies only the primary Experience root. Its MicroBundle
         // declares the canonical Moniker dependency, so FSM_COS closes the graph.
         RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
             RuntimeId: 1,
-            Bundles: PrimaryManifestExperience.MicroBundles
+            Bundles: primaryExperience.MicroBundles
                 .Select(root => root.ToRuntimeManifestEntry())
                 .ToArray()));
 
