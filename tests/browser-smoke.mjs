@@ -26,11 +26,18 @@ try {
   await page.getByText("A public window into composable software.", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
   await page.screenshot({ path: `${outputDir}/03-hub.png`, fullPage: true });
 
+  // Re-check the finished hub at a narrow mobile viewport. This catches responsive
+  // regressions without restarting the time-dependent opening animation.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await hubTitle.waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByText("A public window into composable software.", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.screenshot({ path: `${outputDir}/04-hub-mobile.png`, fullPage: true });
+
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
 
-  console.log("Browser journey passed: gateway -> moniker -> manifest-driven hub.");
+  console.log("Browser journey passed: gateway -> moniker -> manifest-driven hub (desktop and mobile viewport).");
 } finally {
   await browser.close();
 }
