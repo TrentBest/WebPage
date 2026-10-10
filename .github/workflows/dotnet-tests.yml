@@ -68,8 +68,8 @@ jobs:
 
       # A lightweight HTTP smoke test proves the built host serves its landing page and
       # Blazor WebAssembly boot manifest. It does not claim to verify browser animations.
-      - name: Smoke-test WebPage host over HTTP
-        timeout-minutes: 2
+      - name: Smoke-test WebPage host and browser journey
+        timeout-minutes: 8
         shell: bash
         run: |
           set -euo pipefail
@@ -104,6 +104,9 @@ jobs:
           curl --fail --silent http://127.0.0.1:5260/_framework/blazor.boot.json -o /tmp/webpage-blazor.boot.json
           grep -q '"resources"' /tmp/webpage-blazor.boot.json
           echo "WebPage host served its landing HTML and Blazor boot manifest."
+
+          mkdir -p TestResults/Browser
+          WORKSHOP_BASE_URL=http://127.0.0.1:5260 WORKSHOP_SCREENSHOT_DIR=TestResults/Browser node tests/browser-smoke.mjs
 
       - name: Build
         run: |
