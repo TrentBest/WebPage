@@ -46,8 +46,10 @@ The host currently consumes:
 
 ~~~xml
 <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" />
-<PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.4" />
+<PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.6" />
 ~~~
+
+CI currently builds the unpublished alpha.6 candidate from a pinned FSM_COS source commit, packs it into a local NuGet feed, and tests WebPage against that package. This proves compatibility without publishing the package; the version declaration does not imply that alpha.6 is available on nuget.org.
 
 The responsibilities are separate:
 
