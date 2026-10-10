@@ -78,8 +78,8 @@ public sealed class WorkshopExperienceService : IDisposable
         IsFirstVisit = !returningVisitor;
         SetState("ManifestLoading");
 
-        Manifest = await _httpClient.GetFromJsonAsync<WebPageHostManifest>(ManifestPath)
-            ?? throw new InvalidOperationException("The WebPage host manifest could not be loaded.");
+        var manifestJson = await _httpClient.GetStringAsync(ManifestPath);
+        Manifest = WebPageHostManifestParser.Parse(manifestJson);
 
         if (Manifest.Startup.Count == 0)
             throw new InvalidOperationException("The WebPage host manifest contains no startup Experience.");
