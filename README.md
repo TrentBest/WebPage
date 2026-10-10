@@ -98,8 +98,8 @@ This is the shortest local path to the browser-host proof. It assumes the [.NET 
 git clone https://github.com/TrentBest/WebPage.git
 cd WebPage
 git switch development
-dotnet restore
-dotnet run
+dotnet restore TheSingularityWorkshop/TheSingularityWorkshop.csproj
+dotnet run --project TheSingularityWorkshop/TheSingularityWorkshop.csproj
 ```
 
 Open the local URL printed by the ASP.NET Core host. The verified opening journey is **gateway → Workshop moniker → `WELCOME` hub**. The automated Chromium smoke test follows that same path in [GitHub Actions](https://github.com/TrentBest/WebPage/actions/workflows/dotnet-tests.yml); its screenshots are retained with the run's test-results artifact.
@@ -145,9 +145,11 @@ When a capability becomes reusable, move its implementation and authoritative do
 ## Build and verify
 
 ```bash
-dotnet restore
-dotnet build --no-restore
-dotnet test --no-build
+dotnet restore TheSingularityWorkshop/TheSingularityWorkshop.csproj
+dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --no-restore
+dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj
+dotnet test Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj
+dotnet test Experiences/PongExperience.Tests/PongExperience.Tests.csproj
 ```
 
 These commands are the local build/test path; use [GitHub Actions](https://github.com/TrentBest/WebPage/actions) for the repository's CI result. A README command is not a substitute for checking the current CI status.
