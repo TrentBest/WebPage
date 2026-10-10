@@ -25,6 +25,27 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      # Source-based integration proof for the unpublished FSM_COS alpha.6 candidate.
+      # This branch intentionally builds against the exact candidate commit instead of
+      # silently depending on a package that is not yet published.
+      - name: Checkout FSM_COS alpha.6 candidate
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.FSM_COS
+          ref: 77c05d68d70159e6f4ffb53bd2209a5ed6ed0abc
+          path: _dependencies/FSM_COS
+
+      - name: Build FSM_COS candidate against public dependencies
+        run: |
+          dotnet restore _dependencies/FSM_COS/TheSingularityWorkshop.FSM_COS.sln --source https://api.nuget.org/v3/index.json
+          dotnet build _dependencies/FSM_COS/TheSingularityWorkshop.FSM_COS.sln --configuration Release --no-restore
+          dotnet test _dependencies/FSM_COS/tests/FSM_COS.Tests/FSM_COS.Tests.csproj --configuration Release --no-build --verbosity normal
+          mkdir -p _dependencies/nuget
+          dotnet pack _dependencies/FSM_COS/src/FSM_COS/FSM_COS.csproj --configuration Release --no-build --output _dependencies/nuget
+
+      - name: Add local FSM_COS candidate feed
+        run: dotnet nuget add source "$GITHUB_WORKSPACE/_dependencies/nuget" --name FSM_COSCandidate
+
       - name: Cache NuGet packages
         uses: actions/cache@v5
         with:
