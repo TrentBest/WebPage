@@ -1,4 +1,5 @@
 using System.Text.Json;
+using TheSingularityWorkshop.FSM_COS;
 
 namespace TheSingularityWorkshop.Services;
 
@@ -12,12 +13,18 @@ public sealed record WebPageHostManifest(
     WebPageDeepDiveManifest DeepDive,
     IReadOnlyList<WebPageManifestCapability>? Capabilities = null);
 
-/// <summary>One manifest-selected startup or running Experience.</summary>
+/// <summary>One manifest-selected startup or running Experience, with explicit MicroBundle versions.</summary>
 public sealed record WebPageManifestExperience(
     string Name,
     string Kind,
-    IReadOnlyList<ulong> MicroBundleIds,
+    IReadOnlyList<WebPageManifestBundle>? MicroBundles,
     double PresentationSeconds);
+
+/// <summary>One versioned MicroBundle root selected by the WebPage host manifest.</summary>
+public sealed record WebPageManifestBundle(ulong BundleId, string Version)
+{
+    public MicroBundleManifestEntry ToRuntimeManifestEntry() => new(BundleId, Version);
+}
 
 /// <summary>One manifest-defined hub destination. The host renders this data; it does not hard-code the catalog.</summary>
 public sealed record WebPageManifestHubItem(
@@ -28,12 +35,12 @@ public sealed record WebPageManifestHubItem(
     string AboutUrl,
     string? BridgeEndpoint,
     string? Route,
-    IReadOnlyList<ulong> MicroBundleIds = null!);
+    IReadOnlyList<WebPageManifestBundle>? MicroBundles = null);
 
 /// <summary>A manifest-declared supporting capability that is composed without becoming a top-level hub destination.</summary>
 public sealed record WebPageManifestCapability(
     string Name,
-    IReadOnlyList<ulong> MicroBundleIds);
+    IReadOnlyList<WebPageManifestBundle>? MicroBundles);
 
 /// <summary>Manifest-defined diagnostic restart contract.</summary>
 public sealed record WebPageDeepDiveManifest(
@@ -41,7 +48,7 @@ public sealed record WebPageDeepDiveManifest(
     bool RestartFromManifest,
     bool Telemetry);
 
-/// <summary>Parses the host manifest without embedding concrete Experience selection in the parser.</summary>
+/// <summary>Parses and validates the host manifest without embedding concrete Experience selection in the parser.</summary>
 public static class WebPageHostManifestParser
 {
     private static readonly JsonSerializerOptions Options = new()
@@ -53,7 +60,28 @@ public static class WebPageHostManifestParser
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(json);
 
-        return JsonSerializer.Deserialize<WebPageHostManifest>(json, Options)
+        var manifest = JsonSerializer.Deserialize<WebPageHostManifest>(json, Options)
             ?? throw new InvalidOperationException("The WebPage host manifest is empty.");
+
+        ValidateBundles(manifest.Startup.SelectMany(x => x.MicroBundles ?? Array.Empty<WebPageManifestBundle>()));
+        ValidateBundles(manifest.Running.SelectMany(x => x.MicroBundles ?? Array.Empty<WebPageManifestBundle>()));
+        ValidateBundles((manifest.Hub ?? Array.Empty<WebPageManifestHubItem>())
+            .SelectMany(x => x.MicroBundles ?? Array.Empty<WebPageManifestBundle>()));
+        ValidateBundles((manifest.Capabilities ?? Array.Empty<WebPageManifestCapability>())
+            .SelectMany(x => x.MicroBundles ?? Array.Empty<WebPageManifestBundle>()));
+
+        return manifest;
+    }
+
+    private static void ValidateBundles(IEnumerable<WebPageManifestBundle> bundles)
+    {
+        foreach (var bundle in bundles)
+        {
+            if (bundle.BundleId == 0)
+                throw new InvalidOperationException("The WebPage host manifest contains a zero MicroBundle ID.");
+            if (string.IsNullOrWhiteSpace(bundle.Version))
+                throw new InvalidOperationException(
+                    $"The WebPage host manifest does not declare a version for MicroBundle {bundle.BundleId}.");
+        }
     }
 }
