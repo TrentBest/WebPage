@@ -232,4 +232,16 @@ public sealed class IncrementalVersionTests
         Assert.Contains("MonikerWord(\"workshop\", \"WORKSHOP\")", firstContact);
         Assert.Contains("helloGlyphWave", firstContact);
     }
+
+    [ArchitectureTest(0, 0, 193)] [Fact(DisplayName = "V0.0.193 — Living_GUI_Coordinate_Space_Is_Anchored_To_The_Layout_Panel")]
+    public void V0_0_193LivingGuiCoordinateSpaceIsAnchoredToLayoutPanel()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
+        var contextTests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "PageStateContextTests.cs"));
+
+        Assert.Contains(".Style(\"position\",\"absolute\").Style(\"inset\",\"0\")", home);
+        Assert.Contains("Assert.Equal(50d, root.X)", contextTests);
+        Assert.Contains("Assert.Equal(50d, root.Y)", contextTests);
+    }
 }
