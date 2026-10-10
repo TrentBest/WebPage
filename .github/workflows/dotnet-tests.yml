@@ -59,6 +59,52 @@ jobs:
           dotnet restore Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj
           dotnet restore Experiences/PongExperience.Tests/PongExperience.Tests.csproj
 
+      # Compile the actual browser host against the same unpublished FSM_COS candidate.
+      # This catches integration failures that isolated experience tests cannot see.
+      - name: Restore and build WebPage browser host
+        run: |
+          dotnet restore TheSingularityWorkshop/TheSingularityWorkshop.csproj
+          dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore
+
+      # A lightweight HTTP smoke test proves the built host serves its landing page and
+      # Blazor WebAssembly boot manifest. It does not claim to verify browser animations.
+      - name: Smoke-test WebPage host over HTTP
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --project TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-build --no-launch-profile --urls http://127.0.0.1:5260 > /tmp/webpage-host.log 2>&1 &
+          host_pid=$!
+          cleanup() {
+            kill "$host_pid" 2>/dev/null || true
+            wait "$host_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          ready=false
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:5260/ -o /tmp/webpage-index.html; then
+              ready=true
+              break
+            fi
+            if ! kill -0 "$host_pid" 2>/dev/null; then
+              cat /tmp/webpage-host.log
+              exit 1
+            fi
+            sleep 2
+          done
+
+          if [ "$ready" != true ]; then
+            cat /tmp/webpage-host.log
+            echo "WebPage host did not become ready within 60 seconds."
+            exit 1
+          fi
+
+          grep -q '<title>The Singularity Workshop</title>' /tmp/webpage-index.html
+          curl --fail --silent http://127.0.0.1:5260/_framework/blazor.boot.json -o /tmp/webpage-blazor.boot.json
+          grep -q '"resources"' /tmp/webpage-blazor.boot.json
+          echo "WebPage host served its landing HTML and Blazor boot manifest."
+
       - name: Build
         run: |
           dotnet build SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-restore
