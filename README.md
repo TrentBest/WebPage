@@ -5,6 +5,8 @@
 [![Tests](https://img.shields.io/badge/tests-GitHub%20Actions-f39c12?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/TrentBest/WebPage/actions)
 [![Code Coverage](https://codecov.io/gh/TrentBest/WebPage/graph/badge.svg)](https://codecov.io/gh/TrentBest/WebPage)
 
+![The WebPage opening journey: gateway, moniker, and manifest-driven hub](docs/assets/webpage-opening-journey.svg)
+
 > **The page opens the door. The Experience gives you somewhere to stand. The machinery lets you look underneath it.**
 
 WebPage is the browser host, public learning surface, and proving ground for [The Singularity Workshop](https://github.com/TrentBest). It lets people witness Workshop behavior in a browser, then follow the evidence into the code and theory.
