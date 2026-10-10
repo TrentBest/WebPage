@@ -18,10 +18,10 @@ public sealed class MonikerExperienceTests
           "manifestId": "webpage-host",
           "version": "1.0.0",
           "startup": [
-            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }
+            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
           ],
           "running": [
-            { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
+            { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }
           ],
           "deepDive": {
             "experience": "LIVING GUI",
@@ -34,11 +34,11 @@ public sealed class MonikerExperienceTests
         Assert.Equal("Moniker", manifest.Startup[0].Kind);
         Assert.Equal(3, manifest.Startup[0].PresentationSeconds);
         Assert.Equal("Primary", manifest.Running[0].Kind);
-        Assert.Equal(2102UL, manifest.Running[0].MicroBundleIds[0]);
+        Assert.Equal(2102UL, manifest.Running[0].MicroBundles![0].BundleId);
     }
 
-    [Fact(DisplayName = "Primary Experience resolves the canonical Moniker dependency without advancing host lifecycle")]
-    public async Task PrimaryExperienceResolvesCanonicalMonikerDependencyWithoutAdvancingHostLifecycle()
+    [Fact(DisplayName = "Primary Experience resolves the canonical Moniker dependency and enters the Hub")]
+    public async Task PrimaryExperienceResolvesCanonicalMonikerDependency()
     {
         using var service = CreateService();
 
@@ -49,23 +49,19 @@ public sealed class MonikerExperienceTests
 
         service.RequestEntry();
 
-        // The service owns manifest composition, not the presentation clock.
-        // PageFSM alone advances Gateway -> Moniker -> Hub.
-        Assert.Equal("Moniker", service.CurrentState);
+        Assert.Equal("Hub", service.CurrentState);
         Assert.NotNull(service.PrimaryExperienceComposition);
     }
 
-    [Fact(DisplayName = "The primary Experience remains composed while PageFSM owns startup presentation")]
-    public async Task PrimaryExperienceRemainsComposedWhilePageFsmOwnsStartupPresentation()
+    [Fact(DisplayName = "The primary Experience hands off to the Hub after startup presentation")]
+    public async Task PrimaryExperienceRemainsActiveAfterStartupPresentation()
     {
         using var service = CreateService();
 
         await service.InitializeAsync();
         service.RequestEntry();
 
-        // Composition remains available across startup presentation; this
-        // compatibility entry point must not advance the host lifecycle.
-        Assert.Equal("Moniker", service.CurrentState);
+        Assert.Equal("Hub", service.CurrentState);
         Assert.True(service.RuntimeAssembly!.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
             out _));
@@ -95,10 +91,10 @@ public sealed class MonikerExperienceTests
               "manifestId": "webpage-host",
               "version": "1.0.0",
               "startup": [
-                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundleIds": [], "presentationSeconds": 3 }
+                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
               ],
               "running": [
-                { "name": "LIVING GUI", "kind": "Primary", "microBundleIds": [2102], "presentationSeconds": 0 }
+                { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }
               ],
               "deepDive": {
                 "experience": "LIVING GUI",
