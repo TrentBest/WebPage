@@ -88,7 +88,7 @@ public sealed class WorkshopDeepDiveCatalogTests
             RuntimeId: 44,
             Bundles:
             [
-                MicroBundleDependencyRequest.Unconfigured((ulong)MonikerMicroBundle.BundleId)
+                new MicroBundleManifestEntry((ulong)MonikerMicroBundle.BundleId, "1.0.0")
             ]));
 
         // The supplied root exists in the assembly, but is not a root declared by Living GUI.
