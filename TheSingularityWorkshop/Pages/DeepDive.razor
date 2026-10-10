@@ -33,126 +33,32 @@
                 another creator find the same capability.
             </p>
         </section>
-
-        <section class="grid">
-            <article>
-                <span>EXPERIENCE</span>
-                <strong>0x@ExperienceId:X16</strong>
-                <p>@ExperienceName is an Experience composition boundary. It points at capabilities;
-                    it does not hard-code the browser presentation into a page.</p>
-            </article>
-            <article>
-                <span>MICROBUNDLE</span>
-                <strong>0x@PrimaryBundleId:X16</strong>
-                <p>The primary MicroBundle is the capability requested by this Experience. The identifier comes from the Experience contract, not from the page route.</p>
-            </article>
-            <article>
-                <span>ONTOLOGY</span>
-                <strong>@OntologySummary</strong>
-                <p>The Experience's ontological coordinate is the discovery trail. A creator can use the contract to locate the capability without copying its presentation.</p>
-            </article>
-            <article>
-                <span>DEPENDENCY</span>
-                <strong>@DependencySummary</strong>
-                <p>@DependencyDescription</p>
-            </article>
-            <article>
-                <span>RUNTIME</span>
-                <strong>@RuntimeSummary</strong>
-                <p>@RuntimeDescription</p>
-            </article>
-            <article>
-                <span>SENSORY SYSTEMS</span>
-                <strong>@SenseCount</strong>
-                <p>@SensorySummary</p>
-            </article>
-        </section>
-
-        <section class="recipe">
-            <div>
-                <span>02 // BUILD RECIPE</span>
-                <h2>How to make your own version</h2>
-                <ol>
-                    <li>Define the capability as a contract, not as a special page animation.</li>
-                    <li>Give the Experience and its MicroBundles stable ontological identities and versions.</li>
-                    <li>Expose behavior through one or more MicroBundles.</li>
-                    <li>Declare dependencies explicitly so composition can resolve them.</li>
-                    <li>Place the capability MicroBundles in an Experience.</li>
-                    <li>Let FSM_COS assemble the runtime.</li>
-                    <li>Give the host a sensory/presentation adapter for the assembled state.</li>
-                </ol>
-            </div>
-            <aside>
-                <div class="terminal">ONTOLOGY QUERY</div>
-                <code>@CompositionGraph</code>
-                <p>
-                    The identifiers are the trail. A creator should be able to search the Workshop
-                    for the ontology, inspect its contract, and use it without copying this page.
-                </p>
-            </aside>
-        </section>
-
-        <section class="architecture">
-            <span>03 // WHO OWNS WHAT</span>
-            <div class="flow">
-                <div><b>AUTHOR</b><small>defines Experience + MicroBundles</small></div>
-                <i>→</i>
-                <div><b>FSM_COS</b><small>composes the RuntimeAssembly</small></div>
-                <i>→</i>
-                <div><b>HOST</b><small>presents the assembled state</small></div>
-                <i>→</i>
-                <div><b>VIEWER</b><small>experiences the result</small></div>
-            </div>
-        </section>
-
-        <section class="closing">
-            <span>04 // NOW YOU KNOW</span>
-            <h2>Don't copy the trick. Use the machinery.</h2>
-            <p>
-                Deep Dives are meant to make the Workshop more discoverable, not less mysterious.
-                The lesson is not “here is the animation.” The lesson is “here is the ontology,
-                here is the composition boundary, and here is how you can build another thing from it.”
-            </p>
-            <button @onclick="GoCreate">ENTER CREATE</button>
-        </section>
     </main>
 </div>
 
 <style>
-.deep-dive{min-height:100vh;background:#020711;color:#dceaf2;font-family:Consolas,'Courier New',monospace;padding:clamp(1rem,4vw,4rem);box-sizing:border-box}
-.deep-dive .hero,.deep-dive main{max-width:1200px;margin:0 auto}
-.kicker,.statement>span,.grid span,.recipe>div>span,.architecture>span,.closing>span{color:#00eaff;letter-spacing:.18em;font-size:.68rem;font-weight:800}
-.hero{padding:5vh 0 7vh;border-bottom:1px solid rgba(0,234,255,.18)}
-h1{font-size:clamp(3rem,9vw,8rem);line-height:.85;margin:.7rem 0 1.4rem;color:#fff;letter-spacing:-.06em}
-.lede{max-width:760px;font-size:clamp(1rem,2vw,1.35rem);line-height:1.6;color:#a8bbc4}
-.actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.5rem}
-button{border:1px solid rgba(0,234,255,.55);background:rgba(0,234,255,.06);color:#00eaff;padding:.7rem 1rem;font:800 .68rem Consolas,'Courier New',monospace;letter-spacing:.12em;cursor:pointer}
-button:hover{background:rgba(0,234,255,.14)}
-section{padding:6rem 0;border-bottom:1px solid rgba(255,255,255,.08)}
-.statement h2,.closing h2{font-size:clamp(2rem,4vw,4rem);max-width:900px;line-height:1;margin:.7rem 0 1rem;color:#fff}
-.statement p,.closing p{max-width:820px;font-size:1rem;line-height:1.8;color:#9fb0b8}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:rgba(0,234,255,.15)}
-.grid article{background:#030a13;padding:2rem;min-height:220px}
-.grid strong{display:block;color:#fff;font-size:1.1rem;margin:.8rem 0}
-.grid p{color:#91a6b0;line-height:1.7}
-.recipe{display:grid;grid-template-columns:1fr 1fr;gap:4rem}
-.recipe h2{font-size:clamp(2rem,4vw,3.5rem);line-height:1;color:#fff;margin:1rem 0 1.5rem}
-ol{padding-left:1.4rem;color:#b5c5cc;line-height:2}
-.terminal{color:#ffd34d;letter-spacing:.12em;font-size:.65rem;margin-bottom:1rem}
-code{display:block;padding:1.4rem;background:#01050a;border:1px solid rgba(255,211,77,.25);color:#d9f8ff;line-height:1.7;white-space:pre-wrap}
-.recipe aside p{color:#778c96;line-height:1.7}
-.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:1rem;align-items:center;margin-top:2rem}
-.flow div{padding:1.3rem;border:1px solid rgba(0,234,255,.2);background:rgba(0,234,255,.025)}
-.flow b{display:block;color:#fff;letter-spacing:.08em}.flow small{display:block;color:#7f969f;margin-top:.4rem;line-height:1.4}.flow i{color:#00eaff;font-style:normal}
-.closing{border-bottom:0}
-@@media(max-width:800px){.grid,.recipe{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow i{text-align:center;transform:rotate(90deg)}}
+.deep-dive{max-width:1100px;margin:0 auto;padding:clamp(1.5rem,5vw,4rem);color:#d9f8ff}
+.hero{padding:2rem 0 3rem;border-bottom:1px solid rgba(0,234,255,.2)}
+.kicker{color:#00eaff;letter-spacing:.16em;font-size:.7rem;margin-bottom:1.2rem}
+h1{font-size:clamp(2.5rem,7vw,5rem);line-height:1.05;margin:0 0 1rem}
+.lede{max-width:50rem;color:#a9bdc6;line-height:1.8}
+.actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem}
+button{padding:.9rem 1.2rem;border:1px solid rgba(0,234,255,.45);background:transparent;color:#d9f8ff;cursor:pointer}
+.statement{padding:3rem 0;border-bottom:1px solid rgba(0,234,255,.15)}
+.statement span{color:#00eaff;font-size:.7rem;letter-spacing:.14em}
+h2{font-size:clamp(1.5rem,4vw,2.5rem);max-width:45rem}
+.statement p{max-width:50rem;color:#a9bdc6;line-height:1.8}
 </style>
 
 @code {
     [Parameter] public long ExperienceId { get; set; }
 
     private WorkshopDeepDiveModel? Model =>
-        DeepDiveCatalog.TryResolve((ulong)ExperienceId, ExperienceService.RuntimeAssembly, ExperienceService.PrimaryManifestExperience?.MicroBundleIds, out var model)
+        DeepDiveCatalog.TryResolve(
+            (ulong)ExperienceId,
+            ExperienceService.RuntimeAssembly,
+            ExperienceService.PrimaryManifestExperience?.MicroBundles.Select(root => root.BundleId).ToArray(),
+            out var model)
             ? model
             : null;
 
@@ -167,31 +73,4 @@ code{display:block;padding:1.4rem;background:#01050a;border:1px solid rgba(255,2
     private IExperience? CurrentExperience => Model?.Experience;
 
     private string ExperienceName => CurrentExperience?.Name ?? $"EXPERIENCE 0x{ExperienceId:X16}";
-
-    private ulong PrimaryBundleId => Model?.PrimaryBundle?.Id ?? 0;
-
-    private string DependencySummary => Model?.DependencySummary ?? "UNRESOLVED EXPERIENCE";
-
-    private string DependencyDescription => Model?.DependencyDescription
-        ?? "The requested Experience is not currently present in the Workshop Experience catalog.";
-
-    private string OntologySummary => Model?.OntologySummary ?? "UNRESOLVED";
-
-    private int SenseCount => CurrentExperience?.SenseCount ?? 0;
-
-    private string SensorySummary => CurrentExperience is null
-        ? "The requested Experience is not currently present in the Workshop Experience catalog."
-        : string.Join(" / ", CurrentExperience.SensorySystems);
-
-    private string CompositionGraph => Model is null
-        ? $"Experience 0x{ExperienceId:X16}\n  └─ UNRESOLVED"
-        : $"Experience 0x{Model.Experience.Id:X16} // {Model.Experience.Name}\n"
-          + "  ├─ MANIFEST-REQUESTED ROOTS\n"
-          + string.Join("\n", Model.RequestedBundleIds.Select(id => $"  │  └─ 0x{id:X16}")) + "\n"
-          + (Model.IsRuntimeAssemblyBacked ? "  └─ RESOLVED RUNTIME ASSEMBLY\n" : "  └─ CATALOG DECLARATIONS (NOT A RUNTIME SNAPSHOT)\n")
-          + string.Join("\n", Model.Bundles.Select((bundle, index) =>
-              $"     {(index == Model.Bundles.Count - 1 ? "└" : "├")}─ 0x{bundle.Id:X16}  v{bundle.Descriptor.Version}  declared-deps:{bundle.Dependencies.Count}"));
-
-    private void ReturnToExperience() => Navigation.NavigateTo("/");
-    private void GoCreate() => Navigation.NavigateTo("/create");
 }
