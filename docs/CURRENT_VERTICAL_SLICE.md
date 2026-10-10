@@ -79,13 +79,17 @@ WebPage does not own:
 
 ## Current public navigation
 
-The navigation is intentionally small while this host is being stabilized.
+The navigation is intentionally small while this host is being stabilized. The first inspectable hub is a checkpoint, not a claim that the final hub content or information architecture has been decided.
 
-AnyApp is the current cross-host demonstration.
+The host boundaries must remain visible:
 
-The repository is the deeper learning resource.
+- **WebPage** is the browser proving ground and public learning resource.
+- **WebApp** is itself a web application/host, not merely a tab inside AnyApp or a WebPage-only feature.
+- **AnyApp** is itself the native desktop host, with its own process, window, input, and presentation lifecycle. A WebPage route describing AnyApp is explanatory material; it must not imply that it launches the native application when no public installer/launcher exists.
 
-Future educational Experiences should be added through the Experience/manifest model rather than by turning the navigation menu into a static encyclopedia.
+Manifest hub entries may introduce or link to these distinct hosts. The hub is a discovery and entry surface, not a substitute implementation of those hosts. Keep the first hub small enough to inspect; grow its content only as the intended visitor journey becomes clear.
+
+The repository is the deeper learning resource. Future educational Experiences should be added through the Experience/manifest model rather than by turning the navigation menu into a static encyclopedia.
 
 ## Transitional work
 
