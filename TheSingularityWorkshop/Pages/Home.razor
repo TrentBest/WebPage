@@ -307,7 +307,7 @@
     private void ExperienceChanged()
         => _ = InvokeAsync(StateHasChanged);
 
-    private void PageStateChanged(string _)
+    private void PageStateChanged(string stateName)
     {
         // PageFSM reports every heartbeat as well as transitions. Re-render this
         // parent only when the state used by BuildExperienceContent actually changes.
