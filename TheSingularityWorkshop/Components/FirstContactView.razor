@@ -80,7 +80,7 @@
     [Parameter] public GuiNode? MonikerComposition { get; set; }
 
     private string MonikerWord(string nodeId, string fallback)
-        => MonikerComposition?.Find(nodeId).Text ?? fallback;
+        => MonikerComposition?.Find(nodeId)?.Text ?? fallback;
 
     private static string LabelStyle(double opacity)
     {
