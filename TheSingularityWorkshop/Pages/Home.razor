@@ -53,8 +53,8 @@
     private RenderFragment BuildRootGui()
     {
         return WorkshopGui.Panel(this)
-            .Class("workshop-root").Style("position","relative").Style("width","100%").Style("height","100%")
-            .Style("min-height","100%").Style("overflow","hidden").Style("background","#020711").Style("color","#fff")
+            .Class("workshop-root").Style("position","absolute").Style("inset","0").Style("width","100%").Style("height","100%")
+            .Style("min-height","0").Style("overflow","hidden").Style("background","#020711").Style("color","#fff")
             .Style("font-family","Consolas,'Courier New',monospace").Child(BuildExperienceContent()).Build();
     }
 
