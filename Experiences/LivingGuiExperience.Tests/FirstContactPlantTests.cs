@@ -23,7 +23,7 @@ public sealed class FirstContactPlantTests
     }
 
     [Fact]
-    public async Task ManifestStartup_ComposesMonikerDependency_ThenEntersHub()
+    public async Task ManifestStartup_ComposesMonikerDependency_WithoutAdvancingHostLifecycle()
     {
         const string manifestJson = """
         {
@@ -51,7 +51,9 @@ public sealed class FirstContactPlantTests
 
         experience.RequestEntry();
 
-        Assert.Equal("Hub", experience.CurrentState);
+        // The manifest service composes the Experience; PageFSM owns the
+        // visible Gateway -> Moniker -> Hub transition.
+        Assert.Equal("Moniker", experience.CurrentState);
     }
 
     private sealed class ManifestHandler : HttpMessageHandler
