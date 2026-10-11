@@ -255,4 +255,22 @@ public sealed class IncrementalVersionTests
         Assert.Contains("WORKSHOP HUB ARRIVING", home);
         Assert.Contains("if (FSM.CurrentState == PageFSM.Running)", home);
     }
+
+
+    [ArchitectureTest(0, 0, 195)] [Fact(DisplayName = "V0.0.195 — Hub_Opens_On_Living_Moniker_And_Destinations_Require_Selection")]
+    public void V0_0_195HubOpensOnLivingMonikerAndDestinationsRequireSelection()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
+        var manifest = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "wwwroot", "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
+        var css = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "wwwroot", "css", "app.css"));
+        var firstContact = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
+
+        Assert.Contains("private string _selectedHubTab = \"MONIKER\";", home);
+        Assert.Contains("aria-pressed", home);
+        Assert.Contains("builder.AddAttribute(sequence++, \"onclick\"", home);
+        Assert.Contains("\"name\": \"Support\"", manifest);
+        Assert.Contains("glyph-red", firstContact);
+        Assert.DoesNotContain(".hello-glyph:nth-child(6n+", css);
+    }
 }
