@@ -22,46 +22,43 @@ try {
 
   const hub = page.locator(".manifest-hub");
   await hub.waitFor({ state: "visible", timeout: 240_000 });
-  const tabs = page.locator(".manifest-hub-tabs");
-  const monikerTab = tabs.getByRole("button", { name: "THE WORKSHOP", exact: true });
-  const anyAppTab = tabs.getByRole("button", { name: "ANYAPP", exact: true });
-  const supportTab = tabs.getByRole("button", { name: "SUPPORT", exact: true });
-
-  await monikerTab.waitFor({ state: "visible", timeout: 10_000 });
-  await anyAppTab.waitFor({ state: "visible", timeout: 10_000 });
-  await supportTab.waitFor({ state: "visible", timeout: 10_000 });
+  if (await page.locator(".manifest-hub-tabs").count() !== 0) {
+    throw new Error("The primary canvas must not add a second tab strip; navigation belongs to the left rail.");
+  }
   await moniker.waitFor({ state: "visible", timeout: 10_000 });
-  if (await monikerTab.getAttribute("aria-pressed") !== "true") {
-    throw new Error("The Workshop moniker must own the initial hub view; no destination is selected automatically.");
-  }
-  if (await page.getByRole("heading", { name: "AnyApp", exact: true }).count() !== 0) {
-    throw new Error("AnyApp content must remain hidden until the visitor explicitly selects its tab.");
-  }
-  if (await page.getByText("WELCOME", { exact: true }).count() !== 0) {
-    throw new Error("The hub should present the living moniker, not a generic welcome landing page.");
-  }
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
-  await anyAppTab.click();
-  await page.getByRole("heading", { name: "AnyApp", exact: true }).waitFor({ state: "visible", timeout: 10_000 });
-  if (await moniker.count() !== 0) {
-    throw new Error("Selecting AnyApp must replace the moniker in the primary panel.");
+  // AnyApp is reached from the persistent left rail and owns a full-height,
+  // paged canvas. It must not present a long scrolling article.
+  await page.getByRole("link", { name: "AnyApp", exact: true }).click();
+  await page.getByRole("heading", { name: "ANYAPP", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  const anyApp = page.locator(".anyapp-life");
+  await anyApp.waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByText("01 / THE IDEA", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  const initialHeight = await anyApp.evaluate(el => el.scrollHeight);
+  const visibleHeight = await anyApp.evaluate(el => el.clientHeight);
+  if (initialHeight > visibleHeight + 2) {
+    throw new Error(`AnyApp must fit its scene in the panel rather than require document scrolling (scrollHeight=${initialHeight}, clientHeight=${visibleHeight}).`);
   }
-  await page.screenshot({ path: `${outputDir}/04-hub-anyapp.png`, fullPage: true });
+  await page.screenshot({ path: `${outputDir}/04-anyapp-concept.png`, fullPage: true });
 
-  await supportTab.click();
-  await page.getByRole("heading", { name: "SUPPORT THE WORKSHOP.", exact: true }).waitFor({ state: "visible", timeout: 10_000 });
-  if (await page.getByRole("heading", { name: "ANYAPP", exact: true }).count() !== 0) {
-    throw new Error("Selecting Support must replace AnyApp content.");
-  }
-  await page.screenshot({ path: `${outputDir}/05-hub-support.png`, fullPage: true });
+  await anyApp.hover();
+  await page.mouse.wheel(0, 500);
+  await page.getByText("02 / INTERCHANGEABILITY", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.screenshot({ path: `${outputDir}/05-anyapp-interchange.png`, fullPage: true });
 
-  // Return to the living moniker and check the hub at a narrow mobile viewport.
-  await monikerTab.click();
-  await moniker.waitFor({ state: "visible", timeout: 10_000 });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await monikerTab.waitFor({ state: "visible", timeout: 10_000 });
-  await page.screenshot({ path: `${outputDir}/06-hub-mobile.png`, fullPage: true });
+  await page.getByRole("button", { name: "Go to scene 3" }).click();
+  await page.getByText("03 / THE SAME IDEA, LIVE RIGHT HERE", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.screenshot({ path: `${outputDir}/06-anyapp-live-proof.png`, fullPage: true });
+
+  await page.getByRole("button", { name: "Go to scene 4" }).click();
+  await page.getByText("04 / THE NEXT FRONTIER", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByRole("link", { name: /INSPECT ANYAPP SOURCE/i }).waitFor({ state: "visible" });
+  await page.screenshot({ path: `${outputDir}/07-anyapp-desktop.png`, fullPage: true });
+
+  // The left rail is still available to return to the Workshop.
+  await page.getByRole("link", { name: "The Singularity Workshop" }).click();
+  await page.locator(".manifest-hub").waitFor({ state: "visible", timeout: 15_000 });
 
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
