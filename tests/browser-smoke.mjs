@@ -10,6 +10,8 @@ try {
   page.on("pageerror", error => browserErrors.push(error.message));
 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  await page.getByText("IF AN IMAGE IS WORTH A THOUSAND WORDS...", { exact: true }).waitFor({ state: "visible", timeout: 30_000 });
+  await page.getByText("HOW MANY WORDS IS A LIVING IMAGE WORTH?", { exact: true }).waitFor({ state: "visible", timeout: 30_000 });
   await page.locator(".enter-workshop").waitFor({ state: "visible", timeout: 45_000 });
   await page.screenshot({ path: `${outputDir}/01-gateway.png`, fullPage: true });
 
