@@ -11,15 +11,21 @@ The host manifest is loaded first.
 ~~~text
 WEBPAGE BOOT
    ↓
-manifest
+manifest + FSM_COS composition
    ↓
-primary composition through FSM_COS
+opening statement: “If an image is worth a thousand words…”
    ↓
-startup Moniker
+opening question: “How many words is a living image worth?”
    ↓
-primary running Experience
+visitor entry gateway
    ↓
-Living GUI
+Living GUI population
+   ↓
+Moniker reveal
+   ↓
+gravity + three-second presentation
+   ↓
+manifest-driven Workshop Hub
 ~~~
 
 The manifest currently contains one startup Moniker and one primary running Experience.
