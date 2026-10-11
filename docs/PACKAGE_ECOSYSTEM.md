@@ -126,17 +126,21 @@ required MicroBundles may be resident in the WebPage bootstrap cache so that
 the Workshop can establish its identity before repository-backed content is
 available.
 
-**This is not yet the active WebPage execution path.** The current WebPage
-branch is pinned to the published FSM_COS alpha.4 contract, while the
-repository-backed catalog is built against the newer `MicroBundleDomain`
-boundary. Until the compatible FSM_COS package boundary is available to
-WebPage, do not add a local compatibility adapter that recreates the old
-composition contract.
+**The compatible composition contract is now published.** WebPage references
+FSM_COS `0.1.0-alpha.6` and MicroBundleDomain `1.0.1`; the integration CI is
+being moved to restore that released FSM_COS package directly from nuget.org.
 
-The target invariant is:
+**Repository-backed retrieval is still future work.** The active
+`WorkshopCompositionCatalog` is an in-memory host catalog of the currently
+implemented Workshop MicroBundles. It is not yet an immutable-artifact
+repository resolver, and the visible Living GUI still passes through the
+transitional WebPage presentation lifecycle. Do not describe that target as
+already implemented or add a local adapter that recreates FSM_COS behavior.
 
-> **Bootstrap the Workshop Moniker locally; retrieve everything else as an
-> immutable MicroBundle artifact and let FSM_COS compose it.**
+The target invariant remains:
+
+> **Bootstrap the Workshop Moniker locally; retrieve other MicroBundles as
+> immutable artifacts and let FSM_COS compose the requested dependency closure.**
 
 This also establishes the path for visitor-created content. A visitor-created
 MicroBundle should eventually be just another immutable artifact address. An
