@@ -1,51 +1,78 @@
 @page "/institutions"
 @using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
-<PageTitle>Institutional Briefing // The Singularity Workshop</PageTitle>
+<PageTitle>Development Briefing // The Singularity Workshop</PageTitle>
 
 <div class="institution-brief">
-    <div class="brief-signal"><span></span> THE SINGULARITY WORKSHOP <i> / INSTITUTIONAL BRIEFING</i></div>
+    <header class="brief-signal"><span></span> THE SINGULARITY WORKSHOP <i>/ DEVELOPMENT BRIEFING</i></header>
     <main class="brief-layout">
         <section class="brief-message">
-            <div class="brief-kicker">FOR INNOVATION PROGRAMS · RESEARCH INSTITUTIONS · PUBLIC-SECTOR PARTNERS</div>
-            <h1>Make complex<br/>systems <em>composable.</em></h1>
-            <p class="brief-lede">The Workshop develops small, independently useful .NET building blocks for systems whose behavior, capabilities, and presentation need to evolve without becoming one inseparable application.</p>
-            <div class="brief-claim"><b>THE PROPOSITION</b><span>Integrate capabilities into existing .NET systems. Keep responsibilities explicit. Compose the experience around the mission.</span></div>
+            <div class="brief-kicker">FOR BRAVE1 · RESEARCH PROGRAMS · TECHNICAL PARTNERS</div>
+            <div class="brief-stage">@(_stage switch { 0 => "01 / THE FOUNDATION", 1 => "02 / THE SYSTEM TAKING SHAPE", _ => "03 / CURRENT STATE & NEXT STEP" })</div>
+            @if (_stage == 0)
+            {
+                <h1>One foundation.<br/><em>A growing system.</em></h1>
+                <p class="brief-lede">The work began with FSM_API: an independently useful .NET library for explicit, runtime-modifiable finite-state-machine behavior. The larger Workshop is the effort to turn that foundation into a coherent set of composable capabilities—not a single monolithic application.</p>
+                <div class="brief-claim"><b>WHY THE FOUNDATION MATTERS</b><span>Behavior is represented explicitly, can be tested, and can change at runtime. Higher-level systems build on that capability instead of hiding it inside one application.</span></div>
+            }
+            else if (_stage == 1)
+            {
+                <h1>From state<br/>to <em>composition.</em></h1>
+                <p class="brief-lede">The ecosystem is growing in layers. Each layer has a responsibility; the composition boundary brings capabilities together for a host application without making the core depend on every possible host.</p>
+                <div class="brief-claim"><b>THE DESIGN DIRECTION</b><span>MicroBundleDomain describes what a capability is. FSM_API governs state behavior. FSM_Layer adds a higher-level layer. FSM_COS assembles experiences from manifests and configuration. Hosts provide the environment where an experience appears.</span></div>
+            }
+            else
+            {
+                <h1>Working software.<br/><em>Open questions.</em></h1>
+                <p class="brief-lede">This is active development, not a claim that every layer is production-proven. The foundation and multiple supporting packages are published; FSM_COS and the end-to-end experience continue to evolve. Integration, mission fit, and operational validation should be evaluated against a concrete use case.</p>
+                <div class="brief-claim"><b>WHAT A PARTNER CAN HELP ESTABLISH</b><span>A defined problem, success criteria, constraints, an integration path, and the evidence needed to decide whether to proceed. No operational readiness or mission suitability is implied without that validation.</span></div>
+            }
+            <nav class="brief-steps" aria-label="Briefing sections">
+                <button class="@(_stage == 0 ? "active" : "")" aria-pressed="@(_stage == 0)" @onclick="() => SetStage(0)">FOUNDATION</button>
+                <button class="@(_stage == 1 ? "active" : "")" aria-pressed="@(_stage == 1)" @onclick="() => SetStage(1)">EVOLUTION</button>
+                <button class="@(_stage == 2 ? "active" : "")" aria-pressed="@(_stage == 2)" @onclick="() => SetStage(2)">READINESS</button>
+            </nav>
             <div class="brief-actions">
-                <button @onclick="RequestBriefing">REQUEST A TECHNICAL BRIEFING <b>↗</b></button>
-                <a href="https://github.com/TrentBest" target="_blank" rel="noopener noreferrer">INSPECT THE OPEN WORK ↗</a>
+                <button @onclick="RequestBriefing">DISCUSS A REAL PROBLEM <b>↗</b></button>
+                <a href="https://github.com/TrentBest" target="_blank" rel="noopener noreferrer">INSPECT SOURCE & RELEASES ↗</a>
             </div>
         </section>
-        <section class="brief-system" aria-label="Workshop architecture">
-            <div class="system-heading"><span>REFERENCE ARCHITECTURE</span><span>01—04</span></div>
-            <div class="system-node node-domain"><small>01 / WHAT EXISTS</small><b>MicroBundleDomain</b><span>Capability contracts and identity</span></div>
-            <div class="system-link">↓ declare behavior</div>
-            <div class="system-node node-fsm"><small>02 / HOW IT CHANGES</small><b>FSM_API</b><span>Explicit, testable state transitions</span></div>
-            <div class="system-link">↓ compose capabilities</div>
-            <div class="system-node node-cos"><small>03 / HOW IT ASSEMBLES</small><b>FSM_COS</b><span>Manifest-driven runtime composition</span></div>
-            <div class="system-link">↓ present in a host</div>
-            <div class="system-node node-host"><small>04 / WHERE IT LIVES</small><b>Existing .NET application</b><span>Web · desktop · simulation · domain-specific host</span></div>
-            <div class="system-foot">MODULARITY IS THE DESIGN GOAL. VALIDATION IS THE EVIDENCE.</div>
+        <section class="brief-system" aria-label="Workshop architecture and development evidence">
+            <div class="system-heading"><span>THE STACK</span><span>FOUNDATION → HOST</span></div>
+            <div class="system-node node-domain"><small>WHAT / CAPABILITY IDENTITY</small><b>MicroBundleDomain</b><span>Ontology and capability contracts</span></div>
+            <div class="system-link">↓</div>
+            <div class="system-node node-fsm"><small>BEHAVIOR / PUBLISHED PACKAGE</small><b>FSM_API</b><span>Explicit state transitions · runtime change</span></div>
+            <div class="system-link">↓</div>
+            <div class="system-node node-layer"><small>ABSTRACTION</small><b>FSM_Layer</b><span>Higher-level state-machine organization</span></div>
+            <div class="system-link">↓</div>
+            <div class="system-node node-cos"><small>COMPOSITION / ACTIVE DEVELOPMENT</small><b>FSM_COS</b><span>Manifest-driven capability assembly</span></div>
+            <div class="system-link">↓</div>
+            <div class="system-node node-host"><small>EXPERIENCE / INTEGRATION TARGET</small><b>.NET host applications</b><span>Web · desktop · simulation · domain-specific systems</span></div>
+            <div class="system-foot">EVIDENCE FIRST: SOURCE · TESTS · BENCHMARKS · INTEGRATION VALIDATION</div>
         </section>
     </main>
-    <footer class="brief-footer"><span>TECHNICAL DIALOGUE, NOT A SALES DECK.</span><span>Research prototypes and maturity are discussed honestly.</span></footer>
+    <footer class="brief-footer"><span>DEVELOPMENT STATUS, NOT A PROCUREMENT CLAIM.</span><span>Scope and maturity are discussed openly.</span></footer>
 </div>
 
 <style>
-.institution-brief{--cyan:#00eaff;--pink:#ff2cff;--gold:#ffd34d;position:relative;isolation:isolate;width:100%;height:100%;min-height:0;overflow:hidden;box-sizing:border-box;padding:clamp(.8rem,2.4vh,1.6rem) clamp(1rem,3vw,2.8rem);background:radial-gradient(ellipse at 15% 35%,#092337 0,transparent 42%),radial-gradient(ellipse at 85% 65%,#210c2c 0,transparent 35%),#020711;color:#eaf8ff;font-family:system-ui,sans-serif;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(.7rem,1.8vh,1.3rem)}
-.brief-signal,.brief-kicker,.system-heading,.system-node small,.system-link,.system-foot,.brief-footer{font:700 .62rem Consolas,monospace;letter-spacing:.12em}.brief-signal{color:#a6c0cc;display:flex;gap:.65rem;align-items:center}.brief-signal>span{width:.5rem;height:.5rem;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}.brief-signal i{font-style:normal;color:var(--pink)}
-.brief-layout{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.78fr);gap:clamp(1.2rem,4vw,4rem);align-items:center;max-width:1450px;width:100%;margin:auto}.brief-message{min-width:0}.brief-kicker{color:#80a9bb;line-height:1.6}.brief-message h1{font-size:clamp(2.8rem,6.2vw,6rem);line-height:.9;letter-spacing:-.065em;margin:1rem 0 1.1rem}.brief-message h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 35px #00eaff30}.brief-lede{max-width:60ch;font-size:clamp(.86rem,1.2vw,1.04rem);line-height:1.7;color:#b3c8d2}.brief-claim{display:grid;gap:.45rem;margin-top:1.2rem;padding:.9rem 1rem;border-left:2px solid var(--pink);background:#ff2cff0a;max-width:610px}.brief-claim b{font:800 .65rem Consolas,monospace;letter-spacing:.1em;color:#ffadff}.brief-claim span{font-size:.85rem;line-height:1.55;color:#c3d2da}.brief-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.8rem;margin-top:1.35rem}.brief-actions button,.brief-actions a{display:inline-flex;align-items:center;gap:.7rem;padding:.8rem .9rem;border:1px solid #00eaff70;background:#00eaff0b;color:#eaf8ff;text-decoration:none;font:800 .63rem Consolas,monospace;letter-spacing:.04em;cursor:pointer}.brief-actions button{background:var(--cyan);color:#031019;border-color:var(--cyan)}.brief-actions button:hover{background:#a8fbff}.brief-actions a:hover{border-color:var(--pink)}
-.brief-system{min-width:0;padding:clamp(.9rem,2vw,1.5rem);border:1px solid #1b4558;background:linear-gradient(145deg,#071522ed,#030711f2);box-shadow:0 20px 70px #0005}.system-heading{display:flex;justify-content:space-between;color:#7198a9;margin-bottom:.8rem}.system-node{display:grid;gap:.3rem;padding:.7rem .85rem;border:1px solid #244657;background:#05101b}.system-node small{font-size:.55rem;color:#7ea4b4}.system-node b{font:800 clamp(.82rem,1.25vw,1.02rem) Consolas,monospace}.system-node span{font-size:.73rem;line-height:1.4;color:#9eb7c3}.node-domain{border-left:3px solid var(--gold)}.node-fsm{border-left:3px solid var(--cyan)}.node-cos{border-left:3px solid var(--pink)}.node-host{border-left:3px solid #52e05a}.system-link{text-align:center;color:#638c9d;font-size:.55rem;padding:.28rem}.system-foot{border-top:1px solid #1b3544;margin-top:.7rem;padding-top:.7rem;color:#ffd34d;font-size:.53rem;line-height:1.5}.brief-footer{display:flex;justify-content:space-between;gap:1rem;color:#648493;font-size:.55rem;line-height:1.5}
-@@media(max-width:800px){.brief-layout{grid-template-columns:minmax(0,1fr) minmax(240px,.8fr);gap:1rem}.brief-message h1{font-size:clamp(2.4rem,6vw,4rem)}.brief-system{padding:.8rem}.system-node{padding:.5rem .65rem}.system-node span{font-size:.65rem}}
-@@media(max-width:620px){.institution-brief{height:100%;padding:.75rem;gap:.6rem}.brief-layout{grid-template-columns:1fr;gap:.6rem;align-content:center}.brief-message h1{font-size:clamp(2.2rem,9vw,3.5rem);margin:.55rem 0}.brief-kicker{font-size:.53rem}.brief-lede{font-size:.78rem;line-height:1.45;margin:.5rem 0}.brief-claim{margin-top:.5rem;padding:.55rem .7rem}.brief-claim span{font-size:.72rem}.brief-actions{margin-top:.6rem;gap:.45rem}.brief-actions button,.brief-actions a{font-size:.53rem;padding:.6rem}.brief-system{padding:.55rem}.system-heading{margin-bottom:.4rem}.system-node{padding:.35rem .55rem;gap:.15rem}.system-node b{font-size:.75rem}.system-node span{font-size:.58rem}.system-node small{font-size:.48rem}.system-link{padding:.12rem;font-size:.48rem}.system-foot{margin-top:.35rem;padding-top:.35rem;font-size:.46rem}.brief-footer{font-size:.46rem}.brief-footer span:last-child{display:none}}
-@@media(max-height:700px) and (min-width:621px){.brief-message h1{font-size:clamp(2.4rem,5vw,4.4rem);margin:.55rem 0}.brief-lede{line-height:1.45;margin:.5rem 0}.brief-claim{margin-top:.55rem;padding:.6rem .8rem}.brief-actions{margin-top:.65rem}.brief-system{padding:.8rem}.system-node{padding:.45rem .65rem}.system-link{padding:.12rem}.brief-footer{font-size:.5rem}}
+.institution-brief{--cyan:#00eaff;--pink:#ff2cff;--gold:#ffd34d;position:relative;isolation:isolate;width:100%;height:100%;min-height:0;overflow:hidden;box-sizing:border-box;padding:clamp(.65rem,2vh,1.4rem) clamp(.8rem,2.5vw,2.4rem);background:radial-gradient(ellipse at 15% 35%,#092337 0,transparent 42%),radial-gradient(ellipse at 85% 65%,#210c2c 0,transparent 35%),#020711;color:#eaf8ff;font-family:system-ui,sans-serif;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(.45rem,1.3vh,1rem)}
+.brief-signal,.brief-kicker,.brief-stage,.system-heading,.system-node small,.system-link,.system-foot,.brief-footer,.brief-steps button{font-family:Consolas,monospace;font-weight:700;letter-spacing:.1em}.brief-signal{font-size:.6rem;color:#a6c0cc;display:flex;gap:.65rem;align-items:center}.brief-signal>span{width:.48rem;height:.48rem;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}.brief-signal i{font-style:normal;color:var(--pink)}
+.brief-layout{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.8fr);gap:clamp(1rem,3vw,3rem);align-items:center;max-width:1450px;width:100%;margin:auto}.brief-message{min-width:0}.brief-kicker{color:#80a9bb;font-size:.6rem;line-height:1.5}.brief-stage{color:var(--gold);font-size:.65rem;margin-top:.8rem}.brief-message h1{font-size:clamp(2.5rem,5.5vw,5.5rem);line-height:.9;letter-spacing:-.065em;margin:.65rem 0 1rem}.brief-message h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 35px #00eaff30}.brief-lede{max-width:60ch;font-size:clamp(.8rem,1.05vw,.98rem);line-height:1.62;color:#b3c8d2;margin:.5rem 0}.brief-claim{display:grid;gap:.4rem;margin-top:.85rem;padding:.8rem .9rem;border-left:2px solid var(--pink);background:#ff2cff0a;max-width:610px}.brief-claim b{font-size:.62rem;color:#ffadff}.brief-claim span{font-size:.8rem;line-height:1.5;color:#c3d2da}.brief-steps{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem}.brief-steps button{padding:.55rem .65rem;font-size:.58rem;color:#8aa9b6;background:#06121e;border:1px solid #244657;cursor:pointer}.brief-steps button.active{color:#061019;background:var(--cyan);border-color:var(--cyan)}.brief-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem;margin-top:.8rem}.brief-actions button,.brief-actions a{display:inline-flex;align-items:center;gap:.6rem;padding:.7rem .8rem;border:1px solid #00eaff70;background:#00eaff0b;color:#eaf8ff;text-decoration:none;font:800 .6rem Consolas,monospace;letter-spacing:.035em;cursor:pointer}.brief-actions button{background:var(--cyan);color:#031019;border-color:var(--cyan)}.brief-actions a:hover{border-color:var(--pink)}
+.brief-system{min-width:0;padding:clamp(.7rem,1.5vw,1.2rem);border:1px solid #1b4558;background:linear-gradient(145deg,#071522ed,#030711f2);box-shadow:0 20px 70px #0005}.system-heading{display:flex;justify-content:space-between;color:#7198a9;margin-bottom:.65rem;font-size:.58rem}.system-node{display:grid;gap:.25rem;padding:.55rem .75rem;border:1px solid #244657;background:#05101b}.system-node small{font-size:.5rem;color:#7ea4b4}.system-node b{font:800 clamp(.78rem,1.1vw,.95rem) Consolas,monospace}.system-node span{font-size:.68rem;line-height:1.35;color:#9eb7c3}.node-domain{border-left:3px solid var(--gold)}.node-fsm{border-left:3px solid var(--cyan)}.node-layer{border-left:3px solid #a78bfa}.node-cos{border-left:3px solid var(--pink)}.node-host{border-left:3px solid #52e05a}.system-link{text-align:center;color:#638c9d;font-size:.55rem;padding:.17rem}.system-foot{border-top:1px solid #1b3544;margin-top:.6rem;padding-top:.6rem;color:#ffd34d;font-size:.49rem;line-height:1.45}.brief-footer{display:flex;justify-content:space-between;gap:1rem;color:#648493;font-size:.5rem;line-height:1.4}
+@@media(max-width:800px){.brief-layout{grid-template-columns:minmax(0,1fr) minmax(250px,.8fr);gap:.8rem}.brief-message h1{font-size:clamp(2.2rem,5.5vw,3.8rem)}.brief-system{padding:.65rem}.system-node{padding:.42rem .55rem}.system-node span{font-size:.61rem}}
+@@media(max-width:620px){.institution-brief{height:100%;padding:.65rem;gap:.45rem}.brief-layout{grid-template-columns:1fr;gap:.55rem;align-content:center}.brief-stage{margin-top:.4rem;font-size:.55rem}.brief-message h1{font-size:clamp(2rem,8vw,3rem);margin:.45rem 0}.brief-kicker{font-size:.5rem}.brief-lede{font-size:.7rem;line-height:1.35;margin:.35rem 0}.brief-claim{margin-top:.45rem;padding:.45rem .6rem;gap:.25rem}.brief-claim b{font-size:.52rem}.brief-claim span{font-size:.64rem;line-height:1.35}.brief-steps{margin-top:.5rem;gap:.3rem}.brief-steps button{font-size:.5rem;padding:.45rem}.brief-actions{margin-top:.5rem;gap:.35rem}.brief-actions button,.brief-actions a{font-size:.49rem;padding:.5rem}.brief-system{padding:.5rem}.system-heading{margin-bottom:.3rem;font-size:.48rem}.system-node{padding:.3rem .45rem;gap:.1rem}.system-node b{font-size:.68rem}.system-node span{font-size:.53rem}.system-node small{font-size:.43rem}.system-link{padding:.08rem;font-size:.45rem}.system-foot{margin-top:.3rem;padding-top:.3rem;font-size:.42rem}.brief-footer{font-size:.42rem}.brief-footer span:last-child{display:none}}
+@@media(max-height:700px) and (min-width:621px){.brief-message h1{font-size:clamp(2rem,4.4vw,4rem);margin:.4rem 0}.brief-lede{line-height:1.35;margin:.35rem 0}.brief-claim{margin-top:.4rem;padding:.5rem .65rem}.brief-steps{margin-top:.5rem}.brief-actions{margin-top:.5rem}.brief-system{padding:.55rem}.system-node{padding:.3rem .5rem}.system-link{padding:.08rem}.brief-footer{font-size:.45rem}}
 </style>
 
 @code {
+    private int _stage;
+
+    private void SetStage(int stage) => _stage = Math.Clamp(stage, 0, 2);
+
     private void RequestBriefing()
     {
-        var subject = Uri.EscapeDataString("Institutional technical briefing — The Singularity Workshop");
-        var body = Uri.EscapeDataString("Hello,\n\nI'd like to discuss The Singularity Workshop's technology and potential fit for our institution or program.\n\nOrganization / program:\nMission or problem area:\nTechnical constraints / existing .NET environment:\nDesired next step:\n\nThank you.");
+        var subject = Uri.EscapeDataString("Technical development briefing — The Singularity Workshop");
+        var body = Uri.EscapeDataString("Hello,\n\nI'd like to discuss The Singularity Workshop's current development and a potential technical or institutional fit.\n\nOrganization / program:\nProblem or mission area:\nExisting systems / technical constraints:\nEvidence or validation required:\nDesired next step:\n\nThank you.");
         Navigation.NavigateTo($"mailto:thesingularityworkshop@gmail.com?subject={subject}&body={body}");
     }
 }
