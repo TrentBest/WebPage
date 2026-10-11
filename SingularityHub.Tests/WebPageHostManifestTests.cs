@@ -70,7 +70,7 @@ public sealed class WebPageHostManifestTests
             wwwroot, "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
         var manifest = WebPageHostManifestParser.Parse(manifestJson);
 
-        Assert.Equal(2, manifest.Hub.Count);
+        Assert.Equal(3, manifest.Hub.Count);
         var hub = Assert.Single(manifest.Hub, item => item.Name == "AnyApp");
         Assert.Equal("/anyapp", hub.Route);
         Assert.Empty(hub.MicroBundles!);
@@ -79,6 +79,11 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("/about-us", support.Route);
         Assert.Equal("/about-us", support.AboutUrl);
         Assert.Empty(support.MicroBundles!);
+
+        var ecosystem = Assert.Single(manifest.Hub, item => item.Name == "Ecosystem");
+        Assert.Equal("Explore", ecosystem.Kind);
+        Assert.Equal("/ecosystem", ecosystem.Route);
+        Assert.Empty(ecosystem.MicroBundles!);
 
         Assert.NotNull(manifest.Capabilities);
         var rendering = Assert.Single(manifest.Capabilities!);
