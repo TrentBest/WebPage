@@ -25,6 +25,7 @@ public sealed class IdleExperienceArchitectureTests
     {
         using var fsm = new PageFSM();
 
+        AdvanceToGateway(fsm);
         Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
         Assert.False(fsm.Context.MonikerReady);
 
@@ -127,6 +128,8 @@ public sealed class IdleExperienceArchitectureTests
         using var first = new PageFSM();
         using var second = new PageFSM();
 
+        AdvanceToGateway(first);
+        AdvanceToGateway(second);
         Assert.Equal(PageFSM.Gateway, first.CurrentState);
         Assert.Equal(PageFSM.Gateway, second.CurrentState);
 
@@ -144,6 +147,7 @@ public sealed class IdleExperienceArchitectureTests
     {
         using var fsm = new PageFSM();
 
+        AdvanceToGateway(fsm);
         fsm.RequestEnter();
         fsm.Update();
         fsm.Update();
@@ -181,6 +185,7 @@ public sealed class IdleExperienceArchitectureTests
         using var defaultFsm = new PageFSM();
         using var customFsm = new PageFSM(monikerPresentationDuration: TimeSpan.FromSeconds(5));
 
+        AdvanceToGateway(defaultFsm);
         Assert.Equal(TimeSpan.FromSeconds(3), defaultFsm.MonikerPresentationDuration);
         Assert.Equal(TimeSpan.FromSeconds(5), customFsm.MonikerPresentationDuration);
 
@@ -210,6 +215,7 @@ public sealed class IdleExperienceArchitectureTests
     {
         using var fsm = new PageFSM();
 
+        AdvanceToGateway(fsm);
         fsm.RequestEnter();
         fsm.Update();
         fsm.Update();
@@ -225,6 +231,15 @@ public sealed class IdleExperienceArchitectureTests
         Assert.True(fsm.Context.MonikerReady);
         Assert.True(fsm.Context.LivingGuiFallen);
         Assert.Equal(PageFSM.Running, fsm.CurrentState);
+    }
+
+
+    private static void AdvanceToGateway(PageFSM fsm)
+    {
+        for (var ticks = 0; ticks < 200 && fsm.CurrentState != PageFSM.Gateway; ticks++)
+            fsm.Update();
+
+        Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
     }
 
 }
