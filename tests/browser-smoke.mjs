@@ -26,6 +26,11 @@ try {
     throw new Error("The primary canvas must not add a second tab strip; navigation belongs to the left rail.");
   }
   await moniker.waitFor({ state: "visible", timeout: 10_000 });
+  const hubHeight = await hub.evaluate(el => el.scrollHeight);
+  const hubVisibleHeight = await hub.evaluate(el => el.clientHeight);
+  if (hubHeight > hubVisibleHeight + 2) {
+    throw new Error(`The manifested hub must fit its viewport without scrolling (scrollHeight=${hubHeight}, clientHeight=${hubVisibleHeight}).`);
+  }
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   // AnyApp is reached from the persistent left rail and owns a full-height,
