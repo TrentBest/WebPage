@@ -177,7 +177,6 @@
         RenderHubTab(builder, ref sequence, "MONIKER", "THE WORKSHOP", "MONIKER");
         foreach (var item in manifest.Hub)
             RenderHubTab(builder, ref sequence, item.Name.ToUpperInvariant(), item.Name.ToUpperInvariant(), item.Name);
-        RenderHubTab(builder, ref sequence, "SUPPORT", "SUPPORT", "SUPPORT");
         builder.CloseElement();
 
         if (string.Equals(_selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase))
@@ -201,11 +200,13 @@
             builder.OpenElement(sequence++, "h2");
             builder.AddContent(sequence++, "SUPPORT THE WORKSHOP.");
             builder.CloseElement();
+            var support = manifest.Hub.FirstOrDefault(x =>
+                string.Equals(x.Name, "Support", StringComparison.OrdinalIgnoreCase));
             builder.OpenElement(sequence++, "p");
-            builder.AddContent(sequence++, "A living software workshop is built in the open, one experiment at a time. Explore the work, ask questions, and help shape what comes next.");
+            builder.AddContent(sequence++, support?.Description ?? "Find a human point of contact for the Workshop.");
             builder.CloseElement();
             builder.OpenElement(sequence++, "a");
-            builder.AddAttribute(sequence++, "href", "/about-us");
+            builder.AddAttribute(sequence++, "href", support?.Route ?? support?.AboutUrl ?? "/about-us");
             builder.AddContent(sequence++, "MEET THE WORKSHOP");
             builder.CloseElement();
             builder.CloseElement();
