@@ -73,6 +73,22 @@
             return;
         }
 
+        if (FSM.CurrentState is PageFSM.FirstContactFirstLabel or PageFSM.FirstContactTransition or PageFSM.FirstContactSecondLabel)
+        {
+            var state = FSM.CurrentState;
+            builder.OpenComponent<TheSingularityWorkshop.Components.FirstContactView>(0);
+            builder.AddAttribute(1, "State", state switch
+            {
+                PageFSM.FirstContactFirstLabel => "FirstOnly",
+                PageFSM.FirstContactTransition => "FirstFadingSecondComingIn",
+                _ => "SecondOnly"
+            });
+            builder.AddAttribute(2, "StatementOpacity", state == PageFSM.FirstContactFirstLabel ? 1d : 0d);
+            builder.AddAttribute(3, "QuestionOpacity", state == PageFSM.FirstContactSecondLabel ? 1d : state == PageFSM.FirstContactTransition ? 1d : 0d);
+            builder.CloseComponent();
+            return;
+        }
+
         if (FSM.CurrentState == PageFSM.Gateway)
         {
             builder.OpenComponent<TheSingularityWorkshop.Components.FirstContactView>(0);
