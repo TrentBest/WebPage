@@ -1,6 +1,6 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
@@ -18,6 +18,16 @@
       "aboutUrl": "/about-us",
       "bridgeEndpoint": null,
       "route": "/anyapp",
+      "microBundles": []
+    },
+    {
+      "name": "Ecosystem",
+      "kind": "Explore",
+      "description": "Explore Workshop NuGet packages and GitHub repositories, trace the architecture, try a local-only submission gauntlet, and request a technical consultation.",
+      "deploymentUrl": null,
+      "aboutUrl": "/about-us",
+      "bridgeEndpoint": null,
+      "route": "/ecosystem",
       "microBundles": []
     },
     {
