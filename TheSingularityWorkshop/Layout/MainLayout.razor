@@ -6,7 +6,7 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden") @(IsWorkshopLanding && ShowWorkshopChrome ? "workshop-hub-manifested workshop-hub-split" : "") @(IsCreatePage ? "workshop-create-page" : "") @(IsSpatialExplorePage ? "workshop-spatial-page" : "")">
+<div class="page @(IsWorkshopLanding ? "workshop-page" : "") @(ShowWorkshopChrome ? "workshop-chrome-visible" : "workshop-chrome-hidden") @(IsWorkshopLanding && ShowWorkshopChrome ? "workshop-hub-manifested workshop-hub-split" : "") @(IsCreatePage ? "workshop-create-page" : "") @(IsSpatialExplorePage ? "workshop-spatial-page" : "") @(IsImmersiveDestination ? "workshop-immersive-destination" : "")">
     @if (!IsWorkshopLanding)
     {
         <div class="sidebar workshop-sidebar"><NavMenu /></div>
@@ -43,6 +43,7 @@
     private bool IsWorkshopLanding => string.IsNullOrWhiteSpace(Navigation.ToBaseRelativePath(Navigation.Uri));
     private bool IsCreatePage => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Equals("create", StringComparison.OrdinalIgnoreCase);
     private bool IsSpatialExplorePage => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Equals("explore", StringComparison.OrdinalIgnoreCase);
+    private bool IsImmersiveDestination => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').ToLowerInvariant() is "institutions" or "ecosystem" or "schedule";
 
     // PageFSM owns the landing sequence. Manifest composition must not release
     // browser chrome early just because its independent loading/presentation state changed.
