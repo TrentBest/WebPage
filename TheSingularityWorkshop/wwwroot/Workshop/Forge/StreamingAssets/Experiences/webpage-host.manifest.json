@@ -1,6 +1,6 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
@@ -18,6 +18,16 @@
       "aboutUrl": "/about-us",
       "bridgeEndpoint": null,
       "route": "/anyapp",
+      "microBundles": []
+    },
+    {
+      "name": "Support",
+      "kind": "Support",
+      "description": "Have a question, want to collaborate, or want to help the Workshop grow? Find a human point of contact and learn more about the people behind the experiments.",
+      "deploymentUrl": null,
+      "aboutUrl": "/about-us",
+      "bridgeEndpoint": null,
+      "route": "/about-us",
       "microBundles": []
     }
   ],
