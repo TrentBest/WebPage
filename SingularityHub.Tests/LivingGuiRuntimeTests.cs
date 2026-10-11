@@ -20,7 +20,7 @@ public sealed class LivingGuiRuntimeTests
     public void LivingGuiCreatesRootAndThenIndependentChildren()
     {
         using var fsm = new PageFSM();
-        fsm.RequestEnter();
+        EnterFromGateway(fsm);
 
         for (var ticks = 0; ticks < 3 && fsm.Context.LivingNodes.Count == 0; ticks++)
             fsm.Update();
@@ -49,7 +49,7 @@ public sealed class LivingGuiRuntimeTests
     public void PageHeartbeatAdvancesOrganismFsmIntoGrowthAndReproduction()
     {
         using var fsm = new PageFSM();
-        fsm.RequestEnter();
+        EnterFromGateway(fsm);
 
         for (var ticks = 0; ticks < 100 && fsm.Context.LivingNodes.Count == 0; ticks++)
             fsm.Update();
@@ -71,7 +71,7 @@ public sealed class LivingGuiRuntimeTests
     public void OrganismsDoNotShareALifecyclePhase()
     {
         using var fsm = new PageFSM();
-        fsm.RequestEnter();
+        EnterFromGateway(fsm);
 
         for (var ticks = 0; ticks < 10_000 && fsm.Context.LivingNodes.Count < 4; ticks++)
             fsm.Update();
@@ -272,6 +272,16 @@ public sealed class LivingGuiRuntimeTests
 
         Assert.Equal(4, quadrants.Count);
         Assert.All(quadrants.Values, count => Assert.InRange(count, 24, 25));
+    }
+
+
+    private static void EnterFromGateway(PageFSM fsm)
+    {
+        for (var ticks = 0; ticks < 200 && fsm.CurrentState != PageFSM.Gateway; ticks++)
+            fsm.Update();
+
+        Assert.Equal(PageFSM.Gateway, fsm.CurrentState);
+        fsm.RequestEnter();
     }
 
 }
