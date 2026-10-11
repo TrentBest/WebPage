@@ -26,9 +26,17 @@ Moniker reveal
 gravity + three-second presentation
    ↓
 manifest-driven Workshop Hub
+   ↓
+living Moniker owns the primary panel by default
+   ↓
+visitor selects THE WORKSHOP, ANYAPP, or SUPPORT
+   ↓
+only the selected destination replaces the Moniker
 ~~~
 
-The manifest currently contains one startup Moniker and one primary running Experience.
+The manifest declares one startup Moniker, the primary Living GUI Experience, and the visitor-facing hub destinations AnyApp and Support.
+
+When the hub arrives, the Moniker remains the selected primary-panel experience. No destination is activated automatically. The upper-left tabs are explicit visitor choices; selecting AnyApp or Support replaces the Moniker panel until the visitor chooses another tab.
 
 The model permits multiple startup Experiences. They are presentation surfaces. The primary running Experience remains a separate manifest concern.
 
