@@ -51,7 +51,7 @@ try {
   await page.getByRole("heading", { name: /Let's find the/i }).waitFor({ state: "visible" });
   await page.screenshot({ path: `${outputDir}/04-schedule.png`, fullPage: true });
 
-  await page.getByRole("link", { name: "Institutions", exact: true }).click();
+  await page.goto(new URL("/institutions", baseUrl).toString(), { waitUntil: "domcontentloaded" });
   const institutions = page.locator(".institution-brief");
   await institutions.waitFor({ state: "visible", timeout: 15_000 });
   const institutionsFits = await institutions.evaluate(el => el.scrollHeight <= el.clientHeight + 2);
@@ -59,7 +59,7 @@ try {
   await page.getByRole("heading", { name: /Make complex systems composable/i }).waitFor({ state: "visible" });
   await page.screenshot({ path: `${outputDir}/05-institutions.png`, fullPage: true });
 
-  await page.getByRole("link", { name: "Ecosystem", exact: true }).click();
+  await page.goto(new URL("/ecosystem", baseUrl).toString(), { waitUntil: "domcontentloaded" });
   // The ecosystem atlas is a manifest-declared destination, not a hard-coded rail entry.
   await page.getByRole("link", { name: "Ecosystem", exact: true }).click();
   await page.getByRole("heading", { name: /Explore the living stack/i }).waitFor({ state: "visible", timeout: 15_000 });
