@@ -166,51 +166,14 @@
         builder.OpenElement(4, "header");
         builder.AddAttribute(5, "class", "manifest-hub-header");
         builder.OpenElement(6, "div");
-        builder.OpenElement(7, "div"); builder.AddAttribute(8, "class", "manifest-hub-kicker"); builder.AddContent(9, "THE SINGULARITY WORKSHOP // HUB"); builder.CloseElement();
-        builder.OpenElement(10, "h1"); builder.AddAttribute(11, "class", "manifest-hub-title"); builder.AddContent(12, "WELCOME"); builder.CloseElement();
+        builder.OpenElement(7, "div");
+        builder.AddAttribute(8, "class", "manifest-hub-kicker");
+        builder.AddContent(9, "THE SINGULARITY WORKSHOP // HUB");
         builder.CloseElement();
-        builder.OpenElement(13, "div"); builder.AddAttribute(14, "class", "manifest-hub-version"); builder.AddContent(15, $"MANIFEST {manifest.ManifestId} // {manifest.Version}"); builder.CloseElement();
         builder.CloseElement();
-
-        builder.OpenElement(16, "section");
-        builder.AddAttribute(17, "class", "manifest-public-brief");
-        builder.OpenElement(18, "div");
-        builder.AddAttribute(19, "class", "brief-status");
-        builder.AddContent(20, "PUBLIC DEMONSTRATION // ACTIVE PROTOTYPE");
-        builder.CloseElement();
-        builder.OpenElement(21, "h2");
-        builder.AddContent(22, "A public window into composable software.");
-        builder.CloseElement();
-        builder.OpenElement(23, "p");
-        builder.AddContent(24, "The Singularity Workshop is an independent software laboratory exploring how complex applications can be assembled from small, reusable capabilities instead of being built as one inseparable block. This page is a working demonstration of that architecture—not a finished commercial product.");
-        builder.CloseElement();
-        builder.OpenElement(25, "div");
-        builder.AddAttribute(26, "class", "brief-flow");
-        builder.AddContent(27, "FSM_API — behavior and state");
-        builder.OpenElement(28, "b"); builder.AddContent(29, "→"); builder.CloseElement();
-        builder.AddContent(30, "FSM_COS — composition");
-        builder.OpenElement(31, "b"); builder.AddContent(32, "→"); builder.CloseElement();
-        builder.AddContent(33, "MICROBUNDLES — capabilities");
-        builder.OpenElement(34, "b"); builder.AddContent(35, "→"); builder.CloseElement();
-        builder.AddContent(36, "BROWSER EXPERIENCE");
-        builder.CloseElement();
-        builder.OpenElement(37, "p");
-        builder.AddContent(38, "What you can verify here: a manifest-selected Workshop Experience, a MicroBundle dependency resolved through FSM_COS, and a living graphical demonstration driven by state-machine technology. Some browser lifecycle behavior is still transitional; the source and architecture pages distinguish working proof from ongoing migration.");
-        builder.CloseElement();
-        builder.OpenElement(39, "div");
-        builder.AddAttribute(40, "class", "manifest-hub-actions");
-        builder.OpenElement(41, "a");
-        builder.AddAttribute(42, "class", "manifest-hub-action");
-        builder.AddAttribute(43, "href", "/about-us");
-        builder.AddContent(44, "HOW THE TECHNOLOGY WORKS");
-        builder.CloseElement();
-        builder.OpenElement(45, "a");
-        builder.AddAttribute(46, "class", "manifest-hub-action manifest-hub-secondary");
-        builder.AddAttribute(47, "href", "https://github.com/TrentBest/WebPage");
-        builder.AddAttribute(48, "target", "_blank");
-        builder.AddAttribute(49, "rel", "noopener noreferrer");
-        builder.AddContent(50, "INSPECT THE SOURCE");
-        builder.CloseElement();
+        builder.OpenElement(10, "div");
+        builder.AddAttribute(11, "class", "manifest-hub-version");
+        builder.AddContent(12, $"MANIFEST {manifest.ManifestId} // {manifest.Version}");
         builder.CloseElement();
         builder.CloseElement();
 
@@ -267,35 +230,6 @@
             builder.CloseElement();
         }
 
-        var deepDiveName = manifest.DeepDive?.Experience;
-        var deepDiveExperience = ExperienceCatalog.Experiences.FirstOrDefault(experience =>
-            string.Equals(experience.Name, deepDiveName, StringComparison.OrdinalIgnoreCase));
-
-        if (deepDiveExperience is not null)
-        {
-            builder.OpenElement(sequence++, "section");
-            builder.AddAttribute(sequence++, "class", "manifest-deep-dive");
-            builder.OpenElement(sequence++, "div");
-            builder.AddAttribute(sequence++, "class", "manifest-hub-kicker");
-            builder.AddContent(sequence++, "AFTER THE EXPERIENCE // DEEP DIVE");
-            builder.CloseElement();
-
-            builder.OpenElement(sequence++, "h2");
-            builder.AddContent(sequence++, $"SEE HOW {deepDiveExperience.Name} IS BUILT");
-            builder.CloseElement();
-
-            builder.OpenElement(sequence++, "p");
-            builder.AddContent(sequence++,
-                "Inspect the Experience identity, MicroBundle contract, ontology, declared dependencies, and the composition boundary.");
-            builder.CloseElement();
-
-            builder.OpenElement(sequence++, "a");
-            builder.AddAttribute(sequence++, "class", "manifest-hub-action");
-            builder.AddAttribute(sequence++, "href", $"/deep-dive/{deepDiveExperience.Id}");
-            builder.AddContent(sequence++, "SHOW DEEP DIVE");
-            builder.CloseElement();
-            builder.CloseElement();
-        }
 
         builder.CloseElement();
         builder.CloseElement();
