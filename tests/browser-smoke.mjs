@@ -18,19 +18,22 @@ try {
   await moniker.waitFor({ state: "visible", timeout: 180_000 });
   await page.screenshot({ path: `${outputDir}/02-moniker.png`, fullPage: true });
 
-  const hubTitle = page.locator(".manifest-hub-title");
-  await hubTitle.waitFor({ state: "visible", timeout: 240_000 });
-  if ((await hubTitle.innerText()).trim() !== "WELCOME") {
-    throw new Error("Expected the manifest-driven hub to show WELCOME.");
+  const hub = page.locator(".manifest-hub");
+  await hub.waitFor({ state: "visible", timeout: 240_000 });
+  await page.locator(".manifest-hub-tabs").getByText("ANYAPP", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  if (await page.getByText("WELCOME", { exact: true }).count() !== 0) {
+    throw new Error("The hub should present manifest navigation, not a generic welcome landing page.");
   }
-  await page.getByText("A public window into composable software.", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  if (await page.getByText("A public window into composable software.", { exact: true }).count() !== 0) {
+    throw new Error("The hub should not insert the retired marketing brief.");
+  }
   await page.screenshot({ path: `${outputDir}/03-hub.png`, fullPage: true });
 
   // Re-check the finished hub at a narrow mobile viewport. This catches responsive
   // regressions without restarting the time-dependent opening animation.
   await page.setViewportSize({ width: 390, height: 844 });
-  await hubTitle.waitFor({ state: "visible", timeout: 10_000 });
-  await page.getByText("A public window into composable software.", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await hub.waitFor({ state: "visible", timeout: 10_000 });
+  await page.locator(".manifest-hub-tabs").getByText("ANYAPP", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
   await page.screenshot({ path: `${outputDir}/04-hub-mobile.png`, fullPage: true });
 
   if (browserErrors.length > 0) {
