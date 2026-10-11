@@ -1,87 +1,96 @@
 @page "/anyapp"
-<PageTitle>AnyApp // The Local Host</PageTitle>
+@using Microsoft.AspNetCore.Components.Web
+@implements IAsyncDisposable
+<PageTitle>AnyApp // Interchangeable Experiences</PageTitle>
 
-<div class="anyapp-page">
-    <header class="anyapp-hero">
-        <div class="anyapp-kicker">THE SINGULARITY WORKSHOP // ANYAPP</div>
-        <h1>One host.<br /><span>Many Experiences.</span></h1>
-        <p class="anyapp-lede">
-            AnyApp is the desktop host for Experiences assembled from small, independent capabilities.
-            The host selects a manifest; FSM_COS composes its MicroBundles into a RuntimeAssembly;
-            the host then presents that Experience.
-        </p>
-        <div class="anyapp-actions">
-            <a class="anyapp-action primary" href="https://github.com/TrentBest/AnyApp" target="_blank" rel="noopener noreferrer">EXPLORE THE ANYAPP SOURCE ↗</a>
-            <a class="anyapp-action" href="/rendering">SEE THE RENDERING RESEARCH</a>
-        </div>
-        <p class="anyapp-note">Research prototype — no public installer or one-click desktop download is currently offered.</p>
-    </header>
-
-    <section class="anyapp-section">
-        <div class="anyapp-kicker">01 // THE COMPOSITION PATH</div>
-        <h2>The host is not the Experience.</h2>
-        <div class="anyapp-flow" aria-label="AnyApp runtime composition path">
-            <article><span>01</span><strong>MANIFEST</strong><p>Selects the Experience and its requested capabilities.</p></article>
-            <b aria-hidden="true">→</b>
-            <article><span>02</span><strong>FSM_COS</strong><p>Resolves dependencies and composes the requested bundle graph.</p></article>
-            <b aria-hidden="true">→</b>
-            <article><span>03</span><strong>RUNTIME ASSEMBLY</strong><p>Provides the composed result for the host to consume.</p></article>
-            <b aria-hidden="true">→</b>
-            <article><span>04</span><strong>HOST</strong><p>Supplies the platform-specific presentation and interaction.</p></article>
-        </div>
-    </section>
-
-    <section class="anyapp-section anyapp-proof">
-        <div class="anyapp-kicker">02 // WHAT THIS WEB DEMONSTRATION PROVES</div>
-        <h2>A real composition path, with migration work still visible.</h2>
-        <p>
-            This WebPage host reads its Experience manifest and asks FSM_COS to compose the Living GUI
-            root (bundle 2102) together with its declared Moniker dependency (bundle 2110). The host
-            receives a RuntimeAssembly instead of hard-coding that dependency closure.
-        </p>
-        <p>
-            The browser's Living GUI lifecycle still includes transitional WebPage-owned FSM code.
-            Moving that execution authority fully into the reusable Experience runtime is active work,
-            not a completed claim. The source and tests are available for inspection.
-        </p>
-        <div class="anyapp-status-grid">
-            <article><span class="status-mark">✓</span><strong>Manifest-selected composition</strong><small>Implemented in WebPage</small></article>
-            <article><span class="status-mark">✓</span><strong>FSM_COS dependency closure</strong><small>Covered by FSM_COS tests</small></article>
-            <article><span class="status-mark pending">↻</span><strong>Experience-owned execution</strong><small>Migration in progress</small></article>
-        </div>
-        <div class="anyapp-actions">
-            <a class="anyapp-action primary" href="https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS" target="_blank" rel="noopener noreferrer">INSPECT FSM_COS ↗</a>
-            <a class="anyapp-action" href="https://github.com/TrentBest/WebPage" target="_blank" rel="noopener noreferrer">INSPECT THE WEB HOST ↗</a>
-        </div>
-    </section>
+<div class="anyapp-life @( _fadingOut ? "fading-out" : _fadingIn ? "fading-in" : "")" tabindex="0" role="region" aria-label="AnyApp interactive experience" @onwheel="OnWheel" @onwheel:preventDefault="true" @onkeydown="OnKeyDown">
+    <header class="app-head"><a href="/" class="app-mark">THE SINGULARITY WORKSHOP <span>↗</span></a><div>ANYAPP // EXPERIENCE FSM <b>@(_page + 1) / 04</b></div></header>
+    <main class="app-scene" aria-live="polite">
+        @if (_page == 0)
+        {
+            <section class="scene concept">
+                <div class="copy"><small>01 / THE IDEA</small><h1>ANY<span>APP</span></h1><h2>The host is not the experience.</h2><p>Build an experience once. Let a host provide the place where it lives. Change the manifest, exchange the capabilities, and the same host can become something entirely different.</p><button @onclick="() => MoveTo(1)">DISCOVER THE MODEL <b>↗</b></button></div>
+                <div class="orbit"><div class="orbit-ring"></div><div class="orbit-core">ANY<br/>APP</div><button class="node n1" @onclick="() => MoveTo(1)">EXPERIENCE</button><button class="node n2" @onclick="() => MoveTo(2)">MANIFEST</button><button class="node n3" @onclick="() => MoveTo(3)">DESKTOP</button></div>
+            </section>
+        }
+        else if (_page == 1)
+        {
+            <section class="scene">
+                <div class="copy"><small>02 / INTERCHANGEABILITY</small><h1>ONE HOST.<br/><span>MANY WORLDS.</span></h1><p>AnyApp is the desktop host. Experiences are assembled from independent MicroBundles. The host doesn't need to become every tool, game, classroom, or simulation it can present.</p><div class="callout"><b>CHANGE THE MANIFEST</b><span>Keep the host. Change the experience.</span></div></div>
+                <div class="swap"><div class="host"><small>STABLE HOST</small><b>AnyApp.exe</b><span>platform shell</span></div><div class="swap-arrow">⇄</div><div class="worlds"><button class="@(_world == 0 ? "chosen" : "")" @onclick="() => _world = 0">01 <b>CREATIVE STUDIO</b><small>tools · assets · making</small></button><button class="@(_world == 1 ? "chosen" : "")" @onclick="() => _world = 1">02 <b>SIMULATION</b><small>worlds · rules · behavior</small></button><button class="@(_world == 2 ? "chosen" : "")" @onclick="() => _world = 2">03 <b>LEARNING SPACE</b><small>lessons · exploration</small></button></div></div>
+            </section>
+        }
+        else if (_page == 2)
+        {
+            <section class="scene">
+                <div class="copy"><small>03 / THE SAME IDEA, LIVE RIGHT HERE</small><h1>THIS PAGE<br/><span>IS PROOF.</span></h1><p>The WebPage you're using follows the same direction: its manifest describes the host experience, FSM_COS composes declared MicroBundles, and the host presents the result. Browser and desktop are different hosts—not different philosophies.</p><div class="callout cyan"><b>MANIFEST → FSM_COS → RUNTIME</b><span>Reusable composition. Platform-specific presentation.</span></div></div>
+                <div class="pipeline"><div><small>01</small><b>MANIFEST</b><span>declares intent</span></div><i>↓</i><div class="cos"><small>02</small><b>FSM_COS</b><span>resolves dependencies</span></div><i>↓</i><div class="runtime"><small>03</small><b>RUNTIME ASSEMBLY</b><span>composed capabilities</span></div><footer><span>WEBPAGE</span><span>ANYAPP</span></footer></div>
+            </section>
+        }
+        else
+        {
+            <section class="scene">
+                <div class="copy"><small>04 / THE NEXT FRONTIER</small><h1>FROM IDEA<br/><span>TO .EXE.</span></h1><p>The destination is a native AnyApp.exe, installed and launched with identity, signing, packaging, and Windows security boundaries handled deliberately—not by asking a webpage to impersonate a desktop application.</p><div class="callout amber"><b>RESEARCH PROTOTYPE</b><span>No public installer yet. Native packaging and trust are future delivery work.</span></div><a class="source-link" href="https://github.com/TrentBest/AnyApp" target="_blank" rel="noopener noreferrer">INSPECT ANYAPP SOURCE ↗</a></div>
+                <div class="desktop"><div class="desktop-bar"><i></i><i></i><i></i><span>AnyApp.exe</span></div><div class="desktop-body">THE<br/><b>SINGULARITY</b><br/>WORKSHOP</div><footer>MANIFEST LOADED　·　FSM_COS READY</footer></div>
+            </section>
+        }
+    </main>
+    <footer class="app-controls"><div class="dots">@for (var i = 0; i < 4; i++){var target = i;<button class="@(target == _page ? "active" : "")" aria-label="Go to scene @(target + 1)" aria-pressed="@(target == _page)" @onclick="() => MoveTo(target)"><span></span></button>}</div><div class="hint">↕ SCROLL / SWIPE TO TRANSITION <small>OR SELECT A NODE</small></div><div class="arrows"><button disabled="@(_page == 0)" aria-label="Previous scene" @onclick="() => MoveTo(_page - 1)">←</button><button disabled="@(_page == 3)" aria-label="Next scene" @onclick="() => MoveTo(_page + 1)">→</button></div></footer>
 </div>
 
 <style>
-.anyapp-page{min-height:100%;overflow:auto;background:radial-gradient(circle at 82% 6%,rgba(255,44,255,.08),transparent 28%),radial-gradient(circle at 12% 25%,rgba(0,234,255,.10),transparent 30%),#020711;color:#f4f8fb;font-family:Consolas,'Courier New',monospace;padding:clamp(1.25rem,5vw,4.5rem)}
-.anyapp-hero,.anyapp-section{width:min(1100px,100%);margin:0 auto}
-.anyapp-hero{padding:clamp(1.5rem,5vw,4rem) 0 3rem}
-.anyapp-kicker{font-size:.72rem;letter-spacing:.2em;color:#6b9aaa}
-.anyapp-hero h1{margin:1.2rem 0;font-size:clamp(2.7rem,8vw,6.6rem);line-height:.92;letter-spacing:-.055em}
-.anyapp-hero h1 span{color:#00dff5}
-.anyapp-lede{max-width:72ch;font-family:system-ui,sans-serif;font-size:clamp(1.05rem,2vw,1.35rem);line-height:1.7;color:#bdcbd2}
-.anyapp-actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.6rem}
-.anyapp-action{display:inline-flex;align-items:center;justify-content:center;min-height:3.25rem;padding:.85rem 1.1rem;border:1px solid rgba(189,214,225,.28);border-radius:.65rem;color:#eaf8fc;text-decoration:none;font-size:.76rem;font-weight:800;letter-spacing:.07em}
-.anyapp-action:hover{border-color:#00dff5;transform:translateY(-1px)}
-.anyapp-action.primary{border-color:rgba(0,223,245,.55);background:linear-gradient(120deg,rgba(0,223,245,.17),rgba(0,135,255,.1))}
-.anyapp-note{margin-top:1rem;color:#80949e;font: .8rem/1.6 system-ui,sans-serif}
-.anyapp-section{padding:2rem 0 3.5rem;border-top:1px solid rgba(129,176,194,.15)}
-.anyapp-section h2{font-size:clamp(1.7rem,4vw,3rem);line-height:1.05;letter-spacing:-.03em;margin:1rem 0}
-.anyapp-section>p{max-width:82ch;font:1rem/1.75 system-ui,sans-serif;color:#b8c8d0}
-.anyapp-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:stretch;gap:.65rem;margin-top:1.5rem}
-.anyapp-flow article{min-width:0;border:1px solid rgba(0,223,245,.18);border-radius:.8rem;padding:1rem;background:rgba(6,20,31,.72)}
-.anyapp-flow article span{display:block;color:#00dff5;font-size:.7rem;margin-bottom:1rem}
-.anyapp-flow article strong{display:block;font-size:.78rem;letter-spacing:.06em}
-.anyapp-flow article p{font: .88rem/1.55 system-ui,sans-serif;color:#9fb3bd}
-.anyapp-flow>b{align-self:center;color:#5d8796}
-.anyapp-proof{margin-bottom:2rem}
-.anyapp-status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;margin:1.5rem 0}
-.anyapp-status-grid article{display:grid;grid-template-columns:auto 1fr;gap:.2rem .7rem;align-content:start;padding:1rem;border:1px solid rgba(129,176,194,.2);border-radius:.75rem;background:rgba(6,20,31,.6)}
-.status-mark{grid-row:span 2;color:#00e5bd;font-size:1.1rem}.status-mark.pending{color:#ffcb67}
-.anyapp-status-grid strong{font-size:.82rem;line-height:1.4}.anyapp-status-grid small{color:#8fa7b2;font: .75rem/1.5 system-ui,sans-serif}
-@@media(max-width:760px){.anyapp-flow{grid-template-columns:1fr}.anyapp-flow>b{transform:rotate(90deg);justify-self:center}.anyapp-status-grid{grid-template-columns:1fr}.anyapp-hero{padding-top:1rem}.anyapp-action{width:100%}}
+.anyapp-life{--cyan:#00eaff;--pink:#ff2cff;position:relative;isolation:isolate;width:100%;height:100%;min-height:0;overflow:hidden;box-sizing:border-box;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:radial-gradient(ellipse at 15% 28%,rgba(0,168,255,.13),transparent 35%),radial-gradient(ellipse at 82% 72%,rgba(255,44,255,.09),transparent 36%),#030712;color:#effaff;font-family:Consolas,'Courier New',monospace;outline:none}
+.anyapp-life:before,.anyapp-life:after{content:"";position:absolute;z-index:-1;pointer-events:none;left:55%;top:8%;width:35vw;aspect-ratio:1;border:1px solid rgba(0,234,255,.12);border-radius:50%;animation:appOrbit 32s linear infinite}.anyapp-life:after{width:52vw;left:45%;top:15%;border-color:rgba(255,44,255,.1);animation-direction:reverse;animation-duration:45s}
+.app-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem clamp(1rem,4vw,3.5rem);border-bottom:1px solid rgba(0,234,255,.17);font-size:.62rem;letter-spacing:.12em;color:#7898a8}.app-head b{margin-left:1rem;color:#f3fcff}.app-mark{color:#eafaff;text-decoration:none;font-weight:800}.app-mark span{color:var(--pink)}
+.app-scene{min-height:0;overflow:hidden;display:grid;place-items:center;padding:clamp(1rem,4vw,3.5rem);transition:opacity .22s,filter .22s,transform .22s}.fading-out .app-scene{opacity:0;filter:blur(8px);transform:translateY(-.8rem) scale(.985)}.fading-in .app-scene{animation:appWake .5s cubic-bezier(.16,.84,.24,1) both}
+.scene{width:min(1160px,100%);max-height:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,.9fr);gap:clamp(1.5rem,5vw,5rem);align-items:center}.copy{min-width:0}.copy>small{display:block;margin-bottom:1.25rem;font-size:.66rem;letter-spacing:.2em;color:#7fa5b4}.copy h1{font-size:clamp(2.7rem,7.5vw,6.6rem);line-height:.88;letter-spacing:-.065em;margin:0 0 1.2rem}.copy h1 span{color:var(--cyan);text-shadow:0 0 35px #00eaff24}.copy h2{font-size:clamp(1.2rem,2vw,1.8rem);margin:0 0 .9rem}.copy p{max-width:56ch;font:clamp(.9rem,1.1vw,1.08rem)/1.7 system-ui,sans-serif;color:#b4c8d2}.copy button,.source-link{display:inline-flex;margin-top:1.3rem;padding:.9rem 1rem;gap:1rem;border:1px solid #00eaff66;background:#00eaff0c;color:#f3fcff;text-decoration:none;font:800 .68rem Consolas,monospace;letter-spacing:.08em;cursor:pointer}.copy button b{color:var(--pink)}
+.orbit{position:relative;width:min(38vw,430px);aspect-ratio:1;margin:auto;display:grid;place-items:center}.orbit-ring{position:absolute;inset:9%;border:1px solid #00eaff44;border-radius:50%;box-shadow:0 0 60px #00eaff0b,inset 0 0 60px #00eaff0b;animation:appOrbit 26s linear infinite}.orbit-core{display:grid;place-content:center;width:32%;aspect-ratio:1;border:1px solid var(--cyan);border-radius:50%;text-align:center;background:#06111ee8;box-shadow:0 0 40px #00eaff2b;font-weight:900;letter-spacing:.12em}.node{position:absolute;padding:.7rem;border:1px solid #00eaff55;background:#030712ed;color:#c6f7ff;font:700 .62rem Consolas,monospace;cursor:pointer}.node:hover{border-color:var(--pink);color:white}.n1{top:8%;left:20%}.n2{right:-2%;top:48%}.n3{bottom:8%;left:25%}
+.callout{display:grid;gap:.4rem;margin-top:1.3rem;padding:1rem;border-left:2px solid var(--pink);background:#ff2cff0a}.callout b{font-size:.7rem;color:#ffc6ff;letter-spacing:.1em}.callout span{font: .82rem/1.5 system-ui,sans-serif;color:#a9bec8}.callout.cyan{border-color:var(--cyan);background:#00eaff0a}.callout.cyan b{color:#8ff7ff}.callout.amber{border-color:#ffd34d;background:#ffd34d0a}.callout.amber b{color:#ffd34d}
+.swap{display:grid;gap:.8rem}.host{display:grid;gap:.35rem;padding:1.2rem;border:1px solid #00eaff66;background:#00eaff0e}.host small,.host span{font-size:.62rem;color:#78a5b4;letter-spacing:.12em}.host b{font-size:1.5rem}.swap-arrow{text-align:center;color:var(--pink);font-size:1.5rem}.worlds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem}.worlds button{display:grid;gap:.5rem;min-width:0;text-align:left;padding:.7rem .55rem;border:1px solid #00eaff2b;background:#05101dcc;color:#9fb8c2;font: .6rem Consolas,monospace;cursor:pointer}.worlds button b{font-size:.62rem;line-height:1.4}.worlds button small{font: .65rem/1.4 system-ui,sans-serif;color:#8ea9b5}.worlds button.chosen{border-color:var(--pink);background:#ff2cff12;color:white}.pipeline{display:grid;justify-items:center;gap:.35rem}.pipeline>div{width:min(100%,320px);display:grid;grid-template-columns:auto 1fr;gap:.2rem .8rem;padding:.8rem 1rem;border:1px solid #00eaff44;background:#05101dee}.pipeline small{grid-row:span 2;color:var(--cyan)}.pipeline b{font-size:.72rem;letter-spacing:.08em}.pipeline span{font: .7rem/1.4 system-ui,sans-serif;color:#8fa9b5}.pipeline i{font-style:normal;color:var(--cyan)}.pipeline .cos{border-color:#ff2cff77}.pipeline .runtime{border-color:#ffd34d77}.pipeline footer,.desktop footer{display:flex;justify-content:center;gap:.6rem;margin-top:.5rem;color:#9beefa;font-size:.6rem;letter-spacing:.1em}.pipeline footer span{padding:.55rem;border:1px solid #00eaff44}.pipeline footer span:last-child{border-color:#ff2cff55}
+.desktop{width:min(100%,430px);aspect-ratio:4/3;margin:auto;border:1px solid #00eaff66;border-radius:.8rem;overflow:hidden;background:#060d1a;box-shadow:0 30px 90px #0008,0 0 40px #00eaff12}.desktop-bar{display:flex;align-items:center;gap:.4rem;padding:.8rem;border-bottom:1px solid #00eaff22}.desktop-bar i{width:.5rem;height:.5rem;border-radius:50%;background:#ff5252}.desktop-bar i:nth-child(2){background:#ffd34d}.desktop-bar i:nth-child(3){background:#52e05a}.desktop-bar span{margin-left:auto;color:#7894a0;font-size:.62rem}.desktop-body{display:grid;place-content:center;height:65%;text-align:center;line-height:1.3;letter-spacing:.12em;font-size:clamp(1rem,2.5vw,1.6rem);background:radial-gradient(circle,#00eaff17,transparent 65%)}.desktop-body b{color:var(--pink)}.desktop footer{height:10%;align-items:center;font-size:.52rem}
+.app-controls{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem clamp(1rem,4vw,3.5rem);border-top:1px solid #00eaff22}.dots{display:flex;gap:.35rem}.dots button{width:1.8rem;height:1.8rem;display:grid;place-items:center;border:1px solid transparent;border-radius:50%;background:transparent;cursor:pointer}.dots button span{width:.42rem;height:.42rem;border-radius:50%;background:#34505e}.dots button.active{border-color:#00eaff66}.dots button.active span{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}.hint{color:#7899a8;font-size:.58rem;letter-spacing:.08em}.hint small{margin-left:.7rem;color:#4f707e}.arrows{display:flex;gap:.3rem}.arrows button{width:2.4rem;height:2.3rem;border:1px solid #00eaff44;background:#00eaff0a;color:white;font-size:1.1rem;cursor:pointer}.arrows button:disabled{opacity:.2}
+@keyframes appOrbit{to{transform:rotate(360deg)}}@keyframes appWake{from{opacity:0;filter:blur(8px);transform:translateY(.8rem) scale(1.01)}to{opacity:1;filter:none;transform:none}}
+@media(max-width:760px){.app-head{padding:.7rem 1rem;font-size:.52rem}.app-scene{padding:1rem}.scene{grid-template-columns:1fr;gap:.65rem;align-content:center}.copy>small{margin-bottom:.75rem}.copy h1{font-size:clamp(2.4rem,10vw,4rem);margin-bottom:.7rem}.copy h2{font-size:1.15rem}.copy p{font-size:.83rem;line-height:1.48;margin:.6rem 0}.orbit{position:absolute;width:48vw;right:-1rem;bottom:2rem;opacity:.42;pointer-events:none}.orbit button{display:none}.worlds{gap:.25rem}.worlds button{padding:.45rem .35rem}.worlds button b{font-size:.54rem}.worlds button small{font-size:.57rem}.pipeline>div{padding:.55rem .7rem}.desktop{width:75%;max-height:28vh}.desktop footer{font-size:.43rem}.app-controls{padding:.45rem .7rem;gap:.4rem}.hint{font-size:0}.hint small{display:none}.hint:before{content:'↕';font-size:1rem;color:var(--pink)}}
+@media(prefers-reduced-motion:reduce){.anyapp-life:before,.anyapp-life:after{animation:none}.app-scene{transition:none}.fading-in .app-scene{animation:none}}
 </style>
+
+@code {
+    private int _page;
+    private int _world;
+    private bool _fadingOut;
+    private bool _fadingIn;
+    private bool _transitioning;
+
+    private async Task OnWheel(WheelEventArgs e)
+    {
+        if (Math.Abs(e.DeltaY) < 12 || _transitioning) return;
+        await MoveTo(_page + (e.DeltaY > 0 ? 1 : -1));
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key is "ArrowDown" or "PageDown" or "ArrowRight") await MoveTo(_page + 1);
+        else if (e.Key is "ArrowUp" or "PageUp" or "ArrowLeft") await MoveTo(_page - 1);
+    }
+
+    private async Task MoveTo(int target)
+    {
+        target = Math.Clamp(target, 0, 3);
+        if (target == _page || _transitioning) return;
+        _transitioning = true;
+        _fadingIn = false;
+        _fadingOut = true;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(220);
+        _page = target;
+        _fadingOut = false;
+        _fadingIn = true;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(520);
+        _fadingIn = false;
+        _transitioning = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+}
