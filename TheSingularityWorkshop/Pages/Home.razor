@@ -21,34 +21,7 @@
 .manifest-hub-title{margin:.25rem 0 0;font-size:clamp(2rem,6vw,5rem);line-height:.9;letter-spacing:.04em}
 .manifest-hub-version{font-size:.7rem;letter-spacing:.14em;color:#536873}
 .manifest-public-brief{border:1px solid rgba(255,44,255,.24);border-radius:1rem;padding:clamp(1.2rem,2.6vw,2rem);background:linear-gradient(120deg,rgba(0,168,255,.08),rgba(255,44,255,.045),rgba(3,8,17,.92));}.manifest-public-brief h2{margin:.65rem 0;color:#fff;font-size:clamp(1.45rem,3.3vw,2.5rem);line-height:1.05;}.manifest-public-brief p{max-width:78ch;color:#c3d0d6;line-height:1.65;margin:.8rem 0;}.manifest-public-brief .brief-status{color:#ffb15c;font-size:.68rem;letter-spacing:.15em;font-weight:800;}.manifest-public-brief .brief-flow{display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;margin:1.1rem 0;color:#9bdfea;font-size:.72rem;letter-spacing:.07em;}.manifest-public-brief .brief-flow b{color:#ff2cff;}.manifest-public-brief .manifest-hub-actions{margin-top:1rem;}
-.manifest-hub-tabs{display:flex;gap:.75rem;overflow:auto;padding:.25rem 0}
-.manifest-hub-tab{border:1px solid rgba(0,234,255,.45);border-radius:999px;padding:.65rem 1.1rem;background:rgba(0,234,255,.08);color:#fff;font:700 .8rem Consolas,'Courier New',monospace;letter-spacing:.12em;white-space:nowrap}
-.manifest-hub-card{position:relative;border:1px solid rgba(0,234,255,.18);border-radius:1.25rem;padding:clamp(1.25rem,3vw,2.5rem);background:linear-gradient(145deg,rgba(10,25,38,.94),rgba(3,8,17,.94));box-shadow:0 30px 100px rgba(0,0,0,.35);overflow:hidden}
-.manifest-hub-card::before{content:"";position:absolute;inset:-50%;background:radial-gradient(circle,rgba(0,234,255,.07),transparent 35%);animation:hubPulse 5s ease-in-out infinite;pointer-events:none}
-.manifest-hub-card>*{position:relative}
-.manifest-hub-status{display:flex;align-items:center;gap:.6rem;font-size:.7rem;letter-spacing:.16em;color:#83a5b4}
-.manifest-hub-pulse{width:.55rem;height:.55rem;border-radius:50%;background:#00eaff;box-shadow:0 0 16px #00eaff;animation:hubDot 1.8s ease-in-out infinite}
-.manifest-hub-description{max-width:75ch;margin:1.25rem 0 1.5rem;color:#c3d0d6;font-size:clamp(1rem,1.7vw,1.25rem);line-height:1.65}
-.manifest-hub-actions{display:flex;gap:.8rem;flex-wrap:wrap}
-.manifest-hub-action{display:inline-flex;align-items:center;justify-content:center;min-height:3.7rem;padding:.8rem 1.5rem;border-radius:.8rem;border:1px solid rgba(0,234,255,.5);background:linear-gradient(135deg,rgba(0,234,255,.18),rgba(0,168,255,.08));color:#fff;text-decoration:none;font:900 .95rem Consolas,'Courier New',monospace;letter-spacing:.1em;transition:transform .2s ease,box-shadow .2s ease}
-.manifest-hub-action:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(0,234,255,.14)}
-.manifest-hub-secondary{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.04)}
-.manifest-hub-note{margin-top:1rem;color:#718792;font-size:.75rem;line-height:1.5}
-.manifest-deep-dive{margin-top:1rem;padding:clamp(1.25rem,3vw,2.5rem);border:1px solid rgba(255,211,77,.28);border-radius:1rem;background:linear-gradient(135deg,rgba(255,211,77,.06),rgba(3,8,17,.92))}.manifest-deep-dive h2{margin:.7rem 0;color:#fff;font-size:clamp(1.5rem,3vw,2.4rem);letter-spacing:.02em}.manifest-deep-dive p{max-width:70ch;color:#9fb0b8;line-height:1.7}
-@@keyframes hubPulse{0%,100%{transform:scale(.8);opacity:.25}50%{transform:scale(1);opacity:.55}}
-@@keyframes hubDot{0%,100%{transform:scale(.8);opacity:.55}50%{transform:scale(1.25);opacity:1}}
-.landing-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;overflow:hidden;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711}
-.landing-aura{position:absolute;width:60vw;height:60vw;border:1px solid rgba(0,234,255,.08);border-radius:50%;box-shadow:0 0 100px rgba(0,234,255,.04);pointer-events:none}
-.workshop-running-surface{position:absolute;inset:0;min-width:0;min-height:0;overflow:hidden;background:#020711}
-.workshop-running-hub{position:absolute;inset:0;min-width:0;min-height:0;overflow:auto}
-.workshop-running-hub .manifest-hub{position:relative;inset:auto;min-height:100%;box-sizing:border-box;align-items:center;padding:clamp(5rem,10vh,7rem) clamp(1rem,5vw,5rem) 3rem}
-.workshop-running-hub .manifest-hub-shell{width:min(1180px,100%);margin:auto}
-.workshop-running-hub .manifest-hub-header{display:none}
-.manifest-hub-tabs{position:absolute;z-index:20;top:clamp(.7rem,2vw,1.5rem);left:clamp(.7rem,2vw,1.5rem);display:flex;gap:.35rem;max-width:calc(100% - 1.4rem);overflow-x:auto;padding:.35rem;border:1px solid rgba(0,234,255,.12);border-radius:0 0 1rem 0;background:rgba(2,7,17,.76);backdrop-filter:blur(16px)}
-.manifest-hub-tab{position:relative;border:1px solid rgba(0,234,255,.18);border-radius:.55rem .55rem .15rem .15rem;padding:.65rem .9rem;background:rgba(0,234,255,.025);color:#7895a4;font:700 .72rem Consolas,'Courier New',monospace;letter-spacing:.12em;white-space:nowrap;cursor:pointer;transition:color .25s ease,border-color .25s ease,background .25s ease,transform .25s ease}
-.manifest-hub-tab:hover{color:#fff;border-color:rgba(0,234,255,.6);transform:translateY(-2px)}
-.manifest-hub-tab.active{color:#fff;border-color:#00eaff;background:linear-gradient(180deg,rgba(0,234,255,.18),rgba(0,234,255,.04));box-shadow:0 -2px 18px rgba(0,234,255,.12),inset 0 0 16px rgba(0,234,255,.06)}
-.manifest-hub-tab.active::after{content:"";position:absolute;left:.7rem;right:.7rem;bottom:-1px;height:2px;background:#00eaff;box-shadow:0 0 10px #00eaff}
+.manifest-hub-tabs,.manifest-hub-tab{display:none!important}
 .manifest-hub-moniker{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:clamp(5.5rem,13vh,8rem) 1rem 2rem;background:radial-gradient(ellipse at 50% 48%,rgba(0,234,255,.09),transparent 30%),radial-gradient(ellipse at 50% 78%,rgba(255,44,255,.045),transparent 42%),#020711}
 .manifest-hub-moniker .first-contact-stage{position:absolute;inset:0;background:transparent}
 .manifest-hub-moniker .hub-moniker-panel{position:absolute;inset:0;padding-top:clamp(5.5rem,13vh,8rem);box-sizing:border-box}
@@ -178,16 +151,9 @@
         builder.OpenElement(0, "section");
         builder.AddAttribute(1, "class", "manifest-hub");
 
-        builder.OpenElement(2, "nav");
-        builder.AddAttribute(3, "class", "manifest-hub-tabs");
-        builder.AddAttribute(4, "aria-label", "Workshop experiences");
-
         var sequence = 10;
-        RenderHubTab(builder, ref sequence, "MONIKER", "THE WORKSHOP", "MONIKER");
-        foreach (var item in manifest.Hub)
-            RenderHubTab(builder, ref sequence, item.Name.ToUpperInvariant(), item.Name.ToUpperInvariant(), item.Name);
-        builder.CloseElement();
-
+        // Navigation belongs to the persistent left Workshop rail, never a
+        // second tab strip layered over the living moniker.
         if (string.Equals(_selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase))
         {
             builder.OpenElement(sequence++, "div");
