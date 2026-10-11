@@ -61,7 +61,7 @@ public sealed class WebPageHostManifestTests
     }
 
     [Fact]
-    public void PublicHostAssetsExposeOnlyTheAnyAppHubAndSupportClientRoutes()
+    public void PublicHostAssetsExposeManifestDrivenAnyAppAndSupportDestinationsAndClientRoutes()
     {
         var repositoryRoot = Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory, "..", "..", "..", ".."));
@@ -70,10 +70,15 @@ public sealed class WebPageHostManifestTests
             wwwroot, "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
         var manifest = WebPageHostManifestParser.Parse(manifestJson);
 
-        var hub = Assert.Single(manifest.Hub);
-        Assert.Equal("AnyApp", hub.Name);
+        Assert.Equal(2, manifest.Hub.Count);
+        var hub = Assert.Single(manifest.Hub.Where(item => item.Name == "AnyApp"));
         Assert.Equal("/anyapp", hub.Route);
         Assert.Empty(hub.MicroBundles!);
+
+        var support = Assert.Single(manifest.Hub.Where(item => item.Name == "Support"));
+        Assert.Equal("/about-us", support.Route);
+        Assert.Equal("/about-us", support.AboutUrl);
+        Assert.Empty(support.MicroBundles!);
 
         Assert.NotNull(manifest.Capabilities);
         var rendering = Assert.Single(manifest.Capabilities!);
