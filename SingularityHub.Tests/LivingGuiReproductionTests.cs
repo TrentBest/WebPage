@@ -57,6 +57,46 @@ public sealed class LivingGuiReproductionTests
         Assert.NotEqual(child.Lineage, root.Lineage);
     }
 
+    [Fact(DisplayName = "A new generation inherits its parent's current position")]
+    public void IncrementalUnitTest62_ChildSpawnsAtParentPosition()
+    {
+        var context = new PageStateContext();
+        context.BeginLivingGui();
+        var hub = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        hub.RegisterProcessGroup("TestParent");
+
+        using var runtime = new LivingGuiFsm(hub, context, "TestParent");
+
+        // Let a first-generation organism travel away from the origin and mature.
+        PageStateContext.LivingNodeState? parent = null;
+        for (var i = 0; i < 20_000; i++)
+        {
+            runtime.Update();
+            parent = context.LivingNodes.FirstOrDefault(node =>
+                node.Generation == 1 &&
+                node.Phase == PageStateContext.LivingNodePhase.Existing &&
+                (Math.Abs(node.X - 50d) > 1d || Math.Abs(node.Y - 50d) > 1d));
+            if (parent is not null)
+                break;
+        }
+
+        Assert.NotNull(parent);
+        Assert.True(Math.Abs(parent!.X - 50d) > 1d || Math.Abs(parent.Y - 50d) > 1d);
+
+        // Exercise the same pool allocation contract used by reproduction.
+        var child = context.CreateOffspring(parent);
+        var inheritedX = child.X;
+        var inheritedY = child.Y;
+
+        Assert.Equal(parent.X, inheritedX);
+        Assert.Equal(parent.Y, inheritedY);
+
+        // Activating its organism FSM must not reset that inherited position.
+        runtime.Update();
+        Assert.Equal(inheritedX, child.X);
+        Assert.Equal(inheritedY, child.Y);
+    }
+
     [Fact(DisplayName = "Reproduction attaches a new FSM without moving the existing parent lifecycle")]
     public void IncrementalUnitTest62_ReproductionAttachesIndependentChild()
     {
