@@ -33,42 +33,33 @@ try {
   }
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
-  // AnyApp is reached from the persistent left rail and owns a full-height,
-  // paged canvas. It must not present a long scrolling article.
-  await page.getByRole("link", { name: "AnyApp", exact: true }).click();
-  await page.getByRole("heading", { name: "ANYAPP", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
-  const anyApp = page.locator(".anyapp-life");
-  await anyApp.waitFor({ state: "visible", timeout: 10_000 });
-  await page.getByText("01 / THE IDEA", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
-  const initialHeight = await anyApp.evaluate(el => el.scrollHeight);
-  const visibleHeight = await anyApp.evaluate(el => el.clientHeight);
-  if (initialHeight > visibleHeight + 2) {
-    throw new Error(`AnyApp must fit its scene in the panel rather than require document scrolling (scrollHeight=${initialHeight}, clientHeight=${visibleHeight}).`);
+  const hubLinks = await page.locator(".workshop-nav-links a").allTextContents();
+  for (const required of ["Ecosystem", "Schedule Consultation", "Institutions"]) {
+    if (!hubLinks.some(label => label.trim() === required)) {
+      throw new Error(`Expected manifest-driven hub destination '${required}'.`);
+    }
   }
-  await page.screenshot({ path: `${outputDir}/04-anyapp-concept.png`, fullPage: true });
+  if (hubLinks.some(label => label.trim() === "AnyApp")) {
+    throw new Error("AnyApp must not appear as a Workshop hub destination.");
+  }
 
-  await anyApp.hover();
-  await page.mouse.wheel(0, 500);
-  await page.getByText("02 / INTERCHANGEABILITY", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
-  // Wait for the current fade lifecycle to finish before requesting another transition.
-  await page.waitForTimeout(800);
-  await page.screenshot({ path: `${outputDir}/05-anyapp-interchange.png`, fullPage: true });
+  await page.getByRole("link", { name: "Schedule Consultation", exact: true }).click();
+  const schedule = page.locator(".schedule-experience");
+  await schedule.waitFor({ state: "visible", timeout: 15_000 });
+  const scheduleFits = await schedule.evaluate(el => el.scrollHeight <= el.clientHeight + 2);
+  if (!scheduleFits) throw new Error("The consultation experience must fit its viewport without scrolling.");
+  await page.getByRole("heading", { name: /Let's find the/i }).waitFor({ state: "visible" });
+  await page.screenshot({ path: `${outputDir}/04-schedule.png`, fullPage: true });
 
-  await page.getByRole("button", { name: "Go to scene 3" }).click();
-  await page.getByText("03 / THE SAME IDEA, LIVE RIGHT HERE", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
-  await page.waitForTimeout(800);
-  await page.screenshot({ path: `${outputDir}/06-anyapp-live-proof.png`, fullPage: true });
+  await page.getByRole("link", { name: "Institutions", exact: true }).click();
+  const institutions = page.locator(".institution-brief");
+  await institutions.waitFor({ state: "visible", timeout: 15_000 });
+  const institutionsFits = await institutions.evaluate(el => el.scrollHeight <= el.clientHeight + 2);
+  if (!institutionsFits) throw new Error("The institutional briefing must fit its viewport without scrolling.");
+  await page.getByRole("heading", { name: /Make complex systems composable/i }).waitFor({ state: "visible" });
+  await page.screenshot({ path: `${outputDir}/05-institutions.png`, fullPage: true });
 
-  await page.getByRole("button", { name: "Go to scene 4" }).click();
-  await page.getByText("04 / THE NEXT FRONTIER", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
-  await page.waitForTimeout(800);
-  await page.getByRole("link", { name: /INSPECT ANYAPP SOURCE/i }).waitFor({ state: "visible" });
-  await page.screenshot({ path: `${outputDir}/07-anyapp-desktop.png`, fullPage: true });
-
-  // The left rail is still available to return to the Workshop.
-  await page.getByRole("link", { name: "The Singularity Workshop" }).click();
-  await page.locator(".manifest-hub").waitFor({ state: "visible", timeout: 15_000 });
-
+  await page.getByRole("link", { name: "Ecosystem", exact: true }).click();
   // The ecosystem atlas is a manifest-declared destination, not a hard-coded rail entry.
   await page.getByRole("link", { name: "Ecosystem", exact: true }).click();
   await page.getByRole("heading", { name: /Explore the living stack/i }).waitFor({ state: "visible", timeout: 15_000 });
