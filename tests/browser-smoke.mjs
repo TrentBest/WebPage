@@ -54,6 +54,7 @@ try {
   await page.getByRole("button", { name: /RUN DESTRUCTIVE TEST SIMULATION/i }).click();
   await page.getByText("REJECTED", { exact: true }).waitFor({ state: "visible", timeout: 5_000 });
 
+  await page.getByRole("link", { name: /RETURN TO HUB/i }).click();
   await page.getByRole("link", { name: "Schedule Consultation", exact: true }).click();
   const schedule = page.locator(".schedule-experience");
   await schedule.waitFor({ state: "visible", timeout: 15_000 });
@@ -62,16 +63,17 @@ try {
   await page.getByRole("heading", { name: /Let's find the/i }).waitFor({ state: "visible" });
   await page.screenshot({ path: `${outputDir}/04-schedule.png`, fullPage: true });
 
+  await page.getByRole("link", { name: /RETURN TO HUB/i }).click();
   await page.getByRole("link", { name: "Institutions", exact: true }).click();
   const institutions = page.locator(".institution-brief");
   await institutions.waitFor({ state: "visible", timeout: 15_000 });
   const institutionsFits = await institutions.evaluate(el => el.scrollHeight <= el.clientHeight + 2);
   if (!institutionsFits) throw new Error("The institutional briefing must fit its viewport without scrolling.");
-  await page.getByRole("heading", { name: /One foundation|From state|Working software/i }).waitFor({ state: "visible" });
+  await page.getByRole("heading", { name: /Behavior|Then, into|Now, the|Demonstrate/i }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "EVOLUTION", exact: true }).click();
-  await page.getByRole("heading", { name: /From state to composition/i }).waitFor({ state: "visible" });
-  await page.getByRole("button", { name: "READINESS", exact: true }).click();
-  await page.getByRole("heading", { name: /Working software/i }).waitFor({ state: "visible" });
+  await page.getByRole("heading", { name: /Then, into Unity/i }).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: "NEXT GATE", exact: true }).click();
+  await page.getByRole("heading", { name: /Demonstrate/i }).waitFor({ state: "visible" });
   await page.screenshot({ path: `${outputDir}/05-institutions.png`, fullPage: true });
 
   if (browserErrors.length > 0) {
