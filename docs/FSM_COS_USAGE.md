@@ -49,7 +49,7 @@ The host currently consumes:
 <PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.6" />
 ~~~
 
-CI currently builds the unpublished alpha.6 candidate from a pinned FSM_COS source commit, packs it into a local NuGet feed, and tests WebPage against that package. This proves compatibility without publishing the package; the version declaration does not imply that alpha.6 is available on nuget.org.
+FSM_COS 0.1.0-alpha.6 is published on nuget.org. WebPage CI restores against the public NuGet source and tests the host against that released package, rather than packing a source checkout into a local feed. This keeps the integration proof aligned with what a real downstream WebPage deployment will consume.
 
 The responsibilities are separate:
 
