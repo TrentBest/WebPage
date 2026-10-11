@@ -71,11 +71,11 @@ public sealed class WebPageHostManifestTests
         var manifest = WebPageHostManifestParser.Parse(manifestJson);
 
         Assert.Equal(2, manifest.Hub.Count);
-        var hub = Assert.Single(manifest.Hub.Where(item => item.Name == "AnyApp"));
+        var hub = Assert.Single(manifest.Hub, item => item.Name == "AnyApp");
         Assert.Equal("/anyapp", hub.Route);
         Assert.Empty(hub.MicroBundles!);
 
-        var support = Assert.Single(manifest.Hub.Where(item => item.Name == "Support"));
+        var support = Assert.Single(manifest.Hub, item => item.Name == "Support");
         Assert.Equal("/about-us", support.Route);
         Assert.Equal("/about-us", support.AboutUrl);
         Assert.Empty(support.MicroBundles!);
