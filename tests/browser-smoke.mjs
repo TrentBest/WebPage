@@ -43,7 +43,7 @@ try {
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   await anyAppTab.click();
-  await page.getByRole("heading", { name: "ANYAPP", exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByRole("heading", { name: "AnyApp", exact: true }).waitFor({ state: "visible", timeout: 10_000 });
   if (await moniker.count() !== 0) {
     throw new Error("Selecting AnyApp must replace the moniker in the primary panel.");
   }
