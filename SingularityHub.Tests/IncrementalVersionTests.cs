@@ -269,7 +269,11 @@ public sealed class IncrementalVersionTests
         Assert.Contains("private string _selectedHubTab = \"MONIKER\";", home);
         Assert.Contains("aria-pressed", home);
         Assert.Contains("builder.AddAttribute(sequence++, \"onclick\"", home);
-        Assert.Contains("\"name\": \"Support\"", manifest);
+        Assert.Contains("\"name\": \"Ecosystem\"", manifest);
+        Assert.Contains("\"name\": \"Schedule Consultation\"", manifest);
+        Assert.Contains("\"name\": \"Institutions\"", manifest);
+        Assert.DoesNotContain("\"name\": \"Support\"", manifest);
+        Assert.DoesNotContain("\"name\": \"AnyApp\"", manifest);
         Assert.Contains("glyph-red", firstContact);
         Assert.DoesNotContain(".hello-glyph:nth-child(6n+", css);
     }
