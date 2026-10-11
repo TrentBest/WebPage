@@ -14,6 +14,9 @@ namespace TheSingularityWorkshop.Services
     {
         public const string ProcessingGroup = "PageFSM";
         public const string Initializing = "PAGE_INITIALIZING";
+        public const string FirstContactFirstLabel = "FIRST_CONTACT_FIRST_LABEL";
+        public const string FirstContactTransition = "FIRST_CONTACT_TRANSITION";
+        public const string FirstContactSecondLabel = "FIRST_CONTACT_SECOND_LABEL";
         public const string Gateway = "GATEWAY";
         public const string GatewayExit = "GATEWAY_EXIT";
         public const string LivingGuiIgnition = "LIVING_GUI_IGNITION";
@@ -92,6 +95,9 @@ namespace TheSingularityWorkshop.Services
 
             fsm_API.Create.CreateFiniteStateMachine("PageFSM", -1, _processingGroup)
                 .State(Initializing, Enter(behavior?.OnInitialization), Tick, null)
+                .State(FirstContactFirstLabel, Enter(null), Tick, null)
+                .State(FirstContactTransition, Enter(null), Tick, null)
+                .State(FirstContactSecondLabel, Enter(null), Tick, null)
                 .State(Gateway, Enter(behavior?.OnGateway), Tick, null)
                 .State(GatewayExit, Enter(behavior?.OnGatewayExit), Tick, null)
                 .State(LivingGuiIgnition, Enter(c =>
@@ -121,7 +127,10 @@ namespace TheSingularityWorkshop.Services
                 .State(Running, Enter(behavior?.OnRunning), Tick, null)
                 .State(ShutdownState, Enter(behavior?.OnShutdown), Tick, null)
                 .WithInitialState(Initializing)
-                .Transition(Initializing, Gateway, c => true)
+                .Transition(Initializing, FirstContactFirstLabel, c => true)
+                .Transition(FirstContactFirstLabel, FirstContactTransition, c => ((PageStateContext)c).StateTicks >= 45)
+                .Transition(FirstContactTransition, FirstContactSecondLabel, c => ((PageStateContext)c).StateTicks >= 45)
+                .Transition(FirstContactSecondLabel, Gateway, c => ((PageStateContext)c).StateTicks >= 45)
                 .Transition(Gateway, GatewayExit, c => ((PageStateContext)c).EnterRequested)
                 .Transition(GatewayExit, LivingGuiIgnition, c => ((PageStateContext)c).StateTicks >= 1)
                 .Transition(LivingGuiIgnition, LivingGuiPopulating, c => ((PageStateContext)c).StateTicks >= 1)
