@@ -1,0 +1,202 @@
+@page "/ecosystem"
+@using Microsoft.AspNetCore.Components
+<PageTitle>Workshop Atlas // Packages, Repositories & Forge</PageTitle>
+
+<div class="atlas">
+    <header class="atlas-head">
+        <div class="signal"><span class="signal-dot"></span> THE SINGULARITY WORKSHOP <span class="slash">/</span> LIVE SYSTEM MAP</div>
+        <div class="head-grid">
+            <div>
+                <div class="eyebrow">NOT A PRODUCT CATALOG. A CONNECTED TOOLCHAIN.</div>
+                <h1>Explore the<br/><em>living stack.</em></h1>
+                <p class="lede">Small .NET building blocks. Explicit behavior. Composable experiences. A Workshop built to help ideas become working software—not disappear into framework ceremony.</p>
+                <div class="head-actions">
+                    <a href="#atlas-map" class="action primary">TRACE THE SYSTEM <span>↓</span></a>
+                    <a href="#consult" class="action">BRING A HARD PROBLEM ↗</a>
+                </div>
+            </div>
+            <div class="stack-orbit" aria-label="Architecture diagram">
+                <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="orbit orbit-c"></div>
+                <div class="orbit-core"><span>THE</span><b>WORKSHOP</b><small>IDEA → BEHAVIOR</small></div>
+                <span class="orbit-label l1">FSM_API</span><span class="orbit-label l2">FSM_COS</span><span class="orbit-label l3">ANY HOST</span>
+            </div>
+        </div>
+        <div class="metrics"><div><b>POCO-FIRST</b><span>Core stays portable</span></div><div><b>COMPOSABLE</b><span>Independent capabilities</span></div><div><b>DOTNET</b><span>Use the ecosystem you have</span></div><div><b>INSPECTABLE</b><span>See the parts and their jobs</span></div></div>
+    </header>
+
+    <section id="atlas-map" class="section">
+        <div class="section-top"><div><div class="eyebrow">01 / NAVIGATE THE ECOSYSTEM</div><h2>Find your entry point.</h2></div><div class="filters" role="group" aria-label="Filter catalog">
+            <button class="@(_filter == "all" ? "selected" : "")" @onclick='() => SetFilter("all")'>ALL SIGNALS</button>
+            <button class="@(_filter == "package" ? "selected" : "")" @onclick='() => SetFilter("package")'>NUGET</button>
+            <button class="@(_filter == "repo" ? "selected" : "")" @onclick='() => SetFilter("repo")'>GITHUB</button>
+        </div></div>
+        <div class="atlas-grid">
+            @if (_filter != "repo")
+            {
+                <article class="catalog-card featured">
+                    <div class="card-top"><span class="type">FOUNDATION / NUGET</span><span class="live-mark">01</span></div><div class="glyph glyph-fsm">↻</div>
+                    <h3>FSM_API</h3><p>Explicit, runtime-modifiable finite state machines. Keep behavior visible, testable, and independent of a specific UI or game engine.</p>
+                    <div class="chips"><span>C#</span><span>STATE</span><span>BEHAVIOR</span></div>
+                    <a href="https://www.nuget.org/packages/TheSingularityWorkshop.FSM_API" target="_blank" rel="noopener noreferrer">PACKAGE DETAILS <b>↗</b></a><a class="sub-link" href="https://github.com/TrentBest/FSM_API" target="_blank" rel="noopener noreferrer">Source repository ↗</a>
+                </article>
+                <article class="catalog-card">
+                    <div class="card-top"><span class="type">COMPOSITION / NUGET</span><span class="live-mark">02</span></div><div class="glyph">⌘</div>
+                    <h3>FSM_COS</h3><p>The assembly crane: composes declared capabilities into a runtime. It is a boundary for composition—not an application loop.</p>
+                    <div class="chips"><span>COMPOSITION</span><span>MICROBUNDLES</span></div>
+                    <a href="https://www.nuget.org/packages/TheSingularityWorkshop.FSM_COS" target="_blank" rel="noopener noreferrer">PACKAGE DETAILS <b>↗</b></a><a class="sub-link" href="https://github.com/TrentBest/FSM_COS" target="_blank" rel="noopener noreferrer">Source repository ↗</a>
+                </article>
+                <article class="catalog-card">
+                    <div class="card-top"><span class="type">DOMAIN / NUGET</span><span class="live-mark">03</span></div><div class="glyph">◇</div>
+                    <h3>MicroBundleDomain</h3><p>Contracts for independent, discoverable capabilities. Each bundle declares what it needs; the host decides how to assemble it.</p>
+                    <div class="chips"><span>CONTRACTS</span><span>DEPENDENCIES</span></div>
+                    <a href="https://www.nuget.org/packages/MicroBundleDomain" target="_blank" rel="noopener noreferrer">SEARCH NUGET ↗</a><a class="sub-link" href="https://github.com/TrentBest/MicroBundleDomain" target="_blank" rel="noopener noreferrer">Source repository ↗</a>
+                </article>
+                <article class="catalog-card">
+                    <div class="card-top"><span class="type">DATA / NUGET</span><span class="live-mark">04</span></div><div class="glyph">⇄</div>
+                    <h3>FSM_Serialization</h3><p>Serialization support for carrying state-machine definitions across the boundary between memory and durable data.</p>
+                    <div class="chips"><span>DATA</span><span>PORTABILITY</span></div>
+                    <a href="https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization" target="_blank" rel="noopener noreferrer">PACKAGE DETAILS ↗</a><a class="sub-link" href="https://github.com/TrentBest/FSM_Serialization" target="_blank" rel="noopener noreferrer">Source repository ↗</a>
+                </article>
+                <article class="catalog-card">
+                    <div class="card-top"><span class="type">INTERACTION / NUGET</span><span class="live-mark">05</span></div><div class="glyph">⌁</div>
+                    <h3>FSM_UserIO</h3><p>A reusable boundary for user input and abilities—designed to be broader than any one kind of player or interface.</p>
+                    <div class="chips"><span>INPUT</span><span>ABILITIES</span></div>
+                    <a href="https://www.nuget.org/packages/TheSingularityWorkshop.FSM_UserIO" target="_blank" rel="noopener noreferrer">PACKAGE DETAILS ↗</a><a class="sub-link" href="https://github.com/TrentBest/FSM_UserIO" target="_blank" rel="noopener noreferrer">Source repository ↗</a>
+                </article>
+                <article class="catalog-card">
+                    <div class="card-top"><span class="type">PRESENTATION / NUGET</span><span class="live-mark">06</span></div><div class="glyph">▦</div>
+                    <h3>Workshop.GUI</h3><p>Semantic GUI building blocks with Blazor and WPF manifestations. A growing toolkit for presentation—not a competing behavior engine.</p>
+                    <div class="chips"><span>GUI.CORE</span><span>BLAZOR</span><span>WPF</span></div>
+                    <a href="https://www.nuget.org/packages/TheSingularityWorkshop.GUI.Core" target="_blank" rel="noopener noreferrer">CORE PACKAGE ↗</a><a class="sub-link" href="https://github.com/TrentBest/TheSingularityWorkshop.GUI" target="_blank" rel="noopener noreferrer">Source repository ↗</a>
+                </article>
+            }
+            @if (_filter != "package")
+            {
+                <article class="catalog-card repo-card">
+                    <div class="card-top"><span class="type">REFERENCE IMPLEMENTATION / GITHUB</span><span class="live-mark">↗</span></div><div class="glyph">⌬</div><h3>WebPage</h3><p>The original organism, now being rebuilt around the abstractions extracted from it. Watch the architecture become real.</p><div class="chips"><span>WEBASSEMBLY</span><span>FSM_COS</span></div><a href="https://github.com/TrentBest/WebPage" target="_blank" rel="noopener noreferrer">EXPLORE REPOSITORY ↗</a>
+                </article>
+                <article class="catalog-card repo-card">
+                    <div class="card-top"><span class="type">HOST / GITHUB</span><span class="live-mark">↗</span></div><div class="glyph">▣</div><h3>AnyApp</h3><p>The ambition: a stable host whose experience can change through declared composition, rather than hard-coded app identities.</p><div class="chips"><span>DESKTOP</span><span>HOSTING</span></div><a href="https://github.com/TrentBest/AnyApp" target="_blank" rel="noopener noreferrer">EXPLORE REPOSITORY ↗</a>
+                </article>
+                <article class="catalog-card repo-card">
+                    <div class="card-top"><span class="type">RUNTIME / GITHUB</span><span class="live-mark">↗</span></div><div class="glyph">⤢</div><h3>FSM_Layer</h3><p>Layered behavior infrastructure between state-machine primitives and higher-level composition.</p><div class="chips"><span>RUNTIME</span><span>ARCHITECTURE</span></div><a href="https://github.com/TrentBest/FSM_Layer" target="_blank" rel="noopener noreferrer">EXPLORE REPOSITORY ↗</a>
+                </article>
+            }
+        </div>
+        <p class="catalog-note">This is a curated map, not a live registry mirror. Follow each package or repository link for its current version, release status, source, and license.</p>
+    </section>
+
+    <section class="section system-section">
+        <div class="eyebrow">02 / HOW THE PIECES BECOME A SYSTEM</div><h2>Not another monolith.<br/><em>A chain of responsibility.</em></h2>
+        <div class="flow-map">
+            <div class="flow-node"><small>01 / DOMAIN</small><b>WHAT</b><span>MicroBundleDomain</span><p>Declare capability and dependency.</p></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><small>02 / BEHAVIOR</small><b>HOW IT CHANGES</b><span>FSM_API</span><p>Make transitions explicit and testable.</p></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><small>03 / ASSEMBLY</small><b>COMPOSE</b><span>FSM_COS</span><p>Resolve the declared runtime.</p></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><small>04 / EXPERIENCE</small><b>WHERE IT LIVES</b><span>WebPage · AnyApp · your .NET app</span><p>Manifest-driven host and platform-specific presentation.</p></div>
+        </div>
+        <div class="claim"><span class="claim-mark">✳</span><div><b>Designed to integrate with ordinary .NET software.</b><p>You do not need to throw away an existing application or adopt a giant engine to experiment with these ideas. The goal is to compose around your constraints—not demand that your project become ours.</p></div></div>
+    </section>
+
+    <section class="section forge-section" id="forge">
+        <div class="section-top"><div><div class="eyebrow">03 / THE GAUNTLET</div><h2>Submit an idea.<br/><em>Try to break it.</em></h2><p class="section-intro">A glimpse of the Workshop's intended contribution pipeline. This interactive model runs locally in your browser; it does not upload code or claim to execute a real security sandbox.</p></div><div class="forge-stamp">FAIL CLOSED<br/><b>PROVE IT</b></div></div>
+        <div class="forge-layout">
+            <div class="forge-editor"><div class="editor-top"><span><i></i><i></i><i></i> BUNDLE MANIFEST / DRAFT</span><span>LOCAL PREVIEW</span></div><label for="bundle-name">Capability name</label><input id="bundle-name" @bind="_bundleName" placeholder="e.g. WeatherSimulation" maxlength="64" /><label for="bundle-purpose">What does it do?</label><textarea id="bundle-purpose" @bind="_bundlePurpose" placeholder="Describe the capability and what it needs from its host..." rows="4" maxlength="800"></textarea><label for="bundle-risk">Testing profile</label><select id="bundle-risk" @bind="_testProfile"><option value="standard">Standard contract gauntlet</option><option value="strict">Strict / adversarial</option><option value="compat">Compatibility and portability</option></select><button class="action primary run-button" @onclick="RunGauntlet">RUN DESTRUCTIVE TEST SIMULATION <span>↗</span></button><small class="editor-disclaimer">Simulation only · no code compilation, execution, upload, or server-side validation occurs here.</small></div>
+            <div class="forge-results"><div class="results-head"><span class="eyebrow">ARBITRATION / TEST REPORT</span><span class="result-state @(_hasRun ? (_allPassed ? "pass" : "reject") : "idle")">@(_hasRun ? (_allPassed ? "PRELIMINARY PASS" : "REJECTED") : "AWAITING INPUT")</span></div>
+                @if (!_hasRun)
+                {
+                    <div class="empty-report"><div class="report-rings">⌁</div><b>Nothing passes on promises.</b><p>Run the model to see how a submission can be checked, rejected, and given actionable next steps.</p></div>
+                }
+                else
+                {
+                    <div class="report-summary"><strong>@_passedCount / @_checks.Count</strong><span>simulated checks passed</span></div>
+                    @foreach (var check in _checks)
+                    {
+                        <div class="check-row"><span class="check-icon @(check.Passed ? "ok" : "bad")">@(check.Passed ? "✓" : "×")</span><div><b>@check.Name</b><p>@check.Detail</p></div><span class="check-state">@(check.Passed ? "PASS" : "FAIL")</span></div>
+                    }
+                    @if (!_allPassed)
+                    {
+                        <div class="recommendation"><b>RECOMMENDED NEXT ACTIONS</b><ul>@foreach (var advice in _advice){<li>@advice</li>}</ul></div>
+                    }
+                    else
+                    {
+                        <div class="recommendation good"><b>READY FOR THE NEXT GATE—IN THIS MODEL ONLY</b><p>A real pipeline would still need isolated compilation, dependency and license review, security/resource limits, deterministic tests, compatibility checks, and human-readable evidence before acceptance.</p></div>
+                    }
+                }
+                <div class="pipeline-steps"><span class="done">DRAFT</span><i>→</i><span class="@(_hasRun ? "done" : "")">ARBITRATE</span><i>→</i><span class="@(_hasRun ? "done" : "")">STRESS TEST</span><i>→</i><span class="@(_hasRun && _allPassed ? "done" : "")">REVIEW</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section consult-section" id="consult">
+        <div><div class="eyebrow">04 / COMPLEXITY IS AN INVITATION</div><h2>Have a problem that<br/><em>doesn't fit a template?</em></h2><p>Bring the hard part. A system that changes at runtime. A legacy .NET application that needs new life. A simulation, workflow, tool, or idea you can't quite make fit the usual boxes.</p><p>No claim that one library solves everything. Just a willingness to understand the problem, model it, and test the solution honestly.</p></div>
+        <div class="consult-card"><div class="consult-orb">↗</div><div class="eyebrow">START A TECHNICAL CONVERSATION</div><h3>Schedule a consultation.</h3><p>Tell me what you're trying to solve and what times work for you. This starts an email request; it does not book a calendar slot automatically.</p><label for="consult-topic">What are we solving?</label><input id="consult-topic" @bind="_consultTopic" placeholder="A stubborn architecture problem..." maxlength="180" /><label for="consult-time">Your time zone / availability</label><input id="consult-time" @bind="_consultAvailability" placeholder="e.g. Pacific, weekday afternoons" maxlength="180" /><label for="consult-detail">A little context (optional)</label><textarea id="consult-detail" @bind="_consultDetail" rows="3" maxlength="1000" placeholder="Constraints, existing stack, what you've already tried..."></textarea><button class="action primary" @onclick="RequestConsultation">PREPARE CONSULTATION REQUEST ↗</button><a href="mailto:thesingularityworkshop@gmail.com">Or email directly ↗</a><small>Nothing is sent until you choose to send the email in your mail application.</small></div>
+    </section>
+    <footer class="atlas-footer"><div class="signal"><span class="signal-dot"></span> THE SINGULARITY WORKSHOP</div><span>Build small. Compose boldly. Test destructively.</span><a href="https://github.com/TrentBest" target="_blank" rel="noopener noreferrer">OPEN SOURCE WORK ↗</a></footer>
+</div>
+
+<style>
+.atlas{--ink:#eaf8ff;--muted:#8ba6b5;--cyan:#00eaff;--pink:#ff2cff;--gold:#ffd34d;background:#030711;color:var(--ink);font-family:Inter,system-ui,sans-serif;min-height:100%;overflow:hidden}
+.atlas *{box-sizing:border-box}.atlas a{color:inherit;text-decoration:none}.atlas-head{position:relative;padding:clamp(1.4rem,4vw,3.5rem) clamp(1rem,5vw,5rem) 0;background:radial-gradient(ellipse at 75% 30%,#07233a 0,transparent 42%),linear-gradient(135deg,#050b17,#030711 65%);border-bottom:1px solid #00eaff20}.signal{display:flex;align-items:center;gap:.65rem;font:700 .65rem Consolas,monospace;letter-spacing:.16em;color:#9ebbc7}.signal-dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--cyan);box-shadow:0 0 15px var(--cyan)}.slash{color:var(--pink)}
+.head-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(240px,.9fr);align-items:center;gap:2rem;max-width:1400px;margin:auto;padding:4rem 0 2.5rem}.eyebrow{font:700 .65rem Consolas,monospace;letter-spacing:.16em;color:#7da8bb}.atlas h1{font-size:clamp(3.2rem,8vw,7.7rem);line-height:.86;letter-spacing:-.08em;margin:1.3rem 0 1.5rem}.atlas h1 em,.atlas h2 em{font-style:normal;color:var(--cyan);text-shadow:0 0 40px #00eaff20}.lede{max-width:620px;color:#b4c9d4;line-height:1.75;font-size:clamp(.95rem,1.3vw,1.15rem)}.head-actions{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.7rem}.action{display:inline-flex;align-items:center;justify-content:center;gap:1rem;padding:.85rem 1rem;border:1px solid #00eaff50;background:#00eaff08;font:800 .68rem Consolas,monospace;letter-spacing:.06em;cursor:pointer;color:var(--ink)}.action:hover{border-color:var(--pink);box-shadow:0 0 25px #ff2cff14}.action.primary{background:var(--cyan);border-color:var(--cyan);color:#031019}.action.primary:hover{background:#a6fbff}
+.stack-orbit{position:relative;aspect-ratio:1;width:min(100%,460px);margin:auto;display:grid;place-items:center}.orbit{position:absolute;border:1px solid #00eaff35;border-radius:50%;inset:10%;animation:spin 36s linear infinite}.orbit-a{inset:6%;border-style:dashed}.orbit-b{inset:19%;border-color:#ff2cff55;animation-direction:reverse;animation-duration:27s}.orbit-c{inset:30%;border-color:#ffd34d55;animation-duration:19s}.orbit-core{width:36%;aspect-ratio:1;border-radius:50%;border:1px solid var(--cyan);background:#071725;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 60px #00eaff15,inset 0 0 30px #00eaff12}.orbit-core span,.orbit-core small{font: .55rem Consolas,monospace;color:var(--muted);letter-spacing:.16em}.orbit-core b{font:900 clamp(.7rem,1.8vw,1.1rem) Consolas,monospace;text-align:center;color:white}.orbit-label{position:absolute;padding:.45rem .6rem;background:#050e1c;border:1px solid #00eaff55;color:#a5f7ff;font:700 .58rem Consolas,monospace}.l1{top:13%;left:0}.l2{right:0;top:45%;border-color:#ff2cff66;color:#ffb4ff}.l3{bottom:12%;left:23%;border-color:#ffd34d66;color:#ffe7a0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);max-width:1400px;margin:auto;border-top:1px solid #00eaff20}.metrics div{padding:1.15rem 1rem;border-right:1px solid #00eaff18;display:grid;gap:.35rem}.metrics div:last-child{border:0}.metrics b{font:800 .7rem Consolas,monospace;color:var(--cyan);letter-spacing:.1em}.metrics span{font-size:.78rem;color:var(--muted)}
+.section{max-width:1500px;margin:auto;padding:clamp(2.8rem,6vw,6rem) clamp(1rem,5vw,5rem)}.section-top{display:flex;align-items:end;justify-content:space-between;gap:1.5rem;margin-bottom:2rem}.atlas h2{font-size:clamp(2rem,4.8vw,4.2rem);letter-spacing:-.06em;line-height:.98;margin:.75rem 0}.filters{display:flex;flex-wrap:wrap;gap:.35rem}.filters button{padding:.65rem .8rem;border:1px solid #284452;background:transparent;color:#7e9ba8;font:700 .62rem Consolas,monospace;cursor:pointer}.filters button.selected{border-color:var(--cyan);color:var(--cyan);background:#00eaff0b}
+.atlas-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:#12303d;border:1px solid #12303d}.catalog-card{position:relative;min-width:0;min-height:340px;padding:1.35rem;background:#050c17;display:flex;flex-direction:column;align-items:flex-start;transition:background .25s,transform .25s}.catalog-card:hover{background:#081727;z-index:1}.catalog-card.featured{background:linear-gradient(145deg,#071b2a,#050c17 65%)}.card-top{display:flex;justify-content:space-between;gap:.5rem;width:100%;font:700 .58rem Consolas,monospace;letter-spacing:.1em;color:#7899a9}.live-mark{color:var(--cyan)}.glyph{display:grid;place-items:center;width:3rem;height:3rem;margin:1.3rem 0 .9rem;border:1px solid #00eaff40;color:var(--cyan);font-size:1.5rem;box-shadow:inset 0 0 20px #00eaff08}.glyph-fsm{border-radius:50%;font-size:2rem}.catalog-card h3{font:800 1.3rem Consolas,monospace;margin:.2rem 0 .6rem;letter-spacing:-.03em}.catalog-card p{font-size:.88rem;line-height:1.65;color:#9db3bf;margin:0 0 1rem}.chips{display:flex;flex-wrap:wrap;gap:.35rem;margin:auto 0 1rem}.chips span{font:700 .55rem Consolas,monospace;padding:.35rem .45rem;border:1px solid #264351;color:#8ab1c1;letter-spacing:.07em}.catalog-card>a{font:800 .65rem Consolas,monospace;color:var(--cyan);letter-spacing:.04em;margin-top:.35rem}.catalog-card>a b{color:var(--pink)}.catalog-card .sub-link{font-weight:500;color:#7c98a7;text-transform:none}.catalog-note{color:#688493;font-size:.75rem;line-height:1.6;margin-top:1rem}
+.system-section{border-top:1px solid #00eaff18;border-bottom:1px solid #00eaff18;background:radial-gradient(ellipse at 50% 30%,#071a2a,transparent 70%)}.flow-map{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1.2fr;align-items:stretch;gap:.7rem;margin:2.5rem 0}.flow-node{padding:1.15rem;border:1px solid #1c4757;background:#040b15;display:flex;flex-direction:column;gap:.65rem;min-width:0}.flow-node small{font:700 .57rem Consolas,monospace;color:#7696a5}.flow-node b{font:900 .85rem Consolas,monospace;color:var(--cyan)}.flow-node span{font:700 .76rem Consolas,monospace}.flow-node p{font-size:.78rem;line-height:1.5;color:var(--muted);margin:0}.flow-arrow{display:grid;place-items:center;color:var(--pink);font-size:1.3rem}.claim{display:flex;align-items:flex-start;gap:1rem;max-width:850px;margin:3rem auto 0;padding:1.4rem;border-left:2px solid var(--pink);background:#ff2cff08}.claim-mark{font-size:1.6rem;color:var(--pink)}.claim b{font-size:1rem}.claim p{color:#9db3bf;line-height:1.7;margin:.5rem 0 0;font-size:.88rem}
+.section-intro{max-width:720px;color:var(--muted);line-height:1.7}.forge-section{background:radial-gradient(ellipse at 5% 40%,#15200f40,transparent 40%)}.forge-stamp{padding:1rem;border:1px solid #ffd34d70;color:#ffd34d;text-align:center;font:700 .65rem/1.7 Consolas,monospace;transform:rotate(3deg)}.forge-stamp b{font-size:1rem}.forge-layout{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.15fr);gap:1rem;margin-top:2rem}.forge-editor,.forge-results{border:1px solid #1b3b49;background:#050c16;min-width:0}.editor-top,.results-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.85rem 1rem;border-bottom:1px solid #17313e;color:#7795a4;font:700 .58rem Consolas,monospace;letter-spacing:.06em}.editor-top i{display:inline-block;width:.45rem;height:.45rem;border-radius:50%;background:#ff5252;margin-right:.22rem}.editor-top i:nth-child(2){background:#ffd34d}.editor-top i:nth-child(3){background:#52e05a}.forge-editor label,.consult-card label{display:block;margin:1rem 1rem .4rem;color:#8ba7b5;font:700 .65rem Consolas,monospace;letter-spacing:.08em}.forge-editor input,.forge-editor textarea,.forge-editor select,.consult-card input,.consult-card textarea{display:block;width:calc(100% - 2rem);margin:0 1rem;padding:.8rem;border:1px solid #254452;background:#020711;color:var(--ink);font: .85rem system-ui,sans-serif;outline:none}.forge-editor input:focus,.forge-editor textarea:focus,.forge-editor select:focus,.consult-card input:focus,.consult-card textarea:focus{border-color:var(--cyan)}.run-button{width:calc(100% - 2rem);margin:1.1rem 1rem .6rem}.editor-disclaimer{display:block;margin:0 1rem 1.2rem;color:#66808e;font-size:.68rem;line-height:1.5}.result-state{font:800 .6rem Consolas,monospace;color:#7896a4}.result-state.pass{color:#52e05a}.result-state.reject{color:#ff7777}.empty-report{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}.report-rings{display:grid;place-items:center;width:4rem;height:4rem;border:1px solid #00eaff44;border-radius:50%;color:var(--cyan);font-size:2rem;margin-bottom:1rem}.empty-report b{font:800 .95rem Consolas,monospace}.empty-report p{max-width:330px;color:var(--muted);font-size:.82rem;line-height:1.6}.report-summary{display:flex;align-items:baseline;gap:.8rem;padding:1.1rem;border-bottom:1px solid #18313c}.report-summary strong{font:900 1.8rem Consolas,monospace;color:var(--cyan)}.report-summary span{font-size:.75rem;color:var(--muted)}.check-row{display:grid;grid-template-columns:1.4rem minmax(0,1fr) auto;gap:.65rem;align-items:start;padding:.8rem 1rem;border-bottom:1px solid #102531}.check-icon{display:grid;place-items:center;width:1.25rem;height:1.25rem;border:1px solid currentColor;font-size:.75rem}.check-icon.ok{color:#52e05a}.check-icon.bad{color:#ff7777}.check-row b{font-size:.78rem}.check-row p{font-size:.74rem;color:var(--muted);line-height:1.5;margin:.25rem 0 0}.check-state{font:800 .55rem Consolas,monospace;color:#ff7777}.check-icon.ok~div~.check-state{color:#52e05a}.recommendation{margin:1rem;padding:1rem;border:1px solid #ff777744;background:#ff777708;font-size:.78rem;line-height:1.6}.recommendation b{font:800 .63rem Consolas,monospace;color:#ff9999}.recommendation ul{padding-left:1.2rem;color:#a8bdc7}.recommendation.good{border-color:#52e05a44;background:#52e05a08}.recommendation.good b{color:#52e05a}.recommendation.good p{color:#a8bdc7}.pipeline-steps{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.6rem;padding:1rem;border-top:1px solid #17313e;font:700 .55rem Consolas,monospace;color:#4d6876}.pipeline-steps i{font-style:normal}.pipeline-steps .done{color:var(--cyan)}
+.consult-section{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.8fr);gap:clamp(2rem,7vw,7rem);align-items:center;background:radial-gradient(ellipse at 15% 50%,#0a2430,transparent 55%)}.consult-section>div:first-child p{max-width:650px;color:#a2b9c4;line-height:1.75;font-size:.92rem}.consult-card{padding:1.4rem;border:1px solid #28505d;background:#050d18;box-shadow:0 25px 80px #0004}.consult-orb{display:grid;place-items:center;width:3rem;height:3rem;border:1px solid var(--pink);border-radius:50%;color:var(--pink);font-size:1.4rem;margin-bottom:1rem}.consult-card h3{font:800 1.4rem Consolas,monospace;margin:.65rem 0}.consult-card p{font-size:.82rem;color:var(--muted);line-height:1.6}.consult-card .action{width:100%;margin:1.2rem 0 .8rem}.consult-card>a{display:block;color:var(--cyan);font:700 .68rem Consolas,monospace;margin:.6rem 0}.consult-card>small{display:block;color:#607b89;font-size:.68rem;line-height:1.5;margin-top:.9rem}.atlas-footer{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:1.5rem clamp(1rem,5vw,5rem);border-top:1px solid #00eaff20;color:#7896a5;font-size:.7rem}.atlas-footer>a{color:var(--cyan);font:700 .63rem Consolas,monospace}
+@@keyframes spin{to{transform:rotate(360deg)}}@@media(max-width:900px){.atlas-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.flow-map{grid-template-columns:1fr 1fr}.flow-arrow{transform:rotate(90deg)}.forge-layout{grid-template-columns:1fr}.consult-section{grid-template-columns:1fr}.head-grid{grid-template-columns:1fr .8fr}.metrics{grid-template-columns:repeat(2,1fr)}.metrics div:nth-child(2){border-right:0}}@@media(max-width:620px){.head-grid{grid-template-columns:1fr;padding-top:2.5rem}.stack-orbit{width:min(82%,320px);grid-row:1;max-height:290px}.head-grid>div:first-child{grid-row:2}.atlas h1{font-size:clamp(3rem,16vw,5rem)}.section-top{align-items:flex-start;flex-direction:column}.atlas-grid{grid-template-columns:1fr}.catalog-card{min-height:300px}.flow-map{grid-template-columns:1fr}.flow-arrow{transform:rotate(90deg);padding:.1rem}.forge-stamp{align-self:flex-start}.atlas-footer{align-items:flex-start;flex-direction:column}}@@media(prefers-reduced-motion:reduce){.orbit{animation:none}}
+</style>
+
+@code {
+    private string _filter = "all";
+    private string _bundleName = "WeatherSimulation";
+    private string _bundlePurpose = "A capability that models changing weather conditions for a host simulation.";
+    private string _testProfile = "standard";
+    private bool _hasRun;
+    private List<GauntletCheck> _checks = new();
+    private List<string> _advice = new();
+    private bool _allPassed => _checks.Count > 0 && _checks.All(c => c.Passed);
+    private int _passedCount => _checks.Count(c => c.Passed);
+    private string _consultTopic = "";
+    private string _consultAvailability = "";
+    private string _consultDetail = "";
+
+    private void SetFilter(string value) => _filter = value;
+
+    private void RunGauntlet()
+    {
+        _hasRun = true;
+        var hasName = !string.IsNullOrWhiteSpace(_bundleName) && _bundleName.All(c => char.IsLetterOrDigit(c) || c == '_');
+        var hasPurpose = !string.IsNullOrWhiteSpace(_bundlePurpose) && _bundlePurpose.Trim().Length >= 24;
+        var hasForbidden = _bundlePurpose.Contains("unsafe", StringComparison.OrdinalIgnoreCase) ||
+                           _bundlePurpose.Contains("secret", StringComparison.OrdinalIgnoreCase) ||
+                           _bundlePurpose.Contains("infinite loop", StringComparison.OrdinalIgnoreCase);
+        _checks = new()
+        {
+            new("Manifest identity", hasName, hasName ? "A simple identifier is present in the draft." : "Name must be non-empty and use letters, digits, or underscores."),
+            new("Capability description", hasPurpose, hasPurpose ? "The draft explains a purpose at a basic descriptive level." : "Provide at least 24 non-whitespace characters describing intent."),
+            new("Dependency closure", _testProfile != "strict" && hasName, _testProfile == "strict" ? "Strict mode requires an explicit dependency declaration; this draft has none." : "Placeholder check only: no dependency graph is actually loaded."),
+            new("Host compatibility", _testProfile != "compat" && hasPurpose, _testProfile == "compat" ? "Compatibility mode requires declared target frameworks and host capabilities." : "Placeholder check only: no target framework is compiled."),
+            new("Adversarial input review", !hasForbidden && _testProfile != "strict", _testProfile == "strict" ? "Strict profile intentionally rejects drafts without explicit resource and threat-boundary declarations." : hasForbidden ? "Draft wording triggered a simulated policy marker; this is not a real security scan." : "Basic text heuristic only; this does not prove the code is safe."),
+            new("Reproducible test evidence", hasName && hasPurpose && _testProfile == "standard", _testProfile == "standard" && hasName && hasPurpose ? "Placeholder check: real deterministic tests would need to run in isolation." : "No executable test report or deterministic build evidence is attached.")
+        };
+        _advice = new();
+        if (!hasName) _advice.Add("Choose a stable capability identifier; keep display names separate from machine identity.");
+        if (!hasPurpose) _advice.Add("Describe what the capability does, what it needs, and what it promises not to do.");
+        if (_testProfile == "strict") _advice.Add("Declare dependencies, permissions, resource limits, and threat boundaries before strict arbitration.");
+        if (_testProfile == "compat") _advice.Add("Declare supported target frameworks and host capabilities, then test each supported combination.");
+        if (hasForbidden) _advice.Add("Review the suspicious wording and document intended behavior and resource boundaries.");
+        if (_advice.Count == 0 && !_allPassed) _advice.Add("Attach concrete evidence for each failing check and rerun the relevant tests.");
+        if (_allPassed) _advice.Add("This is only a local demonstration result; a real submission still requires isolated execution and external review.");
+    }
+
+    private void RequestConsultation()
+    {
+        var subject = Uri.EscapeDataString("Workshop consultation request: " + (_consultTopic.Trim().Length > 0 ? _consultTopic.Trim() : "Complex .NET problem"));
+        var body = Uri.EscapeDataString($"Hello,\n\nI'd like to discuss a technical problem with The Singularity Workshop.\n\nProblem: {_consultTopic}\nAvailability / time zone: {_consultAvailability}\nContext: {_consultDetail}\n\nThank you.");
+        Navigation.NavigateTo($"mailto:thesingularityworkshop@gmail.com?subject={subject}&body={body}");
+    }
+
+    private sealed record GauntletCheck(string Name, bool Passed, string Detail);
+}
