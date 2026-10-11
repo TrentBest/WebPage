@@ -137,10 +137,9 @@ namespace TheSingularityWorkshop.Services
                 return;
             }
 
-            // Targets are precomputed when the 100-slot population is allocated.
-            // No RNG object or random stream is created during reproduction.
-            node.X = 50;
-            node.Y = 50;
+            // CreateOffspring has already copied the parent's current position.
+            // Preserve that inherited origin; only the precomputed destination
+            // belongs to the child's pool slot.
             node.Phase = LivingNodePhase.Traveling;
         }
 
