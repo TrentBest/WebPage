@@ -45,20 +45,36 @@ try {
   await anyApp.hover();
   await page.mouse.wheel(0, 500);
   await page.getByText("02 / INTERCHANGEABILITY", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  // Wait for the current fade lifecycle to finish before requesting another transition.
+  await page.waitForTimeout(800);
   await page.screenshot({ path: `${outputDir}/05-anyapp-interchange.png`, fullPage: true });
 
   await page.getByRole("button", { name: "Go to scene 3" }).click();
   await page.getByText("03 / THE SAME IDEA, LIVE RIGHT HERE", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.waitForTimeout(800);
   await page.screenshot({ path: `${outputDir}/06-anyapp-live-proof.png`, fullPage: true });
 
   await page.getByRole("button", { name: "Go to scene 4" }).click();
   await page.getByText("04 / THE NEXT FRONTIER", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.waitForTimeout(800);
   await page.getByRole("link", { name: /INSPECT ANYAPP SOURCE/i }).waitFor({ state: "visible" });
   await page.screenshot({ path: `${outputDir}/07-anyapp-desktop.png`, fullPage: true });
 
   // The left rail is still available to return to the Workshop.
   await page.getByRole("link", { name: "The Singularity Workshop" }).click();
   await page.locator(".manifest-hub").waitFor({ state: "visible", timeout: 15_000 });
+
+  // The ecosystem atlas is a manifest-declared destination, not a hard-coded rail entry.
+  await page.getByRole("link", { name: "Ecosystem", exact: true }).click();
+  await page.getByRole("heading", { name: /Explore the living stack/i }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByRole("button", { name: "GITHUB", exact: true }).click();
+  await page.getByRole("heading", { name: "WebPage", exact: true }).waitFor({ state: "visible", timeout: 5_000 });
+  await page.getByRole("button", { name: "ALL SIGNALS", exact: true }).click();
+  await page.getByRole("button", { name: /RUN DESTRUCTIVE TEST SIMULATION/i }).click();
+  await page.getByText("PRELIMINARY PASS", { exact: true }).waitFor({ state: "visible", timeout: 5_000 });
+  await page.getByLabel("Testing profile").selectOption("strict");
+  await page.getByRole("button", { name: /RUN DESTRUCTIVE TEST SIMULATION/i }).click();
+  await page.getByText("REJECTED", { exact: true }).waitFor({ state: "visible", timeout: 5_000 });
 
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
