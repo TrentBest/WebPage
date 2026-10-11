@@ -1,0 +1,51 @@
+@page "/institutions"
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager Navigation
+<PageTitle>Institutional Briefing // The Singularity Workshop</PageTitle>
+
+<div class="institution-brief">
+    <div class="brief-signal"><span></span> THE SINGULARITY WORKSHOP <i> / INSTITUTIONAL BRIEFING</i></div>
+    <main class="brief-layout">
+        <section class="brief-message">
+            <div class="brief-kicker">FOR INNOVATION PROGRAMS · RESEARCH INSTITUTIONS · PUBLIC-SECTOR PARTNERS</div>
+            <h1>Make complex<br/>systems <em>composable.</em></h1>
+            <p class="brief-lede">The Workshop develops small, independently useful .NET building blocks for systems whose behavior, capabilities, and presentation need to evolve without becoming one inseparable application.</p>
+            <div class="brief-claim"><b>THE PROPOSITION</b><span>Integrate capabilities into existing .NET systems. Keep responsibilities explicit. Compose the experience around the mission.</span></div>
+            <div class="brief-actions">
+                <button @onclick="RequestBriefing">REQUEST A TECHNICAL BRIEFING <b>↗</b></button>
+                <a href="https://github.com/TrentBest" target="_blank" rel="noopener noreferrer">INSPECT THE OPEN WORK ↗</a>
+            </div>
+        </section>
+        <section class="brief-system" aria-label="Workshop architecture">
+            <div class="system-heading"><span>REFERENCE ARCHITECTURE</span><span>01—04</span></div>
+            <div class="system-node node-domain"><small>01 / WHAT EXISTS</small><b>MicroBundleDomain</b><span>Capability contracts and identity</span></div>
+            <div class="system-link">↓ declare behavior</div>
+            <div class="system-node node-fsm"><small>02 / HOW IT CHANGES</small><b>FSM_API</b><span>Explicit, testable state transitions</span></div>
+            <div class="system-link">↓ compose capabilities</div>
+            <div class="system-node node-cos"><small>03 / HOW IT ASSEMBLES</small><b>FSM_COS</b><span>Manifest-driven runtime composition</span></div>
+            <div class="system-link">↓ present in a host</div>
+            <div class="system-node node-host"><small>04 / WHERE IT LIVES</small><b>Existing .NET application</b><span>Web · desktop · simulation · domain-specific host</span></div>
+            <div class="system-foot">MODULARITY IS THE DESIGN GOAL. VALIDATION IS THE EVIDENCE.</div>
+        </section>
+    </main>
+    <footer class="brief-footer"><span>TECHNICAL DIALOGUE, NOT A SALES DECK.</span><span>Research prototypes and maturity are discussed honestly.</span></footer>
+</div>
+
+<style>
+.institution-brief{--cyan:#00eaff;--pink:#ff2cff;--gold:#ffd34d;position:relative;isolation:isolate;width:100%;height:100%;min-height:0;overflow:hidden;box-sizing:border-box;padding:clamp(.8rem,2.4vh,1.6rem) clamp(1rem,3vw,2.8rem);background:radial-gradient(ellipse at 15% 35%,#092337 0,transparent 42%),radial-gradient(ellipse at 85% 65%,#210c2c 0,transparent 35%),#020711;color:#eaf8ff;font-family:system-ui,sans-serif;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(.7rem,1.8vh,1.3rem}
+.brief-signal,.brief-kicker,.system-heading,.system-node small,.system-link,.system-foot,.brief-footer{font:700 .62rem Consolas,monospace;letter-spacing:.12em}.brief-signal{color:#a6c0cc;display:flex;gap:.65rem;align-items:center}.brief-signal>span{width:.5rem;height:.5rem;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}.brief-signal i{font-style:normal;color:var(--pink)}
+.brief-layout{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.78fr);gap:clamp(1.2rem,4vw,4rem);align-items:center;max-width:1450px;width:100%;margin:auto}.brief-message{min-width:0}.brief-kicker{color:#80a9bb;line-height:1.6}.brief-message h1{font-size:clamp(2.8rem,6.2vw,6rem);line-height:.9;letter-spacing:-.065em;margin:1rem 0 1.1rem}.brief-message h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 35px #00eaff30}.brief-lede{max-width:60ch;font-size:clamp(.86rem,1.2vw,1.04rem);line-height:1.7;color:#b3c8d2}.brief-claim{display:grid;gap:.45rem;margin-top:1.2rem;padding:.9rem 1rem;border-left:2px solid var(--pink);background:#ff2cff0a;max-width:610px}.brief-claim b{font:800 .65rem Consolas,monospace;letter-spacing:.1em;color:#ffadff}.brief-claim span{font-size:.85rem;line-height:1.55;color:#c3d2da}.brief-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.8rem;margin-top:1.35rem}.brief-actions button,.brief-actions a{display:inline-flex;align-items:center;gap:.7rem;padding:.8rem .9rem;border:1px solid #00eaff70;background:#00eaff0b;color:#eaf8ff;text-decoration:none;font:800 .63rem Consolas,monospace;letter-spacing:.04em;cursor:pointer}.brief-actions button{background:var(--cyan);color:#031019;border-color:var(--cyan)}.brief-actions button:hover{background:#a8fbff}.brief-actions a:hover{border-color:var(--pink)}
+.brief-system{min-width:0;padding:clamp(.9rem,2vw,1.5rem);border:1px solid #1b4558;background:linear-gradient(145deg,#071522ed,#030711f2);box-shadow:0 20px 70px #0005}.system-heading{display:flex;justify-content:space-between;color:#7198a9;margin-bottom:.8rem}.system-node{display:grid;gap:.3rem;padding:.7rem .85rem;border:1px solid #244657;background:#05101b}.system-node small{font-size:.55rem;color:#7ea4b4}.system-node b{font:800 clamp(.82rem,1.25vw,1.02rem) Consolas,monospace}.system-node span{font-size:.73rem;line-height:1.4;color:#9eb7c3}.node-domain{border-left:3px solid var(--gold)}.node-fsm{border-left:3px solid var(--cyan)}.node-cos{border-left:3px solid var(--pink)}.node-host{border-left:3px solid #52e05a}.system-link{text-align:center;color:#638c9d;font-size:.55rem;padding:.28rem}.system-foot{border-top:1px solid #1b3544;margin-top:.7rem;padding-top:.7rem;color:#ffd34d;font-size:.53rem;line-height:1.5}.brief-footer{display:flex;justify-content:space-between;gap:1rem;color:#648493;font-size:.55rem;line-height:1.5}
+@media(max-width:800px){.brief-layout{grid-template-columns:minmax(0,1fr) minmax(240px,.8fr);gap:1rem}.brief-message h1{font-size:clamp(2.4rem,6vw,4rem)}.brief-system{padding:.8rem}.system-node{padding:.5rem .65rem}.system-node span{font-size:.65rem}}
+@media(max-width:620px){.institution-brief{height:100%;padding:.75rem;gap:.6rem}.brief-layout{grid-template-columns:1fr;gap:.6rem;align-content:center}.brief-message h1{font-size:clamp(2.2rem,9vw,3.5rem);margin:.55rem 0}.brief-kicker{font-size:.53rem}.brief-lede{font-size:.78rem;line-height:1.45;margin:.5rem 0}.brief-claim{margin-top:.5rem;padding:.55rem .7rem}.brief-claim span{font-size:.72rem}.brief-actions{margin-top:.6rem;gap:.45rem}.brief-actions button,.brief-actions a{font-size:.53rem;padding:.6rem}.brief-system{padding:.55rem}.system-heading{margin-bottom:.4rem}.system-node{padding:.35rem .55rem;gap:.15rem}.system-node b{font-size:.75rem}.system-node span{font-size:.58rem}.system-node small{font-size:.48rem}.system-link{padding:.12rem;font-size:.48rem}.system-foot{margin-top:.35rem;padding-top:.35rem;font-size:.46rem}.brief-footer{font-size:.46rem}.brief-footer span:last-child{display:none}}
+@media(max-height:700px) and (min-width:621px){.brief-message h1{font-size:clamp(2.4rem,5vw,4.4rem);margin:.55rem 0}.brief-lede{line-height:1.45;margin:.5rem 0}.brief-claim{margin-top:.55rem;padding:.6rem .8rem}.brief-actions{margin-top:.65rem}.brief-system{padding:.8rem}.system-node{padding:.45rem .65rem}.system-link{padding:.12rem}.brief-footer{font-size:.5rem}}
+</style>
+
+@code {
+    private void RequestBriefing()
+    {
+        var subject = Uri.EscapeDataString("Institutional technical briefing — The Singularity Workshop");
+        var body = Uri.EscapeDataString("Hello,\n\nI'd like to discuss The Singularity Workshop's technology and potential fit for our institution or program.\n\nOrganization / program:\nMission or problem area:\nTechnical constraints / existing .NET environment:\nDesired next step:\n\nThank you.");
+        Navigation.NavigateTo($"mailto:thesingularityworkshop@gmail.com?subject={subject}&body={body}");
+    }
+}
