@@ -51,10 +51,10 @@
 .app-controls{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem clamp(1rem,4vw,3.5rem);border-top:1px solid #00eaff22}.dots{display:flex;gap:.35rem}.dots button{width:1.8rem;height:1.8rem;display:grid;place-items:center;border:1px solid transparent;border-radius:50%;background:transparent;cursor:pointer}.dots button span{width:.42rem;height:.42rem;border-radius:50%;background:#34505e}.dots button.active{border-color:#00eaff66}.dots button.active span{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}.hint{color:#7899a8;font-size:.58rem;letter-spacing:.08em}.hint small{margin-left:.7rem;color:#4f707e}.arrows{display:flex;gap:.3rem}.arrows button{width:2.4rem;height:2.3rem;border:1px solid #00eaff44;background:#00eaff0a;color:white;font-size:1.1rem;cursor:pointer}.arrows button:disabled{opacity:.2}
 @@keyframes appOrbit{to{transform:rotate(360deg)}}@@keyframes appWake{from{opacity:0;filter:blur(8px);transform:translateY(.8rem) scale(1.01)}to{opacity:1;filter:none;transform:none}}
 @@media(max-width:760px){.app-head{padding:.7rem 1rem;font-size:.52rem}.app-scene{padding:1rem}.scene{grid-template-columns:1fr;gap:.65rem;align-content:center}.copy>small{margin-bottom:.75rem}.copy h1{font-size:clamp(2.4rem,10vw,4rem);margin-bottom:.7rem}.copy h2{font-size:1.15rem}.copy p{font-size:.83rem;line-height:1.48;margin:.6rem 0}.orbit{position:absolute;width:48vw;right:-1rem;bottom:2rem;opacity:.42;pointer-events:none}.orbit button{display:none}.worlds{gap:.25rem}.worlds button{padding:.45rem .35rem}.worlds button b{font-size:.54rem}.worlds button small{font-size:.57rem}.pipeline>div{padding:.55rem .7rem}.desktop{width:75%;max-height:28vh}.desktop footer{font-size:.43rem}.app-controls{padding:.45rem .7rem;gap:.4rem}.hint{font-size:0}.hint small{display:none}.hint:before{content:'↕';font-size:1rem;color:var(--pink)}}
-/* Keep every scene inside the host panel: fit the composition, not the browser page. */
+/* Keep the host panel bounded without clipping the copy as a second, hidden viewport. */
 .app-scene{min-height:0;min-width:0;overflow:hidden}
-.scene{min-height:0;min-width:0;overflow:hidden}
-.copy{max-height:100%;overflow:hidden}
+.scene{min-height:0;min-width:0;overflow:visible}
+.copy{max-height:none;overflow:visible;min-height:0}
 .copy h1{font-size:clamp(2rem,min(6.6vw,8.5vh),6rem)}
 .copy p{font-size:clamp(.78rem,min(1vw,1.65vh),1rem);line-height:1.48;margin:.6rem 0}
 .orbit,.swap,.pipeline,.desktop{max-height:100%;min-height:0}
@@ -118,4 +118,25 @@
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+}
+
+/* Short screens compress the composition before content reaches the host boundary. */
+@@media(max-height:850px) and (min-width:761px){
+ .copy h1{font-size:clamp(1.8rem, min(5.2vw,7vh),4.7rem);margin-bottom:.55rem}
+ .copy>small{margin-bottom:.55rem;font-size:.58rem}
+ .copy h2{font-size:clamp(1rem,2vh,1.4rem);margin-bottom:.45rem}
+ .copy p{font-size:clamp(.72rem,1.45vh,.9rem);line-height:1.36;margin:.4rem 0}
+ .copy button,.source-link{margin-top:.65rem;padding:.65rem .75rem;font-size:.58rem}
+ .callout{margin-top:.55rem;padding:.65rem}
+ .callout span{font-size:.72rem}
+}
+@@media(max-width:760px){
+ .app-scene{padding:.7rem;overflow:hidden}
+ .scene{gap:.35rem;overflow:visible}
+ .copy{max-height:none;overflow:visible}
+ .copy h1{font-size:clamp(1.9rem,8.8vw,3.5rem);line-height:.9;margin-bottom:.55rem}
+ .copy>small{font-size:.56rem;margin-bottom:.55rem}
+ .copy p{font-size:clamp(.72rem,2.5vw,.86rem);line-height:1.38;margin:.45rem 0}
+ .copy button,.source-link{margin-top:.65rem;padding:.65rem .7rem}
+ .callout{margin-top:.6rem;padding:.65rem}
 }
