@@ -26,7 +26,7 @@
             <div class="top-row workshop-tab-header workshop-top-row-placeholder" aria-hidden="true"></div>
         }
 
-        <article class="content px-4 @(IsWorkshopLanding ? "workshop-content" : "")">@Body</article>
+        <article class="content px-4 @(IsWorkshopLanding || IsImmersiveDestination ? "workshop-content" : "")">@Body</article>
         @if (_worldAnnouncementVisible && _worldAnnouncement is not null)
         {
             <section class="world-event-announcement" role="status" aria-live="assertive">
