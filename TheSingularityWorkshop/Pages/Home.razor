@@ -176,7 +176,7 @@
         var sequence = 10;
         RenderHubTab(builder, ref sequence, "MONIKER", "THE WORKSHOP", "MONIKER");
         foreach (var item in manifest.Hub)
-            RenderHubTab(builder, ref sequence, item.Name.ToUpperInvariant(), item.Name, item.Name);
+            RenderHubTab(builder, ref sequence, item.Name.ToUpperInvariant(), item.Name.ToUpperInvariant(), item.Name);
         RenderHubTab(builder, ref sequence, "SUPPORT", "SUPPORT", "SUPPORT");
         builder.CloseElement();
 
