@@ -51,6 +51,31 @@
 .app-controls{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem clamp(1rem,4vw,3.5rem);border-top:1px solid #00eaff22}.dots{display:flex;gap:.35rem}.dots button{width:1.8rem;height:1.8rem;display:grid;place-items:center;border:1px solid transparent;border-radius:50%;background:transparent;cursor:pointer}.dots button span{width:.42rem;height:.42rem;border-radius:50%;background:#34505e}.dots button.active{border-color:#00eaff66}.dots button.active span{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}.hint{color:#7899a8;font-size:.58rem;letter-spacing:.08em}.hint small{margin-left:.7rem;color:#4f707e}.arrows{display:flex;gap:.3rem}.arrows button{width:2.4rem;height:2.3rem;border:1px solid #00eaff44;background:#00eaff0a;color:white;font-size:1.1rem;cursor:pointer}.arrows button:disabled{opacity:.2}
 @@keyframes appOrbit{to{transform:rotate(360deg)}}@@keyframes appWake{from{opacity:0;filter:blur(8px);transform:translateY(.8rem) scale(1.01)}to{opacity:1;filter:none;transform:none}}
 @@media(max-width:760px){.app-head{padding:.7rem 1rem;font-size:.52rem}.app-scene{padding:1rem}.scene{grid-template-columns:1fr;gap:.65rem;align-content:center}.copy>small{margin-bottom:.75rem}.copy h1{font-size:clamp(2.4rem,10vw,4rem);margin-bottom:.7rem}.copy h2{font-size:1.15rem}.copy p{font-size:.83rem;line-height:1.48;margin:.6rem 0}.orbit{position:absolute;width:48vw;right:-1rem;bottom:2rem;opacity:.42;pointer-events:none}.orbit button{display:none}.worlds{gap:.25rem}.worlds button{padding:.45rem .35rem}.worlds button b{font-size:.54rem}.worlds button small{font-size:.57rem}.pipeline>div{padding:.55rem .7rem}.desktop{width:75%;max-height:28vh}.desktop footer{font-size:.43rem}.app-controls{padding:.45rem .7rem;gap:.4rem}.hint{font-size:0}.hint small{display:none}.hint:before{content:'↕';font-size:1rem;color:var(--pink)}}
+/* Keep every scene inside the host panel: fit the composition, not the browser page. */
+.app-scene{min-height:0;min-width:0;overflow:hidden}
+.scene{min-height:0;min-width:0;overflow:hidden}
+.copy{max-height:100%;overflow:hidden}
+.copy h1{font-size:clamp(2rem,min(6.6vw,8.5vh),6rem)}
+.copy p{font-size:clamp(.78rem,min(1vw,1.65vh),1rem);line-height:1.48;margin:.6rem 0}
+.orbit,.swap,.pipeline,.desktop{max-height:100%;min-height:0}
+.orbit{width:min(34vw,58vh,410px)}
+.pipeline{transform:scale(.92);transform-origin:center}
+.desktop{width:min(100%,55vh,410px)}
+.app-head{padding-block:clamp(.45rem,1.2vh,1rem)}
+.app-controls{padding-block:clamp(.35rem,.9vh,.65rem)}
+@@media(max-height:720px) and (min-width:761px){
+ .scene{gap:clamp(1rem,3vw,3rem)}
+ .copy>small{margin-bottom:.65rem}
+ .copy h1{font-size:clamp(2rem,5.7vw,4.5rem);margin-bottom:.65rem}
+ .copy h2{font-size:1.15rem}
+ .copy p{font-size:.8rem;line-height:1.4}
+ .callout{margin-top:.7rem;padding:.7rem}
+ .orbit{width:min(30vw,47vh,330px)}
+ .pipeline{transform:scale(.82)}
+ .desktop{width:min(100%,45vh,350px)}
+ .app-head{padding-block:.5rem}
+ .app-controls{padding-block:.35rem}
+}
 @@media(prefers-reduced-motion:reduce){.anyapp-life:before,.anyapp-life:after{animation:none}.app-scene{transition:none}.fading-in .app-scene{animation:none}}
 </style>
 
