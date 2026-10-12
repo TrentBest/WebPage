@@ -20,7 +20,9 @@
     @if (!collapseNavMenu)
     {
         <div class="workshop-nav-links">
-            @foreach (var item in Experience.Manifest?.Hub ?? Array.Empty<WebPageManifestHubItem>())
+            @foreach (var item in Experience.Manifest?.Hub.Where(item =>
+                string.Equals(item.Name, "Welcome", StringComparison.OrdinalIgnoreCase))
+                ?? Array.Empty<WebPageManifestHubItem>())
             {
                 <NavLink class="nav-link" href="@HubTabHref(item.Name)" @onclick="() => SelectHubDestination(item.Name)">@item.Name</NavLink>
             }
