@@ -21,8 +21,8 @@ main { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; flex-directio
 .top-row ::deep a:hover, .top-row ::deep .btn-link:hover { color: #ff2cff; }
 .top-row ::deep a:first-child { overflow: hidden; text-overflow: ellipsis; }
 
-article { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; height: auto; overflow: auto; overflow-x: hidden; padding: 0 !important; background: #050a14; transition: flex-basis 1200ms cubic-bezier(.16,1,.3,1), height 1200ms cubic-bezier(.16,1,.3,1), padding 1200ms cubic-bezier(.16,1,.3,1), transform 1200ms cubic-bezier(.16,1,.3,1); }
-article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: hidden !important; }
+main > article.content { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; height: auto; overflow: auto; overflow-x: hidden; padding: 0 !important; background: #050a14; transition: flex-basis 1200ms cubic-bezier(.16,1,.3,1), height 1200ms cubic-bezier(.16,1,.3,1), padding 1200ms cubic-bezier(.16,1,.3,1), transform 1200ms cubic-bezier(.16,1,.3,1); }
+main > article.content:has(.hypervisor-shell), main > article.content:has(.living-sequence-shell) { overflow: hidden !important; }
 
 .workshop-page .workshop-sidebar { width: 0; flex: 0 0 0; border-right-width: 0; opacity: 0; overflow: hidden; transition: width 2000ms cubic-bezier(.16,1,.3,1), flex-basis 2000ms cubic-bezier(.16,1,.3,1), border-right-width 2000ms ease, opacity 2000ms ease; }
 .workshop-page.workshop-chrome-visible .workshop-sidebar { width: 200px; flex-basis: 200px; border-right-width: 1px; opacity: 1; }
@@ -229,7 +229,7 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .workshop-page .workshop-sidebar, .workshop-page .workshop-top-row-placeholder, .top-row, article { transition: none; }
+    .workshop-page .workshop-sidebar, .workshop-page .workshop-top-row-placeholder, .top-row, main > article.content { transition: none; }
     .workshop-page .workshop-content ::deep .hello-moniker, .workshop-page .workshop-content ::deep .hello-glyph { animation: none !important; }
 }
 
