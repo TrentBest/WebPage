@@ -206,21 +206,9 @@
         }
         else if (string.Equals(_selectedHubTab, "WELCOME", StringComparison.OrdinalIgnoreCase))
         {
-            builder.OpenElement(sequence++, "section");
-            builder.AddAttribute(sequence++, "class", "welcome-signal");
-            builder.AddAttribute(sequence++, "style", "position:relative;left:auto;bottom:auto;transform:none;");
-            builder.AddAttribute(sequence++, "aria-label", "Welcome to The Singularity Workshop");
-            builder.OpenElement(sequence++, "div");
-            builder.AddAttribute(sequence++, "class", "welcome-eyebrow");
-            builder.AddContent(sequence++, "A LIVING WORKSHOP");
-            builder.CloseElement();
-            builder.OpenElement(sequence++, "h1");
-            builder.AddContent(sequence++, "Ideas become systems. Systems become experiences.");
-            builder.CloseElement();
-            builder.OpenElement(sequence++, "p");
-            builder.AddContent(sequence++, "Explore a growing workshop where explicit state and composable capabilities become living experiences across different environments.");
-            builder.CloseElement();
-            builder.CloseElement();
+            // Welcome is a hands-on Experience composed through the Workshop GUI builders.
+            builder.OpenComponent<TheSingularityWorkshop.Components.WelcomeExperience>(sequence++);
+            builder.CloseComponent();
         }
         else if (string.Equals(_selectedHubTab, "SUPPORT", StringComparison.OrdinalIgnoreCase))
         {
