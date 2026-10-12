@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Components
 @using TheSingularityWorkshop.FSM_API
+@using FsmApi = TheSingularityWorkshop.FSM_API.FSM_API
 @using TheSingularityWorkshop.Gui
 @implements IDisposable
 
@@ -40,7 +41,7 @@
         _events.Clear();
         _machineName = $"WelcomeLabMachine_{_labId}_{Guid.NewGuid():N}";
 
-        var machine = FSM_API.Create.CreateFiniteStateMachine(
+        var machine = FsmApi.Create.CreateFiniteStateMachine(
             _machineName,
             processRate: -1,
             processingGroup: _processingGroup);
@@ -69,7 +70,7 @@
         machine.Transition("Running", "Complete", ctx => ((WelcomeLabContext)ctx).UpdateCount >= 3);
         machine.BuildDefinition();
 
-        _handle = FSM_API.Create.CreateInstance(_machineName, _context, _processingGroup);
+        _handle = FsmApi.Create.CreateInstance(_machineName, _context, _processingGroup);
     }
 
     private void Begin()
@@ -86,7 +87,7 @@
         if (!IsRunning)
             return;
 
-        FSM_API.Interaction.Update(_processingGroup);
+        FsmApi.Interaction.Update(_processingGroup);
         StateHasChanged();
     }
 
@@ -193,16 +194,17 @@
         {
             var active = string.Equals(CurrentState, state, StringComparison.Ordinal);
             var accent = state switch { "Ready" => Cyan, "Running" => Magenta, _ => Green };
-            stateFlow.Content(WorkshopGui.Panel(this)
+            var stateCard = WorkshopGui.Panel(this)
                 .Style("padding", ".7rem .4rem")
                 .Style("text-align", "center")
                 .Style("border", $"1px solid {accent}{(active ? "cc" : "33")}")
-                .Style("background", active ? $"{accent}16" : "rgba(255,255,255,.015)")
-                .Content(WorkshopGui.Element(this, "div")
-                    .Style("color", accent)
-                    .Style("font-size", ".58rem")
-                    .Style("font-weight", "800")
-                    .Text(state)));
+                .Style("background", active ? $"{accent}16" : "rgba(255,255,255,.015)");
+            stateCard.Content(WorkshopGui.Element(this, "div")
+                .Style("color", accent)
+                .Style("font-size", ".58rem")
+                .Style("font-weight", "800")
+                .Text(state));
+            stateFlow.Content(stateCard);
         }
         machine.Content(stateFlow);
 
