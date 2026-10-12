@@ -41,3 +41,22 @@ Historical working implementations are worth inspecting before rewriting anythin
 Do not declare success from unit tests alone. For visual work, verify the browser manifestation.
 
 The Workshop is deliberately weird. That is a feature. The software is supposed to demonstrate itself.
+
+
+## Demonstrations gallery — implementation checkpoint (2026-10-12)
+
+The Demonstrations tab and manifest-backed gallery are being introduced on `development`.
+
+- `webpage-host.manifest.json` now declares a Demonstrations hub destination and three source-backed entries: WebGPU instancing, native WPF/Direct3D 12 surface, and Renderer Event Horizon buckets.
+- `DemonstrationRegistry` resolves entries by stable ID and reports whether declared host capabilities are present.
+- The gallery/detail view is hosted by the existing Home experience; detail links return to the gallery. No second router or standalone demo framework was added.
+- No **Run demonstration** action is shown because none of the three proofs has a verified runnable destination inside WebPage. The WebGPU entry documents its local-server instructions instead.
+- The current registry is a metadata-discovery increment, not yet an executable `IExperience` registry. Do not claim the external proofs are registered for Hub-owned execution or that their processing groups are integrated.
+
+Next verification steps:
+1. Build the solution and run `SingularityHub.Tests`.
+2. Verify the landing/Moniker sequence is unchanged.
+3. Open Demonstrations, each detail view, and the return-to-gallery link in an actual browser.
+4. Check desktop and narrow layouts, and verify the navigation collapses as before.
+5. Update this checkpoint with actual build/test/browser evidence; do not infer success from commits alone.
+6. Do not merge or publish without explicit authorization.
