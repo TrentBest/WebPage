@@ -66,33 +66,39 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
 }
 
 
-/* The navigation becomes an overlay rail. It must not take width away from
-   the stage; the expander travels into the top header's left-side control slot. */
+/* The Hub navigation and primary stage are adjacent flex siblings.
+   The rail owns its width; the main panel receives the remaining viewport.
+   This prevents the rail's vertical edge from floating over the experience. */
 @media (min-width: 641px) {
     .workshop-page.workshop-hub-split {
-        display: block;
+        display: flex;
+        flex-direction: row;
         position: relative;
         overflow: hidden;
     }
     .workshop-page.workshop-hub-split > .workshop-sidebar {
-        position: absolute;
-        inset: 0 auto 0 0;
+        position: relative;
+        inset: auto;
+        display: block;
         width: 3.4rem !important;
         min-width: 3.4rem !important;
         max-width: 3.4rem !important;
         height: 100%;
-        flex: none !important;
+        flex: 0 0 3.4rem !important;
         z-index: 20;
         background: linear-gradient(180deg, rgba(3,8,18,.97), rgba(7,2,17,.93));
-        transition: width 900ms cubic-bezier(.16,1,.3,1), max-width 900ms cubic-bezier(.16,1,.3,1);
+        transition: width 900ms cubic-bezier(.16,1,.3,1), flex-basis 900ms cubic-bezier(.16,1,.3,1), max-width 900ms cubic-bezier(.16,1,.3,1);
     }
     .workshop-page.workshop-hub-split > .workshop-sidebar:has(.workshop-nav-shell.expanded) {
         width: 12.5rem !important;
+        min-width: 12.5rem !important;
         max-width: 12.5rem !important;
+        flex-basis: 12.5rem !important;
     }
     .workshop-page.workshop-hub-split > main {
         position: relative;
-        width: 100%;
+        flex: 1 1 0%;
+        width: auto;
         height: 100%;
         min-width: 0;
         margin: 0;
