@@ -16,7 +16,7 @@ try {
   await page.screenshot({ path: `${outputDir}/01-gateway.png`, fullPage: true });
 
   await page.getByRole("button", { name: /enter the singularity workshop/i }).click();
-  const moniker = page.locator(".hello-moniker");
+  const moniker = page.locator(".workshop-persistent-moniker .hello-moniker");
   await moniker.waitFor({ state: "visible", timeout: 180_000 });
   const monikerNode = await moniker.elementHandle();
   if (!monikerNode) {
@@ -49,41 +49,12 @@ try {
   if (await page.locator(".workshop-nav-links").count() !== 0) {
     throw new Error("Selecting Welcome must retract the navigation to the expander only.");
   }
-  await page.waitForFunction(() => {
-    const stage = document.querySelector(".workshop-running-surface.destination-selected .living-experience-panel");
-    return stage && getComputedStyle(stage).visibility === "hidden";
-  });
+  await page.locator(".workshop-persistent-moniker").waitFor({ state: "detached" });
   const sidebarWidth = await page.locator(".workshop-sidebar").evaluate(el => el.getBoundingClientRect().width);
   if (sidebarWidth > 60) {
     throw new Error(`The collapsed navigation should leave only the expander rail; width was ${sidebarWidth}px.`);
   }
 
-  console.log("Welcome render diagnostic", JSON.stringify({
-    url: page.url(),
-    selectedTab: await page.locator(".workshop-hub-overlay").getAttribute("data-selected-hub-tab"),
-    overlayText: await page.locator(".workshop-hub-overlay").innerText(),
-    headings: await page.locator("h1").allTextContents(),
-    headingLayout: await page.locator("h1").first().evaluate(el => {
-      const chain = [];
-      for (let node = el; node && chain.length < 8; node = node.parentElement) {
-        const style = getComputedStyle(node);
-        const rect = node.getBoundingClientRect();
-        chain.push({
-          tag: node.tagName,
-          className: node.className?.baseVal ?? node.className,
-          visibility: style.visibility,
-          display: style.display,
-          opacity: style.opacity,
-          position: style.position,
-          width: rect.width,
-          height: rect.height,
-          left: rect.left,
-          top: rect.top
-        });
-      }
-      return chain;
-    })
-  }));
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
   await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
