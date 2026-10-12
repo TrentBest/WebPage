@@ -1,6 +1,6 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
@@ -11,33 +11,13 @@
   ],
   "hub": [
     {
-      "name": "Ecosystem",
-      "kind": "Explore",
-      "description": "Trace the Workshop's reusable .NET capabilities, see how packages fit together, and inspect source and releases.",
+      "name": "Welcome",
+      "kind": "Welcome",
+      "description": "Welcome to The Singularity Workshop: a living exploration of the systems, ideas, and experiences being built here.",
       "deploymentUrl": null,
       "aboutUrl": "/about-us",
       "bridgeEndpoint": null,
-      "route": "/ecosystem",
-      "microBundles": []
-    },
-    {
-      "name": "Schedule Consultation",
-      "kind": "Consultation",
-      "description": "Request a technical consultation, coordinate a time, and manage Workshop appointments.",
-      "deploymentUrl": null,
-      "aboutUrl": "/about-us",
-      "bridgeEndpoint": null,
-      "route": "/schedule",
-      "microBundles": []
-    },
-    {
-      "name": "Institutions",
-      "kind": "Institutional Briefing",
-      "description": "A focused technical briefing for institutions, research programs, and innovation organizations evaluating the Workshop's technology and potential fit.",
-      "deploymentUrl": null,
-      "aboutUrl": "/about-us",
-      "bridgeEndpoint": null,
-      "route": "/institutions",
+      "route": "/",
       "microBundles": []
     }
   ],
