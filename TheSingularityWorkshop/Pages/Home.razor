@@ -115,20 +115,10 @@
             builder.AddAttribute(1, "class", "workshop-running-surface");
             builder.OpenElement(2, "div");
             builder.AddAttribute(3, "class", "workshop-running-hub");
-            if (FSM.CurrentState == PageFSM.Running)
-            {
-                BuildManifestHub(builder);
-            }
-            else
-            {
-                builder.OpenElement(4, "div");
-                builder.AddAttribute(5, "class", "manifest-hub-arrival");
-                builder.OpenElement(6, "span");
-                builder.AddAttribute(7, "class", "manifest-hub-pulse");
-                builder.CloseElement();
-                builder.AddContent(8, "WORKSHOP HUB ARRIVING");
-                builder.CloseElement();
-            }
+            // Keep the same landing surface through NavigationArrival. The hub
+            // chrome may manifest, but the moniker is cleared only by a visitor
+            // selecting a destination from the navigation.
+            BuildManifestHub(builder);
             builder.CloseElement();
             builder.CloseElement();
             return;
