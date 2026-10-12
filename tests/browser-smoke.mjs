@@ -62,7 +62,27 @@ try {
     url: page.url(),
     selectedTab: await page.locator(".workshop-hub-overlay").getAttribute("data-selected-hub-tab"),
     overlayText: await page.locator(".workshop-hub-overlay").innerText(),
-    headings: await page.locator("h1").allTextContents()
+    headings: await page.locator("h1").allTextContents(),
+    headingLayout: await page.locator("h1").first().evaluate(el => {
+      const chain = [];
+      for (let node = el; node && chain.length < 8; node = node.parentElement) {
+        const style = getComputedStyle(node);
+        const rect = node.getBoundingClientRect();
+        chain.push({
+          tag: node.tagName,
+          className: node.className?.baseVal ?? node.className,
+          visibility: style.visibility,
+          display: style.display,
+          opacity: style.opacity,
+          position: style.position,
+          width: rect.width,
+          height: rect.height,
+          left: rect.left,
+          top: rect.top
+        });
+      }
+      return chain;
+    })
   }));
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
