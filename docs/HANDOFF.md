@@ -52,6 +52,7 @@ The Demonstrations tab and manifest-backed gallery are being introduced on `deve
 - The gallery/detail view is hosted by the existing Home experience; detail links return to the gallery. No second router or standalone demo framework was added.
 - No **Run demonstration** action is shown because none of the three proofs has a verified runnable destination inside WebPage. The WebGPU entry documents its local-server instructions instead.
 - The current registry is a metadata-discovery increment, not yet an executable `IExperience` registry. Do not claim the external proofs are registered for Hub-owned execution or that their processing groups are integrated.
+- Gallery-specific cards/details/diagrams currently extend Home's existing RenderTreeBuilder Hub presentation path. They remain inside the Workshop GUI root and use no separate UI framework, but are not yet a fully platform-neutral GUI builder tree. Inspect the active GUI builder/rendering contract before claiming this boundary complete; a reusable Link/action primitive may be needed.
 
 Next verification steps:
 1. Build the solution and run `SingularityHub.Tests`.
