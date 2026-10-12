@@ -18,16 +18,10 @@
     @if (!collapseNavMenu)
     {
         <div class="workshop-nav-links">
-            @if (Experience.Manifest?.Hub is { Count: > 0 } hub)
+            <NavLink class="nav-link welcome-link" href="/" @onclick="WelcomeSelected">Welcome</NavLink>
+            @if (welcomeSelected)
             {
-                @foreach (var item in hub)
-                {
-                    var href = item.Route ?? item.DeploymentUrl;
-                    if (!string.IsNullOrWhiteSpace(href))
-                    {
-                        <NavLink class="nav-link" href="@href" @onclick="CollapseNavMenu">@item.Name</NavLink>
-                    }
-                }
+                <NavLink class="nav-link about-link" href="/about-us" @onclick="CollapseNavMenu">About Us</NavLink>
             }
         </div>
     }
@@ -45,7 +39,16 @@
 
 @code {
     private bool collapseNavMenu;
+    private bool welcomeSelected;
+
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+
+    private void WelcomeSelected()
+    {
+        welcomeSelected = true;
+        collapseNavMenu = true;
+    }
+
     private void CollapseNavMenu() => collapseNavMenu = true;
 
     protected override void OnInitialized()
