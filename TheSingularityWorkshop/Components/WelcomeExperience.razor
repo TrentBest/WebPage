@@ -84,6 +84,11 @@
 
         _context.StartRequested = true;
         StepMachine();
+
+        // FSM_API marks the destination state as not-yet-entered on transition.
+        // A second tick delivers that state's OnEnter lifecycle callback immediately.
+        if (CurrentState == "Running")
+            StepMachine();
     }
 
     private void StepMachine()
