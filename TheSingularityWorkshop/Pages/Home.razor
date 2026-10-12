@@ -174,7 +174,8 @@
             // The landing Moniker is a separate, persistent presentation layer.
             // It is not owned by the organism lifecycle or by hub arrival. Only
             // choosing another destination removes this component.
-            if (string.Equals(_selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase))
+            if (FSM.Context.MonikerReady &&
+                string.Equals(_selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase))
             {
                 builder.OpenElement(5, "div");
                 builder.AddAttribute(6, "class", "workshop-persistent-moniker");
