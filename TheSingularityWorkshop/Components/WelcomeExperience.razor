@@ -71,6 +71,10 @@
         machine.BuildDefinition();
 
         _handle = FsmApi.Create.CreateInstance(_machineName, _context, _processingGroup);
+
+        // Enter Ready during composition so the first visitor signal is evaluated
+        // as a signal, rather than being consumed by the FSM's initial lifecycle step.
+        FsmApi.Interaction.Update(_processingGroup);
     }
 
     private void Begin()
