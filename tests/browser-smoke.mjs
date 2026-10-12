@@ -16,7 +16,7 @@ try {
   await page.screenshot({ path: `${outputDir}/01-gateway.png`, fullPage: true });
 
   await page.getByRole("button", { name: /enter the singularity workshop/i }).click();
-  const moniker = page.locator(".workshop-persistent-moniker .hello-moniker");
+  const moniker = page.locator(".workshop-running-hub .living-experience-panel .hello-moniker");
   await moniker.waitFor({ state: "visible", timeout: 180_000 });
   const monikerNode = await moniker.elementHandle();
   if (!monikerNode) {
@@ -49,7 +49,7 @@ try {
   if (await page.locator(".workshop-nav-links").count() !== 0) {
     throw new Error("Selecting Welcome must retract the navigation to the expander only.");
   }
-  await page.locator(".workshop-persistent-moniker").waitFor({ state: "detached" });
+  await page.locator(".workshop-running-surface.destination-selected .living-experience-panel > .first-contact-stage").waitFor({ state: "hidden" });
   const sidebarWidth = await page.locator(".workshop-sidebar").evaluate(el => el.getBoundingClientRect().width);
   if (sidebarWidth > 60) {
     throw new Error(`The collapsed navigation should leave only the expander rail; width was ${sidebarWidth}px.`);
