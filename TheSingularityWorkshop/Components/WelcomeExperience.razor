@@ -154,7 +154,7 @@
 
         var workspace = WorkshopGui.MultiPanel(this)
             .Style("display", "grid")
-            .Style("grid-template-columns", "minmax(0,1.1fr) minmax(260px,.9fr)")
+            .Style("grid-template-columns", "repeat(auto-fit,minmax(min(100%,320px),1fr))")
             .Style("gap", "1rem")
             .Style("align-items", "stretch")
             .Style("margin-top", "1.2rem");
