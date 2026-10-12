@@ -18,7 +18,7 @@
     @if (!collapseNavMenu)
     {
         <div class="workshop-nav-links">
-            <NavLink class="nav-link welcome-link" href="/" @onclick="WelcomeSelected">Welcome</NavLink>
+            <NavLink class="nav-link welcome-link" href="/?tab=welcome" @onclick="WelcomeSelected">Welcome</NavLink>
             @if (welcomeSelected)
             {
                 <NavLink class="nav-link about-link" href="/about-us" @onclick="CollapseNavMenu">About Us</NavLink>
