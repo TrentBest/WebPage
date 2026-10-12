@@ -299,7 +299,7 @@
                 builder.AddAttribute(sequence++, "class", "demonstration-detail");
                 builder.OpenElement(sequence++, "a");
                 builder.AddAttribute(sequence++, "class", "demonstration-back");
-                builder.AddAttribute(sequence++, "href", "/?tab=demonstrations");
+                builder.AddAttribute(sequence++, "href", DemonstrationRoutes.Gallery);
                 builder.AddContent(sequence++, "← BACK TO DEMONSTRATIONS");
                 builder.CloseElement();
                 builder.OpenElement(sequence++, "h1");
@@ -316,7 +316,7 @@
             builder.AddAttribute(sequence++, "class", "demonstration-detail");
             builder.OpenElement(sequence++, "a");
             builder.AddAttribute(sequence++, "class", "demonstration-back");
-            builder.AddAttribute(sequence++, "href", "/?tab=demonstrations");
+            builder.AddAttribute(sequence++, "href", DemonstrationRoutes.Gallery);
             builder.AddContent(sequence++, "← BACK TO DEMONSTRATIONS");
             builder.CloseElement();
             builder.OpenElement(sequence++, "div");
@@ -409,7 +409,7 @@
             builder.OpenElement(sequence++, "div");
             builder.AddAttribute(sequence++, "class", "demonstration-actions");
             builder.OpenElement(sequence++, "a");
-            builder.AddAttribute(sequence++, "href", "/?tab=demonstrations&demo=" + Uri.EscapeDataString(demonstration.Id));
+            builder.AddAttribute(sequence++, "href", DemonstrationRoutes.Detail(demonstration.Id));
             builder.AddContent(sequence++, "READ EXPLANATION");
             builder.CloseElement();
             builder.OpenElement(sequence++, "a");
@@ -503,14 +503,7 @@
             ? "MONIKER"
             : requestedTab.Replace('-', ' ').Trim().ToUpperInvariant();
 
-        _selectedDemonstrationId = uri.Query
-            .TrimStart('?')
-            .Split('&', StringSplitOptions.RemoveEmptyEntries)
-            .Select(part => part.Split('=', 2))
-            .Where(parts => parts.Length == 2
-                && string.Equals(Uri.UnescapeDataString(parts[0].Replace('+', ' ')), "demo", StringComparison.OrdinalIgnoreCase))
-            .Select(parts => Uri.UnescapeDataString(parts[1].Replace('+', ' ')))
-            .FirstOrDefault();
+        _selectedDemonstrationId = DemonstrationRoutes.ReadSelectedId(uri.Query);
     }
 
     private void ExperienceChanged()
