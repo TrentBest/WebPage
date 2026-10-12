@@ -174,6 +174,7 @@
             {
                 builder.OpenElement(5, "div");
                 builder.AddAttribute(6, "class", "workshop-hub-overlay");
+                builder.AddAttribute(7, "data-selected-hub-tab", _selectedHubTab);
                 BuildManifestHub(builder);
                 builder.CloseElement();
             }
