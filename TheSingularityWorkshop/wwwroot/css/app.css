@@ -17,7 +17,7 @@ h1:focus{outline:none}a,.btn-link{color:#0071c1}.btn-primary{color:#fff;backgrou
 @container (max-aspect-ratio:1/1){.monolith-btn::before{width:72%!important;height:auto!important}}
 
 /* The Hub arrives as a layout transition, not a layout snap. */
-.workshop-page .workshop-sidebar,.workshop-page .workshop-top-row-placeholder,.top-row,article{transition-duration:1200ms}
+.workshop-page .workshop-sidebar,.workshop-page .workshop-top-row-placeholder,.top-row,main>article.content{transition-duration:1200ms}
 .workshop-page .workshop-sidebar{will-change:width,height,flex-basis,opacity}
 .workshop-page .workshop-top-row-placeholder{will-change:flex-basis,height,padding,opacity}
 .workshop-page .workshop-content{will-change:height,width}
