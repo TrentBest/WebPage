@@ -83,7 +83,10 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
         width: 3.4rem !important;
         min-width: 3.4rem !important;
         max-width: 3.4rem !important;
-        height: 100%;
+        height: auto;
+        min-height: 0;
+        align-self: flex-start;
+        border-right-width: 0;
         flex: 0 0 3.4rem !important;
         z-index: 20;
         background: linear-gradient(180deg, rgba(3,8,18,.97), rgba(7,2,17,.93));
@@ -114,11 +117,16 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
         flex: 1 1 auto;
     }
     .workshop-page.workshop-hub-split .workshop-nav-shell {
-        min-height: 100%;
+        min-height: 0;
+        height: auto;
         padding: 0;
         background: transparent;
         border-right: 0;
         box-shadow: none;
+    }
+    .workshop-page.workshop-hub-split .workshop-nav-shell.collapsed .workshop-nav-head {
+        min-height: 2.4rem;
+        height: 2.4rem;
     }
     .workshop-page.workshop-hub-split .workshop-nav-head {
         position: static;
