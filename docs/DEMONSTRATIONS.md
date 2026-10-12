@@ -29,10 +29,12 @@ WorkshopExperienceService
 DemonstrationRegistry (manifest-backed metadata discovery)
         |
         v
-Home / Workshop GUI presentation
+Home's existing Hub presentation adapter
 ```
 
 The manifest describes entries and their limitations; it does not embed executable behavior. The registry keeps unavailable/source-only entries discoverable so the detail view can explain why they cannot run here. The host currently declares WebPage and Browser as host capabilities. GPU/WebGPU and native WPF/Direct3D 12 execution are not claimed as integrated.
+
+**Presentation boundary to tighten:** the gallery currently extends the Home page's existing RenderTreeBuilder-based Hub presentation path, nested inside the Workshop GUI root. It does not introduce a new UI framework or router, but the gallery's cards and diagrams are not yet composed as a fully platform-neutral GUI builder tree. Before claiming that boundary complete, inspect the current GUI builder/rendering contract and add a reusable link/action primitive if the existing vocabulary cannot express navigation safely.
 
 **Architectural boundary still to advance:** this first gallery increment is a manifest-backed *demonstration metadata registry*. It does not yet turn the three external proofs into executable `IExperience` implementations or register their processing groups with the Hub. That is intentional for these source-only proofs; do not imply that metadata discovery equals runtime integration. As proofs acquire reusable behavior, move that behavior into the appropriate MicroBundle/Experience and let the Hub own execution lifecycle and stepping.
 
