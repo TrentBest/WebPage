@@ -45,6 +45,16 @@
 .manifest-hub-support a:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,211,77,.12)}
 @@keyframes hubContentWake{from{opacity:0;transform:translateY(18px) scale(.985);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:none}}
 @@media(max-width:700px){.workshop-running-hub .manifest-hub{padding:5.5rem 1rem 2rem}.manifest-hub-tabs{gap:.2rem}.manifest-hub-tab{padding:.6rem .65rem;font-size:.65rem}.manifest-hub-moniker .hello-glyph{font-size:clamp(1.8rem,10vw,4rem)}}
+
+.welcome-signal{position:absolute;z-index:5;left:50%;bottom:clamp(1.5rem,6vh,4.5rem);width:min(54rem,calc(100% - 2rem));transform:translateX(-50%);text-align:center;pointer-events:none;color:#c8dce5;animation:welcomeSignalArrival 1.2s cubic-bezier(.16,1,.3,1) both}
+.welcome-signal .welcome-eyebrow{font-size:clamp(.55rem,1vw,.72rem);letter-spacing:.3em;color:#00eaff;text-shadow:0 0 16px rgba(0,234,255,.38);animation:welcomePulse 4.5s ease-in-out infinite}
+.welcome-signal h1{margin:.8rem 0 .6rem;font:700 clamp(1.1rem,2.6vw,2rem)/1.1 Consolas,'Courier New',monospace;letter-spacing:.04em;color:#f4fbff;text-shadow:0 0 24px rgba(0,234,255,.12)}
+.welcome-signal p{margin:0 auto;max-width:58ch;font:400 clamp(.72rem,1.15vw,.92rem)/1.65 system-ui,sans-serif;color:#9bb5c2}
+@keyframes welcomeSignalArrival{from{opacity:0;transform:translate(-50%,12px);filter:blur(6px)}to{opacity:1;transform:translate(-50%,0);filter:blur(0)}}
+@keyframes welcomePulse{0%,100%{opacity:.68;letter-spacing:.28em}50%{opacity:1;letter-spacing:.34em}}
+@media(max-height:600px){.welcome-signal{bottom:.8rem}.welcome-signal h1{margin:.35rem 0;font-size:1rem}.welcome-signal p{font-size:.68rem}}
+@media(prefers-reduced-motion:reduce){.welcome-signal,.welcome-signal .welcome-eyebrow{animation:none}}
+
 </style>
 
 @code {
@@ -162,6 +172,20 @@
             builder.AddAttribute(sequence++, "State", "Landing");
             builder.AddAttribute(sequence++, "MonikerComposition", Experience.MonikerComposition);
             builder.CloseComponent();
+            builder.OpenElement(sequence++, "section");
+            builder.AddAttribute(sequence++, "class", "welcome-signal");
+            builder.AddAttribute(sequence++, "aria-label", "Welcome to The Singularity Workshop");
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "welcome-eyebrow");
+            builder.AddContent(sequence++, "A LIVING WORKSHOP");
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "h1");
+            builder.AddContent(sequence++, "Ideas become systems. Systems become experiences.");
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "p");
+            builder.AddContent(sequence++, "Explore a growing ecosystem built around explicit state, composable capabilities, and experiences that can manifest across different environments.");
+            builder.CloseElement();
+            builder.CloseElement();
             builder.CloseElement();
         }
         else if (string.Equals(_selectedHubTab, "SUPPORT", StringComparison.OrdinalIgnoreCase))
