@@ -146,13 +146,21 @@
 
         if (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)
         {
+            // The hub arriving is NOT permission to replace the landing experience.
+            // Keep the original LivingGui component mounted while MONIKER remains
+            // selected. That preserves the moniker and its living stage through the
+            // FSM handoff; only an explicit destination selection replaces it.
+            if (string.Equals(_selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.OpenComponent<LivingGui>(0);
+                builder.CloseComponent();
+                return;
+            }
+
             builder.OpenElement(0, "section");
             builder.AddAttribute(1, "class", "workshop-running-surface");
             builder.OpenElement(2, "div");
             builder.AddAttribute(3, "class", "workshop-running-hub");
-            // Keep the same landing surface through NavigationArrival. The hub
-            // chrome may manifest, but the moniker is cleared only by a visitor
-            // selecting a destination from the navigation.
             BuildManifestHub(builder);
             builder.CloseElement();
             builder.CloseElement();
