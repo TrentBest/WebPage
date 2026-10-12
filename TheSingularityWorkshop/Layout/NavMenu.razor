@@ -1,6 +1,7 @@
 @using TheSingularityWorkshop.Shared
 @using TheSingularityWorkshop.Services
 @inject WorkshopExperienceService Experience
+@inject NavigationManager Navigation
 @implements IDisposable
 
 <div class="workshop-nav-shell @(collapseNavMenu ? "collapsed" : "expanded")">
@@ -53,7 +54,21 @@
 
     protected override void OnInitialized()
     {
+        SyncNavigationState();
+        Navigation.LocationChanged += HandleLocationChanged;
         Experience.StateChanged += HandleExperienceStateChanged;
+    }
+
+    private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
+        => _ = InvokeAsync(() => { SyncNavigationState(); StateHasChanged(); });
+
+    private void SyncNavigationState()
+    {
+        var relative = Navigation.ToBaseRelativePath(Navigation.Uri);
+        var query = relative.Contains('?') ? relative[(relative.IndexOf('?') + 1)..] : string.Empty;
+        var isWelcome = query.Split('&', StringSplitOptions.RemoveEmptyEntries).Any(part => part.Equals("tab=welcome", StringComparison.OrdinalIgnoreCase));
+        welcomeSelected = isWelcome || welcomeSelected;
+        if (isWelcome) collapseNavMenu = true;
     }
 
     private void HandleExperienceStateChanged()
@@ -61,6 +76,7 @@
 
     public void Dispose()
     {
+        Navigation.LocationChanged -= HandleLocationChanged;
         Experience.StateChanged -= HandleExperienceStateChanged;
     }
 }
