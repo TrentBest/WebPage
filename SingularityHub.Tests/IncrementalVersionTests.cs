@@ -277,4 +277,19 @@ public sealed class IncrementalVersionTests
         Assert.Contains("glyph-red", firstContact);
         Assert.DoesNotContain(".hello-glyph:nth-child(6n+", css);
     }
+
+    
+    [ArchitectureTest(0, 0, 196)] [Fact(DisplayName = "V0.0.196 — Hub_Navigation_Overlays_Without_Contracting_The_Moniker_Stage")]
+    public void V0_0_196HubNavigationOverlaysWithoutContractingMonikerStage()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var layout = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "MainLayout.razor"));
+        var layoutCss = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "MainLayout.razor.css"));
+        var nav = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "NavMenu.razor"));
+
+        Assert.DoesNotContain("article.workshop-content { flex: 1 1 0%; width: 0;", layout);
+        Assert.Contains(".workshop-page.workshop-hub-split > .workshop-sidebar {", layoutCss);
+        Assert.Contains(".workshop-page.workshop-hub-split .workshop-content {", layoutCss);
+        Assert.Contains("private bool collapseNavMenu = true;", nav);
+    }
 }
