@@ -15,7 +15,9 @@
 
 <style>
 .manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker #the{color:#00a8ff}.manifest-moniker #singularity{color:#ff2cff}.manifest-moniker #workshop{color:#ff7a00}.manifest-moniker #moniker-composition{display:flex;flex-direction:column;align-items:center;gap:.15em}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
+.workshop-running-surface,.workshop-running-hub{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden}
 .manifest-hub{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(1rem,4vw,4rem);overflow:hidden;overscroll-behavior:none;background:radial-gradient(circle at 18% 28%,rgba(0,168,255,.10),transparent 28%),radial-gradient(circle at 82% 72%,rgba(255,44,255,.07),transparent 30%),#020711}
+.manifest-hub.manifest-hub-moniker-host{background:transparent;pointer-events:none}
 .manifest-hub-shell{width:min(1100px,100%);display:grid;gap:clamp(1rem,2vw,2rem)}
 .manifest-hub-header{display:flex;align-items:end;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 .manifest-hub-kicker{font-size:clamp(.65rem,1.2vw,.9rem);letter-spacing:.2em;color:#6d8795}
@@ -144,24 +146,28 @@
             return;
         }
 
-        if (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)
+        if (FSM.CurrentState is PageFSM.GatewayExit
+            or PageFSM.LivingGuiIgnition
+            or PageFSM.LivingGuiPopulating
+            or PageFSM.MonikerReveal
+            or PageFSM.Gravity
+            or PageFSM.LivingGuiDissipating
+            or PageFSM.NavigationArrival
+            or PageFSM.Running)
         {
-            // The hub arriving is NOT permission to replace the landing experience.
-            // Keep the original LivingGui component mounted while MONIKER remains
-            // selected. That preserves the moniker and its living stage through the
-            // FSM handoff; only an explicit destination selection replaces it.
-            if (string.Equals(_selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase))
-            {
-                builder.OpenComponent<LivingGui>(0);
-                builder.CloseComponent();
-                return;
-            }
-
+            // Keep one LivingGui instance at one stable render-tree location from
+            // ignition through hub arrival. Hub arrival adds navigation content;
+            // it must not replace/remount the landing stage or dismiss its moniker.
             builder.OpenElement(0, "section");
             builder.AddAttribute(1, "class", "workshop-running-surface");
             builder.OpenElement(2, "div");
             builder.AddAttribute(3, "class", "workshop-running-hub");
-            BuildManifestHub(builder);
+            builder.OpenComponent<LivingGui>(4);
+            builder.CloseComponent();
+
+            if (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)
+                BuildManifestHub(builder);
+
             builder.CloseElement();
             builder.CloseElement();
             return;
@@ -192,23 +198,24 @@
         if (manifest is null)
             return;
 
+        var monikerSelected = string.Equals(
+            _selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase);
         builder.OpenElement(0, "section");
-        builder.AddAttribute(1, "class", "manifest-hub");
+        builder.AddAttribute(1, "class",
+            monikerSelected ? "manifest-hub manifest-hub-moniker-host" : "manifest-hub");
+
+        // The landing Moniker is rendered by the continuously mounted LivingGui.
+        // Keep the hub surface present but transparent until a visitor chooses a tab.
+        if (monikerSelected)
+        {
+            builder.CloseElement();
+            return;
+        }
 
         var sequence = 10;
         // Navigation belongs to the persistent left Workshop rail, never a
         // second tab strip layered over the living moniker.
-        if (string.Equals(_selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase))
-        {
-            builder.OpenElement(sequence++, "div");
-            builder.AddAttribute(sequence++, "class", "manifest-hub-moniker");
-            builder.OpenComponent<TheSingularityWorkshop.Components.FirstContactView>(sequence++);
-            builder.AddAttribute(sequence++, "State", "Landing");
-            builder.AddAttribute(sequence++, "MonikerComposition", Experience.MonikerComposition);
-            builder.CloseComponent();
-            builder.CloseElement();
-        }
-        else if (string.Equals(_selectedHubTab, "DEMONSTRATIONS", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(_selectedHubTab, "DEMONSTRATIONS", StringComparison.OrdinalIgnoreCase))
         {
             BuildDemonstrations(builder, ref sequence);
         }
