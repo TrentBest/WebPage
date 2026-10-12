@@ -42,7 +42,7 @@ The Workshop's repositories explain different responsibilities. This README is t
 - **MicroBundleDomain** owns the canonical MicroBundle contract.
 - Other packages document their own domains; WebPage links to their authoritative explanations instead of redefining them.
 
-The shared [FSM_COS Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md) defines the Workshop README journey. This repository applies it to a browser host. Deeper explanations belong in the focused guides linked in section 05.
+The shared [FSM_COS Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md) defines the Workshop README journey. This repository applies it to a browser host. Deeper explanations belong in the focused guides linked in section 05. The [Demonstrations guide](docs/DEMONSTRATIONS.md) records the gallery's discovery path, evidence limits, and extension rules.
 
 ## 🩵 03 — The problem and solution in depth
 
