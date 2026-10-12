@@ -1,6 +1,6 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
@@ -13,7 +13,7 @@
     {
       "name": "Welcome",
       "kind": "Welcome",
-      "description": "Welcome to The Singularity Workshop: a living exploration of the systems, ideas, and experiences being built here.",
+      "description": "Enter a hands-on Workshop lab: send signals to a live FSM_API state machine and watch its transitions and lifecycle trace.",
       "deploymentUrl": null,
       "aboutUrl": "/about-us",
       "bridgeEndpoint": null,
