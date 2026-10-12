@@ -47,6 +47,27 @@
 @@keyframes hubContentWake{from{opacity:0;transform:translateY(18px) scale(.985);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:none}}
 @@media(max-width:700px){.workshop-running-hub .manifest-hub{padding:5.5rem 1rem 2rem}.manifest-hub-tabs{gap:.2rem}.manifest-hub-tab{padding:.6rem .65rem;font-size:.65rem}.manifest-hub-moniker .hello-glyph{font-size:clamp(1.8rem,10vw,4rem)}}
 
+.demonstrations-gallery,.demonstration-detail{width:min(1100px,100%);max-height:100%;overflow:auto;margin:auto;padding:clamp(1rem,3vw,2.5rem);box-sizing:border-box;color:#e8f4f8}
+.demonstrations-kicker,.demonstration-kicker{color:#00eaff;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase}
+.demonstrations-title{margin:.55rem 0;font-size:clamp(2rem,5vw,4.5rem);line-height:.95;letter-spacing:.035em}
+.demonstrations-intro{max-width:68ch;color:#a8c0ca;line-height:1.7}
+.demonstration-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:1rem;margin-top:1.5rem}
+.demonstration-card{display:flex;flex-direction:column;align-items:flex-start;gap:.7rem;min-width:0;padding:1.2rem;border:1px solid rgba(0,234,255,.24);border-radius:0 1rem 1rem 1rem;background:linear-gradient(145deg,rgba(0,168,255,.07),rgba(255,44,255,.035),rgba(3,8,17,.94));}
+.demonstration-card h2{margin:0;color:#fff;font-size:1.25rem;line-height:1.15}
+.demonstration-card p,.demonstration-detail p{margin:0;color:#b9cbd3;line-height:1.65}
+.demonstration-status{color:#ffd34d;font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.demonstration-why{padding-top:.65rem;border-top:1px solid rgba(255,255,255,.09)}
+.demonstration-actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:auto;padding-top:.35rem}
+.demonstration-actions a,.demonstration-back{display:inline-flex;align-items:center;padding:.65rem .85rem;border:1px solid rgba(0,234,255,.35);border-radius:.25rem;color:#dffaff;text-decoration:none;font:800 .68rem Consolas,'Courier New',monospace;letter-spacing:.1em}
+.demonstration-actions a:hover,.demonstration-back:hover{border-color:#ff2cff;color:#fff}
+.demonstration-detail{max-width:900px}
+.demonstration-detail h1{margin:.6rem 0 1rem;font-size:clamp(2rem,5vw,4.2rem);line-height:.95}
+.demonstration-detail h2{margin:1.5rem 0 .55rem;color:#00eaff;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase}
+.demonstration-detail .demonstration-detail-copy{margin:.7rem 0}
+.demonstration-run-instructions{margin-top:1.5rem;padding:1rem;border-left:3px solid #ffd34d;background:rgba(255,211,77,.045);white-space:pre-wrap;overflow-wrap:anywhere}
+.demonstration-unavailable{margin:1rem 0;padding:1rem;border-left:3px solid #ff2cff;background:rgba(255,44,255,.05);color:#e7c8e7}
+.demonstration-detail .demonstration-back{margin-bottom:1.2rem}
+@@media(max-width:700px){.demonstration-grid{grid-template-columns:1fr}.demonstrations-gallery,.demonstration-detail{padding:1rem}.demonstrations-title{font-size:2.3rem}}
 .welcome-signal{position:absolute;z-index:5;left:50%;bottom:clamp(1.5rem,6vh,4.5rem);width:min(54rem,calc(100% - 2rem));transform:translateX(-50%);text-align:center;pointer-events:none;color:#c8dce5;animation:welcomeSignalArrival 1.2s cubic-bezier(.16,1,.3,1) both}
 .welcome-signal .welcome-eyebrow{font-size:clamp(.55rem,1vw,.72rem);letter-spacing:.3em;color:#00eaff;text-shadow:0 0 16px rgba(0,234,255,.38);animation:welcomePulse 4.5s ease-in-out infinite}
 .welcome-signal h1{margin:.8rem 0 .6rem;font:700 clamp(1.1rem,2.6vw,2rem)/1.1 Consolas,'Courier New',monospace;letter-spacing:.04em;color:#f4fbff;text-shadow:0 0 24px rgba(0,234,255,.12)}
@@ -61,6 +82,7 @@
 @code {
     private bool firstRender;
     private string _selectedHubTab = "MONIKER";
+    private string? _selectedDemonstrationId;
 
     private RenderFragment BuildRootGui()
     {
@@ -165,6 +187,10 @@
             builder.CloseComponent();
             builder.CloseElement();
         }
+        else if (string.Equals(_selectedHubTab, "DEMONSTRATIONS", StringComparison.OrdinalIgnoreCase))
+        {
+            BuildDemonstrations(builder, ref sequence);
+        }
         else if (string.Equals(_selectedHubTab, "WELCOME", StringComparison.OrdinalIgnoreCase))
         {
             builder.OpenElement(sequence++, "section");
@@ -252,6 +278,171 @@
         builder.CloseElement();
     }
 
+    private void BuildDemonstrations(RenderTreeBuilder builder, ref int sequence)
+    {
+        var registry = Experience.Demonstrations;
+        if (registry is null)
+        {
+            builder.OpenElement(sequence++, "section");
+            builder.AddAttribute(sequence++, "class", "demonstrations-gallery");
+            builder.AddAttribute(sequence++, "role", "status");
+            builder.AddContent(sequence++, "DEMONSTRATIONS // Waiting for the host manifest registry.");
+            builder.CloseElement();
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_selectedDemonstrationId))
+        {
+            if (!registry.TryGet(_selectedDemonstrationId, out var selected) || selected is null)
+            {
+                builder.OpenElement(sequence++, "section");
+                builder.AddAttribute(sequence++, "class", "demonstration-detail");
+                builder.OpenElement(sequence++, "a");
+                builder.AddAttribute(sequence++, "class", "demonstration-back");
+                builder.AddAttribute(sequence++, "href", "/?tab=demonstrations");
+                builder.AddContent(sequence++, "← BACK TO DEMONSTRATIONS");
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "h1");
+                builder.AddContent(sequence++, "Demonstration unavailable");
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "p");
+                builder.AddContent(sequence++, "This demonstration ID is not declared by the current host manifest. Return to the gallery to discover available entries.");
+                builder.CloseElement();
+                builder.CloseElement();
+                return;
+            }
+
+            builder.OpenElement(sequence++, "article");
+            builder.AddAttribute(sequence++, "class", "demonstration-detail");
+            builder.OpenElement(sequence++, "a");
+            builder.AddAttribute(sequence++, "class", "demonstration-back");
+            builder.AddAttribute(sequence++, "href", "/?tab=demonstrations");
+            builder.AddContent(sequence++, "← BACK TO DEMONSTRATIONS");
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "demonstration-kicker");
+            builder.AddContent(sequence++, "WORKSHOP PROOF // " + selected.LaunchMode.ToUpperInvariant());
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "h1");
+            builder.AddContent(sequence++, selected.Title);
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "demonstration-status");
+            builder.AddContent(sequence++, selected.Status);
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "p");
+            builder.AddAttribute(sequence++, "class", "demonstration-detail-copy");
+            builder.AddContent(sequence++, selected.Summary);
+            builder.CloseElement();
+
+            if (!registry.HasRequiredHostCapabilities(selected))
+            {
+                builder.OpenElement(sequence++, "div");
+                builder.AddAttribute(sequence++, "class", "demonstration-unavailable");
+                builder.AddContent(sequence++, "NOT RUNNABLE INSIDE THIS WEBPAGE HOST. The required execution capability is not declared here. This entry remains available as a source-backed explanation; use the instructions below where applicable.");
+                builder.CloseElement();
+            }
+
+            AddDemonstrationSection(builder, ref sequence, "WHY IT MATTERS", selected.WhyItMatters);
+            AddDemonstrationSection(builder, ref sequence, "WHAT IT PROVES", selected.WhatItProves);
+            AddDemonstrationSection(builder, ref sequence, "WHAT IT DOES NOT PROVE", selected.WhatItDoesNotProve);
+            AddDemonstrationSection(builder, ref sequence, "REQUIREMENTS / LIMITATIONS", selected.Requirements);
+
+            builder.OpenElement(sequence++, "section");
+            builder.AddAttribute(sequence++, "class", "demonstration-run-instructions");
+            builder.OpenElement(sequence++, "h2");
+            builder.AddContent(sequence++, selected.LaunchMode == "Run locally" ? "RUN LOCALLY — INSTRUCTIONS" : "READ EXPLANATION");
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "p");
+            builder.AddContent(sequence++, selected.RunInstructions);
+            builder.CloseElement();
+            builder.CloseElement();
+
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "demonstration-actions");
+            builder.OpenElement(sequence++, "a");
+            builder.AddAttribute(sequence++, "href", selected.SourceUrl);
+            builder.AddAttribute(sequence++, "target", "_blank");
+            builder.AddAttribute(sequence++, "rel", "noopener noreferrer");
+            builder.AddContent(sequence++, "VIEW SOURCE ↗");
+            builder.CloseElement();
+            builder.CloseElement();
+            builder.CloseElement();
+            return;
+        }
+
+        builder.OpenElement(sequence++, "section");
+        builder.AddAttribute(sequence++, "class", "demonstrations-gallery");
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "demonstrations-kicker");
+        builder.AddContent(sequence++, "THE WORKSHOP // EVIDENCE");
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "h1");
+        builder.AddAttribute(sequence++, "class", "demonstrations-title");
+        builder.AddContent(sequence++, "Demonstrations");
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "p");
+        builder.AddAttribute(sequence++, "class", "demonstrations-intro");
+        builder.AddContent(sequence++, "Inspect the machinery behind the Workshop. Each entry tells you what the proof shows, what it does not show, how mature it is, and where to inspect the source. Source-only entries are labelled honestly; no unverified Run button.");
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "demonstration-grid");
+
+        foreach (var demonstration in registry.Entries)
+        {
+            builder.OpenElement(sequence++, "article");
+            builder.AddAttribute(sequence++, "class", "demonstration-card");
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "demonstration-status");
+            builder.AddContent(sequence++, demonstration.Status);
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "h2");
+            builder.AddContent(sequence++, demonstration.Title);
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "p");
+            builder.AddContent(sequence++, demonstration.Summary);
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "p");
+            builder.AddAttribute(sequence++, "class", "demonstration-why");
+            builder.AddContent(sequence++, demonstration.WhyItMatters);
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "demonstration-actions");
+            builder.OpenElement(sequence++, "a");
+            builder.AddAttribute(sequence++, "href", "/?tab=demonstrations&demo=" + Uri.EscapeDataString(demonstration.Id));
+            builder.AddContent(sequence++, "READ EXPLANATION");
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "a");
+            builder.AddAttribute(sequence++, "href", demonstration.SourceUrl);
+            builder.AddAttribute(sequence++, "target", "_blank");
+            builder.AddAttribute(sequence++, "rel", "noopener noreferrer");
+            builder.AddContent(sequence++, "VIEW SOURCE ↗");
+            builder.CloseElement();
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+    }
+
+    private static void AddDemonstrationSection(
+        RenderTreeBuilder builder,
+        ref int sequence,
+        string heading,
+        string body)
+    {
+        builder.OpenElement(sequence++, "section");
+        builder.OpenElement(sequence++, "h2");
+        builder.AddContent(sequence++, heading);
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "p");
+        builder.AddAttribute(sequence++, "class", "demonstration-detail-copy");
+        builder.AddContent(sequence++, body);
+        builder.CloseElement();
+        builder.CloseElement();
+    }
+
     private void RenderHubTab(
         RenderTreeBuilder builder,
         ref int sequence,
@@ -308,9 +499,18 @@
             .Select(parts => Uri.UnescapeDataString(parts[1].Replace('+', ' ')))
             .FirstOrDefault();
 
-        _selectedHubTab = string.Equals(requestedTab, "welcome", StringComparison.OrdinalIgnoreCase)
-            ? "WELCOME"
-            : "MONIKER";
+        _selectedHubTab = string.IsNullOrWhiteSpace(requestedTab)
+            ? "MONIKER"
+            : requestedTab.Replace('-', ' ').Trim().ToUpperInvariant();
+
+        _selectedDemonstrationId = uri.Query
+            .TrimStart('?')
+            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Select(part => part.Split('=', 2))
+            .Where(parts => parts.Length == 2
+                && string.Equals(Uri.UnescapeDataString(parts[0].Replace('+', ' ')), "demo", StringComparison.OrdinalIgnoreCase))
+            .Select(parts => Uri.UnescapeDataString(parts[1].Replace('+', ' ')))
+            .FirstOrDefault();
     }
 
     private void ExperienceChanged()
