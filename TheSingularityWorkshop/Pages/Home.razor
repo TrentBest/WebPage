@@ -309,11 +309,18 @@
     private void ApplyRequestedHubTab()
     {
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
-        _selectedHubTab = query.TryGetValue("tab", out var tab)
-            && string.Equals(tab.ToString(), "welcome", StringComparison.OrdinalIgnoreCase)
-                ? "WELCOME"
-                : "MONIKER";
+        var requestedTab = uri.Query
+            .TrimStart('?')
+            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Select(part => part.Split('=', 2))
+            .Where(parts => parts.Length == 2
+                && string.Equals(Uri.UnescapeDataString(parts[0].Replace('+', ' ')), "tab", StringComparison.OrdinalIgnoreCase))
+            .Select(parts => Uri.UnescapeDataString(parts[1].Replace('+', ' ')))
+            .FirstOrDefault();
+
+        _selectedHubTab = string.Equals(requestedTab, "welcome", StringComparison.OrdinalIgnoreCase)
+            ? "WELCOME"
+            : "MONIKER";
     }
 
     private void ExperienceChanged()
