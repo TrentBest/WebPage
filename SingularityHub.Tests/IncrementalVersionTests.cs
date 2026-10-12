@@ -318,7 +318,7 @@ public sealed class IncrementalVersionTests
         var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
         var nav = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "NavMenu.razor"));
 
-        Assert.Contains("@inject TheSingularityWorkshop.Services.FSMManagerService FSM", nav);
+        Assert.Contains("@inject FSMManagerService FSM", nav);
         Assert.Contains("private bool _hasSelectedDestination;", nav);
         Assert.Contains("state == PageFSM.NavigationArrival || state == PageFSM.Running", nav);
         Assert.Contains("if (!_hasSelectedDestination", nav);
