@@ -1,5 +1,6 @@
 @page "/"
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 @inject TheSingularityWorkshop.Services.WorkshopExperienceService Experience
 @inject TheSingularityWorkshop.Services.FSMManagerService FSM
 @inject TheSingularityWorkshop.Workshop.Composition.WorkshopExperienceCatalog ExperienceCatalog
@@ -172,8 +173,13 @@
             builder.AddAttribute(sequence++, "State", "Landing");
             builder.AddAttribute(sequence++, "MonikerComposition", Experience.MonikerComposition);
             builder.CloseComponent();
+            builder.CloseElement();
+        }
+        else if (string.Equals(_selectedHubTab, "WELCOME", StringComparison.OrdinalIgnoreCase))
+        {
             builder.OpenElement(sequence++, "section");
             builder.AddAttribute(sequence++, "class", "welcome-signal");
+            builder.AddAttribute(sequence++, "style", "position:relative;left:auto;bottom:auto;transform:none;");
             builder.AddAttribute(sequence++, "aria-label", "Welcome to The Singularity Workshop");
             builder.OpenElement(sequence++, "div");
             builder.AddAttribute(sequence++, "class", "welcome-eyebrow");
@@ -183,8 +189,7 @@
             builder.AddContent(sequence++, "Ideas become systems. Systems become experiences.");
             builder.CloseElement();
             builder.OpenElement(sequence++, "p");
-            builder.AddContent(sequence++, "Explore a growing ecosystem built around explicit state, composable capabilities, and experiences that can manifest across different environments.");
-            builder.CloseElement();
+            builder.AddContent(sequence++, "Explore a growing workshop where explicit state and composable capabilities become living experiences across different environments.");
             builder.CloseElement();
             builder.CloseElement();
         }
@@ -278,6 +283,8 @@
 
     protected override void OnInitialized()
     {
+        ApplyRequestedHubTab();
+        Navigation.LocationChanged += HandleLocationChanged;
         _lastRenderedPageState = FSM.CurrentState;
         Experience.StateChanged += ExperienceChanged;
         FSM.StateChanged += PageStateChanged;
@@ -291,6 +298,22 @@
         this.firstRender = true;
         var returningVisitor = await JS.InvokeAsync<bool>("interop.workshopVisited");
         await Experience.InitializeAsync(returningVisitor);
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        ApplyRequestedHubTab();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void ApplyRequestedHubTab()
+    {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        _selectedHubTab = query.TryGetValue("tab", out var tab)
+            && string.Equals(tab.ToString(), "welcome", StringComparison.OrdinalIgnoreCase)
+                ? "WELCOME"
+                : "MONIKER";
     }
 
     private void ExperienceChanged()
@@ -312,5 +335,6 @@
     {
         Experience.StateChanged -= ExperienceChanged;
         FSM.StateChanged -= PageStateChanged;
+        Navigation.LocationChanged -= HandleLocationChanged;
     }
 }
