@@ -108,15 +108,17 @@ namespace TheSingularityWorkshop.Services
                 .State(LivingGuiPopulating, Enter(behavior?.OnLivingGuiPopulating), Tick, null)
                 .State(MonikerReveal, Enter(c =>
                 {
-                    // This is the handoff beat: the population threshold has been
-                    // observed, but Gravity has not yet released the organisms.
-                    c.MonikerPresentationStartTick = -1;
+                    // Freeze the Living GUI's process group by leaving Populating.
+                    // Initialize the Moniker now, inside LivingGui and behind its
+                    // actors; the next state transfers the heartbeat to Gravity.
+                    c.MonikerPresentationStartTick = c.TotalTicks;
+                    c.MonikerReady = true;
                     behavior?.OnMonikerReveal?.Invoke(c);
                 }), Tick, null)
                 .State(Gravity, Enter(c =>
                 {
-                    c.MonikerPresentationStartTick = c.TotalTicks;
-                    c.MonikerReady = true;
+                    // LivingGuiFsm is no longer stepped. Only Gravity advances,
+                    // carrying the frozen actors away and exposing the Moniker.
                     c.GravityReleased = false;
                     c.LivingGuiFallen = false;
                     c.FreezeLivingGui();
