@@ -16,6 +16,7 @@
 <style>
 .manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker #the{color:#00a8ff}.manifest-moniker #singularity{color:#ff2cff}.manifest-moniker #workshop{color:#ff7a00}.manifest-moniker #moniker-composition{display:flex;flex-direction:column;align-items:center;gap:.15em}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
 .workshop-running-surface,.workshop-running-hub{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden}
+.workshop-running-surface.destination-selected .living-experience-panel{visibility:hidden}
 .manifest-hub{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(1rem,4vw,4rem);overflow:hidden;overscroll-behavior:none;background:radial-gradient(circle at 18% 28%,rgba(0,168,255,.10),transparent 28%),radial-gradient(circle at 82% 72%,rgba(255,44,255,.07),transparent 30%),#020711}
 .manifest-hub.manifest-hub-moniker-host{background:transparent;pointer-events:none}
 .manifest-hub-shell{width:min(1100px,100%);display:grid;gap:clamp(1rem,2vw,2rem)}
@@ -159,7 +160,10 @@
             // ignition through hub arrival. Hub arrival adds navigation content;
             // it must not replace/remount the landing stage or dismiss its moniker.
             builder.OpenElement(0, "section");
-            builder.AddAttribute(1, "class", "workshop-running-surface");
+            builder.AddAttribute(1, "class",
+                string.Equals(_selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase)
+                    ? "workshop-running-surface"
+                    : "workshop-running-surface destination-selected");
             builder.OpenElement(2, "div");
             builder.AddAttribute(3, "class", "workshop-running-hub");
             builder.OpenComponent<LivingGui>(4);
