@@ -245,15 +245,16 @@ public sealed class IncrementalVersionTests
         Assert.Contains("Assert.Equal(50d, root.Y)", contextTests);
     }
 
-    [ArchitectureTest(0, 0, 194)] [Fact(DisplayName = "V0.0.194 — Navigation_Arrival_Contracts_The_Moniker_Panel_Before_Hub_Manifestation")]
-    public void V0_0_194NavigationArrivalContractsMonikerPanelBeforeHub()
+    [ArchitectureTest(0, 0, 194)] [Fact(DisplayName = "V0.0.194 — Navigation_Arrival_Preserves_Moniker_While_Hub_Manifests")]
+    public void V0_0_194NavigationArrivalPreservesMonikerWhileHubManifests()
     {
         var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
         var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
 
         Assert.Contains("FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running", home);
-        Assert.Contains("WORKSHOP HUB ARRIVING", home);
-        Assert.Contains("if (FSM.CurrentState == PageFSM.Running)", home);
+        Assert.Contains("Keep the same landing surface through NavigationArrival", home);
+        Assert.Contains("BuildManifestHub(builder);", home);
+        Assert.DoesNotContain("WORKSHOP HUB ARRIVING", home);
     }
 
 
@@ -291,5 +292,23 @@ public sealed class IncrementalVersionTests
         Assert.Contains(".workshop-page.workshop-hub-split > .workshop-sidebar {", layoutCss);
         Assert.Contains(".workshop-page.workshop-hub-split .workshop-content {", layoutCss);
         Assert.Contains("private bool collapseNavMenu = true;", nav);
+    }
+
+
+    [ArchitectureTest(0, 0, 197)] [Fact(DisplayName = "V0.0.197 — Keep_Moniker_Visible_Until_Visitor_Selects_A_Hub_Destination")]
+    public void V0_0_197KeepMonikerVisibleUntilVisitorSelectsHubDestination()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
+
+        var arrivalStart = home.IndexOf("if (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)", StringComparison.Ordinal);
+        var arrivalEnd = home.IndexOf("private async Task EnterWorkshop()", StringComparison.Ordinal);
+        Assert.True(arrivalStart >= 0 && arrivalEnd > arrivalStart);
+        var arrival = home.Substring(arrivalStart, arrivalEnd - arrivalStart);
+
+        Assert.Contains("BuildManifestHub(builder);", arrival);
+        Assert.DoesNotContain("WORKSHOP HUB ARRIVING", arrival);
+        Assert.Contains("private string _selectedHubTab = \"MONIKER\";", home);
+        Assert.Contains("_selectedHubTab = tab;", home);
     }
 }
