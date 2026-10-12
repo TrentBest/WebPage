@@ -169,17 +169,6 @@
 }
 
 <style>
-    /* Global rules: NavMenu's shell is rendered by a child component and is outside CSS isolation scope. */
-    @@media (min-width: 641px) {
-        .workshop-page .workshop-sidebar:has(.workshop-nav-shell.collapsed) { width: 3.4rem !important; flex: 0 0 3.4rem !important; min-width: 3.4rem; max-width: 3.4rem !important; }
-        .workshop-page .workshop-sidebar:has(.workshop-nav-shell.expanded) { width: 12.5rem !important; flex: 0 0 12.5rem !important; min-width: 12.5rem; max-width: 12.5rem !important; }
-        .workshop-page.workshop-hub-split main { flex: 1 1 0%; width: auto; min-width: 0; }
-        .workshop-page.workshop-hub-split article.workshop-content { flex: 1 1 0%; width: 0; min-width: 0; }
-    }
-    .workshop-page .workshop-content { overflow: hidden !important; }
-</style>
-
-<style>
     .workshop-create-page .workshop-sidebar{width:3.8rem;flex:0 0 3.8rem;max-width:3.8rem;transition:width .35s ease,flex-basis .35s ease}.workshop-create-page .workshop-sidebar:has(.workshop-nav-shell.expanded){width:15rem;flex-basis:15rem;max-width:15rem}.workshop-create-page main{min-width:0}.workshop-create-page .content{padding-left:.5rem!important;padding-right:.5rem!important}
 </style>
 
