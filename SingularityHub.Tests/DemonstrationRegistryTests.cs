@@ -79,7 +79,8 @@ public sealed class DemonstrationRegistryTests
               "runInstructions": "Start a local static server.",
               "sourceUrl": "https://example.com/source",
               "requirements": "A WebGPU-capable browser.",
-              "requiredHostCapabilities": ["WebGPU"]
+              "requiredHostCapabilities": ["WebGPU"],
+              "diagramKind": "event-horizon-buckets"
             }
           ]
         }
@@ -93,6 +94,7 @@ public sealed class DemonstrationRegistryTests
         Assert.Equal("Production performance.", demonstration.WhatItDoesNotProve);
         Assert.Equal("https://example.com/source", demonstration.SourceUrl);
         Assert.Contains("WebGPU", demonstration.RequiredHostCapabilities!);
+        Assert.Equal("event-horizon-buckets", demonstration.DiagramKind);
     }
 
     private static DemonstrationDefinition Create(
