@@ -18,7 +18,8 @@ public sealed record DemonstrationDefinition(
     string RunInstructions,
     string SourceUrl,
     string Requirements,
-    IReadOnlyList<string>? RequiredHostCapabilities = null);
+    IReadOnlyList<string>? RequiredHostCapabilities = null,
+    string? DiagramKind = null);
 
 /// <summary>
 /// Registry of demonstration descriptions loaded from the host manifest.
