@@ -58,6 +58,12 @@ try {
     throw new Error(`The collapsed navigation should leave only the expander rail; width was ${sidebarWidth}px.`);
   }
 
+  console.log("Welcome render diagnostic", JSON.stringify({
+    url: page.url(),
+    selectedTab: await page.locator(".workshop-hub-overlay").getAttribute("data-selected-hub-tab"),
+    overlayText: await page.locator(".workshop-hub-overlay").innerText(),
+    headings: await page.locator("h1").allTextContents()
+  }));
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
   await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
