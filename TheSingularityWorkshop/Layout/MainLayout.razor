@@ -60,7 +60,7 @@
     {
         get
         {
-            var path = Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
+            var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', 2)[0].Trim('/');
             return path.ToLowerInvariant() switch
             {
                 "" => "THE WORKSHOP",
