@@ -65,3 +65,29 @@ public sealed class DemonstrationRegistry
         (demonstration.RequiredHostCapabilities ?? Array.Empty<string>())
             .All(_hostCapabilities.Contains);
 }
+
+/// <summary>URL conventions for selecting a demonstration inside the existing Home/Hub route.</summary>
+public static class DemonstrationRoutes
+{
+    public const string Gallery = "/?tab=demonstrations";
+
+    public static string Detail(string id)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        return $"{Gallery}&demo={Uri.EscapeDataString(id)}";
+    }
+
+    public static string? ReadSelectedId(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return null;
+
+        return query.TrimStart('?')
+            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Select(part => part.Split('=', 2))
+            .Where(parts => parts.Length == 2 &&
+                string.Equals(Uri.UnescapeDataString(parts[0].Replace('+', ' ')), "demo", StringComparison.OrdinalIgnoreCase))
+            .Select(parts => Uri.UnescapeDataString(parts[1].Replace('+', ' ')))
+            .FirstOrDefault();
+    }
+}
