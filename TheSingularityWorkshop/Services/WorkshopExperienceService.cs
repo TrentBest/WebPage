@@ -25,6 +25,7 @@ public sealed class WorkshopExperienceService : IDisposable
     public bool IsInitialized { get; private set; }
     public bool IsDeepDive { get; private set; }
     public WebPageHostManifest? Manifest { get; private set; }
+    public DemonstrationRegistry? Demonstrations { get; private set; }
     public WebPageManifestExperience? CurrentManifestExperience { get; private set; }
     public WebPageManifestExperience? PrimaryManifestExperience { get; private set; }
     public FlexExperienceDefinition? SelectedFlexExperience { get; private set; }
@@ -80,6 +81,9 @@ public sealed class WorkshopExperienceService : IDisposable
 
         var manifestJson = await _httpClient.GetStringAsync(ManifestPath);
         Manifest = WebPageHostManifestParser.Parse(manifestJson);
+        Demonstrations = new DemonstrationRegistry(
+            Manifest.Demonstrations,
+            hostCapabilities: ["WebPage", "Browser"]);
 
         if (Manifest.Startup.Count == 0)
             throw new InvalidOperationException("The WebPage host manifest contains no startup Experience.");
