@@ -11,7 +11,8 @@ public sealed record WebPageHostManifest(
     IReadOnlyList<WebPageManifestHubItem> Hub,
     IReadOnlyList<WebPageManifestExperience> Running,
     WebPageDeepDiveManifest DeepDive,
-    IReadOnlyList<WebPageManifestCapability>? Capabilities = null);
+    IReadOnlyList<WebPageManifestCapability>? Capabilities = null,
+    IReadOnlyList<DemonstrationDefinition>? Demonstrations = null);
 
 /// <summary>One manifest-selected startup or running Experience, with explicit MicroBundle versions.</summary>
 public sealed record WebPageManifestExperience(
@@ -69,6 +70,14 @@ public static class WebPageHostManifestParser
             .SelectMany(x => x.MicroBundles ?? Array.Empty<WebPageManifestBundle>()));
         ValidateBundles((manifest.Capabilities ?? Array.Empty<WebPageManifestCapability>())
             .SelectMany(x => x.MicroBundles ?? Array.Empty<WebPageManifestBundle>()));
+
+        var demonstrations = manifest.Demonstrations ?? Array.Empty<DemonstrationDefinition>();
+        if (demonstrations.Any(item =>
+                string.IsNullOrWhiteSpace(item.Id) ||
+                string.IsNullOrWhiteSpace(item.Title) ||
+                string.IsNullOrWhiteSpace(item.SourceUrl)))
+            throw new InvalidOperationException(
+                "Every demonstration must declare a stable ID, title, and source URL.");
 
         return manifest;
     }
