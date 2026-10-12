@@ -29,7 +29,9 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
 .workshop-page .workshop-top-row-placeholder { flex-basis: 0; height: 0; min-height: 0; padding: 0 !important; border-bottom-width: 0; opacity: 0; overflow: hidden; }
 .workshop-page.workshop-chrome-visible .workshop-top-row-placeholder { flex-basis: 3.5rem; height: 3.5rem; min-height: 3.5rem; padding-left: 2rem !important; padding-right: 1.5rem !important; border-bottom-width: 1px; opacity: 1; }
 .workshop-page .workshop-content { will-change: flex-basis, height, width; }
-.workshop-page.workshop-hub-split .workshop-content {\n    overflow-y: clip !important;\n    overscroll-behavior: none;
+.workshop-page.workshop-hub-split .workshop-content {
+    overflow-y: clip !important;
+    overscroll-behavior: none;
     position: relative;
     min-width: 0;
     min-height: 0;
@@ -186,3 +188,12 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
     .workshop-page .workshop-sidebar,
     .workshop-page .workshop-tab-header { transition: none; }
 }
+
+
+@media (min-width: 641px) {
+.workshop-page.workshop-chrome-visible .workshop-sidebar:has(.workshop-nav-shell.collapsed) { width:3.4rem!important; flex:0 0 3.4rem!important; min-width:3.4rem; max-width:3.4rem!important; }
+.workshop-page.workshop-chrome-visible .workshop-sidebar:has(.workshop-nav-shell.expanded) { width:12.5rem!important; flex:0 0 12.5rem!important; min-width:12.5rem; max-width:12.5rem!important; }
+.workshop-page.workshop-hub-split main { flex:1 1 0%; width:auto; min-width:0; }
+.workshop-page.workshop-hub-split article.workshop-content { flex:1 1 0%; width:0; min-width:0; }
+}
+.workshop-page .workshop-content { overflow:hidden!important; }
