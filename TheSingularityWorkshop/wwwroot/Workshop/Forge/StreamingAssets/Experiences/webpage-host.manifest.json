@@ -64,7 +64,7 @@
     {
       "id": "gpu-instancing-webgpu",
       "title": "GPU Instancing — Browser WebGPU Proof",
-      "summary": "A standalone browser sample for adjusting procedural triangle-instance population, observer offset, and motion.",
+      "summary": "A standalone browser sample for adjusting 1,000–50,000 procedural triangle instances, observer offset, and motion.",
       "whyItMatters": "It explores how large populations can share one instanced draw call while near and far cohorts update at different cadences.",
       "status": "Runnable proof — local sample; not hosted by WebPage",
       "whatItProves": "A browser WebGPU instancing experiment and a visible starting point for evaluating population rendering and update cadence.",
@@ -75,7 +75,8 @@
       "requirements": "A checkout containing samples/WebGpuInstancingProof, Python's static server, and a browser with WebGPU support.",
       "requiredHostCapabilities": [
         "WebGPU"
-      ]
+      ],
+      "diagramKind": null
     },
     {
       "id": "native-wpf-d3d12-surface",
@@ -92,7 +93,8 @@
       "requiredHostCapabilities": [
         "WPF",
         "Direct3D12"
-      ]
+      ],
+      "diagramKind": "native-surface-lifecycle"
     },
     {
       "id": "renderer-event-horizon-buckets",
@@ -106,7 +108,8 @@
       "runInstructions": "Review the pull request and its tests. WebPage presents this as an explanatory architecture model; it does not simulate or report performance measurements.",
       "sourceUrl": "https://github.com/TrentBest/TheSingularityWorkshop.Renderer/pull/8",
       "requirements": "No special browser capability is required to read the explanation. Renderer source and tests are required to inspect implementation evidence.",
-      "requiredHostCapabilities": []
+      "requiredHostCapabilities": [],
+      "diagramKind": "event-horizon-buckets"
     }
   ]
 }
