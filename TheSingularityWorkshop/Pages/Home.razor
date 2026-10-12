@@ -16,8 +16,7 @@
 <style>
 .manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker #the{color:#00a8ff}.manifest-moniker #singularity{color:#ff2cff}.manifest-moniker #workshop{color:#ff7a00}.manifest-moniker #moniker-composition{display:flex;flex-direction:column;align-items:center;gap:.15em}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
 .workshop-running-surface,.workshop-running-hub{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden}
-.workshop-persistent-moniker{position:absolute;inset:0;z-index:3;min-width:0;min-height:0;overflow:hidden;pointer-events:none}
-.workshop-running-surface .workshop-running-hub > .living-experience-panel > .first-contact-stage{visibility:hidden}
+.workshop-running-surface.destination-selected .workshop-running-hub > .living-experience-panel > .first-contact-stage{visibility:hidden}
 .workshop-hub-overlay{position:absolute;inset:0;z-index:4;min-width:0;min-height:0;overflow:hidden}
 .manifest-hub{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(1rem,4vw,4rem);overflow:hidden;overscroll-behavior:none;background:radial-gradient(circle at 18% 28%,rgba(0,168,255,.10),transparent 28%),radial-gradient(circle at 82% 72%,rgba(255,44,255,.07),transparent 30%),#020711}
 .manifest-hub.manifest-hub-moniker-host{background:transparent;pointer-events:none}
@@ -170,22 +169,6 @@
             builder.AddAttribute(3, "class", "workshop-running-hub");
             builder.OpenComponent<LivingGui>(4);
             builder.CloseComponent();
-
-            // The landing Moniker is a separate, persistent presentation layer.
-            // It is not owned by the organism lifecycle or by hub arrival. Only
-            // choosing another destination removes this component.
-            if (FSM.Context.MonikerReady &&
-                string.Equals(_selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase))
-            {
-                builder.OpenElement(5, "div");
-                builder.AddAttribute(6, "class", "workshop-persistent-moniker");
-                builder.OpenComponent<TheSingularityWorkshop.Components.FirstContactView>(7);
-                builder.AddAttribute(8, "State", "Landing");
-                builder.AddAttribute(9, "Ticks", FSM.Context.MonikerPresentationStartTick);
-                builder.AddAttribute(10, "MonikerComposition", Experience.MonikerComposition);
-                builder.CloseComponent();
-                builder.CloseElement();
-            }
 
             if (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)
             {
