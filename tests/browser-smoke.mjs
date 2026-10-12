@@ -33,48 +33,30 @@ try {
   }
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
-  const hubLinks = await page.locator(".workshop-nav-links a").allTextContents();
-  for (const required of ["Ecosystem", "Schedule Consultation", "Institutions"]) {
-    if (!hubLinks.some(label => label.trim() === required)) {
-      throw new Error(`Expected manifest-driven hub destination '${required}'.`);
-    }
+  const initialLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
+  if (initialLinks.length !== 1 || initialLinks[0] !== "Welcome") {
+    throw new Error(`The initial hub must show Welcome as its only tab; found: ${initialLinks.join(", ")}.`);
   }
-  if (hubLinks.some(label => label.trim() === "AnyApp")) {
-    throw new Error("AnyApp must not appear as a Workshop hub destination.");
+  await page.getByText("Ideas become systems. Systems become experiences.", { exact: true }).waitFor({ state: "visible" });
+  await page.getByText("A LIVING WORKSHOP", { exact: true }).waitFor({ state: "visible" });
+
+  await page.getByRole("link", { name: "Welcome", exact: true }).click();
+  await page.locator(".workshop-nav-shell.collapsed").waitFor({ state: "visible" });
+  if (await page.locator(".workshop-nav-links").count() !== 0) {
+    throw new Error("Selecting Welcome must retract the navigation to the expander only.");
+  }
+  const sidebarWidth = await page.locator(".workshop-sidebar").evaluate(el => el.getBoundingClientRect().width);
+  if (sidebarWidth > 60) {
+    throw new Error(`The collapsed navigation should leave only the expander rail; width was ${sidebarWidth}px.`);
   }
 
-  await page.getByRole("link", { name: "Ecosystem", exact: true }).click();
-  await page.getByRole("heading", { name: /Explore the living stack/i }).waitFor({ state: "visible", timeout: 15_000 });
-  await page.getByRole("button", { name: "GITHUB", exact: true }).click();
-  await page.getByRole("heading", { name: "WebPage", exact: true }).waitFor({ state: "visible", timeout: 5_000 });
-  await page.getByRole("button", { name: "ALL SIGNALS", exact: true }).click();
-  await page.getByRole("button", { name: /RUN DESTRUCTIVE TEST SIMULATION/i }).click();
-  await page.getByText("PRELIMINARY PASS", { exact: true }).waitFor({ state: "visible", timeout: 5_000 });
-  await page.getByLabel("Testing profile").selectOption("strict");
-  await page.getByRole("button", { name: /RUN DESTRUCTIVE TEST SIMULATION/i }).click();
-  await page.getByText("REJECTED", { exact: true }).waitFor({ state: "visible", timeout: 5_000 });
-
-  await page.getByRole("link", { name: /RETURN TO HUB/i }).click();
-  await page.getByRole("link", { name: "Schedule Consultation", exact: true }).click();
-  const schedule = page.locator(".schedule-experience");
-  await schedule.waitFor({ state: "visible", timeout: 15_000 });
-  const scheduleFits = await schedule.evaluate(el => el.scrollHeight <= el.clientHeight + 2);
-  if (!scheduleFits) throw new Error("The consultation experience must fit its viewport without scrolling.");
-  await page.getByRole("heading", { name: /Let's find the/i }).waitFor({ state: "visible" });
-  await page.screenshot({ path: `${outputDir}/04-schedule.png`, fullPage: true });
-
-  await page.getByRole("link", { name: /RETURN TO HUB/i }).click();
-  await page.getByRole("link", { name: "Institutions", exact: true }).click();
-  const institutions = page.locator(".institution-brief");
-  await institutions.waitFor({ state: "visible", timeout: 15_000 });
-  const institutionsFits = await institutions.evaluate(el => el.scrollHeight <= el.clientHeight + 2);
-  if (!institutionsFits) throw new Error("The institutional briefing must fit its viewport without scrolling.");
-  await page.getByRole("heading", { name: /Behavior|Then, into|Now, the|Demonstrate/i }).waitFor({ state: "visible" });
-  await page.getByRole("button", { name: "EVOLUTION", exact: true }).click();
-  await page.getByRole("heading", { name: /Then, into Unity/i }).waitFor({ state: "visible" });
-  await page.getByRole("button", { name: "NEXT GATE", exact: true }).click();
-  await page.getByRole("heading", { name: /Demonstrate/i }).waitFor({ state: "visible" });
-  await page.screenshot({ path: `${outputDir}/05-institutions.png`, fullPage: true });
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
+  const expandedLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
+  if (expandedLinks.some(label => ["Ecosystem", "Schedule Consultation", "Institutions"].includes(label))) {
+    throw new Error("Removed destination tabs must not reappear in the hub.");
+  }
+  await page.screenshot({ path: `${outputDir}/03-welcome.png`, fullPage: true });
 
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
