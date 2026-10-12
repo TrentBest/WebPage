@@ -311,4 +311,20 @@ public sealed class IncrementalVersionTests
         Assert.Contains("private string _selectedHubTab = \"MONIKER\";", home);
         Assert.Contains("_selectedHubTab = tab;", home);
     }
+
+    [ArchitectureTest(0, 0, 198)] [Fact(DisplayName = "V0.0.198 — Hub_Navigation_Expands_On_Arrival_And_Collapses_After_Selection")]
+    public void V0_0_198HubNavigationExpandsOnArrivalAndCollapsesAfterSelection()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var nav = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "NavMenu.razor"));
+
+        Assert.Contains("@inject TheSingularityWorkshop.Services.FSMManagerService FSM", nav);
+        Assert.Contains("private bool _hasSelectedDestination;", nav);
+        Assert.Contains("state == PageFSM.NavigationArrival || state == PageFSM.Running", nav);
+        Assert.Contains("if (!_hasSelectedDestination", nav);
+        Assert.Contains("_hasSelectedDestination = true;", nav);
+        Assert.Contains("collapseNavMenu = true;", nav);
+        Assert.Contains("FSM.StateChanged += HandleFSMStateChanged;", nav);
+        Assert.Contains("FSM.StateChanged -= HandleFSMStateChanged;", nav);
+    }
 }
