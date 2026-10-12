@@ -50,10 +50,10 @@
 .welcome-signal .welcome-eyebrow{font-size:clamp(.55rem,1vw,.72rem);letter-spacing:.3em;color:#00eaff;text-shadow:0 0 16px rgba(0,234,255,.38);animation:welcomePulse 4.5s ease-in-out infinite}
 .welcome-signal h1{margin:.8rem 0 .6rem;font:700 clamp(1.1rem,2.6vw,2rem)/1.1 Consolas,'Courier New',monospace;letter-spacing:.04em;color:#f4fbff;text-shadow:0 0 24px rgba(0,234,255,.12)}
 .welcome-signal p{margin:0 auto;max-width:58ch;font:400 clamp(.72rem,1.15vw,.92rem)/1.65 system-ui,sans-serif;color:#9bb5c2}
-@keyframes welcomeSignalArrival{from{opacity:0;transform:translate(-50%,12px);filter:blur(6px)}to{opacity:1;transform:translate(-50%,0);filter:blur(0)}}
-@keyframes welcomePulse{0%,100%{opacity:.68;letter-spacing:.28em}50%{opacity:1;letter-spacing:.34em}}
-@media(max-height:600px){.welcome-signal{bottom:.8rem}.welcome-signal h1{margin:.35rem 0;font-size:1rem}.welcome-signal p{font-size:.68rem}}
-@media(prefers-reduced-motion:reduce){.welcome-signal,.welcome-signal .welcome-eyebrow{animation:none}}
+@@keyframes welcomeSignalArrival{from{opacity:0;transform:translate(-50%,12px);filter:blur(6px)}to{opacity:1;transform:translate(-50%,0);filter:blur(0)}}
+@@keyframes welcomePulse{0%,100%{opacity:.68;letter-spacing:.28em}50%{opacity:1;letter-spacing:.34em}}
+@@media(max-height:600px){.welcome-signal{bottom:.8rem}.welcome-signal h1{margin:.35rem 0;font-size:1rem}.welcome-signal p{font-size:.68rem}}
+@@media(prefers-reduced-motion:reduce){.welcome-signal,.welcome-signal .welcome-eyebrow{animation:none}}
 
 </style>
 
