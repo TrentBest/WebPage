@@ -41,22 +41,29 @@
 @code {
     private bool collapseNavMenu = true;
     private bool welcomeSelected;
+    private bool _hasSelectedDestination;
 
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
     private void WelcomeSelected()
     {
         welcomeSelected = true;
+        _hasSelectedDestination = true;
         collapseNavMenu = true;
     }
 
-    private void CollapseNavMenu() => collapseNavMenu = true;
+    private void CollapseNavMenu()
+    {
+        _hasSelectedDestination = true;
+        collapseNavMenu = true;
+    }
 
     protected override void OnInitialized()
     {
         SyncNavigationState();
         Navigation.LocationChanged += HandleLocationChanged;
         Experience.StateChanged += HandleExperienceStateChanged;
+        FSM.StateChanged += HandleFSMStateChanged;
     }
 
     private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
@@ -66,17 +73,41 @@
     {
         var relative = Navigation.ToBaseRelativePath(Navigation.Uri);
         var query = relative.Contains('?') ? relative[(relative.IndexOf('?') + 1)..] : string.Empty;
+        var path = relative.Split('?', 2)[0].Trim('/');
         var isWelcome = query.Split('&', StringSplitOptions.RemoveEmptyEntries).Any(part => part.Equals("tab=welcome", StringComparison.OrdinalIgnoreCase));
         welcomeSelected = isWelcome || welcomeSelected;
-        if (isWelcome) collapseNavMenu = true;
+        if (isWelcome || !string.IsNullOrEmpty(path))
+        {
+            _hasSelectedDestination = true;
+            collapseNavMenu = true;
+        }
+        else
+        {
+            _hasSelectedDestination = false;
+            if (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)
+                collapseNavMenu = false;
+        }
     }
 
     private void HandleExperienceStateChanged()
         => _ = InvokeAsync(StateHasChanged);
 
+    private void HandleFSMStateChanged(string state)
+        => _ = InvokeAsync(() =>
+        {
+            // Reveal the available destinations when the hub arrives. Once a
+            // destination is selected, keep the rail collapsed for its content.
+            if (!_hasSelectedDestination &&
+                (state == PageFSM.NavigationArrival || state == PageFSM.Running))
+                collapseNavMenu = false;
+
+            StateHasChanged();
+        });
+
     public void Dispose()
     {
         Navigation.LocationChanged -= HandleLocationChanged;
         Experience.StateChanged -= HandleExperienceStateChanged;
+        FSM.StateChanged -= HandleFSMStateChanged;
     }
 }
