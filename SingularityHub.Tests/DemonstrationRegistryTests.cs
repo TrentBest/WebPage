@@ -31,6 +31,17 @@ public sealed class DemonstrationRegistryTests
     }
 
     [Fact]
+    public void Detail_selection_and_return_use_the_existing_demonstrations_route()
+    {
+        var detailRoute = DemonstrationRoutes.Detail("gpu instancing");
+
+        Assert.Equal("/?tab=demonstrations&demo=gpu%20instancing", detailRoute);
+        Assert.Equal("gpu instancing", DemonstrationRoutes.ReadSelectedId("?tab=demonstrations&demo=gpu%20instancing"));
+        Assert.Null(DemonstrationRoutes.ReadSelectedId("?tab=demonstrations"));
+        Assert.Equal("/?tab=demonstrations", DemonstrationRoutes.Gallery);
+    }
+
+    [Fact]
     public void Registry_rejects_duplicate_ids_case_insensitively()
     {
         var first = Create("gpu-proof");
