@@ -65,6 +65,44 @@ article:has(.hypervisor-shell), article:has(.living-sequence-shell) { overflow: 
     padding: 0 !important;
 }
 
+
+/* Keep the living moniker centered on the viewport, not the remainder left
+   after navigation takes its share. The rail floats above this visual layer. */
+@media (min-width: 641px) {
+    .workshop-page.workshop-hub-split .workshop-sidebar {
+        width: 2.85rem !important;
+        flex: 0 0 2.85rem !important;
+        min-width: 2.85rem !important;
+        max-width: 2.85rem !important;
+        z-index: 10;
+    }
+    .workshop-page.workshop-hub-split .workshop-sidebar:has(.workshop-nav-shell.expanded) {
+        width: 12.5rem !important;
+        flex-basis: 12.5rem !important;
+        max-width: 12.5rem !important;
+    }
+    .workshop-page.workshop-hub-split .workshop-nav-shell.collapsed {
+        padding: .5rem .2rem;
+    }
+    .workshop-page.workshop-hub-split .workshop-nav-head {
+        min-height: 2.4rem;
+    }
+    .workshop-page.workshop-hub-split .workshop-nav-toggle {
+        width: 2.2rem;
+        height: 2.2rem;
+    }
+    .workshop-page.workshop-hub-split .workshop-content ::deep .hub-moniker-panel {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100dvh;
+        pointer-events: none;
+    }
+    .workshop-page.workshop-hub-split .workshop-content ::deep .hub-moniker-panel .hello-moniker {
+        pointer-events: auto;
+    }
+}
+
 /* The Hub manifests as one physical gesture: the chrome grows from a hairline
    into its full geometry while its border wakes from dark cyan through a brief
    white-hot peak and settles into a living breath. */
