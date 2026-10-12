@@ -47,6 +47,19 @@
 @@keyframes hubContentWake{from{opacity:0;transform:translateY(18px) scale(.985);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:none}}
 @@media(max-width:700px){.workshop-running-hub .manifest-hub{padding:5.5rem 1rem 2rem}.manifest-hub-tabs{gap:.2rem}.manifest-hub-tab{padding:.6rem .65rem;font-size:.65rem}.manifest-hub-moniker .hello-glyph{font-size:clamp(1.8rem,10vw,4rem)}}
 
+.demonstration-diagram{margin:1.4rem 0;padding:1rem;border:1px solid rgba(0,234,255,.22);background:rgba(0,8,18,.65)}
+.demonstration-diagram-label{margin:0 0 .9rem;color:#7f9aa7;font-size:.62rem;letter-spacing:.17em}
+.demonstration-diagram-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.demonstration-diagram-node{min-width:0;padding:1rem;border:1px solid rgba(0,234,255,.3);background:linear-gradient(140deg,rgba(0,168,255,.08),rgba(3,8,17,.92))}
+.demonstration-diagram-node strong{display:block;color:#fff;font-size:.8rem;letter-spacing:.08em}
+.demonstration-diagram-node p{margin:.55rem 0 0;color:#a8c1cc;font-size:.82rem}
+.demonstration-diagram-flow{display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;padding:.8rem;border:1px dashed rgba(255,44,255,.35);color:#ffd8ff;text-align:center;font-size:.72rem;letter-spacing:.04em}
+.demonstration-diagram-flow b{color:#ff2cff}
+.demonstration-diagram-disclaimer{margin:.8rem 0 0;color:#7f9aa7;font-size:.68rem;line-height:1.5}
+.demonstration-native-flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.35rem;align-items:stretch}
+.demonstration-native-step{display:flex;flex-direction:column;justify-content:center;min-height:5rem;padding:.65rem .45rem;border:1px solid rgba(255,211,77,.32);background:rgba(255,211,77,.035);color:#fff;text-align:center;font-size:.72rem}
+.demonstration-native-step:not(:last-child)::after{content:"→";display:none}
+@@media(max-width:700px){.demonstration-diagram-grid{grid-template-columns:1fr}.demonstration-native-flow{grid-template-columns:1fr}.demonstration-native-step{min-height:3.2rem}}
 .demonstrations-gallery,.demonstration-detail{width:min(1100px,100%);max-height:100%;overflow:auto;margin:auto;padding:clamp(1rem,3vw,2.5rem);box-sizing:border-box;color:#e8f4f8}
 .demonstrations-kicker,.demonstration-kicker{color:#00eaff;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase}
 .demonstrations-title{margin:.55rem 0;font-size:clamp(2rem,5vw,4.5rem);line-height:.95;letter-spacing:.035em}
@@ -335,6 +348,8 @@
             builder.AddContent(sequence++, selected.Summary);
             builder.CloseElement();
 
+            RenderDemonstrationDiagram(builder, ref sequence, selected);
+
             if (!registry.HasRequiredHostCapabilities(selected))
             {
                 builder.OpenElement(sequence++, "div");
@@ -422,6 +437,87 @@
             builder.CloseElement();
         }
 
+        builder.CloseElement();
+        builder.CloseElement();
+    }
+
+    private static void RenderDemonstrationDiagram(
+        RenderTreeBuilder builder,
+        ref int sequence,
+        DemonstrationDefinition demonstration)
+    {
+        if (string.Equals(demonstration.DiagramKind, "event-horizon-buckets", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.OpenElement(sequence++, "section");
+            builder.AddAttribute(sequence++, "class", "demonstration-diagram");
+            builder.AddAttribute(sequence++, "aria-label", "Conceptual near and far event horizon processing buckets");
+            builder.OpenElement(sequence++, "p");
+            builder.AddAttribute(sequence++, "class", "demonstration-diagram-label");
+            builder.AddContent(sequence++, "CONCEPTUAL MODEL // DIFFERENT UPDATE CADENCES");
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "demonstration-diagram-grid");
+            AddDiagramNode(builder, ref sequence, "NEAR FIELD", "Refresh more often when detail is relevant; update the representation from current source data.");
+            AddDiagramNode(builder, ref sequence, "FAR FIELD", "Refresh less often; retain cached output while its dependencies remain valid.");
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "demonstration-diagram-flow");
+            builder.AddContent(sequence++, "SOURCE CHANGE");
+            builder.OpenElement(sequence++, "b");
+            builder.AddContent(sequence++, "→");
+            builder.CloseElement();
+            builder.AddContent(sequence++, "INVALIDATE AFFECTED DEPENDENTS");
+            builder.OpenElement(sequence++, "b");
+            builder.AddContent(sequence++, "→");
+            builder.CloseElement();
+            builder.AddContent(sequence++, "RECOMPUTE WHEN ELIGIBLE");
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "p");
+            builder.AddAttribute(sequence++, "class", "demonstration-diagram-disclaimer");
+            builder.AddContent(sequence++, "Architecture illustration only. It does not represent a running renderer or measured frame-rate gain.");
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        else if (string.Equals(demonstration.DiagramKind, "native-surface-lifecycle", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.OpenElement(sequence++, "section");
+            builder.AddAttribute(sequence++, "class", "demonstration-diagram");
+            builder.AddAttribute(sequence++, "aria-label", "Conceptual native WPF and Direct3D 12 surface lifecycle");
+            builder.OpenElement(sequence++, "p");
+            builder.AddAttribute(sequence++, "class", "demonstration-diagram-label");
+            builder.AddContent(sequence++, "SOURCE-SCOPE DIAGRAM // NOT A RUNTIME CAPTURE");
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "demonstration-native-flow");
+            foreach (var step in new[] { "WPF HOST", "DEVICE / QUEUE", "SWAPCHAIN", "PRESENT / RESIZE", "RESOURCE LIFETIME" })
+            {
+                builder.OpenElement(sequence++, "div");
+                builder.AddAttribute(sequence++, "class", "demonstration-native-step");
+                builder.AddContent(sequence++, step);
+                builder.CloseElement();
+            }
+            builder.CloseElement();
+            builder.OpenElement(sequence++, "p");
+            builder.AddAttribute(sequence++, "class", "demonstration-diagram-disclaimer");
+            builder.AddContent(sequence++, "This diagram summarizes the areas described by the sample; it is not evidence of geometry rendering or a verified hardware run.");
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+    }
+
+    private static void AddDiagramNode(
+        RenderTreeBuilder builder,
+        ref int sequence,
+        string title,
+        string description)
+    {
+        builder.OpenElement(sequence++, "article");
+        builder.AddAttribute(sequence++, "class", "demonstration-diagram-node");
+        builder.OpenElement(sequence++, "strong");
+        builder.AddContent(sequence++, title);
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "p");
+        builder.AddContent(sequence++, description);
         builder.CloseElement();
         builder.CloseElement();
     }
