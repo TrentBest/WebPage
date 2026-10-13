@@ -50,6 +50,17 @@ public sealed class WorkshopExperienceService : IDisposable
             ? moniker!.Composition
             : null;
 
+    /// <summary>
+    /// Browser manifestation hint contributed by the separately composed sway behavior.
+    /// Other hosts may map the same behavior capability to a different presentation.
+    /// </summary>
+    public string? MonikerBehaviorClass =>
+        RuntimeAssembly?.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
+            (ulong)MonikerSwayBehaviorMicroBundle.BundleId,
+            out var behavior) == true
+            ? behavior!.Composition?.Properties.GetValueOrDefault("presentationClass")
+            : null;
+
     public LivingGuiExperienceMicroBundle? PrimaryExperienceComposition =>
         RuntimeAssembly?.TryGetBundle<LivingGuiExperienceMicroBundle>(
             (ulong)LivingGuiExperienceMicroBundle.BundleId,
@@ -105,28 +116,39 @@ public sealed class WorkshopExperienceService : IDisposable
 
     private void ComposePrimaryExperience()
     {
-        var primaryExperience = PrimaryManifestExperience;
-        if (primaryExperience?.MicroBundles is not { Count: > 0 } primaryBundles)
+        var startupBundles = CurrentManifestExperience?.MicroBundles;
+        if (startupBundles is not { Count: > 0 })
+            throw new InvalidOperationException(
+                "The manifest-selected startup Experience has no MicroBundles. The canonical Moniker and its selected behavior must be declared by the manifest.");
+
+        var primaryBundles = PrimaryManifestExperience?.MicroBundles;
+        if (primaryBundles is not { Count: > 0 })
             throw new InvalidOperationException("The manifest-selected primary Experience has no MicroBundles.");
 
-        // The manifest supplies only the primary Experience root. Its MicroBundle
-        // declares the canonical Moniker dependency, so FSM_COS closes the graph.
+        // Startup and running roots are requested together so the canonical Moniker
+        // and its behavior are resolved once in the same RuntimeAssembly as the
+        // primary Experience. FSM_COS owns dependency closure and load ordering.
+        var roots = startupBundles.Concat(primaryBundles)
+            .Select(root => root.ToRuntimeManifestEntry())
+            .ToArray();
+
         RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
             RuntimeId: 1,
-            Bundles: primaryBundles
-                .Select(root => root.ToRuntimeManifestEntry())
-                .ToArray()));
+            Bundles: roots));
 
         var hasMoniker = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
+            out _);
+        var hasSway = RuntimeAssembly.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
+            (ulong)MonikerSwayBehaviorMicroBundle.BundleId,
             out _);
         var hasPrimary = RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
             LivingGuiExperienceMicroBundle.BundleId,
             out _);
 
-        if (!hasMoniker || !hasPrimary)
+        if (!hasMoniker || !hasSway || !hasPrimary)
             throw new InvalidOperationException(
-                "FSM_COS did not compose the manifest-selected primary Experience and its canonical Moniker dependency.");
+                "FSM_COS did not compose the manifest-declared Moniker, its selected sway behavior, and the primary Experience.");
 
         if (RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
                 (ulong)MonikerMicroBundle.BundleId,
