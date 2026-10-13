@@ -52,3 +52,10 @@ Frame interval includes browser scheduling. JavaScript encode/submit timing is n
 3. Feed refresh, invalidation, and reuse decisions from actual Renderer Event Horizon bucket APIs rather than a duplicate page-owned cadence policy.
 4. Capture GPU timestamps where supported, warm-up runs, repeated trials, and initial ×10/×100 scaling curves.
 5. Increase practical population limits only as buffer/memory constraints and measurements justify it.
+
+
+## Head scientist's helmet tablet
+
+The hosted snapshot now includes a data-driven demonstration catalog. The player can order a sternum-plate impact, a thermal-dissipation prototype, or a non-firing cutaway. Each entry declares its stable demonstration ID, part ID, fictional research-credit price, setup-time estimate, event sequence, and research question. The interaction progresses through order, simulated setup, and range result; the plate-impact result shows a crater/hot edge, barrel heat, chassis heat distortion, and the head scientist's line. Funding cooling research changes the next simulated thermal result and enables the nearby trooper's follow-on joke about the rifle transferring heat into the chassis.
+
+These values are game-simulation parameters, not measured material properties or test results. Haptic output is not yet connected to a physical controller, and the specimen illustration is not yet a separately manipulable 3D plate subassembly. This copy must stay synchronized with the canonical Visualize sample until the repositories have a versioned asset-delivery contract.
