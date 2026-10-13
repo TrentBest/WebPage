@@ -17,7 +17,7 @@ public sealed class WebPageHostManifestTests
           "manifestId": "webpage-host",
           "version": "1.0.0",
           "startup": [
-            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
+            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [{ "bundleId": 2110, "version": "1.0.0" }, { "bundleId": 2111, "version": "1.0.0" }], "presentationSeconds": 3 }
           ],
           "hub": [
             { "name": "AnyApp", "kind": "Host", "description": "Desktop host architecture", "deploymentUrl": null, "aboutUrl": "/about-us", "bridgeEndpoint": null, "route": "/anyapp", "microBundles": [] }
@@ -41,7 +41,9 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("webpage-host", manifest.ManifestId);
         Assert.Single(manifest.Startup);
         Assert.Equal("Moniker", manifest.Startup[0].Kind);
-        Assert.Empty(manifest.Startup[0].MicroBundles!);
+        Assert.Equal(new ulong[] { 2110, 2111 }, manifest.Startup[0].MicroBundles!
+            .Select(root => root.BundleId));
+        Assert.All(manifest.Startup[0].MicroBundles!, root => Assert.Equal("1.0.0", root.Version));
         Assert.Single(manifest.Hub);
         Assert.Equal("AnyApp", manifest.Hub[0].Name);
         Assert.Equal("Host", manifest.Hub[0].Kind);
