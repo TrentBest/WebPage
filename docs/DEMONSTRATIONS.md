@@ -9,8 +9,9 @@ The Demonstrations gallery is a WebPage-hosted Experience, not a separate demo s
 | GPU Instancing — Browser WebGPU Proof | Runnable locally; not hosted by WebPage | Read the scope and limitations, inspect the proof branch, and follow the local server instructions |
 | Native WPF / Direct3D 12 Surface Proof | Experimental, source-only | Read the native-surface scope and inspect the sample source |
 | Event Horizon Buckets — Renderer Architecture | Experimental architecture model | Read the bucket/cache/invalidation explanation and inspect the renderer pull request |
+| Soldier Field — Exoskeleton and Event Horizon Lab | Live WebPage experience; exploratory WebGPU lab | View the 3D soldier, inspect 38 stable part records, download preliminary cut sheets, and scale per-horizon stress workloads |
 
-None of these entries has a verified runnable destination inside WebPage, so the gallery deliberately does not show a **Run demonstration** button. A source link is not a run link. Build success is not evidence of a native GPU run, and the Event Horizon entry does not invent simulated performance measurements.
+Soldier Field is the first entry with an embedded destination inside WebPage. It is a browser adapter hosting the Visualize repository's exploratory WebGPU lab, not a production .NET Visualize backend. The other entries remain source-only or locally runnable as described. A source link is not a run link. Build success is not evidence of a native GPU run, and the Event Horizon entry does not invent simulated performance measurements.
 
 ## Runtime boundary
 
@@ -32,7 +33,7 @@ DemonstrationRegistry (manifest-backed metadata discovery)
 Home's existing Hub presentation adapter
 ```
 
-The manifest describes entries and their limitations; it does not embed executable behavior. The registry keeps unavailable/source-only entries discoverable so the detail view can explain why they cannot run here. The host currently declares WebPage and Browser as host capabilities. GPU/WebGPU and native WPF/Direct3D 12 execution are not claimed as integrated.
+The manifest describes entries, optional same-origin embedded presentation URLs, and their limitations; it does not embed executable behavior. The registry keeps unavailable/source-only entries discoverable so the detail view can explain why they cannot run here. Soldier Field is rendered in an iframe declared by its manifest entry and served from WebPage's static assets. The host currently declares WebPage and Browser as host capabilities. This does not claim a production .NET Visualize backend, native WPF/Direct3D 12 execution, or Renderer-driven bucket scheduling.
 
 **Presentation boundary to tighten:** the gallery currently extends the Home page's existing RenderTreeBuilder-based Hub presentation path, nested inside the Workshop GUI root. It does not introduce a new UI framework or router, but the gallery's cards and diagrams are not yet composed as a fully platform-neutral GUI builder tree. Before claiming that boundary complete, inspect the current GUI builder/rendering contract and add a reusable link/action primitive if the existing vocabulary cannot express navigation safely.
 
@@ -42,8 +43,8 @@ The manifest describes entries and their limitations; it does not embed executab
 
 1. Verify the source, maturity, launch method, requirements, and evidence. Do not infer a runnable URL from a source repository or pull request.
 2. Add a `demonstrations` entry to `TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json`.
-3. Supply a stable `id`, title, short summary, engineering motivation, status, `whatItProves`, `whatItDoesNotProve`, launch mode, run instructions, source URL, requirements, and optional `requiredHostCapabilities`.
-4. Keep descriptive metadata separate from behavior. If the demonstration becomes a real runtime Experience, use the existing Experience/MicroBundle contracts and Hub-owned process groups rather than adding a name-based switch to the gallery.
+3. Supply a stable `id`, title, short summary, engineering motivation, status, `whatItProves`, `whatItDoesNotProve`, launch mode, run instructions, source URL, requirements, and optional `requiredHostCapabilities`. An optional `embeddedExperienceUrl` is for an existing same-origin browser surface that the host can present; it is not a license to put reusable behavior in the gallery.
+4. Keep descriptive metadata separate from behavior. The optional embedded URL is presentation routing only. If the demonstration becomes a real runtime Experience, use the existing Experience/MicroBundle contracts and Hub-owned process groups rather than adding a name-based switch to the gallery.
 5. Add tests for metadata parsing, stable-ID lookup, duplicate IDs, and capability compatibility.
 6. Build and run tests, then inspect the actual browser at desktop and narrow widths. Tests alone do not verify the visual manifestation.
 
@@ -54,6 +55,7 @@ The manifest describes entries and their limitations; it does not embed executab
 - [GPU Instancing WebGPU proof pull request](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/pull/5)
 - [Native WPF / Direct3D 12 sample source](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/tree/development/samples/WpfD3D12Proof)
 - [Renderer Event Horizon buckets pull request](https://github.com/TrentBest/TheSingularityWorkshop.Renderer/pull/8)
+- [Visualize Soldier Field and engineering cut-sheet lab](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/pull/7)
 
 ## Verification checkpoint
 
