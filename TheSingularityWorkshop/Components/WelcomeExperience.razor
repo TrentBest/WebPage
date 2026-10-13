@@ -20,6 +20,7 @@
     private FSMHandle? _handle;
     private WelcomeLabContext? _context;
     private string _machineName = string.Empty;
+    private bool _processingGroupCreated;
     private bool _disposed;
 
     private string CurrentState => _handle?.CurrentState ?? "NOT COMPOSED";
@@ -32,6 +33,18 @@
     {
         if (_disposed)
             return;
+
+        // The visitor's group is isolated from the Hub scheduler. Register it
+        // explicitly before creating its first FSM, and retire the previous
+        // instance when Reset builds a replacement.
+        if (_handle?.IsValid == true)
+            FsmApi.Interaction.DestroyFiniteStateMachine(_machineName, _processingGroup);
+
+        if (!_processingGroupCreated)
+        {
+            FsmApi.Create.CreateProcessingGroup(_processingGroup);
+            _processingGroupCreated = true;
+        }
 
         _context = new WelcomeLabContext
         {
@@ -299,7 +312,7 @@
         if (_context is not null)
             _context.IsValid = false;
         if (_handle?.IsValid == true)
-            FSM_API.Interaction.Update(_processingGroup);
+            FsmApi.Interaction.DestroyFiniteStateMachine(_machineName, _processingGroup);
         _handle = null;
         _context = null;
     }
