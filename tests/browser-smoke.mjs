@@ -56,6 +56,8 @@ try {
   }
 
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: "REVEAL THE FSM" }).click();
+  await page.getByRole("button", { name: "SEND START SIGNAL" }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
   await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
   const tick = page.getByRole("button", { name: "TICK RUNTIME" });
