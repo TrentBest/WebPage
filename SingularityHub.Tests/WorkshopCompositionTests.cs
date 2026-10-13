@@ -30,6 +30,10 @@ public sealed class WorkshopCompositionTests
             out _));
         Assert.NotNull(moniker?.Composition);
         Assert.Same(moniker!.Composition, experience.MonikerComposition);
+        Assert.True(experience.RuntimeAssembly.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
+            (ulong)MonikerSwayBehaviorMicroBundle.BundleId, out var sway));
+        Assert.NotNull(sway?.Composition);
+        Assert.Equal(MonikerSwayBehaviorMicroBundle.PresentationClass, experience.MonikerBehaviorClass);
         Assert.True(experience.CapabilityRuntimeAssemblies.TryGetValue("Rendering", out var renderingAssembly));
         Assert.True(renderingAssembly!.TryGetBundle<RenderingMicroBundle>(
             RenderingMicroBundle.BundleId,
@@ -144,7 +148,7 @@ public sealed class WorkshopCompositionTests
               "manifestId": "webpage-host",
               "version": "1.0.0",
               "startup": [
-                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
+                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [{ "bundleId": 2110, "version": "1.0.0" }, { "bundleId": 2111, "version": "1.0.0" }], "presentationSeconds": 3 }
               ],
               "hub": [
                 {
