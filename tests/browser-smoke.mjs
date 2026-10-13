@@ -41,8 +41,8 @@ try {
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   const initialLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  if (initialLinks.length !== 1 || initialLinks[0] !== "Welcome") {
-    throw new Error(`The initial hub must show Welcome as its only tab; found: ${initialLinks.join(", ")}.`);
+  if (!initialLinks.includes("Welcome") || !initialLinks.includes("About Us")) {
+    throw new Error(`The initial navigation must expose both Welcome and About Us; found: ${initialLinks.join(", ")}.`);
   }
   await page.getByRole("link", { name: "Welcome", exact: true }).click();
   await page.locator(".workshop-nav-shell.collapsed").waitFor({ state: "visible" });
