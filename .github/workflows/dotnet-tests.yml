@@ -147,11 +147,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       # Use sibling checkouts so project-relative paths match a local Workshop workspace.
-      - name: Checkout WebPage development
+      - name: Checkout WebPage event revision
         uses: actions/checkout@v5
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           path: WebPage
-          ref: development
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Checkout FSM_API development
         uses: actions/checkout@v5
         with:
