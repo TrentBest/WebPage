@@ -249,11 +249,11 @@
             .Style("grid-template-columns", "repeat(3,minmax(0,1fr))")
             .Style("gap", ".4rem");
 
-        for (var stateIndex = 0; stateIndex < StateNames.Length; stateIndex++)
+        var stateIndex = 0;
+        foreach (var state in StateNames)
         {
-            var state = StateNames[stateIndex];
             var active = string.Equals(CurrentState, state, StringComparison.Ordinal);
-            var accent = stateIndex switch { 0 => Cyan, 1 => Magenta, _ => Green };
+            var accent = stateIndex++ switch { 0 => Cyan, 1 => Magenta, _ => Green };
             var stateCard = WorkshopGui.Panel(this)
                 .Style("padding", ".7rem .4rem")
                 .Style("text-align", "center")
