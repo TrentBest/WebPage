@@ -10,7 +10,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// The stationary Moniker remains owned by MonikerMicroBundle; this bundle describes
 /// the optional behavior that a host-specific presentation adapter can manifest.
 /// </summary>
-public sealed class MonikerSwayBehaviorMicroBundle : IMicroBundle, IMonikerPresentationBehavior
+public sealed class MonikerSwayBehaviorMicroBundle : TheSingularityWorkshop.MicroBundleDomain.IMicroBundle, IMonikerPresentationBehavior
 {
     public const int BundleId = 2111;
     public const string PresentationClass = "moniker-kelp-sway";
