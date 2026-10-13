@@ -125,24 +125,24 @@ public sealed class RenderingMicroBundle : IMicroBundle
 
     private GuiNode BuildComposition()
     {
-        var panel = GuiBuilders.Panel("rendering")
+        var panel = GuiBuilder.Create("Panel", "rendering")
             .Property("composition", "Rendering")
-            .Child(GuiBuilders.Text("rendering-title", "RENDERING"))
-            .Child(GuiBuilders.Text(
-                "rendering-description",
+            .Child("Text", "rendering-title", title => title.Text("RENDERING"))
+            .Child("Text", "rendering-description", description => description.Text(
                 "Semantic world -> camera/context -> perception band -> manifestation."));
 
         if (!string.IsNullOrWhiteSpace(AiObservationText))
         {
-            panel.Child(
-                GuiBuilders.TextBox("rendering-ai-observation", AiObservationText)
-                    .Property("label", "AI OBSERVATION")
-                    .Property("readonly", "true")
-                    .Property("multiline", "true"));
+            panel.Child("TextBox", "rendering-ai-observation", input => input
+                .Property("label", "AI OBSERVATION")
+                .Property("readonly", "true")
+                .Property("multiline", "true")
+                .Text(AiObservationText));
         }
 
         return panel.Build();
     }
+
 }
 
 
