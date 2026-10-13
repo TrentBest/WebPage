@@ -114,6 +114,7 @@ Choose the guide that answers your question; the README stays an orientation and
 
 - [**Learning Path**](docs/LEARNING_PATH.md) — a visitor and developer route from witnessing the Experience to inspecting its proof.
 - [**Repository Map**](docs/REPOSITORY_MAP.md) — where source responsibilities live and how dependencies should point.
+- [**Dependency Workflow**](docs/DEPENDENCY_WORKFLOW.md) — the package hierarchy and the planned source-versus-NuGet verification workflow.
 - [**Current Vertical Slice**](docs/CURRENT_VERTICAL_SLICE.md) — the current manifest, startup sequence, known gap, and proof obligations.
 - [**FSM_COS Usage**](docs/FSM_COS_USAGE.md) — how WebPage requests composition and consumes the RuntimeAssembly.
 - [**Workshop Runtime Architecture**](docs/WORKSHOP_RUNTIME_ARCHITECTURE.md) — the boundary between runtime behavior and browser host.
