@@ -380,7 +380,7 @@
         StateHasChanged();
     }
 
-    private EventCallback MachineChanged => EventCallback.Factory.Create<ChangeEventArgs>(this, ChangeMachine);
+    private EventCallback MachineChanged => EventCallback.Factory.Create(this, (ChangeEventArgs args) => ChangeMachine(args));
 
     private void ChangeMachine(ChangeEventArgs args)
     {
