@@ -10,8 +10,6 @@ public partial class WelcomeExperience : IDisposable
         _disposed = true;
         if (_context is not null)
             _context.IsValid = false;
-        if (_handle?.IsValid == true)
-            FSM_API.Interaction.Update(_processingGroup);
         _handle = null;
         _context = null;
     }
