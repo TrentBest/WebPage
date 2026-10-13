@@ -23,13 +23,13 @@ public sealed class FirstContactPlantTests
     }
 
     [Fact]
-    public async Task ManifestStartup_ComposesMonikerDependency_WithoutAdvancingHostLifecycle()
+    public async Task ManifestStartup_ComposesMonikerExperience_WithoutAdvancingHostLifecycle()
     {
         const string manifestJson = """
         {
           "manifestId": "webpage-host",
           "version": "1.0.0",
-          "startup": [{ "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }],
+          "startup": [{ "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [{ "bundleId": 2101, "version": "1.0.0" }], "presentationSeconds": 3 }],
           "running": [{ "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }],
           "deepDive": { "experience": "LIVING GUI", "restartFromManifest": true, "telemetry": true }
         }
