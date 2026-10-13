@@ -53,8 +53,8 @@ jobs:
           dotnet restore Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj
           dotnet restore Experiences/PongExperience.Tests/PongExperience.Tests.csproj
 
-      # Compile the actual browser host against the same unpublished FSM_COS candidate.
-      # This catches integration failures that isolated experience tests cannot see.
+      # Compile the browser host against the pinned public FSM_COS package.
+      # This catches package integration failures that isolated experience tests cannot see.
       - name: Restore and build WebPage browser host
         run: |
           dotnet restore TheSingularityWorkshop/TheSingularityWorkshop.csproj
