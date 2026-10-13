@@ -71,6 +71,7 @@ The existing runtime currently proves the following behavior and therefore estab
 ### Complete
 
 - Host manifest loading/validation.
+- Manifest-declared startup Moniker and sway behavior.
 - Manifest-selected primary root.
 - FSM_COS dependency closure.
 - 2102 → 2110 dependency declaration.
