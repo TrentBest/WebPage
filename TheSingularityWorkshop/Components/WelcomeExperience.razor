@@ -252,11 +252,11 @@
             .Style("grid-template-columns", "repeat(3,minmax(0,1fr))")
             .Style("gap", ".4rem");
 
-        var stateIndex = 0;
+        var cardIndex = 0;
         foreach (var state in StateNames)
         {
             var active = string.Equals(CurrentState, state, StringComparison.Ordinal);
-            var accent = stateIndex++ switch { 0 => Cyan, 1 => Magenta, _ => Green };
+            var accent = cardIndex++ switch { 0 => Cyan, 1 => Magenta, _ => Green };
             var stateCard = WorkshopGui.Panel(this)
                 .Style("padding", ".7rem .4rem")
                 .Style("text-align", "center")
@@ -383,7 +383,7 @@
         StateHasChanged();
     }
 
-    private EventCallback MachineChanged => EventCallback.Factory.Create(this, (ChangeEventArgs args) => ChangeMachine(args));
+    private EventCallback<ChangeEventArgs> MachineChanged => EventCallback.Factory.Create<ChangeEventArgs>(this, ChangeMachine);
 
     private void ChangeMachine(ChangeEventArgs args)
     {
