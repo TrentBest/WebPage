@@ -66,9 +66,8 @@ public sealed class WorkshopExperienceService : IDisposable
             // the manifest roots and implementing IMonikerPresentationBehavior.
             foreach (var root in roots)
             {
-                if (RuntimeAssembly.TryGetBundle<IMonikerPresentationBehavior>(
-                        root.BundleId, out var behavior) &&
-                    behavior is not null)
+                if (RuntimeAssembly.TryGetBundle(root.BundleId, out var bundle) &&
+                    bundle is IMonikerPresentationBehavior behavior)
                 {
                     return behavior.PresentationClass;
                 }
