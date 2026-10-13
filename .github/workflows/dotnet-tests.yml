@@ -105,9 +105,11 @@ jobs:
           grep -q 'deriveCutSheet' /tmp/soldier-cut-sheet.mjs
           curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/research-demonstrations.json -o /tmp/research-demonstrations.json
           grep -q '"id": "plate-impact"' /tmp/research-demonstrations.json
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/research-demonstrations.schema.json -o /tmp/research-demonstrations.schema.json
+          grep -q '"mostFrequentlyHitArmorPartId"' /tmp/research-demonstrations.schema.json
           curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-research-simulation.mjs -o /tmp/soldier-research-simulation.mjs
           grep -q 'function fireDemonstration' /tmp/soldier-research-simulation.mjs
-          echo "WebPage host served the Soldier Field lab, 38 part records, cut-sheet module, research catalog, and simulation state module."
+          echo "WebPage host served the Soldier Field lab, 38 part records, cut-sheet module, research catalog/schema, and simulation state module."
           WORKSHOP_BASE_URL=http://127.0.0.1:5260 node tests/soldier-field-smoke.mjs
 
           mkdir -p TestResults/Browser
