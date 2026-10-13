@@ -30,6 +30,8 @@
     private WelcomeLabContext? _context;
     private string _machineName = string.Empty;
     private bool _disposed;
+    private bool _showLab;
+    private bool _transitioning;
     private string _selectedMachine = "Lifecycle";
     private string[] StateNames => _selectedMachine switch
     {
@@ -153,6 +155,9 @@
             .Style("min-height", "0")
             .Style("box-sizing", "border-box")
             .Style("overflow", "hidden")
+            .Style("transition", "opacity 650ms ease, transform 850ms cubic-bezier(.2,.8,.2,1)")
+            .Style("opacity", _transitioning ? "0" : "1")
+            .Style("transform", _transitioning ? "scale(.94)" : "scale(1)")
             .Style("padding", "clamp(1rem,3vw,2.5rem)")
             .Style("background", "radial-gradient(ellipse at 50% 0%,rgba(0,234,255,.08),transparent 45%),#020711")
             .Style("color", "#f4fbff")
@@ -178,6 +183,32 @@
             .Style("font-size", "clamp(.8rem,1.2vw,1rem)")
             .Style("line-height", "1.7")
             .Text("The Workshop builds experiences from explicit state, composable capabilities, and shared GUI grammar. Start with a real finite-state machine below: you control the signal, the FSM_API runtime drives transitions, and the lifecycle trace records what actually happens."));
+
+        if (!_showLab)
+        {
+            root.Content(WorkshopGui.Element(this, "p")
+                .Style("max-width", "56ch")
+                .Style("margin-top", "1.5rem")
+                .Style("color", "#d8faff")
+                .Style("font-size", "clamp(1rem,2vw,1.3rem)")
+                .Style("line-height", "1.6")
+                .Text("First, meet the idea in words. A system waits. You give it a signal. It changes state. Then we open the controls and let you drive the runtime."));
+            root.Content(WorkshopGui.Button(this)
+                .Label("REVEAL THE FSM")
+                .Style("margin-top", "1rem")
+                .Style("padding", ".9rem 1.1rem")
+                .Style("border", "1px solid " + Cyan)
+                .Style("background", Cyan + "18")
+                .Style("color", Cyan)
+                .Style("font-family", "inherit")
+                .Style("font-weight", "800")
+                .Style("letter-spacing", ".12em")
+                .Style("cursor", "pointer")
+                .Style("animation", "welcomeFsmBreath 1.45s ease-in-out infinite")
+                .Style("box-shadow", "0 0 22px " + Cyan + "55")
+                .OnClick(RevealLab));
+            return root.Build();
+        }
 
         var workspace = WorkshopGui.MultiPanel(this)
             .Style("display", "grid")
@@ -334,6 +365,18 @@
             .Text("NEXT: this hands-on pattern can grow into manifest-selected MicroBundles and FSM_COS-composed Experiences. This first slice demonstrates real FSM lifecycle behavior; it does not pretend the lab itself is a complete FSM_COS assembly authoring tool."));
 
         return root.Build();
+    }
+
+    private async Task RevealLab()
+    {
+        if (_showLab || _transitioning)
+            return;
+        _transitioning = true;
+        StateHasChanged();
+        await Task.Delay(720);
+        _showLab = true;
+        _transitioning = false;
+        StateHasChanged();
     }
 
     private void ChangeMachine(ChangeEventArgs args)
