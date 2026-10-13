@@ -1,14 +1,13 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.3.9",
+  "version": "1.4.0",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
       "kind": "Moniker",
       "presentationSeconds": 3,
       "microBundles": [
-        { "bundleId": 2110, "version": "1.0.0" },
-        { "bundleId": 2111, "version": "1.0.0" }
+        { "bundleId": 2101, "version": "1.0.0" }
       ]
     }
   ],
