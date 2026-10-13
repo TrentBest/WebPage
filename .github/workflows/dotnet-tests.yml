@@ -141,3 +141,66 @@ jobs:
           token: ${{ env.CODECOV_TOKEN }}
           files: ./TestResults/**/coverage.cobertura.xml
           fail_ci_if_error: false
+
+  source-integration:
+    name: Workshop repository-source integration
+    runs-on: ubuntu-24.04
+    steps:
+      # Use sibling checkouts so project-relative paths match a local Workshop workspace.
+      - name: Checkout WebPage development
+        uses: actions/checkout@v5
+        with:
+          path: WebPage
+          ref: development
+      - name: Checkout FSM_API development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/FSM_API
+          ref: development
+          path: FSM_API
+      - name: Checkout MicroBundleDomain development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.MicroBundleDomain
+          ref: development
+          path: TheSingularityWorkshop.MicroBundleDomain
+      - name: Checkout FSM_COS development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.FSM_COS
+          ref: development
+          path: TheSingularityWorkshop.FSM_COS
+      - name: Checkout FSM_UserIO development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/FSM_UserIO
+          ref: development
+          path: FSM_UserIO
+      - name: Checkout GUI development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.GUI
+          ref: development
+          path: TheSingularityWorkshop.GUI
+      - name: Checkout ProtocolAi development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.ProtocolAi
+          ref: development
+          path: TheSingularityWorkshop.ProtocolAi
+      - name: Checkout GrammarAi development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.GrammarAi
+          ref: development
+          path: TheSingularityWorkshop.GrammarAi
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore WebPage from checked-out Workshop source
+        working-directory: WebPage
+        run: dotnet restore TheSingularityWorkshop/TheSingularityWorkshop.csproj -p:WorkshopUseRepositorySources=true
+      - name: Build WebPage from checked-out Workshop source
+        working-directory: WebPage
+        run: dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore -p:WorkshopUseRepositorySources=true
