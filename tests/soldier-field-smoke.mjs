@@ -50,7 +50,7 @@ try {
   await page.locator("#request-demo").click();
   await page.locator("#complete-setup").click();
   await page.locator("#fire-demo").click();
-  await page.getByText("IMPACT REGISTERED / CRATER + HOT EDGE", { exact: true }).waitFor({ state: "attached" });
+  await page.locator("#research-log").getByText("PROTOTYPE DISCHARGE.", { exact: false }).waitFor({ state: "attached" });
   await page.getByText("Head scientist: “As you can see, sire, we still struggle with dissipating the heat…”", { exact: true }).waitFor({ state: "attached" });
   await page.locator("#invest-cooling").click();
   await page.locator("#demo-select").selectOption("plate-impact");
