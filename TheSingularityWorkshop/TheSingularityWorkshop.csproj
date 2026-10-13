@@ -13,12 +13,21 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.20" PrivateAssets="all" />
-    <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" />
-    <PackageReference Include="TheSingularityWorkshop.MicroBundleDomain" Version="1.0.1" />
-    <PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.6" />
-    <PackageReference Include="TheSingularityWorkshop.GUI.Blazor" Version="0.1.0-alpha.8" />
-    <PackageReference Include="TheSingularityWorkshop.ProtocolAi" Version="0.1.0-alpha.2" />
-    <PackageReference Include="TheSingularityWorkshop.GrammarAi" Version="0.1.0-alpha.2" />
+    <!-- NuGet mode is the safe default. Opt into sibling development sources with
+         -p:WorkshopUseRepositorySources=true from a workspace containing the repositories below. -->
+    <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
+    <PackageReference Include="TheSingularityWorkshop.MicroBundleDomain" Version="1.0.1" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
+    <PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.6" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
+    <PackageReference Include="TheSingularityWorkshop.GUI.Blazor" Version="0.1.0-alpha.8" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
+    <PackageReference Include="TheSingularityWorkshop.ProtocolAi" Version="0.1.0-alpha.2" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
+    <PackageReference Include="TheSingularityWorkshop.GrammarAi" Version="0.1.0-alpha.2" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
+
+    <ProjectReference Include="..\..\FSM_API\FSM_API\FSM_API.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.MicroBundleDomain\TheSingularityWorkshop.MicroBundleDomain.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.FSM_COS\src\FSM_COS\FSM_COS.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.GUI\src\Blazor\TheSingularityWorkshop.GUI.Blazor.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.ProtocolAi\TheSingularityWorkshop.ProtocolAi.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.GrammarAi\TheSingularityWorkshop.GrammarAi.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\SingularityHub\SingularityHub.csproj" />
   </ItemGroup>
 
@@ -34,5 +43,15 @@
   <ItemGroup>
     <Folder Include="Infastructure\Demos\FoxesAndDogs\" />
   </ItemGroup>
+
+
+  <Target Name="ValidateWorkshopRepositorySources" BeforeTargets="PrepareForBuild" Condition="'$(WorkshopUseRepositorySources)' == 'true'">
+    <Error Condition="!Exists('..\..\FSM_API\FSM_API\FSM_API.csproj')" Text="Workshop source mode requires sibling repository FSM_API on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.MicroBundleDomain\TheSingularityWorkshop.MicroBundleDomain.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.MicroBundleDomain on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.FSM_COS\src\FSM_COS\FSM_COS.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.FSM_COS on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.GUI\src\Blazor\TheSingularityWorkshop.GUI.Blazor.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.GUI on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.ProtocolAi\TheSingularityWorkshop.ProtocolAi.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.ProtocolAi on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.GrammarAi\TheSingularityWorkshop.GrammarAi.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.GrammarAi on development." />
+  </Target>
 
 </Project>
