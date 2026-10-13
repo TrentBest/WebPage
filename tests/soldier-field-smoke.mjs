@@ -55,6 +55,7 @@ try {
   await page.locator("#complete-setup").click();
   await page.locator("#fire-demo").click();
   await page.waitForFunction(() => document.querySelector("#specimen-hit-count")?.textContent === "1");
+  await page.waitForFunction(() => { const log = document.querySelector("#research-log")?.innerText || ""; return log.includes("breath intake and exertion grunt cue played.") || log.includes("Web Audio unavailable; sound cue skipped."); });
   await page.locator("#research-log").getByText("PROTOTYPE DISCHARGE.", { exact: false }).waitFor({ state: "attached" });
   await page.getByText("Head scientist: “As you can see, sire, we still struggle with dissipating the heat…”", { exact: true }).waitFor({ state: "attached" });
   await page.locator("#invest-cooling").click();
@@ -77,7 +78,7 @@ try {
   if (pageErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected: ${pageErrors.join("\n")}`);
   }
-  console.log("Soldier Field smoke passed: 38 part records, cut-sheet download, priced setup, persistent part-specific damage events, heat response, cooling investment, and follow-on trooper chatter.");
+  console.log("Soldier Field smoke passed: 38 part records, cut-sheet download, priced setup, persistent part-specific damage events, procedural audio fallback, heat response, cooling investment, and follow-on trooper chatter.");
 } finally {
   await browser.close();
 }
