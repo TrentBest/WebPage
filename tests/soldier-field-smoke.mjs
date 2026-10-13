@@ -39,7 +39,29 @@ try {
   if (pageErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected: ${pageErrors.join("\n")}`);
   }
-  console.log("Soldier Field smoke passed: 38 records loaded, a part selected, and a derived cut sheet downloaded.");
+  await page.locator("#demo-select option").nth(2).waitFor({ state: "attached", timeout: 15_000 });
+  if (await page.locator("#demo-select option").count() !== 3) {
+    throw new Error("Expected three data-driven research demonstrations.");
+  }
+  await page.locator("#demo-select").selectOption("plate-impact");
+  if (await page.locator("#demo-cost").textContent() !== "120 cr") {
+    throw new Error("Plate-impact demonstration did not show its catalog price.");
+  }
+  await page.locator("#request-demo").click();
+  await page.locator("#complete-setup").click();
+  await page.locator("#fire-demo").click();
+  await page.getByText("IMPACT REGISTERED / CRATER + HOT EDGE", { exact: true }).waitFor({ state: "attached" });
+  await page.getByText("Head scientist: “As you can see, sire, we still struggle with dissipating the heat…”", { exact: true }).waitFor({ state: "attached" });
+  await page.locator("#invest-cooling").click();
+  await page.locator("#demo-select").selectOption("plate-impact");
+  await page.locator("#request-demo").click();
+  await page.locator("#complete-setup").click();
+  await page.locator("#fire-demo").click();
+  await page.locator("#research-log").getByText("Nearby trooper, dryly:", { exact: false }).waitFor({ state: "attached" });
+  if (pageErrors.length > 0) {
+    throw new Error(`Browser JavaScript errors detected: ${pageErrors.join("\n")}`);
+  }
+  console.log("Soldier Field smoke passed: 38 part records, cut-sheet download, priced demonstration setup, impact/heat response, cooling investment, and follow-on trooper chatter.");
 } finally {
   await browser.close();
 }
