@@ -18,7 +18,7 @@ public sealed class MonikerExperienceTests
           "manifestId": "webpage-host",
           "version": "1.0.0",
           "startup": [
-            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
+            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [{ "bundleId": 2101, "version": "1.0.0" }], "presentationSeconds": 3 }
           ],
           "running": [
             { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }
@@ -33,6 +33,8 @@ public sealed class MonikerExperienceTests
 
         Assert.Equal("Moniker", manifest.Startup[0].Kind);
         Assert.Equal(3, manifest.Startup[0].PresentationSeconds);
+        Assert.Equal(2101UL, manifest.Startup[0].MicroBundles![0].BundleId);
+        Assert.Equal("1.0.0", manifest.Startup[0].MicroBundles[0].Version);
         Assert.Equal("Primary", manifest.Running[0].Kind);
         Assert.Equal(2102UL, manifest.Running[0].MicroBundles![0].BundleId);
     }
@@ -66,8 +68,14 @@ public sealed class MonikerExperienceTests
         // Composition remains available across startup presentation; this
         // compatibility entry point must not advance the host lifecycle.
         Assert.Equal("Moniker", service.CurrentState);
-        Assert.True(service.RuntimeAssembly!.TryGetBundle<MonikerMicroBundle>(
+        Assert.True(service.RuntimeAssembly!.TryGetBundle<MonikerExperienceMicroBundle>(
+            (ulong)MonikerExperienceMicroBundle.BundleId,
+            out _));
+        Assert.True(service.RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
+            out _));
+        Assert.True(service.RuntimeAssembly.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
+            (ulong)MonikerSwayBehaviorMicroBundle.BundleId,
             out _));
         Assert.True(service.RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
             LivingGuiExperienceMicroBundle.BundleId,
@@ -95,7 +103,7 @@ public sealed class MonikerExperienceTests
               "manifestId": "webpage-host",
               "version": "1.0.0",
               "startup": [
-                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
+                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [{ "bundleId": 2101, "version": "1.0.0" }], "presentationSeconds": 3 }
               ],
               "running": [
                 { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }
