@@ -74,14 +74,7 @@
             var capturedState = state;
             machine.State(capturedState,
                 onEnter: _ => Record($"OnEnter → {capturedState}"),
-                onUpdate: _ =>
-                {
-                    if (capturedState == states[1])
-                        _context.UpdateCount++;
-                    Record(capturedState == states[1]
-                        ? $"OnUpdate → {capturedState} // tick {_context.UpdateCount}"
-                        : $"OnUpdate → {capturedState}"));
-                },
+                onUpdate: _ => UpdateState(capturedState, states),
                 onExit: _ => Record($"OnExit → {capturedState}"));
         }
 
@@ -129,6 +122,16 @@
         // A reset creates a fresh FSM rather than resetting a shared/global machine.
         ComposeMachine();
         StateHasChanged();
+    }
+
+    private void UpdateState(string state, string[] states)
+    {
+        if (state == states[1] && _context is not null)
+            _context.UpdateCount++;
+
+        Record(state == states[1] && _context is not null
+            ? $"OnUpdate → {state} // tick {_context.UpdateCount}"
+            : $"OnUpdate → {state}");
     }
 
     private void Record(string entry)
