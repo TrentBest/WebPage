@@ -15,8 +15,8 @@ Make the WebPage host manifest the startup authority and make the repository exp
 
 The current manifest contains:
 
-- one startup Moniker presentation;
-- one primary running Experience: Living GUI;
+- one startup Moniker presentation that explicitly requests the stationary Moniker MicroBundle (2110) and its independent sway behavior (2111);
+- one primary running Experience: Living GUI (2102);
 - Deep Dive restart/telemetry intent.
 
 The model permits more than one startup Experience. The concrete sample currently uses one.
@@ -28,13 +28,14 @@ WEBPAGE BOOT
    ↓
 load host manifest
    ↓
-compose primary root through FSM_COS
+request startup roots 2110 (stationary Moniker) + 2111 (sway behavior)
+and running root 2102 (Living GUI)
    ↓
-FSM_COS resolves 2102
+FSM_COS resolves the declared dependency closure
    ↓
-2102 declares 2110 Moniker dependency
+RuntimeAssembly contains the Moniker, selected behavior, and primary Experience
    ↓
-RuntimeAssembly contains the closed composition
+browser reads the Moniker node and behavior presentation hint from RuntimeAssembly
    ↓
 present startup Moniker
    ↓
@@ -55,9 +56,9 @@ The host must not confuse the two by requesting the same dependency twice.
 
 The current primary root is 2102 — LivingGuiExperienceMicroBundle.
 
-Its declared dependency is 2110 — MonikerMicroBundle.
+Its declared dependency is 2110 — MonikerMicroBundle, the stationary/canonical Moniker definition. The startup manifest separately requests 2111 — MonikerSwayBehaviorMicroBundle.
 
-The manifest names 2102. FSM_COS discovers 2110 through the MicroBundle dependency contract.
+The host requests the declared startup and running roots together. FSM_COS resolves the dependency closure and assembles the capabilities into one RuntimeAssembly; the browser does not create a second Moniker or select the sway behavior in host code.
 
 ## Current browser responsibilities
 
@@ -66,6 +67,8 @@ WebPage owns:
 - fetching/parsing the host manifest;
 - providing the WebPage composition catalog;
 - consuming the RuntimeAssembly;
+- manifesting the stationary Moniker node supplied by MonikerMicroBundle;
+- mapping the separately composed sway behavior to browser animation;
 - browser presentation;
 - navigation/chrome;
 - WebPage-only Deep Dive presentation.
