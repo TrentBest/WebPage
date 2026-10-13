@@ -51,9 +51,28 @@ Each listed source repository has a `development` branch. Before adding or chang
 
 ## Workspace expectations
 
-A source-mode workspace must contain WebPage and each selected source dependency as separate checked-out repositories. Keep sibling locations predictable and document the expected relative paths next to the build switch. Source mode must validate all required project files before restore/build.
+For local development, keep these repositories as siblings and check each out on `development`:
 
-Do not make source mode the default. A normal checkout must continue to restore the pinned NuGet packages without requiring sibling repositories.
+```text
+workspace/
+  WebPage/
+  FSM_API/
+  FSM_UserIO/
+  TheSingularityWorkshop.MicroBundleDomain/
+  TheSingularityWorkshop.FSM_COS/
+  TheSingularityWorkshop.GUI/
+  TheSingularityWorkshop.ProtocolAi/
+  TheSingularityWorkshop.GrammarAi/
+```
+
+From the WebPage repository root, opt in explicitly:
+
+```bash
+dotnet restore TheSingularityWorkshop/TheSingularityWorkshop.csproj -p:WorkshopUseRepositorySources=true
+dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore -p:WorkshopUseRepositorySources=true
+```
+
+The property selects source references; it does not check out branches. Pass it to both restore and build so they evaluate the same dependency graph. Source mode is not the default; a normal checkout continues to use pinned NuGet packages.
 
 ## Release and CI checks
 
@@ -67,9 +86,14 @@ Before a release or promotion:
 
 Source mode and NuGet mode are separate proofs. A successful source build does not prove that published packages are compatible; a successful package build does not prove that current dependency source integrates.
 
-## Current implementation status
+## CI verification
 
-This document establishes the hierarchy and required workflow. The existing browser-host project currently uses versioned NuGet references for its Workshop libraries and a local project reference to `SingularityHub`. Do not assume source-mode switching is already implemented: the next code change must add an explicit opt-in switch, validate every source path, and prove both modes in CI before the workflow can be considered complete.
+The `.NET Tests` workflow has two independent paths:
+
+- **NuGet integration:** uses pinned packages and runs the existing browser-host and experience checks.
+- **Repository-source integration:** checks out WebPage and the dependency repositories as siblings at `development`, then restores and builds with `WorkshopUseRepositorySources=true`.
+
+The source job proves source integration at compile time. The NuGet job remains the package-consumer and browser-journey proof. Neither substitutes for the other.
 
 ## Related guides
 
