@@ -62,15 +62,12 @@ public sealed class WorkshopExperienceService : IDisposable
                 return null;
 
             // The host recognizes a behavior contract, not a hard-coded behavior ID.
-            // A future style or motion bundle can replace the default sway by changing
-            // the manifest roots and implementing IMonikerPresentationBehavior.
-            foreach (var root in roots)
+            // The manifest selects the Moniker experience root; FSM_COS resolves its
+            // dependencies, and any composed presentation behavior can manifest itself.
+            foreach (var bundle in RuntimeAssembly.Bundles)
             {
-                if (RuntimeAssembly.TryGetBundle(root.BundleId, out var bundle) &&
-                    bundle is IMonikerPresentationBehavior behavior)
-                {
+                if (bundle is IMonikerPresentationBehavior behavior)
                     return behavior.PresentationClass;
-                }
             }
 
             return null;
@@ -152,6 +149,9 @@ public sealed class WorkshopExperienceService : IDisposable
             RuntimeId: 1,
             Bundles: roots));
 
+        var hasMonikerExperience = RuntimeAssembly.TryGetBundle<MonikerExperienceMicroBundle>(
+            (ulong)MonikerExperienceMicroBundle.BundleId,
+            out _);
         var hasMoniker = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
             out _);
@@ -159,9 +159,9 @@ public sealed class WorkshopExperienceService : IDisposable
             LivingGuiExperienceMicroBundle.BundleId,
             out _);
 
-        if (!hasMoniker || !hasPrimary)
+        if (!hasMonikerExperience || !hasMoniker || !hasPrimary)
             throw new InvalidOperationException(
-                "FSM_COS did not compose the manifest-declared Moniker and the primary Experience.");
+                "FSM_COS did not compose the manifest-declared Moniker Experience, its canonical Moniker dependency, and the primary Experience.");
 
         if (RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
                 (ulong)MonikerMicroBundle.BundleId,
