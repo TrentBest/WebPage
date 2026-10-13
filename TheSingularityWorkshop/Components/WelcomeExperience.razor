@@ -37,7 +37,7 @@
         // The visitor's group is isolated from the Hub scheduler. Register it
         // explicitly before creating its first FSM, and retire the previous
         // instance when Reset builds a replacement.
-        if (_handle?.IsValid == true)
+        if (_handle is not null)
             FsmApi.Interaction.DestroyFiniteStateMachine(_machineName, _processingGroup);
 
         if (!_processingGroupCreated)
