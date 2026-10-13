@@ -140,12 +140,12 @@
 
     private RenderFragment BuildWelcome()
     {
-        var stateAccent = CurrentState switch
+        var stateIndex = Array.IndexOf(StateNames, CurrentState);
+        var stateAccent = stateIndex switch
         {
-            "Ready" => Cyan,
-            "Running" => Magenta,
-            "Complete" => Green,
-            _ => Yellow
+            0 => Cyan,
+            1 => Magenta,
+            _ => Green
         };
 
         var root = WorkshopGui.Panel(this)
@@ -249,10 +249,11 @@
             .Style("grid-template-columns", "repeat(3,minmax(0,1fr))")
             .Style("gap", ".4rem");
 
-        foreach (var state in StateNames)
+        for (var stateIndex = 0; stateIndex < StateNames.Length; stateIndex++)
         {
+            var state = StateNames[stateIndex];
             var active = string.Equals(CurrentState, state, StringComparison.Ordinal);
-            var accent = state switch { "Ready" => Cyan, "Running" => Magenta, _ => Green };
+            var accent = stateIndex switch { 0 => Cyan, 1 => Magenta, _ => Green };
             var stateCard = WorkshopGui.Panel(this)
                 .Style("padding", ".7rem .4rem")
                 .Style("text-align", "center")
