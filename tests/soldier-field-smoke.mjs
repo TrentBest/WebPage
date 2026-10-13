@@ -51,12 +51,6 @@ try {
   if (await page.locator("#demo-cost").textContent() !== "120 cr") {
     throw new Error("Plate-impact demonstration did not show its catalog price.");
   }
-  const requestButtonHitTest = await page.locator("#request-demo").evaluate(el => {
-    const rect = el.getBoundingClientRect();
-    const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-    return { tag: top?.tagName, id: top?.id, className: typeof top?.className === "string" ? top.className : "", html: top?.outerHTML?.slice(0, 240) };
-  });
-  console.log("Research order button hit-test:", JSON.stringify(requestButtonHitTest));
   await page.locator("#request-demo").click();
   await page.locator("#complete-setup").click();
   await page.locator("#fire-demo").click();
