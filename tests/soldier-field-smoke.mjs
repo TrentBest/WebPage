@@ -68,6 +68,13 @@ try {
   await page.locator("#complete-setup").click();
   await page.locator("#fire-demo").click();
   await page.locator("#research-log").getByText("Nearby trooper, dryly:", { exact: false }).waitFor({ state: "attached" });
+  if (await page.locator("#trial-history tr").count() !== 2) {
+    throw new Error("The research board did not preserve both baseline and cooling-iteration trials.");
+  }
+  const trialRows = await page.locator("#trial-history").innerText();
+  if (!trialRows.includes("760 °C") || !trialRows.includes("669 °C")) {
+    throw new Error("The research board did not show the expected fictional before/after barrel-temperature values.");
+  }
   if (pageErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected: ${pageErrors.join("\n")}`);
   }
