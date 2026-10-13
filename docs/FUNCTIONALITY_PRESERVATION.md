@@ -23,8 +23,9 @@ The manifest → FSM_COS composition path declares the stationary Moniker and it
 
 ```text
 host manifest
-    ├── startup root 2110: stationary Moniker
-    ├── startup root 2111: kelp-sway behavior
+    ├── startup root 2101: Moniker Experience
+    │       ├── dependency 2110: stationary Moniker
+    │       └── dependency 2111: kelp-sway behavior
     └── running root 2102: Living GUI
               ↓
            FSM_COS
