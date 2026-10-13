@@ -227,9 +227,9 @@ public sealed class IncrementalVersionTests
         var firstContact = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
         Assert.Contains("MonikerComposition=\"@Experience.MonikerComposition\"", livingGui);
-        Assert.Contains("MonikerWord(\"the\", \"THE\")", firstContact);
-        Assert.Contains("MonikerWord(\"singularity\", \"SINGULARITY\")", firstContact);
-        Assert.Contains("MonikerWord(\"workshop\", \"WORKSHOP\")", firstContact);
+        Assert.Contains("MonikerWord(\"the\")", firstContact);
+        Assert.Contains("MonikerWord(\"singularity\")", firstContact);
+        Assert.Contains("MonikerWord(\"workshop\")", firstContact);
         Assert.Contains("helloGlyphWave", firstContact);
     }
 
