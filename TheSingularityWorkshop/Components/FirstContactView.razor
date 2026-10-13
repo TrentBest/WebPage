@@ -24,9 +24,9 @@
         {
             <section class="flex-hello @(State == "Landing" ? "hub-moniker-panel" : "") @(MonikerBehaviorClass ?? string.Empty)" aria-label="The Singularity Workshop">
                 <div class="hello-moniker">
-                    <div class="hello-line">@RenderMonikerLine(MonikerWord("the", "THE"), 0, 1d)</div>
-                    <div class="hello-line">@RenderMonikerLine(MonikerWord("singularity", "SINGULARITY"), 3, 5d)</div>
-                    <div class="hello-line">@RenderMonikerLine(MonikerWord("workshop", "WORKSHOP"), 14, 3.5d)</div>
+                    <div class="hello-line">@RenderMonikerLine(MonikerWord("the"), 0, 1d)</div>
+                    <div class="hello-line">@RenderMonikerLine(MonikerWord("singularity"), 3, 5d)</div>
+                    <div class="hello-line">@RenderMonikerLine(MonikerWord("workshop"), 14, 3.5d)</div>
                 </div>
             </section>
         }
@@ -80,8 +80,10 @@
     [Parameter] public GuiNode? MonikerComposition { get; set; }
     [Parameter] public string? MonikerBehaviorClass { get; set; }
 
-    private string MonikerWord(string nodeId, string fallback)
-        => MonikerComposition?.Find(nodeId)?.Text ?? fallback;
+    private string MonikerWord(string nodeId)
+        => MonikerComposition?.Find(nodeId).Text
+            ?? throw new InvalidOperationException(
+                $"The composed Moniker is missing its canonical '{nodeId}' text node.");
 
     private static string LabelStyle(double opacity)
     {
