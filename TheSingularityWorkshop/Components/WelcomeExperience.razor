@@ -289,7 +289,7 @@
             .Style("font-family", "inherit")
             .Style("font-size", ".75rem")
             .Attribute("value", _selectedMachine)
-            .Attribute("onchange", EventCallback.Factory.Create(this, new Action<ChangeEventArgs>(ChangeMachine)));
+            .Attribute("onchange", MachineChanged);
         foreach (var sample in new[] { "Lifecycle", "Movement", "Spellcasting" })
             samplePicker.Child(WorkshopGui.Element(this, "option").Attribute("value", sample).Text(sample switch
             {
@@ -379,6 +379,8 @@
         _transitioning = false;
         StateHasChanged();
     }
+
+    private EventCallback MachineChanged => EventCallback.Factory.Create<ChangeEventArgs>(this, ChangeMachine);
 
     private void ChangeMachine(ChangeEventArgs args)
     {
