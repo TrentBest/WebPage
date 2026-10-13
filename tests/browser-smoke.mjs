@@ -60,6 +60,9 @@ try {
 
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
+  // FSM_API changes the current state during the transition tick and invokes
+  // the destination state's OnEnter callback on the next explicit update.
+  await page.getByRole("button", { name: "TICK RUNTIME" }).click();
   try {
     await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
   } catch (error) {
