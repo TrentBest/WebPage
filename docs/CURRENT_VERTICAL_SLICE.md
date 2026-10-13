@@ -56,7 +56,7 @@ The host must not confuse the two by requesting the same dependency twice.
 
 The current primary root is 2102 — LivingGuiExperienceMicroBundle.
 
-Its declared dependency is 2110 — MonikerMicroBundle, the stationary/canonical Moniker definition. The startup manifest separately requests 2111 — MonikerSwayBehaviorMicroBundle.
+Its declared dependency is 2110 — MonikerMicroBundle, the stationary/canonical Moniker definition. The startup root is 2101 — MonikerExperienceMicroBundle, which separately declares 2111 — MonikerSwayBehaviorMicroBundle as a behavior dependency.
 
 The host requests the declared startup and running roots together. FSM_COS resolves 2101's stationary Moniker and selected behavior dependencies, along with the primary Experience, into one RuntimeAssembly; the browser does not create a second Moniker or select the sway behavior in host code.
 
