@@ -110,6 +110,7 @@ jobs:
           curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-geometry.js -o /tmp/soldier-geometry.js
           grep -q 'buildPartGeometry' /tmp/soldier-geometry.js
           grep -q 'thermalGlow' /tmp/soldier-field.html
+          grep -q 'playFiringAudioCue' /tmp/soldier-field.html
           curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/research-trial.schema.json -o /tmp/research-trial.schema.json
           grep -q 'Workshop Research Trial Record' /tmp/research-trial.schema.json
           curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-research-simulation.mjs -o /tmp/soldier-research-simulation.mjs
