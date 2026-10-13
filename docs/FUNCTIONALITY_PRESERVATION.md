@@ -19,19 +19,20 @@ If the canonical owner does not yet exist, the WebPage implementation is **migra
 
 ## Current composition versus current execution
 
-The manifest → FSM_COS composition path is real and proven:
+The manifest → FSM_COS composition path declares the stationary Moniker and its selected behavior separately:
 
 ```text
 host manifest
-    ↓
-Living GUI root 2102
-    ↓
-declared Moniker dependency 2110
-    ↓
-FSM_COS
-    ↓
-RuntimeAssembly
+    ├── startup root 2110: stationary Moniker
+    ├── startup root 2111: kelp-sway behavior
+    └── running root 2102: Living GUI
+              ↓
+           FSM_COS
+              ↓
+        RuntimeAssembly
 ```
+
+The browser reads the canonical word content from MonikerMicroBundle. The separate MonikerSwayBehaviorMicroBundle declares the kelp-sway presentation capability; WebPage maps that capability to its CSS animation. The CSS is a browser manifestation, not the source of Moniker identity or the selector for which behavior is composed.
 
 However, the browser manifestation is **not yet fully driven by that RuntimeAssembly**.
 
