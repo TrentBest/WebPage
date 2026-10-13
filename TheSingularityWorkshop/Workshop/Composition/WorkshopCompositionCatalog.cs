@@ -17,6 +17,7 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
         var aiExchange = new AiExchangeCompositionBundle();
         var moniker = new MonikerMicroBundle();
         var monikerSway = new MonikerSwayBehaviorMicroBundle();
+        var monikerExperience = new MonikerExperienceMicroBundle();
         var livingGui = new LivingGuiExperienceMicroBundle();
         var rendering = new RenderingMicroBundle();
 
@@ -24,6 +25,7 @@ public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
         {
             [moniker.Descriptor.Id] = moniker,
             [monikerSway.Descriptor.Id] = monikerSway,
+            [monikerExperience.Descriptor.Id] = monikerExperience,
             [livingGui.Id] = livingGui,
             [rendering.Id] = rendering,
             [protocol.Id] = protocol,
