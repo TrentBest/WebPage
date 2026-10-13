@@ -97,7 +97,13 @@ jobs:
           grep -q '<title>The Singularity Workshop</title>' /tmp/webpage-index.html
           curl --fail --silent http://127.0.0.1:5260/_framework/blazor.boot.json -o /tmp/webpage-blazor.boot.json
           grep -q '"resources"' /tmp/webpage-blazor.boot.json
-          echo "WebPage host served its landing HTML and Blazor boot manifest."
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/index.html -o /tmp/soldier-field.html
+          grep -q 'Soldier Field — Event Horizon Scaling Lab' /tmp/soldier-field.html
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-part-records.json -o /tmp/soldier-part-records.json
+          grep -q '"recordCount": 38' /tmp/soldier-part-records.json
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-cut-sheet.mjs -o /tmp/soldier-cut-sheet.mjs
+          grep -q 'deriveCutSheet' /tmp/soldier-cut-sheet.mjs
+          echo "WebPage host served its landing HTML, Blazor boot manifest, Soldier Field lab, part records, and cut-sheet module."
 
           mkdir -p TestResults/Browser
           WORKSHOP_BASE_URL=http://127.0.0.1:5260 WORKSHOP_SCREENSHOT_DIR=TestResults/Browser node tests/browser-smoke.mjs
