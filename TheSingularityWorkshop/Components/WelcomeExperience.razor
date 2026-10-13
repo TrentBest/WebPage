@@ -1,10 +1,19 @@
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.FSM_API
 @using FsmApi = TheSingularityWorkshop.FSM_API.FSM_API
 @using TheSingularityWorkshop.Gui
 @implements IDisposable
 
 @BuildWelcome()
+
+<style>
+    @@keyframes welcomeFsmBreath {
+        0%, 100% { filter: brightness(.9) saturate(.9); transform: scale(1); }
+        50% { filter: brightness(1.65) saturate(1.5); transform: scale(1.035); }
+    }
+    .welcome-fsm-action-breathing { will-change: transform, filter; }
+</style>
 
 @code {
     private const string Cyan = "#00eaff";
@@ -21,6 +30,17 @@
     private WelcomeLabContext? _context;
     private string _machineName = string.Empty;
     private bool _disposed;
+    private string _selectedMachine = "Lifecycle";
+    private string[] StateNames => _selectedMachine switch
+    {
+        "Movement" => new[] { "Idle", "Walking", "Jumping" },
+        "Spellcasting" => new[] { "Idle", "Casting Magic", "Complete" },
+        _ => new[] { "Ready", "Running", "Complete" }
+    };
+    private bool IsComplete => CurrentState == StateNames[^1];
+    private bool CanStart => CurrentState == StateNames[0];
+    private bool CanTick => CurrentState == StateNames[1];
+    private bool CanReset => IsComplete;
 
     private string CurrentState => _handle?.CurrentState ?? "NOT COMPOSED";
     private int TickCount => _context?.UpdateCount ?? 0;
@@ -46,28 +66,26 @@
             processRate: -1,
             processingGroup: _processingGroup);
 
-        machine.State("Ready",
-            onEnter: _ => Record("OnEnter → Ready"),
-            onUpdate: _ => Record("OnUpdate → Ready"),
-            onExit: _ => Record("OnExit → Ready"));
+        var states = StateNames;
+        foreach (var state in states)
+        {
+            var capturedState = state;
+            machine.State(capturedState,
+                onEnter: _ => Record($"OnEnter → {capturedState}"),
+                onUpdate: _ =>
+                {
+                    if (capturedState == states[1])
+                        _context.UpdateCount++;
+                    Record(capturedState == states[1]
+                        ? $"OnUpdate → {capturedState} // tick {_context.UpdateCount}"
+                        : $"OnUpdate → {capturedState}"));
+                },
+                onExit: _ => Record($"OnExit → {capturedState}"));
+        }
 
-        machine.State("Running",
-            onEnter: _ => Record("OnEnter → Running"),
-            onUpdate: _ =>
-            {
-                _context.UpdateCount++;
-                Record($"OnUpdate → Running // tick {_context.UpdateCount}");
-            },
-            onExit: _ => Record("OnExit → Running"));
-
-        machine.State("Complete",
-            onEnter: _ => Record("OnEnter → Complete"),
-            onUpdate: _ => Record("OnUpdate → Complete"),
-            onExit: _ => Record("OnExit → Complete"));
-
-        machine.WithInitialState("Ready");
-        machine.Transition("Ready", "Running", ctx => ((WelcomeLabContext)ctx).StartRequested);
-        machine.Transition("Running", "Complete", ctx => ((WelcomeLabContext)ctx).UpdateCount >= 3);
+        machine.WithInitialState(states[0]);
+        machine.Transition(states[0], states[1], ctx => ((WelcomeLabContext)ctx).StartRequested);
+        machine.Transition(states[1], states[2], ctx => ((WelcomeLabContext)ctx).UpdateCount >= 2);
         machine.BuildDefinition();
 
         _handle = FsmApi.Create.CreateInstance(_machineName, _context, _processingGroup);
@@ -79,15 +97,15 @@
 
     private void Begin()
     {
-        if (_context is null || !_context.IsValid || CurrentState == "Complete")
+        if (_context is null || !_context.IsValid || !CanStart)
             return;
 
         _context.StartRequested = true;
         StepMachine();
 
         // FSM_API marks the destination state as not-yet-entered on transition.
-        // A second tick delivers that state's OnEnter lifecycle callback immediately.
-        if (CurrentState == "Running")
+        // A second tick delivers the destination state's OnEnter lifecycle callback.
+        if (CurrentState == StateNames[1])
             StepMachine();
     }
 
@@ -134,7 +152,7 @@
             .Style("height", "100%")
             .Style("min-height", "0")
             .Style("box-sizing", "border-box")
-            .Style("overflow", "auto")
+            .Style("overflow", "hidden")
             .Style("padding", "clamp(1rem,3vw,2.5rem)")
             .Style("background", "radial-gradient(ellipse at 50% 0%,rgba(0,234,255,.08),transparent 45%),#020711")
             .Style("color", "#f4fbff")
@@ -187,8 +205,9 @@
             .Style("min-height", "8rem")
             .Style("margin", ".8rem 0")
             .Style("border", $"1px solid {stateAccent}55")
-            .Style("background", $"{stateAccent}0b")
-            .Style("color", stateAccent)
+            .Style("background", stateAccent)
+            .Style("color", Ink)
+            .Style("box-shadow", $"0 0 36px {stateAccent}44")
             .Style("font-size", "clamp(1.7rem,4vw,3rem)")
             .Style("font-weight", "800")
             .Style("letter-spacing", ".08em")
@@ -199,7 +218,7 @@
             .Style("grid-template-columns", "repeat(3,minmax(0,1fr))")
             .Style("gap", ".4rem");
 
-        foreach (var state in new[] { "Ready", "Running", "Complete" })
+        foreach (var state in StateNames)
         {
             var active = string.Equals(CurrentState, state, StringComparison.Ordinal);
             var accent = state switch { "Ready" => Cyan, "Running" => Magenta, _ => Green };
@@ -207,7 +226,8 @@
                 .Style("padding", ".7rem .4rem")
                 .Style("text-align", "center")
                 .Style("border", $"1px solid {accent}{(active ? "cc" : "33")}")
-                .Style("background", active ? $"{accent}16" : "rgba(255,255,255,.015)");
+                .Style("background", active ? accent : "rgba(255,255,255,.015)")
+                .Style("color", active ? Ink : accent);
             stateCard.Content(WorkshopGui.Element(this, "div")
                 .Style("color", accent)
                 .Style("font-size", ".58rem")
@@ -222,9 +242,36 @@
             .Style("flex-wrap", "wrap")
             .Style("gap", ".5rem")
             .Style("margin-top", "1rem");
-        controls.Content(Action("SEND START SIGNAL", Begin, Cyan));
-        controls.Content(Action("TICK RUNTIME", StepMachine, Magenta));
-        controls.Content(Action("RESET MACHINE", Reset, Yellow));
+        controls.Content(Action("SEND START SIGNAL", Begin, Cyan, CanStart));
+        controls.Content(Action("TICK RUNTIME", StepMachine, Magenta, CanTick));
+        controls.Content(Action("RESET MACHINE", Reset, Yellow, CanReset));
+
+        var samplePicker = WorkshopGui.Element(this, "select")
+            .Attribute("aria-label", "Choose an example finite-state machine")
+            .Style("width", "100%")
+            .Style("margin-top", "1rem")
+            .Style("padding", ".75rem")
+            .Style("border", "1px solid rgba(0,234,255,.35)")
+            .Style("background", "#071321")
+            .Style("color", "#f4fbff")
+            .Style("font-family", "inherit")
+            .Style("font-size", ".75rem")
+            .Attribute("value", _selectedMachine)
+            .Attribute("onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, ChangeMachine));
+        foreach (var sample in new[] { "Lifecycle", "Movement", "Spellcasting" })
+            samplePicker.Child(WorkshopGui.Element(this, "option").Attribute("value", sample).Text(sample switch
+            {
+                "Movement" => "Movement — Idle, Walking, Jumping",
+                "Spellcasting" => "Spellcasting — Idle, Casting Magic, Complete",
+                _ => "Lifecycle — Ready, Running, Complete"
+            }));
+        machine.Content(WorkshopGui.Element(this, "div")
+            .Style("margin-top", "1.1rem")
+            .Style("color", Cyan)
+            .Style("font-size", ".58rem")
+            .Style("letter-spacing", ".12em")
+            .Text("CHOOSE AN FSM EXAMPLE"));
+        machine.Content(samplePicker);
         machine.Content(controls);
 
         machine.Content(WorkshopGui.Element(this, "p")
@@ -233,7 +280,7 @@
             .Style("font-family", "system-ui,sans-serif")
             .Style("font-size", ".75rem")
             .Style("line-height", "1.6")
-            .Text($"UPDATE COUNT // {TickCount} — Running transitions to Complete after three updates. The runtime instance and processing group are isolated to this lab."));
+            .Text($"UPDATE COUNT // {TickCount} — {StateNames[1]} transitions to {StateNames[2]} after two runtime updates. Choose another sample above to compose a fresh FSM."));
 
         var trace = WorkshopGui.Panel(this)
             .Style("min-width", "0")
@@ -289,9 +336,20 @@
         return root.Build();
     }
 
-    private ElementBuilder Action(string label, Action action, string accent)
+    private void ChangeMachine(ChangeEventArgs args)
+    {
+        var next = args.Value?.ToString();
+        if (next is not ("Lifecycle" or "Movement" or "Spellcasting"))
+            return;
+        _selectedMachine = next;
+        ComposeMachine();
+        StateHasChanged();
+    }
+
+    private ElementBuilder Action(string label, Action action, string accent, bool breathe)
         => WorkshopGui.Button(this)
             .Label(label)
+            .Attribute("class", breathe ? "welcome-fsm-action welcome-fsm-action-breathing" : "welcome-fsm-action")
             .Style("padding", ".75rem .8rem")
             .Style("border", $"1px solid {accent}66")
             .Style("background", $"{accent}0c")
@@ -299,7 +357,10 @@
             .Style("font-family", "inherit")
             .Style("font-size", ".6rem")
             .Style("letter-spacing", ".08em")
-            .Style("cursor", "pointer")
+            .Style("cursor", breathe ? "pointer" : "default")
+            .Style("opacity", breathe ? "1" : ".38")
+            .Style("animation", breathe ? "welcomeFsmBreath 1.45s ease-in-out infinite" : "none")
+            .Style("box-shadow", breathe ? $"0 0 22px {accent}55" : "none")
             .OnClick(action);
 
     public void Dispose()
