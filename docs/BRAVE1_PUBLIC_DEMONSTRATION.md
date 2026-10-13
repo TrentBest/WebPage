@@ -39,7 +39,7 @@ The opening should demonstrate first, explain immediately afterward, and never r
 - The Workshop is actively developing a composable software architecture.
 - FSM_API, FSM_COS, and MicroBundles have distinct responsibilities.
 - WebPage loads a host manifest and composes declared MicroBundles through FSM_COS.
-- The stationary Moniker definition and its optional sway behavior are separate manifest-declared capabilities; the browser presents their composed result.
+- The manifest selects a Moniker Experience root; FSM_COS resolves its stationary Moniker and separately declared sway-behavior dependency, and the browser presents their composed result.
 - The current public page demonstrates a living graphical Experience.
 - Source code and implementation status are available for inspection.
 
