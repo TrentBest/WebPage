@@ -31,8 +31,8 @@
             .Content(
                 WorkshopGui.Element(this, "div")
                     .Class("ai-exchange-grid")
-                    .Child(BuildReadonlyBlock("Protocol", exchange?.Protocol?.Describe() ?? "Waiting for composition..."))
-                    .Child(BuildReadonlyBlock("Grammar", exchange?.Grammar?.Describe() ?? "Waiting for composition...")))
+                    .Content(BuildReadonlyBlock("Protocol", exchange?.Protocol?.Describe() ?? "Waiting for composition..."))
+                    .Content(BuildReadonlyBlock("Grammar", exchange?.Grammar?.Describe() ?? "Waiting for composition...")))
             .Content(
                 WorkshopGui.Element(this, "textarea")
                     .Attribute("id", "ai-llm-response")
@@ -58,7 +58,7 @@
             .Build();
     }
 
-    private ElementBuilder BuildReadonlyBlock(string label, string value) =>
+    private RenderFragment BuildReadonlyBlock(string label, string value) =>
         WorkshopGui.Element(this, "div")
             .Style("display", "flex")
             .Style("flex-direction", "column")
@@ -71,7 +71,8 @@
                     .Attribute("aria-label", label)
                     .Style("width", "100%")
                     .Style("box-sizing", "border-box")
-                    .Text(value));
+                    .Text(value))
+            .Build();
 
     private async Task ExtractAsync()
     {
