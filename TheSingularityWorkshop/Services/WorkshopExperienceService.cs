@@ -58,7 +58,7 @@ public sealed class WorkshopExperienceService : IDisposable
     {
         get
         {
-            if (RuntimeAssembly is null || CurrentManifestExperience?.MicroBundles is not { } roots)
+            if (RuntimeAssembly is null || CurrentManifestExperience?.MicroBundles is not { Count: > 0 })
                 return null;
 
             // The host recognizes a behavior contract, not a hard-coded behavior ID.
