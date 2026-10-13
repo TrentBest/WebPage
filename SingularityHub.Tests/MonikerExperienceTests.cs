@@ -34,7 +34,7 @@ public sealed class MonikerExperienceTests
         Assert.Equal("Moniker", manifest.Startup[0].Kind);
         Assert.Equal(3, manifest.Startup[0].PresentationSeconds);
         Assert.Equal(2101UL, manifest.Startup[0].MicroBundles![0].BundleId);
-        Assert.Equal("1.0.0", manifest.Startup[0].MicroBundles[0].Version);
+        Assert.Equal("1.0.0", manifest.Startup[0].MicroBundles![0].Version);
         Assert.Equal("Primary", manifest.Running[0].Kind);
         Assert.Equal(2102UL, manifest.Running[0].MicroBundles![0].BundleId);
     }
