@@ -54,6 +54,7 @@ try {
   await page.locator("#request-demo").click();
   await page.locator("#complete-setup").click();
   await page.locator("#fire-demo").click();
+  await page.waitForFunction(() => document.querySelector("#specimen-hit-count")?.textContent === "1");
   await page.locator("#research-log").getByText("PROTOTYPE DISCHARGE.", { exact: false }).waitFor({ state: "attached" });
   await page.getByText("Head scientist: “As you can see, sire, we still struggle with dissipating the heat…”", { exact: true }).waitFor({ state: "attached" });
   await page.locator("#invest-cooling").click();
@@ -61,6 +62,7 @@ try {
   await page.locator("#request-demo").click();
   await page.locator("#complete-setup").click();
   await page.locator("#fire-demo").click();
+  await page.waitForFunction(() => document.querySelector("#specimen-hit-count")?.textContent === "2");
   await page.locator("#research-log").getByText("Nearby trooper, dryly:", { exact: false }).waitFor({ state: "attached" });
   if (await page.locator("#trial-history tr").count() !== 2) {
     throw new Error("The research board did not preserve both baseline and cooling-iteration trials.");
@@ -69,10 +71,13 @@ try {
   if (!trialRows.includes("760 °C") || !trialRows.includes("669 °C")) {
     throw new Error("The research board did not show the expected fictional before/after barrel-temperature values.");
   }
+  if (!trialRows.includes("damage-0001-torso.sternum-plate") || !trialRows.includes("damage-0002-torso.sternum-plate")) {
+    throw new Error("The research board did not retain the stable damage-event identities for both impacts.");
+  }
   if (pageErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected: ${pageErrors.join("\n")}`);
   }
-  console.log("Soldier Field smoke passed: 38 part records, cut-sheet download, priced demonstration setup, impact/heat response, cooling investment, and follow-on trooper chatter.");
+  console.log("Soldier Field smoke passed: 38 part records, cut-sheet download, priced setup, persistent part-specific damage events, heat response, cooling investment, and follow-on trooper chatter.");
 } finally {
   await browser.close();
 }
