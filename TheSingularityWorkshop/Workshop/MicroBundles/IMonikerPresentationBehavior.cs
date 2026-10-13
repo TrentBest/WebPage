@@ -1,5 +1,3 @@
-using TheSingularityWorkshop.MicroBundleDomain;
-
 namespace TheSingularityWorkshop.Workshop.MicroBundles;
 
 /// <summary>
@@ -7,7 +5,7 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// stationary Workshop Moniker. Presentation hosts map this semantic choice to
 /// their own rendering mechanism.
 /// </summary>
-public interface IMonikerPresentationBehavior : IMicroBundle
+public interface IMonikerPresentationBehavior
 {
     string PresentationClass { get; }
 }
