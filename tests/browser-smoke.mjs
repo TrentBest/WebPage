@@ -8,6 +8,9 @@ const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
   page.on("pageerror", error => browserErrors.push(error.message));
+  page.on("console", message => {
+    if (message.type() === "error") browserErrors.push(message.text());
+  });
 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
   await page.getByText("IF AN IMAGE IS WORTH A THOUSAND WORDS...", { exact: true }).waitFor({ state: "visible", timeout: 30_000 });
@@ -57,7 +60,12 @@ try {
 
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
-  await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
+  try {
+    await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
+  } catch (error) {
+    await page.screenshot({ path: `${outputDir}/debug-welcome-start-failure.png`, fullPage: true });
+    throw new Error(`${error instanceof Error ? error.message : String(error)}\nBrowser errors: ${browserErrors.join(" | ") || "(none captured)"}`);
+  }
   const tick = page.getByRole("button", { name: "TICK RUNTIME" });
   await tick.click();
   await tick.click();
