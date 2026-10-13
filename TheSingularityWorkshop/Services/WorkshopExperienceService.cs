@@ -54,12 +54,29 @@ public sealed class WorkshopExperienceService : IDisposable
     /// Browser manifestation hint contributed by the separately composed sway behavior.
     /// Other hosts may map the same behavior capability to a different presentation.
     /// </summary>
-    public string? MonikerBehaviorClass =>
-        RuntimeAssembly?.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
-            (ulong)MonikerSwayBehaviorMicroBundle.BundleId,
-            out var behavior) == true
-            ? behavior!.Composition?.Properties.GetValueOrDefault("presentationClass")
-            : null;
+    public string? MonikerBehaviorClass
+    {
+        get
+        {
+            if (RuntimeAssembly is null || CurrentManifestExperience?.MicroBundles is not { } roots)
+                return null;
+
+            // The host recognizes a behavior contract, not a hard-coded behavior ID.
+            // A future style or motion bundle can replace the default sway by changing
+            // the manifest roots and implementing IMonikerPresentationBehavior.
+            foreach (var root in roots)
+            {
+                if (RuntimeAssembly.TryGetBundle<IMonikerPresentationBehavior>(
+                        root.BundleId, out var behavior) &&
+                    behavior is not null)
+                {
+                    return behavior.PresentationClass;
+                }
+            }
+
+            return null;
+        }
+    }
 
     public LivingGuiExperienceMicroBundle? PrimaryExperienceComposition =>
         RuntimeAssembly?.TryGetBundle<LivingGuiExperienceMicroBundle>(
@@ -139,16 +156,13 @@ public sealed class WorkshopExperienceService : IDisposable
         var hasMoniker = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
             out _);
-        var hasSway = RuntimeAssembly.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
-            (ulong)MonikerSwayBehaviorMicroBundle.BundleId,
-            out _);
         var hasPrimary = RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
             LivingGuiExperienceMicroBundle.BundleId,
             out _);
 
-        if (!hasMoniker || !hasSway || !hasPrimary)
+        if (!hasMoniker || !hasPrimary)
             throw new InvalidOperationException(
-                "FSM_COS did not compose the manifest-declared Moniker, its selected sway behavior, and the primary Experience.");
+                "FSM_COS did not compose the manifest-declared Moniker and the primary Experience.");
 
         if (RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
                 (ulong)MonikerMicroBundle.BundleId,
