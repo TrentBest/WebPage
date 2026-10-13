@@ -44,6 +44,7 @@ try {
     throw new Error("Expected three data-driven research demonstrations.");
   }
   await page.locator("#demo-select").selectOption("plate-impact");
+  await page.locator("#demo-description").getByText("Current selection basis: most-hit candidate", { exact: false }).waitFor({ state: "attached" });
   if (await page.locator("#demo-cost").textContent() !== "120 cr") {
     throw new Error("Plate-impact demonstration did not show its catalog price.");
   }
