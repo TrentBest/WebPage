@@ -1,3 +1,5 @@
+> **WebPage host snapshot:** This folder is a same-origin copy of the exploratory Soldier Field lab from [TheSingularityWorkshop.Visualize PR #7](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/pull/7). The canonical sample lives in that repository. Until a versioned content/package delivery contract exists, changes to the sample must be copied here in the same reviewed change. Do not treat the nominal render geometry as fabrication-ready engineering data.
+
 # Soldier Field — Event Horizon Scaling Lab
 
 This is a visible soldier-first rendering target, not a triangle placeholder. The WebGPU page imports a separate, deterministic geometry asset whose stable semantic part IDs describe the modular armor, articulated chassis, helmet/visor, six provisional neural-shunt endpoints, life-support pack, and held tool silhouette. It avoids contemporary national military imagery and requires no downloaded model or external image. The current mesh is an intentional silhouette blockout; its component inventory is ready to refine without rewriting the renderer.
