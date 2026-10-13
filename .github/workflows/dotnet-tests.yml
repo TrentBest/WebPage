@@ -107,9 +107,14 @@ jobs:
           grep -q '"id": "plate-impact"' /tmp/research-demonstrations.json
           curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/research-demonstrations.schema.json -o /tmp/research-demonstrations.schema.json
           grep -q '"mostFrequentlyHitArmorPartId"' /tmp/research-demonstrations.schema.json
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-geometry.js -o /tmp/soldier-geometry.js
+          grep -q 'buildPartGeometry' /tmp/soldier-geometry.js
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/research-trial.schema.json -o /tmp/research-trial.schema.json
+          grep -q 'Workshop Research Trial Record' /tmp/research-trial.schema.json
           curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-research-simulation.mjs -o /tmp/soldier-research-simulation.mjs
           grep -q 'function fireDemonstration' /tmp/soldier-research-simulation.mjs
-          echo "WebPage host served the Soldier Field lab, 38 part records, cut-sheet module, research catalog/schema, and simulation state module."
+          grep -q 'partConditions' /tmp/soldier-research-simulation.mjs
+          echo "WebPage host served the Soldier Field lab, 38 part records, isolated geometry builder, cut-sheet module, research catalog/schema, trial schema, and persistent simulation state."
           WORKSHOP_BASE_URL=http://127.0.0.1:5260 node tests/soldier-field-smoke.mjs
 
           mkdir -p TestResults/Browser
