@@ -252,7 +252,7 @@ public sealed class IncrementalVersionTests
         var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
 
         Assert.Contains("FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running", home);
-        Assert.Contains("FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running", home);
+        Assert.Contains("destination-selected", home);
         Assert.Contains("BuildManifestHub(builder);", home);
         Assert.DoesNotContain("WORKSHOP HUB ARRIVING", home);
     }
