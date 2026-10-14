@@ -10,7 +10,7 @@
 button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:2px solid white;outline-offset:3px}
 .shell{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);background:radial-gradient(ellipse at 50% 0,rgba(0,234,255,.09),transparent 45%),var(--bg)}
 header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem 1.2rem;border-bottom:1px solid var(--line);background:rgba(3,8,17,.88)}
-.eyebrow,.kicker{font-size:.65rem;letter-spacing:.19em;font-weight:800;color:var(--cyan)}h1{margin:.1rem 0;font-size:clamp(1.1rem,2.3vw,1.8rem);letter-spacing:.04em}header p{margin:0;color:var(--muted);font-size:.8rem}.status{color:var(--mint);font-size:.7rem;letter-spacing:.1em}
+.eyebrow,.kicker{font-size:.65rem;letter-spacing:.19em;font-weight:800;color:var(--cyan)}h1{margin:.1rem 0;font-size:clamp(1.1rem,2.3vw,1.8rem);letter-spacing:.04em}header p{margin:0;color:var(--muted);font-size:.8rem}.status{color:var(--mint);font-size:.7rem;letter-spacing:.1em}.hub-button{padding:.5rem .7rem;border:1px solid rgba(0,234,255,.4);border-radius:.25rem;background:rgba(0,234,255,.05);color:var(--cyan);font-size:.68rem;letter-spacing:.1em}.hub-button:hover{border-color:var(--pink);color:white}
 main{min-height:0;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(18rem,.85fr);gap:.8rem;padding:.8rem}
 .panel{min-width:0;min-height:0;border:1px solid var(--line);background:linear-gradient(145deg,rgba(10,25,42,.94),rgba(3,8,17,.97));border-radius:.8rem;overflow:hidden}
 .floor-panel{display:grid;grid-template-rows:auto minmax(0,1fr) auto}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.75rem 1rem;border-bottom:1px solid rgba(35,70,91,.7)}h2{font-size:.82rem;letter-spacing:.12em;margin:0;text-transform:uppercase}.hint{font-size:.72rem;color:var(--muted)}
@@ -23,7 +23,7 @@ main{min-height:0;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(18re
 </head>
 <body>
 <div class="shell">
-<header><div><div class="eyebrow">THE SINGULARITY WORKSHOP · ECONOMY</div><h1>SINGULARITY CASINO</h1><p>A living floor. Choose a place to step closer.</p></div><div class="status">● SIMULATION RUNNING</div></header>
+<header><div><div class="eyebrow">THE SINGULARITY WORKSHOP · ECONOMY</div><h1>SINGULARITY CASINO</h1><p>A living floor. Choose a place to step closer.</p></div><div style="display:flex;align-items:center;gap:.8rem"><button class="hub-button" id="backHub" type="button">← HUB</button><div class="status">● SIMULATION RUNNING</div></div></header>
 <main>
 <section class="panel floor-panel" aria-labelledby="floorHeading">
 <div class="panel-head"><h2 id="floorHeading">01 / Floor plan · top down</h2><span class="hint">Select any station</span></div>
@@ -135,6 +135,7 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;if(a==='reset'){chips=100;wagers=0;count=0;logs=[];$('events').textContent='0';$('chips').textContent='100';$('wagers').textContent='0';$('journal').textContent='No events yet. Choose an interaction to begin.';return}if(a==='buyin'){chips+=10;log('BUY-IN','+10 virtual chips')}if(a==='wager'){if(chips<5){log('REJECTED','Not enough chips for a 5-chip wager');return}chips-=5;wagers+=5;log('WAGER','5 virtual chips committed')}if(a==='payout'){chips+=8;log('RETURN','+8 virtual chips returned (demo outcome)')}}));
 $('interact').addEventListener('click',()=>{const s=stations[selected];if(selected==='poker'||selected==='blackjack'){log('DEAL','Sample cards shown; opponent hands remain illustrative')}else if(selected==='roulette'){log('SPIN','Roulette animation is illustrative; no odds model is connected')}else if(selected==='slots'){log('SPIN','Cabinet reels shown; outcome is not a real game result')}else if(selected==='cage'){chips+=10;log('CAGE','+10 virtual chips issued')}else if(selected==='security'){log('AUDIT','Journal inspected; no production ledger connected')}else log('LOUNGE','A Digiten visits the lounge; no inventory transaction occurred');$('chips').textContent=String(chips)});
 select('poker');
+$('backHub').addEventListener('click',()=>{window.top.location.href='/?tab=welcome'});
 })();
 </script>
 </body>
