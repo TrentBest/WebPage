@@ -2,6 +2,7 @@
 @layout BareLayout
 @using TheSingularityWorkshop.Gui
 @using Microsoft.AspNetCore.Components
+@implements IDisposable
 
 <PageTitle>Digitens // Singularity City</PageTitle>
 
@@ -12,6 +13,103 @@
         <h1>Not just avatars.<br /><em>People in a world.</em></h1>
         <p class="world-intro">A Digiten is a digital citizen with an identity, a place in the world, and a relationship to the systems around them. This first slice exposes the Workshop's existing civic identity and mansion-architecture data; it does not pretend that disconnected citizens are running autonomous agents yet.</p>
     </header>
+
+
+    <section class="topic-workbench" aria-label="Explore Digitens and Singularity City">
+        <nav class="topic-choices" aria-label="Choose a topic">
+            <div class="section-kicker">START EXPLORING</div>
+            <h2>Digital citizens. A city. A new scale of detail.</h2>
+            <p>Choose a question. The surrounding panels explain the idea; the central surface shows the relevant model or a verified rendering proof.</p>
+            <button class="topic-choice @(_selectedTopic == "digitens" ? "active" : "")" @onclick='() => SelectTopic("digitens")' aria-pressed="@(_selectedTopic == "digitens")"><span>01</span><strong>Meet the Digitens</strong><small>Identity, place, and goals</small></button>
+            <button class="topic-choice @(_selectedTopic == "theory" ? "active" : "")" @onclick='() => SelectTopic("theory")' aria-pressed="@(_selectedTopic == "theory")"><span>02</span><strong>Code &amp; theory</strong><small>What a Digiten is made of</small></button>
+            <button class="topic-choice @(_selectedTopic == "renderer" ? "active" : "")" @onclick='() => SelectTopic("renderer")' aria-pressed="@(_selectedTopic == "renderer")"><span>03</span><strong>Renderer &amp; detail</strong><small>Event Horizons</small></button>
+            <button class="topic-choice @(_selectedTopic == "city" ? "active" : "")" @onclick='() => SelectTopic("city")' aria-pressed="@(_selectedTopic == "city")"><span>04</span><strong>Singularity City</strong><small>Places, districts, and opportunity</small></button>
+        </nav>
+
+        <section class="topic-stage" aria-live="polite">
+            <div class="topic-stage-head"><span class="section-kicker">WORKSPACE / @TopicEyebrow</span><span class="topic-stage-state">MODEL + PRESENTATION</span></div>
+            @if (_selectedTopic == "renderer")
+            {
+                <div class="visualize-proof">
+                    <img src="/Visualize/07-gui-svg-connected-points.svg" alt="Connected geometry emitted through the Visualize C# frame pipeline and GUI.SVG proof backend" />
+                    <p class="proof-caption">REAL VISUALIZE OUTPUT · C# FRAME → VISUALIZER API → GUI.SVG PROOF BACKEND</p>
+                </div>
+            }
+            else if (_selectedTopic == "city")
+            {
+                <div class="topic-city-map">
+                    <div class="city-map-header">SINGULARITY CITY <span>SEMANTIC PLACE INDEX</span></div>
+                    <div class="city-map-center"><strong>MAYOR'S MANSION</strong><small>SPATIAL ANCHOR</small></div>
+                    <div class="city-map-branches">
+                        @foreach (var feature in SingularityMansionArchitecture.Features.Take(6))
+                        {
+                            <div @key="feature.Id" class="city-map-node"><span>@feature.Kind.ToUpperInvariant()</span><strong>@feature.Name</strong></div>
+                        }
+                    </div>
+                    <p class="proof-caption">HOST-MANIFESTED COMPOSITION · LABELS COME FROM THE EXISTING C# CITY MODEL</p>
+                </div>
+            }
+            else if (_selectedTopic == "theory")
+            {
+                <div class="digiten-composition">
+                    <div class="composition-identity"><span>IDENTITY</span><strong>Digiten</strong><small>Stable concept / changing representation</small></div>
+                    <div class="composition-flow"><span>GOAL</span><b>→</b><span>CAPABILITIES</span><b>→</b><span>OBSERVATION</span></div>
+                    <div class="composition-foot">Domain meaning belongs to the Experience. Renderer chooses computational detail. Visualize presents the resulting frame.</div>
+                    <p class="proof-caption">EXPLANATORY HOST GUI · NOT A CLAIM THAT TEXT IS ALREADY A VISUALIZE DRAW COMMAND</p>
+                </div>
+            }
+            else
+            {
+                <div class="digiten-composition">
+                    <div class="composition-identity"><span>ONE DIGITAL CITIZEN</span><strong>@_selectedOfficial.Name</strong><small>@_selectedOfficial.Role</small></div>
+                    <div class="composition-flow"><span>IDENTITY</span><b>+</b><span>PLACE</span><b>+</b><span>GOAL</span></div>
+                    <div class="composition-foot">The civic catalog supplies identity. Shopping, housing, jobs, and citizen-owned companies are future capabilities—not implemented behavior in this page.</div>
+                    <p class="proof-caption">HOST-MANIFESTED EXPLANATION · IDENTITY DATA COMES FROM THE EXISTING CIVIC CATALOG</p>
+                </div>
+            }
+            <div class="topic-stage-bottom">
+                <div><span class="detail-label">WHAT THIS PROVES</span><p>@TopicProof</p></div>
+                <div><span class="detail-label">WHAT IT DOES NOT CLAIM</span><p>@TopicBoundary</p></div>
+            </div>
+        </section>
+
+        <aside class="topic-inspector">
+            <div class="section-kicker">INSPECT / @TopicNumber</div><h3>@TopicTitle</h3><p>@TopicDescription</p>
+            @if (_selectedTopic == "renderer")
+            {
+                <div class="inspector-facts">
+                    <div><span>COMPUTATIONAL MODEL</span><strong>5 representation targets</strong></div>
+                    <div><span>DETAIL POLICY</span><strong>Event Horizons</strong></div>
+                    <div><span>GPU MEMORY PER DIGITEN</span><strong>Not measured here</strong></div>
+                </div>
+                @if (_rendererProbe.IsConnected)
+                {
+                    <div class="renderer-live"><span class="detail-label">LIVE RENDERER FSM / SOURCE MODE</span><strong>@_rendererProbe.ActiveRepresentation</strong>
+                        <div class="representation-buttons">
+                            @foreach (var representation in RendererRepresentations)
+                            {
+                                <button @key="representation" class="representation-button @(string.Equals(_rendererProbe.ActiveRepresentation, representation, StringComparison.OrdinalIgnoreCase) ? "active" : "")" @onclick="() => SelectRepresentation(representation)">@representation</button>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="source-mode-note">The live representation FSM is enabled when WebPage is built with the sibling Renderer source repository. Default NuGet mode does not pretend the source project is loaded.</p>
+                }
+                <a class="source-link" href="https://github.com/TrentBest/TheSingularityWorkshop.Renderer" target="_blank" rel="noopener noreferrer">Explore Renderer source ↗</a>
+                <a class="source-link" href="https://github.com/TrentBest/TheSingularityWorkshop.Visualize/tree/development/samples/PrimitiveGallery" target="_blank" rel="noopener noreferrer">Explore Visualize proof gallery ↗</a>
+            }
+            else if (_selectedTopic == "city")
+            {
+                <div class="inspector-facts"><div><span>EXISTING SPATIAL MODEL</span><strong>@SingularityMansionArchitecture.Features.Count mansion features</strong></div><div><span>MAP STATUS</span><strong>Semantic schematic</strong></div><div><span>FUTURE CITY</span><strong>Homes · jobs · companies</strong></div></div>
+            }
+            else
+            {
+                <div class="inspector-facts"><div><span>EXISTING DATA</span><strong>Civic identity catalog</strong></div><div><span>IDENTITY ≠ DETAIL</span><strong>One citizen, many representations</strong></div><div><span>GOAL COMPLEXITY</span><strong>Requires explicit capability data</strong></div></div>
+            }
+        </aside>
+    </section>
 
     <section class="world-grid" aria-label="Singularity City civic directory and Mayor's Mansion plan">
         <section class="citizen-panel">
@@ -115,13 +213,42 @@
 .world-footer{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1.4rem;padding:.9rem 0;border-top:1px solid #193746;color:#5f8291;font:700 .52rem Consolas,monospace;letter-spacing:.1em}
 @@media(max-width:850px){.world-grid{grid-template-columns:1fr}.citizen-list{max-height:320px}.world-header h1{font-size:clamp(2.8rem,11vw,5rem)}}
 @@media(prefers-reduced-motion:reduce){.plan-feature rect{transition:none}}
+
+.topic-workbench{width:min(1500px,100%);margin:2rem auto 0;display:grid;grid-template-columns:minmax(14rem,.75fr) minmax(0,1.4fr) minmax(13rem,.7fr);gap:1rem;align-items:stretch}
+.topic-choices,.topic-stage,.topic-inspector{min-width:0;border:1px solid #1d4052;background:linear-gradient(145deg,#071522ef,#030711f5);padding:1rem;box-shadow:0 20px 60px #0003}
+.topic-choices h2{font-size:clamp(1.2rem,2vw,1.8rem);line-height:1.05;letter-spacing:-.035em;margin:.6rem 0}.topic-choices>p,.topic-inspector>p{font-size:.75rem;line-height:1.6;color:#9db7c3}
+.topic-choice{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:.1rem .65rem;align-items:center;text-align:left;width:100%;margin-top:.45rem;padding:.7rem;background:#04101b;color:#eaf8ff;border:1px solid #193746;cursor:pointer}.topic-choice>span{grid-row:span 2;color:#00eaff;font:700 .65rem Consolas,monospace}.topic-choice strong{font-size:.76rem}.topic-choice small{font-size:.63rem;color:#7f9eac}.topic-choice:hover,.topic-choice.active{border-color:#00eaff;background:linear-gradient(100deg,#00eaff12,#ff2cff08)}
+.topic-stage{display:flex;flex-direction:column;gap:.8rem}.topic-stage-head{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap}.topic-stage-state{color:#58e8c1;font:700 .52rem Consolas,monospace;letter-spacing:.1em}.visualize-proof{min-height:220px;display:grid;align-content:center;gap:.65rem;background:#020711;border:1px solid #193746;padding:.65rem}.visualize-proof img{display:block;width:100%;height:auto}.proof-caption{margin:0;color:#6792a4;font:700 .5rem/1.5 Consolas,monospace;letter-spacing:.07em}
+.topic-stage-bottom{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;border-top:1px solid #193746;padding-top:.8rem}.topic-stage-bottom p{font-size:.68rem;line-height:1.55;color:#a7bdc7;margin:.4rem 0 0}
+.topic-city-map,.digiten-composition{display:flex;flex-direction:column;justify-content:center;gap:1rem;min-height:250px;padding:1rem;border:1px solid #23475b;background:radial-gradient(ellipse at center,#092237 0,#020711 72%)}.city-map-header{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;color:#00eaff;font:800 .65rem Consolas,monospace;letter-spacing:.1em}.city-map-header span{color:#63899a;font-size:.5rem}.city-map-center{align-self:center;display:grid;gap:.35rem;text-align:center;padding:1rem 1.4rem;border:1px solid #ff2cff;background:#ff2cff0c;box-shadow:0 0 28px #ff2cff12}.city-map-center strong{font-size:.85rem}.city-map-center small{color:#7ea8ba;font:700 .5rem Consolas,monospace}.city-map-branches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem}.city-map-node{display:grid;gap:.25rem;padding:.6rem;border:1px solid #1d4052;background:#04101b}.city-map-node span{font:700 .48rem Consolas,monospace;color:#00eaff}.city-map-node strong{font-size:.65rem;line-height:1.3}
+.composition-identity{display:grid;gap:.4rem;text-align:center;padding:1.1rem;border:1px solid #00eaff;background:#00eaff08}.composition-identity span{font:700 .52rem Consolas,monospace;letter-spacing:.12em;color:#00eaff}.composition-identity strong{font-size:clamp(1.5rem,3vw,2.4rem)}.composition-identity small{color:#93b1bf;font-size:.7rem}.composition-flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:.65rem;color:#eaf8ff;font:700 .62rem Consolas,monospace}.composition-flow b{color:#ff2cff;font-size:1rem}.composition-foot{color:#a8c1cc;font-size:.73rem;line-height:1.6;text-align:center;max-width:52ch;align-self:center}
+.topic-inspector h3{font-size:1.3rem;line-height:1.1;margin:.6rem 0}.inspector-facts{display:grid;gap:.45rem;margin-top:1rem}.inspector-facts>div{display:grid;gap:.3rem;padding:.65rem;border:1px solid #193746;background:#04101b}.inspector-facts span{font:700 .48rem Consolas,monospace;letter-spacing:.1em;color:#6e98a9}.inspector-facts strong{font-size:.68rem;line-height:1.4;color:#eaf8ff}.source-link{display:block;margin-top:.7rem;color:#00eaff;text-decoration:none;font:700 .6rem Consolas,monospace}.source-link:hover{text-decoration:underline}.source-mode-note{margin:.8rem 0;color:#91a6b0;font-size:.65rem;line-height:1.55}.renderer-live{margin-top:1rem;padding:.75rem;border:1px solid #2d5b6c;background:#00eaff08;display:grid;gap:.5rem}.renderer-live>strong{font:800 1.2rem Consolas,monospace;color:#00eaff}.representation-buttons{display:flex;flex-wrap:wrap;gap:.3rem}.representation-button{padding:.4rem .45rem;background:#04101b;border:1px solid #254655;color:#a8c1cc;font:700 .5rem Consolas,monospace;cursor:pointer}.representation-button.active,.representation-button:hover{border-color:#00eaff;color:#00eaff}
+@media(max-width:1100px){.topic-workbench{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)}.topic-inspector{grid-column:1/-1}}
+@media(max-width:850px){.topic-workbench{grid-template-columns:1fr}.topic-inspector{grid-column:auto}.topic-stage-bottom{grid-template-columns:1fr}.city-map-branches{grid-template-columns:1fr}}
+
 </style>
 
 @code {
+    private string _selectedTopic = "digitens";
+    private readonly DigitenRendererProbe _rendererProbe = new();
+    private static readonly string[] RendererRepresentations = ["Semantic", "Aggregate", "Distant", "Near", "Interactive"];
+
+    private string TopicEyebrow => _selectedTopic switch { "theory" => "CODE + THEORY", "renderer" => "EVENT HORIZONS", "city" => "CITY MODEL", _ => "CITIZEN IDENTITY" };
+    private string TopicNumber => _selectedTopic switch { "theory" => "02", "renderer" => "03", "city" => "04", _ => "01" };
+    private string TopicTitle => _selectedTopic switch { "theory" => "Identity is not detail.", "renderer" => "Render only what matters.", "city" => "A place has structure.", _ => "A citizen is more than an avatar." };
+    private string TopicDescription => _selectedTopic switch { "theory" => "A Digiten is a domain-level digital citizen. Its identity and goals belong to the Experience; presentation detail can change without replacing the citizen.", "renderer" => "Renderer models computational detail through Event Horizons. Five representation targets describe what an observer currently justifies; they are not five different citizens.", "city" => "Singularity City is a world users should be able to shape. This page can inspect existing civic and mansion data; businesses, homes, and jobs remain future capabilities.", _ => "These are the digital citizens of our city: identities that can be placed into a world and eventually connected to richer goals and capabilities." };
+    private string TopicProof => _selectedTopic switch { "renderer" => "The displayed geometry is a committed Visualize C# proof output generated through the Visualizer frame and GUI.SVG backend.", "city" => "The labels shown here are sourced from the current mansion feature model, not invented city coordinates.", "theory" => "The explainer separates domain identity from observer-relative representation.", _ => "The selected identity and role come from the existing civic catalog." };
+    private string TopicBoundary => _selectedTopic switch { "renderer" => "This is a CPU-side SVG proof, not a production GPU renderer. Per-Digiten memory and live GPU residency are not measured here.", "city" => "This is not yet a fully inhabited simulation. Commerce, housing, employment, and user-owned offices are planned directions.", "theory" => "This explanatory host GUI is not evidence of autonomous goal execution.", _ => "The page does not claim disconnected citizens are autonomous agents." };
+
+    private void SelectTopic(string topic) => _selectedTopic = topic;
+    private void SelectRepresentation(string representation) { _rendererProbe.Request(representation); StateHasChanged(); }
+
     private SingularityCivicDigiten _selectedOfficial = SingularityCivicDigitenCatalog.Mayor;
     private SingularityMansionFeature _selectedFeature = SingularityMansionArchitecture.Features[0];
 
     private void SelectOfficial(SingularityCivicDigiten official) => _selectedOfficial = official;
+
+    public void Dispose() => _rendererProbe.Dispose();
     private void SelectFeature(SingularityMansionFeature feature) => _selectedFeature = feature;
 
     private static string Initials(string name)
