@@ -255,6 +255,15 @@
             builder.AddAttribute(sequence++, "allow", "fullscreen");
             builder.CloseElement();
         }
+        else if (string.Equals(_selectedHubTab, "CITY LAB", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.OpenElement(sequence++, "iframe");
+            builder.AddAttribute(sequence++, "class", "economy-experience");
+            builder.AddAttribute(sequence++, "src", "/city-lab");
+            builder.AddAttribute(sequence++, "title", "Singularity City Lab: density, districts, skins, and history");
+            builder.AddAttribute(sequence++, "allow", "fullscreen");
+            builder.CloseElement();
+        }
         else if (string.Equals(_selectedHubTab, "SUPPORT", StringComparison.OrdinalIgnoreCase))
         {
             builder.OpenElement(sequence++, "section");
