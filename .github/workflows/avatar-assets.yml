@@ -1,0 +1,42 @@
+name: Living Avatar Asset
+
+on:
+  push:
+    branches: [development]
+    paths:
+      - "TheSingularityWorkshop/wwwroot/Images/TheSingularityWorkshopLivingAvatar.svg"
+      - ".github/workflows/avatar-assets.yml"
+  pull_request:
+    paths:
+      - "TheSingularityWorkshop/wwwroot/Images/TheSingularityWorkshopLivingAvatar.svg"
+      - ".github/workflows/avatar-assets.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-avatar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate animated SVG structure and intent
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          path = Path("TheSingularityWorkshop/wwwroot/Images/TheSingularityWorkshopLivingAvatar.svg")
+          root = ET.parse(path).getroot()
+          ns = {"svg": "http://www.w3.org/2000/svg"}
+          ids = {element.attrib.get("id") for element in root.iter() if element.attrib.get("id")}
+          assert root.tag == "{http://www.w3.org/2000/svg}svg", "Asset must be a valid SVG document"
+          assert {"title", "desc", "watching-eye", "glow", "avatarClip"} <= ids, "Accessible title/description and avatar/eye effects are required"
+          assert sum(1 for element in root.iter() if element.tag.endswith(("}animate", "}animateTransform", "}animateMotion"))) >= 10, "The avatar should visibly animate, not merely contain a static eye"
+          image = root.find(".//svg:image", ns)
+          assert image is not None and "TheSingularityWorkshopLogo.png" in image.attrib.get("href", ""), "Keep the canonical Workshop logo as the source image"
+          assert root.find(".//svg:title", ns) is not None and root.find(".//svg:desc", ns) is not None, "Accessible name and description are required"
+          print(f"Validated {path}: central eye, energy vortex, canonical logo reference, accessibility, and animation.")
+          PY
