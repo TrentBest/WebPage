@@ -61,7 +61,7 @@ public sealed class WebPageHostManifestTests
     }
 
     [Fact]
-    public void PublicHostAssetsExposeOnlyTheThreeManifestDrivenWorkshopDestinationsAndClientRoutes()
+    public void PublicHostAssetsExposeTheCurrentManifestDrivenWorkshopDestinationsAndClientRoutes()
     {
         var repositoryRoot = Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory, "..", "..", "..", ".."));
@@ -70,24 +70,19 @@ public sealed class WebPageHostManifestTests
             wwwroot, "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
         var manifest = WebPageHostManifestParser.Parse(manifestJson);
 
-        Assert.Equal(new[] { "Ecosystem", "Schedule Consultation", "Institutions" }, manifest.Hub.Select(item => item.Name));
+        Assert.Equal(new[] { "Welcome", "Demonstrations" }, manifest.Hub.Select(item => item.Name));
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "AnyApp");
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "Support");
 
-        var ecosystem = Assert.Single(manifest.Hub, item => item.Name == "Ecosystem");
-        Assert.Equal("Explore", ecosystem.Kind);
-        Assert.Equal("/ecosystem", ecosystem.Route);
-        Assert.Empty(ecosystem.MicroBundles!);
+        var welcome = Assert.Single(manifest.Hub, item => item.Name == "Welcome");
+        Assert.Equal("Welcome", welcome.Kind);
+        Assert.Equal("/", welcome.Route);
+        Assert.Empty(welcome.MicroBundles!);
 
-        var consultation = Assert.Single(manifest.Hub, item => item.Name == "Schedule Consultation");
-        Assert.Equal("Consultation", consultation.Kind);
-        Assert.Equal("/schedule", consultation.Route);
-        Assert.Empty(consultation.MicroBundles!);
-
-        var institutions = Assert.Single(manifest.Hub, item => item.Name == "Institutions");
-        Assert.Equal("Institutional Briefing", institutions.Kind);
-        Assert.Equal("/institutions", institutions.Route);
-        Assert.Empty(institutions.MicroBundles!);
+        var demonstrations = Assert.Single(manifest.Hub, item => item.Name == "Demonstrations");
+        Assert.Equal("ExperienceGallery", demonstrations.Kind);
+        Assert.Equal("/?tab=demonstrations", demonstrations.Route);
+        Assert.Empty(demonstrations.MicroBundles!);
 
         Assert.NotNull(manifest.Capabilities);
         var rendering = Assert.Single(manifest.Capabilities!);
