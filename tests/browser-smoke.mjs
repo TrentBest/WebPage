@@ -131,7 +131,8 @@ try {
   await cityLab.getByText("28,874 residents/km²", { exact: true }).waitFor({ state: "visible" });
   const structureCount = await cityLab.locator(".readout-card").first().locator("strong").innerText();
   await cityLab.getByRole("button", { name: /02 \/ METRO/ }).click();
-  await cityLab.locator('[data-skin="metro"]').waitFor({ state: "visible" });
+  await cityLab.screenshot({ path: `${outputDir}/08-city-lab-metro.png`, fullPage: true });
+  await cityLab.locator('[data-skin="metro"]').waitFor({ state: "visible", timeout: 10_000 });
   if (await cityLab.locator(".readout-card").first().locator("strong").innerText() !== structureCount) {
     throw new Error("Switching to Metro must preserve the exact same city geometry/data.");
   }
