@@ -89,15 +89,18 @@
         <div><span class="lab-eyebrow">CITY STATISTICS / MODEL INPUT</span><h2>Ground the skyline in real urban patterns.</h2><p>Density is an active input to deterministic massing rules: it changes plot vacancy, structure clustering, and tower heights. The 28,000 residents/km² starting point is a tuning assumption, not a claim of census calibration; the next data layer will import documented reference-city profiles with source, year, land-area basis, and uncertainty.</p></div>
         <label for="density-profile">Reference profile / planning scenario</label>
         <select id="density-profile" @onchange="OnProfileChanged">
-            <option value="28874">Manhattan, NYC · 2020 Census · ~28,874 residents/km²</option>
+            <option value="28874">Manhattan / New York County · 2020 Census · ~28,874/km²</option>
+            <option value="13483">Bronx County · 2020 Census · ~13,483/km²</option>
+            <option value="15227">Brooklyn / Kings County · 2020 Census · ~15,227/km²</option>
+            <option value="8542">Queens County · 2020 Census · ~8,542/km²</option>
             <option value="40000">Dense future core · 40,000/km² planning assumption</option>
             <option value="50000">Arcology stress test · 50,000/km² planning assumption</option>
         </select>
         <label for="density-input">Target population density <strong>@DensityPerKm2.ToString("N0") residents/km²</strong></label>
         <input id="density-input" type="range" min="5000" max="50000" step="1" value="@DensityPerKm2" @oninput="OnDensityChanged" />
         <div class="density-scale"><span>5,000 / km²</span><span>50,000 / km²</span></div>
-        <p class="model-source">REFERENCE DATA: U.S. Census Bureau QuickFacts reports New York County population density of 74,781.6 people per square mile in 2020 (about 28,874/km²). <a href="https://www.census.gov/quickfacts/table/EDU635214/36061" target="_blank" rel="noopener noreferrer">Open the Census source ↗</a></p>
-        <p class="model-boundary">MODEL BOUNDARY: the Manhattan profile is sourced; the other two presets are planning assumptions. Density changes procedural building placement and height, not yet household distribution, census population allocation, or transport demand.</p>
+        <p class="model-source">REFERENCE DATA: 2020 population density from U.S. Census Bureau QuickFacts, converted from people per square mile to people per km² (1 sq mi = 2.58999 km²): <a href="https://www.census.gov/quickfacts/table/EDU635214/36061" target="_blank" rel="noopener noreferrer">Manhattan ↗</a> · <a href="https://www.census.gov/quickfacts/fact/table/bronxcountynewyork/POP715223" target="_blank" rel="noopener noreferrer">Bronx ↗</a> · <a href="https://www.census.gov/quickfacts/fact/table/kingscountynewyork/EDU635223" target="_blank" rel="noopener noreferrer">Brooklyn ↗</a> · <a href="https://www.census.gov/quickfacts/fact/table/queenscountynewyork/POP060220" target="_blank" rel="noopener noreferrer">Queens ↗</a></p>
+        <p class="model-boundary">MODEL BOUNDARY: the four NYC borough profiles are sourced; the future-core and arcology presets are planning assumptions. Density changes procedural building placement and height, not yet household distribution, census population allocation, or transport demand.</p>
     </section>
 
     <section class="reference-studies">
