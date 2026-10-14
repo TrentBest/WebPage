@@ -272,7 +272,7 @@ public sealed class IncrementalVersionTests
         Assert.Contains("builder.AddAttribute(sequence++, \"onclick\"", home);
         Assert.Contains("\"name\": \"Welcome\"", manifest);
         Assert.Contains("\"name\": \"Demonstrations\"", manifest);
-        Assert.DoesNotContain("\"name\": \"Ecosystem\"", manifest);
+        Assert.DoesNotContain("\"name\": \"Institutions\"", manifest);
         Assert.DoesNotContain("\"name\": \"Support\"", manifest);
         Assert.DoesNotContain("\"name\": \"AnyApp\"", manifest);
         Assert.Contains("glyph-red", firstContact);
