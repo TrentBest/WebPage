@@ -86,11 +86,11 @@
     </section>
 
     <section class="density-panel">
-        <div><span class="lab-eyebrow">CITY STATISTICS / MODEL INPUT</span><h2>Ground the skyline in real urban patterns.</h2><p>This first test exposes density as a model input rather than disguising invented values as census facts. The current geometry is a deterministic procedural slice; its reference-city calibration and population-to-building allocation are the next data layer.</p></div>
+        <div><span class="lab-eyebrow">CITY STATISTICS / MODEL INPUT</span><h2>Ground the skyline in real urban patterns.</h2><p>Density is an active input to deterministic massing rules: it changes plot vacancy, structure clustering, and tower heights. The 28,000 residents/km² starting point is a tuning assumption, not a claim of census calibration; the next data layer will import documented reference-city profiles with source, year, land-area basis, and uncertainty.</p></div>
         <label for="density-input">Target population density <strong>@DensityPerKm2.ToString("N0") residents/km²</strong></label>
         <input id="density-input" type="range" min="5000" max="50000" step="1000" value="@DensityPerKm2" @oninput="OnDensityChanged" />
         <div class="density-scale"><span>5,000 / km²</span><span>50,000 / km²</span></div>
-        <p class="model-boundary">HONEST BOUNDARY: this slider changes the stated planning target and readout today; it does not yet regenerate the building population, household distribution, or transport demand. Those will become coupled model outputs, not decorative controls.</p>
+        <p class="model-boundary">MODEL BOUNDARY: density changes procedural building placement and height. Household distribution, measured population allocation, and transport demand are not simulated yet; this is a visible model input, not a census-backed prediction.</p>
     </section>
 
     <footer class="lab-footer"><a href="/">THE SINGULARITY WORKSHOP</a><span>ONE WORLD MODEL · MANY REPRESENTATIONS · MANY POSSIBLE FUTURES</span></footer>
@@ -112,32 +112,35 @@
     {
         if (int.TryParse(args.Value?.ToString(), out var density))
             DensityPerKm2 = Math.Clamp(density, 5000, 50000);
+            Buildings = BuildCity(DensityPerKm2);
     }
 
     private sealed record CityBuilding(int Id, string Kind, int Floors, string LeftFace, string RightFace, string Roof, string WindowLines, string Crown, bool IsLandmark);
     private sealed record CityDistrict(int Id, string Name, string Points, int LabelX, int LabelY);
     private sealed record CityRoad(int Id, string Points);
 
-    private List<CityBuilding> Buildings { get; } = BuildCity();
+    private List<CityBuilding> Buildings { get; set; } = BuildCity(28000);
     private List<CityDistrict> Districts { get; } = BuildDistricts();
     private List<CityRoad> Roads { get; } = BuildRoads();
 
-    private static List<CityBuilding> BuildCity()
+    private static List<CityBuilding> BuildCity(int targetDensity)
     {
         var result = new List<CityBuilding>();
+        var densityFactor = Math.Clamp((targetDensity - 5000) / 45000d, 0d, 1d);
+        var openSpaceThreshold = 25 - (int)Math.Round(17 * densityFactor);
         var id = 0;
         for (var row = 0; row < 18; row++)
         for (var col = 0; col < 22; col++)
         {
             var hash = (col * 73 + row * 151 + col * row * 17) % 101;
-            if (hash < 8) continue; // plazas, parks, water cuts and transport voids
-            var count = 1 + (hash % 4 == 0 ? 2 : hash % 3 == 0 ? 1 : 0);
+            if (hash < openSpaceThreshold) continue; // density-dependent plazas, parks, water cuts and transport voids
+            var count = 1 + (hash % 4 < 1 + (int)(densityFactor * 3) ? 1 : 0) + (densityFactor > .72 && hash % 7 == 0 ? 1 : 0);
             for (var local = 0; local < count; local++)
             {
                 var localHash = (col * 97 + row * 61 + local * 43 + col * row * 7) % 997;
                 var x = 500 + (col - row) * 25 + (local - 1) * 7;
                 var y = 55 + (col + row) * 15 + (local % 2) * 4;
-                var floors = 3 + localHash % 58;
+                var floors = 3 + (int)((localHash % 58) * (.65 + densityFactor * .8));
                 var landmark = (col == 10 && row == 8 && local == 0) || (col == 14 && row == 5 && local == 0) || (col == 5 && row == 13 && local == 0);
                 if (landmark) floors = 75 + localHash % 45;
                 var h = floors * 1.55;
