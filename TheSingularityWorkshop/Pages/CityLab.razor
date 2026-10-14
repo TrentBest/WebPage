@@ -94,7 +94,7 @@
             <option value="50000">Arcology stress test · 50,000/km² planning assumption</option>
         </select>
         <label for="density-input">Target population density <strong>@DensityPerKm2.ToString("N0") residents/km²</strong></label>
-        <input id="density-input" type="range" min="5000" max="50000" step="1000" value="@DensityPerKm2" @oninput="OnDensityChanged" />
+        <input id="density-input" type="range" min="5000" max="50000" step="1" value="@DensityPerKm2" @oninput="OnDensityChanged" />
         <div class="density-scale"><span>5,000 / km²</span><span>50,000 / km²</span></div>
         <p class="model-source">REFERENCE DATA: U.S. Census Bureau QuickFacts reports New York County population density of 74,781.6 people per square mile in 2020 (about 28,874/km²). <a href="https://www.census.gov/quickfacts/table/EDU635214/36061" target="_blank" rel="noopener noreferrer">Open the Census source ↗</a></p>
         <p class="model-boundary">MODEL BOUNDARY: the Manhattan profile is sourced; the other two presets are planning assumptions. Density changes procedural building placement and height, not yet household distribution, census population allocation, or transport demand.</p>
