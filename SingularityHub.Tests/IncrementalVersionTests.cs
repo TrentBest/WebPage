@@ -201,7 +201,7 @@ public sealed class IncrementalVersionTests
         Assert.Contains("FirstContactView", home);
         Assert.Contains("FSM.CurrentState == PageFSM.Gateway", home);
         Assert.Contains("FSM.RequestEnter();", home);
-        Assert.Contains("FSM.CurrentState == PageFSM.Running", home);
+        Assert.Contains("or PageFSM.Running)", home);
         Assert.Contains("PageFSM.NavigationArrival", layout);
         Assert.Contains(".Style(\"width\", \"50vw\")", firstContact);
         Assert.Contains(".Style(\"height\", \"50vh\")", firstContact);
@@ -252,7 +252,7 @@ public sealed class IncrementalVersionTests
         var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
 
         Assert.Contains("FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running", home);
-        Assert.Contains("Keep the same landing surface through NavigationArrival", home);
+        Assert.Contains("builder.OpenComponent<LivingGui>(4);", home);
         Assert.Contains("BuildManifestHub(builder);", home);
         Assert.DoesNotContain("WORKSHOP HUB ARRIVING", home);
     }
@@ -270,9 +270,9 @@ public sealed class IncrementalVersionTests
         Assert.Contains("private string _selectedHubTab = \"MONIKER\";", home);
         Assert.Contains("aria-pressed", home);
         Assert.Contains("builder.AddAttribute(sequence++, \"onclick\"", home);
-        Assert.Contains("\"name\": \"Ecosystem\"", manifest);
-        Assert.Contains("\"name\": \"Schedule Consultation\"", manifest);
-        Assert.Contains("\"name\": \"Institutions\"", manifest);
+        Assert.Contains("\"name\": \"Welcome\"", manifest);
+        Assert.Contains("\"name\": \"Demonstrations\"", manifest);
+        Assert.DoesNotContain("\"name\": \"Ecosystem\"", manifest);
         Assert.DoesNotContain("\"name\": \"Support\"", manifest);
         Assert.DoesNotContain("\"name\": \"AnyApp\"", manifest);
         Assert.Contains("glyph-red", firstContact);
