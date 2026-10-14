@@ -81,9 +81,9 @@
         <div><span class="lab-eyebrow">CITY STATISTICS / MODEL INPUT</span><h2>Ground the skyline in real urban patterns.</h2><p>Density is an active input to deterministic massing rules: it changes plot vacancy, structure clustering, and tower heights. The 28,000 residents/km² starting point is a tuning assumption, not a claim of census calibration; the next data layer will import documented reference-city profiles with source, year, land-area basis, and uncertainty.</p></div>
         <label for="density-profile">Reference profile / planning scenario</label>
         <select id="density-profile" value="@_selectedProfile" @onchange="OnProfileChanged">
-            @foreach (var profile in CityProfiles)
+            @foreach (var cityProfile in CityProfiles)
             {
-                <option value="@profile.Id">@profile.Name · 2020 Census · ~@profile.DensityPerKm2.ToString("N0")/km²</option>
+                <option value="@cityProfile.Id">@cityProfile.Name · 2020 Census · ~@cityProfile.DensityPerKm2.ToString("N0")/km²</option>
             }
             <option value="future-core">Dense future core · 40,000/km² planning assumption</option>
             <option value="arcology">Arcology stress test · 50,000/km² planning assumption</option>
