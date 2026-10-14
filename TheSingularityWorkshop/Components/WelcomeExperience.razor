@@ -26,7 +26,13 @@
     private int TickCount => _context?.UpdateCount ?? 0;
     private bool IsRunning => _context?.IsValid == true && _handle?.IsValid == true;
 
-    protected override void OnInitialized() => ComposeMachine();
+    protected override void OnInitialized()
+    {
+        // FSM_API updates are addressed to processing groups. Create the group
+        // explicitly before registering this visitor's finite-state machine.
+        FsmApi.Create.CreateProcessingGroup(_processingGroup);
+        ComposeMachine();
+    }
 
     private void ComposeMachine()
     {
@@ -93,13 +99,23 @@
 
     private void Reset()
     {
+        // Replace this lab's machine, not merely its context. Otherwise the old
+        // FSM remains registered in the processing group and receives future ticks.
+        DestroyMachine();
+        ComposeMachine();
+        StateHasChanged();
+    }
+
+    private void DestroyMachine()
+    {
         if (_context is not null)
             _context.IsValid = false;
 
-        // The unique processing group belongs only to this visitor's lab instance.
-        // A reset creates a fresh FSM rather than resetting a shared/global machine.
-        ComposeMachine();
-        StateHasChanged();
+        if (!string.IsNullOrWhiteSpace(_machineName))
+            FsmApi.Interaction.DestroyFiniteStateMachine(_machineName, _processingGroup);
+
+        _handle = null;
+        _context = null;
     }
 
     private void Record(string entry)
@@ -295,13 +311,11 @@
 
     public void Dispose()
     {
+        if (_disposed)
+            return;
+
         _disposed = true;
-        if (_context is not null)
-            _context.IsValid = false;
-        if (_handle?.IsValid == true)
-            FSM_API.Interaction.Update(_processingGroup);
-        _handle = null;
-        _context = null;
+        DestroyMachine();
     }
 
     private sealed class WelcomeLabContext : IStateContext
