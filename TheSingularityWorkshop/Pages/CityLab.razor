@@ -124,7 +124,11 @@
     private string _skin = "noir";
     private int DensityPerKm2 = 28874;
     private string _skinClass => _skin switch { "metro" => "metro", "solarpunk" => "solarpunk", _ => "noir" };
-    private void SetSkin(string skin) => _skin = skin;
+    private void SetSkin(string skin)
+    {
+        _skin = skin;
+        StateHasChanged();
+    }
     private void OnDensityChanged(ChangeEventArgs args)
     {
         if (int.TryParse(args.Value?.ToString(), out var density))
