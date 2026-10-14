@@ -5,7 +5,10 @@
   </a>
 </p>
 
-# The Singularity Workshop — WebPage
+# ✳️ 00 The Singularity Workshop — WebPage
+
+
+This README follows the Workshop's shared [Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/master/DOCUMENTATION_STANDARD.md), while keeping this repository's own purpose and implementation authoritative.
 
 ## What this repository actually is
 
