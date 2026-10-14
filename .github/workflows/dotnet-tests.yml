@@ -233,3 +233,49 @@ jobs:
       - name: Build WebPage from checked-out Workshop source
         working-directory: WebPage
         run: dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore -p:WorkshopUseRepositorySources=true
+      - name: Setup Node.js for source-mode browser proof
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Install Playwright Chromium for source-mode browser proof
+        run: |
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+      - name: Verify live Renderer FSM transitions in the browser
+        working-directory: WebPage
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p TestResults/Browser
+          dotnet run --project TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-build --no-launch-profile --urls http://127.0.0.1:5261 > /tmp/webpage-source-host.log 2>&1 &
+          host_pid=$!
+          cleanup() {
+            kill "$host_pid" 2>/dev/null || true
+            wait "$host_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=false
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:5261/ -o /tmp/webpage-source-index.html; then
+              ready=true
+              break
+            fi
+            if ! kill -0 "$host_pid" 2>/dev/null; then
+              cat /tmp/webpage-source-host.log
+              exit 1
+            fi
+            sleep 2
+          done
+          if [ "$ready" != true ]; then
+            cat /tmp/webpage-source-host.log
+            echo "Source-mode WebPage host did not become ready within 60 seconds."
+            exit 1
+          fi
+          WORKSHOP_BASE_URL=http://127.0.0.1:5261 WORKSHOP_SCREENSHOT="$GITHUB_WORKSPACE/WebPage/TestResults/Browser/renderer-source-smoke.png" node tests/renderer-source-smoke.mjs
+      - name: Upload source-mode Renderer browser proof
+        uses: actions/upload-artifact@v7
+        with:
+          name: renderer-source-browser-proof
+          path: WebPage/TestResults/Browser/renderer-source-smoke.png
+          if-no-files-found: error
