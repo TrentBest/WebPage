@@ -109,6 +109,8 @@ try {
   await digitens.getByRole("heading", { name: "Aurora Foundry", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await digitens.getByText(/LOCAL DRAFT ONLY/).waitFor({ state: "visible", timeout: 15_000 });
   await page.screenshot({ path: `${outputDir}/06-company-blueprint.png`, fullPage: true });
+  await digitens.getByRole("button", { name: /Explore Singularity City/i }).click();
+  await digitens.getByText(/LABELS COME FROM THE EXISTING C# CITY MODEL/).waitFor({ state: "visible", timeout: 15_000 });
 
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "Economy", exact: true }).click();
