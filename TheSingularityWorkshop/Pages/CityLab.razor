@@ -88,13 +88,14 @@
     <section class="density-panel">
         <div><span class="lab-eyebrow">CITY STATISTICS / MODEL INPUT</span><h2>Ground the skyline in real urban patterns.</h2><p>Density is an active input to deterministic massing rules: it changes plot vacancy, structure clustering, and tower heights. The 28,000 residents/km² starting point is a tuning assumption, not a claim of census calibration; the next data layer will import documented reference-city profiles with source, year, land-area basis, and uncertainty.</p></div>
         <label for="density-profile">Reference profile / planning scenario</label>
-        <select id="density-profile" @onchange="OnProfileChanged">
+        <select id="density-profile" value="@_selectedProfile" @onchange="OnProfileChanged">
             <option value="28874">Manhattan / New York County · 2020 Census · ~28,874/km²</option>
             <option value="13483">Bronx County · 2020 Census · ~13,483/km²</option>
             <option value="15227">Brooklyn / Kings County · 2020 Census · ~15,227/km²</option>
             <option value="8542">Queens County · 2020 Census · ~8,542/km²</option>
             <option value="40000">Dense future core · 40,000/km² planning assumption</option>
             <option value="50000">Arcology stress test · 50,000/km² planning assumption</option>
+            <option value="custom">Custom / slider value</option>
         </select>
         <label for="density-input">Target population density <strong>@DensityPerKm2.ToString("N0") residents/km²</strong></label>
         <input id="density-input" type="range" min="5000" max="50000" step="1" value="@DensityPerKm2" @oninput="OnDensityChanged" />
@@ -126,6 +127,7 @@
 @code {
     private string _skin = "noir";
     private int DensityPerKm2 = 28874;
+    private string _selectedProfile = "28874";
     private string _skinClass => _skin switch { "metro" => "metro", "solarpunk" => "solarpunk", _ => "noir" };
     private void SetSkin(string skin)
     {
@@ -136,12 +138,25 @@
     {
         if (int.TryParse(args.Value?.ToString(), out var density))
         {
-            DensityPerKm2 = Math.Clamp(density, 5000, 50000);
-            Buildings = BuildCity(DensityPerKm2);
+            _selectedProfile = "custom";
+            SetDensity(density);
         }
     }
 
-    private void OnProfileChanged(ChangeEventArgs args) => OnDensityChanged(args);
+    private void OnProfileChanged(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var density))
+        {
+            _selectedProfile = args.Value?.ToString() ?? "custom";
+            SetDensity(density);
+        }
+    }
+
+    private void SetDensity(int density)
+    {
+        DensityPerKm2 = Math.Clamp(density, 5000, 50000);
+        Buildings = BuildCity(DensityPerKm2);
+    }
 
     private sealed record CityBuilding(int Id, string Kind, int Floors, string LeftFace, string RightFace, string Roof, string WindowLines, string Crown, bool IsLandmark);
     private sealed record CityDistrict(int Id, string Name, string Points, int LabelX, int LabelY);
