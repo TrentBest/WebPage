@@ -27,6 +27,7 @@
                 <NavLink class="nav-link" href="@HubTabHref(item.Name)" @onclick="() => SelectHubDestination(item.Name)">@item.Name</NavLink>
             }
             <NavLink class="nav-link" href="/?tab=economy" @onclick="SelectEconomyDestination">Economy</NavLink>
+            <NavLink class="nav-link" href="/?tab=digitens" @onclick="SelectDigitensDestination">Digitens</NavLink>
             @if (welcomeSelected)
             {
                 <NavLink class="nav-link about-link" href="/about-us" @onclick="CollapseNavMenu">About Us</NavLink>
@@ -53,6 +54,8 @@
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
     private void SelectEconomyDestination() => SelectHubDestination("Economy");
+
+    private void SelectDigitensDestination() => SelectHubDestination("Digitens");
 
     private static string HubTabHref(string name) =>
         $"/?tab={Uri.EscapeDataString(name.Trim().ToLowerInvariant().Replace(' ', '-'))}";
