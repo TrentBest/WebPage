@@ -27,7 +27,7 @@
 .manifest-hub-version{font-size:.7rem;letter-spacing:.14em;color:#536873}
 .manifest-public-brief{border:1px solid rgba(255,44,255,.24);border-radius:1rem;padding:clamp(1.2rem,2.6vw,2rem);background:linear-gradient(120deg,rgba(0,168,255,.08),rgba(255,44,255,.045),rgba(3,8,17,.92));}.manifest-public-brief h2{margin:.65rem 0;color:#fff;font-size:clamp(1.45rem,3.3vw,2.5rem);line-height:1.05;}.manifest-public-brief p{max-width:78ch;color:#c3d0d6;line-height:1.65;margin:.8rem 0;}.manifest-public-brief .brief-status{color:#ffb15c;font-size:.68rem;letter-spacing:.15em;font-weight:800;}.manifest-public-brief .brief-flow{display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;margin:1.1rem 0;color:#9bdfea;font-size:.72rem;letter-spacing:.07em;}.manifest-public-brief .brief-flow b{color:#ff2cff;}.manifest-public-brief .manifest-hub-actions{margin-top:1rem;}
 .manifest-hub-tabs,.manifest-hub-tab{display:none!important}
-.economy-experience{position:absolute;inset:0;width:100%;height:100%;border:0;background:#050a14;display:block}.manifest-hub-economy{padding:0!important;overflow:hidden!important;background:#050a14!important}
+.economy-experience{position:absolute;inset:0;width:100%;height:100%;border:0;background:#050a14;display:block}.manifest-hub-economy,.manifest-hub-digitens{padding:0!important;overflow:hidden!important;background:#050a14!important}
 .manifest-hub-moniker{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0;background:radial-gradient(ellipse at 50% 48%,rgba(0,234,255,.09),transparent 30%),radial-gradient(ellipse at 50% 78%,rgba(255,44,255,.045),transparent 42%),#020711}
 .manifest-hub-moniker .first-contact-stage{position:absolute;inset:0;background:transparent}
 .manifest-hub-moniker .hub-moniker-panel{position:absolute;inset:0;width:100%;height:100%;padding:0;box-sizing:border-box}
@@ -214,7 +214,7 @@
             _selectedHubTab, "MONIKER", StringComparison.OrdinalIgnoreCase);
         builder.OpenElement(0, "section");
         builder.AddAttribute(1, "class",
-            monikerSelected ? "manifest-hub manifest-hub-moniker-host" : string.Equals(_selectedHubTab, "ECONOMY", StringComparison.OrdinalIgnoreCase) ? "manifest-hub manifest-hub-economy" : "manifest-hub");
+            monikerSelected ? "manifest-hub manifest-hub-moniker-host" : string.Equals(_selectedHubTab, "ECONOMY", StringComparison.OrdinalIgnoreCase) ? "manifest-hub manifest-hub-economy" : string.Equals(_selectedHubTab, "DIGITENS", StringComparison.OrdinalIgnoreCase) ? "manifest-hub manifest-hub-digitens" : "manifest-hub");
 
         // The landing Moniker is rendered by the continuously mounted LivingGui.
         // Keep the hub surface present but transparent until a visitor chooses a tab.
@@ -243,6 +243,15 @@
             builder.AddAttribute(sequence++, "class", "economy-experience");
             builder.AddAttribute(sequence++, "src", "/economy/casino-floor.html");
             builder.AddAttribute(sequence++, "title", "Singularity Casino living economy experience");
+            builder.AddAttribute(sequence++, "allow", "fullscreen");
+            builder.CloseElement();
+        }
+        else if (string.Equals(_selectedHubTab, "DIGITENS", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.OpenElement(sequence++, "iframe");
+            builder.AddAttribute(sequence++, "class", "economy-experience");
+            builder.AddAttribute(sequence++, "src", "/digitens/index.html");
+            builder.AddAttribute(sequence++, "title", "Digitens: digital citizens of the Singularity World");
             builder.AddAttribute(sequence++, "allow", "fullscreen");
             builder.CloseElement();
         }
