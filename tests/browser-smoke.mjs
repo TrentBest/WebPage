@@ -124,7 +124,15 @@ try {
   cityLab.on("pageerror", error => browserErrors.push(error.message));
   await cityLab.goto(`${baseUrl}/city-lab`, { waitUntil: "domcontentloaded", timeout: 30_000 });
   await cityLab.getByRole("heading", { name: "Singularity City Lab" }).waitFor({ state: "visible", timeout: 30_000 });
+  await cityLab.getByRole("heading", { name: "From harbor settlement to sovereign megacity." }).waitFor({ state: "visible" });
+  await cityLab.getByRole("button", { name: /2300.*The City-State/ }).click();
+  await cityLab.getByText("SOVEREIGN MEGA-CIVIC SYSTEM", { exact: true }).waitFor({ state: "visible" });
+  await cityLab.getByText(/Mayor-President Amara Velez/).waitFor({ state: "visible" });
+  await cityLab.getByText("50,000 residents/km²", { exact: true }).waitFor({ state: "visible" });
   await cityLab.locator("#density-profile").selectOption("bronx");
+  if (await cityLab.locator("#density-profile").inputValue() !== "bronx") {
+    throw new Error("Selecting a Census profile must update the selected profile.");
+  }
   await cityLab.getByText("13,483 residents/km²", { exact: true }).waitFor({ state: "visible" });
   await cityLab.getByText("1,472,654 residents", { exact: true }).waitFor({ state: "visible" });
   await cityLab.locator("#density-profile").selectOption("manhattan");
