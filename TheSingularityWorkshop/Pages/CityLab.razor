@@ -1,0 +1,179 @@
+@page "/city-lab"
+@layout BareLayout
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Singularity City // City Lab</PageTitle>
+
+<main class="city-lab @(_skinClass)">
+    <header class="lab-header">
+        <a href="/digitens" class="lab-back">← DIGITENS</a>
+        <div class="lab-eyebrow">THE SINGULARITY WORKSHOP / WORLD GENERATION TEST</div>
+        <h1>Singularity <em>City Lab</em></h1>
+        <p>One city model. Three possible futures. Change the skin; the streets, structures, and their identities stay the same.</p>
+        <div class="lab-controls" role="group" aria-label="City visual skin">
+            <button class="skin-button noir @(_skin == "noir" ? "active" : "")" aria-pressed="@(_skin == "noir")" @onclick='() => SetSkin("noir")'><span></span><strong>01 / NOIR</strong><small>Neon density · cyberpunk</small></button>
+            <button class="skin-button metro @(_skin == "metro" ? "active" : "")" aria-pressed="@(_skin == "metro")" @onclick='() => SetSkin("metro")'><span></span><strong>02 / METRO</strong><small>Future New York · lived-in</small></button>
+            <button class="skin-button solarpunk @(_skin == "solarpunk" ? "active" : "")" aria-pressed="@(_skin == "solarpunk")" @onclick='() => SetSkin("solarpunk")'><span></span><strong>03 / HARMONY</strong><small>Green infrastructure · human-scale</small></button>
+        </div>
+    </header>
+
+    <section class="lab-stage" aria-label="Procedural city model">
+        <div class="stage-topline"><span>WORLD SLICE / ISOMETRIC MASSING</span><span>DETERMINISTIC MODEL · @Buildings.Count STRUCTURES</span></div>
+        <svg class="city-render" viewBox="0 0 1000 790" role="img" aria-label="Procedurally generated isometric futuristic city with hundreds of buildings, districts, and connected streets">
+            <defs>
+                <pattern id="city-ground-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" class="ground-grid" fill="none" stroke-width="0.7" />
+                </pattern>
+                <linearGradient id="city-atmosphere" x1="0" y1="0" x2="0.8" y2="1">
+                    <stop offset="0%" class="atmosphere-top" />
+                    <stop offset="100%" class="atmosphere-bottom" />
+                </linearGradient>
+            </defs>
+            <rect width="1000" height="790" fill="url(#city-atmosphere)" />
+            <rect width="1000" height="790" fill="url(#city-ground-grid)" opacity=".28" />
+            @foreach (var district in Districts)
+            {
+                <g @key="district.Id" class="district-mark">
+                    <polygon points="@district.Points" class="district-plane" />
+                    <text x="@district.LabelX" y="@district.LabelY" class="district-label">@district.Name</text>
+                </g>
+            }
+            @foreach (var road in Roads)
+            {
+                <polyline @key="road.Id" points="@road.Points" class="city-road" />
+            }
+            @foreach (var building in Buildings)
+            {
+                <g @key="building.Id" class="building @building.Kind">
+                    <polygon points="@building.LeftFace" class="building-left" />
+                    <polygon points="@building.RightFace" class="building-right" />
+                    <polygon points="@building.Roof" class="building-roof" />
+                    <path d="@building.WindowLines" class="building-windows" />
+                    @if (building.IsLandmark)
+                    {
+                        <polygon points="@building.Crown" class="building-crown" />
+                    }
+                </g>
+            }
+            <g class="workshop-anchor">
+                <circle cx="500" cy="385" r="18" class="anchor-halo" />
+                <circle cx="500" cy="385" r="5" class="anchor-core" />
+                <path d="M 500 365 V 342 M 500 405 V 428 M 480 385 H 457 M 520 385 H 543" class="anchor-cross" />
+                <text x="518" y="358" class="anchor-label">THE WORKSHOP</text>
+                <text x="518" y="371" class="anchor-subtitle">FIXED COMPOSITION ANCHOR</text>
+            </g>
+        </svg>
+        <div class="stage-footer"><span>OBSERVE THE WHOLE</span><span>↓ SAME MODEL / NEW MATERIALS ↓</span><span>ZOOM INTO A DISTRICT NEXT</span></div>
+    </section>
+
+    <section class="lab-readout">
+        <article class="readout-card">
+            <span class="readout-label">WORLD DATA</span>
+            <strong>@Buildings.Count</strong><p>Generated structures</p>
+        </article>
+        <article class="readout-card">
+            <span class="readout-label">DENSITY MODEL</span>
+            <strong>@DensityPerKm2.ToString("N0")</strong><p>Target residents / km² · adjustable input</p>
+        </article>
+        <article class="readout-card">
+            <span class="readout-label">TALLEST STRUCTURE</span>
+            <strong>@Buildings.Max(x => x.Floors) <small>floors</small></strong><p>Procedural height, not a real building</p>
+        </article>
+        <article class="readout-card">
+            <span class="readout-label">REPRESENTATION</span>
+            <strong>Massing</strong><p>District-scale geometry · no interior simulation yet</p>
+        </article>
+    </section>
+
+    <section class="density-panel">
+        <div><span class="lab-eyebrow">CITY STATISTICS / MODEL INPUT</span><h2>Ground the skyline in real urban patterns.</h2><p>This first test exposes density as a model input rather than disguising invented values as census facts. The current geometry is a deterministic procedural slice; its reference-city calibration and population-to-building allocation are the next data layer.</p></div>
+        <label for="density-input">Target population density <strong>@DensityPerKm2.ToString("N0") residents/km²</strong></label>
+        <input id="density-input" type="range" min="5000" max="50000" step="1000" value="@DensityPerKm2" @oninput="OnDensityChanged" />
+        <div class="density-scale"><span>5,000 / km²</span><span>50,000 / km²</span></div>
+        <p class="model-boundary">HONEST BOUNDARY: this slider changes the stated planning target and readout today; it does not yet regenerate the building population, household distribution, or transport demand. Those will become coupled model outputs, not decorative controls.</p>
+    </section>
+
+    <footer class="lab-footer"><a href="/">THE SINGULARITY WORKSHOP</a><span>ONE WORLD MODEL · MANY REPRESENTATIONS · MANY POSSIBLE FUTURES</span></footer>
+</main>
+
+<style>
+.city-lab{--bg:#050a12;--panel:#091522;--ink:#edf8ff;--muted:#9ab0bf;--line:#244253;--accent:#00eaff;--accent2:#ff3fd2;--ground:#0b1924;min-height:100vh;padding:clamp(1rem,3vw,3rem);background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+.city-lab.metro{--bg:#101821;--panel:#18232b;--ink:#f0eee8;--muted:#aeb9bc;--line:#52616a;--accent:#f4bb68;--accent2:#76c9d1;--ground:#27353c}
+.city-lab.solarpunk{--bg:#edf4e9;--panel:#dce9dc;--ink:#19372f;--muted:#506d62;--line:#a8c7b5;--accent:#1d8065;--accent2:#d28b46;--ground:#d4e7d9}
+.lab-header{max-width:1500px;margin:0 auto 1.5rem}.lab-back,.lab-footer a{color:var(--accent);text-decoration:none;font-weight:800;font-size:.72rem;letter-spacing:.14em}.lab-eyebrow{font-size:.68rem;letter-spacing:.18em;color:var(--accent);font-weight:800;margin-top:1.2rem}.lab-header h1{font-size:clamp(2.6rem,7vw,6.4rem);line-height:.94;letter-spacing:-.065em;margin:.6rem 0 1rem}.lab-header h1 em{color:var(--accent);font-style:normal}.lab-header>p{max-width:780px;color:var(--muted);font-size:1.05rem;line-height:1.65}.lab-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1.5rem}.skin-button{display:grid;grid-template-columns:3rem 1fr;grid-template-rows:auto auto;gap:.15rem .8rem;text-align:left;padding:1rem;background:var(--panel);border:1px solid var(--line);color:var(--ink);cursor:pointer}.skin-button>span{grid-row:1/3;width:3rem;height:3rem;border-radius:50%;border:3px solid var(--accent);background:linear-gradient(135deg,#060912,#ff2dd0,#00eaff)}.skin-button.metro>span{background:linear-gradient(135deg,#26343c,#f2ba6a,#76c9d1);border-color:#f4bb68}.skin-button.solarpunk>span{background:linear-gradient(135deg,#edf4e9,#7ab99b,#d28b46);border-color:#1d8065}.skin-button strong{font-size:.78rem;letter-spacing:.08em}.skin-button small{color:var(--muted);font-size:.75rem}.skin-button.active{border-color:var(--accent);box-shadow:inset 0 -3px var(--accent)}.lab-stage{max-width:1500px;margin:0 auto;background:var(--panel);border:1px solid var(--line);overflow:hidden}.stage-topline,.stage-footer{display:flex;justify-content:space-between;gap:1rem;padding:.85rem 1rem;color:var(--muted);font:700 .63rem/1.5 ui-monospace,monospace;letter-spacing:.1em}.city-render{display:block;width:100%;height:auto;min-height:350px;background:var(--ground)}.ground-grid{stroke:var(--accent);stroke-opacity:.17}.atmosphere-top{stop-color:var(--panel)}.atmosphere-bottom{stop-color:var(--ground)}.district-plane{fill:var(--accent);fill-opacity:.035;stroke:var(--accent);stroke-opacity:.2;stroke-width:1.1;stroke-dasharray:5 7}.district-label{fill:var(--muted);font-size:11px;font-weight:800;letter-spacing:2px;opacity:.75}.city-road{fill:none;stroke:var(--accent);stroke-opacity:.23;stroke-width:2;stroke-dasharray:4 5}.building-left{fill:var(--accent);fill-opacity:.3;stroke:var(--accent);stroke-opacity:.4;stroke-width:.65}.building-right{fill:var(--accent2);fill-opacity:.32;stroke:var(--accent2);stroke-opacity:.5;stroke-width:.65}.building-roof{fill:var(--ink);fill-opacity:.72;stroke:var(--accent);stroke-opacity:.7;stroke-width:.65}.building-windows{fill:none;stroke:var(--ink);stroke-opacity:.6;stroke-width:.7}.building.landmark .building-roof{fill:var(--accent);fill-opacity:.95}.building-crown{fill:var(--accent2);fill-opacity:.8;stroke:var(--ink);stroke-opacity:.6;stroke-width:.7}.metro .building-left{fill:#7f9ca4;fill-opacity:.55}.metro .building-right{fill:#d6a86e;fill-opacity:.5}.metro .building-roof{fill:#d9e0d9;fill-opacity:.78}.metro .building-windows{stroke:#283944;stroke-opacity:.9}.solarpunk .building-left{fill:#5d9e7c;fill-opacity:.55}.solarpunk .building-right{fill:#d28b46;fill-opacity:.35}.solarpunk .building-roof{fill:#b7d9c0;fill-opacity:.95}.solarpunk .building-windows{stroke:#2f6a56;stroke-opacity:.85}.solarpunk .building-crown{fill:#8ccda0}.anchor-halo{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:3 4}.anchor-core{fill:var(--accent);stroke:var(--ink);stroke-width:1}.anchor-cross{stroke:var(--accent);stroke-width:1.4}.anchor-label{font:800 11px ui-monospace,monospace;fill:var(--ink);letter-spacing:1.5px}.anchor-subtitle{font:700 7px ui-monospace,monospace;fill:var(--accent);letter-spacing:1px}.lab-readout{max-width:1500px;margin:1rem auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}.readout-card{padding:1rem;background:var(--panel);border:1px solid var(--line)}.readout-label{display:block;color:var(--accent);font-size:.6rem;font-weight:800;letter-spacing:.14em}.readout-card>strong{display:block;font-size:clamp(1.5rem,3vw,2.6rem);margin:.6rem 0}.readout-card strong small{font-size:.8rem;color:var(--muted)}.readout-card p{margin:0;color:var(--muted);font-size:.75rem;line-height:1.5}.density-panel{max-width:1500px;margin:0 auto;padding:clamp(1rem,3vw,2rem);border:1px solid var(--line);background:var(--panel)}.density-panel h2{font-size:clamp(1.4rem,3vw,2.5rem);margin:.4rem 0}.density-panel p{max-width:850px;color:var(--muted);line-height:1.65}.density-panel label{display:flex;justify-content:space-between;gap:1rem;margin-top:1.5rem;font-size:.85rem}.density-panel input{width:100%;accent-color:var(--accent);margin-top:1rem}.density-scale{display:flex;justify-content:space-between;color:var(--muted);font-size:.7rem}.model-boundary{border-left:3px solid var(--accent2);padding-left:1rem;font-size:.76rem!important}.lab-footer{max-width:1500px;margin:1.5rem auto;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;color:var(--muted);font-size:.65rem;letter-spacing:.1em}@media(max-width:760px){.lab-controls{grid-template-columns:1fr}.lab-readout{grid-template-columns:repeat(2,minmax(0,1fr))}.stage-topline,.stage-footer{font-size:.52rem}.city-render{min-height:240px}.density-panel label{display:grid}.lab-footer{line-height:1.6}}@media(prefers-reduced-motion:reduce){.skin-button{transition:none}}
+</style>
+
+@code {
+    private string _skin = "noir";
+    private int DensityPerKm2 = 28000;
+    private string _skinClass => _skin switch { "metro" => "metro", "solarpunk" => "solarpunk", _ => "noir" };
+    private void SetSkin(string skin) => _skin = skin;
+    private void OnDensityChanged(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var density))
+            DensityPerKm2 = Math.Clamp(density, 5000, 50000);
+    }
+
+    private sealed record CityBuilding(int Id, string Kind, int Floors, string LeftFace, string RightFace, string Roof, string WindowLines, string Crown, bool IsLandmark);
+    private sealed record CityDistrict(int Id, string Name, string Points, int LabelX, int LabelY);
+    private sealed record CityRoad(int Id, string Points);
+
+    private List<CityBuilding> Buildings { get; } = BuildCity();
+    private List<CityDistrict> Districts { get; } = BuildDistricts();
+    private List<CityRoad> Roads { get; } = BuildRoads();
+
+    private static List<CityBuilding> BuildCity()
+    {
+        var result = new List<CityBuilding>();
+        var id = 0;
+        for (var row = 0; row < 18; row++)
+        for (var col = 0; col < 22; col++)
+        {
+            var hash = (col * 73 + row * 151 + col * row * 17) % 101;
+            if (hash < 8) continue; // plazas, parks, water cuts and transport voids
+            var count = 1 + (hash % 4 == 0 ? 2 : hash % 3 == 0 ? 1 : 0);
+            for (var local = 0; local < count; local++)
+            {
+                var localHash = (col * 97 + row * 61 + local * 43 + col * row * 7) % 997;
+                var x = 500 + (col - row) * 25 + (local - 1) * 7;
+                var y = 55 + (col + row) * 15 + (local % 2) * 4;
+                var floors = 3 + localHash % 58;
+                var landmark = (col == 10 && row == 8 && local == 0) || (col == 14 && row == 5 && local == 0) || (col == 5 && row == 13 && local == 0);
+                if (landmark) floors = 75 + localHash % 45;
+                var h = floors * 1.55;
+                const double w = 10;
+                const double d = 6;
+                var roof = $"{x-w:0.#},{y-h} {x:0.#},{y-h-d} {x+w:0.#},{y-h} {x:0.#},{y-h+d}";
+                var left = $"{x-w:0.#},{y-h} {x:0.#},{y-h+d} {x:0.#},{y+d} {x-w:0.#},{y}";
+                var right = $"{x+w:0.#},{y-h} {x:0.#},{y-h+d} {x:0.#},{y+d} {x+w:0.#},{y}";
+                var windows = $"M {x-w/2:0.#} {y-h+8:0.#} V {y-2:0.#} M {x+w/2:0.#} {y-h+8:0.#} V {y-2:0.#} M {x-w/2:0.#} {y-h+8:0.#} L {x:0.#} {y-h+12:0.#} M {x:0.#} {y-h+20:0.#} L {x+w/2:0.#} {y-h+24:0.#}";
+                var crown = $"{x-w*.6:0.#},{y-h} {x:0.#},{y-h-d-12} {x+w*.6:0.#},{y-h}";
+                var kind = landmark ? "landmark" : floors > 35 ? "tower" : floors > 16 ? "midrise" : "lowrise";
+                result.Add(new CityBuilding(++id, kind, floors, left, right, roof, windows, crown, landmark));
+            }
+        }
+        // Near-to-far painter ordering makes the same deterministic geometry read as a massing model.
+        return result.OrderBy(b => b.Id).ToList();
+    }
+
+    private static List<CityDistrict> BuildDistricts() => new()
+    {
+        new(1, "CIVIC CORE", "500,105 650,195 500,285 350,195", 444, 192),
+        new(2, "VERTICAL EXCHANGE", "660,230 790,308 660,386 530,308", 588, 307),
+        new(3, "RESIDENTIAL TERRACES", "345,285 470,360 345,435 220,360", 260, 359),
+        new(4, "TRANSIT + INDUSTRY", "480,445 630,535 480,625 330,535", 401, 536),
+        new(5, "GARDEN BELT", "700,410 805,473 700,536 595,473", 656, 474)
+    };
+
+    private static List<CityRoad> BuildRoads()
+    {
+        var roads = new List<CityRoad>();
+        for (var i = 0; i < 15; i++)
+        {
+            var a = 130 + i * 48;
+            roads.Add(new CityRoad(i, $"{a},90 {a-230},320 {a-460},550 {a-690},780"));
+            roads.Add(new CityRoad(i + 20, $"{a-100},90 {a+130},320 {a+360},550 {a+590},780"));
+        }
+        return roads;
+    }
+}
