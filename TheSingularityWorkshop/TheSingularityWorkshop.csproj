@@ -58,6 +58,8 @@
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.GUI\src\Blazor\TheSingularityWorkshop.GUI.Blazor.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.GUI on development." />
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.ProtocolAi\TheSingularityWorkshop.ProtocolAi.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.ProtocolAi on development." />
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.GrammarAi\TheSingularityWorkshop.GrammarAi.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.GrammarAi on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.Renderer\TheSingularityWorkshop.Renderer.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.Renderer on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.Visualize\TheSingularityWorkshop.Visualize.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.Visualize on development." />
   </Target>
 
 </Project>
