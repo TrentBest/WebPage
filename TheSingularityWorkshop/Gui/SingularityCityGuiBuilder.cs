@@ -206,23 +206,49 @@ public static class SingularityCityGuiBuilder
     }
 
     private static ElementBuilder AvatarMarker(object receiver, string avatarLabel)
-        => WorkshopGui.Panel(receiver)
-            .Style("position", "fixed").Style("left", "50%").Style("top", "50%")
-            .Style("transform", "translate(-50%,-50%)").Style("z-index", "30")
-            .Style("pointer-events", "none").Style("display", "flex")
-            .Style("flex-direction", "column").Style("align-items", "center").Style("gap", ".2rem")
+    {
+        var pulse = WorkshopGui.Element(receiver, "span").Attribute("class", "city-pulse")
+            .Style("position", "absolute")
+            .Style("inset", "-6px")
+            .Style("border", $"1px solid {Magenta}")
+            .Style("border-radius", "50%");
+
+        var marker = WorkshopGui.Element(receiver, "div")
+            .Style("width", "1.1rem")
+            .Style("height", "1.1rem")
+            .Style("border-radius", "50%")
+            .Style("border", $"2px solid {White}")
+            .Style("background", Magenta)
+            .Style("box-shadow", $"0 0 16px {Magenta}")
+            .Style("position", "relative")
+            .Content(pulse);
+
+        var label = WorkshopGui.Element(receiver, "div")
+            .Style("padding", ".15rem .35rem")
+            .Style("border", $"1px solid {Magenta}88")
+            .Style("background", "rgba(3,10,20,.92)")
+            .Style("color", White)
+            .Style("font-size", ".6rem")
+            .Style("font-weight", "800")
+            .Style("letter-spacing", ".08em")
+            .Style("white-space", "nowrap")
+            .Text($"YOU ARE HERE · {avatarLabel.ToUpperInvariant()}");
+
+        return WorkshopGui.Panel(receiver)
+            .Style("position", "fixed")
+            .Style("left", "50%")
+            .Style("top", "50%")
+            .Style("transform", "translate(-50%,-50%)")
+            .Style("z-index", "30")
+            .Style("pointer-events", "none")
+            .Style("display", "flex")
+            .Style("flex-direction", "column")
+            .Style("align-items", "center")
+            .Style("gap", ".2rem")
             .Attribute("aria-label", "You are here")
-            .Content(WorkshopGui.Element(receiver, "div").Style("width", "1.1rem").Style("height", "1.1rem")
-                .Style("border-radius", "50%").Style("border", $"2px solid {White}").Style("background", Magenta)
-                .Style("box-shadow", $"0 0 16px {Magenta}").Style("position", "relative")
-                .Content(WorkshopGui.Element(receiver, "span").Attribute("class", "city-pulse")
-                    .Style("position", "absolute").Style("inset", "-6px").Style("border", $"1px solid {Magenta}")
-                    .Style("border-radius", "50%")))
-            .Content(WorkshopGui.Element(receiver, "div").Style("padding", ".15rem .35rem")
-                .Style("border", $"1px solid {Magenta}88").Style("background", "rgba(3,10,20,.92)")
-                .Style("color", White).Style("font-size", ".6rem").Style("font-weight", "800")
-                .Style("letter-spacing", ".08em").Style("white-space", "nowrap")
-                .Text($"YOU ARE HERE · {avatarLabel.ToUpperInvariant()}"));
+            .Content(marker)
+            .Content(label);
+    }
 
     private static ElementBuilder Header(object receiver, string status, int buildingCount, int digitenCount)
         => WorkshopGui.Panel(receiver).Attribute("class", "city-world-title")
