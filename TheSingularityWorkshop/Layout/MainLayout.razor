@@ -61,6 +61,16 @@
         get
         {
             var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', 2)[0].Trim('/');
+            var relative = Navigation.ToBaseRelativePath(Navigation.Uri);
+            var query = relative.Contains('?') ? relative[(relative.IndexOf('?') + 1)..] : string.Empty;
+            var selectedTab = query.Split('&', StringSplitOptions.RemoveEmptyEntries)
+                .Select(part => part.Split('=', 2))
+                .Where(parts => parts.Length == 2 && string.Equals(Uri.UnescapeDataString(parts[0]), "tab", StringComparison.OrdinalIgnoreCase))
+                .Select(parts => Uri.UnescapeDataString(parts[1]).Replace('-', ' '))
+                .FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(selectedTab))
+                return selectedTab.ToUpperInvariant();
+
             return path.ToLowerInvariant() switch
             {
                 "" => "THE WORKSHOP",
