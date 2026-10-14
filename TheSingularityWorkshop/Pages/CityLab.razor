@@ -11,9 +11,9 @@
         <h1>Singularity <em>City Lab</em></h1>
         <p>One city model. Three possible futures. Change the skin; the streets, structures, and their identities stay the same.</p>
         <div class="lab-controls" role="group" aria-label="City visual skin">
-            <button class="skin-button noir @(_skin == "noir" ? "active" : "")" aria-pressed="@(_skin == "noir")" @onclick='() => SetSkin("noir")'><span></span><strong>01 / NOIR</strong><small>Neon density · cyberpunk</small></button>
-            <button class="skin-button metro @(_skin == "metro" ? "active" : "")" aria-pressed="@(_skin == "metro")" @onclick='() => SetSkin("metro")'><span></span><strong>02 / METRO</strong><small>Future New York · lived-in</small></button>
-            <button class="skin-button solarpunk @(_skin == "solarpunk" ? "active" : "")" aria-pressed="@(_skin == "solarpunk")" @onclick='() => SetSkin("solarpunk")'><span></span><strong>03 / HARMONY</strong><small>Green infrastructure · human-scale</small></button>
+            <button class="skin-button noir @(_skin == "noir" ? "active" : "")" aria-pressed="@(_skin == "noir")" @onclick="SelectNoirSkin"><span></span><strong>01 / NOIR</strong><small>Neon density · cyberpunk</small></button>
+            <button class="skin-button metro @(_skin == "metro" ? "active" : "")" aria-pressed="@(_skin == "metro")" @onclick="SelectMetroSkin"><span></span><strong>02 / METRO</strong><small>Future New York · lived-in</small></button>
+            <button class="skin-button solarpunk @(_skin == "solarpunk" ? "active" : "")" aria-pressed="@(_skin == "solarpunk")" @onclick="SelectHarmonySkin"><span></span><strong>03 / HARMONY</strong><small>Green infrastructure · human-scale</small></button>
         </div>
     </header>
 
@@ -146,6 +146,9 @@
         _skin = skin;
         StateHasChanged();
     }
+    private void SelectNoirSkin() => SetSkin("noir");
+    private void SelectMetroSkin() => SetSkin("metro");
+    private void SelectHarmonySkin() => SetSkin("solarpunk");
     private void OnDensityChanged(ChangeEventArgs args)
     {
         if (int.TryParse(args.Value?.ToString(), out var density))
