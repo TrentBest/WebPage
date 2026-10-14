@@ -124,6 +124,11 @@ try {
   cityLab.on("pageerror", error => browserErrors.push(error.message));
   await cityLab.goto(`${baseUrl}/city-lab`, { waitUntil: "domcontentloaded", timeout: 30_000 });
   await cityLab.getByRole("heading", { name: "Singularity City Lab" }).waitFor({ state: "visible", timeout: 30_000 });
+  await cityLab.locator("#density-profile").selectOption("bronx");
+  await cityLab.getByText("13,483 residents/km²", { exact: true }).waitFor({ state: "visible" });
+  await cityLab.getByText("1,472,654 residents", { exact: true }).waitFor({ state: "visible" });
+  await cityLab.locator("#density-profile").selectOption("manhattan");
+  await cityLab.getByText("28,874 residents/km²", { exact: true }).waitFor({ state: "visible" });
   const structureCount = await cityLab.locator(".readout-card").first().locator("strong").innerText();
   await cityLab.getByRole("button", { name: /02 \/ METRO/ }).click();
   await cityLab.locator('[data-skin="metro"]').waitFor({ state: "visible" });
