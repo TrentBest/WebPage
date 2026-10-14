@@ -126,12 +126,12 @@ try {
   await cityLab.getByRole("heading", { name: "Singularity City Lab" }).waitFor({ state: "visible", timeout: 30_000 });
   const structureCount = await cityLab.locator(".readout-card").first().locator("strong").innerText();
   await cityLab.getByRole("button", { name: /02 \/ METRO/ }).click();
-  await cityLab.locator(".city-lab.metro").waitFor({ state: "visible" });
+  await cityLab.locator('[data-skin="metro"]').waitFor({ state: "visible" });
   if (await cityLab.locator(".readout-card").first().locator("strong").innerText() !== structureCount) {
     throw new Error("Switching to Metro must preserve the exact same city geometry/data.");
   }
   await cityLab.getByRole("button", { name: /03 \/ HARMONY/ }).click();
-  await cityLab.locator(".city-lab.solarpunk").waitFor({ state: "visible" });
+  await cityLab.locator('[data-skin="solarpunk"]').waitFor({ state: "visible" });
   if (await cityLab.locator(".readout-card").first().locator("strong").innerText() !== structureCount) {
     throw new Error("Switching to Harmony must preserve the exact same city geometry/data.");
   }
