@@ -100,6 +100,16 @@ try {
   await digitens.getByText(/LABELS COME FROM THE EXISTING C# CITY MODEL/).waitFor({ state: "visible", timeout: 15_000 });
   await page.screenshot({ path: `${outputDir}/05-singularity-city.png`, fullPage: true });
 
+  // The first company-building step is a real local draft, not a fake city write.
+  await digitens.getByRole("button", { name: /Start building/i }).click();
+  await digitens.getByLabel("Company name").fill("Aurora Foundry");
+  await digitens.getByLabel("What will it do?").fill("Builds civic rendering tools for Singularity City.");
+  await digitens.getByLabel("Office footprint").selectOption({ label: "Team floor" });
+  await digitens.getByRole("button", { name: "Prepare blueprint", exact: true }).click();
+  await digitens.getByRole("heading", { name: "Aurora Foundry", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await digitens.getByText(/LOCAL DRAFT ONLY/).waitFor({ state: "visible", timeout: 15_000 });
+  await page.screenshot({ path: `${outputDir}/06-company-blueprint.png`, fullPage: true });
+
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "Economy", exact: true }).click();
   const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
