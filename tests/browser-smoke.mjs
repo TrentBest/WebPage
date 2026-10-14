@@ -46,21 +46,6 @@ try {
     throw new Error(`The hub destinations must be Welcome, Economy, and Digitens; found: ${initialLinks.join(", ")}.`);
   }
 
-  // The Digitens destination must render the source-backed explainer and city explorer.
-  await page.getByRole("link", { name: "Digitens", exact: true }).click();
-  const digitens = page.frameLocator('iframe[title="Digitens: digital citizens of the Singularity World"]');
-  await digitens.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
-  await digitens.getByRole("heading", { name: "The Workshop stays at the heart of the city.", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
-
-  // Economy remains a separate interactive destination.
-  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
-  await page.getByRole("link", { name: "Economy", exact: true }).click();
-  const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
-  await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
-
-  // Return to Welcome to continue the existing FSM interaction journey.
-  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
-  await page.getByRole("link", { name: "Welcome", exact: true }).click();
   await page.locator(".workshop-nav-shell.collapsed").waitFor({ state: "visible" });
   if (await page.locator(".workshop-nav-links").count() !== 0) {
     throw new Error("Selecting Welcome must retract the navigation to the expander only.");
@@ -87,6 +72,18 @@ try {
     throw new Error("Removed destination tabs must not reappear in the hub.");
   }
   await page.screenshot({ path: `${outputDir}/03-welcome.png`, fullPage: true });
+
+  // Exercise the additional destinations after the original Welcome/FSM journey.
+  // That keeps the pre-existing state-transition proof independent of iframe navigation.
+  await page.getByRole("link", { name: "Digitens", exact: true }).click();
+  const digitens = page.frameLocator('iframe[title="Digitens: digital citizens of the Singularity World"]');
+  await digitens.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await digitens.getByRole("heading", { name: "The Workshop stays at the heart of the city.", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "Economy", exact: true }).click();
+  const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
+  await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
 
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
