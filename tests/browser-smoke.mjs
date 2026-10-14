@@ -119,6 +119,27 @@ try {
   const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
   await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
 
+  // The City Lab is a separate, navigable renderer test: all three skins must reuse one geometry model.
+  const cityLab = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
+  cityLab.on("pageerror", error => browserErrors.push(error.message));
+  await cityLab.goto(`${baseUrl}/city-lab`, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  await cityLab.getByRole("heading", { name: "Singularity City Lab" }).waitFor({ state: "visible", timeout: 30_000 });
+  const structureCount = await cityLab.locator(".readout-card").first().locator("strong").innerText();
+  await cityLab.getByRole("button", { name: /02 \/ METRO/ }).click();
+  await cityLab.locator(".city-lab.metro").waitFor({ state: "visible" });
+  if (await cityLab.locator(".readout-card").first().locator("strong").innerText() !== structureCount) {
+    throw new Error("Switching to Metro must preserve the exact same city geometry/data.");
+  }
+  await cityLab.getByRole("button", { name: /03 \/ HARMONY/ }).click();
+  await cityLab.locator(".city-lab.solarpunk").waitFor({ state: "visible" });
+  if (await cityLab.locator(".readout-card").first().locator("strong").innerText() !== structureCount) {
+    throw new Error("Switching to Harmony must preserve the exact same city geometry/data.");
+  }
+  await cityLab.getByLabel(/Target population density/).fill("42000");
+  await cityLab.getByText("42,000 residents/km²", { exact: true }).waitFor({ state: "visible" });
+  await cityLab.screenshot({ path: `${outputDir}/07-city-lab-harmony.png`, fullPage: true });
+  await cityLab.close();
+
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
