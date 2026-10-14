@@ -1,0 +1,143 @@
+@page "/digitens"
+@layout null
+@using TheSingularityWorkshop.Gui
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Digitens // Singularity City</PageTitle>
+
+<main class="digiten-world">
+    <header class="world-header">
+        <a class="world-back" href="/" target="_top">← THE WORKSHOP</a>
+        <div class="world-signal"><span></span> SINGULARITY CITY <i>/</i> LIVING DIGITAL CITIZENS</div>
+        <h1>Not just avatars.<br /><em>People in a world.</em></h1>
+        <p class="world-intro">A Digiten is a digital citizen with an identity, a place in the world, and a relationship to the systems around them. This first slice exposes the Workshop's existing civic identity and mansion-architecture data; it does not pretend that disconnected citizens are running autonomous agents yet.</p>
+    </header>
+
+    <section class="world-grid" aria-label="Singularity City civic directory and Mayor's Mansion plan">
+        <section class="citizen-panel">
+            <div class="section-kicker">01 / CIVIC DIRECTORY</div>
+            <div class="section-heading"><h2>Meet the officials.</h2><span>@SingularityCivicDigitenCatalog.Officials.Count REGISTERED</span></div>
+            <p class="section-copy">Select an official to inspect their identity, office, role, and committee assignments. The directory is backed by the existing C# civic catalog.</p>
+            <div class="citizen-list">
+                @foreach (var official in SingularityCivicDigitenCatalog.Officials)
+                {
+                    <button class="citizen-row @(ReferenceEquals(official, _selectedOfficial) ? "selected" : "")"
+                            @key="official.Id"
+                            @onclick="() => SelectOfficial(official)"
+                            aria-pressed="@(ReferenceEquals(official, _selectedOfficial))">
+                        <span class="citizen-glyph">@Initials(official.Name)</span>
+                        <span class="citizen-name"><strong>@official.Name</strong><small>@official.Role</small></span>
+                        <span class="citizen-arrow">↗</span>
+                    </button>
+                }
+            </div>
+            <article class="citizen-detail" aria-live="polite">
+                <div class="detail-label">SELECTED IDENTITY</div>
+                <h3>@_selectedOfficial.Name</h3>
+                <p class="office-id">@_selectedOfficial.OfficeId</p>
+                <p>@_selectedOfficial.Role</p>
+                <div class="committee-list">
+                    @foreach (var committee in _selectedOfficial.CommitteeAssignments)
+                    {
+                        <span @key="committee">@committee</span>
+                    }
+                </div>
+            </article>
+        </section>
+
+        <section class="mansion-panel">
+            <div class="section-kicker">02 / SPATIAL ANCHOR</div>
+            <div class="section-heading"><h2>The Mayor's Mansion.</h2><span>@SingularityMansionArchitecture.Features.Count FEATURES</span></div>
+            <p class="section-copy">A semantic plan, not a fabrication-ready architectural drawing. Choose a feature to inspect the meaning already recorded in the Workshop model.</p>
+            <div class="plan-frame">
+                <svg class="mansion-plan" viewBox="0 0 100 100" role="img" aria-label="Conceptual Mayor's Mansion feature map">
+                    <rect class="plan-boundary" x="2" y="2" width="96" height="96" rx="1" />
+                    @foreach (var feature in SingularityMansionArchitecture.Features)
+                    {
+                        <g @key="feature.Id" class="plan-feature @(string.Equals(feature.Id, _selectedFeature.Id, StringComparison.Ordinal) ? "active" : "")">
+                            <rect x="@feature.X" y="@feature.Y" width="@feature.Width" height="@feature.Height" rx="1" />
+                            <title>@feature.Name — @feature.Description</title>
+                            <text x="@(feature.X + feature.Width / 2)" y="@(feature.Y + feature.Height / 2)" text-anchor="middle" dominant-baseline="middle">@ShortLabel(feature.Name)</text>
+                        </g>
+                    }
+                    <path class="plan-axis" d="M 50 2 V 98 M 2 50 H 98" />
+                </svg>
+                <div class="plan-caption"><span>SCHEMATIC / NORMALIZED COORDINATES</span><span>NOT TO SCALE</span></div>
+            </div>
+            <div class="feature-list" aria-label="Mansion features">
+                @foreach (var feature in SingularityMansionArchitecture.Features)
+                {
+                    <button @key="feature.Id"
+                            class="feature-chip @(string.Equals(feature.Id, _selectedFeature.Id, StringComparison.Ordinal) ? "selected" : "")"
+                            @onclick="() => SelectFeature(feature)"
+                            aria-pressed="@(string.Equals(feature.Id, _selectedFeature.Id, StringComparison.Ordinal))">
+                        <span>@feature.Kind</span><strong>@feature.Name</strong>
+                    </button>
+                }
+            </div>
+            <article class="feature-detail" aria-live="polite">
+                <div class="detail-label">SELECTED PLACE / @_selectedFeature.Kind.ToUpperInvariant()</div>
+                <h3>@_selectedFeature.Name</h3>
+                <p>@_selectedFeature.Description</p>
+            </article>
+        </section>
+    </section>
+
+    <footer class="presence-contract">
+        <span class="contract-mark">✳</span>
+        <div><div class="section-kicker">03 / PRESENCE CONTRACT</div><h2>A world persists. A live avatar does not.</h2>
+            <p>@SingularityDigitenPresenceRules.PresenceContract</p>
+            <small>This is the declared boundary, not a claim that account connection, durable storage, or network presence is implemented by this page.</small>
+        </div>
+    </footer>
+    <footer class="world-footer"><span>THE SINGULARITY WORKSHOP</span><span>IDENTITY · PLACE · PRESENCE · PERSISTENCE</span></footer>
+</main>
+
+<style>
+.digiten-world{--cyan:#00eaff;--pink:#ff2cff;--gold:#ffd34d;min-height:100vh;box-sizing:border-box;padding:clamp(1rem,3vw,2.6rem);background:radial-gradient(ellipse at 75% 4%,#08243a 0,transparent 34%),radial-gradient(ellipse at 15% 55%,#190b29 0,transparent 38%),#020711;color:#eaf8ff;font-family:Inter,system-ui,sans-serif;overflow:auto}
+.digiten-world *{box-sizing:border-box}.world-header,.world-grid,.presence-contract,.world-footer{width:min(1500px,100%);margin-inline:auto}
+.world-back{display:inline-flex;padding:.55rem .7rem;border:1px solid #254658;color:#a4c3d1;text-decoration:none;font:700 .6rem Consolas,monospace;letter-spacing:.1em}
+.world-signal{display:flex;align-items:center;gap:.6rem;margin-top:1.6rem;color:#91afbd;font:700 .62rem Consolas,monospace;letter-spacing:.17em}.world-signal span{width:.45rem;height:.45rem;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}.world-signal i{font-style:normal;color:var(--pink)}
+.world-header h1{margin:.8rem 0;font-size:clamp(2.7rem,7vw,6.6rem);line-height:.88;letter-spacing:-.065em}.world-header h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 35px #00eaff22}
+.world-intro,.section-copy{max-width:76ch;color:#a8c1cc;line-height:1.7;font-size:.9rem}
+.world-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(1rem,2.4vw,2.2rem);margin-top:2.5rem}
+.citizen-panel,.mansion-panel{min-width:0;padding:clamp(1rem,2vw,1.5rem);border:1px solid #1d4052;background:linear-gradient(145deg,#071522eF,#030711f5);box-shadow:0 20px 60px #0003}
+.section-kicker,.detail-label{color:#7ea8ba;font:700 .58rem Consolas,monospace;letter-spacing:.16em}
+.section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:.8rem;flex-wrap:wrap}.section-heading h2{margin:.65rem 0;font-size:clamp(1.45rem,2.5vw,2.4rem);letter-spacing:-.035em}.section-heading>span{color:#648a9b;font:700 .53rem Consolas,monospace;letter-spacing:.1em}
+.section-copy{font-size:.78rem;margin:.25rem 0 1rem}
+.citizen-list{display:grid;gap:.4rem;max-height:420px;overflow:auto;padding-right:.2rem}
+.citizen-row{display:grid;grid-template-columns:2.3rem minmax(0,1fr) auto;align-items:center;gap:.75rem;width:100%;padding:.7rem;border:1px solid #193746;background:#04101b;color:inherit;text-align:left;cursor:pointer}
+.citizen-row:hover,.citizen-row.selected{border-color:var(--cyan);background:linear-gradient(100deg,#00eaff10,#ff2cff07)}.citizen-glyph{display:grid;place-items:center;aspect-ratio:1;border:1px solid #315b6b;color:var(--cyan);font:800 .65rem Consolas,monospace}.citizen-name{display:grid;gap:.22rem;min-width:0}.citizen-name strong{font-size:.8rem}.citizen-name small{color:#7f9eac;font-size:.68rem}.citizen-arrow{color:var(--pink)}
+.citizen-detail,.feature-detail{margin-top:1rem;padding:1rem;border-left:2px solid var(--pink);background:#ff2cff08}.citizen-detail h3,.feature-detail h3{margin:.4rem 0;font-size:1.4rem}.citizen-detail p,.feature-detail p{margin:.35rem 0;color:#b2c7d1;font-size:.8rem;line-height:1.6}.citizen-detail .office-id{color:var(--cyan);font:600 .66rem Consolas,monospace}.committee-list{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.8rem}.committee-list span{padding:.35rem .5rem;border:1px solid #254655;color:#a9c3cf;font-size:.62rem}
+.plan-frame{padding:.6rem;border:1px solid #1d4052;background:radial-gradient(circle at center,#09223780,transparent 70%),#020812}.mansion-plan{display:block;width:100%;max-height:500px;overflow:visible}.plan-boundary{fill:#04101b;stroke:#376174;stroke-width:.6}.plan-axis{fill:none;stroke:#173748;stroke-width:.25;stroke-dasharray:1 1}.plan-feature rect{fill:#0a2434;stroke:#2e6375;stroke-width:.45;transition:fill .2s,stroke .2s}.plan-feature.active rect{fill:#00eaff28;stroke:var(--cyan);stroke-width:1.1}.plan-feature text{fill:#a9d2df;font:2.1px Consolas,monospace;pointer-events:none}.plan-feature.active text{fill:#fff}.plan-caption{display:flex;justify-content:space-between;gap:.5rem;color:#587f91;font:700 .48rem Consolas,monospace;letter-spacing:.08em}
+.feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9.5rem),1fr));gap:.4rem;margin-top:.7rem}.feature-chip{display:grid;gap:.3rem;min-width:0;padding:.65rem;border:1px solid #193746;background:#04101b;color:#eaf8ff;text-align:left;cursor:pointer}.feature-chip span{color:#6e98a9;font:700 .5rem Consolas,monospace;letter-spacing:.1em;text-transform:uppercase}.feature-chip strong{font-size:.68rem;line-height:1.3}.feature-chip:hover,.feature-chip.selected{border-color:var(--cyan);background:#00eaff0c}
+.presence-contract{display:grid;grid-template-columns:3rem minmax(0,1fr);gap:1rem;align-items:start;margin-top:2rem;padding:clamp(1rem,2vw,1.6rem);border:1px solid #49384e;background:linear-gradient(100deg,#ff2cff0c,#00eaff06)}.contract-mark{display:grid;place-items:center;width:2.5rem;height:2.5rem;border:1px solid var(--pink);color:var(--pink);font-size:1.4rem}.presence-contract h2{margin:.5rem 0;font-size:clamp(1.2rem,2.5vw,2rem)}.presence-contract p{color:#d3b9d7;font:700 clamp(.65rem,1vw,.8rem)/1.6 Consolas,monospace;overflow-wrap:anywhere}.presence-contract small{color:#7e96a5;line-height:1.5}
+.world-footer{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1.4rem;padding:.9rem 0;border-top:1px solid #193746;color:#5f8291;font:700 .52rem Consolas,monospace;letter-spacing:.1em}
+@@media(max-width:850px){.world-grid{grid-template-columns:1fr}.citizen-list{max-height:320px}.world-header h1{font-size:clamp(2.8rem,11vw,5rem)}}
+@@media(prefers-reduced-motion:reduce){.plan-feature rect{transition:none}}
+</style>
+
+@code {
+    private SingularityCivicDigiten _selectedOfficial = SingularityCivicDigitenCatalog.Mayor;
+    private SingularityMansionFeature _selectedFeature = SingularityMansionArchitecture.Features[0];
+
+    private void SelectOfficial(SingularityCivicDigiten official) => _selectedOfficial = official;
+    private void SelectFeature(SingularityMansionFeature feature) => _selectedFeature = feature;
+
+    private static string Initials(string name)
+        => string.Join("", name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(part => part[0])).ToUpperInvariant();
+
+    private static string ShortLabel(string name)
+        => name switch
+        {
+            "Grand Stair & Landing" => "STAIR",
+            "West Gallery Alcove" => "WEST",
+            "East Gallery Alcove" => "EAST",
+            "Portrait Alcove" => "PORTRAITS",
+            "City Charter Alcove" => "CHARTER",
+            "Mayor's Library" => "LIBRARY",
+            "City Map Room" => "MAP ROOM",
+            "State Dining Room" => "DINING",
+            _ => name.ToUpperInvariant()
+        };
+}
