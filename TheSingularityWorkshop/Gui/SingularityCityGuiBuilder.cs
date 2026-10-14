@@ -210,22 +210,22 @@ public static class SingularityCityGuiBuilder
         var pulse = WorkshopGui.Element(receiver, "span").Attribute("class", "city-pulse")
             .Style("position", "absolute")
             .Style("inset", "-6px")
-            .Style("border", $"1px solid {Magenta}")
+            .Style("border", "1px solid " + Magenta)
             .Style("border-radius", "50%");
 
         var marker = WorkshopGui.Element(receiver, "div")
             .Style("width", "1.1rem")
             .Style("height", "1.1rem")
             .Style("border-radius", "50%")
-            .Style("border", $"2px solid {White}")
+            .Style("border", "2px solid " + White)
             .Style("background", Magenta)
-            .Style("box-shadow", $"0 0 16px {Magenta}")
+            .Style("box-shadow", "0 0 16px " + Magenta)
             .Style("position", "relative")
             .Content(pulse);
 
         var label = WorkshopGui.Element(receiver, "div")
             .Style("padding", ".15rem .35rem")
-            .Style("border", $"1px solid {Magenta}88")
+            .Style("border", "1px solid " + Magenta + "88")
             .Style("background", "rgba(3,10,20,.92)")
             .Style("color", White)
             .Style("font-size", ".6rem")
