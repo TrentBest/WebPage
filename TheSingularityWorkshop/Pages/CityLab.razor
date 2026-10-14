@@ -78,7 +78,7 @@
     </section>
 
     <section class="density-panel">
-        <div><span class="lab-eyebrow">CITY STATISTICS / MODEL INPUT</span><h2>Ground the skyline in real urban patterns.</h2><p>Density is an active input to deterministic massing rules: it changes plot vacancy, structure clustering, and tower heights. The 28,000 residents/km² starting point is a tuning assumption, not a claim of census calibration; the next data layer will import documented reference-city profiles with source, year, land-area basis, and uncertainty.</p></div>
+        <div><span class="lab-eyebrow">CITY STATISTICS / MODEL INPUT</span><h2>Ground the skyline in real urban patterns.</h2><p>Density is an active input to deterministic massing rules: it changes plot vacancy, structure clustering, and tower heights. Reference profiles use sourced 2020 Census population and land-area figures; their densities are converted to residents/km². The procedural geometry is a model response to density, not a census-calibrated map of individual buildings.</p></div>
         <label for="density-profile">Reference profile / planning scenario</label>
         <select id="density-profile" value="@_selectedProfile" @onchange="OnProfileChanged">
             @foreach (var cityProfile in CityProfiles)
@@ -147,6 +147,7 @@
         {
             _selectedProfile = "custom";
             SetDensity(density);
+            StateHasChanged();
         }
     }
 
@@ -159,6 +160,7 @@
             SetDensity(40000);
         else if (_selectedProfile == "arcology")
             SetDensity(50000);
+        StateHasChanged();
     }
 
     private void SetDensity(int density)
