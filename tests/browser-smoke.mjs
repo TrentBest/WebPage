@@ -93,12 +93,12 @@ try {
   if (!proofLoaded) {
     throw new Error("The Visualize proof image did not load in the Digitens renderer topic.");
   }
-  await digitens.locator(".topic-workbench").screenshot({ path: `${outputDir}/04-digitens-renderer.png` });
+  await page.screenshot({ path: `${outputDir}/04-digitens-renderer.png`, fullPage: true });
 
   await digitens.getByRole("button", { name: /Singularity City/i }).click();
   await digitens.getByText("MAYOR'S MANSION", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await digitens.getByText(/LABELS COME FROM THE EXISTING C# CITY MODEL/).waitFor({ state: "visible", timeout: 15_000 });
-  await digitens.locator(".topic-workbench").screenshot({ path: `${outputDir}/05-singularity-city.png` });
+  await page.screenshot({ path: `${outputDir}/05-singularity-city.png`, fullPage: true });
 
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "Economy", exact: true }).click();
