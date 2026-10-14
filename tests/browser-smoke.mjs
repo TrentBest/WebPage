@@ -85,6 +85,21 @@ try {
   await digitens.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await digitens.getByRole("heading", { name: "The Workshop stays at the heart of the city.", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
 
+  // Verify the real Visualize proof asset and the city model view, not only the route shell.
+  await digitens.getByRole("button", { name: /Renderer & detail/i }).click();
+  await digitens.getByText(/REAL VISUALIZE OUTPUT/).waitFor({ state: "visible", timeout: 15_000 });
+  const proofLoaded = await digitens.locator(".visualize-proof img").evaluate(image =>
+    image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0);
+  if (!proofLoaded) {
+    throw new Error("The Visualize proof image did not load in the Digitens renderer topic.");
+  }
+  await digitens.locator(".topic-workbench").screenshot({ path: `${outputDir}/04-digitens-renderer.png` });
+
+  await digitens.getByRole("button", { name: /Singularity City/i }).click();
+  await digitens.getByText("MAYOR'S MANSION", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await digitens.getByText(/LABELS COME FROM THE EXISTING C# CITY MODEL/).waitFor({ state: "visible", timeout: 15_000 });
+  await digitens.locator(".topic-workbench").screenshot({ path: `${outputDir}/05-singularity-city.png` });
+
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "Economy", exact: true }).click();
   const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
