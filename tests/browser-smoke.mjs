@@ -59,11 +59,15 @@ try {
 
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
-  await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
+  // FSM_API advances the current-state name on one tick; the new state's OnEnter
+  // callback occurs on the next tick. Assert state first, then verify actual lifecycle callbacks.
+  await page.getByText("Running", { exact: true }).first().waitFor({ state: "visible" });
   const tick = page.getByRole("button", { name: "TICK RUNTIME" });
+  await tick.click(); // enters Running and executes its first update
+  await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
   await tick.click();
-  await tick.click();
-  await tick.click();
+  await tick.click(); // third Running update requests Complete
+  await tick.click(); // enters Complete on the following update
   await page.getByText("OnEnter → Complete", { exact: false }).waitFor({ state: "visible" });
 
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
