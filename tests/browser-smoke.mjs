@@ -10,6 +10,7 @@ try {
   page.on("pageerror", error => browserErrors.push(error.message));
 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  await page.getByRole("link", { name: "Return to The Singularity Workshop home" }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByText("IF AN IMAGE IS WORTH A THOUSAND WORDS...", { exact: true }).waitFor({ state: "visible", timeout: 30_000 });
   await page.getByText("HOW MANY WORDS IS A LIVING IMAGE WORTH?", { exact: true }).waitFor({ state: "visible", timeout: 30_000 });
   await page.locator(".enter-workshop").waitFor({ state: "visible", timeout: 45_000 });
@@ -83,6 +84,7 @@ try {
   await page.getByRole("link", { name: "Digitens", exact: true }).click();
   const digitens = page.frameLocator('iframe[title="Digitens: digital citizens of the Singularity World"]');
   await digitens.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await digitens.getByRole("link", { name: "Return to The Singularity Workshop home" }).waitFor({ state: "visible", timeout: 15_000 });
   await digitens.getByRole("heading", { name: "The Workshop stays at the heart of the city.", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
 
   // Verify the real Visualize proof asset and the city model view, not only the route shell.

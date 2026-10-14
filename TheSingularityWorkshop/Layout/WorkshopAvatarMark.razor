@@ -1,0 +1,34 @@
+<a class="workshop-avatar-mark" href="/" aria-label="Return to The Singularity Workshop home" title="The Singularity Workshop">
+    <img src="/Images/TheSingularityWorkshopLivingAvatar.svg" alt="The Singularity Workshop animated eye avatar" loading="eager" />
+</a>
+
+<style>
+    .workshop-avatar-mark {
+        position: fixed;
+        right: max(.75rem, env(safe-area-inset-right));
+        bottom: max(.75rem, env(safe-area-inset-bottom));
+        z-index: 1200;
+        display: block;
+        width: clamp(2.75rem, 5vw, 4rem);
+        aspect-ratio: 1;
+        border: 1px solid rgba(0, 234, 255, .58);
+        border-radius: 50%;
+        overflow: hidden;
+        background: #050a14;
+        box-shadow: 0 0 .9rem rgba(0, 234, 255, .18);
+        opacity: .84;
+        transition: opacity 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+    }
+    .workshop-avatar-mark img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .workshop-avatar-mark:hover, .workshop-avatar-mark:focus-visible {
+        opacity: 1;
+        transform: scale(1.08);
+        box-shadow: 0 0 1.25rem rgba(0, 234, 255, .42);
+        outline: 2px solid #00eaff;
+        outline-offset: 3px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .workshop-avatar-mark { transition: none; }
+    }
+    @media print { .workshop-avatar-mark { display: none; } }
+</style>
