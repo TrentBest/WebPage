@@ -26,6 +26,7 @@
             <button class="topic-choice @(_selectedTopic == "theory" ? "active" : "")" @onclick='() => SelectTopic("theory")' aria-pressed="@(_selectedTopic == "theory")"><span>02</span><strong>Code &amp; theory</strong><small>What a Digiten is made of</small></button>
             <button class="topic-choice @(_selectedTopic == "renderer" ? "active" : "")" @onclick='() => SelectTopic("renderer")' aria-pressed="@(_selectedTopic == "renderer")"><span>03</span><strong>Renderer &amp; detail</strong><small>Event Horizons</small></button>
             <button class="topic-choice @(_selectedTopic == "city" ? "active" : "")" @onclick='() => SelectTopic("city")' aria-pressed="@(_selectedTopic == "city")"><span>04</span><strong>Singularity City</strong><small>Places, districts, and opportunity</small></button>
+            <button class="topic-choice @(_selectedTopic == "venture" ? "active" : "")" @onclick='() => SelectTopic("venture")' aria-pressed="@(_selectedTopic == "venture")"><span>05</span><strong>Start building</strong><small>Draft a company office</small></button>
         </nav>
 
         <section class="topic-stage" aria-live="polite">
@@ -49,6 +50,46 @@
                         }
                     </div>
                     <p class="proof-caption">HOST-MANIFESTED COMPOSITION · LABELS COME FROM THE EXISTING C# CITY MODEL</p>
+                </div>
+            }
+            else if (_selectedTopic == "venture")
+            {
+                <div class="venture-builder">
+                    <div class="venture-form">
+                        <div class="section-kicker">FIRST STEP / LOCAL BLUEPRINT</div>
+                        <label for="company-name">Company name</label>
+                        <input id="company-name" @bind="_companyName" placeholder="e.g. Aurora Foundry" />
+                        <label for="company-purpose">What will it do?</label>
+                        <textarea id="company-purpose" @bind="_companyPurpose" rows="3" placeholder="Describe the work your company wants to do."></textarea>
+                        <label for="office-footprint">Office footprint</label>
+                        <select id="office-footprint" @bind="_officeFootprint">
+                            <option>Studio</option>
+                            <option>Team floor</option>
+                            <option>Campus wing</option>
+                        </select>
+                        <button class="blueprint-submit" @onclick="PrepareCompanyBlueprint">Prepare blueprint</button>
+                        @if (!string.IsNullOrWhiteSpace(_blueprintValidationMessage))
+                        {
+                            <p class="blueprint-validation" role="status">@_blueprintValidationMessage</p>
+                        }
+                    </div>
+                    <div class="blueprint-preview">
+                        @if (_blueprintPrepared)
+                        {
+                            <div class="section-kicker">DRAFT BLUEPRINT / NOT PUBLISHED</div>
+                            <h3>@_companyName.Trim()</h3>
+                            <p>@_companyPurpose.Trim()</p>
+                            <div class="blueprint-facts"><span>OFFICE FOOTPRINT</span><strong>@_officeFootprint</strong></div>
+                            <p class="proof-caption">LOCAL DRAFT ONLY · NO PLOT ALLOCATED · NO CITIZENS ASSIGNED</p>
+                        }
+                        else
+                        {
+                            <div class="section-kicker">YOUR FIRST COMPANY</div>
+                            <h3>A city needs an idea before it needs an address.</h3>
+                            <p>Describe the work first. A future city-building step can connect this blueprint to a plot, an office, and the Digitens who choose to work there.</p>
+                            <p class="proof-caption">NOT YET SAVED TO SINGULARITY CITY</p>
+                        }
+                    </div>
                 </div>
             }
             else if (_selectedTopic == "theory")
@@ -105,6 +146,11 @@
             else if (_selectedTopic == "city")
             {
                 <div class="inspector-facts"><div><span>EXISTING SPATIAL MODEL</span><strong>@SingularityMansionArchitecture.Features.Count mansion features</strong></div><div><span>MAP STATUS</span><strong>Semantic schematic</strong></div><div><span>FUTURE CITY</span><strong>Homes · jobs · companies</strong></div></div>
+            }
+            else if (_selectedTopic == "venture")
+            {
+                <div class="inspector-facts"><div><span>THIS STEP</span><strong>Local company blueprint</strong></div><div><span>STORED IN CITY</span><strong>No — draft only</strong></div><div><span>FUTURE INTEGRATION</span><strong>Plot · office · Digitens</strong></div></div>
+                <a class="source-link" href="https://github.com/TrentBest/WebPage" target="_blank" rel="noopener noreferrer">Explore the WebPage host ↗</a>
             }
             else
             {
@@ -236,16 +282,30 @@
     private string _selectedTopic = "digitens";
     private readonly DigitenRendererProbe _rendererProbe = new();
     private static readonly string[] RendererRepresentations = ["Semantic", "Aggregate", "Distant", "Near", "Interactive"];
+    private string _companyName = "";
+    private string _companyPurpose = "";
+    private string _officeFootprint = "Studio";
+    private bool _blueprintPrepared;
+    private string? _blueprintValidationMessage;
 
-    private string TopicEyebrow => _selectedTopic switch { "theory" => "CODE + THEORY", "renderer" => "EVENT HORIZONS", "city" => "CITY MODEL", _ => "CITIZEN IDENTITY" };
-    private string TopicNumber => _selectedTopic switch { "theory" => "02", "renderer" => "03", "city" => "04", _ => "01" };
-    private string TopicTitle => _selectedTopic switch { "theory" => "Identity is not detail.", "renderer" => "Render only what matters.", "city" => "A place has structure.", _ => "A citizen is more than an avatar." };
-    private string TopicDescription => _selectedTopic switch { "theory" => "A Digiten is a domain-level digital citizen. Its identity and goals belong to the Experience; presentation detail can change without replacing the citizen.", "renderer" => "Renderer models computational detail through Event Horizons. Five representation targets describe what an observer currently justifies; they are not five different citizens.", "city" => "Singularity City is a world users should be able to shape. This page can inspect existing civic and mansion data; businesses, homes, and jobs remain future capabilities.", _ => "These are the digital citizens of our city: identities that can be placed into a world and eventually connected to richer goals and capabilities." };
-    private string TopicProof => _selectedTopic switch { "renderer" => "The displayed geometry is a committed Visualize C# proof output generated through the Visualizer frame and GUI.SVG backend.", "city" => "The labels shown here are sourced from the current mansion feature model, not invented city coordinates.", "theory" => "The explainer separates domain identity from observer-relative representation.", _ => "The selected identity and role come from the existing civic catalog." };
-    private string TopicBoundary => _selectedTopic switch { "renderer" => "This is a CPU-side SVG proof, not a production GPU renderer. Per-Digiten memory and live GPU residency are not measured here.", "city" => "This is not yet a fully inhabited simulation. Commerce, housing, employment, and user-owned offices are planned directions.", "theory" => "This explanatory host GUI is not evidence of autonomous goal execution.", _ => "The page does not claim disconnected citizens are autonomous agents." };
+    private string TopicEyebrow => _selectedTopic switch { "theory" => "CODE + THEORY", "renderer" => "EVENT HORIZONS", "city" => "CITY MODEL", "venture" => "COMPANY BLUEPRINT", _ => "CITIZEN IDENTITY" };
+    private string TopicNumber => _selectedTopic switch { "theory" => "02", "renderer" => "03", "city" => "04", "venture" => "05", _ => "01" };
+    private string TopicTitle => _selectedTopic switch { "theory" => "Identity is not detail.", "renderer" => "Render only what matters.", "city" => "A place has structure.", "venture" => "Start with a company blueprint.", _ => "A citizen is more than an avatar." };
+    private string TopicDescription => _selectedTopic switch { "theory" => "A Digiten is a domain-level digital citizen. Its identity and goals belong to the Experience; presentation detail can change without replacing the citizen.", "renderer" => "Renderer models computational detail through Event Horizons. Five representation targets describe what an observer currently justifies; they are not five different citizens.", "city" => "Singularity City is a world users should be able to shape. This page can inspect existing civic and mansion data; businesses, homes, and jobs remain future capabilities.", "venture" => "Draft the first idea for a company and its office. This is a local planning step, not yet a saved city transaction.", _ => "These are the digital citizens of our city: identities that can be placed into a world and eventually connected to richer goals and capabilities." };
+    private string TopicProof => _selectedTopic switch { "renderer" => "The displayed geometry is a committed Visualize C# proof output generated through the Visualizer frame and GUI.SVG backend.", "city" => "The labels shown here are sourced from the current mansion feature model, not invented city coordinates.", "theory" => "The explainer separates domain identity from observer-relative representation.", "venture" => _blueprintPrepared ? "A local company blueprint has been assembled from your input." : "The form lets you define a company idea before city persistence exists.", _ => "The selected identity and role come from the existing civic catalog." };
+    private string TopicBoundary => _selectedTopic switch { "renderer" => "This is a CPU-side SVG proof, not a production GPU renderer. Per-Digiten memory and live GPU residency are not measured here.", "city" => "This is not yet a fully inhabited simulation. Commerce, housing, employment, and user-owned offices are planned directions.", "theory" => "This explanatory host GUI is not evidence of autonomous goal execution.", "venture" => "The draft stays in this page's memory. It is not saved, published, assigned a city plot, or staffed by autonomous Digitens.", _ => "The page does not claim disconnected citizens are autonomous agents." };
 
     private void SelectTopic(string topic) => _selectedTopic = topic;
     private void SelectRepresentation(string representation) { _rendererProbe.Request(representation); StateHasChanged(); }
+
+    private void PrepareCompanyBlueprint()
+    {
+        _blueprintPrepared = !string.IsNullOrWhiteSpace(_companyName) &&
+                            !string.IsNullOrWhiteSpace(_companyPurpose);
+        _blueprintValidationMessage = _blueprintPrepared
+            ? null
+            : "Enter a company name and purpose before preparing the draft.";
+    }
 
     private SingularityCivicDigiten _selectedOfficial = SingularityCivicDigitenCatalog.Mayor;
     private SingularityMansionFeature _selectedFeature = SingularityMansionArchitecture.Features[0];
