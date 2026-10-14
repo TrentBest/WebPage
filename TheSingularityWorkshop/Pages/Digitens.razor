@@ -21,10 +21,10 @@
             <div class="citizen-list">
                 @foreach (var official in SingularityCivicDigitenCatalog.Officials)
                 {
-                    <button class="citizen-row @(ReferenceEquals(official, _selectedOfficial) ? "selected" : "")"
+                    <button class="citizen-row @(string.Equals(official.Id, _selectedOfficial.Id, StringComparison.OrdinalIgnoreCase) ? "selected" : "")"
                             @key="official.Id"
                             @onclick="() => SelectOfficial(official)"
-                            aria-pressed="@(ReferenceEquals(official, _selectedOfficial))">
+                            aria-pressed="@(string.Equals(official.Id, _selectedOfficial.Id, StringComparison.OrdinalIgnoreCase))">
                         <span class="citizen-glyph">@Initials(official.Name)</span>
                         <span class="citizen-name"><strong>@official.Name</strong><small>@official.Role</small></span>
                         <span class="citizen-arrow">↗</span>
