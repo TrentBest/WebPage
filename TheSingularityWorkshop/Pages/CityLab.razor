@@ -80,7 +80,7 @@
     <section class="density-panel">
         <div><span class="lab-eyebrow">CITY STATISTICS / MODEL INPUT</span><h2>Ground the skyline in real urban patterns.</h2><p>Density is an active input to deterministic massing rules: it changes plot vacancy, structure clustering, and tower heights. Reference profiles use sourced 2020 Census population and land-area figures; their densities are converted to residents/km². The procedural geometry is a model response to density, not a census-calibrated map of individual buildings.</p></div>
         <label for="density-profile">Reference profile / planning scenario</label>
-        <select id="density-profile" value="@_selectedProfile" @onchange="OnProfileChanged">
+        <select id="density-profile" @bind="_selectedProfile" @bind:after="ApplySelectedProfile">
             @foreach (var cityProfile in CityProfiles)
             {
                 <option value="@cityProfile.Id">@cityProfile.Name · 2020 Census · ~@cityProfile.DensityPerKm2.ToString("N0")/km²</option>
@@ -151,9 +151,8 @@
         }
     }
 
-    private void OnProfileChanged(ChangeEventArgs args)
+    private void ApplySelectedProfile()
     {
-        _selectedProfile = args.Value?.ToString() ?? "custom";
         if (CityProfiles.FirstOrDefault(profile => profile.Id == _selectedProfile) is { } profile)
             SetDensity(profile.DensityPerKm2);
         else if (_selectedProfile == "future-core")
