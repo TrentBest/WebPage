@@ -182,6 +182,18 @@ jobs:
           repository: TrentBest/TheSingularityWorkshop.GUI
           ref: development
           path: TheSingularityWorkshop.GUI
+      - name: Checkout Renderer development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.Renderer
+          ref: development
+          path: TheSingularityWorkshop.Renderer
+      - name: Checkout Visualize development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.Visualize
+          ref: development
+          path: TheSingularityWorkshop.Visualize
       - name: Checkout ProtocolAi development
         uses: actions/checkout@v5
         with:
