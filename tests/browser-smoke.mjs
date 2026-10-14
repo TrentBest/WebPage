@@ -135,8 +135,9 @@ try {
   if (await cityLab.locator(".readout-card").first().locator("strong").innerText() !== structureCount) {
     throw new Error("Switching to Harmony must preserve the exact same city geometry/data.");
   }
-  await cityLab.getByLabel(/Target population density/).fill("42000");
-  await cityLab.getByText("42,000 residents/km²", { exact: true }).waitFor({ state: "visible" });
+  await cityLab.locator("#density-input").focus();
+  await cityLab.locator("#density-input").press("End");
+  await cityLab.getByText("50,000 residents/km²", { exact: true }).waitFor({ state: "visible" });
   await cityLab.screenshot({ path: `${outputDir}/07-city-lab-harmony.png`, fullPage: true });
   await cityLab.close();
 
