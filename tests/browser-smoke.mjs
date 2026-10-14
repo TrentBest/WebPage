@@ -138,6 +138,9 @@ try {
   await cityLab.locator("#density-input").focus();
   await cityLab.locator("#density-input").press("End");
   await cityLab.getByText("50,000 residents/km²", { exact: true }).waitFor({ state: "visible" });
+  if (await cityLab.locator("#density-profile").inputValue() !== "custom") {
+    throw new Error("Moving the density slider must switch the profile selector to Custom.");
+  }
   const denseStructureCount = await cityLab.locator(".readout-card").first().locator("strong").innerText();
   if (Number(denseStructureCount.replaceAll(",", "")) <= Number(structureCount.replaceAll(",", ""))) {
     throw new Error("Increasing density must generate more structures in the deterministic city model.");
