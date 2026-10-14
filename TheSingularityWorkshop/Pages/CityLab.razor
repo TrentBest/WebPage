@@ -42,19 +42,11 @@
             {
                 <polyline @key="road.Id" points="@road.Points" class="city-road" />
             }
-            @foreach (var building in Buildings)
-            {
-                <g @key="building.Id" class="building @building.Kind">
-                    <polygon points="@building.LeftFace" class="building-left" />
-                    <polygon points="@building.RightFace" class="building-right" />
-                    <polygon points="@building.Roof" class="building-roof" />
-                    <path d="@building.WindowLines" class="building-windows" />
-                    @if (building.IsLandmark)
-                    {
-                        <polygon points="@building.Crown" class="building-crown" />
-                    }
-                </g>
-            }
+            <path d="@LeftFacesPath" class="building-left" />
+            <path d="@RightFacesPath" class="building-right" />
+            <path d="@RoofFacesPath" class="building-roof" />
+            <path d="@WindowLinesPath" class="building-windows" />
+            <path d="@LandmarkCrownsPath" class="building-crown" />
             <g class="workshop-anchor">
                 <circle cx="500" cy="385" r="18" class="anchor-halo" />
                 <circle cx="500" cy="385" r="5" class="anchor-core" />
@@ -190,6 +182,17 @@
     private sealed record CityRoad(int Id, string Points);
 
     private List<CityBuilding> Buildings { get; set; } = BuildCity(28874);
+    private string LeftFacesPath => JoinPolygons(Buildings.Select(building => building.LeftFace));
+    private string RightFacesPath => JoinPolygons(Buildings.Select(building => building.RightFace));
+    private string RoofFacesPath => JoinPolygons(Buildings.Select(building => building.Roof));
+    private string WindowLinesPath => string.Join(" ", Buildings.Select(building => building.WindowLines));
+    private string LandmarkCrownsPath => JoinPolygons(Buildings.Where(building => building.IsLandmark).Select(building => building.Crown));
+
+    private static string JoinPolygons(IEnumerable<string> polygons) => string.Join(" ", polygons.Select(points =>
+    {
+        var vertices = points.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return vertices.Length < 3 ? string.Empty : $"M {string.Join(" L ", vertices)} Z";
+    }));
     private List<CityDistrict> Districts { get; } = BuildDistricts();
     private List<CityRoad> Roads { get; } = BuildRoads();
 
