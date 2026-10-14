@@ -307,6 +307,24 @@ The problem being attacked is the durable part.
 The eventual integer-backed mapping work extends this idea: let the AI understand
 human-readable concepts while giving the runtime compact, deterministic identities.
 
+### Current ProtocolAi / GrammarAi composition example
+
+The active composition-level example is covered by
+[`SingularityHub.Tests/WorkshopCompositionTests.cs`](https://github.com/TrentBest/WebPage/blob/master/SingularityHub.Tests/WorkshopCompositionTests.cs).
+The `ExplicitlyComposesAiExchange` test composes ProtocolAi and GrammarAi through
+FSM_COS, then checks the extracted exchange and its intent surfaces. The companion
+`ExplicitAiCompositionIncludesClosure` test checks that both definition bundles
+are included in the runtime dependency closure.
+
+This is evidence of **composition-level use**, not a claim that the WebPage application
+project directly references the ProtocolAi NuGet package. The package owns vocabulary
+identity, GrammarAi owns structure, FSM_COS assembles the requested bundles, and the
+host remains responsible for policy and execution.
+
+For the API contract and other confirmed consumers, see the
+[ProtocolAi ecosystem usage map](https://github.com/TrentBest/TheSingularityWorkshop.ProtocolAi/blob/development/docs/ECOSYSTEM_USAGE_MAP.md)
+and the [ProtocolAi domain roadmap](https://github.com/TrentBest/TheSingularityWorkshop.ProtocolAi/blob/development/docs/DOMAIN_AUDIT_AND_ROADMAP.md).
+
 ---
 
 # MicroBundles
