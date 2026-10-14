@@ -46,6 +46,7 @@ try {
     throw new Error(`The hub destinations must be Welcome, Economy, and Digitens; found: ${initialLinks.join(", ")}.`);
   }
 
+  await page.getByRole("link", { name: "Welcome", exact: true }).click();
   await page.locator(".workshop-nav-shell.collapsed").waitFor({ state: "visible" });
   if (await page.locator(".workshop-nav-links").count() !== 0) {
     throw new Error("Selecting Welcome must retract the navigation to the expander only.");
