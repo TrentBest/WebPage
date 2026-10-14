@@ -25,6 +25,7 @@
 .city-lab-note{font-size:.78rem;line-height:1.55;color:#a4bac7}
 .city-legend{display:flex;flex-wrap:wrap;gap:.8rem;color:#a4bac7;font-size:.73rem;margin:.75rem .2rem}
 .city-legend span:before{content:"";display:inline-block;width:.55rem;height:.55rem;margin-right:.35rem;border-radius:2px;background:var(--swatch,#00eaff)}
+.city-enter-world{display:inline-flex;align-items:center;margin:.6rem 0;padding:.85rem 1rem;border:1px solid rgba(0,234,255,.55);background:rgba(0,234,255,.06);color:#eafcff;text-decoration:none;font:800 .72rem Consolas,monospace;letter-spacing:.1em}.city-enter-world:hover{border-color:#ff2cff;color:#fff}
 @media(max-width:850px){.city-lab{grid-template-columns:1fr}.city-map{min-height:0}}
 
 </style>
@@ -69,7 +70,7 @@
 </svg>
 <div class="city-legend"><span style="--swatch:#00eaff">Workshop anchor</span><span style="--swatch:#ff2cff">Commerce</span><span style="--swatch:#58e8c1">Residences</span><span style="--swatch:#ffd34d">Civic / infrastructure</span></div>
 </div>
-<p class="city-lab-note">Try it: select a district, change its building role, or drag it to another place. The Workshop stays fixed at the center.</p>
+<p class="city-lab-note">Try it: select a district, change its building role, or drag it to another place. The Workshop stays fixed at the center.</p><a class="city-enter-world" href="/explore">ENTER THE WORKSHOP SPATIAL EXPERIENCE ↗</a><p class="city-lab-note">That link opens the existing Blazor Workshop experience, which already uses its spatial scene/builders, visitor identity, camera-follow movement, and interactive Workshop destinations. The layout explorer above is a local design sketch, not that runtime.</p>
 </div>
 <aside class="city-controls">
 <div class="eyebrow">City layout explorer</div>
