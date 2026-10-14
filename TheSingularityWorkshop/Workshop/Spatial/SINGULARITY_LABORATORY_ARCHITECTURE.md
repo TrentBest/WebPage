@@ -222,3 +222,7 @@ This architecture extends the current:
 - physics laboratory work tracked in issues #48 and #49.
 
 Master remains untouched. This architecture belongs to `development`.
+
+## Physics runtime contract
+
+The laboratory's simulation substrate, deterministic execution contract, material/process MicroBundle families, fire and effect causality, multi-scale fidelity, validation ladder, and living-documentation requirements are specified in [Physics System Architecture](PHYSICS_SYSTEM_ARCHITECTURE.md). That document is the implementation guide for turning these laboratory families into executable, testable models; this architecture remains the facility/composition boundary.
