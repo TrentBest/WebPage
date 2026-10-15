@@ -76,9 +76,10 @@ public sealed class WorkshopCompositionTests
         Assert.NotNull(ai.ExchangeText);
         Assert.Contains("PROTOCOL", ai.ExchangeText!, StringComparison.Ordinal);
         Assert.Contains("GRAMMAR", ai.ExchangeText!, StringComparison.Ordinal);
-        Assert.Contains("Extract to Clipboard", ai.Composition!.Find("ai-extract").Text);
-        Assert.Equal("ai.extract", ai.Composition.Find("ai-extract").Properties["command"]);
-        Assert.Equal("ai.submit", ai.Composition.Find("ai-submit").Properties["command"]);
+        Assert.Contains("Copy to Clipboard", ai.Composition!.Find("ai-copy-to-clipboard").Text);
+        Assert.Equal("ai.copy-to-clipboard", ai.Composition.Find("ai-copy-to-clipboard").Properties["command"]);
+        Assert.Contains("Paste from Clipboard", ai.Composition.Find("ai-copy-from-clipboard").Text);
+        Assert.Equal("ai.paste-from-clipboard", ai.Composition.Find("ai-copy-from-clipboard").Properties["command"]);
     }
 
     [Fact(DisplayName = "FSM_COS composes the Rendering tab and its AI semantic dependencies")]
