@@ -1,7 +1,7 @@
 # Physics Replay / Shareable Moments — WebPageLLM Integration Brief
 
 **Audience:** WebPageLLM and anyone implementing the Workshop's public-facing experience  
-**Status:** integration brief; the replay foundation is under active development, but there is not yet an executable playback experience  
+**Status:** updated integration brief; Physics now has a tested model-driven single-segment replay executor, but there is not yet a concrete world adapter or browser playback experience  
 **Source branch:** `development` in both repositories  
 **Do not publish or deploy from this brief.**
 
@@ -24,13 +24,13 @@ This is a direction for the Workshop ecosystem, not a claim that all six steps e
 
 Repository: [TheSingularityWorkshop.Physics](https://github.com/TrentBest/TheSingularityWorkshop.Physics/tree/development)
 
-The current code establishes validated *replay-route inputs*, not a playable replay engine:
+The current code now includes validated replay-route inputs and a model-driven executor for one validated segment. It is an executable seam, not yet a playable physics-world replay:
 
 - [`TimelineBranch` / lineage foundations](https://github.com/TrentBest/TheSingularityWorkshop.Physics/tree/development/Physics/Universe) model timeline identity and parent/fork relationships.
 - [`TimelineReplayPlan`](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/Physics/Universe/TimelineReplayPlan.cs) describes a forward route across fork-aware intervals.
 - [`TimelineHistorySegment`](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/Physics/Universe/TimelineHistorySegment.cs) validates a checkpoint plus ordered events through a requested tick.
 - [`TimelineReplaySegment`](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/Physics/Universe/TimelineReplaySegment.cs) binds one history segment to one planned interval and checks timeline identity, checkpoint tick and versions, interval coverage, and event boundaries.
-- [Replay-segment tests](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/tests/TheSingularityWorkshop.Physics.Tests/TimelineReplaySegmentTests.cs) cover valid child-interval history and invalid timeline, exclusive-start event, and incomplete interval cases.
+- [Replay-segment tests](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/tests/TheSingularityWorkshop.Physics.Tests/TimelineReplaySegmentTests.cs) cover valid child-interval history and invalid timeline, exclusive-start event, and incomplete interval cases.\n- [`TimelineReplayExecutor`](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/Physics/Universe/TimelineReplayExecutor.cs) restores state through a caller-provided checkpoint decoder, applies events in sequence, and advances a model to any requested tick inside that segment's validated interval.\n- [Replay executor tests](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/tests/TheSingularityWorkshop.Physics.Tests/TimelineReplayExecutorTests.cs) verify ordered event application, scrubbing before a later event, and out-of-range rejection. [CI run](https://github.com/TrentBest/TheSingularityWorkshop.Physics/actions/runs/38672083529) passed.
 - [Timeline/replay design contract](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/TIMELINES_AND_MULTIVERSE.md) explains checkpointing, deterministic replay, branching, and the future shareable-moment package.
 - [Physics roadmap](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/ROADMAP.md) tracks the future portable-moment, preview/scrub, creator-controlled sharing, and hosting milestones.
 
