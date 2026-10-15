@@ -19,8 +19,8 @@ public static class SpatialAcousticStudioLabGuiBuilder
         ArgumentNullException.ThrowIfNull(studio);
         selectedSourceId ??= studio.Sources.FirstOrDefault().Id;
         selectedListenerId ??= studio.Listeners.FirstOrDefault().Id;
-        var selectedSource = studio.Sources.FirstOrDefault(x => x.Id == selectedSourceId);
-        var selectedListener = studio.Listeners.FirstOrDefault(x => x.Id == selectedListenerId);
+        var selectedSource = studio.ResolveSource(selectedSourceId ?? string.Empty);
+        var selectedListener = studio.ResolveListener(selectedListenerId ?? string.Empty);
         var observation = studio.FindFixtureObservation(selectedSourceId ?? "", selectedListenerId ?? "");
 
         var root = WorkshopGui.Panel(receiver)
@@ -111,7 +111,7 @@ public static class SpatialAcousticStudioLabGuiBuilder
             .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".35rem").Style("font-size", ".43rem").Style("line-height", "1.6").Style("color", "#b8c9d4")
                 .Text(observation is null
                     ? "No authored fixture exists for this source/listener pair. Physics adapter is not connected; no acoustic values are inferred."
-                    : $"Distance {observation.DistanceMeters:0.##} m // Delay {observation.PropagationDelayMilliseconds:0.##} ms // {observation.DirectionDescription} // Relative level {observation.RelativeLevelDb:0.#} dB"))
+                    : $"Distance {observation.Value.DistanceMeters:0.##} m // Delay {observation.Value.PropagationDelayMilliseconds:0.##} ms // {observation.Value.DirectionDescription} // Relative level {observation.Value.RelativeLevelDb:0.#} dB"))
             .Content(WorkshopGui.Element(receiver, "div").Style("margin-top", ".45rem").Style("font-size", ".4rem").Style("line-height", "1.5").Style("color", "#718896")
                 .Text("These authored demonstration values are not calculated by the Physics solver. The WebPage adapter seam is intentionally not connected to the unpublished Physics PR.")));
 
