@@ -6,6 +6,41 @@ This is a staged experience handoff for the WebPageLLM. **Singularity Labs** is 
 
 **Important integration gate:** keep the electricity implementation handoff separate from broader Labs and factory planning until Physics exposes an agreed, usable integration boundary. The current proposed Physics model is ideal fixed-voltage DC resistive-load accounting—not a general circuit or transistor solver. WebPage must consume authoritative Physics observations through that boundary; it must not recreate Ohm's-law, current, power, circuit, or transistor calculations in browser code as a substitute. Until the boundary is agreed and usable, electricity is a scoped design/coordination item, not permission to ship a parallel solver. Other Labs work may proceed independently where its own model ownership and contracts are explicit.
 
+## The scientific-use mission: plan real experiments before running them
+
+Singularity Labs is intended not only for public science education or fictional-city operations. It should grow into a practical simulation workspace that scientists, engineers, and experimental teams can use to explore whether a proposed experiment is worth running, test the mathematics behind a hypothesis, inspect predicted behavior, and prepare a more informed real-world experiment.
+
+The target workflow is:
+
+1. **State the scientific question.** Record the hypothesis, model domain, geometry, initial and boundary conditions, material/device parameters, controlled variables, measured quantities, and the intended comparison.
+2. **Establish the model's validity envelope.** Show which equations and physical effects are implemented, which assumptions are made, which conditions are supported, and which conditions lie outside the model. A model must be able to say “not suitable for this question.”
+3. **Check the mathematics before trusting the picture.** Provide analytical/reference cases, dimensional consistency checks, conservation checks, limiting-case tests, and independent benchmark comparisons where applicable. Visual plausibility is not numerical validation.
+4. **Run controlled experiments.** Support repeatable single runs first, then parameter sweeps, side-by-side comparisons, and sensitivity studies when the owning model can support them. Record the exact configuration and model version for each run.
+5. **Observe the evolving result.** Allow pause, step, reset, inspection of intermediate state, plots and units, and export of the actual observations. Rendering and animation must not alter or invent the scientific result.
+6. **Compare with evidence.** Where appropriate, let users import or reference measured datasets, align units and sampling conditions, compare predictions against observations, and document discrepancies. Keep measured data, simulated output, and explanatory annotations visibly distinct.
+7. **Produce a reproducible experiment record.** Capture model/package version, parameters, units, initial conditions, time-step or solver settings where relevant, random seeds where used, assumptions, outputs, validation status, and provenance. A colleague should be able to understand what was run and reproduce it to the degree the model supports.
+
+### Trust and scientific limitations are first-class features
+
+A useful laboratory must expose the boundary between a calculation that has been tested and a hypothesis that remains unverified. Each experiment should identify its model owner, equations or method, units, applicable range, known omissions, numerical limitations, and evidence supporting the implementation. Where uncertainty quantification, parameter fitting, convergence studies, or calibration are not implemented, say so rather than implying precision from a smooth plot.
+
+Do not market every model as research-grade. A model may be useful for conceptual exploration, preliminary planning, teaching, or a narrow validated operating range without being suitable for final engineering decisions. High-consequence experimental planning requires domain-expert review and appropriate independent validation; the Lab should help make evidence inspectable, not replace scientific judgment, laboratory safety review, or professional responsibility.
+
+### A reusable scientific workflow, not a one-off demo
+
+The experience layer should eventually provide common experiment capabilities without forcing every domain into one numerical solver:
+
+- experiment definition and validation against each model's supported inputs;
+- model/version and assumption disclosure before a run;
+- deterministic run, step, pause, reset, and replay where supported;
+- parameter sweeps and comparative runs where computationally appropriate;
+- plots, tables, spatial views, and living diagrams bound to the same authoritative observations;
+- measured-data import/comparison with explicit units and provenance;
+- exportable run manifests and results;
+- validation evidence linking to implementation, tests, benchmarks, and theory.
+
+These are shared *workflow* capabilities. Physics and other domain packages still own their equations, state evolution, numerical methods, and observations. Singularity Labs must not become a second solver or make a generic UI pretend that every scientific domain supports every control.
+
 The Labs experience should make the Workshop's core idea tangible:
 
 > If a picture is worth a thousand words, what is a living picture worth?
