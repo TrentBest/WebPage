@@ -121,6 +121,7 @@ Choose the guide that answers your question; the README stays an orientation and
 - [**FSM_COS Usage**](docs/FSM_COS_USAGE.md) — how WebPage requests composition and consumes the RuntimeAssembly.
 - [**Workshop Runtime Architecture**](docs/WORKSHOP_RUNTIME_ARCHITECTURE.md) — the boundary between runtime behavior and browser host.
 - [**Experience Theory**](docs/EXPERIENCE_THEORY.md) — the Workshop meaning of an Experience and how it relates to composition.
+- [**Experience Catalog**](docs/EXPERIENCE_CATALOG.md) — Arena events, market/craft fairs, optional Economy, and the VR magic-weaving direction.
 - [**Package Ecosystem**](docs/PACKAGE_ECOSYSTEM.md) — package ownership and why each external dependency is present.
 - [**Usage**](docs/USAGE.md) — local setup and the host's runtime shape.
 - [**Brave1 Public Demonstration**](docs/BRAVE1_PUBLIC_DEMONSTRATION.md) — the public MVP story, claim boundaries, and pre-submission checks.
