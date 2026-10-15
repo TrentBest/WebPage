@@ -7,11 +7,13 @@
 - [PACKAGE_ECOSYSTEM.md](PACKAGE_ECOSYSTEM.md) — map each active capability to the Workshop package that owns it and identify WebPage-only responsibilities.
 - [PROVING_GROUND_MIGRATION.md](PROVING_GROUND_MIGRATION.md) — explicit WebPage-to-package extraction contract, FSM_COS startup boundary, and branch consolidation rules.
 - [WEBAPP_HOST_MIGRATION.md](WEBAPP_HOST_MIGRATION.md) — WebPage creation architecture, WebApp's browser-manifestation role, author → compose → preview direction, behavior-preservation gates, and release discipline.
+- [integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md](integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md) — truthful host integration plan for Gesture evaluation, Renderer constraints, and evidence boundaries.
 
 ## Start here
 
 - [Brave1 Public Demonstration](BRAVE1_PUBLIC_DEMONSTRATION.md) — the public-facing MVP story, claim boundaries, and pre-submission deployment checklist.
 - [Singularity City Experience](SINGULARITY_CITY_EXPERIENCE.md) — spatial-world source foundations, Digitens, MicroBundle/provider boundaries, multiple renderers, and the editable city direction with explicit current/future claim boundaries.
+- [Gestures & Movement Lab](../TheSingularityWorkshop/Pages/Gestures.razor) — browser learning surface for the engine-neutral CPU reference, its current maturity, and the unimplemented rig/Renderer handoff.
 
 | Order | Document | Purpose |
 |---:|---|---|
@@ -27,7 +29,8 @@
 | 10 | CURRENT_VERTICAL_SLICE.md | Active implementation and proof obligations |
 | 11 | PROVING_GROUND_MIGRATION.md | Extraction plan and architecture ownership contract |
 | 12 | WEBAPP_HOST_MIGRATION.md | WebPage creation, WebApp relationship, and acceptance gates |
-| 13 | DOCUMENTATION_STANDARD.md | Documentation maintenance rules |
+| 13 | integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md | Gesture/Renderer integration contract and claim limits |
+| 14 | DOCUMENTATION_STANDARD.md | How WebPage applies the Workshop documentation rules |
 
 ## Read architecture as a chain
 
