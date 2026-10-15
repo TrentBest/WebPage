@@ -70,7 +70,7 @@ public sealed class WebPageHostManifestTests
             wwwroot, "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
         var manifest = WebPageHostManifestParser.Parse(manifestJson);
 
-        Assert.Equal(new[] { "Welcome", "Demonstrations" }, manifest.Hub.Select(item => item.Name));
+        Assert.Equal(new[] { "Welcome", "Demonstrations", "Singularity Architecture" }, manifest.Hub.Select(item => item.Name));
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "AnyApp");
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "Support");
 
@@ -83,6 +83,11 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("ExperienceGallery", demonstrations.Kind);
         Assert.Equal("/?tab=demonstrations", demonstrations.Route);
         Assert.Empty(demonstrations.MicroBundles!);
+
+        var architecture = Assert.Single(manifest.Hub, item => item.Name == "Singularity Architecture");
+        Assert.Equal("CreationStudio", architecture.Kind);
+        Assert.Equal("/architecture", architecture.Route);
+        Assert.Empty(architecture.MicroBundles!);
 
         Assert.NotNull(manifest.Capabilities);
         var rendering = Assert.Single(manifest.Capabilities!);
