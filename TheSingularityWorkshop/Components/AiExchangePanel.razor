@@ -61,7 +61,7 @@
                     .OnClick(() => CopyToClipboardAsync(exchangeText)))
             .Content(
                 WorkshopGui.Button(this)
-                    .Label("Copy from Clipboard")
+                    .Label("Paste from Clipboard")
                     .OnClick(ImportFromClipboardAsync))
             .Paragraph($"STATUS // {_status}")
             .Build();
