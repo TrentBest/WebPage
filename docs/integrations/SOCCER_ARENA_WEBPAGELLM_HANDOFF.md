@@ -75,3 +75,28 @@ A completed pose is not proof of a pass, possession, foul, offside, or goal. Web
 8. Validate the full path in the browser before describing it as a live match.
 
 This brief is a handoff, not authorization to publish or deploy. Keep the WebPage branch separate from the MicroBundleDomain review branch until the integration contract is agreed.
+
+## Singularity City is the primary showcase
+
+The arena is not a standalone sports page. The city itself is the main WebPage experience: people should see a connected future city, understand that Digitens live and move through it, and then discover the arena as one destination within that shared world. The water-world/physics showcase is adjacent work, not a reason to delay the city.
+
+### Implementation order
+
+1. **Make the existing city legible first.** Preserve the canonical structure IDs and footprints in `SingularityCityCatalog`; the Workshop remains the stable anchor. Selecting the soccer arena should lead into its venue experience without creating a second, unrelated world model.
+2. **Connect citizens to real activity state.** Use the existing spatial Digiten/crowd model and movement contracts. Show a citizen's location and activity only when those values come from the model; do not animate decorative dots and label them autonomous citizens.
+3. **Connect ground transit and aerial traffic as separate layers.** The current taxi and transit manifests are declarative definitions, not proof that vehicles are being simulated or rendered in the city. A flying-car layer needs stable vehicle identity, route/origin/destination, altitude or lane, and reproducible update rules. Keep air lanes distinct from ground movement, and expose the actual manifest/state to the renderer instead of hard-coding an unrelated stream of moving icons inside the GUI builder.
+4. **Make the arena a city destination.** Arrival routes, transit/drop-off, entrances, concourses, stands, and field should share the same spatial identity. Crowd counts and seating states must come from an explicit venue/crowd model, not a guessed fill percentage.
+5. **Compose match authority before showing live play.** The current MicroBundleDomain fixture scripts a pass, shot, and goal. Until a real match contract supplies authoritative snapshots/events, the venue may show a clearly labelled static layout or scripted fixture, but it must not claim live ball physics, player locomotion, a real score, or crowd reactions to authoritative events.
+6. **Use Gestures for action vocabulary and Renderer for presentation.** Gesture requests are not match outcomes. A pose, animation, or crowd reaction must not independently award a goal or change possession.
+
+### City-first acceptance checks
+
+- The arena's stable ID resolves to the same structure when viewed from the city and when entering the venue.
+- Ground transit, flying vehicles, and Digitens have explicit, inspectable model/state sources; the visual layer does not manufacture autonomous behavior.
+- Air traffic is visibly separated in altitude/lane from street-level movement and is deterministic enough for repeatable tests.
+- Arena visitors can be traced through arrival, entrance, stand/seat, watching, reaction, and departure states as those states become implemented.
+- Scoreboard and goal celebration change only in response to an authoritative match result.
+- Every experience labels the difference between catalogued/design-only, scripted fixture, integrated, and simulated behavior.
+
+This order deliberately prioritizes a city that feels connected over a polished isolated arena mock-up. It is an integration plan, not a claim that these acceptance checks already pass.
+
