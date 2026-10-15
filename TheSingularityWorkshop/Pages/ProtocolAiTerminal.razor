@@ -1,0 +1,26 @@
+@page "/protocolai-terminal"
+
+<PageTitle>ProtocolAi Terminal // The Workshop</PageTitle>
+
+<section class="terminal-page">
+    <a class="terminal-back" href="/architecture">← SINGULARITY ARCHITECTURE</a>
+    <div class="terminal-kicker">THE HUB / PROTOCOLAI TERMINAL</div>
+    <h1>Take the exchange to your LLM of choice.</h1>
+    <p class="terminal-intro">The Workshop prepares the semantic exchange. You decide which LLM receives it. Bring the response back through the clipboard terminal, where host-side validation and review can decide what the response means.</p>
+    <div class="terminal-flow" aria-label="Clipboard exchange steps">
+        <span>1 · COPY TO CLIPBOARD</span><b>→</b><span>2 · YOUR CHOSEN LLM</span><b>→</b><span>3 · COPY RESPONSE</span><b>→</b><span>4 · COPY FROM CLIPBOARD</span>
+    </div>
+    <AiExchangePanel />
+    <p class="terminal-boundary">No provider is contacted by this terminal. Importing text is not approval or execution; the host owns interpretation, validation, and any resulting state change.</p>
+</section>
+
+<style>
+    .terminal-page{max-width:1250px;margin:0 auto;padding:clamp(1rem,3vw,2.5rem);color:#eafaff;background:radial-gradient(circle at 80% 10%,rgba(0,234,255,.08),transparent 32%),#030914;min-height:calc(100vh - 5rem);box-sizing:border-box}
+    .terminal-back{color:#7ca9b8;text-decoration:none;font:700 .68rem Consolas,'Courier New',monospace;letter-spacing:.1em}.terminal-back:hover{color:#ff2cff}
+    .terminal-kicker{margin-top:2rem;color:#00eaff;font:700 .65rem Consolas,'Courier New',monospace;letter-spacing:.2em}
+    .terminal-page h1{max-width:850px;margin:.7rem 0;font-size:clamp(2rem,5vw,4.3rem);line-height:1.02}
+    .terminal-intro{max-width:78ch;color:#a0bac5;font:1rem/1.7 system-ui,sans-serif}
+    .terminal-flow{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;margin:1.5rem 0;padding:1rem;border:1px solid rgba(0,234,255,.2);background:rgba(0,234,255,.025)}
+    .terminal-flow span{padding:.65rem;border:1px solid rgba(0,234,255,.2);font:700 .62rem Consolas,'Courier New',monospace;letter-spacing:.05em}.terminal-flow b{color:#ff2cff}
+    .terminal-boundary{margin-top:1.5rem;padding-left:1rem;border-left:2px solid #ffcb70;color:#a0bac5;font: .8rem/1.7 system-ui,sans-serif}
+</style>
