@@ -28,6 +28,8 @@
             }
             <NavLink class="nav-link" href="/?tab=economy" @onclick="SelectEconomyDestination">Economy</NavLink>
             <NavLink class="nav-link" href="/?tab=digitens" @onclick="SelectDigitensDestination">Digitens</NavLink>
+            <NavLink class="nav-link" href="/architecture" @onclick="CollapseNavMenu">Singularity Architecture</NavLink>
+            <NavLink class="nav-link" href="/protocolai-terminal" @onclick="CollapseNavMenu">ProtocolAi Terminal</NavLink>
             @if (welcomeSelected)
             {
                 <NavLink class="nav-link about-link" href="/about-us" @onclick="CollapseNavMenu">About Us</NavLink>
