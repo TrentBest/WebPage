@@ -48,11 +48,11 @@ public sealed record SpatialAcousticStudioManifest(
         ]);
 
     public SpatialAcousticStudioSource ResolveSource(string id)
-        => Sources.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.Ordinal))
+        => Sources.Where(x => string.Equals(x.Id, id, StringComparison.Ordinal)).Select(x => (SpatialAcousticStudioSource?)x).FirstOrDefault()
            ?? throw new KeyNotFoundException($"Unknown acoustic studio source '{id}'.");
 
     public SpatialAcousticStudioListener ResolveListener(string id)
-        => Listeners.FirstOrDefault(x => string.Equals(x.Id, id, StringComparison.Ordinal))
+        => Listeners.Where(x => string.Equals(x.Id, id, StringComparison.Ordinal)).Select(x => (SpatialAcousticStudioListener?)x).FirstOrDefault()
            ?? throw new KeyNotFoundException($"Unknown acoustic studio listener '{id}'.");
 
     public SpatialAcousticStudioFixtureObservation? FindFixtureObservation(string sourceId, string listenerId)
