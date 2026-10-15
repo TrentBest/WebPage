@@ -17,9 +17,13 @@ public static class AiExchangeTextBuilder
             "WORKSHOP PROTOCOLAI TERMINAL EXCHANGE",
             "The response is a proposal only. Do not invent IDs or claim validation.",
             "PROTOCOL",
-            protocolDescription ?? "Protocol vocabulary is not composed.",
+            string.IsNullOrWhiteSpace(protocolDescription)
+                ? "Protocol vocabulary is not composed."
+                : protocolDescription,
             "GRAMMAR",
-            grammarDescription ?? "Grammar definition is not composed."
+            string.IsNullOrWhiteSpace(grammarDescription)
+                ? "Grammar definition is not composed."
+                : grammarDescription
         };
 
         if (!string.IsNullOrWhiteSpace(contextPayload))
