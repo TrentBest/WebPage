@@ -26,6 +26,35 @@ A useful laboratory must expose the boundary between a calculation that has been
 
 Do not market every model as research-grade. A model may be useful for conceptual exploration, preliminary planning, teaching, or a narrow validated operating range without being suitable for final engineering decisions. High-consequence experimental planning requires domain-expert review and appropriate independent validation; the Lab should help make evidence inspectable, not replace scientific judgment, laboratory safety review, or professional responsibility.
 
+
+### Explore constants and equations: change the mathematics, then watch the consequences
+
+A core Labs capability should be **controlled constant/parameter exploration**. Because the simulation is mathematical, a scientist or learner should be able to start from a known baseline, change one declared value, rerun the same experiment, and compare the resulting observations. This is not limited to electricity: it applies to gravity, motion, material properties, heat transfer, fluids, and any other domain whose model exposes meaningful parameters.
+
+For a simple dropped object under constant gravitational acceleration, neglecting air resistance and starting from rest, the model predicts
+
+\[ y(t) = y_0 - \tfrac{1}{2} g t^2, \qquad v(t) = -g t \]
+
+for an upward-positive vertical coordinate. With the same initial height and same elapsed time, changing the model's gravitational acceleration changes both the predicted displacement and velocity. The experiment should plot the baseline and alternate trajectories together, show the chosen value of \(g\) with units, and report a comparison such as fall time or impact speed. The displayed result must come from the owning model's actual calculation—not a separately animated illustration.
+
+The UI should distinguish two different questions:
+
+- **Change a parameter within a model's supported range.** For example, vary mass, drag coefficient, spring stiffness, resistance, or a declared gravitational field strength while retaining the rest of the experiment setup.
+- **Explore a hypothetical world by changing a physical constant.** For example, change the gravitational acceleration used by the model, or—in models that explicitly support it—explore a different value of a fundamental constant. Label this as a counterfactual scenario, not a claim about our measured universe. Some constants are coupled to other quantities or embedded in the model's derivation; a change may require recalibrating dependent parameters or may make the model's assumptions invalid.
+
+### Requirements for constant/parameter studies
+
+- Preserve a named **baseline run** and make each variation a separate, reproducible run; provide reset-to-baseline and side-by-side comparison.
+- Change one variable at a time for simple sensitivity demonstrations, then allow multi-parameter sweeps when supported. Record which variables changed and which remained fixed.
+- Show the symbol, value, units, baseline value, permitted range, and whether the value is a measured physical constant, a material/model parameter, an initial condition, or a hypothetical override.
+- Make dependencies explicit. Do not silently change related values, mix unit systems, or treat dimensioned and dimensionless quantities as interchangeable.
+- Plot the actual output over time or against the varied parameter, with readable axes, units, and data export. A chart, animation, and numeric readout must all derive from the same run observations.
+- Validate against known analytical cases and boundary/limiting cases. For the ideal constant-acceleration drop, compare the numerical or simulated trajectory with the closed-form equations above. If the model uses a numerical solver, expose relevant timestep/tolerance settings where applicable and avoid implying exactness beyond the evidence.
+- Show when a changed value exits the model's validated range or invalidates assumptions. Reject unsupported inputs or mark the result out-of-domain instead of presenting it as equally trustworthy.
+- Record the model version, baseline configuration, override values, units, solver settings, and validation status so another person can reproduce the comparison.
+
+The same workflow supports scientific work: estimate sensitivity before committing to a physical experiment, identify which parameters dominate an outcome, check whether a measurement could distinguish two hypotheses, and plan a useful range of experimental conditions. These are decision-support aids, not a substitute for uncertainty analysis or domain review unless those methods are implemented and validated explicitly.
+
 ### A reusable scientific workflow, not a one-off demo
 
 The experience layer should eventually provide common experiment capabilities without forcing every domain into one numerical solver:
