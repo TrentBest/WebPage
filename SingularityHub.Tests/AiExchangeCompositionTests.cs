@@ -21,7 +21,7 @@ public sealed class AiExchangeCompositionTests
         Assert.NotNull(terminal.Grammar);
         Assert.False(string.IsNullOrWhiteSpace(terminal.ExchangeText));
 
-        Assert.Contains("PROTOCOL", terminal.ExchangeText, StringComparison.Ordinal);
-        Assert.Contains("GRAMMAR", terminal.ExchangeText, StringComparison.Ordinal);
+        Assert.Contains("PROTOCOL", terminal.ExchangeText);
+        Assert.Contains("GRAMMAR", terminal.ExchangeText);
     }
 }
