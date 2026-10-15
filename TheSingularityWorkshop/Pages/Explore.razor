@@ -804,6 +804,7 @@
         if (interactable is null) return;
 
         workshopMapVisible = false;
+        StopAirTrafficLoop();
         await InvokeAsync(StateHasChanged);
 
         // A map selection is an intention, not an entry command. The avatar walks
