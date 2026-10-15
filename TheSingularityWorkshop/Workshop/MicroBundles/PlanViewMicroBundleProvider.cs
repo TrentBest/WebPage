@@ -164,7 +164,9 @@ public static class PlanSketchExamples
             new("front-door", "south", 1.0, 0.9, PlanOpeningKind.HingedDoor,
                 PlanHinge.Start, PlanSwingDirection.IntoRoom),
             new("bedroom-door", "bedroom-divider", 0.8, 0.82, PlanOpeningKind.SlidingDoor),
-            new("bath-door", "bath-divider", 0.35, 0.72, PlanOpeningKind.PocketDoor)
+            new("bath-door", "bath-divider", 0.35, 0.72, PlanOpeningKind.PocketDoor),
+            new("east-revolving-entry", "east", 2.0, 1.6, PlanOpeningKind.RevolvingDoor),
+            new("north-window", "north", 9.0, 1.2, PlanOpeningKind.Window)
         ],
         [
             new("sofa", "Sofa", "Seating", 1.0, 1.1, 2.3, 0.95),
