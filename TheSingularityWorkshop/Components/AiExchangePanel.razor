@@ -47,12 +47,12 @@
                     .Class("ai-terminal-actions")
                     .Child(
                         WorkshopGui.Button(this)
-                            .Label("Copy to Clipboard")
+                            .Text("Copy to Clipboard")
                             .Class(_hasContext ? "ai-terminal-button ai-breathing" : "ai-terminal-button")
                             .OnClick(() => CopyToClipboardAsync(exchangeText)))
                     .Child(
                         WorkshopGui.Button(this)
-                            .Label("Paste from Clipboard")
+                            .Text("Paste from Clipboard")
                             .Class(_awaitingResponse ? "ai-terminal-button ai-breathing" : "ai-terminal-button")
                             .OnClick(ImportFromClipboardAsync)))
             .Paragraph($"STATUS // {_status}")
