@@ -21,6 +21,18 @@ Repository: [TheSingularityWorkshop.Physics — development](https://github.com/
 
 This proves a working model-level reconstruction contract and a test of one solver adapter. It does **not** prove a browser-ready world adapter, general scene serialization, cross-platform bitwise determinism, asset transport, or an end-to-end interactive physics scene. Do not present the browser fixture as a replay produced by Physics.
 
+## Current WebPage prototype in the movement/replay feature branch
+
+The feature branch now contains a first browser-facing Replay Lab slice:
+
+- `TheSingularityWorkshop/Pages/ReplayLab.razor` provides a local deterministic timeline fixture, event markers, an accessible range scrubber, play/pause, reset/end controls, and a marker that follows the selected tick.
+- The page keeps the status **ILLUSTRATIVE DEMO DATA — Not yet connected to Physics world replay** visible above the scene.
+- The page separates evidence into Physics model-level implementation, the missing world/browser adapter, and planned portable moments.
+- The host manifest exposes it as the `Replay Lab` destination at `/replay-lab`.
+- The browser smoke journey now includes navigation to Replay Lab, scrubbing to tick 51, and checking that playback advances and can be paused.
+
+These are source changes and planned automated assertions, not a verified CI result. The current head still needs a workflow run and browser execution before this slice can be called passing. Keep the fixture separate from Physics checkpoint formats; replace it only after an actual versioned browser-facing contract exists.
+
 ## My intent for the WebPage experience
 
 Build a visible **Replay Lab / Moments** experience that demonstrates the user journey and gives Trent something real to inspect in a browser while the integration boundary matures. It should fit the current Workshop hub and navigation patterns, not introduce a competing app shell.
