@@ -50,6 +50,15 @@ public sealed class BuildingPlanTests
     }
 
     [Fact]
+    public void OpeningRejectsUnknownSemanticEnumValues()
+    {
+        Assert.Throws<ArgumentException>(() => new BuildingPlan(
+            "bad", "Bad plan", 10, 10, Array.Empty<PlanRoom>(),
+            [new("wall", 0, 0, 10, 0)],
+            [new("door", "wall", 1, 1, (PlanOpeningKind)99)]));
+    }
+
+    [Fact]
     public void ProviderExposesPlanCapabilityWithoutGuiDependency()
     {
         var provider = new PlanViewMicroBundleProvider();
