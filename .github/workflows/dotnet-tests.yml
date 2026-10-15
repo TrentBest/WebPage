@@ -147,11 +147,13 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       # Use sibling checkouts so project-relative paths match a local Workshop workspace.
-      - name: Checkout WebPage development
+      - name: Checkout WebPage source for this event
         uses: actions/checkout@v5
         with:
           path: WebPage
-          ref: development
+          # On pull requests, validate the proposed WebPage code against sibling development sources.
+          # On a development push or manual run, validate the current development branch.
+          ref: ${{ github.event.pull_request.head.sha || github.ref_name }}
       - name: Checkout FSM_API development
         uses: actions/checkout@v5
         with:
