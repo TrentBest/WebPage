@@ -26,9 +26,11 @@ The generated TestResults/ directory is intentionally ignored by Git. It should 
 
 ## GitHub Actions
 
-The .NET Tests workflow is intentionally manual while the repository is being consolidated. Run it from Actions → .NET Tests → Run workflow.
+The .NET Tests workflow runs automatically for pull requests targeting `development` and pushes to `development`. It can also be started manually from Actions → .NET Tests → Run workflow.
 
-The workflow restores all test projects, builds Release, runs all three suites, writes TRX results, collects cross-platform coverage, uploads TRX and coverage as a 14-day artifact, and uploads to Codecov when CODECOV_TOKEN is configured.
+The workflow installs Chromium for the browser journey, restores and builds the WebPage browser host, runs the browser smoke test, builds and runs all three .NET test suites, writes TRX results, collects cross-platform coverage, and uploads test results and coverage as a 14-day artifact. Coverage is uploaded to Codecov when `CODECOV_TOKEN` is configured.
+
+The source-integration job also checks the proposed WebPage pull-request revision against sibling Workshop development sources; on development pushes and manual runs, it checks the current `development` branch.
 
 ## Architecture tests
 
@@ -37,5 +39,7 @@ Architecture tests are first-class tests. They enforce contracts such as FSM/API
 ## Coverage philosophy
 
 Coverage is evidence about exercised code, not a substitute for architectural tests. The goal is to make important behavior executable and observable, then use coverage to identify untested surfaces.
+
+Browser smoke coverage verifies user-visible behavior but does not automatically count as .NET line coverage for Razor markup. Where component markup is flagged as uncovered, treat that as an explicit testing gap rather than claiming browser checks have resolved it.
 
 No arbitrary coverage threshold is imposed yet. We will establish thresholds after the current architecture has been consolidated and the remaining transitional host code has been migrated.
