@@ -39,6 +39,16 @@
       "bridgeEndpoint": null,
       "route": "/architecture",
       "microBundles": []
+    },
+    {
+      "name": "Movement Lab",
+      "kind": "ExperienceGallery",
+      "description": "Inspect a small authored movement course: ordered regions, stable IDs, dimensions, and explicit evidence boundaries.",
+      "deploymentUrl": null,
+      "aboutUrl": "/about-us",
+      "bridgeEndpoint": null,
+      "route": "/movement-lab",
+      "microBundles": []
     }
   ],
   "running": [
