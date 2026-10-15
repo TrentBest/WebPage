@@ -6,12 +6,12 @@
 <main class="movement-lab">
     <header class="lab-header">
         <a class="back-link" href="/">← RETURN TO THE WORKSHOP</a>
-        <p class="eyebrow">GESTURES // WEBPAGE PROVING GROUND</p>
+        <p class="eyebrow">WORKSHOP FIELD BAY / MOVEMENT COURSE</p>
         <h1>Movement <span>Lab</span></h1>
-        <p class="intro">Inspect an authored movement challenge as geometry: ordered regions, stable IDs, dimensions, and units. This first slice is deliberately static and light to open.</p>
+        <p class="intro">A three-part course is laid out in this bay. Select a marked region to inspect its dimensions and place in the route. The course record is available; no traversal record is attached yet.</p>
         <div class="status-row">
-            <span class="status-chip">GEOMETRY FIXTURE</span>
-            <span class="status-note">Not a physics simulation · not an agent run</span>
+            <span class="status-chip">COURSE SCHEMATIC</span>
+            <span class="status-note">No traversal record attached</span>
         </div>
     </header>
 
@@ -19,12 +19,12 @@
         <div class="course-visual">
             <div class="panel-heading">
                 <div>
-                    <p class="eyebrow">01 / COURSE GEOMETRY</p>
+                    <p class="eyebrow">FIELD BAY / COURSE SCHEMATIC</p>
                     <h2>Approach → Hurdle → Landing</h2>
                 </div>
                 <span class="unit-label">METERS</span>
             </div>
-            <p class="view-caption">Side elevation · X/Y plane · authored axis-aligned bounds</p>
+            <p class="view-caption">Side elevation · X/Y plane · authored course bounds</p>
             <svg class="course-svg" viewBox="0 0 760 280" role="img" aria-labelledby="course-title course-desc">
                 <title id="course-title">Three-element hurdle course, side elevation</title>
                 <desc id="course-desc">Approach zone centered at zero, hurdle centered at x three and y one half, and landing zone centered at x five. Rectangles represent full authored extents, not a simulated trajectory.</desc>
@@ -50,13 +50,13 @@
                 <text x="28" y="36" class="svg-axis">Y ↑</text>
                 <text x="708" y="258" text-anchor="end" class="svg-axis">X →</text>
             </svg>
-            <p class="figure-note">Illustration of the three authored bounds. It does not draw a trajectory, infer clearance, or report a physical attempt.</p>
+            <p class="figure-note">Schematic only. A route line, clearance result, or physical attempt will appear only when supported by actual evaluation data.</p>
         </div>
 
         <aside class="element-panel">
-            <p class="eyebrow">02 / INSPECT AN ELEMENT</p>
-            <h2>Course elements</h2>
-            <p class="panel-copy">Select an element to inspect its stable ID, type, center, and full extents.</p>
+            <p class="eyebrow">BAY TERMINAL / INSPECT REGION</p>
+            <h2>Course regions</h2>
+            <p class="panel-copy">Select a marked region to read its recorded identity, position, and full dimensions.</p>
             <div class="element-list" role="group" aria-label="Select course element">
                 @foreach (var element in Elements)
                 {
@@ -83,22 +83,22 @@
 
     <section class="evidence-layout">
         <article class="evidence-card">
-            <p class="eyebrow">03 / WHAT EXISTS</p>
-            <h2>Geometry is not proof of traversal.</h2>
+            <p class="eyebrow">COURSE RECORD</p>
+            <h2>The course is authored. The attempt is not recorded here.</h2>
             <ul>
-                <li><strong>Available in source:</strong> course elements, stable IDs, explicit traversal order, center-plus-full-extents bounds.</li>
-                <li><strong>Evaluation contract:</strong> deterministic outcomes for caller-supplied observations, under review on the Gestures working branch.</li>
-                <li><strong>Not connected here:</strong> physics, collision detection, a movement controller, or a live agent attempt.</li>
+                <li><strong>Route:</strong> approach, hurdle, landing.</li>
+                <li><strong>Recorded geometry:</strong> stable IDs, traversal order, centers, full extents, and caller-defined units.</li>
+                <li><strong>Not connected to this bay:</strong> a physics owner, movement controller, or live agent attempt.</li>
             </ul>
         </article>
         <article class="evidence-card evidence-boundary">
-            <p class="eyebrow">04 / EVIDENCE BOUNDARY</p>
-            <h2>No invented outcomes.</h2>
-            <p>This browser fixture is kept separate from the unpublished Gestures working-branch contract. It is not canonical serialized course data. No success, collision, clearance, support, momentum, or landing safety is inferred from this drawing.</p>
+            <p class="eyebrow">INSTRUMENT STATUS</p>
+            <h2>No traversal record attached.</h2>
+            <p>This bay currently displays a local geometry fixture, not canonical serialized course data. It reports no success, collision, clearance, support, momentum, or landing-safety result. Those readings require observations from an authoritative simulation.</p>
             <a href="https://github.com/TrentBest/TheSingularityWorkshop.Gestures/pull/10" target="_blank" rel="noopener noreferrer">INSPECT GESTURES PR #10 ↗</a>
         </article>
     </section>
-    <footer class="lab-footer">THE SINGULARITY WORKSHOP · BROWSER PROVING GROUND · STATIC GEOMETRY FIXTURE</footer>
+    <footer class="lab-footer">THE SINGULARITY WORKSHOP · FIELD BAY · COURSE SCHEMATIC</footer>
 </main>
 
 <style>
