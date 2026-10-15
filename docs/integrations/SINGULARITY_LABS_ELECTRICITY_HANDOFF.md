@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This is an implementation handoff for the WebPageLLM. Place the electricity-learning experience inside **Singularity Labs**—not as a detached utility page and not as a premature city infrastructure dashboard. Singularity Labs is where a visitor can experiment, observe cause and effect, learn the underlying model, and then follow that model outward into Singularity City's electrical infrastructure.
+This is an implementation handoff for the WebPageLLM. Place the electricity-learning experience inside **Singularity Labs**—not as a detached utility page and not as a premature city infrastructure dashboard. Singularity Labs is the Workshop's scientific and industrial experience layer: visitors can experiment, observe cause and effect, learn the underlying model, and follow that model outward into Singularity City's utilities, factories, logistics, and delivered products. Electricity is the first vertical slice, not the full remit.
 
 The Labs experience should make the Workshop's core idea tangible:
 
@@ -112,6 +112,83 @@ Let visitors vary demand, available generation, and operating constraints. Show 
 
 For the nuclear scenario, teach energy conversion, feedback, heat removal, decay heat, and protection at a conceptual level. Label the experience as educational simulation—not plant operating instructions, engineering design guidance, or a safety certification tool. Do not present simplified reactor controls as instructions for operating real equipment.
 
+## Beyond electricity: Singularity Labs as the scientific and industrial front door
+
+Electricity is the first vertical slice, not the boundary of the Labs. **Singularity Labs should become the place where the Workshop exposes its physical models and other scientific capabilities as inspectable, interactive experiences.** It is also a deliberate front door into the Physics package: discover what is modeled, run a controlled experiment, inspect observations and assumptions, and follow the implementation/tests/theory back to the owning repository.
+
+Treat the following as a long-range destination map, not a claim that these simulations already exist. Prefer a few real, composable vertical slices over a wall of impressive but inert buttons.
+
+### Factory Lab: make products through causal processes
+
+A vehicle factory should not spawn a finished vehicle from a menu. It should transform inputs through a traceable production chain:
+
+```text
+orders / design specification
+  -> raw materials and purchased components arrive
+  -> inventory and storage
+  -> work orders and machine reservations
+  -> fabrication / machining / forming
+  -> assembly stations and tools
+  -> inspection, calibration, and quality disposition
+  -> finished vehicle inventory
+  -> loading dock and outbound freight
+  -> delivery to the city / customer / construction site
+```
+
+Each station consumes inputs, occupies capacity and time, produces outputs or scrap, and may be blocked by missing stock, a failed machine, a quality hold, or a transport delay. The factory should make bottlenecks and cause-and-effect visible: a missing motor delays assembly; a machine failure queues work; a quality failure sends a part to rework; a loaded truck or freight train carries the completed vehicle to its destination.
+
+Build the model in layers: first deterministic work orders, inventory quantities, station capacity, and explicit state transitions; then processing time, energy/material consumption, machine condition, quality checks, buffers, and failures; finally spatial layout, workers/robots, and richer physics. Do not claim detailed machining or material behavior until the corresponding model exists.
+
+### Exoskeleton Factory: raWWar equipment is manufactured too
+
+A soldier's exoskeleton should be a product with a bill of materials, fabrication route, assembly sequence, test results, serial identity, and delivery history—not a costume that appears on a soldier. The production experience can eventually include frame manufacture, joint/actuator installation, power and control systems, armor/shunt integration where defined by the raWWar design, calibration, load testing, maintenance, and repair.
+
+Keep ownership clean: Singularity Labs presents the factory experience; Physics provides physical models that genuinely belong in Physics; Gestures/IK provides movement and contact behavior; raWWar owns its soldier/equipment consumption and campaign context. The factory may compose those capabilities through established package boundaries, but must not copy their implementation or force their dependencies into the Physics core.
+
+A completed exoskeleton can enter finished inventory, be loaded onto a vehicle, travel through a cargo network, arrive at a depot, and be issued to a soldier. That continuity is the point: production, logistics, and use are connected observations of a world, not unrelated scenes.
+
+### Materials, energy, and utility facilities
+
+Factories need utilities and material flows. Grow the Labs catalogue around shared contracts for mass, energy, heat, electrical demand, machine state, and material condition. Candidate experiences include:
+
+- material testing: stress/strain, deformation, failure thresholds, thermal expansion, and comparative material samples;
+- thermal processing: heating/cooling curves, heat transfer, and energy accounting;
+- fluids: pumps, pipes, pressure/flow, tanks, and coolant loops when supported by validated models;
+- water treatment and distribution, waste handling, recycling, and scrap recovery;
+- machine shop and robotic workcells, including power consumption and scheduled maintenance;
+- warehouse, loading dock, rail freight, truck fleet, and last-mile delivery;
+- utility substations, generation, storage, and demand response connected to the same electrical accounting.
+
+A facility is a physical system with inputs, outputs, constraints, and state. A dashboard can summarize it, but the underlying facility must own the causal behavior.
+
+### Particle Accelerator / Hadron Collider Lab
+
+Reach for a memorable science landmark: a hadron collider that visitors can explore as a chain of real, bounded models. Begin with a clearly labelled conceptual accelerator ring: particle source, accelerating cavities, magnets, beam path, detectors, and experiment readouts. Let visitors change a small set of parameters and see which observations change.
+
+Build credibility in stages:
+
+1. particle kinematics and relativistic energy/momentum calculations with units and checked reference cases;
+2. magnetic bending and beam optics in a documented simplified model;
+3. RF acceleration and staged energy gain, with explicit assumptions;
+4. collision kinematics and conservation of energy/momentum for selected educational events;
+5. detector layers and reconstructed tracks derived from generated event data;
+6. statistical experiment views over reproducible event samples.
+
+Do not imply that a browser visualization is a full accelerator lattice solver, a particle-physics event generator, or a research-grade detector simulation. Make model fidelity, simplifications, units, and provenance visible. Start with one testable event and a living diagram; add depth only as each layer gains numerical validation.
+
+### How Singularity Labs wraps Physics and the wider Workshop
+
+The Labs is the **experience and composition surface**, not a monolithic physics engine. It should wrap and expose capabilities owned by Physics and other packages through narrow, explicit adapters:
+
+- a catalogue of experiments/facilities with their required capabilities, model status, and links to source/tests/theory;
+- a shared run lifecycle: configure, initialize, step or run, pause, reset, inspect observations, and export/replay a reproducible scenario where supported;
+- explicit model versions, units, assumptions, seeded inputs where randomness is used, and clear separation of measured output from explanatory annotation;
+- adapters that translate WebPage controls into domain commands and domain observations into visual state;
+- consistent time controls and event history without pretending all physical domains share one timestep;
+- composition of Physics, FSM_API, FSM_COS, Visualize/Renderer/GUI.SVG, Gestures/IK, and application-specific packages only where their actual contracts permit it.
+
+The Labs should make it easy to add a new experiment without making Physics depend on WebPage. It should also make missing capability honest and useful: a catalogue entry can say “planned” or “conceptual preview” rather than showing a fake live simulation. Do not build a second lifecycle or scheduling system in the UI if the Workshop already has an established composition path.
+
 ## Architecture and ownership boundaries
 
 - **Physics** owns deterministic physical/electrical calculations, model state, and observations. It should remain independent of WebPage, Unity, SVG, and rendering technology.
@@ -166,6 +243,17 @@ The visuals should follow the Workshop's existing documentation style and the cu
 - Add dispatch and storage scenarios.
 - Introduce the educational nuclear model only with explicit simplifications and conservative, testable state transitions.
 
+### Stage 6 — Factory and delivery loop
+- Model one simple product with explicit inputs, work orders, stations, inventory, inspection, and finished goods.
+- Deliver the finished product through a real simulated logistics chain to a named destination.
+- Add a vehicle factory, then an exoskeleton manufacturing route composed with the owning Gestures/IK and raWWar capabilities.
+- Track shortages, queues, machine downtime, quality holds, energy consumption, and delivery state from model observations.
+
+### Stage 7 — Scientific landmark experiments
+- Add a validated particle-kinematics experiment, then expand toward a conceptual hadron-collider ring.
+- Derive detector views from reproducible event data; disclose the fidelity of each physics layer.
+- Grow the Labs catalogue into material, thermal, fluid, and other experiments only when each has an explicit model owner and testable scope.
+
 ## Acceptance checklist
 
 - [ ] Singularity Labs is the natural home and entry point for the electricity experience.
@@ -176,7 +264,7 @@ The visuals should follow the Workshop's existing documentation style and the cu
 - [ ] The UI distinguishes implemented behavior from conceptual illustrations.
 - [ ] Physics remains renderer-independent; WebPage does not duplicate the solver.
 - [ ] The README/docs link to the experiment and its theory/evidence.
-- [ ] No unsupported claims about circuit solving, transistor fidelity, grid dynamics, or plant safety.
+- [ ] No unsupported claims about circuit solving, transistor fidelity, grid dynamics, plant safety, factory fidelity, or collider accuracy.\n- [ ] Products are manufactured from modeled inputs and process steps, then transported/delivered; they do not simply appear.\n- [ ] Labs catalogue distinguishes implemented, planned, and conceptual experiments and points to the owning package.
 - [ ] Build and tests are run and their actual results are reported.
 
 ## Coordination note
