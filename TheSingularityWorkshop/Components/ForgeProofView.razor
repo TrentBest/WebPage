@@ -37,7 +37,7 @@
             .Style("font-size", ".48rem").Style("letter-spacing", ".08em")
             .Text("THIS PANEL READS THE ACTUAL ASSEMBLY. IT IS NOT TELEMETRY DECORATION."));
 
-        root.Content(Metric("RUNTIME", assembly is null ? "NOT INITIALIZED" : $"0x{assembly.RuntimeId:X16}"));
+        root.Child(Metric("RUNTIME", assembly is null ? "NOT INITIALIZED" : $"0x{assembly.RuntimeId:X16}"));
         root.Content(Metric("MICROBUNDLES", assembly?.Bundles.Count.ToString() ?? "0"));
         root.Content(Metric("ARBITRATION", assembly is null ? "—" : $"{assembly.ArbitrationRounds} ROUND(S)"));
         root.Content(Metric("MONIKER", compositionText));
@@ -54,7 +54,7 @@
                 .Style("color", "#8fa7b2").Text($"UPDATES // {_preview.TickCount}"))
             .Content(WorkshopGui.Element(this, "div").Style("display", "flex").Style("gap", ".35rem")
                 .Style("flex-wrap", "wrap").Style("margin-top", ".55rem")
-                .Content(ActionButton("START", StartPreview, "#00eaff"))
+                .Child(ActionButton("START", StartPreview, "#00eaff"))
                 .Content(ActionButton("TICK", TickPreview, "#ffd34d"))
                 .Content(ActionButton("STOP", StopPreview, "#ff2cff"))
                 .Content(ActionButton("DEEP DIVE", DeepDive, "#ffd34d"))
@@ -70,17 +70,17 @@
         builder.AddContent(0, root.Build());
     };
 
-    private ElementBuilder Metric(string name, string value)
+    private RenderFragment Metric(string name, string value)
         => WorkshopGui.Element(this, "div").Style("display", "grid")
             .Style("grid-template-columns", "7.5rem 1fr").Style("gap", ".5rem").Style("margin-top", ".35rem")
             .Content(WorkshopGui.Element(this, "span").Style("color", "#8fa7b2").Style("font-size", ".46rem").Text(name))
-            .Content(WorkshopGui.Element(this, "span").Style("color", "#eefaff").Style("font-size", ".48rem").Text(value));
+            .Content(WorkshopGui.Element(this, "span").Style("color", "#eefaff").Style("font-size", ".48rem").Text(value)).Build();
 
-    private ElementBuilder ActionButton(string label, Action action, string accent)
+    private RenderFragment ActionButton(string label, Action action, string accent)
         => WorkshopGui.Button(this).Label(label).Style("padding", ".35rem .55rem")
             .Style("border", $"1px solid {accent}88").Style("background", $"{accent}10").Style("color", accent)
             .Style("font-family", "inherit").Style("font-size", ".45rem").Style("font-weight", "800")
-            .Style("letter-spacing", ".08em").Style("cursor", "pointer").OnClick(action);
+            .Style("letter-spacing", ".08em").Style("cursor", "pointer").OnClick(action).Build();
 
     private void StartPreview()
     {
