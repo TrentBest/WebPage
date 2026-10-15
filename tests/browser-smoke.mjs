@@ -126,6 +126,26 @@ try {
   }
   await page.screenshot({ path: `${outputDir}/04-replay-lab-mobile.png`, fullPage: true });
 
+  // Verify the human-mediated ProtocolAi clipboard terminal remains inspectable.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "ProtocolAi Terminal", exact: true }).click();
+  await page.locator(".ai-exchange-grid .ai-exchange-block").nth(0).waitFor({ state: "visible", timeout: 15_000 });
+  await page.locator(".ai-exchange-grid .ai-exchange-block").nth(1).waitFor({ state: "visible", timeout: 15_000 });
+  const responsePreview = page.locator("#ai-llm-response");
+  await responsePreview.waitFor({ state: "visible", timeout: 10_000 });
+  if (!(await responsePreview.isEditable()) || !(await responsePreview.getAttribute("readonly")) !== true) {
+    // The preview is intentionally read-only: response text comes from the clipboard button.
+    if (await responsePreview.isEditable()) {
+      throw new Error("ProtocolAi response preview must not be directly editable.");
+    }
+  }
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.evaluate(() => navigator.clipboard.writeText("browser smoke response fixture"));
+  await page.getByRole("button", { name: "Paste from Clipboard", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector("#ai-llm-response")?.value === "browser smoke response fixture", null, { timeout: 10_000 });
+  await page.getByText(/NO HOST PROCESSOR ATTACHED; NO ACTUATION OCCURRED/).waitFor({ state: "visible", timeout: 10_000 });
+
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
