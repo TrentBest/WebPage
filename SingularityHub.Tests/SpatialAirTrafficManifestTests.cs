@@ -35,8 +35,8 @@ public sealed class SpatialAirTrafficManifestTests
         Assert.Equal(originalVehicles, manifest.Vehicles);
         Assert.Equal(first.Count, later.Count);
 
-        var firstVehicle = Assert.Single(first.Where(snapshot => snapshot.VehicleId == "air-vehicle-001"));
-        var laterVehicle = Assert.Single(later.Where(snapshot => snapshot.VehicleId == "air-vehicle-001"));
+        var firstVehicle = Assert.Single(first, snapshot => snapshot.VehicleId == "air-vehicle-001");
+        var laterVehicle = Assert.Single(later, snapshot => snapshot.VehicleId == "air-vehicle-001");
 
         Assert.NotEqual(firstVehicle.Position.X, laterVehicle.Position.X);
         Assert.InRange(firstVehicle.RouteProgress, 0, 1);
