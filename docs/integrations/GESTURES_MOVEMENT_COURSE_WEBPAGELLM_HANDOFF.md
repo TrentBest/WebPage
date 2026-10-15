@@ -1,7 +1,7 @@
 # Gestures Movement Course — WebPageLLM Handoff
 
 **Audience:** WebPageLLM and anyone integrating a Workshop capability into the browser experience  
-**Status:** early integration handoff; course geometry and a deterministic outcome-evaluation contract are under review in Gestures PR #10  
+**Status:** early integration handoff; course geometry and deterministic outcome evaluation are implemented on the Gestures working branch, with CI green and public API review still open in PR #10  
 **Source repository:** [TheSingularityWorkshop.Gestures](https://github.com/TrentBest/TheSingularityWorkshop.Gestures)  
 **Working source branch:** `work/planar-ik-reference`  
 **Do not merge, publish a package, or deploy from this brief.**
