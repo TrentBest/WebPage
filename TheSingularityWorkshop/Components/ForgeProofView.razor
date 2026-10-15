@@ -37,10 +37,10 @@
             .Style("font-size", ".48rem").Style("letter-spacing", ".08em")
             .Text("THIS PANEL READS THE ACTUAL ASSEMBLY. IT IS NOT TELEMETRY DECORATION."));
 
-        root.Child(Metric("RUNTIME", assembly is null ? "NOT INITIALIZED" : $"0x{assembly.RuntimeId:X16}"));
-        root.Child(Metric("MICROBUNDLES", assembly?.Bundles.Count.ToString() ?? "0"));
-        root.Child(Metric("ARBITRATION", assembly is null ? "—" : $"{assembly.ArbitrationRounds} ROUND(S)"));
-        root.Child(Metric("MONIKER", compositionText));
+        root.Content(Metric("RUNTIME", assembly is null ? "NOT INITIALIZED" : $"0x{assembly.RuntimeId:X16}"));
+        root.Content(Metric("MICROBUNDLES", assembly?.Bundles.Count.ToString() ?? "0"));
+        root.Content(Metric("ARBITRATION", assembly is null ? "—" : $"{assembly.ArbitrationRounds} ROUND(S)"));
+        root.Content(Metric("MONIKER", compositionText));
 
         root.Content(WorkshopGui.Element(this, "div")
             .Style("margin-top", ".75rem").Style("padding-top", ".7rem")
@@ -54,11 +54,11 @@
                 .Style("color", "#8fa7b2").Text($"UPDATES // {_preview.TickCount}"))
             .Content(WorkshopGui.Element(this, "div").Style("display", "flex").Style("gap", ".35rem")
                 .Style("flex-wrap", "wrap").Style("margin-top", ".55rem")
-                .Child(ActionButton("START", StartPreview, "#00eaff"))
-                .Child(ActionButton("TICK", TickPreview, "#ffd34d"))
-                .Child(ActionButton("STOP", StopPreview, "#ff2cff"))
-                .Child(ActionButton("DEEP DIVE", DeepDive, "#ffd34d"))
-                .Child(ActionButton("ENTER FORGE", EnterForge, "#52e05a"))));
+                .Content(ActionButton("START", StartPreview, "#00eaff"))
+                .Content(ActionButton("TICK", TickPreview, "#ffd34d"))
+                .Content(ActionButton("STOP", StopPreview, "#ff2cff"))
+                .Content(ActionButton("DEEP DIVE", DeepDive, "#ffd34d"))
+                .Content(ActionButton("ENTER FORGE", EnterForge, "#52e05a"))));
 
         foreach (var entry in _preview.Events.TakeLast(5))
         {
@@ -70,17 +70,17 @@
         builder.AddContent(0, root.Build());
     };
 
-    private RenderFragment Metric(string name, string value)
+    private ElementBuilder Metric(string name, string value)
         => WorkshopGui.Element(this, "div").Style("display", "grid")
             .Style("grid-template-columns", "7.5rem 1fr").Style("gap", ".5rem").Style("margin-top", ".35rem")
             .Content(WorkshopGui.Element(this, "span").Style("color", "#8fa7b2").Style("font-size", ".46rem").Text(name))
-            .Content(WorkshopGui.Element(this, "span").Style("color", "#eefaff").Style("font-size", ".48rem").Text(value)).Build();
+            .Content(WorkshopGui.Element(this, "span").Style("color", "#eefaff").Style("font-size", ".48rem").Text(value));
 
-    private RenderFragment ActionButton(string label, Action action, string accent)
+    private ElementBuilder ActionButton(string label, Action action, string accent)
         => WorkshopGui.Button(this).Label(label).Style("padding", ".35rem .55rem")
             .Style("border", $"1px solid {accent}88").Style("background", $"{accent}10").Style("color", accent)
             .Style("font-family", "inherit").Style("font-size", ".45rem").Style("font-weight", "800")
-            .Style("letter-spacing", ".08em").Style("cursor", "pointer").OnClick(action).Build();
+            .Style("letter-spacing", ".08em").Style("cursor", "pointer").OnClick(action);
 
     private void StartPreview()
     {
