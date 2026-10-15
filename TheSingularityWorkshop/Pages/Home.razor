@@ -470,6 +470,32 @@
             builder.CloseElement();
         }
 
+        // Replay Lab is a visible, interactive prototype while the real browser adapter is developed.
+        builder.OpenElement(sequence++, "article");
+        builder.AddAttribute(sequence++, "class", "demonstration-card");
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "demonstration-status");
+        builder.AddContent(sequence++, "EXPERIMENTAL PREVIEW");
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "h2");
+        builder.AddContent(sequence++, "Replay Lab // Shareable Moments");
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "p");
+        builder.AddContent(sequence++, "Scrub a local illustrative timeline, inspect event markers, and see the selected scene state change. This preview is not yet connected to Physics world replay.");
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "p");
+        builder.AddAttribute(sequence++, "class", "demonstration-why");
+        builder.AddContent(sequence++, "The visible experience gives us a browser target to evaluate while Physics model reconstruction and the future world adapter mature.");
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "demonstration-actions");
+        builder.OpenElement(sequence++, "a");
+        builder.AddAttribute(sequence++, "href", "/replay-lab");
+        builder.AddContent(sequence++, "OPEN REPLAY LAB ↗");
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.CloseElement();
+
         builder.CloseElement();
         builder.CloseElement();
     }
