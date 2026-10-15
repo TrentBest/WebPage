@@ -130,7 +130,7 @@ try {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
 
-  console.log("Browser journey passed: gateway -> moniker -> manifest-driven hub (desktop and mobile viewport).");
+  console.log("Browser journey passed: desktop gateway/hub journey, Movement Lab keyboard selection, and Replay Lab scrub/play/pause at desktop and narrow viewport.");
 } finally {
   await browser.close();
 }
