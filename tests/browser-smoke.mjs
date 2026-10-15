@@ -134,11 +134,9 @@ try {
   await page.locator(".ai-exchange-grid .ai-exchange-block").nth(1).waitFor({ state: "visible", timeout: 15_000 });
   const responsePreview = page.locator("#ai-llm-response");
   await responsePreview.waitFor({ state: "visible", timeout: 10_000 });
-  if (!(await responsePreview.isEditable()) || !(await responsePreview.getAttribute("readonly")) !== true) {
-    // The preview is intentionally read-only: response text comes from the clipboard button.
-    if (await responsePreview.isEditable()) {
-      throw new Error("ProtocolAi response preview must not be directly editable.");
-    }
+  // The preview is intentionally read-only: response text comes from the clipboard button.
+  if (await responsePreview.isEditable()) {
+    throw new Error("ProtocolAi response preview must not be directly editable.");
   }
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.evaluate(() => navigator.clipboard.writeText("browser smoke response fixture"));
