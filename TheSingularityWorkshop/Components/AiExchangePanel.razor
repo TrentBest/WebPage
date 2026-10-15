@@ -84,28 +84,11 @@
             .Child(WorkshopGui.Element(this, "strong").Text(label))
             .Child(WorkshopGui.Element(this, "pre").Class("ai-exchange-value").Text(value));
 
-    private string BuildExchangeText(AiExchangeCompositionBundle? exchange)
-    {
-        var parts = new List<string>
-        {
-            "WORKSHOP PROTOCOLAI TERMINAL EXCHANGE",
-            "The response is a proposal only. Do not invent IDs or claim validation.",
-            "PROTOCOL",
-            exchange?.Protocol?.Describe() ?? "Protocol vocabulary is not composed.",
-            "GRAMMAR",
-            exchange?.Grammar?.Describe() ?? "Grammar definition is not composed."
-        };
-
-        if (!string.IsNullOrWhiteSpace(ContextPayload))
-        {
-            parts.Add("HOST CONTEXT / TASK");
-            parts.Add(ContextPayload.Trim());
-        }
-
-        parts.Add("RESPONSE CONTRACT");
-        parts.Add("Return a structured proposal matching the host task's requested format. Preserve stable IDs where supplied. Explain conflicts instead of silently guessing. The host will validate and review the response before applying changes.");
-        return string.Join(Environment.NewLine + Environment.NewLine, parts);
-    }
+    private string BuildExchangeText(AiExchangeCompositionBundle? exchange) =>
+        AiExchangeTextBuilder.Build(
+            exchange?.Protocol?.Describe(),
+            exchange?.Grammar?.Describe(),
+            ContextPayload);
 
     private async Task CopyToClipboardAsync(string exchangeText)
     {
