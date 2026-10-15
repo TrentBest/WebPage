@@ -41,7 +41,7 @@ try {
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   const initialLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  const expectedLinks = ["Welcome", "Demonstrations", "Movement Lab", "Economy", "Digitens", "Singularity Architecture", "ProtocolAi Terminal"];
+  const expectedLinks = ["Welcome", "Demonstrations", "Movement Lab", "Replay Lab", "Economy", "Digitens", "Singularity Architecture", "ProtocolAi Terminal"];
   if (initialLinks.length !== expectedLinks.length || expectedLinks.some((label, i) => initialLinks[i] !== label)) {
     throw new Error(`The hub navigation must expose the expected core destinations plus manifest-declared gallery entries; found: ${initialLinks.join(", ")}.`);
   }
@@ -99,6 +99,24 @@ try {
   await page.keyboard.press("Enter");
   await page.getByText("(3, 0.5, 0)", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
   await page.getByText("(0.2, 1, 2)", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+
+  // Replay Lab is intentionally a local presentation fixture, but its controls must work.
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "Replay Lab", exact: true }).click();
+  await page.getByRole("heading", { name: "Replay Lab", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByText("ILLUSTRATIVE DEMO DATA", { exact: true }).waitFor({ state: "visible" });
+  const scrubber = page.locator("#replay-scrubber");
+  await scrubber.evaluate(el => {
+    el.value = "51";
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await page.getByText("051", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByText("Illustrative state marker", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByRole("button", { name: /play timeline/i }).click();
+  await page.getByRole("button", { name: /pause/i }).waitFor({ state: "visible", timeout: 5_000 });
+  await page.waitForFunction(() => Number(document.querySelector(".tick-readout strong")?.textContent) > 51, null, { timeout: 5_000 });
+  await page.getByRole("button", { name: /pause/i }).click();
+  await page.getByText(/PAUSED — ILLUSTRATIVE FIXTURE ONLY/).waitFor({ state: "visible", timeout: 5_000 });
 
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
