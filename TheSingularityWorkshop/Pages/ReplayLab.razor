@@ -1,0 +1,188 @@
+@page "/replay-lab"
+@using System.Globalization
+@using Microsoft.AspNetCore.Components
+@implements IAsyncDisposable
+
+<PageTitle>Replay Lab | The Singularity Workshop</PageTitle>
+
+<main class="replay-lab">
+    <header class="replay-header">
+        <a class="back-link" href="/">← RETURN TO THE WORKSHOP</a>
+        <p class="eyebrow">WORKSHOP FIELD BAY / TIMELINE INSTRUMENT</p>
+        <h1>Replay <span>Lab</span></h1>
+        <p class="intro">Move through a small timeline, inspect its recorded event markers, and see the playhead change. This is an interactive presentation fixture—not a replay of a Physics world.</p>
+        <div class="evidence-banner" role="status">
+            <span class="status-light" aria-hidden="true"></span>
+            <div><strong>ILLUSTRATIVE DEMO DATA</strong><span>Not yet connected to Physics world replay</span></div>
+        </div>
+    </header>
+
+    <section class="replay-console" aria-label="Illustrative replay timeline">
+        <div class="console-topline"><span>LOCAL TIMELINE / FIXTURE-01</span><span>NO WORLD ATTACHED</span></div>
+        <div class="scene-panel">
+            <div class="scene-heading"><div><p class="eyebrow">MOMENT VIEW</p><h2>@SelectedMoment.Title</h2></div><span class="tick-readout">TICK <strong>@Tick.ToString("000", CultureInfo.InvariantCulture)</strong></span></div>
+            <svg class="scene-svg" viewBox="0 0 720 230" role="img" aria-labelledby="scene-title scene-description">
+                <title id="scene-title">Illustrative object position at the selected timeline tick</title>
+                <desc id="scene-description">A schematic object marker moves along a fixed guide as the local illustrative timeline is scrubbed. It is not a simulated physical trajectory.</desc>
+                <defs><pattern id="scene-grid" width="36" height="30" patternUnits="userSpaceOnUse"><path d="M36 0H0V30" fill="none" stroke="#153043" stroke-width="1"/></pattern></defs>
+                <rect x="12" y="12" width="696" height="198" fill="url(#scene-grid)"/>
+                <path d="M36 174H684" stroke="#507185" stroke-width="2"/>
+                <path d="M36 174 C140 174 150 118 250 118 S390 192 474 142 S590 74 684 74" fill="none" stroke="#00eaff" stroke-opacity=".3" stroke-width="2" stroke-dasharray="5 7"/>
+                <circle cx="@SceneX" cy="@SceneY" r="24" fill="#00eaff" fill-opacity=".08" stroke="#00eaff" stroke-width="1.5"/>
+                <circle cx="@SceneX" cy="@SceneY" r="7" fill="#ff38d1"/>
+                <path d="M@(SceneX - 34) @SceneY H@(SceneX + 34) M@SceneX @(SceneY - 34) V@(SceneY + 34)" stroke="#ff38d1" stroke-opacity=".8" stroke-width="1"/>
+                <text x="28" y="198" fill="#8aa9b9" font-size="11">START</text><text x="692" y="198" text-anchor="end" fill="#8aa9b9" font-size="11">END</text>
+                <text x="28" y="34" fill="#00eaff" font-size="10" letter-spacing="2">PRESENTATION SPACE</text>
+            </svg>
+            <div class="scene-values">
+                <div><span>FIXTURE POSITION</span><strong>@SelectedMoment.Position</strong></div>
+                <div><span>EVENT AT THIS MOMENT</span><strong>@SelectedMoment.Event</strong></div>
+                <div><span>DATA SOURCE</span><strong>Local deterministic fixture</strong></div>
+            </div>
+        </div>
+
+        <div class="timeline-panel">
+            <div class="timeline-heading"><h2>Timeline</h2><span>@SelectedMoment.Label · @Tick%</span></div>
+            <div class="timeline-track" aria-label="Timeline event markers">
+                <div class="track-base"></div>
+                @foreach (var moment in Moments)
+                {
+                    <button type="button" class="event-marker @(moment.Tick == SelectedMoment.Tick ? "active" : "")"
+                            style="left:@(moment.Tick)%"
+                            aria-label="@($"Select {moment.Label}, tick {moment.Tick}: {moment.Event}")"
+                            aria-pressed="@(moment.Tick == SelectedMoment.Tick)"
+                            @onclick="() => SetTick(moment.Tick)"><span>@moment.Label</span></button>
+                }
+                <div class="playhead" style="left:@(Tick)%" aria-hidden="true"></div>
+            </div>
+            <label class="scrub-label" for="replay-scrubber"><span>SCRUB TIMELINE</span><span>0 — 100</span></label>
+            <input id="replay-scrubber" class="scrubber" type="range" min="0" max="100" step="1" value="@Tick" @oninput="OnScrub" aria-describedby="scrub-help" />
+            <p id="scrub-help" class="help-text">Use the slider or choose an event marker. Playback advances this fixture only.</p>
+            <div class="transport">
+                <button type="button" class="secondary-button" @onclick="() => SetTick(0)">⟲ RESET</button>
+                <button type="button" class="primary-button" @onclick="TogglePlayback" aria-pressed="@IsPlaying">@(IsPlaying ? "Ⅱ PAUSE" : "▶ PLAY TIMELINE")</button>
+                <button type="button" class="secondary-button" @onclick="() => SetTick(100)">SKIP TO END ↠</button>
+            </div>
+            <p class="playback-status" role="status">@Status</p>
+        </div>
+    </section>
+
+    <section class="capability-grid" aria-label="Replay integration status">
+        <article class="capability-card implemented"><p class="eyebrow">IMPLEMENTED IN PHYSICS</p><h2>Model-level reconstruction</h2><p>Segment replay and fork-aware route coordination have tests, including one solver-backed reconstruction test.</p></article>
+        <article class="capability-card gap"><p class="eyebrow">INTEGRATION GAP</p><h2>World-to-browser adapter</h2><p>This page has no Physics world adapter or browser-consumable scene record. The moving marker above is illustrative, not solver output.</p></article>
+        <article class="capability-card planned"><p class="eyebrow">PLANNED</p><h2>Portable moments</h2><p>Export, share links, hosted playback, and remix remain unavailable until a versioned transport and end-to-end flow exist.</p></article>
+    </section>
+    <footer class="replay-footer">THE SINGULARITY WORKSHOP · REPLAY LAB · PRESENTATION FIXTURE ONLY</footer>
+</main>
+
+@code {
+    private static readonly Moment[] Moments =
+    {
+        new(0, "START", "Initial frame", "Fixture begins", "x 0.00 · y 0.00 · z 0.00"),
+        new(24, "EVENT 01", "Input marker", "Illustrative input marker", "x 1.20 · y 0.35 · z 0.00"),
+        new(51, "EVENT 02", "State marker", "Illustrative state marker", "x 2.55 · y 0.80 · z 0.00"),
+        new(76, "EVENT 03", "Branch marker", "Illustrative branch marker", "x 3.80 · y 0.45 · z 0.00"),
+        new(100, "END", "Final frame", "Fixture ends", "x 5.00 · y 0.00 · z 0.00")
+    };
+
+    private int Tick { get; set; }
+    private string Status { get; set; } = "READY — NO PHYSICS WORLD CONNECTED";
+    private CancellationTokenSource? _playback;
+    private bool IsPlaying => _playback is not null;
+    private Moment SelectedMoment => Moments.OrderBy(moment => Math.Abs(moment.Tick - Tick)).First();
+    private int SceneX => 48 + (int)(Tick * 6.24);
+    private int SceneY => 174 - (int)(Math.Sin(Tick / 100d * Math.PI * 2) * 35) - (int)(Tick * .45);
+
+    private void OnScrub(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value))
+            SetTick(value);
+    }
+
+    private void SetTick(int tick)
+    {
+        StopPlayback();
+        Tick = Math.Clamp(tick, 0, 100);
+        Status = $"FIXTURE POSITIONED AT TICK {Tick:000} — NO PHYSICS WORLD CONNECTED";
+    }
+
+    private async Task TogglePlayback()
+    {
+        if (_playback is not null)
+        {
+            StopPlayback();
+            Status = "PAUSED — ILLUSTRATIVE FIXTURE ONLY";
+            return;
+        }
+
+        if (Tick >= 100) Tick = 0;
+        var playback = new CancellationTokenSource();
+        _playback = playback;
+        Status = "PLAYING — ILLUSTRATIVE FIXTURE ONLY";
+        try
+        {
+            while (Tick < 100 && !playback.IsCancellationRequested)
+            {
+                await Task.Delay(160, playback.Token);
+                Tick = Math.Min(100, Tick + 2);
+                await InvokeAsync(StateHasChanged);
+            }
+            if (Tick >= 100) Status = "END OF FIXTURE — NO PHYSICS WORLD CONNECTED";
+        }
+        catch (OperationCanceledException) { }
+        finally
+        {
+            if (ReferenceEquals(_playback, playback))
+            {
+                _playback = null;
+                playback.Dispose();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+
+    private void StopPlayback()
+    {
+        var playback = _playback;
+        _playback = null;
+        if (playback is null) return;
+        playback.Cancel();
+        playback.Dispose();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        StopPlayback();
+        return ValueTask.CompletedTask;
+    }
+
+    private sealed record Moment(int Tick, string Label, string Title, string Event, string Position);
+}
+
+<style>
+.replay-lab{min-height:100vh;box-sizing:border-box;padding:clamp(1rem,4vw,3.5rem);background:#020711;color:#edfaff;font-family:Consolas,'Courier New',monospace}
+.replay-header,.replay-console,.capability-grid,.replay-footer{width:min(1180px,100%);margin-inline:auto}
+.back-link{display:inline-block;margin-bottom:2rem;color:#91bdca;text-decoration:none;font-size:.7rem;letter-spacing:.12em}
+.eyebrow{margin:0;color:#00eaff;font-size:.62rem;letter-spacing:.18em}
+.replay-header h1{margin:.5rem 0;font-size:clamp(2.6rem,7vw,5.6rem);line-height:.95;letter-spacing:-.04em}.replay-header h1 span{color:#ff38d1}
+.intro{max-width:75ch;color:#a9c2ce;line-height:1.7;font-family:system-ui,sans-serif}
+.evidence-banner{display:flex;align-items:center;gap:.8rem;margin:1.4rem 0 2rem;padding:.9rem 1rem;border:1px solid rgba(255,211,77,.55);background:rgba(255,211,77,.035)}
+.status-light{width:.65rem;height:.65rem;flex:0 0 auto;border-radius:50%;background:#ffd34d;box-shadow:0 0 12px #ffd34d55}.evidence-banner div{display:flex;flex-direction:column;gap:.25rem}.evidence-banner strong{font-size:.7rem;color:#ffd34d;letter-spacing:.12em}.evidence-banner span{font-size:.75rem;color:#a9c2ce}
+.replay-console{border:1px solid rgba(0,234,255,.24);background:linear-gradient(145deg,rgba(0,168,255,.05),rgba(3,8,17,.96));}
+.console-topline{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border-bottom:1px solid rgba(0,234,255,.15);color:#7594a2;font-size:.58rem;letter-spacing:.12em}
+.scene-panel,.timeline-panel{padding:clamp(1rem,2.5vw,1.8rem)}.scene-panel{border-bottom:1px solid rgba(0,234,255,.15)}
+.scene-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem}.scene-heading h2,.timeline-heading h2{margin:.4rem 0;font-size:1.2rem}.tick-readout{color:#8ba7b4;font-size:.65rem;letter-spacing:.12em}.tick-readout strong{color:#ff38d1;font-size:1.25rem}
+.scene-svg{display:block;width:100%;height:auto;max-height:290px;margin:.8rem 0}
+.scene-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem}.scene-values div{min-width:0;padding:.75rem;border:1px solid rgba(0,234,255,.12);background:rgba(0,234,255,.025)}.scene-values span,.scene-values strong{display:block}.scene-values span{margin-bottom:.4rem;color:#7795a4;font-size:.55rem;letter-spacing:.1em}.scene-values strong{overflow-wrap:anywhere;color:#d9f8ff;font-size:.7rem;font-weight:500}
+.timeline-heading{display:flex;justify-content:space-between;align-items:center;gap:1rem}.timeline-heading span{color:#ff38d1;font-size:.7rem}
+.timeline-track{position:relative;height:4.4rem;margin:1.5rem .6rem .6rem}.track-base{position:absolute;left:0;right:0;top:1rem;height:2px;background:#254456}
+.event-marker{position:absolute;top:.5rem;z-index:2;display:flex;flex-direction:column;align-items:center;gap:.45rem;transform:translateX(-50%);padding:0;border:0;background:transparent;color:#87a5b3;font:inherit;font-size:.56rem;cursor:pointer;white-space:nowrap}.event-marker:before{content:"";width:.8rem;height:.8rem;border:1px solid #00eaff;border-radius:50%;background:#06121d}.event-marker.active{color:#fff}.event-marker.active:before{background:#ff38d1;border-color:#ff38d1;box-shadow:0 0 12px #ff38d177}.event-marker:focus-visible,.transport button:focus-visible,.scrubber:focus-visible{outline:2px solid #ffd34d;outline-offset:4px}
+.playhead{position:absolute;top:.55rem;z-index:1;width:2px;height:2.3rem;background:#ffd34d;transform:translateX(-50%);pointer-events:none}.playhead:before{content:"";position:absolute;top:-.25rem;left:-.2rem;width:.4rem;height:.4rem;background:#ffd34d;transform:rotate(45deg)}
+.scrub-label{display:flex;justify-content:space-between;gap:1rem;color:#86a5b4;font-size:.58rem;letter-spacing:.12em}.scrubber{width:100%;margin:1rem 0;accent-color:#ff38d1;cursor:pointer}.help-text{color:#7795a4;font-family:system-ui,sans-serif;font-size:.82rem;line-height:1.5}
+.transport{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.2rem}.transport button{min-height:2.8rem;padding:.75rem 1rem;border:1px solid rgba(0,234,255,.45);background:rgba(0,234,255,.04);color:#dffaff;font:700 .68rem Consolas,'Courier New',monospace;letter-spacing:.06em;cursor:pointer}.transport .primary-button{border-color:#ff38d1;background:rgba(255,56,209,.09);color:#ffb6ee}.transport button:hover{border-color:#ffd34d;color:#ffd34d}
+.playback-status{margin:.9rem 0 0;color:#8ba7b4;font-size:.65rem;letter-spacing:.06em}
+.capability-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;margin-top:1rem}.capability-card{padding:1.2rem;border:1px solid rgba(0,234,255,.16);background:rgba(0,168,255,.025)}.capability-card h2{margin:.7rem 0;font-size:1rem}.capability-card p:last-child{color:#a3bac5;font-family:system-ui,sans-serif;font-size:.88rem;line-height:1.6}.capability-card.implemented .eyebrow{color:#00eaff}.capability-card.gap .eyebrow{color:#ffd34d}.capability-card.planned .eyebrow{color:#ff38d1}
+.replay-footer{margin:2rem auto 0;color:#597887;font-size:.58rem;letter-spacing:.16em}
+@media(max-width:720px){.scene-values,.capability-grid{grid-template-columns:1fr}.event-marker{font-size:.48rem}.timeline-track{margin-inline:.2rem}.event-marker span{writing-mode:vertical-rl;transform:rotate(180deg);max-height:3.2rem}.transport button{flex:1 1 8rem}.scene-heading{align-items:flex-start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.replay-lab *{scroll-behavior:auto!important}}
+</style>
