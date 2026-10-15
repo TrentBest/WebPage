@@ -51,3 +51,12 @@ The city should communicate scale through coordinated activity, not just a large
 ## Evidence boundary
 
 This plan records the intended direction. It does **not** assert that flying-car traffic, persistent citizen schedules, spectator simulation, or the Soccer MicroBundle match are already integrated. Each becomes a shipped capability only after its implementation and tests exist.
+
+## First aerial-traffic model slice
+
+The city work branch now includes `SpatialAirTrafficManifest`, a renderer-independent aerial-route model. Its default manifest declares four stable vehicle identities, model IDs, origin/destination coordinates, corridor IDs, discrete altitude bands, travel durations, and phase offsets. `SnapshotAt(elapsedSeconds)` produces repeatable position snapshots without starting a clock or mutating the manifest; the route moves out and back between its declared endpoints.
+
+This is intentionally a small, inspectable first slice. **It is not yet a city traffic simulation.** Altitude bands are discrete presentation lanes rather than physical heights; routes do not yet negotiate intersections, avoid collisions, respond to buildings, dispatch for passengers, or connect to the taxi passenger lifecycle. The GUI builder has not yet been wired to consume these snapshots, so this commit alone does not make flying cars visible in the city.
+
+The accompanying tests cover stable unique IDs, declared altitude bands, case-insensitive lookup, repeatable snapshots, route progression, and invalid elapsed times. Treat these tests as intended coverage until the branch's CI actually reports a result.
+
