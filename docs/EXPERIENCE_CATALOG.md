@@ -27,21 +27,23 @@ The neutral scheduler should own only common scheduling facts: event identity, v
 
 See the [Singularity Arena reference fixture](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain/blob/work/soccer-domain-microbundle/docs/SINGULARITY_ARENA_PERFORMANCE.md), [Experiences Beyond the Arena](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain/blob/work/soccer-domain-microbundle/docs/EXPERIENCES_AND_OPTIONAL_ECONOMY.md), and Economy's [game store patterns](https://github.com/TrentBest/TheSingularityWorkshop.Economy/blob/forge/economy-game-store-patterns/docs/GAME_STORE_PATTERNS.md). These are review-branch documents, not merged releases.
 
-## Economy is optional
+## Economy: simulated first, composable, and optional
 
-Market and craft fairs should remain meaningful without Economy. Visitors can browse, talk, watch a maker, attend a demonstration, or learn without a checkout path. A stall can expose a non-commercial profile and activity without prices, inventory, or payment.
+Economy is primarily intended to support **simulated economies**, with Singularity City as the reference world: Digitens, businesses, shops, goods, offers, and in-world money-like values participating in observable economic behavior. Proving how many Digitens can be represented and how much useful economic activity can be simulated is a performance and architecture goal—not a claim that scale has already been demonstrated.
 
-When Economy is composed, selected providers may expose optional offers, prices, inventory, purchases, or commissions through adapters. The Experience must not require Economy merely to exist, and the presence of an offer must not be treated as proof of a completed transaction.
+Creator commerce is an adoption path through the same vocabulary. A user should eventually be able to define a shop/catalog once, present it digitally, reskin its storefront, and compose that same shop into multiple Experiences without duplicating its canonical identity. A market stall, gallery counter, arena merchandise booth, or fantasy merchant can look different while using a shared shop description and each Experience's own policies.
 
-This also applies to the other environments:
+A fair still works without Economy. Visitors can browse, talk, watch a maker, attend a demonstration, or learn without prices, inventory, or checkout. Similarly, an Arena event can be scheduled and attended, a workshop can teach, a gallery can exhibit artwork, and a spellcasting Experience can cast spells without any economic provider.
 
-- An Arena event does not require Economy to be scheduled or attended.
-- A workshop does not require a paid lesson to teach.
-- A gallery does not require artwork to be for sale.
-- A spellcasting Experience does not require paid materials or an Economy provider to cast.
-- A transit hub may run its logistics simulation without fares or commerce enabled.
+When Economy is composed, selected providers may add in-world prices, offers, simulated exchanges, or other optional economic behavior through adapters. An offer is not proof of a completed exchange. Simulated balances and transfers are not real cash or payment settlement.
 
-Economy is exploratory; this document does not claim production payment handling or live money movement. The adapter is optional and provider results remain authoritative.
+**Near-term priority:** prove the visible creator workflow and the reusable seams before pursuing real-money execution. Start with a small simulated city/business, a source-defined shop, two presentation skins, and composition of that same shop into two Experience contexts. Measure Digiten/update costs as population grows, and test that changing presentation does not change the canonical shop/catalog identity.
+
+**Monetization direction:** validate useful, clearly delivered digital capabilities—such as creator tools, premium customization, hosting, or other creator/host services—as early business hypotheses. These are options to validate, not existing product features or guaranteed income. Do not make real-money processing a prerequisite for proving simulation or creator adoption.
+
+Real-money execution remains a separate future concern. It will require an explicit provider boundary and appropriate security, operational, tax, consumer-protection, and legal review. This document makes no compliance determination and does not claim that payment handling is implemented.
+
+See Economy's [simulated economies and creator commerce plan](https://github.com/TrentBest/TheSingularityWorkshop.Economy/blob/forge/economy-game-store-patterns/docs/SIMULATED_ECONOMIES_AND_CREATOR_COMMERCE.md) for the first proposed vertical slice. That link currently points to a review branch.
 
 ## VR Magic — a distinct Gestures use case
 
@@ -79,4 +81,4 @@ Optional capabilities should be represented as optional composition choices or a
 
 - **Current:** WebPage has a manifest-driven composition direction and an Experience theory contract. The Arena reference fixture and the Gestures magic scenario live in their owning repositories on review branches.
 - **Direction:** use the catalog to guide Experience discovery and to compose provider-owned domain capabilities without hard-coding each domain into WebPage.
-- **Future:** a visitor-selectable catalog, actual market/craft-fair provider behavior, optional Economy adapters, and tracked VR spellcasting. Those require integration work and observable proofs before being described as implemented.
+- **Future:** a visitor-selectable catalog, actual market/craft-fair provider behavior, reusable/reskinnable creator shops, measurable Digiten-scale simulation, optional Economy adapters, early creator monetization experiments, and tracked VR spellcasting. Those require integration work and observable proofs before being described as implemented.
