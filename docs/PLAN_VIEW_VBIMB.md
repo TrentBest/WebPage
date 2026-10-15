@@ -2,9 +2,9 @@
 
 ## Purpose
 
-VBIMB is the Workshop's proposed fast path from intent to a coherent, inspectable building plan. It is not a static floor-plan picture. A plan is structured data: rooms, walls, openings, fixtures, circulation, and the relationships that make the geometry meaningful.
+VBIMB is the Workshop's path from intent to a coherent, inspectable building plan. It is not a static floor-plan picture. A plan is structured data: rooms, walls, openings, fixtures, circulation, and the relationships that make the geometry meaningful.
 
-The first implementation slice lives in WebPage as a host-side MicroBundle capability and an interactive Singularity Architecture plan studio at `/architecture`. The studio draws the renderer-neutral plan model, lets you select rooms, edit room rectangles, toggle opening state, and capture a structured design brief. The current edits are in-memory only; it does **not** yet persist projects, register a new bundle in FSM_COS, call an LLM, coordinate room edits with wall geometry, provide undo/redo, or claim compliance with building codes.
+The first implementation slice lives in WebPage as a host-side plan capability and the interactive Singularity Architecture studio at `/architecture`. The studio draws the renderer-neutral plan model, lets you select rooms, edit room rectangles, toggle opening state, and capture a structured design brief. Edits are currently in-memory only; room edits do not yet reshape related wall geometry.
 
 ## First plan vocabulary
 
@@ -12,7 +12,7 @@ The first implementation slice lives in WebPage as a host-side MicroBundle capab
 - **PlanRoom** — bounded area with name and use.
 - **PlanWall** — segment with thickness.
 - **PlanOpening** — a semantic opening attached to a wall, with offset and width.
-- **PlanFixture** — a piece of built-in or movable plan content.
+- **PlanFixture** — built-in or movable plan content.
 - **PlanOpeningKind** — hinged door, sliding door, pocket door, revolving door, archway, or window.
 
 Opening semantics are separate from drawing style. A renderer can draw a hinged door's leaf and swing arc, a sliding door's panel and travel direction, a pocket door disappearing into a wall, or a revolving door's radial leaves. A closed opening, open fraction, hinge, and swing direction are data; the visual glyph is a projection of those data.
@@ -21,23 +21,32 @@ The initial schema validates unique IDs, positive plan extents, in-bounds room a
 
 ## The organization and asset substrate
 
-Singularity Architecture is a Workshop destination, but the organization model is intentionally generic. An architecture firm is an organization profile; the same data shape can represent a school, manufacturer, retailer, studio, or civic service. Members reference stable Digiten IDs and role labels rather than cloning people into each company. Projects can produce typed artifacts such as a `BuildingPlan`, tool, service, or other reusable asset.
+Singularity Architecture is a Workshop destination, but the organization model is intentionally generic. An architecture firm is one kind of organization; the same data shape can represent a school, manufacturer, retailer, studio, or civic service. Members reference stable Digiten IDs and role labels rather than cloning people into each company. Projects can produce typed artifacts such as a `BuildingPlan`, tool, service, or another reusable asset.
 
-The initial `SingularityOrganization` contract supports identity, industry, optional building assignment, membership, and project/artifact references. It does not implement persistence, employment simulation, ownership policy, licensing, payment, or marketplace fees. Those policies should be layered on only after people, organizations, projects, and reusable assets have stable identities.
+The initial `SingularityOrganization` contract supports identity, industry, optional building assignment, membership, and project/artifact references. It does not implement persistence, employment simulation, ownership policy, licensing, payment, or marketplace fees. Those policies belong above stable identities for people, organizations, projects, and reusable assets.
 
-## How an AI-assisted sketch should work
+## The Architect and the ProtocolAi terminal
 
-ProtocolAi and GrammarAi should be optional authoring tools around the same plan schema, not dependencies of the plan model itself.
+**The Workshop does not have to talk directly to an LLM.** The user chooses their own LLM and the Hub exposes the ProtocolAi terminal as the exchange boundary. The intended interaction is a deliberate clipboard round trip:
 
-1. A person or agent proposes a small semantic brief: "a narrow townhouse, entry vestibule, stair, kitchen facing a courtyard, two bedrooms upstairs."
-2. GrammarAi maps the vocabulary to a constrained plan grammar and typed operations.
-3. ProtocolAi transports a structured request and result through the chosen provider/protocol.
-4. The plan builder applies operations to a candidate plan.
-5. Validation reports geometric and semantic conflicts instead of silently guessing.
-6. The user accepts, edits, or rejects the result.
-7. The selected plan can be projected into 2D plan, 3D building, street-level navigation, and city-scale massing using shared IDs and coordinate systems.
+1. The host assembles the current task, relevant plan state, protocol vocabulary, and grammar/context.
+2. The user presses **Copy to Clipboard** and pastes the exchange into the LLM of their choice.
+3. The user copies the LLM's response.
+4. The user presses **Copy from Clipboard** in the Workshop terminal.
+5. The host processes the response using its own parser, ProtocolAi identities, applicable GrammarAi rules, plan validation, and a review step.
+6. Only an accepted, validated proposal can alter the working plan.
 
-An AI suggestion is not truth. The schema and validation results are the authority for the properties they actually check. Door clearance, circulation, occupancy, structure, egress, and code requirements need separate explicit rules before a plan can be called buildable.
+ProtocolAi defines deterministic application-owned meaning; it does not itself provide clipboard transport, contact a provider, or execute returned instructions. GrammarAi describes allowed structure; it is not a truth oracle or permission system. The terminal is the transport surface, and the host remains responsible for validation and authority.
+
+HeadlessAi can optionally support a role such as **Architect** when a user or deployment explicitly configures a provider endpoint. In that mode, HeadlessAi is an invocation path for a bounded role task—not a requirement for the building schema or the clipboard workflow. It must remain optional, and its output must enter the same proposal validation and review boundary. The role can help clarify requirements, explain trade-offs, or draft a plan proposal; it cannot silently approve its own work.
+
+The plan schema must not depend on ProtocolAi, GrammarAi, or HeadlessAi. They are optional collaborators around the same host-owned plan model.
+
+## Proposal contract and safety boundary
+
+A response should be treated as untrusted proposal data. Preserve stable IDs where they are supplied, reject malformed or out-of-bounds geometry, report unresolved references and conflicts, and retain the original response for inspection. Do not silently guess a missing dimension or execute an arbitrary response as code.
+
+The current plan validator checks only its documented geometric constraints. Door clearance, circulation, occupancy, structure, egress, accessibility, and building-code requirements need separate explicit rules before a plan can be called buildable.
 
 ## Agent cards and inspect-on-select
 
@@ -53,12 +62,12 @@ The plan view, aerial view, street/FPS view, and historical view must resolve th
 
 1. **Schema and example** — implemented as the renderer-neutral plan contract and compact apartment.
 2. **Plan canvas first pass** — implemented at `/architecture`: selectable room rectangles, dimension editing, fixtures, walls, and semantic opening symbols. Edits are local to the page session and room edits do not yet reshape associated walls.
-3. **Door behavior refinement** — hinged, sliding, pocket, revolving and window symbols are present; exact drafting conventions and clearance geometry still need refinement.
-4. **Persistent editing** — next: coordinated room/wall edits, undo/redo, saved projects, and validation feedback.
-5. **Digiten cards** — compact data cards linked to persistent Digiten IDs; selection opens a detailed inspector.
-6. **City placement** — place building footprints on actual parcels/blocks and expose plan/building/street projections.
-7. **AI authoring adapter** — structured, validated proposals from ProtocolAi/GrammarAi, with review and error reports.
-8. **Calibration and simulation** — only then connect occupancy, jobs, schools, schedules and circulation to the population model.
+3. **Shared terminal contract** — the WebPage contains a ProtocolAi + GrammarAi composition and a clipboard terminal component. The terminal is being shaped into the two-button host exchange; task-specific response processing still needs to be connected to the architecture proposal validator.
+4. **Persistent editing** — coordinated room/wall edits, undo/redo, saved projects, and validation feedback.
+5. **Architect role** — first use the clipboard round trip; optionally add a HeadlessAi-backed role when explicitly configured. Both paths must feed the same validated proposal contract.
+6. **Digiten cards** — compact data cards linked to persistent Digiten IDs; selection opens a detailed inspector.
+7. **City placement** — place building footprints on actual parcels/blocks and expose plan/building/street projections.
+8. **Calibration and simulation** — connect occupancy, jobs, schools, schedules and circulation to the population model only when shared identities and world data support it.
 
 ## Performance guardrails
 
@@ -70,4 +79,4 @@ The plan view, aerial view, street/FPS view, and historical view must resolve th
 
 ## Current boundary
 
-The schema, example, first interactive plan studio, and generalized organization/project data contract are real code. Persistence, coordinated room/wall editing, live employment simulation, interactive Digiten cards, AI authoring, and multi-view projections remain future work. The bundle provider is a WebPage demonstration adapter, not yet a separately published MicroBundle package.
+The plan schema, example, first interactive plan studio, and generalized organization/project data contract are real code. The terminal component provides clipboard operations but is not yet connected to a strict architecture proposal parser. Persistence, coordinated room/wall editing, live employment simulation, interactive Digiten cards, city-wide multi-view projections, and an optional HeadlessAi Architect role remain future integration work. The plan bundle provider is a WebPage demonstration adapter, not yet a separately published MicroBundle package.
