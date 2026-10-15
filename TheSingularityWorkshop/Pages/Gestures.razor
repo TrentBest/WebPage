@@ -1,0 +1,87 @@
+@page "/gestures"
+<PageTitle>Gestures & Movement Lab // The Singularity Workshop</PageTitle>
+
+<main class="gesture-lab">
+    <a class="back-link" href="/hub">← RETURN TO THE HUB</a>
+    <header class="hero">
+        <div class="eyebrow">THE WORKSHOP // GESTURES RESEARCH</div>
+        <h1>Intent becomes a pose.<br /><span>Evidence decides what happened.</span></h1>
+        <p class="lede">Gestures is an engine-neutral .NET model for describing a physical procedure and evaluating its pose over time. It is one capability in a larger system—not a claim that animation alone can move a body through the physical world.</p>
+        <div class="status">RESEARCH / CPU REFERENCE / RENDERER HANDOFF NOT YET INTEGRATED</div>
+    </header>
+
+    <section class="section">
+        <div class="eyebrow">01 // THE DATA PATH</div>
+        <h2>A procedure is not a physical outcome.</h2>
+        <div class="pipeline" aria-label="Gesture data flow">
+            <article><b>01</b><strong>Authored procedure</strong><p>Keyframes and provider-defined named transforms describe the intended movement.</p></article>
+            <span aria-hidden="true">→</span>
+            <article><b>02</b><strong>CPU evaluation</strong><p>The evaluator samples normalized time and returns an <code>EvaluatedPose</code>.</p></article>
+            <span aria-hidden="true">→</span>
+            <article><b>03</b><strong>Rig / host adapter</strong><p>A consumer must map names, coordinate spaces, hierarchy, and root-offset policy.</p></article>
+            <span aria-hidden="true">→</span>
+            <article><b>04</b><strong>Presentation</strong><p>Resolved representation can be presented only through a supported renderer contract.</p></article>
+        </div>
+    </section>
+
+    <section class="section split">
+        <div>
+            <div class="eyebrow">02 // WHAT THE POSE MEANS</div>
+            <h2>Useful data, honest boundaries.</h2>
+            <ul>
+                <li><strong>NormalizedProgress</strong> — the clamped point in the requested time interval.</li>
+                <li><strong>IsComplete</strong> — the evaluator reached the time interval's end; not proof of success.</li>
+                <li><strong>LocalTransforms</strong> — name-keyed local position, rotation, and scale values.</li>
+                <li><strong>RootOffset</strong> — presentation/root-projection data, not authoritative world displacement.</li>
+            </ul>
+        </div>
+        <aside class="boundary">
+            <div class="eyebrow">PHYSICS / DOMAIN OWNERSHIP</div>
+            <h3>Reachability ≠ contact</h3>
+            <p>Contact ≠ support. Support may slip, fail, or be released. A completed vehicle-boarding Gesture does not prove occupancy. Those outcomes must come from the owning physics or domain system.</p>
+        </aside>
+    </section>
+
+    <section class="section">
+        <div class="eyebrow">03 // IMPLEMENTATION STATUS</div>
+        <h2>Current evidence, next seams.</h2>
+        <div class="status-grid">
+            <article><span class="state implemented">IMPLEMENTED ON REVIEW BRANCH</span><h3>CPU reference</h3><p>Engine-neutral pose evaluation, deterministic bounded variation, initial translation golden vectors, and test-backed soldier-movement and vehicle-boarding examples.</p></article>
+            <article><span class="state pending">PENDING</span><h3>Host rig mapping</h3><p>No universal rig is assumed. A consumer must define the mapping and parent-transform composition.</p></article>
+            <article><span class="state pending">PENDING</span><h3>Renderer pose contract</h3><p>The currently inspected Renderer frame accepts resolved draw commands; it does not expose a named-skeleton or evaluated-pose input slot.</p></article>
+            <article><span class="state unmeasured">UNMEASURED</span><h3>GPU parity / crossover</h3><p>No CPU/GPU parity or workload crossover is claimed. Both require reference outputs and measured representative workloads.</p></article>
+        </div>
+    </section>
+
+    <section class="section source-trail">
+        <div class="eyebrow">04 // FOLLOW THE EVIDENCE</div>
+        <h2>Inspect the work, not just the story.</h2>
+        <p>The source branch is under review. The links below distinguish implementation evidence from proposals and the host integration plan.</p>
+        <div class="links">
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.Gestures/tree/work/planar-ik-reference" target="_blank" rel="noopener noreferrer">Gestures source branch ↗</a>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.Gestures/pull/10" target="_blank" rel="noopener noreferrer">Open review · PR #10 ↗</a>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/work/planar-ik-reference/docs/ROADMAP.md" target="_blank" rel="noopener noreferrer">Research roadmap ↗</a>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/work/planar-ik-reference/docs/RENDERER_POSE_HANDOFF_PROPOSAL.md" target="_blank" rel="noopener noreferrer">Renderer handoff proposal ↗</a>
+            <a href="https://github.com/TrentBest/WebPage/blob/development/docs/integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md" target="_blank" rel="noopener noreferrer">WebPage integration brief ↗</a>
+        </div>
+    </section>
+    <footer>Illustrative architecture only. This page does not run the .NET evaluator, simulate physics, or claim a live Gesture-to-Renderer adapter.</footer>
+</main>
+
+<style>
+.gesture-lab{min-height:100vh;margin:-1rem -1.5rem;padding:clamp(1rem,4vw,4rem);box-sizing:border-box;background:radial-gradient(ellipse at 75% 0%,rgba(0,234,255,.11),transparent 35%),#020711;color:#eafaff;font-family:system-ui,sans-serif}
+.back-link{display:inline-block;color:#8aa7b4;text-decoration:none;font:700 .65rem Consolas,monospace;letter-spacing:.12em}.back-link:hover,.back-link:focus-visible{color:#00eaff}
+.hero,.section,footer{max-width:1180px;margin-inline:auto}.hero{padding:clamp(2rem,7vw,6rem) 0 3rem}.eyebrow{color:#00eaff;font:700 .62rem Consolas,monospace;letter-spacing:.19em}
+.hero h1{font-size:clamp(2.6rem,7vw,6.2rem);line-height:.98;letter-spacing:-.055em;margin:1rem 0}.hero h1 span{color:#ff2cff}.lede{max-width:75ch;color:#a3bbc6;line-height:1.75;font-size:1.02rem}
+.status{display:inline-block;margin-top:1rem;padding:.6rem .8rem;border:1px solid rgba(255,211,77,.35);color:#ffd34d;font:700 .58rem Consolas,monospace;letter-spacing:.08em}
+.section{padding:3rem 0;border-top:1px solid rgba(0,234,255,.13)}.section h2{font-size:clamp(1.8rem,4vw,3.3rem);line-height:1.05;letter-spacing:-.035em;margin:.7rem 0 1.5rem}
+.pipeline{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:.65rem;align-items:stretch}.pipeline article,.status-grid article{padding:1.1rem;border:1px solid rgba(0,234,255,.16);background:rgba(4,13,27,.72)}.pipeline article b{display:block;color:#ff2cff;font:700 .65rem Consolas,monospace}.pipeline strong{display:block;margin:.65rem 0;font-size:.9rem}.pipeline p,.status-grid p{margin:0;color:#93abb7;font-size:.84rem;line-height:1.65}.pipeline>span{align-self:center;color:#00eaff}
+.split{display:grid;grid-template-columns:1.3fr .7fr;gap:2rem}.split ul{padding-left:1.2rem;color:#a4bbc5;line-height:1.8}.split li{padding:.25rem 0}.split strong{color:#eafaff}
+.boundary{padding:1.4rem;border-left:3px solid #ff2cff;background:rgba(255,44,255,.045);align-self:start}.boundary h3{font-size:1.5rem;margin:1rem 0 .5rem}.boundary p{color:#a4bbc5;line-height:1.75;margin:0}
+.status-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}.state{display:inline-block;font:700 .57rem Consolas,monospace;letter-spacing:.08em}.implemented{color:#75e6a2}.pending{color:#ffd34d}.unmeasured{color:#dba6ff}.status-grid h3{margin:.7rem 0;font-size:1.05rem}
+.source-trail>p{max-width:75ch;color:#93abb7;line-height:1.7}.links{display:flex;flex-wrap:wrap;gap:.65rem}.links a{padding:.8rem 1rem;border:1px solid rgba(0,234,255,.25);color:#00eaff;text-decoration:none;font:700 .62rem Consolas,monospace;letter-spacing:.04em}.links a:hover,.links a:focus-visible{border-color:#ff2cff;color:#ff2cff}
+.gesture-lab footer{padding:1.5rem 0 3rem;color:#6f8b98;font-size:.75rem;line-height:1.6}
+@@media(max-width:900px){.pipeline{grid-template-columns:1fr 1fr}.pipeline>span{display:none}.split{grid-template-columns:1fr}}
+@@media(max-width:560px){.status-grid{grid-template-columns:1fr}.links a{width:100%;box-sizing:border-box}.hero h1{font-size:clamp(2.4rem,12vw,4rem)}}
+@@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
