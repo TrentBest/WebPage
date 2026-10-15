@@ -15,7 +15,8 @@ public static partial class SpatialWorkshopMapGuiBuilder
         Action<double>? setZoom = null,
         Action<SpatialMapScope>? setScope = null,
         SpatialWorkshopArrangement? arrangement = null,
-        ElementBuilder? hubIdentityDock = null)
+        ElementBuilder? hubIdentityDock = null,
+        IReadOnlyList<SpatialAirTrafficSnapshot>? airTraffic = null)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("z-index", "200")
@@ -98,7 +99,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
         layout.Content(scope == SpatialMapScope.Workshop
             ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement)
             : scope == SpatialMapScope.City
-                ? CityMap(receiver, avatarX, avatarY, selectDestination, zoom, setZoom)
+                ? CityMap(receiver, avatarX, avatarY, selectDestination, zoom, setZoom, airTraffic)
                 : scope == SpatialMapScope.World
                     ? WorldMap(receiver, avatarX, avatarY, zoom, setZoom)
                     : SolarSystemMap(receiver, zoom, setZoom));
@@ -288,7 +289,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
         return svg;
     }
 
-    private static ElementBuilder CityMap(object receiver, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom)
+    private static ElementBuilder CityMap(object receiver, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, IReadOnlyList<SpatialAirTrafficSnapshot>? airTraffic)
     {
         var map = MapFrame(receiver, zoom, setZoom);
         map.Content(WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100")
@@ -309,6 +310,39 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Content(WorkshopGui.Element(receiver, "span").Style("display", "block").Style("padding", ".2rem")
                     .Style("font-size", "clamp(.35rem,.46vw,.55rem)").Style("color", accent)
                     .Style("font-weight", "700").Text(structure.Name)));
+        }
+
+        if (airTraffic is not null)
+        {
+            foreach (var vehicle in airTraffic)
+            {
+                var accent = vehicle.AltitudeBand >= 3 ? Magenta : Cyan;
+                map.Content(WorkshopGui.Element(receiver, "div")
+                    .Style("position", "absolute")
+                    .Style("left", $"{vehicle.Position.X:0.###}%")
+                    .Style("top", $"{vehicle.Position.Y:0.###}%")
+                    .Style("transform", "translate(-50%,-50%)")
+                    .Style("z-index", "6")
+                    .Style("display", "flex")
+                    .Style("align-items", "center")
+                    .Style("gap", ".2rem")
+                    .Style("pointer-events", "none")
+                    .Style("white-space", "nowrap")
+                    .Style("color", accent)
+                    .Style("font-size", "clamp(.35rem,.45vw,.55rem)")
+                    .Style("font-weight", "800")
+                    .Style("text-shadow", "0 1px 3px #000,0 0 5px #000")
+                    .Title($"{vehicle.ModelId} // {vehicle.LaneId} // presentation altitude band {vehicle.AltitudeBand}")
+                    .Content(WorkshopGui.Element(receiver, "span")
+                        .Style("display", "inline-block")
+                        .Style("width", ".42rem")
+                        .Style("height", ".42rem")
+                        .Style("border", $"1px solid {accent}")
+                        .Style("border-radius", "50%")
+                        .Style("background", accent)
+                        .Style("box-shadow", $"0 0 8px {accent}"))
+                    .Content(WorkshopGui.Element(receiver, "span").Text(vehicle.ModelId.ToUpperInvariant())));
+            }
         }
 
         var workshop = SingularityCityCatalog.WorkshopDistrict;
