@@ -90,6 +90,16 @@ try {
   const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
   await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
 
+  // The new destination must work through the existing Workshop navigation, not just by direct URL.
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "Movement Lab", exact: true }).click();
+  await page.getByRole("heading", { name: "Movement Lab", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  const hurdle = page.getByRole("button", { name: /hurdle-01/i });
+  await hurdle.focus();
+  await page.keyboard.press("Enter");
+  await page.getByText("(3, 0.5, 0)", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByText("(0.2, 1, 2)", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
