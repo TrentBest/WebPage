@@ -107,6 +107,10 @@ public sealed class BuildingPlan
         foreach (var opening in Openings)
         {
             RequireId(opening.Id, "opening");
+            if (!Enum.IsDefined(typeof(PlanOpeningKind), opening.Kind)
+                || !Enum.IsDefined(typeof(PlanHinge), opening.Hinge)
+                || !Enum.IsDefined(typeof(PlanSwingDirection), opening.Swing))
+                throw new ArgumentException($"Opening '{opening.Id}' contains an unknown kind, hinge, or swing value.");
             if (!wallIds.Contains(opening.WallId))
                 throw new ArgumentException($"Opening '{opening.Id}' refers to missing wall '{opening.WallId}'.");
             if (!FinitePositive(opening.Width) || !double.IsFinite(opening.Offset) || opening.Offset < 0)
