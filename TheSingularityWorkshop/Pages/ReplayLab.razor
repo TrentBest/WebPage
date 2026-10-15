@@ -1,0 +1,242 @@
+@page "/replay-lab"
+@using Microsoft.AspNetCore.Components
+@implements IAsyncDisposable
+
+<PageTitle>Replay Lab // The Singularity Workshop</PageTitle>
+
+<main class="replay-lab">
+    <a class="replay-back" href="/?tab=demonstrations">← RETURN TO THE WORKSHOP</a>
+    <header class="replay-header">
+        <div>
+            <p class="replay-kicker">THE SINGULARITY WORKSHOP / EXPERIMENTAL EXPERIENCE</p>
+            <h1>Replay <span>Lab</span></h1>
+            <p class="replay-lede">A moment is more than a frame. Explore a bounded timeline, inspect its events, and move the playhead to see how the scene changes.</p>
+        </div>
+        <div class="replay-state" role="status">
+            <span class="status-dot"></span>
+            ILLUSTRATIVE FIXTURE
+        </div>
+    </header>
+
+    <section class="replay-disclaimer" aria-label="Prototype status">
+        <strong>DEMO DATA — NOT YET CONNECTED TO PHYSICS WORLD REPLAY</strong>
+        <p>This interactive scene is a local, deterministic presentation fixture. The Physics repository has tested model-level replay and fork-aware route coordination, but this browser scene does not consume a Physics checkpoint or reconstruct a physical world.</p>
+    </section>
+
+    <section class="replay-workbench" aria-label="Interactive timeline demonstration">
+        <div class="scene-topline">
+            <div><span class="scene-label">SCENE / 001</span><h2>The passing signal</h2></div>
+            <div class="tick-readout"><span>SELECTED TICK</span><strong>@CurrentTick.ToString("000")</strong></div>
+        </div>
+
+        <div class="replay-scene" aria-label="@($"Illustrative scene at tick {CurrentTick}")">
+            <div class="scene-grid" aria-hidden="true"></div>
+            <div class="scene-orbit orbit-one" aria-hidden="true"></div>
+            <div class="scene-orbit orbit-two" aria-hidden="true"></div>
+            <div class="scene-star star-one" aria-hidden="true"></div>
+            <div class="scene-star star-two" aria-hidden="true"></div>
+            <div class="scene-star star-three" aria-hidden="true"></div>
+            <div class="scene-planet"></div>
+            <div class="scene-signal" style="@($"--signal-x:{SignalX}%;--signal-y:{SignalY}%;")">
+                <span class="signal-core"></span><span class="signal-trail"></span>
+            </div>
+            <div class="scene-caption">
+                <span>FIXTURE STATE</span>
+                <strong>@CurrentEvent.Title</strong>
+                <small>@CurrentEvent.Description</small>
+            </div>
+            <div class="scene-coordinates">X @SignalX.ToString("000") / Y @SignalY.ToString("000")</div>
+        </div>
+
+        <div class="timeline-panel">
+            <div class="timeline-head">
+                <span>HISTORY WINDOW</span>
+                <span>000 — 100 TICKS</span>
+            </div>
+            <div class="timeline-track-wrap">
+                <div class="timeline-track" aria-hidden="true"></div>
+                @foreach (var marker in Events)
+                {
+                    <button class="timeline-marker @(CurrentTick >= marker.Tick ? "reached" : "") @(CurrentEvent.Tick == marker.Tick ? "selected" : "")"
+                            style="@($"left:{marker.Tick}%;")"
+                            title="@($"{marker.Title}, tick {marker.Tick}")"
+                            aria-label="@($"Jump to {marker.Title}, tick {marker.Tick}")"
+                            @onclick="() => SetTick(marker.Tick)">
+                        <span></span>
+                    </button>
+                }
+                <input class="timeline-slider" type="range" min="0" max="100" step="1" value="@CurrentTick"
+                       aria-label="Scrub illustrative timeline" aria-valuetext="@($"Tick {CurrentTick}: {CurrentEvent.Title}")"
+                       @oninput="OnScrub" />
+            </div>
+            <div class="timeline-labels"><span>START · 000</span><span>HIGHLIGHT · 060</span><span>END · 100</span></div>
+            <div class="timeline-controls">
+                <button class="replay-control secondary" @onclick="StepBack" disabled="@(CurrentTick == 0)" aria-label="Previous tick">− 1 TICK</button>
+                <button class="replay-control primary" @onclick="TogglePlayback">@(_isPlaying ? "Ⅱ PAUSE" : "▶ PLAY")</button>
+                <button class="replay-control secondary" @onclick="StepForward" disabled="@(CurrentTick == 100)" aria-label="Next tick">+ 1 TICK</button>
+                <button class="replay-control secondary reset-control" @onclick="Reset">RESET</button>
+            </div>
+        </div>
+
+        <div class="event-ledger">
+            <div class="ledger-heading"><span>EVENT LEDGER</span><span>LOCAL FIXTURE / READ-ONLY</span></div>
+            @foreach (var item in Events)
+            {
+                <button class="event-row @(CurrentEvent.Tick == item.Tick ? "active" : "")"
+                        @onclick="() => SetTick(item.Tick)" aria-pressed="@(CurrentEvent.Tick == item.Tick)">
+                    <span class="event-tick">@item.Tick.ToString("000")</span>
+                    <span class="event-marker-dot"></span>
+                    <span class="event-copy"><strong>@item.Title</strong><small>@item.Description</small></span>
+                    <span class="event-action">JUMP ↗</span>
+                </button>
+            }
+        </div>
+    </section>
+
+    <section class="replay-capabilities" aria-label="Implementation status">
+        <article class="capability-card verified">
+            <span class="capability-index">01 / VERIFIED IN PHYSICS</span>
+            <h3>Model-level reconstruction</h3>
+            <p>Single-segment replay, fork-aware route coordination, and a focused test using the repository's actual ConstantAccelerationSolver.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.Physics/tree/development/Physics/Universe" target="_blank" rel="noopener noreferrer">INSPECT PHYSICS ↗</a>
+        </article>
+        <article class="capability-card pending">
+            <span class="capability-index">02 / NOT YET INTEGRATED</span>
+            <h3>Browser world adapter</h3>
+            <p>This page does not yet load real solver checkpoints, physics-world snapshots, or portable scene history.</p>
+            <span class="capability-unavailable">UNAVAILABLE IN THIS PROTOTYPE</span>
+        </article>
+        <article class="capability-card planned">
+            <span class="capability-index">03 / PLANNED</span>
+            <h3>Share and remix</h3>
+            <p>Portable moments, share links, hosted playback, and branch/remix workflows need real end-to-end contracts first.</p>
+            <span class="capability-unavailable">NOT IMPLEMENTED</span>
+        </article>
+    </section>
+    <footer class="replay-footer">A visible experiment, not a claim of completed physics playback. No data is uploaded or shared by this page.</footer>
+</main>
+
+@code {
+    private sealed record TimelineEvent(int Tick, string Title, string Description);
+    private static readonly TimelineEvent[] Events =
+    [
+        new(0, "Signal enters", "A marker appears at the edge of the observation window."),
+        new(24, "Course change", "The illustrative path bends toward the orbital field."),
+        new(60, "Moment highlighted", "The selected instant is called out for closer inspection."),
+        new(82, "Signal passes", "The marker continues beyond the highlighted moment."),
+        new(100, "Window ends", "The local sample reaches its final tick.")
+    ];
+
+    private int CurrentTick { get; set; } = 60;
+    private bool _isPlaying;
+    private CancellationTokenSource? _playbackCancellation;
+
+    private TimelineEvent CurrentEvent => Events.LastOrDefault(item => item.Tick <= CurrentTick) ?? Events[0];
+    private int SignalX => 10 + (int)(CurrentTick * .78);
+    private int SignalY => 48 - (int)(Math.Sin(CurrentTick / 100d * Math.PI * 2) * 24);
+
+    private void OnScrub(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var tick))
+            SetTick(tick);
+    }
+
+    private void SetTick(int tick)
+    {
+        CurrentTick = Math.Clamp(tick, 0, 100);
+        if (CurrentTick >= 100)
+            StopPlayback();
+    }
+
+    private void StepBack() => SetTick(CurrentTick - 1);
+    private void StepForward() => SetTick(CurrentTick + 1);
+    private void Reset()
+    {
+        StopPlayback();
+        CurrentTick = 0;
+    }
+
+    private async Task TogglePlayback()
+    {
+        if (_isPlaying)
+        {
+            StopPlayback();
+            return;
+        }
+
+        if (CurrentTick >= 100)
+            CurrentTick = 0;
+
+        _isPlaying = true;
+        _playbackCancellation = new CancellationTokenSource();
+        var token = _playbackCancellation.Token;
+        try
+        {
+            while (!token.IsCancellationRequested && CurrentTick < 100)
+            {
+                await Task.Delay(100, token);
+                if (token.IsCancellationRequested)
+                    break;
+                CurrentTick++;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when the visitor pauses or leaves the page.
+        }
+        finally
+        {
+            _isPlaying = false;
+            _playbackCancellation?.Dispose();
+            _playbackCancellation = null;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void StopPlayback()
+    {
+        _playbackCancellation?.Cancel();
+        _isPlaying = false;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        StopPlayback();
+        _playbackCancellation?.Dispose();
+        _playbackCancellation = null;
+        return ValueTask.CompletedTask;
+    }
+}
+
+<style>
+.replay-lab{min-height:100vh;box-sizing:border-box;padding:clamp(1rem,4vw,3.5rem);background:radial-gradient(ellipse at 80% 5%,rgba(0,168,255,.1),transparent 30%),#020711;color:#eafaff;font-family:system-ui,sans-serif}
+.replay-back{display:inline-block;color:#7c9ca9;text-decoration:none;font:700 .68rem Consolas,monospace;letter-spacing:.12em}.replay-back:hover,.replay-back:focus-visible{color:#00eaff}
+.replay-header{max-width:1180px;margin:2rem auto 1.5rem;display:flex;justify-content:space-between;align-items:end;gap:1.5rem;flex-wrap:wrap}
+.replay-kicker{color:#00eaff;font:700 .68rem Consolas,monospace;letter-spacing:.19em}
+.replay-header h1{font-size:clamp(3rem,8vw,6.8rem);line-height:.9;letter-spacing:-.06em;margin:.8rem 0}.replay-header h1 span{color:#ff2cff}
+.replay-lede{max-width:66ch;color:#a6bec9;line-height:1.7}
+.replay-state{display:flex;align-items:center;gap:.6rem;border:1px solid rgba(255,177,92,.45);padding:.8rem 1rem;color:#ffcb88;font:700 .65rem Consolas,monospace;letter-spacing:.08em}
+.status-dot{width:.5rem;height:.5rem;border-radius:50%;background:#ffb15c;box-shadow:0 0 12px #ffb15c}
+.replay-disclaimer{max-width:1180px;margin:0 auto 1.5rem;padding:1rem 1.2rem;border-left:3px solid #ffb15c;background:rgba(255,177,92,.06)}.replay-disclaimer strong{color:#ffcb88;font:800 .72rem Consolas,monospace;letter-spacing:.06em}.replay-disclaimer p{margin:.5rem 0 0;color:#a8bbc5;font-size:.88rem;line-height:1.65;max-width:110ch}
+.replay-workbench{max-width:1180px;margin:auto;border:1px solid rgba(0,234,255,.2);background:rgba(4,13,27,.9);box-shadow:0 25px 90px rgba(0,0,0,.25)}
+.scene-topline{padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(0,234,255,.13)}.scene-label,.tick-readout span,.timeline-head,.timeline-labels,.ledger-heading,.event-tick,.event-action,.capability-index{font:700 .63rem Consolas,monospace;letter-spacing:.12em;color:#6e909f}.scene-topline h2{font-size:1.25rem;margin:.35rem 0 0}.tick-readout{text-align:right}.tick-readout strong{display:block;margin-top:.3rem;color:#00eaff;font:700 1.8rem Consolas,monospace}
+.replay-scene{position:relative;min-height:clamp(270px,40vw,430px);overflow:hidden;background:radial-gradient(ellipse at 50% 55%,rgba(0,168,255,.14),transparent 35%),linear-gradient(160deg,#06152a,#020711 70%);isolation:isolate}
+.scene-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,234,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,234,255,.06) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent)}
+.scene-orbit{position:absolute;left:50%;top:52%;border:1px solid rgba(0,234,255,.18);border-radius:50%;transform:translate(-50%,-50%) rotate(-18deg)}.orbit-one{width:min(68vw,650px);height:min(23vw,220px)}.orbit-two{width:min(48vw,460px);height:min(16vw,150px);border-color:rgba(255,44,255,.22);transform:translate(-50%,-50%) rotate(22deg)}
+.scene-planet{position:absolute;left:50%;top:52%;width:clamp(60px,10vw,115px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 32% 28%,#92f5ff 0,#1787b9 16%,#06385c 47%,#020711 75%);box-shadow:0 0 35px rgba(0,168,255,.35),inset -12px -8px 18px rgba(0,0,0,.7)}
+.scene-signal{position:absolute;left:var(--signal-x);top:var(--signal-y);width:1rem;height:1rem;transform:translate(-50%,-50%);transition:left .12s linear,top .12s linear;z-index:2}.signal-core{position:absolute;inset:0;border-radius:50%;background:#fff;box-shadow:0 0 10px #fff,0 0 22px #00eaff,0 0 38px #00eaff}.signal-trail{position:absolute;width:3.8rem;height:1px;right:.6rem;top:50%;transform:rotate(-12deg);transform-origin:right;background:linear-gradient(90deg,transparent,#00eaff)}
+.scene-star{position:absolute;width:3px;height:3px;border-radius:50%;background:#a5f5ff;box-shadow:0 0 10px #00eaff}.star-one{left:18%;top:22%}.star-two{right:22%;top:25%;background:#ffb8ff;box-shadow:0 0 10px #ff2cff}.star-three{right:15%;bottom:24%}
+.scene-caption{position:absolute;left:1.2rem;bottom:1.2rem;display:grid;gap:.35rem;max-width:min(60%,360px);padding:.85rem 1rem;border-left:2px solid #ff2cff;background:rgba(2,7,17,.78);backdrop-filter:blur(8px)}.scene-caption span,.scene-coordinates{font:700 .6rem Consolas,monospace;letter-spacing:.12em;color:#7898a8}.scene-caption strong{font-size:.9rem}.scene-caption small{color:#9db3be;line-height:1.5}.scene-coordinates{position:absolute;right:1rem;bottom:1.2rem}
+.timeline-panel{padding:1.3rem 1.5rem 1.5rem;border-top:1px solid rgba(0,234,255,.14)}.timeline-head,.ledger-heading{display:flex;justify-content:space-between;gap:1rem}
+.timeline-track-wrap{position:relative;height:34px;margin:1.1rem 0 .4rem;display:flex;align-items:center}.timeline-track{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,#00a8ff,#ff2cff 60%,rgba(255,255,255,.12));opacity:.7}
+.timeline-slider{position:relative;z-index:2;width:100%;margin:0;background:transparent;accent-color:#00eaff;cursor:ew-resize}.timeline-slider:focus-visible{outline:2px solid #fff;outline-offset:6px}
+.timeline-marker{position:absolute;z-index:1;top:50%;width:18px;height:24px;transform:translate(-50%,-50%);display:grid;place-items:center;border:0;background:transparent;cursor:pointer}.timeline-marker span{width:6px;height:6px;border-radius:50%;background:#8298a6;box-shadow:0 0 0 3px #071422}.timeline-marker.reached span{background:#00eaff}.timeline-marker.selected span{width:10px;height:10px;background:#ff2cff;box-shadow:0 0 0 4px rgba(255,44,255,.15),0 0 15px #ff2cff}
+.timeline-labels{display:flex;justify-content:space-between;gap:.5rem;font-size:.57rem}.timeline-controls{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.25rem}
+.replay-control{min-height:42px;padding:.7rem 1rem;border:1px solid rgba(0,234,255,.3);background:transparent;color:#eafaff;font:700 .67rem Consolas,monospace;letter-spacing:.06em;cursor:pointer}.replay-control:hover:not(:disabled),.replay-control:focus-visible{border-color:#ff2cff;outline-color:#ff2cff}.replay-control:disabled{opacity:.3;cursor:not-allowed}.replay-control.primary{background:#00eaff;border-color:#00eaff;color:#020711}.reset-control{margin-left:auto}
+.event-ledger{border-top:1px solid rgba(0,234,255,.14);padding:1.3rem 1.5rem}.ledger-heading{margin-bottom:.6rem}.event-row{width:100%;display:grid;grid-template-columns:3rem 1rem minmax(0,1fr) auto;align-items:center;gap:.8rem;text-align:left;padding:.9rem .65rem;border:0;border-bottom:1px solid rgba(0,234,255,.09);background:transparent;color:#eafaff;cursor:pointer}.event-row:hover,.event-row:focus-visible,.event-row.active{background:rgba(0,234,255,.045);outline-color:#00eaff}.event-row.active{border-left:2px solid #ff2cff}.event-tick{color:#00eaff}.event-marker-dot{width:.5rem;height:.5rem;border:1px solid #5b8798;border-radius:50%}.event-row.active .event-marker-dot{background:#ff2cff;border-color:#ff2cff;box-shadow:0 0 10px #ff2cff}.event-copy{display:grid;gap:.25rem}.event-copy strong{font-size:.85rem}.event-copy small{color:#8fa9b6;font-size:.78rem;line-height:1.4}.event-action{font-size:.55rem}
+.replay-capabilities{max-width:1180px;margin:1.5rem auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:rgba(0,234,255,.16);border:1px solid rgba(0,234,255,.16)}.capability-card{background:#040d1b;padding:1.2rem}.capability-index{font-size:.58rem}.capability-card h3{font-size:1rem;margin:1rem 0 .5rem}.capability-card p{min-height:5rem;color:#9eb4bf;font-size:.82rem;line-height:1.65}.capability-card a,.capability-unavailable{display:inline-block;margin-top:.5rem;color:#00eaff;text-decoration:none;font:700 .6rem Consolas,monospace;letter-spacing:.06em}.capability-card.pending .capability-index{color:#ffcb88}.capability-card.planned .capability-index{color:#dba6ff}.capability-unavailable{color:#8399a4}
+.replay-footer{max-width:1180px;margin:1.3rem auto 0;color:#637f8c;font-size:.72rem;line-height:1.6}
+@@media(max-width:720px){.replay-header{margin-top:1.5rem}.replay-scene{min-height:300px}.scene-caption{max-width:72%;left:.7rem;bottom:.7rem}.scene-coordinates{right:.7rem;bottom:.7rem;font-size:.5rem}.timeline-panel,.event-ledger{padding:1rem}.replay-capabilities{grid-template-columns:1fr}.capability-card p{min-height:0}.event-row{grid-template-columns:2.5rem .7rem minmax(0,1fr)}.event-action{display:none}.timeline-labels{font-size:.49rem}}
+@@media(prefers-reduced-motion:reduce){.scene-signal{transition:none}.replay-control{scroll-behavior:auto}}
+</style>
