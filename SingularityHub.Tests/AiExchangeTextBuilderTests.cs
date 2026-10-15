@@ -28,6 +28,16 @@ public sealed class AiExchangeTextBuilderTests
     }
 
     [Fact]
+    public void BuildUsesExplicitFallbacksForBlankDescriptions()
+    {
+        var exchange = AiExchangeTextBuilder.Build("   ", string.Empty, null);
+
+        Assert.Contains("Protocol vocabulary is not composed.", exchange);
+        Assert.Contains("Grammar definition is not composed.", exchange);
+        Assert.DoesNotContain("PROTOCOL" + Environment.NewLine + Environment.NewLine + "   ", exchange);
+    }
+
+    [Fact]
     public void BuildTrimsAndIncludesOptionalHostContext()
     {
         var exchange = AiExchangeTextBuilder.Build("protocol", "grammar", "  task payload  ");
