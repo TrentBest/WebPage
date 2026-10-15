@@ -25,7 +25,7 @@ A shared venue identity and scheduling capability can host event kinds from diff
 
 The neutral scheduler should own only common scheduling facts: event identity, venue identity, provider identity, time interval, and lifecycle. It should not hard-code goals, songs, stall sales, or other event-specific outcomes.
 
-See the canonical [Singularity Arena reference fixture](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain/blob/work/soccer-domain-microbundle/docs/SINGULARITY_ARENA_PERFORMANCE.md) and [Experiences Beyond the Arena](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain/blob/work/soccer-domain-microbundle/docs/EXPERIENCES_AND_OPTIONAL_ECONOMY.md). The linked branch is a review proposal, not a merged release.
+See the [Singularity Arena reference fixture](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain/blob/work/soccer-domain-microbundle/docs/SINGULARITY_ARENA_PERFORMANCE.md), [Experiences Beyond the Arena](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain/blob/work/soccer-domain-microbundle/docs/EXPERIENCES_AND_OPTIONAL_ECONOMY.md), and Economy's [game store patterns](https://github.com/TrentBest/TheSingularityWorkshop.Economy/blob/forge/economy-game-store-patterns/docs/GAME_STORE_PATTERNS.md). These are review-branch documents, not merged releases.
 
 ## Economy is optional
 
