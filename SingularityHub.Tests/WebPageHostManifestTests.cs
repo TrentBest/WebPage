@@ -61,7 +61,7 @@ public sealed class WebPageHostManifestTests
     }
 
     [Fact]
-    public void PublicHostAssetsExposeOnlyTheThreeManifestDrivenWorkshopDestinationsAndClientRoutes()
+    public void PublicHostAssetsExposeManifestDrivenWorkshopDestinationsAndClientRoutes()
     {
         var repositoryRoot = Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory, "..", "..", "..", ".."));
