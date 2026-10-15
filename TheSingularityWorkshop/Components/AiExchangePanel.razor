@@ -70,10 +70,10 @@
                             .Attribute("id", "ai-llm-response")
                             .Attribute("rows", 8)
                             .Attribute("placeholder", "Use Paste from Clipboard to stage the response here...")
-                            .Attribute("value", _responsePreview)
                             .Attribute("readonly", true)
                             .Attribute("aria-label", "Imported LLM response preview")
-                            .Class("ai-response-preview")))
+                            .Class("ai-response-preview")
+                            .Text(_responsePreview)))
             .Paragraph($"STATUS // {_status}")
             .Build();
     }
