@@ -28,6 +28,21 @@
         <div class="telemetry-card"><span>MONIKER</span><strong>@(FSM.Context.MonikerReady ? "REVEALED" : "WAITING")</strong><small>@FSM.MonikerPresentationDuration.TotalSeconds.ToString("0.##")s presentation</small></div>
     </section>
 
+    <section class="integration-shortcuts" aria-label="Workshop movement and rendering laboratories">
+        <a class="integration-shortcut" href="/movement-lab">
+            <span class="shortcut-index">LAB 01</span>
+            <strong>Movement Lab</strong>
+            <span>Inspect the authored hurdle-course geometry fixture and its evidence boundary.</span>
+            <span class="shortcut-action">OPEN FIELD BAY ↗</span>
+        </a>
+        <a class="integration-shortcut" href="/gestures-renderer">
+            <span class="shortcut-index">LAB 02</span>
+            <strong>Gestures × Renderer</strong>
+            <span>Follow the CPU pose-to-presentation architecture and see which integration seams remain pending.</span>
+            <span class="shortcut-action">INSPECT INTEGRATION ↗</span>
+        </a>
+    </section>
+
     <section class="control-grid">
         <div class="control-panel">
             <div class="eyebrow">LIVE PRESENTATION PROFILE</div>
@@ -116,6 +131,14 @@ button{font:inherit;cursor:pointer;padding:.75rem 1rem;border:1px solid rgba(0,2
 .flow span{font-size:.72rem;letter-spacing:.08em}.flow i{opacity:.4}
 dl{display:grid;grid-template-columns:1fr auto;gap:.65rem;font-size:.8rem}
 dt{opacity:.55}dd{margin:0}
+.integration-shortcuts{max-width:1200px;margin:0 auto 2rem;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.integration-shortcut{display:flex;flex-direction:column;align-items:flex-start;gap:.7rem;min-width:0;padding:1.25rem;border:1px solid rgba(0,234,255,.22);background:linear-gradient(135deg,rgba(0,168,255,.07),rgba(5,12,24,.9));color:#eefcff;text-decoration:none}
+.integration-shortcut:hover{border-color:rgba(0,234,255,.7);background:rgba(0,234,255,.07)}
+.integration-shortcut:focus-visible{outline:2px solid #ffd34d;outline-offset:4px}
+.shortcut-index,.shortcut-action{font-size:.65rem;letter-spacing:.14em;color:#00eaff}
+.integration-shortcut strong{font-size:1.1rem}
+.integration-shortcut>span:not(.shortcut-index):not(.shortcut-action){font-family:system-ui,sans-serif;color:#a9c2ce;line-height:1.6;font-size:.85rem}
+.shortcut-action{margin-top:.25rem}
 @@media(max-width:850px){.hub-header,.control-grid{grid-template-columns:1fr;display:grid}.telemetry{grid-template-columns:repeat(2,1fr)}.hub-shell{padding:1rem}}
 </style>
 
