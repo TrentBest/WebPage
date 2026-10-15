@@ -15,8 +15,13 @@
     <p class="ai-kicker" style="text-align:center">LIVE EXCHANGE // FSM_COS ASSEMBLES · GUI MANIFESTS · HOST TRANSPORTS</p>
 
     <section aria-label="Live AI exchange">
-        <AiExchangePanel />
+        <AiExchangePanel OnResponseImported="StageAiResponse" />
     </section>
+
+    @if (_hasStagedAiResponse)
+    {
+        <p class="ai-kicker" role="status">@_aiProposalStatus</p>
+    }
 
     <section class="ai-pipeline" aria-label="Workshop AI architecture">
         <article class="ai-card protocol">
@@ -110,6 +115,21 @@
         <span>APP AI // EMERGING CONSTRUCT</span>
     </footer>
 </div>
+
+@code {
+    private string? _pendingAiResponse;
+    private string _aiProposalStatus = string.Empty;
+    private bool _hasStagedAiResponse => !string.IsNullOrWhiteSpace(_pendingAiResponse);
+
+    // First safe inbound seam: retain the proposal for future ProtocolAi/GrammarAi
+    // validation. It deliberately does not actuate intent.
+    private Task StageAiResponse(string response)
+    {
+        _pendingAiResponse = response.Trim();
+        _aiProposalStatus = "LLM RESPONSE STAGED — VALIDATION AND ACTUATION ARE NOT IMPLEMENTED";
+        return Task.CompletedTask;
+    }
+}
 
 <style>
     .ai-workshop {
