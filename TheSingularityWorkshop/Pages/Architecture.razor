@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using System.Text.Json
+@using System.Text.Json.Serialization
 @using TheSingularityWorkshop.Workshop.Architecture
 
 <PageTitle>Singularity Architecture // The Workshop</PageTitle>
@@ -218,6 +219,11 @@
     private BuildingPlan? ProposedPlan;
     private string? ProposalMessage;
 
+    private static readonly JsonSerializerOptions ArchitectureContextJsonOptions = new()
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
+
     private string ArchitectureContext => JsonSerializer.Serialize(new
     {
         task = "Act as the Architect for The Singularity Workshop. Propose a complete revised building plan, but do not claim code compliance.",
@@ -248,7 +254,7 @@
             "All geometry must fit within plan extents and every opening must refer to a wall.",
             "The host validates this response and requires explicit user acceptance."
         }
-    });
+    }, ArchitectureContextJsonOptions);
 
     private PlanRoom? SelectedRoom => Plan.Rooms.FirstOrDefault(x => x.Id == SelectedRoomId);
 
