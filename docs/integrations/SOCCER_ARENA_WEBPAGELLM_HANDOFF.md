@@ -10,6 +10,12 @@ Singularity City should feel inhabited. The soccer arena is one public, legible 
 
 The goal is not a decorative sports screen or a set of unrelated player animations. The visible match should be driven by domain state and confirmed outcomes.
 
+### Digitens are active arena participants
+
+Digitens who arrive at the stadium to watch are not static background props. The arena supplies a spectator-gesture vocabulary that they can participate in: arriving and navigating to a stand, moving through aisles and finding a place, sitting in the bleachers, standing to get a better view where appropriate, turning attention toward the live play, reacting to near chances, cheering when meaningful events occur, and celebrating especially when a goal is authoritatively awarded. Their activity should be varied and individually situated, not a single crowd animation played by everyone at once.
+
+The arena/venue provides the available gestures and environmental constraints; each Digiten's own state and context determine which gesture is appropriate and when. A Digiten can be arriving, finding a seat, seated and watching, moving temporarily, reacting, cheering, or settling again. Crowd reactions should be event-driven and staggered across people and sections. A shot attempt can prompt attention or anticipation; a save, miss, or confirmed goal should produce distinct responses. The score and goal celebration still follow match authority, not spectator animation. This handoff describes desired behavior, not a claim that spectator locomotion, seating, or crowd simulation is already implemented.
+
 ## Source work currently available for review
 
 The soccer domain work is staged on a review branch, not yet merged or published:
@@ -42,11 +48,15 @@ A completed pose is not proof of a pass, possession, foul, offside, or goal. Web
 4. **A readable first attack:** show carrier, support player, defenders, ball, attack direction, clock and score. Make off-ball intent legible; support players should create options instead of all chasing the ball.
 5. **Honest status labeling:** distinguish designed, scripted fixture, integrated, and simulated behavior.
 6. **A crowd/venue reaction plan:** crowd intensity, camera changes, celebration, scoreboard changes, and restart staging should follow confirmed match outcomes. A goal celebration follows a confirmed goal, not a shot animation.
+7. **A participant gesture plan:** Digitens who come to watch should use arena-provided gestures to enter, navigate stands, sit in bleachers, watch the match, and react. Design individual variation and section-level waves rather than synchronized crowd puppetry. Gesture availability comes from the arena; individual timing comes from each Digiten's context; reactions to match events are triggered by authoritative outcomes.
 
 ## First experience acceptance checks
 
 - A visitor can identify the two teams, goals, ball, attacking direction, score, and match phase.
 - At least one support player has an independent objective away from the ball carrier.
+- Digitens can be represented as active spectators with distinct arrival, seating, watching, and reaction states; crowd reactions vary across individuals and follow confirmed match events.
+- A goal produces a stronger, clearly event-linked cheer and celebration than a routine pass, while misses and saves have distinct reactions.
+- Spectator gestures do not change match state or manufacture a scoring outcome.
 - Defenders respond to the attack rather than merely following a canned animation.
 - The score only changes after the authoritative match result says a goal was awarded.
 - An attempted pass/shot is distinguishable from a completed pass or confirmed goal.
@@ -60,7 +70,8 @@ A completed pose is not proof of a pass, possession, foul, offside, or goal. Web
 3. Agree on a host-facing snapshot/event contract before binding UI to invented types.
 4. Replace scripted outcomes with authoritative simulation outcomes as the match engine becomes available.
 5. Connect Gestures and a real rig adapter only after the host contract is agreed.
-6. Add crowd, camera, scoreboard and restart reactions driven by confirmed match state.
-7. Validate the full path in the browser before describing it as a live match.
+6. Add spectator gesture participation and crowd reactions, with individual/section variation driven by confirmed match state.
+7. Add camera, scoreboard and restart reactions driven by confirmed match state.
+8. Validate the full path in the browser before describing it as a live match.
 
 This brief is a handoff, not authorization to publish or deploy. Keep the WebPage branch separate from the MicroBundleDomain review branch until the integration contract is agreed.
