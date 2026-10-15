@@ -1,6 +1,7 @@
 @page "/architecture"
 @using TheSingularityWorkshop.Workshop.MicroBundles
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
 
 <PageTitle>Singularity Architecture // The Workshop</PageTitle>
 
@@ -26,7 +27,7 @@
                     <rect x="0" y="0" width="840" height="650" fill="url(#planGrid)" />
                     @foreach (var room in Plan.Rooms)
                     {
-                        <g class="plan-room @(SelectedRoom?.Id == room.Id ? "selected" : "")" role="button" tabindex="0" aria-label="@($"Select {room.Name}")" @onclick="() => SelectRoom(room.Id)" @onkeydown="(e) => { if (e.Key == "Enter" || e.Key == " ") SelectRoom(room.Id); }">
+                        <g class="plan-room @(SelectedRoom?.Id == room.Id ? "selected" : "")" role="button" tabindex="0" aria-label="@($"Select {room.Name}")" @onclick="() => SelectRoom(room.Id)" @onkeydown="(e) => SelectRoomOnKey(e, room.Id)">
                             <rect x="@Px(room.X)" y="@Py(room.Y)" width="@Px(room.Width)" height="@Px(room.Height)" rx="3" />
                             <text x="@(Px(room.X) + Px(room.Width) / 2)" y="@(Py(room.Y) + Px(room.Height) / 2 - 4)" text-anchor="middle">@room.Name</text>
                             <text class="room-dimensions" x="@(Px(room.X) + Px(room.Width) / 2)" y="@(Py(room.Y) + Px(room.Height) / 2 + 17)" text-anchor="middle">@($"{room.Width:0.0} × {room.Height:0.0} m")</text>
@@ -52,19 +53,26 @@
                         <g class="opening-symbol" aria-label="@($"{opening.Kind}: {opening.Id}")">
                             @if (opening.Kind == PlanOpeningKind.HingedDoor)
                             {
-                                <line class="door-leaf" x1="@Px(symbol.HingeX)" y1="@Py(symbol.HingeY)" x2="@Px(symbol.LeafX)" y2="@Py(symbol.LeafY)" />
-                                <path class="door-swing" d="@symbol.ArcPath" />
+                                @if (opening.OpenFraction > 0)
+                                {
+                                    <line class="door-leaf" x1="@Px(symbol.HingeX)" y1="@Py(symbol.HingeY)" x2="@Px(symbol.LeafX)" y2="@Py(symbol.LeafY)" />
+                                    <path class="door-swing" d="@symbol.ArcPath" />
+                                }
+                                else
+                                {
+                                    <line class="door-leaf" x1="@Px(symbol.X1)" y1="@Py(symbol.Y1)" x2="@Px(symbol.X2)" y2="@Py(symbol.Y2)" />
+                                }
                             }
                             else if (opening.Kind == PlanOpeningKind.SlidingDoor)
                             {
                                 <line class="sliding-track" x1="@Px(symbol.X1)" y1="@Py(symbol.Y1)" x2="@Px(symbol.X2)" y2="@Py(symbol.Y2)" />
-                                <line class="sliding-panel" x1="@Px(symbol.HingeX)" y1="@Py(symbol.HingeY)" x2="@Px(symbol.LeafX)" y2="@Py(symbol.LeafY)" />
-                                <path class="motion-arrow" d="@symbol.ArrowPath" />
+                                <line class="sliding-panel" x1="@Px(opening.OpenFraction > 0 ? symbol.HingeX : symbol.X1)" y1="@Py(opening.OpenFraction > 0 ? symbol.HingeY : symbol.Y1)" x2="@Px(opening.OpenFraction > 0 ? symbol.LeafX : symbol.X2)" y2="@Py(opening.OpenFraction > 0 ? symbol.LeafY : symbol.Y2)" />
+                                @if (opening.OpenFraction > 0) { <path class="motion-arrow" d="@symbol.ArrowPath" /> }
                             }
                             else if (opening.Kind == PlanOpeningKind.PocketDoor)
                             {
                                 <line class="pocket-track" x1="@Px(symbol.X1)" y1="@Py(symbol.Y1)" x2="@Px(symbol.X2)" y2="@Py(symbol.Y2)" />
-                                <line class="pocket-panel" x1="@Px(symbol.HingeX)" y1="@Py(symbol.HingeY)" x2="@Px(symbol.LeafX)" y2="@Py(symbol.LeafY)" />
+                                <line class="pocket-panel" x1="@Px(opening.OpenFraction > 0 ? symbol.HingeX : symbol.X1)" y1="@Py(opening.OpenFraction > 0 ? symbol.HingeY : symbol.Y1)" x2="@Px(opening.OpenFraction > 0 ? symbol.LeafX : symbol.X2)" y2="@Py(opening.OpenFraction > 0 ? symbol.LeafY : symbol.Y2)" />
                             }
                             else if (opening.Kind == PlanOpeningKind.RevolvingDoor)
                             {
@@ -181,6 +189,11 @@
 
     private static double Px(double value) => value * 60 + 40;
     private static double Py(double value) => value * 60 + 40;
+
+    private void SelectRoomOnKey(KeyboardEventArgs e, string id)
+    {
+        if (e.Key is "Enter" or " ") SelectRoom(id);
+    }
 
     private void SelectRoom(string id)
     {
