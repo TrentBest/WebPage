@@ -40,12 +40,15 @@ Add a small, lazy-loaded **Movement Lab** experience using the existing Workshop
 
 ### 1. Show a tiny authored hurdle course
 
-Use a small local fixture that mirrors the current data contract:
+Use the same three-element geometry as the current Gestures evaluator tests so the browser view and source-level fixture stay aligned:
 
-1. Approach / acceleration zone
-2. Hurdle
-3. Landing zone
-4. Continuation / finish
+| Element ID | Kind | Center (X, Y, Z) | Full size (X, Y, Z) |
+|---|---|---|---|
+| `approach` | ApproachZone | `(0, 0, 0)` | `(2, 1, 2)` |
+| `hurdle-01` | Hurdle | `(3, 0.5, 0)` | `(0.2, 1, 2)` |
+| `landing` | LandingZone | `(5, 0, 0)` | `(2, 0.2, 2)` |
+
+All values use the fixture's `meters` label; bounds are axis-aligned and size means full extent, not half extent. This is deliberately a small geometry/evaluation fixture, not a full 110-metre track.
 
 Show a simple top-down and/or side-on diagram, ordered element list, stable IDs, center, full extents, and units. Distinguish the hurdle from traversal regions visually. Let a visitor select an element and inspect its geometry.
 
