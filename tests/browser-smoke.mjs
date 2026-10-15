@@ -99,6 +99,27 @@ try {
   await page.keyboard.press("Enter");
   await page.getByText("(3, 0.5, 0)", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
   await page.getByText("(0.2, 1, 2)", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  const schematic = await page.locator(".course-svg").evaluate(svg => ({
+    viewBox: svg.getAttribute("viewBox"),
+    approach: ["x", "y", "width", "height"].map(name => svg.querySelector(".approach-zone").getAttribute(name)),
+    hurdle: ["x", "y", "width", "height"].map(name => svg.querySelector(".hurdle-zone").getAttribute(name)),
+    landing: ["x", "y", "width", "height"].map(name => svg.querySelector(".landing-zone").getAttribute(name)),
+    description: svg.querySelector("#course-desc")?.textContent ?? ""
+  }));
+  const expectedSchematic = {
+    viewBox: "0 0 760 300",
+    approach: ["100", "175", "180", "90"],
+    hurdle: ["451", "130", "18", "90"],
+    landing: ["550", "211", "180", "18"]
+  };
+  for (const key of Object.keys(expectedSchematic)) {
+    if (JSON.stringify(schematic[key]) !== JSON.stringify(expectedSchematic[key])) {
+      throw new Error(`Movement Lab schematic geometry changed unexpectedly for ${key}: ${JSON.stringify(schematic[key])}`);
+    }
+  }
+  if (!schematic.description.includes("same 90 SVG units per meter on both axes")) {
+    throw new Error("Movement Lab must disclose its shared schematic scale and authored-bound representation.");
+  }
 
   // Replay Lab uses the current development fixture: slider, event ledger, and transport.
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
