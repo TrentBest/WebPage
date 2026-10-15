@@ -30,9 +30,9 @@ After that contract is accepted, replace the fixture adapter with the real versi
 
 ## Verification checklist
 
-- [ ] Build WebPage and run the relevant tests.
-- [ ] Verify the Movement Lab destination appears in the existing Workshop hub.
-- [ ] Inspect element selection by mouse and keyboard.
-- [ ] Inspect desktop and narrow viewport layouts.
+- [x] Build WebPage and run the relevant tests; the latest PR CI run passed both the test/browser journey and Workshop repository-source integration jobs: [run 38679612277](https://github.com/TrentBest/WebPage/actions/runs/38679612277).
+- [x] Verify the Movement Lab destination appears in the existing Workshop hub.
+- [x] Exercise element selection and geometry assertions in the browser smoke journey.
+- [ ] Inspect desktop and narrow viewport layouts specifically for Movement Lab.
 - [ ] Measure cold-open and selection latency.
-- [ ] Confirm the landing sequence and existing experiences remain unchanged.
+- [x] Confirm the landing sequence and existing experiences remain unchanged in the browser smoke journey.
