@@ -13,7 +13,7 @@
         <div class="architecture-kicker">SINGULARITY ARCHITECTURE / VBIMB</div>
         <h1>Build places people can inhabit.</h1>
         <p>Design a building as structured world data—not just a picture. The same building can become a plan, a place to walk through, and eventually a reusable asset in other experiences.</p>
-        <div class="architecture-status"><span></span> PLAN MODEL ONLINE <i>·</i> AI AUTHORING CONNECTOR IN DEVELOPMENT</div>
+        <div class="architecture-status"><span></span> PLAN MODEL ONLINE <i>·</i> CLIPBOARD TERMINAL AVAILABLE</div>
     </header>
 
     <main class="architecture-workspace">
@@ -142,7 +142,7 @@
             <section class="panel brief-panel">
                 <div class="panel-heading"><span>03 / ARCHITECTURE BRIEF</span><span>LLM-READY</span></div>
                 <div class="inspector-body">
-                    <p>Describe the place you want to create. The brief is captured here; a live GrammarAi / ProtocolAi authoring connection will be added as a reviewed proposal pipeline.</p>
+                    <p>Describe the place you want to create. The current plan and brief are included in the ProtocolAi terminal exchange below. Copy that exchange to your chosen LLM, then bring the response back for validation and review.</p>
                     <label for="building-brief">Your building idea</label>
                     <textarea id="building-brief" rows="4" @bind="BuildingBrief" placeholder="A narrow live-work townhouse around a quiet planted courtyard…"></textarea>
                     <label for="building-purpose">Primary purpose</label>
@@ -163,7 +163,7 @@
                             <p>@PreparedBrief</p>
                         </div>
                     }
-                    <p class="muted small">No generated design is claimed yet. The next step is to send this brief through an optional LLM adapter, validate proposed operations against the plan schema, and ask you to accept or revise them.</p>
+                    <p class="muted small">The clipboard round trip is user-controlled. Imported proposals are checked against the BuildingPlan schema, and the host asks you to apply or reject them. ProtocolAi symbol resolution and full GrammarAi validation remain future work.</p>
                 </div>
             </section>
 
