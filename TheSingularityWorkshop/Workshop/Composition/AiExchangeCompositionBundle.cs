@@ -68,7 +68,7 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.MicroBu
             .Child("button", "ai-copy-to-clipboard", child => child
                 .Text("Copy to Clipboard")
                 .Property("command", "ai.copy-to-clipboard"))
-            .Child("button", "ai-copy-from-clipboard", child => child
+            .Child("button", "ai-paste-from-clipboard", child => child
                 .Text("Copy from Clipboard")
                 .Property("command", "ai.paste-from-clipboard"))
             .Build();
