@@ -16,6 +16,8 @@ public sealed class BuildingPlanTests
         Assert.Contains(plan.Openings, x => x.Kind == PlanOpeningKind.HingedDoor);
         Assert.Contains(plan.Openings, x => x.Kind == PlanOpeningKind.SlidingDoor);
         Assert.Contains(plan.Openings, x => x.Kind == PlanOpeningKind.PocketDoor);
+        Assert.Contains(plan.Openings, x => x.Kind == PlanOpeningKind.RevolvingDoor);
+        Assert.Contains(plan.Openings, x => x.Kind == PlanOpeningKind.Window);
     }
 
     [Fact]
