@@ -45,12 +45,10 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.MicroBu
         ArgumentNullException.ThrowIfNull(context);
 
         Composition = BuildComposition(
-            "Protocol identity + grammar structure, ready for clipboard exchange.",
-            protocol: null,
-            grammar: null);
+            "Copy context to your chosen LLM, then bring its response back.");
     }
 
-    private static GuiNode BuildComposition(string description, string? protocol, string? grammar) =>
+    private static GuiNode BuildComposition(string description) =>
         GuiBuilder.Create("panel", "ai-exchange")
             .Property("composition", "AiExchange")
             .Child("text", "ai-title", child => child.Text("PROTOCOLAI TERMINAL"))
@@ -95,9 +93,7 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.MicroBu
             Grammar.Describe());
 
         Composition = BuildComposition(
-            "Copy the deterministic semantic exchange to an LLM, then paste the response back into the host.",
-            Protocol.Describe(),
-            Grammar.Describe());
+            "Copy context to your chosen LLM, then bring its response back.");
 
         return changed;
     }
