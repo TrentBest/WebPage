@@ -12,6 +12,12 @@ The Demonstrations gallery is a WebPage-hosted Experience, not a separate demo s
 
 None of these entries has a verified runnable destination inside WebPage, so the gallery deliberately does not show a **Run demonstration** button. A source link is not a run link. Build success is not evidence of a native GPU run, and the Event Horizon entry does not invent simulated performance measurements.
 
+## Candidate: Living Water World
+
+The Living Water World is a planned physics demonstration, not yet a runnable gallery entry. The Physics repository has a renderer-independent 1D wave reference and a 2D shallow-water solver on draft PRs; the 2D change is not yet merged to Physics `development`, and WebPage does not yet host or render it. See the [Living Water World integration brief](integrations/PHYSICS_LIVING_WATER_WORLD_HANDOFF.md) for verified status, integration gates, and acceptance checks.
+
+Do not add a **Run demonstration** action until WebPage advances the actual solver, visualizes its computed state, and passes adapter plus browser verification. In particular, do not use a decorative wave animation as a substitute for the Physics state.
+
 ## Runtime boundary
 
 Current path:
