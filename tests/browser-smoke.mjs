@@ -41,9 +41,9 @@ try {
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   const initialLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  const expectedLinks = ["Welcome", "Economy", "Digitens"];
+  const expectedLinks = ["Welcome", "Economy", "Digitens", "Singularity Architecture", "ProtocolAi Terminal"];
   if (initialLinks.length !== expectedLinks.length || expectedLinks.some((label, i) => initialLinks[i] !== label)) {
-    throw new Error(`The hub destinations must be Welcome, Economy, and Digitens; found: ${initialLinks.join(", ")}.`);
+    throw new Error(`The hub navigation must expose Welcome, Economy, Digitens, Singularity Architecture, and ProtocolAi Terminal; found: ${initialLinks.join(", ")}.`);
   }
 
   await page.getByRole("link", { name: "Welcome", exact: true }).click();
