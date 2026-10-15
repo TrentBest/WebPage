@@ -60,4 +60,52 @@ public sealed class SingularityCitySliceTests
         Assert.Contains("DISCONNECTED = REMOVE LIVE AVATAR", SingularityDigitenPresenceRules.PresenceContract);
         Assert.Contains("PERSISTED WORLD STATE = RETAIN DURABLE ROLES AND WORLD DATA", SingularityDigitenPresenceRules.PresenceContract);
     }
+
+    [Fact]
+    public void AerialTrafficHasStableUniqueVehiclesAndExplicitAltitudeLanes()
+    {
+        var manifest = SpatialAirTrafficManifest.CreateDefault();
+
+        Assert.Equal("singularity-air-traffic", manifest.Id);
+        Assert.Equal(4, manifest.Vehicles.Count);
+        Assert.Equal(
+            manifest.Vehicles.Count,
+            manifest.Vehicles.Select(vehicle => vehicle.Id).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.Contains(manifest.Vehicles, vehicle => vehicle.AltitudeBand == 1);
+        Assert.Contains(manifest.Vehicles, vehicle => vehicle.AltitudeBand == 2);
+        Assert.Contains(manifest.Vehicles, vehicle => vehicle.AltitudeBand == 3);
+        Assert.Equal("air-vehicle-001", manifest.FindVehicle("AIR-VEHICLE-001")?.Id);
+    }
+
+    [Fact]
+    public void AerialTrafficSnapshotsAreDeterministicAndAdvanceAlongDeclaredRoutes()
+    {
+        var manifest = SpatialAirTrafficManifest.CreateDefault();
+
+        var first = manifest.SnapshotAt(12);
+        var repeat = manifest.SnapshotAt(12);
+        var later = manifest.SnapshotAt(18);
+
+        Assert.Equal(first, repeat);
+        Assert.Equal(first.Count, later.Count);
+
+        var vehicleAtFirst = Assert.Single(first.Where(snapshot => snapshot.VehicleId == "air-vehicle-001"));
+        var vehicleLater = Assert.Single(later.Where(snapshot => snapshot.VehicleId == "air-vehicle-001"));
+
+        Assert.NotEqual(vehicleAtFirst.Position, vehicleLater.Position);
+        Assert.InRange(vehicleAtFirst.RouteProgress, 0, 1);
+        Assert.InRange(vehicleLater.RouteProgress, 0, 1);
+        Assert.Equal(1, vehicleAtFirst.AltitudeBand);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    public void AerialTrafficRejectsInvalidElapsedTime(double elapsedSeconds)
+    {
+        var manifest = SpatialAirTrafficManifest.CreateDefault();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => manifest.SnapshotAt(elapsedSeconds));
+    }
 }
