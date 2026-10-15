@@ -68,6 +68,15 @@
           "version": "0.1.0"
         }
       ]
+    },
+    {
+      "name": "ProtocolAi Terminal",
+      "microBundles": [
+        {
+          "bundleId": 4099,
+          "version": "0.1.0"
+        }
+      ]
     }
   ],
   "demonstrations": [
