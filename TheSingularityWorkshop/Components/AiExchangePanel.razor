@@ -22,6 +22,8 @@
     [Parameter] public EventCallback<string> OnResponseImported { get; set; }
 
     private string _status = "READY";
+    private bool _awaitingResponse;
+    private bool _hasContext => Exchange?.Protocol is not null && Exchange?.Grammar is not null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,32 +44,20 @@
             .Paragraph("Copy the semantic exchange into the LLM of your choice. Copy its response back to your clipboard, then import it here. This terminal does not call an LLM.")
             .Content(
                 WorkshopGui.Element(this, "div")
-                    .Class("ai-exchange-grid")
-                    .Child(BuildReadonlyBlock("Protocol", exchange?.Protocol?.Describe() ?? "Waiting for composition..."))
-                    .Child(BuildReadonlyBlock("Grammar", exchange?.Grammar?.Describe() ?? "Waiting for composition...")))
-            .Content(
-                WorkshopGui.Element(this, "textarea")
-                    .Attribute("id", "ai-llm-response")
-                    .Attribute("rows", 10)
-                    .Attribute("placeholder", "The imported clipboard response will appear here...")
-                    .Attribute("value", _responsePreview)
-                    .Attribute("readonly", true)
-                    .Attribute("aria-label", "Imported LLM response")
-                    .Style("width", "100%")
-                    .Style("box-sizing", "border-box"))
-            .Content(
-                WorkshopGui.Button(this)
-                    .Label("Copy to Clipboard")
-                    .OnClick(() => CopyToClipboardAsync(exchangeText)))
-            .Content(
-                WorkshopGui.Button(this)
-                    .Label("Paste from Clipboard")
-                    .OnClick(ImportFromClipboardAsync))
+                    .Class("ai-terminal-actions")
+                    .Child(
+                        WorkshopGui.Button(this)
+                            .Class(_hasContext ? "ai-terminal-button ai-breathing" : "ai-terminal-button")
+                            .Label("Copy to Clipboard")
+                            .OnClick(() => CopyToClipboardAsync(exchangeText)))
+                    .Child(
+                        WorkshopGui.Button(this)
+                            .Class(_awaitingResponse ? "ai-terminal-button ai-breathing" : "ai-terminal-button")
+                            .Label("Paste from Clipboard")
+                            .OnClick(ImportFromClipboardAsync)))
             .Paragraph($"STATUS // {_status}")
             .Build();
     }
-
-    private string _responsePreview = string.Empty;
 
     private string BuildExchangeText(AiExchangeCompositionBundle? exchange)
     {
@@ -92,30 +82,17 @@
         return string.Join(Environment.NewLine + Environment.NewLine, parts);
     }
 
-    private ElementBuilder BuildReadonlyBlock(string label, string value) =>
-        WorkshopGui.Element(this, "div")
-            .Style("display", "flex")
-            .Style("flex-direction", "column")
-            .Style("gap", ".35rem")
-            .Child(WorkshopGui.Element(this, "strong").Text(label))
-            .Child(
-                WorkshopGui.Element(this, "textarea")
-                    .Attribute("readonly", true)
-                    .Attribute("rows", 8)
-                    .Attribute("aria-label", label)
-                    .Style("width", "100%")
-                    .Style("box-sizing", "border-box")
-                    .Text(value));
-
     private async Task CopyToClipboardAsync(string exchangeText)
     {
         try
         {
             await JS.InvokeVoidAsync("navigator.clipboard.writeText", exchangeText);
-            _status = "EXCHANGE COPIED — PASTE INTO YOUR CHOSEN LLM";
+            _awaitingResponse = true;
+            _status = "CONTEXT COPIED — PASTE INTO YOUR CHOSEN LLM";
         }
         catch (JSException)
         {
+            _awaitingResponse = false;
             _status = "CLIPBOARD COPY FAILED — CHECK BROWSER PERMISSION";
         }
 
@@ -134,15 +111,15 @@
                 return;
             }
 
-            _responsePreview = response;
             if (OnResponseImported.HasDelegate)
             {
                 await OnResponseImported.InvokeAsync(response);
+                _awaitingResponse = false;
                 _status = "RESPONSE IMPORTED — HOST PROCESSOR NOTIFIED";
             }
             else
             {
-                _status = "RESPONSE IMPORTED — NO HOST PROCESSOR ATTACHED";
+                _status = "RESPONSE READ — NO HOST PROCESSOR ATTACHED; NO ACTUATION OCCURRED";
             }
         }
         catch (JSException)
@@ -153,3 +130,12 @@
         StateHasChanged();
     }
 }
+
+<style>
+    .ai-terminal-actions{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin:1rem 0}
+    .ai-terminal-button{min-height:3rem;padding:.8rem 1.2rem;border:1px solid rgba(0,234,255,.65);border-radius:.25rem;background:rgba(0,234,255,.07);color:#eafcff;font:700 .9rem Consolas,'Courier New',monospace;letter-spacing:.04em;cursor:pointer}
+    .ai-terminal-button:hover{border-color:#ff2cff;box-shadow:0 0 16px rgba(255,44,255,.22)}
+    .ai-terminal-button.ai-breathing{animation:aiTerminalBreathing 2.2s ease-in-out infinite}
+    @keyframes aiTerminalBreathing{0%,100%{box-shadow:0 0 0 rgba(0,234,255,0);border-color:rgba(0,234,255,.55)}50%{box-shadow:0 0 18px rgba(0,234,255,.28);border-color:rgba(0,234,255,1)}}
+    @media(prefers-reduced-motion:reduce){.ai-terminal-button.ai-breathing{animation:none;box-shadow:0 0 12px rgba(0,234,255,.2)}}
+</style>
