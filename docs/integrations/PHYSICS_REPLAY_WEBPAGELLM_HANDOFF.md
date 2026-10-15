@@ -67,9 +67,9 @@ Visual direction: preserve the Workshop's living, instrumented aesthetic. The ti
 - Show a capability/status panel distinguishing **implemented**, **in progress**, and **planned**. A button must either work, explain why it is unavailable, or be disabled; it must not pretend to save, restore, scrub, or share.
 - Keep all existing navigation and living-GUI behavior intact. The new experience must not make the page slower or eagerly load an expensive scene before the visitor opens it.
 
-### Next: connect only after the Physics side provides a tested executable seam
+### Next: connect after the Physics side provides a world-reconstruction adapter
 
-Physics should first deliver a small deterministic reconstruction example that starts from a checkpoint, applies ordered inputs/events, and produces verifiable state at a target tick. Then define a versioned moment contract and an adapter that WebPage can consume. Until that exists, use a fixture only for clearly labeled layout/design work.
+The model-level executor now provides a tested seam: it decodes a checkpoint into a caller-owned model, applies ordered events, and advances to a target tick within one validated segment. The next Physics milestone is a concrete world/solver adapter plus a deterministic reconstruction example whose resulting state can be independently verified. In parallel, define a versioned moment contract only after the payload and compatibility requirements are grounded in real code. Until a browser-consumable adapter exists, use a fixture only for clearly labeled layout/design work.
 
 A likely eventual separation is:
 
@@ -92,10 +92,10 @@ Do not assume that reversing time is implemented by running updates backward. Ge
 
 ## What WebPageLLM should do next
 
-1. Read this brief and the linked Physics design contract.
+1. Read this brief and the linked Physics design contract; inspect `TimelineReplayExecutor` and its tests to understand the actual model-level seam.
 2. Inspect the current WebPage navigation/hub and place the entry using the existing architecture.
 3. Implement the smallest truthful, lazy-loaded visual prototype—or only the navigation/empty state if no real fixture is appropriate.
-4. Do not make claims or UI affordances for real replay, sharing, hosting, or remix until those paths work.
+4. Keep the fixture visibly illustrative; do not make claims or UI affordances for physical replay, sharing, hosting, or remix until those paths work end to end.
 5. Report the exact files changed, how to launch the local browser experience, and what Trent should click/test. Leave release/deploy actions untouched.
 
 This is an integration handoff, not permission to publish or deploy. The goal is to bring the work into view early enough for human eyes and a real browser to validate it while the underlying reconstruction capability is built.
