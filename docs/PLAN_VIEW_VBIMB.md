@@ -33,10 +33,10 @@ The initial `SingularityOrganization` contract supports identity, industry, opti
 2. The user presses **Copy to Clipboard** and pastes the exchange into the LLM of their choice.
 3. The user copies the LLM's response.
 4. The user presses **Copy from Clipboard** in the Workshop terminal.
-5. The host processes the response using its own parser, ProtocolAi identities, applicable GrammarAi rules, plan validation, and a review step.
-6. Only an accepted, validated proposal can alter the working plan.
+5. The host parses the architecture response as a strict JSON proposal and validates its plan geometry through `BuildingPlan`.
+6. The user explicitly applies a validated proposal; import alone never changes the working plan.
 
-ProtocolAi defines deterministic application-owned meaning; it does not itself provide clipboard transport, contact a provider, or execute returned instructions. GrammarAi describes allowed structure; it is not a truth oracle or permission system. The terminal is the transport surface, and the host remains responsible for validation and authority.
+ProtocolAi defines deterministic application-owned meaning; it does not itself provide clipboard transport, contact a provider, or execute returned instructions. GrammarAi describes allowed structure; it is not a truth oracle or permission system. The terminal is the transport surface, and the host remains responsible for validation and authority. The current WebPage Architecture path includes the composed protocol and grammar descriptions in the copied context, then parses a returned JSON plan and applies the documented `BuildingPlan` checks. It does **not yet** resolve the incoming proposal through ProtocolAi symbols or validate it with a full GrammarAi rule engine; those semantic checks remain a next step.
 
 HeadlessAi can optionally support a role such as **Architect** when a user or deployment explicitly configures a provider endpoint. In that mode, HeadlessAi is an invocation path for a bounded role task—not a requirement for the building schema or the clipboard workflow. It must remain optional, and its output must enter the same proposal validation and review boundary. The role can help clarify requirements, explain trade-offs, or draft a plan proposal; it cannot silently approve its own work.
 
@@ -62,7 +62,7 @@ The plan view, aerial view, street/FPS view, and historical view must resolve th
 
 1. **Schema and example** — implemented as the renderer-neutral plan contract and compact apartment.
 2. **Plan canvas first pass** — implemented at `/architecture`: selectable room rectangles, dimension editing, fixtures, walls, and semantic opening symbols. Edits are local to the page session and room edits do not yet reshape associated walls.
-3. **Shared terminal contract** — the WebPage contains a ProtocolAi + GrammarAi composition and a clipboard terminal component. The terminal is being shaped into the two-button host exchange; task-specific response processing still needs to be connected to the architecture proposal validator.
+3. **Clipboard terminal + first proposal loop** — the WebPage exposes the two-button terminal in navigation and within Singularity Architecture. The architecture context includes the current plan and design brief; imported JSON is checked by the plan schema and requires an explicit Apply action. ProtocolAi symbol resolution and full GrammarAi validation are not yet connected.
 4. **Persistent editing** — coordinated room/wall edits, undo/redo, saved projects, and validation feedback.
 5. **Architect role** — first use the clipboard round trip; optionally add a HeadlessAi-backed role when explicitly configured. Both paths must feed the same validated proposal contract.
 6. **Digiten cards** — compact data cards linked to persistent Digiten IDs; selection opens a detailed inspector.
@@ -79,4 +79,4 @@ The plan view, aerial view, street/FPS view, and historical view must resolve th
 
 ## Current boundary
 
-The plan schema, example, first interactive plan studio, and generalized organization/project data contract are real code. The terminal component provides clipboard operations but is not yet connected to a strict architecture proposal parser. Persistence, coordinated room/wall editing, live employment simulation, interactive Digiten cards, city-wide multi-view projections, and an optional HeadlessAi Architect role remain future integration work. The plan bundle provider is a WebPage demonstration adapter, not yet a separately published MicroBundle package.
+The plan schema, example, interactive plan studio, generalized organization/project data contract, two-button clipboard terminal, and first strict-JSON proposal review loop are real code. Imported proposals are checked by the current BuildingPlan schema and require explicit application, but semantic ProtocolAi resolution and full GrammarAi validation are not yet connected. Persistence, coordinated room/wall editing, live employment simulation, interactive Digiten cards, city-wide multi-view projections, and an optional HeadlessAi Architect role remain future integration work. The plan bundle provider is a WebPage demonstration adapter, not yet a separately published MicroBundle package.
