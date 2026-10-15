@@ -30,7 +30,7 @@ public sealed class SingularityCitySliceTests
         Assert.True(arena.Bounds.X + arena.Bounds.Width <= SingularityCityCatalog.WorldBounds.Width, "The arena exceeds the city width.");
         Assert.True(arena.Bounds.Y + arena.Bounds.Height <= SingularityCityCatalog.WorldBounds.Height, "The arena exceeds the city height.");
         Assert.Contains(structures, structure => structure.Id == "city-transit-hub");
-        Assert.Contains(arena.FutureFunction, "Soccer MicroBundle", StringComparison.Ordinal);
+        Assert.Contains("Soccer MicroBundle", arena.FutureFunction);
     }
 
     [Fact]
