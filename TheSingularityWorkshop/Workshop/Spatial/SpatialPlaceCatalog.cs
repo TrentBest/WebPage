@@ -34,6 +34,7 @@ public static class SpatialPlaceCatalog
         new("workshop.fsm-bench", "FSM Workbench", SpatialDomain.Workshop, "fsm-workbench", "fsm-workbench", new SpatialPoint(50, 78), "Focused FSM construction and inspection."),
         new("workshop.npc-studio", "NPC Studio", SpatialDomain.Workshop, "npc-studio", "npc-studio", new SpatialPoint(50, 78), "NPC authoring and behavioral composition."),
         new("workshop.storage", "Storage Bins", SpatialDomain.Workshop, "storage", "data-storage", new SpatialPoint(50, 78), "Persistent Workshop assets and generated artifacts."),
+        new("workshop.acoustic-studio", "Acoustic Studio Lab", SpatialDomain.Workshop, "acoustic-studio-lab", "acoustic-studio-lab", new SpatialPoint(50, 78), "An inspectable studio prototype for source/listener acoustics and spatial observation."),
 
         new("city.mansion", "Singularity Mansion", SpatialDomain.SingularityCity, "mansion", "building-authoring", new SpatialPoint(50, 78), "A full architectural residence and its nested spaces."),
         new("city.transit", "Singularity Transit", SpatialDomain.SingularityCity, "singularity-transit", "transit-authoring", new SpatialPoint(50, 78), "The city's transportation interchange."),
