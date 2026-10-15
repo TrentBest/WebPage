@@ -55,16 +55,6 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.MicroBu
             .Property("composition", "AiExchange")
             .Child("text", "ai-title", child => child.Text("PROTOCOLAI TERMINAL"))
             .Child("text", "ai-description", child => child.Text(description))
-            .Child("textbox", "ai-protocol", child => child
-                .Property("label", "Protocol")
-                .Property("readonly", "true")
-                .Property("multiline", "true")
-                .Property("value", protocol ?? string.Empty))
-            .Child("textbox", "ai-grammar", child => child
-                .Property("label", "Grammar")
-                .Property("readonly", "true")
-                .Property("multiline", "true")
-                .Property("value", grammar ?? string.Empty))
             .Child("button", "ai-copy-to-clipboard", child => child
                 .Text("Copy to Clipboard")
                 .Property("command", "ai.copy-to-clipboard"))
