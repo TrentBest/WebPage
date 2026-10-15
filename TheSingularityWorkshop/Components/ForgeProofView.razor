@@ -38,9 +38,9 @@
             .Text("THIS PANEL READS THE ACTUAL ASSEMBLY. IT IS NOT TELEMETRY DECORATION."));
 
         root.Child(Metric("RUNTIME", assembly is null ? "NOT INITIALIZED" : $"0x{assembly.RuntimeId:X16}"));
-        root.Content(Metric("MICROBUNDLES", assembly?.Bundles.Count.ToString() ?? "0"));
-        root.Content(Metric("ARBITRATION", assembly is null ? "—" : $"{assembly.ArbitrationRounds} ROUND(S)"));
-        root.Content(Metric("MONIKER", compositionText));
+        root.Child(Metric("MICROBUNDLES", assembly?.Bundles.Count.ToString() ?? "0"));
+        root.Child(Metric("ARBITRATION", assembly is null ? "—" : $"{assembly.ArbitrationRounds} ROUND(S)"));
+        root.Child(Metric("MONIKER", compositionText));
 
         root.Content(WorkshopGui.Element(this, "div")
             .Style("margin-top", ".75rem").Style("padding-top", ".7rem")
@@ -55,10 +55,10 @@
             .Content(WorkshopGui.Element(this, "div").Style("display", "flex").Style("gap", ".35rem")
                 .Style("flex-wrap", "wrap").Style("margin-top", ".55rem")
                 .Child(ActionButton("START", StartPreview, "#00eaff"))
-                .Content(ActionButton("TICK", TickPreview, "#ffd34d"))
-                .Content(ActionButton("STOP", StopPreview, "#ff2cff"))
-                .Content(ActionButton("DEEP DIVE", DeepDive, "#ffd34d"))
-                .Content(ActionButton("ENTER FORGE", EnterForge, "#52e05a"))));
+                .Child(ActionButton("TICK", TickPreview, "#ffd34d"))
+                .Child(ActionButton("STOP", StopPreview, "#ff2cff"))
+                .Child(ActionButton("DEEP DIVE", DeepDive, "#ffd34d"))
+                .Child(ActionButton("ENTER FORGE", EnterForge, "#52e05a"))));
 
         foreach (var entry in _preview.Events.TakeLast(5))
         {
