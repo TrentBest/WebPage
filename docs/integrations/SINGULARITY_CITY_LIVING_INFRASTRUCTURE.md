@@ -73,7 +73,7 @@ A storefront displays catalog data with provenance and freshness → the user ex
 ## Suggested implementation order
 
 1. **Station as a real place:** catalog entry, platform/berth identities, transfers, schedule model, and GUI inspection.
-2. **Time-driven transport snapshots:** wire the existing aerial snapshot model to a host-owned elapsed simulation time and prove repeatable movement in tests.
+2. **Time-driven transport snapshots:** a first presentation prototype now advances the four declared aerial routes once per second while the City map is open, and cancels its loop when the map closes or scope changes. Next, replace the component-local UTC epoch with an authoritative host/simulation clock and add integration-level replay tests.
 3. **One end-to-end passenger journey:** walking/boarding/ride/alighting state before multiplying vehicle counts.
 4. **Maglev service:** stations, timetable, vehicle runs, capacity, and arrival boards.
 5. **Cargo chain:** container IDs and auditable handoff events between ship, yard, train, and truck.
