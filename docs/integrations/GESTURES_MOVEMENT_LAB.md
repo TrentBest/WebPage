@@ -4,6 +4,12 @@
 
 The Movement Lab is a small, lazy-by-navigation browser view for inspecting the authored hurdle-course geometry described in the Gestures WebPageLLM handoff. It makes the element order, stable IDs, axis-aligned center/full-extents bounds, and unit label visible.
 
+## Diegetic direction
+
+Treat the Architect experience as the design reference: visitors should discover the underlying model by interacting with a place, not by leaving the experience to read a dashboard. The Movement Lab is therefore framed as a Workshop field bay with a course schematic and an in-world inspection terminal. Stable IDs, dimensions, and unit values remain exact technical readings, while the instrument status makes clear that no traversal record is attached.
+
+Future slices should preserve that boundary while increasing embodiment: make course regions selectable in the scene, let a real versioned course contract drive the schematic, and show an attempt only when an authoritative simulation supplies observations. Do not add decorative trajectories, fake physics, or success animations without corresponding data. Keep the Workshop gateway and manifest-driven navigation as the shared threshold between experiences.
+
 ## Current status
 
 - The view uses a local three-element display fixture matching the values in the handoff and current Gestures test fixture.
