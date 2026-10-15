@@ -56,7 +56,10 @@ public sealed record SpatialAcousticStudioManifest(
            ?? throw new KeyNotFoundException($"Unknown acoustic studio listener '{id}'.");
 
     public SpatialAcousticStudioFixtureObservation? FindFixtureObservation(string sourceId, string listenerId)
-        => FixtureObservations.FirstOrDefault(x => x.SourceId == sourceId && x.ListenerId == listenerId);
+        => FixtureObservations
+            .Where(x => x.SourceId == sourceId && x.ListenerId == listenerId)
+            .Select(x => (SpatialAcousticStudioFixtureObservation?)x)
+            .FirstOrDefault();
 }
 
 public readonly record struct SpatialAcousticStudioPoint(double X, double Y, double Z);
