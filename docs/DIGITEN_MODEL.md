@@ -38,6 +38,17 @@ The current `DigitenState` layout is 68 bytes with four-byte packing and explici
 
 Detailed skills, relationships, personal history, inventory, preferences, job contracts, school records, and rich narrative should be keyed extension data or independently composed capabilities. They should not automatically inflate every hot record.
 
+## Statistical inputs: keep provenance and vintage
+
+The current Singularity City work has a New York City frame, so NYC is a useful first reference population. The official Census Bureau QuickFacts page reports **8,804,190 residents in the April 1, 2020 Census**. The same page currently reports **20.2% under age 18**, **16.6% age 65+**, **3,334,088 households**, and **2.48 persons per household** for its **2020–2024** estimate period. Those values are useful for locating the dimensions a profile must represent, but they are **not one consistent-year dataset** and must not be silently blended into a calibrated 2020 population.
+
+Sources:
+- [U.S. Census Bureau QuickFacts — New York City](https://www.census.gov/quickfacts/fact/table/newyorkcitynewyork/POP645221)
+- [U.S. Census Bureau — Age and Sex Composition in the United States: 2020](https://www.census.gov/data/tables/2020/demo/age-and-sex/2020-age-sex-composition.html)
+- [U.S. Census Bureau — American Community Survey subject tables](https://www.census.gov/acs/www/data/data-tables-and-tools/subject-tables/)
+
+Before we generate a baseline, choose one reference year and geography, then record each input's source table, estimate period, universe, units, and uncertainty. Use consistent ACS/Census tables for age, household structure, labor-force participation, occupation/industry, education, and school enrollment. Keep **observed statistics**, **derived simulation parameters**, and **synthetic 100× scenario rules** as separate records so we can audit every generated outcome.
+
 ## The city is a coupled system, not a crowd counter
 
 A Digiten's activity is the result of needs, age/life stage, education, available opportunities, household responsibilities, location, schedule, and world conditions. A person should not be marked employed merely because a percentage says they have a job: an actual job slot and employer/workplace must exist. Job seekers search available openings; students need a school and enrollment; commuting connects home, school, shops, and workplaces through the spatial/physics layer.
