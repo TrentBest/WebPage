@@ -22,6 +22,7 @@
     [Parameter] public EventCallback<string> OnResponseImported { get; set; }
 
     private string _status = "READY";
+    private string _responsePreview = string.Empty;
     private bool _awaitingResponse;
     private bool _hasContext => Exchange?.Protocol is not null && Exchange?.Grammar is not null;
 
@@ -60,6 +61,19 @@
                             .Text("Paste from Clipboard")
                             .Class(_awaitingResponse ? "ai-terminal-button ai-breathing" : "ai-terminal-button")
                             .OnClick(ImportFromClipboardAsync)))
+            .Content(
+                WorkshopGui.Element(this, "section")
+                    .Class("ai-response-panel")
+                    .Child(WorkshopGui.Element(this, "strong").Text("Clipboard response / read-only preview"))
+                    .Child(
+                        WorkshopGui.Element(this, "textarea")
+                            .Attribute("id", "ai-llm-response")
+                            .Attribute("rows", 8)
+                            .Attribute("placeholder", "Use Paste from Clipboard to stage the response here...")
+                            .Attribute("value", _responsePreview)
+                            .Attribute("readonly", true)
+                            .Attribute("aria-label", "Imported LLM response preview")
+                            .Class("ai-response-preview")))
             .Paragraph($"STATUS // {_status}")
             .Build();
     }
@@ -122,6 +136,7 @@
                 return;
             }
 
+            _responsePreview = response;
             _awaitingResponse = false;
             if (OnResponseImported.HasDelegate)
             {
@@ -147,6 +162,9 @@
     .ai-exchange-block{min-width:0;padding:.9rem;border:1px solid rgba(0,234,255,.18);background:rgba(0,10,20,.55)}
     .ai-exchange-block strong{display:block;margin-bottom:.6rem;color:#00eaff;font:700 .75rem Consolas,'Courier New',monospace;letter-spacing:.12em;text-transform:uppercase}
     .ai-exchange-value{max-height:18rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;color:#b9d4de;font:.78rem/1.55 Consolas,'Courier New',monospace}
+    .ai-response-panel{min-width:0;margin:1rem 0;padding:.9rem;border:1px solid rgba(255,44,255,.24);background:rgba(15,5,22,.4)}
+    .ai-response-panel strong{display:block;margin-bottom:.6rem;color:#ff8cff;font:700 .75rem Consolas,'Courier New',monospace;letter-spacing:.1em;text-transform:uppercase}
+    .ai-response-preview{display:block;width:100%;box-sizing:border-box;min-height:10rem;max-height:24rem;overflow:auto;resize:vertical;padding:.8rem;border:1px solid rgba(0,234,255,.22);background:rgba(0,0,0,.35);color:#edfaff;font:.8rem/1.55 Consolas,'Courier New',monospace;white-space:pre-wrap;overflow-wrap:anywhere}
     .ai-terminal-actions{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin:1rem 0}
     .ai-terminal-button{min-height:3rem;padding:.8rem 1.2rem;border:1px solid rgba(0,234,255,.65);border-radius:.25rem;background:rgba(0,234,255,.07);color:#eafcff;font:700 .9rem Consolas,'Courier New',monospace;letter-spacing:.04em;cursor:pointer}
     .ai-terminal-button:hover{border-color:#ff2cff;box-shadow:0 0 16px rgba(255,44,255,.22)}
