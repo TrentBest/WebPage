@@ -6,7 +6,23 @@
 @inject IJSRuntime JS
 @inject WorkshopExperienceService Experience
 
-@BuildPanel()
+<section class="ai-terminal" aria-labelledby="ai-terminal-heading">
+    <h2 id="ai-terminal-heading">PROTOCOLAI TERMINAL</h2>
+    <p>Copy the semantic exchange into the LLM of your choice. Copy its response back to your clipboard, then import it here. This terminal does not call an LLM.</p>
+    <div class="ai-terminal-actions">
+        <button type="button"
+                class="@(_hasContext ? "ai-terminal-button ai-breathing" : "ai-terminal-button")"
+                @onclick="CopyCurrentExchangeAsync">
+            Copy to Clipboard
+        </button>
+        <button type="button"
+                class="@(_awaitingResponse ? "ai-terminal-button ai-breathing" : "ai-terminal-button")"
+                @onclick="ImportFromClipboardAsync">
+            Paste from Clipboard
+        </button>
+    </div>
+    <p class="ai-terminal-status" role="status" aria-live="polite">STATUS // @_status</p>
+</section>
 
 @code {
     /// <summary>
@@ -34,30 +50,8 @@
     private AiExchangeCompositionBundle? Exchange =>
         Experience.AiExchangeComposition;
 
-    private RenderFragment BuildPanel()
-    {
-        var exchange = Exchange;
-        var exchangeText = BuildExchangeText(exchange);
-
-        return WorkshopGui.Panel(this)
-            .Heading("PROTOCOLAI TERMINAL", 2)
-            .Paragraph("Copy the semantic exchange into the LLM of your choice. Copy its response back to your clipboard, then import it here. This terminal does not call an LLM.")
-            .Content(
-                WorkshopGui.Element(this, "div")
-                    .Class("ai-terminal-actions")
-                    .Child(
-                        WorkshopGui.Button(this)
-                            .Class(_hasContext ? "ai-terminal-button ai-breathing" : "ai-terminal-button")
-                            .Label("Copy to Clipboard")
-                            .OnClick(() => CopyToClipboardAsync(exchangeText)))
-                    .Child(
-                        WorkshopGui.Button(this)
-                            .Class(_awaitingResponse ? "ai-terminal-button ai-breathing" : "ai-terminal-button")
-                            .Label("Paste from Clipboard")
-                            .OnClick(ImportFromClipboardAsync)))
-            .Paragraph($"STATUS // {_status}")
-            .Build();
-    }
+    private Task CopyCurrentExchangeAsync() =>
+        CopyToClipboardAsync(BuildExchangeText(Exchange));
 
     private string BuildExchangeText(AiExchangeCompositionBundle? exchange)
     {
@@ -135,7 +129,8 @@
     .ai-terminal-actions{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin:1rem 0}
     .ai-terminal-button{min-height:3rem;padding:.8rem 1.2rem;border:1px solid rgba(0,234,255,.65);border-radius:.25rem;background:rgba(0,234,255,.07);color:#eafcff;font:700 .9rem Consolas,'Courier New',monospace;letter-spacing:.04em;cursor:pointer}
     .ai-terminal-button:hover{border-color:#ff2cff;box-shadow:0 0 16px rgba(255,44,255,.22)}
+    .ai-terminal-button:focus-visible{outline:2px solid #ff2cff;outline-offset:3px}
     .ai-terminal-button.ai-breathing{animation:aiTerminalBreathing 2.2s ease-in-out infinite}
-    @keyframes aiTerminalBreathing{0%,100%{box-shadow:0 0 0 rgba(0,234,255,0);border-color:rgba(0,234,255,.55)}50%{box-shadow:0 0 18px rgba(0,234,255,.28);border-color:rgba(0,234,255,1)}}
-    @media(prefers-reduced-motion:reduce){.ai-terminal-button.ai-breathing{animation:none;box-shadow:0 0 12px rgba(0,234,255,.2)}}
+    @@keyframes aiTerminalBreathing{0%,100%{box-shadow:0 0 0 rgba(0,234,255,0);border-color:rgba(0,234,255,.55)}50%{box-shadow:0 0 18px rgba(0,234,255,.28);border-color:rgba(0,234,255,1)}}
+    @@media(prefers-reduced-motion:reduce){.ai-terminal-button.ai-breathing{animation:none;box-shadow:0 0 12px rgba(0,234,255,.2)}}
 </style>
