@@ -24,31 +24,31 @@
                 </div>
                 <span class="unit-label">METERS</span>
             </div>
-            <p class="view-caption">Side elevation · X/Y plane · authored course bounds</p>
-            <svg class="course-svg" viewBox="0 0 760 280" role="img" aria-labelledby="course-title course-desc">
+            <p class="view-caption">Side elevation · X/Y plane · shared display scale: 90 units per meter</p>
+            <svg class="course-svg" viewBox="0 0 760 300" role="img" aria-labelledby="course-title course-desc">
                 <title id="course-title">Three-element hurdle course, side elevation</title>
-                <desc id="course-desc">Approach zone centered at zero, hurdle centered at x three and y one half, and landing zone centered at x five. Rectangles represent full authored extents, not a simulated trajectory.</desc>
+                <desc id="course-desc">Approach bounds span x minus one to one and y minus one half to one half. The hurdle spans x 2.9 to 3.1 and y zero to one. The landing spans x four to six and y minus one tenth to one tenth. All rectangles use the same 90 SVG units per meter on both axes and show full authored extents, not a simulated trajectory.</desc>
                 <defs>
-                    <pattern id="grid" width="38" height="28" patternUnits="userSpaceOnUse">
+                    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
                         <path d="M 38 0 L 0 0 0 28" fill="none" stroke="#173043" stroke-width="1" />
                     </pattern>
                 </defs>
-                <rect x="24" y="20" width="712" height="220" fill="url(#grid)" />
+                <rect x="24" y="20" width="712" height="260" fill="url(#grid)" />
                 <line x1="30" y1="220" x2="730" y2="220" stroke="#648092" stroke-width="1.5" />
-                <line x1="100" y1="26" x2="100" y2="244" stroke="#648092" stroke-width="1" stroke-dasharray="4 5" />
-                <line x1="390" y1="26" x2="390" y2="244" stroke="#648092" stroke-width="1" stroke-dasharray="4 5" />
-                <line x1="570" y1="26" x2="570" y2="244" stroke="#648092" stroke-width="1" stroke-dasharray="4 5" />
-                <rect x="100" y="176" width="104" height="44" rx="3" class="approach-zone" />
-                <rect x="378" y="132" width="12" height="88" rx="2" class="hurdle-zone" />
-                <rect x="518" y="211" width="104" height="9" rx="2" class="landing-zone" />
-                <text x="152" y="164" text-anchor="middle" class="svg-label">APPROACH</text>
-                <text x="390" y="112" text-anchor="middle" class="svg-label">HURDLE</text>
-                <text x="570" y="196" text-anchor="middle" class="svg-label">LANDING</text>
-                <text x="100" y="258" text-anchor="middle" class="svg-axis">x = 0</text>
-                <text x="390" y="258" text-anchor="middle" class="svg-axis">x = 3</text>
-                <text x="570" y="258" text-anchor="middle" class="svg-axis">x = 5</text>
+                <line x1="190" y1="26" x2="190" y2="280" stroke="#648092" stroke-width="1" stroke-dasharray="4 5" />
+                <line x1="460" y1="26" x2="460" y2="280" stroke="#648092" stroke-width="1" stroke-dasharray="4 5" />
+                <line x1="640" y1="26" x2="640" y2="280" stroke="#648092" stroke-width="1" stroke-dasharray="4 5" />
+                <rect x="100" y="175" width="180" height="90" rx="3" class="approach-zone" />
+                <rect x="451" y="130" width="18" height="90" rx="2" class="hurdle-zone" />
+                <rect x="550" y="211" width="180" height="18" rx="2" class="landing-zone" />
+                <text x="190" y="160" text-anchor="middle" class="svg-label">APPROACH</text>
+                <text x="460" y="112" text-anchor="middle" class="svg-label">HURDLE</text>
+                <text x="640" y="196" text-anchor="middle" class="svg-label">LANDING</text>
+                <text x="190" y="258" text-anchor="middle" class="svg-axis">x = 0</text>
+                <text x="460" y="258" text-anchor="middle" class="svg-axis">x = 3</text>
+                <text x="640" y="258" text-anchor="middle" class="svg-axis">x = 5</text>
                 <text x="28" y="36" class="svg-axis">Y ↑</text>
-                <text x="708" y="258" text-anchor="end" class="svg-axis">X →</text>
+                <text x="708" y="278" text-anchor="end" class="svg-axis">X →</text>
             </svg>
             <p class="figure-note">Schematic only. A route line, clearance result, or physical attempt will appear only when supported by actual evaluation data.</p>
         </div>
