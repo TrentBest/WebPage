@@ -85,7 +85,7 @@
             0 0 34px color-mix(in srgb,var(--flower-color) 34%,transparent),
             inset 0 0 18px color-mix(in srgb,var(--flower-color) 22%,transparent);
         transition:left .16s linear,top .16s linear,width .16s linear,height .16s linear,opacity .16s linear,transform .16s linear;
-        will-change:left,top,width,height,transform;
+        /* Avoid forcing a compositor layer for every actor; the browser can promote layers as needed. */
         transform-origin:center;
         z-index:20;
     }
