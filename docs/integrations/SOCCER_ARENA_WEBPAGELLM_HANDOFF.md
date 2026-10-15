@@ -27,6 +27,11 @@ The soccer domain work is staged on a review branch, not yet merged or published
 
 The fixture currently scripts a pass, shot, and goal outcome. It does **not** implement ball physics, collision/contact, real player locomotion, goalkeeper saves, offside adjudication, crowd simulation, or Renderer/WebPage integration. Do not present it as a functioning match.
 
+The fixture also now projects authoritative fixture events into individual spectator intents in [SpectatorReactionDirector.cs](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain/blob/work/soccer-domain-microbundle/examples/SoccerMatchFixture/SpectatorReactionDirector.cs). Each reaction carries the Digiten identity, stand section, seat label, triggering event, gesture intent, and per-person presentation-delay metadata. The seat label is an anchor key for a future venue adapter—not a world-space position—and the delay is data, not a running timer. The fixture validates that all five identities and seats remain distinct and that celebration is triggered only by `GoalAwarded`.
+
+**Next host seam:** resolve each seat label through the arena's explicit venue/seat model; route the resulting reaction intent to the Digiten's own gesture/pose pipeline; let Renderer/WebPage present the result. Keep the match event authoritative, keep each Digiten's task/state independent, and do not invent a public Renderer rig API to bridge the gap. Until a real host contract and adapter exist, this remains a deterministic domain-to-presentation projection—not live crowd animation or a scheduled reaction system.
+
+
 ## Ownership boundaries
 
 | Concern | Owner |
