@@ -70,7 +70,7 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.MicroBu
                 .Property("command", "ai.copy-to-clipboard"))
             .Child("button", "ai-copy-from-clipboard", child => child
                 .Text("Copy from Clipboard")
-                .Property("command", "ai.copy-from-clipboard"))
+                .Property("command", "ai.paste-from-clipboard"))
             .Build();
 
     public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex)
