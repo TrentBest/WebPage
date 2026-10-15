@@ -44,27 +44,34 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.MicroBu
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        Composition = GuiBuilders.Panel("ai-exchange")
+        Composition = BuildComposition(
+            "Protocol identity + grammar structure, ready for clipboard exchange.",
+            protocol: null,
+            grammar: null);
+    }
+
+    private static GuiNode BuildComposition(string description, string? protocol, string? grammar) =>
+        GuiBuilder.Create("panel", "ai-exchange")
             .Property("composition", "AiExchange")
-            .Child(GuiBuilders.Text("ai-title", "AI EXCHANGE"))
-            .Child(GuiBuilders.Text("ai-description", "Protocol identity + grammar structure, ready for clipboard or provider transport."))
-            .Child(GuiBuilders.TextBox("ai-protocol", null)
+            .Child("text", "ai-title", child => child.Text("PROTOCOLAI TERMINAL"))
+            .Child("text", "ai-description", child => child.Text(description))
+            .Child("textbox", "ai-protocol", child => child
                 .Property("label", "Protocol")
                 .Property("readonly", "true")
-                .Property("multiline", "true"))
-            .Child(GuiBuilders.TextBox("ai-grammar", null)
+                .Property("multiline", "true")
+                .Property("value", protocol ?? string.Empty))
+            .Child("textbox", "ai-grammar", child => child
                 .Property("label", "Grammar")
                 .Property("readonly", "true")
-                .Property("multiline", "true"))
-            .Child(GuiBuilders.TextBox("ai-input", null)
-                .Property("label", "LLM response")
-                .Property("multiline", "true"))
-            .Child(GuiBuilders.Button("ai-extract", "Extract to Clipboard")
-                .Property("command", "ai.extract"))
-            .Child(GuiBuilders.Button("ai-submit", "Validate / Re-enter")
-                .Property("command", "ai.submit"))
+                .Property("multiline", "true")
+                .Property("value", grammar ?? string.Empty))
+            .Child("button", "ai-copy-to-clipboard", child => child
+                .Text("Copy to Clipboard")
+                .Property("command", "ai.copy-to-clipboard"))
+            .Child("button", "ai-copy-from-clipboard", child => child
+                .Text("Copy from Clipboard")
+                .Property("command", "ai.copy-from-clipboard"))
             .Build();
-    }
 
     public bool Arbitrate(IMicroBundleArbitrationContext context, int roundIndex)
     {
@@ -97,26 +104,10 @@ public sealed class AiExchangeCompositionBundle : TheSingularityWorkshop.MicroBu
             "GRAMMAR",
             Grammar.Describe());
 
-        Composition = GuiBuilders.Panel("ai-exchange")
-            .Property("composition", "AiExchange")
-            .Child(GuiBuilders.Text("ai-title", "AI EXCHANGE"))
-            .Child(GuiBuilders.Text("ai-description", "Copy the deterministic semantic exchange to an LLM, then paste the response back into the host."))
-            .Child(GuiBuilders.TextBox("ai-protocol", Protocol.Describe())
-                .Property("label", "Protocol")
-                .Property("readonly", "true")
-                .Property("multiline", "true"))
-            .Child(GuiBuilders.TextBox("ai-grammar", Grammar.Describe())
-                .Property("label", "Grammar")
-                .Property("readonly", "true")
-                .Property("multiline", "true"))
-            .Child(GuiBuilders.TextBox("ai-input", null)
-                .Property("label", "LLM response")
-                .Property("multiline", "true"))
-            .Child(GuiBuilders.Button("ai-extract", "Extract to Clipboard")
-                .Property("command", "ai.extract"))
-            .Child(GuiBuilders.Button("ai-submit", "Validate / Re-enter")
-                .Property("command", "ai.submit"))
-            .Build();
+        Composition = BuildComposition(
+            "Copy the deterministic semantic exchange to an LLM, then paste the response back into the host.",
+            Protocol.Describe(),
+            Grammar.Describe());
 
         return changed;
     }
