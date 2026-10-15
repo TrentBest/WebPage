@@ -17,6 +17,7 @@ public sealed class WorkshopExperienceService : IDisposable
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
     private readonly HubRuntime _hubRuntime;
     private bool _disposed;
+    private RuntimeAssembly? _aiTerminalAssembly;
 
     public event Action? StateChanged;
 
@@ -57,8 +58,12 @@ public sealed class WorkshopExperienceService : IDisposable
             ? primary
             : null;
 
+    /// <summary>
+    /// The Hub's ProtocolAi terminal composition. It is a separate FSM_COS assembly,
+    /// so the primary Experience does not need to depend on authoring tools.
+    /// </summary>
     public AiExchangeCompositionBundle? AiExchangeComposition =>
-        RuntimeAssembly?.TryGetBundle<AiExchangeCompositionBundle>(
+        _aiTerminalAssembly?.TryGetBundle<AiExchangeCompositionBundle>(
             AiExchangeCompositionBundle.BundleId,
             out var ai) == true
             ? ai
@@ -97,6 +102,7 @@ public sealed class WorkshopExperienceService : IDisposable
         ComposePrimaryExperience();
         ComposeManifestHubBundles();
         ComposeManifestCapabilities();
+        ComposeAiTerminal();
 
         // This is composition metadata, not a presentation clock. PageFSM owns
         // gateway, population, reveal, gravity, and navigation timing.
@@ -177,6 +183,22 @@ public sealed class WorkshopExperienceService : IDisposable
                     .ToArray()));
 
             _capabilityRuntimeAssemblies[capability.Name] = assembly;
+        }
+    }
+
+    private void ComposeAiTerminal()
+    {
+        // Keep authoring tools beside the primary Experience rather than making them
+        // a mandatory dependency of the Experience itself.
+        _aiTerminalAssembly = _compositionSystem.Execute(new RuntimeManifest(
+            RuntimeId: 300UL,
+            Bundles: [new MicroBundleManifestEntry(AiExchangeCompositionBundle.BundleId, "0.1.0")]));
+
+        if (!_aiTerminalAssembly.TryGetBundle<AiExchangeCompositionBundle>(
+                AiExchangeCompositionBundle.BundleId, out _))
+        {
+            throw new InvalidOperationException(
+                "FSM_COS did not compose the Hub's ProtocolAi terminal and its declared dependencies.");
         }
     }
 
