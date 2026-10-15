@@ -4,7 +4,7 @@
 
 VBIMB is the Workshop's proposed fast path from intent to a coherent, inspectable building plan. It is not a static floor-plan picture. A plan is structured data: rooms, walls, openings, fixtures, circulation, and the relationships that make the geometry meaningful.
 
-The first implementation slice lives in WebPage as a host-side MicroBundle capability. It defines a renderer-neutral plan schema and an example apartment. It does **not** yet register a new bundle in FSM_COS, render an interactive editor, infer plans from natural language, or claim compliance with building codes.
+The first implementation slice lives in WebPage as a host-side MicroBundle capability and an interactive Singularity Architecture plan studio at `/architecture`. The studio draws the renderer-neutral plan model, lets you select rooms, edit room rectangles, toggle opening state, and capture a structured design brief. The current edits are in-memory only; it does **not** yet persist projects, register a new bundle in FSM_COS, call an LLM, coordinate room edits with wall geometry, provide undo/redo, or claim compliance with building codes.
 
 ## First plan vocabulary
 
@@ -45,13 +45,14 @@ The plan view, aerial view, street/FPS view, and historical view must resolve th
 
 ## Iteration sequence
 
-1. **Schema and example** — current first slice.
-2. **Plan canvas** — draw/select rooms, walls, openings and fixtures; edit numeric dimensions; undo/redo.
-3. **Door glyphs** — correct plan symbols and open/closed states for hinged, sliding, pocket and revolving doors.
-4. **Digiten cards** — compact data cards linked to the same persistent Digiten IDs; selection opens a detailed inspector.
-5. **City placement** — place building footprints on actual parcels/blocks and expose plan/building/street projections.
-6. **AI authoring adapter** — structured, validated proposals from ProtocolAi/GrammarAi, with review and error reports.
-7. **Calibration and simulation** — only then connect occupancy, jobs, schools, schedules and circulation to the population model.
+1. **Schema and example** — implemented as the renderer-neutral plan contract and compact apartment.
+2. **Plan canvas first pass** — implemented at `/architecture`: selectable room rectangles, dimension editing, fixtures, walls, and semantic opening symbols. Edits are local to the page session and room edits do not yet reshape associated walls.
+3. **Door behavior refinement** — hinged, sliding, pocket, revolving and window symbols are present; exact drafting conventions and clearance geometry still need refinement.
+4. **Persistent editing** — next: coordinated room/wall edits, undo/redo, saved projects, and validation feedback.
+5. **Digiten cards** — compact data cards linked to persistent Digiten IDs; selection opens a detailed inspector.
+6. **City placement** — place building footprints on actual parcels/blocks and expose plan/building/street projections.
+7. **AI authoring adapter** — structured, validated proposals from ProtocolAi/GrammarAi, with review and error reports.
+8. **Calibration and simulation** — only then connect occupancy, jobs, schools, schedules and circulation to the population model.
 
 ## Performance guardrails
 
