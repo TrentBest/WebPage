@@ -73,8 +73,8 @@ try {
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
   const expandedLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  if (expandedLinks.some(label => ["Ecosystem", "Schedule Consultation", "Institutions", "Demonstrations"].includes(label))) {
-    throw new Error("Removed destination tabs must not reappear in the hub.");
+  if (expandedLinks.some(label => ["Ecosystem", "Schedule Consultation", "Institutions"].includes(label))) {
+    throw new Error("Removed destination tabs must not reappear in the hub; manifest-declared gallery entries remain valid.");
   }
   await page.screenshot({ path: `${outputDir}/03-welcome.png`, fullPage: true });
 
