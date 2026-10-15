@@ -76,9 +76,9 @@
                             }
                             else if (opening.Kind == PlanOpeningKind.RevolvingDoor)
                             {
-                                <circle class="revolving-outline" cx="@Px(symbol.CenterX)" cy="@Py(symbol.CenterY)" r="16" />
-                                <line class="revolving-leaf" x1="@Px(symbol.CenterX - 16)" y1="@Py(symbol.CenterY)" x2="@Px(symbol.CenterX + 16)" y2="@Py(symbol.CenterY)" />
-                                <line class="revolving-leaf" x1="@Px(symbol.CenterX)" y1="@Py(symbol.CenterY - 16)" x2="@Px(symbol.CenterX)" y2="@Py(symbol.CenterY + 16)" />
+                                <circle class="revolving-outline" cx="@Px(symbol.CenterX)" cy="@Py(symbol.CenterY)" r="@(opening.Width * 30)" />
+                                <line class="revolving-leaf" x1="@Px(symbol.CenterX - opening.Width / 2)" y1="@Py(symbol.CenterY)" x2="@Px(symbol.CenterX + opening.Width / 2)" y2="@Py(symbol.CenterY)" />
+                                <line class="revolving-leaf" x1="@Px(symbol.CenterX)" y1="@Py(symbol.CenterY - opening.Width / 2)" x2="@Px(symbol.CenterX)" y2="@Py(symbol.CenterY + opening.Width / 2)" />
                             }
                             else if (opening.Kind == PlanOpeningKind.Window)
                             {
@@ -306,7 +306,6 @@
         var length = Math.Sqrt(dx * dx + dy * dy);
         var ux = dx / length;
         var uy = dy / length;
-        var sign = opening.Hinge == PlanHinge.Start ? 1d : -1d;
         var hingeDistance = opening.Offset + (opening.Hinge == PlanHinge.Start ? 0 : opening.Width);
         var hx = wall.X1 + ux * hingeDistance;
         var hy = wall.Y1 + uy * hingeDistance;
