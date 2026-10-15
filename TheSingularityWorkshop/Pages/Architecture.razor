@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using System.Text.Json
-@using System.Text.Json.Serialization
+@using TheSingularityWorkshop.Workshop.Architecture
 
 <PageTitle>Singularity Architecture // The Workshop</PageTitle>
 
@@ -218,12 +218,6 @@
     private BuildingPlan? ProposedPlan;
     private string? ProposalMessage;
 
-    private static readonly JsonSerializerOptions ProposalJsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        Converters = { new JsonStringEnumConverter() }
-    };
-
     private string ArchitectureContext => JsonSerializer.Serialize(new
     {
         task = "Act as the Architect for The Singularity Workshop. Propose a complete revised building plan, but do not claim code compliance.",
@@ -254,7 +248,7 @@
             "All geometry must fit within plan extents and every opening must refer to a wall.",
             "The host validates this response and requires explicit user acceptance."
         }
-    }, ProposalJsonOptions);
+    });
 
     private PlanRoom? SelectedRoom => Plan.Rooms.FirstOrDefault(x => x.Id == SelectedRoomId);
 
@@ -335,41 +329,9 @@
 
     private void ImportArchitectureResponse(string response)
     {
-        ProposedPlan = null;
-        try
-        {
-            var envelope = JsonSerializer.Deserialize<ArchitectureProposalEnvelope>(response, ProposalJsonOptions);
-            if (!string.Equals(envelope?.Kind, "building-plan-proposal", StringComparison.Ordinal)
-                || envelope.Plan is null
-                || envelope.Plan.Rooms is null
-                || envelope.Plan.Walls is null
-                || envelope.Plan.Openings is null)
-            {
-                ProposalMessage = "Rejected: expected a building-plan-proposal JSON object with rooms, walls, and openings. The working plan was not changed.";
-                return;
-            }
-
-            ProposedPlan = new BuildingPlan(
-                envelope.Plan.Id ?? string.Empty,
-                envelope.Plan.Name ?? string.Empty,
-                envelope.Plan.Width,
-                envelope.Plan.Height,
-                envelope.Plan.Rooms,
-                envelope.Plan.Walls,
-                envelope.Plan.Openings,
-                envelope.Plan.Fixtures ?? Array.Empty<PlanFixture>());
-
-            ProposalMessage = $"Validated proposal “{ProposedPlan.Name}”: {ProposedPlan.Rooms.Count} rooms, {ProposedPlan.Walls.Count} walls, {ProposedPlan.Openings.Count} openings. Review it before applying; validation covers only the plan schema's current geometric constraints.";
-        }
-        catch (JsonException ex)
-        {
-            ProposalMessage = $"Rejected: response is not valid proposal JSON ({ex.Message}). The working plan was not changed.";
-        }
-        catch (ArgumentException ex)
-        {
-            ProposedPlan = null;
-            ProposalMessage = $"Rejected by BuildingPlan validation: {ex.Message}. The working plan was not changed.";
-        }
+        var result = BuildingPlanProposalParser.Parse(response);
+        ProposedPlan = result.Plan;
+        ProposalMessage = result.Message;
     }
 
     private void ApplyProposedPlan()
@@ -380,24 +342,6 @@
         SelectedRoomId = Plan.Rooms.FirstOrDefault()?.Id ?? string.Empty;
         SyncRoomDrafts();
         ProposalMessage = "Validated proposal applied to the in-memory working plan. No project has been saved.";
-    }
-
-    private sealed class ArchitectureProposalEnvelope
-    {
-        public string? Kind { get; set; }
-        public ArchitectureProposalPlan? Plan { get; set; }
-    }
-
-    private sealed class ArchitectureProposalPlan
-    {
-        public string? Id { get; set; }
-        public string? Name { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
-        public PlanRoom[]? Rooms { get; set; }
-        public PlanWall[]? Walls { get; set; }
-        public PlanOpening[]? Openings { get; set; }
-        public PlanFixture[]? Fixtures { get; set; }
     }
 
     private static string FriendlyKind(PlanOpeningKind kind) => kind switch
