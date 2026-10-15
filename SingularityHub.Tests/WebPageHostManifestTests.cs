@@ -90,10 +90,13 @@ public sealed class WebPageHostManifestTests
         Assert.Empty(architecture.MicroBundles!);
 
         Assert.NotNull(manifest.Capabilities);
-        var rendering = Assert.Single(manifest.Capabilities!);
-        Assert.Equal("Rendering", rendering.Name);
+        Assert.Equal(new[] { "Rendering", "ProtocolAi Terminal" }, manifest.Capabilities!.Select(capability => capability.Name));
+        var rendering = Assert.Single(manifest.Capabilities!, capability => capability.Name == "Rendering");
         Assert.Equal(4100UL, rendering.MicroBundles![0].BundleId);
         Assert.Equal("0.1.0", rendering.MicroBundles[0].Version);
+        var terminal = Assert.Single(manifest.Capabilities!, capability => capability.Name == "ProtocolAi Terminal");
+        Assert.Equal(AiExchangeCompositionBundle.BundleId, terminal.MicroBundles![0].BundleId);
+        Assert.Equal("0.1.0", terminal.MicroBundles[0].Version);
 
         using var config = JsonDocument.Parse(File.ReadAllText(
             Path.Combine(wwwroot, "staticwebapp.config.json")));
