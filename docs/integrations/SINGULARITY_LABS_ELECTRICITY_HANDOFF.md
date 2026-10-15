@@ -1,8 +1,10 @@
-# Singularity Labs: Electricity, Transistors, and the Living Grid
+# Singularity Labs: Scientific and Industrial Experience Handoff
 
 ## Purpose
 
-This is an implementation handoff for the WebPageLLM. Place the electricity-learning experience inside **Singularity Labs**—not as a detached utility page and not as a premature city infrastructure dashboard. Singularity Labs is the Workshop's scientific and industrial experience layer: visitors can experiment, observe cause and effect, learn the underlying model, and follow that model outward into Singularity City's utilities, factories, logistics, and delivered products. Electricity is the first vertical slice, not the full remit.
+This is a staged experience handoff for the WebPageLLM. **Singularity Labs** is the Workshop's scientific and industrial experience layer: visitors can experiment, observe cause and effect, learn the underlying model, and follow that model outward into Singularity City's utilities, factories, logistics, and delivered products. Electricity is one planned vertical slice, not the full remit.
+
+**Important integration gate:** keep the electricity implementation handoff separate from broader Labs and factory planning until Physics exposes an agreed, usable integration boundary. The current proposed Physics model is ideal fixed-voltage DC resistive-load accounting—not a general circuit or transistor solver. WebPage must consume authoritative Physics observations through that boundary; it must not recreate Ohm's-law, current, power, circuit, or transistor calculations in browser code as a substitute. Until the boundary is agreed and usable, electricity is a scoped design/coordination item, not permission to ship a parallel solver. Other Labs work may proceed independently where its own model ownership and contracts are explicit.
 
 The Labs experience should make the Workshop's core idea tangible:
 
@@ -25,26 +27,28 @@ These are learning stations in one coherent lab, not four unrelated demos. The v
 
 ## First vertical slice: Electricity Lab
 
-Deliver one polished, working experiment before attempting the full catalog.
+Deliver one polished, working experiment before attempting the full catalog—but only after the Physics integration boundary is agreed and usable. Before that gate, WebPage work is limited to experience design, capability discovery, and non-simulated explanatory material that is clearly labelled as such.
 
 ### Interaction
 
 - Show a small, readable DC circuit with a source, a switch, a resistive load, and measurement points.
-- Let the visitor toggle the switch and adjust source voltage and load resistance within safe, meaningful educational ranges.
+- Let the visitor toggle supported loads and adjust only parameters exposed by the agreed Physics contract. Do not imply source-voltage adjustment or arbitrary circuit controls unless the model supports them.
 - Show voltage, current, resistance, and power with units.
 - Show conventional current direction and distinguish it from electron drift where useful.
-- Explain Ohm's law and power relationships from the live values, not from unrelated hard-coded numbers.
+- Explain relationships from the live Physics observations and model documentation; do not duplicate the numerical calculations in WebPage.
 - Make the switch visibly and causally affect the current and power.
 - Include a reset-to-known-experiment action and a small set of guided challenges.
 
 ### Living-picture rule
 
-The circuit drawing, highlighted current path, meter readouts, and explanatory text must all derive from one authoritative experiment state. Avoid independently authored animation values that can contradict the numbers. If the underlying model cannot yet calculate a behavior, label it as a conceptual illustration rather than implying it is simulated.
+The circuit drawing, highlighted current path, meter readouts, and explanatory text must derive from one authoritative experiment state supplied by Physics. WebPage may format and visualize observations, but must not calculate replacement values. Avoid independently authored animation values that can contradict the observations. If the underlying model cannot calculate a behavior—or no usable integration contract exists yet—label it as conceptual, not simulated, and do not present it as a live experiment.
 
 The first Physics implementation is intentionally narrow: it accounts for switched resistive loads on an ideal fixed-voltage DC bus and aggregates demand against declared generation capacity. It is **not yet** a general circuit-network solver. Do not imply that arbitrary circuit topologies, voltage drop, transients, or transistor behavior have already been implemented.
 
-Physics handoff: https://github.com/TrentBest/TheSingularityWorkshop.Physics/pull/22
+Physics proposal (draft; not yet an agreed integration contract): https://github.com/TrentBest/TheSingularityWorkshop.Physics/pull/22
 Physics electricity design notes: https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/work/electrical-grid-loads/docs/ELECTRICITY_AND_SINGULARITY_GRID.md
+
+**Do not treat these design notes or the draft PR as a stable integration contract.** Coordinate with the Physics owner to agree on the public API, lifecycle, units, observation semantics, versioning, and supported controls before wiring WebPage to it.
 
 ## Transistor Lab: the signature experience
 
@@ -215,9 +219,14 @@ The visuals should follow the Workshop's existing documentation style and the cu
 
 ## Suggested delivery sequence
 
-### Stage 1 — Electricity Lab vertical slice
+### Stage 1 — Electricity integration boundary (blocked until agreed)
+- Coordinate with Physics to agree on a supported public contract for configuring/observing the existing load-accounting model.
+- Establish units, lifecycle, versioning, validation behavior, and which controls are actually supported.
+- Do not duplicate Physics calculations in WebPage or infer support for circuit topologies/transistors.
+
+### Stage 1b — Electricity Lab vertical slice (after the boundary is usable)
 - Inspect the current WebPage experience/manifest architecture and determine the smallest compatible integration.
-- Deliver one functioning switched resistive DC experiment.
+- Deliver one functioning switched-resistive-load experience backed by Physics observations.
 - Bind all displayed readings and visual state to a single experiment state.
 - Explain Ohm's law and power using the actual values.
 - Include reset, one or two guided challenges, and visible scope notes.
@@ -257,14 +266,17 @@ The visuals should follow the Workshop's existing documentation style and the cu
 ## Acceptance checklist
 
 - [ ] Singularity Labs is the natural home and entry point for the electricity experience.
-- [ ] First experiment is usable and interactive, not a static mockup.
+- [ ] Electricity implementation begins only after a usable Physics integration boundary is agreed; until then, any preview is explicitly conceptual.
+- [ ] First implemented experiment is usable and interactive, not a static mockup.
 - [ ] Controls affect one authoritative model state.
 - [ ] Measurements have correct units and derive from that state.
 - [ ] Current/power calculations are tested against known cases.
 - [ ] The UI distinguishes implemented behavior from conceptual illustrations.
-- [ ] Physics remains renderer-independent; WebPage does not duplicate the solver.
+- [ ] Physics remains renderer-independent; WebPage consumes authoritative observations and does not duplicate the solver or accounting formulas.
 - [ ] The README/docs link to the experiment and its theory/evidence.
-- [ ] No unsupported claims about circuit solving, transistor fidelity, grid dynamics, plant safety, factory fidelity, or collider accuracy.\n- [ ] Products are manufactured from modeled inputs and process steps, then transported/delivered; they do not simply appear.\n- [ ] Labs catalogue distinguishes implemented, planned, and conceptual experiments and points to the owning package.
+- [ ] No unsupported claims about circuit solving, transistor fidelity, grid dynamics, plant safety, factory fidelity, or collider accuracy.
+- [ ] Products are manufactured from modeled inputs and process steps, then transported/delivered; they do not simply appear.
+- [ ] Labs catalogue distinguishes implemented, planned, and conceptual experiments and points to the owning package.
 - [ ] Build and tests are run and their actual results are reported.
 
 ## Coordination note
