@@ -19,6 +19,12 @@ Opening semantics are separate from drawing style. A renderer can draw a hinged 
 
 The initial schema validates unique IDs, positive plan extents, in-bounds room and fixture rectangles, wall references, positive opening widths, and open fractions in the range 0–1. It is a sketching contract, not a structural, fire, accessibility, or permit validator.
 
+## The organization and asset substrate
+
+Singularity Architecture is a Workshop destination, but the organization model is intentionally generic. An architecture firm is an organization profile; the same data shape can represent a school, manufacturer, retailer, studio, or civic service. Members reference stable Digiten IDs and role labels rather than cloning people into each company. Projects can produce typed artifacts such as a `BuildingPlan`, tool, service, or other reusable asset.
+
+The initial `SingularityOrganization` contract supports identity, industry, optional building assignment, membership, and project/artifact references. It does not implement persistence, employment simulation, ownership policy, licensing, payment, or marketplace fees. Those policies should be layered on only after people, organizations, projects, and reusable assets have stable identities.
+
 ## How an AI-assisted sketch should work
 
 ProtocolAi and GrammarAi should be optional authoring tools around the same plan schema, not dependencies of the plan model itself.
@@ -64,4 +70,4 @@ The plan view, aerial view, street/FPS view, and historical view must resolve th
 
 ## Current boundary
 
-The schema and example are real code. The editor, shared city data model, interactive card selection, AI authoring, and multi-view projections are next work, not existing features. The bundle provider is a WebPage demonstration adapter, not yet a separately published MicroBundle package.
+The schema, example, first interactive plan studio, and generalized organization/project data contract are real code. Persistence, coordinated room/wall editing, live employment simulation, interactive Digiten cards, AI authoring, and multi-view projections remain future work. The bundle provider is a WebPage demonstration adapter, not yet a separately published MicroBundle package.
