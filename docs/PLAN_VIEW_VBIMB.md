@@ -32,7 +32,7 @@ The initial `SingularityOrganization` contract supports identity, industry, opti
 1. The host assembles the current task, relevant plan state, protocol vocabulary, and grammar/context.
 2. The user presses **Copy to Clipboard** and pastes the exchange into the LLM of their choice.
 3. The user copies the LLM's response.
-4. The user presses **Copy from Clipboard** in the Workshop terminal.
+4. The user presses **Paste from Clipboard** in the Workshop terminal.
 5. The host parses the architecture response as a strict JSON proposal and validates its plan geometry through `BuildingPlan`.
 6. The user explicitly applies a validated proposal; import alone never changes the working plan.
 
@@ -62,7 +62,7 @@ The plan view, aerial view, street/FPS view, and historical view must resolve th
 
 1. **Schema and example** — implemented as the renderer-neutral plan contract and compact apartment.
 2. **Plan canvas first pass** — implemented at `/architecture`: selectable room rectangles, dimension editing, fixtures, walls, and semantic opening symbols. Edits are local to the page session and room edits do not yet reshape associated walls.
-3. **Clipboard terminal + first proposal loop** — the WebPage exposes the two-button terminal in navigation and within Singularity Architecture. The architecture context includes the current plan and design brief; imported JSON is checked by the plan schema and requires an explicit Apply action. ProtocolAi symbol resolution and full GrammarAi validation are not yet connected.
+3. **Clipboard terminal + first proposal loop** — the WebPage exposes the two-button clipboard terminal in navigation and within Singularity Architecture. The architecture context includes the current plan and design brief; imported JSON is checked by the plan schema and requires an explicit Apply action. ProtocolAi symbol resolution and full GrammarAi validation are not yet connected.
 4. **Persistent editing** — coordinated room/wall edits, undo/redo, saved projects, and validation feedback.
 5. **Architect role** — first use the clipboard round trip; optionally add a HeadlessAi-backed role when explicitly configured. Both paths must feed the same validated proposal contract.
 6. **Digiten cards** — compact data cards linked to persistent Digiten IDs; selection opens a detailed inspector.
