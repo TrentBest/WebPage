@@ -1,6 +1,6 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.3.8",
+  "version": "1.3.9",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
@@ -28,6 +28,16 @@
       "aboutUrl": "/about-us",
       "bridgeEndpoint": null,
       "route": "/?tab=demonstrations",
+      "microBundles": []
+    },
+    {
+      "name": "Singularity Architecture",
+      "kind": "CreationStudio",
+      "description": "Design inspectable building plans for Singularity City and future reusable experience assets.",
+      "deploymentUrl": null,
+      "aboutUrl": "/architecture",
+      "bridgeEndpoint": null,
+      "route": "/architecture",
       "microBundles": []
     }
   ],
