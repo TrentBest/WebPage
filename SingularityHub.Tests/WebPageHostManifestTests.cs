@@ -70,7 +70,7 @@ public sealed class WebPageHostManifestTests
             wwwroot, "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
         var manifest = WebPageHostManifestParser.Parse(manifestJson);
 
-        Assert.Equal(new[] { "Welcome", "Demonstrations", "Singularity Architecture" }, manifest.Hub.Select(item => item.Name));
+        Assert.Equal(new[] { "Welcome", "Demonstrations", "Singularity Architecture", "Movement Lab" }, manifest.Hub.Select(item => item.Name));
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "AnyApp");
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "Support");
 
@@ -88,6 +88,11 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("CreationStudio", architecture.Kind);
         Assert.Equal("/architecture", architecture.Route);
         Assert.Empty(architecture.MicroBundles!);
+
+        var movementLab = Assert.Single(manifest.Hub, item => item.Name == "Movement Lab");
+        Assert.Equal("ExperienceGallery", movementLab.Kind);
+        Assert.Equal("/movement-lab", movementLab.Route);
+        Assert.Empty(movementLab.MicroBundles!);
 
         Assert.NotNull(manifest.Capabilities);
         Assert.Equal(new[] { "Rendering", "ProtocolAi Terminal" }, manifest.Capabilities!.Select(capability => capability.Name));
