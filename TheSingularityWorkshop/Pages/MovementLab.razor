@@ -1,0 +1,166 @@
+@page "/movement-lab"
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Movement Lab | The Singularity Workshop</PageTitle>
+
+<main class="movement-lab">
+    <header class="lab-header">
+        <a class="back-link" href="/">← RETURN TO THE WORKSHOP</a>
+        <p class="eyebrow">WORKSHOP FIELD BAY / MOVEMENT COURSE</p>
+        <h1>Movement <span>Lab</span></h1>
+        <p class="intro">A three-part course schematic is laid out in this bay. Select a marked region to inspect its dimensions and place in the route. The displayed geometry is a local fixture; no canonical course record or traversal record is connected.</p>
+        <div class="status-row">
+            <span class="status-chip">COURSE SCHEMATIC</span>
+            <span class="status-note">No traversal record attached</span>
+        </div>
+    </header>
+
+    <section class="course-layout" aria-label="Movement course inspection">
+        <div class="course-visual">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">FIELD BAY / COURSE SCHEMATIC</p>
+                    <h2>Approach → Hurdle → Landing</h2>
+                </div>
+                <span class="unit-label">METERS</span>
+            </div>
+            <p class="view-caption">Side elevation · X/Y plane · shared display scale: 90 units per meter</p>
+            <svg class="course-svg" viewBox="0 0 760 300" role="img" aria-labelledby="course-title course-desc">
+                <title id="course-title">Three-element hurdle course, side elevation</title>
+                <desc id="course-desc">Approach bounds span x minus one to one and y minus one half to one half. The hurdle spans x 2.9 to 3.1 and y zero to one. The landing spans x four to six and y minus one tenth to one tenth. All rectangles use the same 90 SVG units per meter on both axes and show the authored X/Y extents, not a simulated trajectory. Z depth is reported in the terminal, not drawn in this side elevation.</desc>
+                <defs>
+                    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                        <path d="M 38 0 L 0 0 0 28" fill="none" stroke="#173043" stroke-width="1" />
+                    </pattern>
+                </defs>
+                <rect x="24" y="20" width="712" height="260" fill="url(#grid)" />
+                <line x1="30" y1="220" x2="730" y2="220" stroke="#648092" stroke-width="1.5" />
+                <line x1="190" y1="26" x2="190" y2="280" stroke="#648092" stroke-width="1" stroke-dasharray="4 5" />
+                <line x1="460" y1="26" x2="460" y2="280" stroke="#648092" stroke-width="1" stroke-dasharray="4 5" />
+                <line x1="640" y1="26" x2="640" y2="280" stroke="#648092" stroke-width="1" stroke-dasharray="4 5" />
+                <rect x="100" y="175" width="180" height="90" rx="3" class="approach-zone" />
+                <rect x="451" y="130" width="18" height="90" rx="2" class="hurdle-zone" />
+                <rect x="550" y="211" width="180" height="18" rx="2" class="landing-zone" />
+                <text x="190" y="160" text-anchor="middle" class="svg-label">APPROACH</text>
+                <text x="460" y="112" text-anchor="middle" class="svg-label">HURDLE</text>
+                <text x="640" y="196" text-anchor="middle" class="svg-label">LANDING</text>
+                <text x="190" y="258" text-anchor="middle" class="svg-axis">x = 0</text>
+                <text x="460" y="258" text-anchor="middle" class="svg-axis">x = 3</text>
+                <text x="640" y="258" text-anchor="middle" class="svg-axis">x = 5</text>
+                <text x="28" y="36" class="svg-axis">Y ↑</text>
+                <text x="708" y="278" text-anchor="end" class="svg-axis">X →</text>
+            </svg>
+            <p class="figure-note">Schematic only. A route line, clearance result, or physical attempt will appear only when supported by actual evaluation data.</p>
+        </div>
+
+        <aside class="element-panel">
+            <p class="eyebrow">BAY TERMINAL / INSPECT REGION</p>
+            <h2>Course regions</h2>
+            <p class="panel-copy">Select a marked region to read its recorded identity, position, and full dimensions.</p>
+            <div class="element-list" role="group" aria-label="Select course element">
+                @foreach (var element in Elements)
+                {
+                    <button type="button"
+                            class="element-button @(Selected.Id == element.Id ? "selected" : "")"
+                            aria-pressed="@(Selected.Id == element.Id)"
+                            @onclick="() => SelectElement(element)">
+                        <span class="element-index">@element.Order.ToString("00")</span>
+                        <span class="element-name">@element.Id</span>
+                        <span class="element-kind">@element.Kind</span>
+                    </button>
+                }
+            </div>
+            <dl class="element-details">
+                <dt>Stable ID</dt><dd>@Selected.Id</dd>
+                <dt>Element kind</dt><dd>@Selected.Kind</dd>
+                <dt>Center (X, Y, Z)</dt><dd class="number-value">@Format(Selected.CenterX, Selected.CenterY, Selected.CenterZ)</dd>
+                <dt>Full size (X, Y, Z)</dt><dd class="number-value">@Format(Selected.SizeX, Selected.SizeY, Selected.SizeZ)</dd>
+                <dt>Units</dt><dd>meters</dd>
+                <dt>Bounds</dt><dd>Axis-aligned</dd>
+            </dl>
+        </aside>
+    </section>
+
+    <section class="evidence-layout">
+        <article class="evidence-card">
+            <p class="eyebrow">DISPLAYED GEOMETRY</p>
+            <h2>The schematic is available. The attempt is not recorded here.</h2>
+            <ul>
+                <li><strong>Route:</strong> approach, hurdle, landing.</li>
+                <li><strong>Displayed geometry:</strong> stable IDs, traversal order, centers, full extents, and caller-defined units from a local fixture.</li>
+                <li><strong>Not connected to this bay:</strong> a physics owner, movement controller, or live agent attempt.</li>
+            </ul>
+        </article>
+        <article class="evidence-card evidence-boundary">
+            <p class="eyebrow">INSTRUMENT STATUS</p>
+            <h2>No traversal record attached.</h2>
+            <p>This bay currently displays a local geometry fixture, not canonical serialized course data. It reports no success, collision, clearance, support, momentum, or landing-safety result. Those readings require observations from an authoritative simulation.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.Gestures/pull/10" target="_blank" rel="noopener noreferrer">INSPECT GESTURES PR #10 ↗</a>
+        </article>
+    </section>
+    <footer class="lab-footer">THE SINGULARITY WORKSHOP · FIELD BAY · COURSE SCHEMATIC</footer>
+</main>
+
+<style>
+.movement-lab{min-height:100vh;box-sizing:border-box;padding:clamp(1rem,4vw,3.5rem);background:#020711;color:#edfaff;font-family:Consolas,'Courier New',monospace}
+.lab-header,.course-layout,.evidence-layout,.lab-footer{width:min(1180px,100%);margin-inline:auto}
+.back-link{display:inline-block;margin-bottom:2.2rem;color:#91bdca;text-decoration:none;font-size:.7rem;letter-spacing:.12em}
+.back-link:hover{color:#fff}
+.eyebrow{margin:0;color:#00eaff;font-size:.65rem;letter-spacing:.2em}
+.lab-header h1{margin:.5rem 0;font-size:clamp(2.6rem,7vw,5.6rem);line-height:.95;letter-spacing:-.04em}
+.lab-header h1 span{color:#ff2cff}
+.intro{max-width:72ch;color:#a9c2ce;line-height:1.7;font-family:system-ui,sans-serif}
+.status-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:1.2rem 0 2.2rem}
+.status-chip{padding:.45rem .65rem;border:1px solid rgba(255,211,77,.55);color:#ffd34d;font-size:.62rem;letter-spacing:.12em}
+.status-note{color:#7693a0;font-size:.72rem}
+.course-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.9fr);gap:1rem;align-items:stretch}
+.course-visual,.element-panel,.evidence-card{min-width:0;border:1px solid rgba(0,234,255,.18);background:linear-gradient(145deg,rgba(0,168,255,.045),rgba(3,8,17,.94));padding:clamp(1rem,2vw,1.5rem)}
+.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.panel-heading h2,.element-panel h2,.evidence-card h2{margin:.55rem 0;font-size:clamp(1.05rem,2vw,1.45rem);line-height:1.25}
+.unit-label{color:#ffd34d;font-size:.65rem;letter-spacing:.14em}
+.view-caption,.panel-copy{color:#8daab8;font-size:.75rem;line-height:1.6}
+.course-svg{display:block;width:100%;height:auto;margin-top:1rem;border:1px solid rgba(100,128,146,.15);background:#030b16}
+.approach-zone{fill:rgba(0,234,255,.15);stroke:#00eaff;stroke-width:2}
+.hurdle-zone{fill:rgba(255,44,255,.55);stroke:#ff2cff;stroke-width:2}
+.landing-zone{fill:rgba(255,211,77,.2);stroke:#ffd34d;stroke-width:2}
+.svg-label{fill:#e9fbff;font:700 11px Consolas,'Courier New',monospace;letter-spacing:1px}
+.svg-axis{fill:#7795a5;font:10px Consolas,'Courier New',monospace}
+.figure-note{margin:1rem 0 0;color:#718d9a;font-size:.68rem;line-height:1.6}
+.element-list{display:grid;gap:.5rem;margin:1rem 0}
+.element-button{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:.1rem .6rem;text-align:left;padding:.75rem;background:rgba(0,0,0,.2);border:1px solid rgba(125,160,180,.22);color:#dceef4;cursor:pointer;font:inherit}
+.element-button:hover,.element-button.selected{border-color:#00eaff;background:rgba(0,234,255,.07)}
+.element-index{grid-row:span 2;color:#00eaff;font-size:.75rem}
+.element-name{overflow-wrap:anywhere;font-size:.8rem}
+.element-kind{margin-top:.2rem;color:#8aa6b3;font-size:.65rem}
+.element-details{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:.65rem .8rem;margin:1.2rem 0 0;padding-top:1rem;border-top:1px solid rgba(255,255,255,.1);font-size:.72rem}
+.element-details dt{color:#7d9aa8}.element-details dd{margin:0;color:#effaff;text-align:right;overflow-wrap:anywhere}.number-value{font-variant-numeric:tabular-nums}
+.evidence-layout{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.evidence-card p,.evidence-card li{color:#a9c2ce;font-family:system-ui,sans-serif;font-size:.85rem;line-height:1.7}
+.evidence-card ul{padding-left:1.2rem}.evidence-card li+li{margin-top:.5rem}.evidence-card strong{color:#edfaff}
+.evidence-boundary{border-color:rgba(255,44,255,.28)}.evidence-boundary .eyebrow{color:#ff7bff}
+.evidence-card a{display:inline-block;margin-top:.7rem;color:#9ceefa;text-decoration:none;font-size:.68rem;letter-spacing:.1em}.evidence-card a:hover{color:#fff}
+.lab-footer{margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.1);color:#5c7784;font-size:.62rem;letter-spacing:.12em}
+@@media(max-width:820px){.course-layout,.evidence-layout{grid-template-columns:1fr}.back-link{margin-bottom:1.5rem}.course-svg{min-height:150px}}
+@@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+@code {
+    private sealed record CourseElement(
+        int Order, string Id, string Kind,
+        double CenterX, double CenterY, double CenterZ,
+        double SizeX, double SizeY, double SizeZ);
+
+    private static readonly IReadOnlyList<CourseElement> Elements =
+    [
+        new(1, "approach", "ApproachZone", 0, 0, 0, 2, 1, 2),
+        new(2, "hurdle-01", "Hurdle", 3, 0.5, 0, 0.2, 1, 2),
+        new(3, "landing", "LandingZone", 5, 0, 0, 2, 0.2, 2)
+    ];
+
+    private CourseElement Selected { get; set; } = Elements[0];
+
+    private void SelectElement(CourseElement element) => Selected = element;
+
+    private static string Format(double x, double y, double z) =>
+        $"({x:0.##}, {y:0.##}, {z:0.##})";
+}
