@@ -118,6 +118,14 @@ try {
   await page.getByRole("button", { name: /pause/i }).click();
   await page.getByText(/PAUSED — ILLUSTRATIVE FIXTURE ONLY/).waitFor({ state: "visible", timeout: 5_000 });
 
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("heading", { name: "Replay Lab", exact: true }).waitFor({ state: "visible" });
+  const mobileScrubberWidth = await scrubber.evaluate(el => el.getBoundingClientRect().width);
+  if (mobileScrubberWidth < 120) {
+    throw new Error(`Replay Lab scrubber should remain usable at a narrow viewport; width was ${mobileScrubberWidth}px.`);
+  }
+  await page.screenshot({ path: `${outputDir}/04-replay-lab-mobile.png`, fullPage: true });
+
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
