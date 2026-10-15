@@ -18,6 +18,22 @@ public sealed class SingularityCitySliceTests
     }
 
     [Fact]
+    public void CityHasStableSoccerArenaIdentityInsideWorldBounds()
+    {
+        var structures = SingularityCityCatalog.Structures;
+        var arena = Assert.Single(structures.Where(structure => structure.Id == "city-soccer-arena"));
+
+        Assert.Equal("Singularity Soccer Arena", arena.Name);
+        Assert.Equal(SpatialCityStructureKind.Culture, arena.Kind);
+        Assert.True(arena.Bounds.X >= 0 && arena.Bounds.Y >= 0, "The arena starts outside the city plan.");
+        Assert.True(arena.Bounds.Width > 0 && arena.Bounds.Height > 0, "The arena must have a visible footprint.");
+        Assert.True(arena.Bounds.X + arena.Bounds.Width <= SingularityCityCatalog.WorldBounds.Width, "The arena exceeds the city width.");
+        Assert.True(arena.Bounds.Y + arena.Bounds.Height <= SingularityCityCatalog.WorldBounds.Height, "The arena exceeds the city height.");
+        Assert.Contains(structures, structure => structure.Id == "city-transit-hub");
+        Assert.Contains(arena.FutureFunction, "Soccer MicroBundle", StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void MansionFeaturesHaveStableIdsAndStayInsideTheNormalizedPlan()
     {
         var features = SingularityMansionArchitecture.Features;
