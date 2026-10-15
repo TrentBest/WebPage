@@ -121,6 +121,33 @@ try {
     throw new Error("Movement Lab must disclose its shared schematic scale and authored-bound representation.");
   }
 
+  // Check the actual Movement Lab layout at a narrow viewport, not just the desktop render.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(100);
+  const mobileLayout = await page.evaluate(() => ({
+    viewportWidth: window.innerWidth,
+    documentWidth: document.documentElement.scrollWidth,
+    courseColumns: getComputedStyle(document.querySelector(".course-layout")).gridTemplateColumns,
+    evidenceColumns: getComputedStyle(document.querySelector(".evidence-layout")).gridTemplateColumns,
+    selectedElementVisible: (() => {
+      const button = document.querySelector(".element-button.selected");
+      if (!button) return false;
+      const rect = button.getBoundingClientRect();
+      return rect.width > 0 && rect.left >= 0 && rect.right <= window.innerWidth;
+    })()
+  }));
+  if (mobileLayout.documentWidth > mobileLayout.viewportWidth + 1) {
+    throw new Error(`Movement Lab must not create horizontal page overflow on mobile: ${JSON.stringify(mobileLayout)}`);
+  }
+  if (!mobileLayout.selectedElementVisible) {
+    throw new Error(`Movement Lab selected region must remain visible on mobile: ${JSON.stringify(mobileLayout)}`);
+  }
+  if (mobileLayout.courseColumns.split(" ").length !== 1 || mobileLayout.evidenceColumns.split(" ").length !== 1) {
+    throw new Error(`Movement Lab course and evidence panels must stack on mobile: ${JSON.stringify(mobileLayout)}`);
+  }
+  await page.screenshot({ path: `${outputDir}/04-movement-lab-mobile.png`, fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 900 });
+
   // Replay Lab uses the current development fixture: slider, event ledger, and transport.
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "Replay Lab", exact: true }).click();
