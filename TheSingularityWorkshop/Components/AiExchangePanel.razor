@@ -9,6 +9,16 @@
 <section class="ai-terminal" aria-labelledby="ai-terminal-heading">
     <h2 id="ai-terminal-heading">PROTOCOLAI TERMINAL</h2>
     <p>Copy the semantic exchange into the LLM of your choice. Copy its response back to your clipboard, then import it here. This terminal does not call an LLM.</p>
+    <div class="ai-exchange-grid">
+        <section class="ai-exchange-block">
+            <strong>Protocol</strong>
+            <pre class="ai-exchange-value">@ProtocolDescription</pre>
+        </section>
+        <section class="ai-exchange-block">
+            <strong>Grammar</strong>
+            <pre class="ai-exchange-value">@GrammarDescription</pre>
+        </section>
+    </div>
     <div class="ai-terminal-actions">
         <button type="button"
                 class="@(_hasContext ? "ai-terminal-button ai-breathing" : "ai-terminal-button")"
@@ -21,6 +31,12 @@
             Paste from Clipboard
         </button>
     </div>
+    <section class="ai-response-panel">
+        <strong>Clipboard response / read-only preview</strong>
+        <textarea id="ai-llm-response" class="ai-response-preview" rows="8" readonly
+                  aria-label="Imported LLM response preview"
+                  placeholder="Use Paste from Clipboard to stage the response here...">@_responsePreview</textarea>
+    </section>
     <p class="ai-terminal-status" role="status" aria-live="polite">STATUS // @_status</p>
 </section>
 
@@ -38,6 +54,7 @@
     [Parameter] public EventCallback<string> OnResponseImported { get; set; }
 
     private string _status = "READY";
+    private string _responsePreview = string.Empty;
     private bool _awaitingResponse;
     private bool _hasContext => Exchange?.Protocol is not null && Exchange?.Grammar is not null;
 
@@ -50,31 +67,17 @@
     private AiExchangeCompositionBundle? Exchange =>
         Experience.AiExchangeComposition;
 
+    private string ProtocolDescription =>
+        Exchange?.Protocol?.Describe() ?? "Protocol vocabulary is not composed.";
+
+    private string GrammarDescription =>
+        Exchange?.Grammar?.Describe() ?? "Grammar definition is not composed.";
+
     private Task CopyCurrentExchangeAsync() =>
-        CopyToClipboardAsync(BuildExchangeText(Exchange));
-
-    private string BuildExchangeText(AiExchangeCompositionBundle? exchange)
-    {
-        var parts = new List<string>
-        {
-            "WORKSHOP PROTOCOLAI TERMINAL EXCHANGE",
-            "The response is a proposal only. Do not invent IDs or claim validation.",
-            "PROTOCOL",
-            exchange?.Protocol?.Describe() ?? "Protocol vocabulary is not composed.",
-            "GRAMMAR",
-            exchange?.Grammar?.Describe() ?? "Grammar definition is not composed."
-        };
-
-        if (!string.IsNullOrWhiteSpace(ContextPayload))
-        {
-            parts.Add("HOST CONTEXT / TASK");
-            parts.Add(ContextPayload.Trim());
-        }
-
-        parts.Add("RESPONSE CONTRACT");
-        parts.Add("Return a structured proposal matching the host task's requested format. Preserve stable IDs where supplied. Explain conflicts instead of silently guessing. The host will validate and review the response before applying changes.");
-        return string.Join(Environment.NewLine + Environment.NewLine, parts);
-    }
+        CopyToClipboardAsync(AiExchangeTextBuilder.Build(
+            Exchange?.Protocol?.Describe(),
+            Exchange?.Grammar?.Describe(),
+            ContextPayload));
 
     private async Task CopyToClipboardAsync(string exchangeText)
     {
@@ -100,15 +103,17 @@
             var response = await JS.InvokeAsync<string>("navigator.clipboard.readText");
             if (string.IsNullOrWhiteSpace(response))
             {
+                _awaitingResponse = false;
                 _status = "CLIPBOARD IS EMPTY";
                 StateHasChanged();
                 return;
             }
 
+            _responsePreview = response;
+            _awaitingResponse = false;
             if (OnResponseImported.HasDelegate)
             {
                 await OnResponseImported.InvokeAsync(response);
-                _awaitingResponse = false;
                 _status = "RESPONSE STAGED — VALIDATION AND ACTUATION NOT YET IMPLEMENTED";
             }
             else
@@ -118,6 +123,7 @@
         }
         catch (JSException)
         {
+            _awaitingResponse = false;
             _status = "CLIPBOARD READ FAILED — CHECK BROWSER PERMISSION";
         }
 
@@ -126,6 +132,13 @@
 }
 
 <style>
+    .ai-exchange-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:1rem;margin:1rem 0}
+    .ai-exchange-block{min-width:0;padding:.9rem;border:1px solid rgba(0,234,255,.18);background:rgba(0,10,20,.55)}
+    .ai-exchange-block strong,.ai-response-panel strong{display:block;margin-bottom:.6rem;color:#00eaff;font:700 .75rem Consolas,'Courier New',monospace;letter-spacing:.12em;text-transform:uppercase}
+    .ai-exchange-value{max-height:18rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;color:#b9d4de;font:.78rem/1.55 Consolas,'Courier New',monospace}
+    .ai-response-panel{min-width:0;margin:1rem 0;padding:.9rem;border:1px solid rgba(255,44,255,.24);background:rgba(15,5,22,.4)}
+    .ai-response-panel strong{color:#ff8cff}
+    .ai-response-preview{display:block;width:100%;box-sizing:border-box;min-height:10rem;max-height:24rem;overflow:auto;resize:vertical;padding:.8rem;border:1px solid rgba(0,234,255,.22);background:rgba(0,0,0,.35);color:#edfaff;font:.8rem/1.55 Consolas,'Courier New',monospace;white-space:pre-wrap;overflow-wrap:anywhere}
     .ai-terminal-actions{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin:1rem 0}
     .ai-terminal-button{min-height:3rem;padding:.8rem 1.2rem;border:1px solid rgba(0,234,255,.65);border-radius:.25rem;background:rgba(0,234,255,.07);color:#eafcff;font:700 .9rem Consolas,'Courier New',monospace;letter-spacing:.04em;cursor:pointer}
     .ai-terminal-button:hover{border-color:#ff2cff;box-shadow:0 0 16px rgba(255,44,255,.22)}
