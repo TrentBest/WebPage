@@ -1,0 +1,325 @@
+@page "/architecture"
+@using TheSingularityWorkshop.Workshop.MicroBundles
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Singularity Architecture // The Workshop</PageTitle>
+
+<div class="architecture-shell">
+    <header class="architecture-header">
+        <a href="/" class="architecture-back">← THE WORKSHOP</a>
+        <div class="architecture-kicker">SINGULARITY ARCHITECTURE / VBIMB</div>
+        <h1>Build places people can inhabit.</h1>
+        <p>Design a building as structured world data—not just a picture. The same building can become a plan, a place to walk through, and eventually a reusable asset in other experiences.</p>
+        <div class="architecture-status"><span></span> PLAN MODEL ONLINE <i>·</i> AI AUTHORING CONNECTOR IN DEVELOPMENT</div>
+    </header>
+
+    <main class="architecture-workspace">
+        <section class="architecture-drawing panel">
+            <div class="panel-heading"><span>01 / PLAN STUDIO</span><span>@Plan.Name.ToUpperInvariant()</span></div>
+            <div class="plan-stage">
+                <svg class="plan-svg" viewBox="0 0 840 650" role="img" aria-label="Interactive floor plan. Select a room to inspect it.">
+                    <defs>
+                        <pattern id="planGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+                            <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#173242" stroke-width="1" />
+                        </pattern>
+                    </defs>
+                    <rect x="0" y="0" width="840" height="650" fill="url(#planGrid)" />
+                    @foreach (var room in Plan.Rooms)
+                    {
+                        <g class="plan-room @(SelectedRoom?.Id == room.Id ? "selected" : "")" role="button" tabindex="0" aria-label="@($"Select {room.Name}")" @onclick="() => SelectRoom(room.Id)" @onkeydown="(e) => { if (e.Key == "Enter" || e.Key == " ") SelectRoom(room.Id); }">
+                            <rect x="@Px(room.X)" y="@Py(room.Y)" width="@Px(room.Width)" height="@Px(room.Height)" rx="3" />
+                            <text x="@(Px(room.X) + Px(room.Width) / 2)" y="@(Py(room.Y) + Px(room.Height) / 2 - 4)" text-anchor="middle">@room.Name</text>
+                            <text class="room-dimensions" x="@(Px(room.X) + Px(room.Width) / 2)" y="@(Py(room.Y) + Px(room.Height) / 2 + 17)" text-anchor="middle">@($"{room.Width:0.0} × {room.Height:0.0} m")</text>
+                        </g>
+                    }
+                    @foreach (var wall in Plan.Walls)
+                    {
+                        @foreach (var segment in WallSegments(wall))
+                        {
+                            <line class="plan-wall" x1="@Px(segment.X1)" y1="@Py(segment.Y1)" x2="@Px(segment.X2)" y2="@Py(segment.Y2)" />
+                        }
+                    }
+                    @foreach (var fixture in Plan.Fixtures)
+                    {
+                        <g class="plan-fixture">
+                            <rect x="@Px(fixture.X)" y="@Py(fixture.Y)" width="@Px(fixture.Width)" height="@Px(fixture.Height)" rx="3" />
+                            <text x="@(Px(fixture.X) + Px(fixture.Width) / 2)" y="@(Py(fixture.Y) + Px(fixture.Height) / 2 + 4)" text-anchor="middle">@fixture.Name</text>
+                        </g>
+                    }
+                    @foreach (var opening in Plan.Openings)
+                    {
+                        var symbol = OpeningSymbol(opening);
+                        <g class="opening-symbol" aria-label="@($"{opening.Kind}: {opening.Id}")">
+                            @if (opening.Kind == PlanOpeningKind.HingedDoor)
+                            {
+                                <line class="door-leaf" x1="@Px(symbol.HingeX)" y1="@Py(symbol.HingeY)" x2="@Px(symbol.LeafX)" y2="@Py(symbol.LeafY)" />
+                                <path class="door-swing" d="@symbol.ArcPath" />
+                            }
+                            else if (opening.Kind == PlanOpeningKind.SlidingDoor)
+                            {
+                                <line class="sliding-track" x1="@Px(symbol.X1)" y1="@Py(symbol.Y1)" x2="@Px(symbol.X2)" y2="@Py(symbol.Y2)" />
+                                <line class="sliding-panel" x1="@Px(symbol.HingeX)" y1="@Py(symbol.HingeY)" x2="@Px(symbol.LeafX)" y2="@Py(symbol.LeafY)" />
+                                <path class="motion-arrow" d="@symbol.ArrowPath" />
+                            }
+                            else if (opening.Kind == PlanOpeningKind.PocketDoor)
+                            {
+                                <line class="pocket-track" x1="@Px(symbol.X1)" y1="@Py(symbol.Y1)" x2="@Px(symbol.X2)" y2="@Py(symbol.Y2)" />
+                                <line class="pocket-panel" x1="@Px(symbol.HingeX)" y1="@Py(symbol.HingeY)" x2="@Px(symbol.LeafX)" y2="@Py(symbol.LeafY)" />
+                            }
+                            else if (opening.Kind == PlanOpeningKind.RevolvingDoor)
+                            {
+                                <circle class="revolving-outline" cx="@Px(symbol.CenterX)" cy="@Py(symbol.CenterY)" r="16" />
+                                <line class="revolving-leaf" x1="@Px(symbol.CenterX - 16)" y1="@Py(symbol.CenterY)" x2="@Px(symbol.CenterX + 16)" y2="@Py(symbol.CenterY)" />
+                                <line class="revolving-leaf" x1="@Px(symbol.CenterX)" y1="@Py(symbol.CenterY - 16)" x2="@Px(symbol.CenterX)" y2="@Py(symbol.CenterY + 16)" />
+                            }
+                            else if (opening.Kind == PlanOpeningKind.Window)
+                            {
+                                <line class="window-line" x1="@Px(symbol.X1)" y1="@Py(symbol.Y1)" x2="@Px(symbol.X2)" y2="@Py(symbol.Y2)" />
+                            }
+                            else
+                            {
+                                <line class="archway-line" x1="@Px(symbol.X1)" y1="@Py(symbol.Y1)" x2="@Px(symbol.X2)" y2="@Py(symbol.Y2)" />
+                            }
+                        </g>
+                    }
+                    <text class="north-marker" x="790" y="45">N ↑</text>
+                    <text class="scale-label" x="40" y="625">SCHEMATIC / METRES / NOT A CODE OR CONSTRUCTION REVIEW</text>
+                </svg>
+            </div>
+            <div class="plan-legend">
+                <span><i class="legend-hinged"></i> Hinged / swing</span>
+                <span><i class="legend-sliding"></i> Sliding</span>
+                <span><i class="legend-pocket"></i> Pocket</span>
+                <span><i class="legend-revolving"></i> Revolving</span>
+                <span><i class="legend-window"></i> Window</span>
+            </div>
+        </section>
+
+        <aside class="architecture-inspector">
+            <section class="panel inspector-panel">
+                <div class="panel-heading"><span>02 / INSPECT</span><span>SHARED MODEL</span></div>
+                @if (SelectedRoom is not null)
+                {
+                    <div class="inspector-body">
+                        <div class="inspector-eyebrow">SELECTED ROOM</div>
+                        <h2>@SelectedRoom.Name</h2>
+                        <p class="muted">@SelectedRoom.Use · ID <code>@SelectedRoom.Id</code></p>
+                        <label for="room-width">Width (metres)</label>
+                        <input id="room-width" type="number" min="0.5" max="@Plan.Width" step="0.1" @bind="RoomWidthDraft" />
+                        <label for="room-height">Height (metres)</label>
+                        <input id="room-height" type="number" min="0.5" max="@Plan.Height" step="0.1" @bind="RoomHeightDraft" />
+                        <button class="architecture-action" type="button" @onclick="ApplyRoomDimensions">APPLY DIMENSIONS</button>
+                        @if (!string.IsNullOrWhiteSpace(EditMessage))
+                        {
+                            <p class="edit-message" role="status">@EditMessage</p>
+                        }
+                    </div>
+                }
+                <div class="inspector-divider"></div>
+                <div class="inspector-body">
+                    <div class="inspector-eyebrow">OPENINGS</div>
+                    @foreach (var opening in Plan.Openings)
+                    {
+                        <div class="opening-row">
+                            <div><strong>@FriendlyKind(opening.Kind)</strong><small>@opening.Id · @opening.Width.ToString("0.00") m</small></div>
+                            <button type="button" class="opening-toggle" @onclick="() => ToggleOpening(opening.Id)">@(opening.OpenFraction > 0 ? "OPEN" : "CLOSED")</button>
+                        </div>
+                    }
+                    <p class="muted small">Door state is model data. The plan symbol responds to the selected opening's state.</p>
+                </div>
+            </section>
+
+            <section class="panel brief-panel">
+                <div class="panel-heading"><span>03 / ARCHITECTURE BRIEF</span><span>LLM-READY</span></div>
+                <div class="inspector-body">
+                    <p>Describe the place you want to create. The brief is captured here; a live GrammarAi / ProtocolAi authoring connection will be added as a reviewed proposal pipeline.</p>
+                    <label for="building-brief">Your building idea</label>
+                    <textarea id="building-brief" rows="4" @bind="BuildingBrief" placeholder="A narrow live-work townhouse around a quiet planted courtyard…"></textarea>
+                    <label for="building-purpose">Primary purpose</label>
+                    <select id="building-purpose" @bind="BuildingPurpose">
+                        <option>Mixed-use</option>
+                        <option>Residential</option>
+                        <option>Commercial</option>
+                        <option>Civic</option>
+                        <option>Industrial</option>
+                        <option>Education</option>
+                        <option>Culture</option>
+                    </select>
+                    <button class="architecture-action secondary" type="button" @onclick="PrepareBrief">PREPARE STRUCTURED BRIEF</button>
+                    @if (!string.IsNullOrWhiteSpace(PreparedBrief))
+                    {
+                        <div class="brief-result" role="status">
+                            <strong>BRIEF CAPTURED · READY FOR AUTHORING ADAPTER</strong>
+                            <p>@PreparedBrief</p>
+                        </div>
+                    }
+                    <p class="muted small">No generated design is claimed yet. The next step is to send this brief through an optional LLM adapter, validate proposed operations against the plan schema, and ask you to accept or revise them.</p>
+                </div>
+            </section>
+        </aside>
+    </main>
+
+    <section class="architecture-next">
+        <div><span class="architecture-kicker">FROM A PLAN TO A PLACE</span><h2>One building. Many experiences.</h2><p>Shared building and room IDs are the foundation for a 3D building, street-level navigation, occupancy, renovation history, and reusable building assets.</p></div>
+        <div class="architecture-pipeline"><span>INTENT</span><b>→</b><span>VALIDATED PLAN</span><b>→</b><span>BUILDING</span><b>→</b><span>WALKABLE EXPERIENCE</span></div>
+    </section>
+</div>
+
+@code {
+    private BuildingPlan Plan = PlanSketchExamples.CompactApartment;
+    private string SelectedRoomId = "living";
+    private double RoomWidthDraft = 7.1;
+    private double RoomHeightDraft = 4.1;
+    private string? EditMessage;
+    private string BuildingBrief = "";
+    private string BuildingPurpose = "Mixed-use";
+    private string? PreparedBrief;
+
+    private PlanRoom? SelectedRoom => Plan.Rooms.FirstOrDefault(x => x.Id == SelectedRoomId);
+
+    protected override void OnInitialized() => SyncRoomDrafts();
+
+    private static double Px(double value) => value * 60 + 40;
+    private static double Py(double value) => value * 60 + 40;
+
+    private void SelectRoom(string id)
+    {
+        SelectedRoomId = id;
+        EditMessage = null;
+        SyncRoomDrafts();
+    }
+
+    private void SyncRoomDrafts()
+    {
+        if (SelectedRoom is null) return;
+        RoomWidthDraft = SelectedRoom.Width;
+        RoomHeightDraft = SelectedRoom.Height;
+    }
+
+    private void ApplyRoomDimensions()
+    {
+        if (SelectedRoom is null) return;
+        if (!double.IsFinite(RoomWidthDraft) || !double.IsFinite(RoomHeightDraft)
+            || RoomWidthDraft <= 0 || RoomHeightDraft <= 0
+            || SelectedRoom.X + RoomWidthDraft > Plan.Width
+            || SelectedRoom.Y + RoomHeightDraft > Plan.Height)
+        {
+            EditMessage = "Dimensions must be positive and remain inside the plan boundary.";
+            return;
+        }
+
+        var rooms = Plan.Rooms.Select(room => room.Id == SelectedRoomId
+            ? room with { Width = RoomWidthDraft, Height = RoomHeightDraft }
+            : room).ToArray();
+
+        try
+        {
+            Plan = new BuildingPlan(Plan.Id, Plan.Name, Plan.Width, Plan.Height,
+                rooms, Plan.Walls, Plan.Openings, Plan.Fixtures);
+            EditMessage = "Room dimensions applied to this in-memory plan.";
+        }
+        catch (ArgumentException ex)
+        {
+            EditMessage = $"Plan validation rejected the edit: {ex.Message}";
+            SyncRoomDrafts();
+        }
+    }
+
+    private void ToggleOpening(string id)
+    {
+        var openings = Plan.Openings.Select(opening => opening.Id == id
+            ? opening with { OpenFraction = opening.OpenFraction > 0 ? 0 : 1 }
+            : opening).ToArray();
+        Plan = new BuildingPlan(Plan.Id, Plan.Name, Plan.Width, Plan.Height,
+            Plan.Rooms, Plan.Walls, openings, Plan.Fixtures);
+    }
+
+    private void PrepareBrief()
+    {
+        var idea = BuildingBrief.Trim();
+        if (idea.Length == 0)
+        {
+            PreparedBrief = "Add a short description first. Nothing has been sent to an LLM.";
+            return;
+        }
+
+        PreparedBrief = $"Purpose: {BuildingPurpose}. Design intent: {idea} " +
+            "Next operation: request a structured, reviewable BuildingPlan proposal; preserve stable IDs where possible; report geometric conflicts rather than guessing.";
+    }
+
+    private static string FriendlyKind(PlanOpeningKind kind) => kind switch
+    {
+        PlanOpeningKind.HingedDoor => "Hinged door",
+        PlanOpeningKind.SlidingDoor => "Sliding door",
+        PlanOpeningKind.PocketDoor => "Pocket door",
+        PlanOpeningKind.RevolvingDoor => "Revolving door",
+        PlanOpeningKind.Archway => "Archway",
+        PlanOpeningKind.Window => "Window",
+        _ => kind.ToString()
+    };
+
+    private readonly record struct WallSegment(double X1, double Y1, double X2, double Y2);
+    private readonly record struct DoorSymbol(double X1, double Y1, double X2, double Y2,
+        double HingeX, double HingeY, double LeafX, double LeafY,
+        double CenterX, double CenterY, string ArcPath, string ArrowPath);
+
+    private IEnumerable<WallSegment> WallSegments(PlanWall wall)
+    {
+        var dx = wall.X2 - wall.X1;
+        var dy = wall.Y2 - wall.Y1;
+        var length = Math.Sqrt(dx * dx + dy * dy);
+        var intervals = Plan.Openings.Where(o => o.WallId == wall.Id)
+            .Select(o => (Start: o.Offset / length, End: (o.Offset + o.Width) / length))
+            .OrderBy(x => x.Start).ToArray();
+        var cursor = 0d;
+        foreach (var interval in intervals)
+        {
+            if (interval.Start > cursor)
+                yield return Segment(cursor, interval.Start);
+            cursor = Math.Max(cursor, interval.End);
+        }
+        if (cursor < 1d) yield return Segment(cursor, 1d);
+
+        WallSegment Segment(double start, double end) =>
+            new(wall.X1 + dx * start, wall.Y1 + dy * start,
+                wall.X1 + dx * end, wall.Y1 + dy * end);
+    }
+
+    private DoorSymbol OpeningSymbol(PlanOpening opening)
+    {
+        var wall = Plan.Walls.First(w => w.Id == opening.WallId);
+        var dx = wall.X2 - wall.X1;
+        var dy = wall.Y2 - wall.Y1;
+        var length = Math.Sqrt(dx * dx + dy * dy);
+        var ux = dx / length;
+        var uy = dy / length;
+        var sign = opening.Hinge == PlanHinge.Start ? 1d : -1d;
+        var hingeDistance = opening.Offset + (opening.Hinge == PlanHinge.Start ? 0 : opening.Width);
+        var hx = wall.X1 + ux * hingeDistance;
+        var hy = wall.Y1 + uy * hingeDistance;
+        var cx = wall.X1 + ux * (opening.Offset + opening.Width / 2);
+        var cy = wall.Y1 + uy * (opening.Offset + opening.Width / 2);
+        var fraction = opening.OpenFraction;
+        var normalSign = opening.Swing == PlanSwingDirection.OutOfRoom ? -1d : 1d;
+        var leafX = hx + (-uy * opening.Width * fraction * normalSign);
+        var leafY = hy + (ux * opening.Width * fraction * normalSign);
+        var radius = opening.Width * 60;
+        var arc = $"M {Px(hx)} {Py(hy)} A {radius:0.##} {radius:0.##} 0 0 1 {Px(hx + (-uy * opening.Width * normalSign))} {Py(hy + (ux * opening.Width * normalSign))}";
+        var tx = cx + ux * .15;
+        var ty = cy + uy * .15;
+        var arrow = $"M {Px(tx - uy * .16)} {Py(ty + ux * .16)} L {Px(tx + uy * .16)} {Py(ty - ux * .16)}";
+        return new DoorSymbol(
+            cx - ux * opening.Width / 2, cy - uy * opening.Width / 2,
+            cx + ux * opening.Width / 2, cy + uy * opening.Width / 2,
+            hx, hy, leafX, leafY, cx, cy, arc, arrow);
+    }
+}
+
+<style>
+    .architecture-shell{min-height:100vh;margin:-1rem -1.5rem;padding:clamp(1rem,3vw,2.5rem);box-sizing:border-box;color:#eaf7fb;background:radial-gradient(ellipse at 16% 4%,rgba(0,168,255,.12),transparent 35%),radial-gradient(ellipse at 90% 20%,rgba(255,44,255,.08),transparent 32%),#030811;font-family:Consolas,'Courier New',monospace}
+    .architecture-header{max-width:1500px;margin:0 auto 1.5rem}.architecture-back{display:inline-block;color:#9bdfea;text-decoration:none;font-size:.7rem;letter-spacing:.12em;margin-bottom:1.4rem}.architecture-kicker{color:#00eaff;font-size:.68rem;letter-spacing:.2em}.architecture-header h1{max-width:1000px;margin:.6rem 0;font-size:clamp(2.3rem,6vw,5.8rem);line-height:.92;letter-spacing:-.04em}.architecture-header p{max-width:78ch;color:#afc3cd;line-height:1.7}.architecture-status{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:1.1rem;color:#92a9b4;font-size:.64rem;letter-spacing:.12em}.architecture-status span{width:.5rem;height:.5rem;border-radius:50%;background:#5ee6b0;box-shadow:0 0 14px #5ee6b0}.architecture-status i{color:#ff2cff}
+    .architecture-workspace{max-width:1500px;margin:auto;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.8fr);gap:1rem;align-items:start}.panel{min-width:0;border:1px solid rgba(0,234,255,.22);background:linear-gradient(145deg,rgba(7,21,33,.96),rgba(3,8,17,.96));box-shadow:0 20px 60px rgba(0,0,0,.18)}.panel-heading{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.9rem 1rem;border-bottom:1px solid rgba(0,234,255,.16);color:#80a7b8;font-size:.62rem;letter-spacing:.13em}.plan-stage{padding:.8rem;overflow:auto}.plan-svg{display:block;width:100%;min-width:480px;height:auto;max-height:76vh}.plan-room{cursor:pointer;outline:none}.plan-room rect{fill:rgba(0,168,255,.055);stroke:#244c5d;stroke-width:1.5;transition:fill .15s,stroke .15s}.plan-room.selected rect,.plan-room:focus rect{fill:rgba(0,234,255,.14);stroke:#00eaff;stroke-width:2.5}.plan-room text{fill:#d9edf4;font:13px Consolas,'Courier New',monospace;pointer-events:none}.plan-room .room-dimensions{fill:#7d9eac;font-size:10px}.plan-wall{stroke:#d6edf5;stroke-width:5;stroke-linecap:square}.plan-fixture rect{fill:rgba(255,44,255,.09);stroke:#bd71c7;stroke-width:1.5}.plan-fixture text{fill:#d8b8e1;font:10px Consolas,'Courier New',monospace}.door-leaf{stroke:#ffcb70;stroke-width:2.5}.door-swing{fill:none;stroke:#ffcb70;stroke-width:1.3;stroke-dasharray:4 3}.sliding-track,.pocket-track{stroke:#6ddcf2;stroke-width:1.5}.sliding-panel{stroke:#6ddcf2;stroke-width:3}.motion-arrow{fill:none;stroke:#6ddcf2;stroke-width:1.5;stroke-dasharray:3 2}.pocket-panel{stroke:#6ddcf2;stroke-width:2;stroke-dasharray:3 3}.revolving-outline{fill:rgba(255,203,112,.06);stroke:#ffcb70;stroke-width:1.5}.revolving-leaf{stroke:#ffcb70;stroke-width:2}.window-line{stroke:#68e0cf;stroke-width:3}.archway-line{stroke:#9b9cff;stroke-width:2;stroke-dasharray:2 3}.north-marker{fill:#7196a7;font:12px Consolas,'Courier New',monospace}.scale-label{fill:#5f7e8b;font:9px Consolas,'Courier New',monospace}.plan-legend{display:flex;gap:.8rem 1.2rem;flex-wrap:wrap;padding:.8rem 1rem 1rem;border-top:1px solid rgba(0,234,255,.12);color:#9eb7c2;font-size:.65rem}.plan-legend span{display:flex;align-items:center;gap:.4rem}.plan-legend i{display:inline-block;width:18px;height:3px}.legend-hinged{background:#ffcb70}.legend-sliding{background:#6ddcf2}.legend-pocket{border-top:2px dashed #6ddcf2}.legend-revolving{border:1px solid #ffcb70;border-radius:50%;width:10px!important;height:10px!important}.legend-window{background:#68e0cf}
+    .architecture-inspector{display:grid;gap:1rem}.inspector-body{padding:1rem}.inspector-eyebrow{color:#00eaff;font-size:.62rem;letter-spacing:.17em}.inspector-body h2{margin:.5rem 0;font-size:1.5rem}.muted{color:#829eac;font: .78rem/1.6 system-ui,sans-serif}.muted code{color:#b6d7e5}.small{font-size:.68rem}.inspector-body label{display:block;margin:.8rem 0 .35rem;color:#a5c1cd;font-size:.67rem;letter-spacing:.06em}.inspector-body input,.inspector-body select,.inspector-body textarea{display:block;width:100%;box-sizing:border-box;border:1px solid #28495a;border-radius:2px;background:#06131e;color:#effaff;padding:.7rem;font: .85rem Consolas,'Courier New',monospace}.architecture-action{display:block;width:100%;margin-top:.8rem;padding:.8rem;border:1px solid rgba(0,234,255,.45);background:rgba(0,234,255,.08);color:#eaffff;font:800 .65rem Consolas,'Courier New',monospace;letter-spacing:.12em;cursor:pointer}.architecture-action:hover{border-color:#ff2cff;background:rgba(255,44,255,.08)}.architecture-action.secondary{border-color:rgba(255,44,255,.4);background:rgba(255,44,255,.055)}.edit-message{margin:.7rem 0 0;color:#ffcb70;font: .75rem/1.5 system-ui,sans-serif}.inspector-divider{height:1px;background:rgba(0,234,255,.12)}.opening-row{display:flex;justify-content:space-between;gap:.5rem;align-items:center;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.07)}.opening-row strong,.opening-row small{display:block}.opening-row strong{font-size:.72rem}.opening-row small{margin-top:.25rem;color:#7897a5;font-size:.62rem}.opening-toggle{padding:.4rem .55rem;border:1px solid #335665;background:#06131e;color:#c7e6ef;font:700 .6rem Consolas,'Courier New',monospace;cursor:pointer}.brief-panel .inspector-body>p{color:#9eb5c0;font: .78rem/1.65 system-ui,sans-serif}.brief-result{margin-top:.9rem;padding:.8rem;border-left:2px solid #ff2cff;background:rgba(255,44,255,.05)}.brief-result strong{color:#ffd7ff;font-size:.6rem;letter-spacing:.08em}.brief-result p{color:#d7c3dc;font: .75rem/1.6 system-ui,sans-serif;overflow-wrap:anywhere}
+    .architecture-next{max-width:1500px;margin:1rem auto 0;padding:1.4rem;border:1px solid rgba(255,44,255,.2);display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,1fr);gap:1.5rem;align-items:center;background:linear-gradient(120deg,rgba(0,168,255,.04),rgba(255,44,255,.045))}.architecture-next h2{margin:.5rem 0;font-size:clamp(1.5rem,3vw,2.5rem)}.architecture-next p{max-width:65ch;color:#9eb5c0;font: .82rem/1.7 system-ui,sans-serif}.architecture-pipeline{display:flex;justify-content:center;align-items:center;gap:.6rem;flex-wrap:wrap}.architecture-pipeline span{padding:.65rem;border:1px solid rgba(0,234,255,.22);color:#c9e7f0;font-size:.6rem;letter-spacing:.07em}.architecture-pipeline b{color:#ff2cff}
+    @@media(max-width:1050px){.architecture-workspace{grid-template-columns:1fr}.architecture-inspector{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.architecture-next{grid-template-columns:1fr}}@@media(max-width:700px){.architecture-inspector{grid-template-columns:1fr}.architecture-shell{margin:-1rem -1rem;padding:1rem}.architecture-header h1{font-size:2.5rem}.plan-svg{min-width:500px}.architecture-pipeline{justify-content:flex-start}}@@media(prefers-reduced-motion:reduce){.plan-room rect{transition:none}}
+</style>
