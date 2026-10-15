@@ -18,6 +18,8 @@ The arena/venue provides the available gestures and environmental constraints; e
 
 ## Source work currently available for review
 
+- [Soccer Arena Economy](https://github.com/TrentBest/WebPage/blob/work/soccer-arena-handoff/docs/integrations/SOCCER_ARENA_ECONOMY.md) — ticket inventory and admission, food and beverage concessions, merchandise, memorabilia, vendor operations, transaction invariants, and a staged simulated-economy milestone.
+
 The soccer domain work is staged on a review branch, not yet merged or published:
 
 - [Soccer Domain MicroBundle](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain/blob/work/soccer-domain-microbundle/docs/SOCCER_DOMAIN_MICROBUNDLE.md) — field, match readiness, teams, zones, action vocabulary, and authority boundaries.
