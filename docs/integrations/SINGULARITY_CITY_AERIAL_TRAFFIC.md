@@ -1,6 +1,6 @@
 # Singularity City — Aerial Traffic Model
 
-**Status:** deterministic route model and GUI snapshot renderer are implemented; the host has not yet been wired to advance and supply snapshots as live simulation time progresses.
+**Status:** deterministic route model, GUI snapshot renderer, and city-map host loop are implemented. The loop advances snapshots once per second while the City map is open; it is a presentation-time prototype, not yet an FSM_API-owned simulation clock.
 
 ## Purpose
 
@@ -27,7 +27,7 @@ This is a first route/presentation reference, not a complete aerial-traffic simu
 - altitude bands are discrete presentation lanes, not physical heights;
 - routes do not yet avoid collisions, negotiate intersections, or react to buildings;
 - dispatch, passenger pickup/drop-off, and taxi ride lifecycle are not implemented here;
-- the host is not yet wired to advance simulation time and pass fresh snapshots to the GUI, so live autonomous movement is not yet demonstrated;
+- the Explore host currently derives elapsed time from a component-local UTC epoch and refreshes snapshots once per second only while the City map is open; this proves visible route progression, not authoritative simulation time, persistence, or FSM_API tick scheduling;
 - no claim is made that the current branch has passed CI until a workflow reports success.
 
 A host may connect snapshots to the city renderer and real transport state. Keep aerial lanes separate from ground transit, and do not describe route interpolation as autonomous intelligence or physical flight dynamics.
@@ -41,3 +41,4 @@ A host may connect snapshots to the city renderer and real transport state. Keep
 - The manifest remains unchanged when snapshots are evaluated.
 - Presentation consumes this model rather than inventing a parallel stream of moving icons.
 - GUI rendering exposes the supplied snapshot identity and coordinates without taking ownership of the simulation clock.
+- the host starts the update loop only for the open City map and cancels it when the map closes, scope changes, or Explore is disposed.
