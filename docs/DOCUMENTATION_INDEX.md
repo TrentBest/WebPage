@@ -12,6 +12,7 @@
 
 - [Brave1 Public Demonstration](BRAVE1_PUBLIC_DEMONSTRATION.md) — the public-facing MVP story, claim boundaries, and pre-submission deployment checklist.
 - [Singularity City Experience](SINGULARITY_CITY_EXPERIENCE.md) — spatial-world source foundations, Digitens, MicroBundle/provider boundaries, multiple renderers, and the editable city direction with explicit current/future claim boundaries.
+- [Experience Catalog](EXPERIENCE_CATALOG.md) — Arena events, market/craft fairs, optional Economy composition, and the VR magic-weaving use case.
 
 | Order | Document | Purpose |
 |---:|---|---|
@@ -21,6 +22,7 @@
 | 4 | WORKSHOP_RUNTIME_ARCHITECTURE.md | Runtime ownership and host boundary |
 | 5 | FSM_COS_USAGE.md | Concrete WebPage → FSM_COS integration |
 | 6 | EXPERIENCE_THEORY.md | Experience vocabulary and composition model |
+| 6a | EXPERIENCE_CATALOG.md | Candidate environments, optional capabilities, and evidence boundaries |
 | 7 | MICROBUNDLE_ARBITRATION_MAP.md | Loading and arbitration flow |
 | 8 | WORKSHOP_OPENING_EXPERIENCE.md | Browser perception/startup contract |
 | 9 | DEEP_DIVE_PROVIDER_ARCHITECTURE.md | WebPage-only educational provider boundary |
