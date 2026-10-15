@@ -66,3 +66,17 @@ Keep responsibilities separated:
 Do not deploy, publish, release, change secrets, or trigger hosting. Do not overwrite the companion handoff merely to fold this addendum into it; it may be under concurrent edit. If WebPage's actual architecture makes the proposed entry incompatible, report the specific constraint and implement the smallest safe empty state instead of building a parallel navigation system.
 
 **Desired outcome:** a real, inspectable browser prototype now, with honest labels and a clean replacement path to future Physics-backed playback—not a mock presented as finished physics.
+
+
+## Implementation now present on `development`
+
+A first browser prototype has now been added:
+
+- [`ReplayLab.razor`](../../TheSingularityWorkshop/Pages/ReplayLab.razor) provides the `/replay-lab` route, a scene that responds to the selected tick, play/pause, tick stepping, an accessible range scrubber, event jumps, and an implementation-status panel.
+- [The existing demonstrations gallery](../../TheSingularityWorkshop/Pages/Home.razor) now includes a **Replay Lab // Shareable Moments** card that opens the route. This reuses the existing gallery rather than creating a parallel navigation shell.
+- The prototype uses local deterministic presentation data only. It prominently states that it is not connected to Physics world replay; share/remix/publish are not offered as working actions.
+- The browser-host .NET test workflow was triggered by the commits. Confirm the latest run is green before treating this as build-verified. The Azure Static Web Apps workflow was skipped; no deployment was performed.
+
+### Manual evaluation target
+
+Open the Workshop, enter the existing hub, select **Demonstrations**, and choose **OPEN REPLAY LAB**. On `/replay-lab`, try the slider, each event row, **PLAY / PAUSE**, **± 1 TICK**, and **RESET**. Confirm the scene coordinates and selected event change as the tick changes. Review the persistent demo disclaimer and the three capability-status cards. Treat visual polish and browser behavior as awaiting Trent's inspection; the illustrative scene is not evidence of a physical simulation.
