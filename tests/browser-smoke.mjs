@@ -136,6 +136,12 @@ try {
     throw new Error("ProtocolAi response preview must not be directly editable.");
   }
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.getByRole("button", { name: "Copy to Clipboard", exact: true }).click();
+  const copiedExchange = await page.evaluate(() => navigator.clipboard.readText());
+  if (!copiedExchange.includes("WORKSHOP PROTOCOLAI TERMINAL EXCHANGE") ||
+      !copiedExchange.includes("PROTOCOL") || !copiedExchange.includes("GRAMMAR")) {
+    throw new Error("ProtocolAi Copy to Clipboard must carry the composed exchange context.");
+  }
   await page.evaluate(() => navigator.clipboard.writeText("browser smoke response fixture"));
   await page.getByRole("button", { name: "Paste from Clipboard", exact: true }).click();
   await page.waitForFunction(() => document.querySelector("#ai-llm-response")?.value === "browser smoke response fixture", null, { timeout: 10_000 });
