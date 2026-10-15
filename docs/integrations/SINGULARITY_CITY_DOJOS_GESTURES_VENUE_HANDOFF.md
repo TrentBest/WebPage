@@ -4,6 +4,10 @@
 
 Define a coherent path for martial-arts dojos and training venues inside Singularity City, coordinated with the Gestures work and the existing arena/venue and Economy design handoffs. This is a design contract for the WebPage experience, not a claim that a dojo simulator or combat model already exists.
 
+## Complementary dojo handoffs
+
+[WebPage PR #117 — hidden martial-arts dojos for Singularity City](https://github.com/TrentBest/WebPage/pull/117) owns the first location/discovery slice: three tucked-away city anchors (market-side, transit-understructure, courtyard), discovery clues, and accessible directory/detail navigation. This document is deliberately complementary: it defines how a dojo venue consumes Gestures, Physics/contact observations, shared venue/event concepts, and Economy-owned accounting. Keep the two responsibilities separate rather than creating competing dojo catalogues or duplicate integration contracts.
+
 ## Experience shape
 
 A dojo is a persistent place in the city, not just a menu or isolated animation demo. A first dojo experience should support:
@@ -71,7 +75,7 @@ Dojo, arena, and city events should eventually share discoverability and schedul
 
 ## Staged implementation
 
-1. **Venue shell:** define dojo identity, spatial footprint, entry, training zones, and a small manifest-backed scene.
+1. **Venue shell:** consume the shared city-anchor/discovery contract from the companion dojo handoff and define a manifest-backed scene with training zones.
 2. **Curriculum and demonstration:** authored reference sequences and instructor/student role routing using existing Gestures data and evaluator APIs.
 3. **Comparison:** compare evaluated poses against reference with explicit timing and variation metadata; do not claim biomechanical correctness.
 4. **Paired drills:** model two participants' roles and procedure states. Keep success/failure scripted until Physics exposes suitable contact/outcome authority.
