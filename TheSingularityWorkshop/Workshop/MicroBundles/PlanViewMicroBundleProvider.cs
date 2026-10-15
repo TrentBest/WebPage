@@ -98,8 +98,10 @@ public sealed class BuildingPlan
             RequireId(wall.Id, "wall");
             if (!double.IsFinite(wall.X1) || !double.IsFinite(wall.Y1)
                 || !double.IsFinite(wall.X2) || !double.IsFinite(wall.Y2)
-                || !FinitePositive(wall.Thickness) || (wall.X1 == wall.X2 && wall.Y1 == wall.Y2))
-                throw new ArgumentException($"Wall '{wall.Id}' has invalid geometry.");
+                || !FinitePositive(wall.Thickness) || (wall.X1 == wall.X2 && wall.Y1 == wall.Y2)
+                || wall.X1 < 0 || wall.X1 > Width || wall.X2 < 0 || wall.X2 > Width
+                || wall.Y1 < 0 || wall.Y1 > Height || wall.Y2 < 0 || wall.Y2 > Height)
+                throw new ArgumentException($"Wall '{wall.Id}' has invalid or out-of-bounds geometry.");
         }
 
         foreach (var opening in Openings)
@@ -109,6 +111,10 @@ public sealed class BuildingPlan
                 throw new ArgumentException($"Opening '{opening.Id}' refers to missing wall '{opening.WallId}'.");
             if (!FinitePositive(opening.Width) || !double.IsFinite(opening.Offset) || opening.Offset < 0)
                 throw new ArgumentException($"Opening '{opening.Id}' has invalid dimensions.");
+            var wall = Walls.First(x => string.Equals(x.Id, opening.WallId, StringComparison.Ordinal));
+            var wallLength = Math.Sqrt(Math.Pow(wall.X2 - wall.X1, 2) + Math.Pow(wall.Y2 - wall.Y1, 2));
+            if (opening.Offset + opening.Width > wallLength)
+                throw new ArgumentException($"Opening '{opening.Id}' extends beyond wall '{opening.WallId}'.");
             if (!double.IsFinite(opening.OpenFraction) || opening.OpenFraction < 0 || opening.OpenFraction > 1)
                 throw new ArgumentException($"Opening '{opening.Id}' open fraction must be between 0 and 1.");
         }
