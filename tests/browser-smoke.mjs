@@ -111,7 +111,7 @@ try {
     el.dispatchEvent(new Event("input", { bubbles: true }));
   });
   await page.getByText("051", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
-  await page.getByText("The illustrative path bends toward the orbital field.", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByText("The illustrative path bends toward the orbital field.", { exact: true }).first().waitFor({ state: "visible", timeout: 10_000 });
   await page.getByRole("button", { name: /play/i }).click();
   await page.getByRole("button", { name: /pause/i }).waitFor({ state: "visible", timeout: 5_000 });
   await page.waitForFunction(() => Number(document.querySelector(".tick-readout strong")?.textContent) > 51, null, { timeout: 5_000 });
