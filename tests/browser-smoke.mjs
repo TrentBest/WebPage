@@ -66,10 +66,8 @@ try {
   await page.locator(".welcome-fsm-current-state").waitFor({ state: "visible" });
   await page.waitForFunction(() => document.querySelector(".welcome-fsm-current-state")?.textContent?.trim() === "Running", null, { timeout: 10_000 });
   const tick = page.getByRole("button", { name: "TICK RUNTIME" });
-  await tick.click(); // enters Running and delivers its OnEnter callback
+  await tick.click(); // advances the Running lifecycle toward its terminal state
   await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
-  await tick.click(); // second Running update requests Complete
-  await tick.click(); // enters Complete on the following update
   await page.getByText("OnEnter → Complete", { exact: false }).waitFor({ state: "visible" });
 
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
