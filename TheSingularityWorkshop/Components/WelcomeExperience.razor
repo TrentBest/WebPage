@@ -102,9 +102,13 @@
             return;
 
         _context.StartRequested = true;
-        // The signal tick selects Running; a second tick delivers its OnEnter
-        // callback before the visitor begins manually stepping the running state.
-        StepMachine();
+
+        // FSM_API defers state transitions to the processing-group update. Tick
+        // until Running becomes the current state, then deliver its OnEnter before
+        // leaving the visitor in control of subsequent runtime ticks.
+        for (var tick = 0; tick < 3 && CurrentState != StateNames[1]; tick++)
+            StepMachine();
+
         if (CurrentState == StateNames[1])
             StepMachine();
     }
