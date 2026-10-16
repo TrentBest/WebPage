@@ -90,6 +90,10 @@
     private readonly SpatialBehaviorBuilderModel BehaviorBuilder = new("OnUpdate");
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
+    private readonly SpatialAirTrafficManifest AirTrafficManifest = SpatialAirTrafficManifest.CreateDefault();
+    private IReadOnlyList<SpatialAirTrafficSnapshot> airTrafficSnapshots = [];
+    private CancellationTokenSource? airTrafficCts;
+    private DateTimeOffset airTrafficEpochUtc = DateTimeOffset.UtcNow;
     private readonly SpatialShipyardManifest ShipyardManifest = SpatialShipyardManifest.CreateDefault();
     private readonly SpatialShipDesignManifest ShipDesignManifest = SpatialShipDesignManifest.CreateDefault();
     private readonly TransitTrainMicroBundle TransitTrain = new(7301, TransitTrainSpecification.WorkshopHoEmu());
@@ -482,7 +486,8 @@
                 SetWorkshopMapZoom,
                 SetWorkshopMapScope,
                 WorkshopArrangement,
-                hubIdentityDock));
+                hubIdentityDock,
+                airTrafficSnapshots));
         }
         return root;
     }
@@ -542,7 +547,11 @@
     private void SetMazeZoom(double zoom)
         => mazeZoom = Math.Clamp(zoom, .6, 2.2);
 
-    private void ShowWorkshopMap() => workshopMapVisible = true;
+    private void ShowWorkshopMap()
+    {
+        workshopMapVisible = true;
+        StartAirTrafficLoopIfNeeded();
+    }
 
     private void ToggleAiTerminal() => aiTerminalOpen = !aiTerminalOpen;
 
@@ -613,7 +622,56 @@
         }
     }
 
-    private void SetWorkshopMapScope(SpatialMapScope scope) => workshopMapScope = scope;
+    private void SetWorkshopMapScope(SpatialMapScope scope)
+    {
+        workshopMapScope = scope;
+        if (scope == SpatialMapScope.City)
+            StartAirTrafficLoopIfNeeded();
+        else
+            StopAirTrafficLoop();
+    }
+
+    private void StartAirTrafficLoopIfNeeded()
+    {
+        if (!workshopMapVisible || workshopMapScope != SpatialMapScope.City || airTrafficCts is not null)
+            return;
+
+        airTrafficEpochUtc = DateTimeOffset.UtcNow;
+        airTrafficSnapshots = AirTrafficManifest.SnapshotAt(0);
+        airTrafficCts = new CancellationTokenSource();
+        _ = RunAirTrafficLoop(airTrafficCts.Token);
+    }
+
+    private void StopAirTrafficLoop()
+    {
+        var cancellation = airTrafficCts;
+        airTrafficCts = null;
+        if (cancellation is null)
+            return;
+
+        cancellation.Cancel();
+        cancellation.Dispose();
+    }
+
+    private async Task RunAirTrafficLoop(CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                if (!workshopMapVisible || workshopMapScope != SpatialMapScope.City)
+                    return;
+
+                var elapsedSeconds = (DateTimeOffset.UtcNow - airTrafficEpochUtc).TotalSeconds;
+                airTrafficSnapshots = AirTrafficManifest.SnapshotAt(elapsedSeconds);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
 
     private void SetWorkshopMapZoom(double zoom) => workshopMapZoom = Math.Clamp(zoom, .75, 2.5);
 
@@ -705,7 +763,11 @@
                     ? "This is the service side: equipment, materials, and the systems that let the visible creation spaces work."
                     : "Here is the heart of the expansion. When the definitions are ready, this becomes a place where creators can build, rehearse, record, and sell what they make.";
     }
-    private void CloseWorkshopMap() => workshopMapVisible = false;
+    private void CloseWorkshopMap()
+    {
+        workshopMapVisible = false;
+        StopAirTrafficLoop();
+    }
 
     private void MoveWorkshopBuilding(string id, int dx, int dy)
     {
@@ -757,6 +819,7 @@
         if (interactable is null) return;
 
         workshopMapVisible = false;
+        StopAirTrafficLoop();
         await InvokeAsync(StateHasChanged);
 
         // A map selection is an intention, not an entry command. The avatar walks
@@ -2028,6 +2091,7 @@
 
     public void Dispose()
     {
+        StopAirTrafficLoop();
         softwareOfficeCinematicCts?.Cancel();
         softwareOfficeCinematicCts?.Dispose();
         holodeckCts?.Cancel();
