@@ -41,7 +41,7 @@
     };
     private bool IsComplete => CurrentState == StateNames[^1];
     private bool CanStart => CurrentState == StateNames[0];
-    private bool CanTick => CurrentState == StateNames[1];
+    private bool CanTick => CurrentState == StateNames[1] || (IsComplete && !_events.Contains($"OnEnter → {StateNames[^1]}"));
     private bool CanReset => IsComplete;
 
     private string CurrentState => _handle?.CurrentState ?? "NOT COMPOSED";
