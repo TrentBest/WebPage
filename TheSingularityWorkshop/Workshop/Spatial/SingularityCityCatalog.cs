@@ -30,7 +30,7 @@ public static class SingularityCityCatalog
         new("city-museum", "Museum District", new SpatialBounds(45, 68, 11, 9), SpatialCityStructureKind.Culture, "Future museums, galleries, archives, and public exhibition halls."),
         new("city-utility", "Utility Works", new SpatialBounds(58, 80, 13, 10), SpatialCityStructureKind.Utility, "Future water, energy, waste, and district utility infrastructure."),
         new("city-park-west", "Western Grand Park", new SpatialBounds(4, 83, 22, 10), SpatialCityStructureKind.Park, "Future metropolitan parkland with trails, gardens, recreation, and ecological reserve."),
-        new("city-park-east", "Eastern Greenbelt", new SpatialBounds(81, 4, 15, 12), SpatialCityStructureKind.Park, "Future greenbelt separating the urban core from the outer development frontier.")
+        new("city-park-east", "Eastern Greenbelt", new SpatialBounds(81, 4, 15, 12), SpatialCityStructureKind.Park, "Future greenbelt separating the urban core from the outer development frontier."),
         new("city-soccer-arena", "Singularity Soccer Arena", new SpatialBounds(58, 65, 18, 13), SpatialCityStructureKind.Culture, "Dedicated science-fiction soccer venue with a regulation-inspired pitch, spectator stands, team areas, public concourses, and access for transit, taxis, and arriving Digitens. Match behavior is supplied by the Soccer MicroBundle when its real contract is available."),
     ];
 }
