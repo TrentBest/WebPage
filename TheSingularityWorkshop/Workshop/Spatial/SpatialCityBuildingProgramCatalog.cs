@@ -36,7 +36,8 @@ public static class SpatialCityBuildingProgramCatalog
         new("city-museum", "office.corporate", "Archives, galleries, public exhibits, and administration."),
         new("city-utility", "industrial.fabrication", "Energy, water, waste, and district utility operations."),
         new("city-park-west", "retail.market", "Park support, recreation, gardens, and visitor services."),
-        new("city-park-east", "retail.market", "Greenbelt support and public recreation.")
+        new("city-park-east", "retail.market", "Greenbelt support and public recreation."),
+        new("city-soccer-arena", "retail.market", "Soccer match-day concourses, spectator services, team support, and public-event commerce.")
     ];
 
     public static IReadOnlyList<SpatialCityBuildingProgram> All => Programs;
