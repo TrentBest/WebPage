@@ -118,13 +118,24 @@
 
     private void Reset()
     {
-        if (_context is not null)
-            _context.IsValid = false;
+        DestroyMachine();
 
         // The unique processing group belongs only to this visitor's lab instance.
         // A reset creates a fresh FSM rather than resetting a shared/global machine.
         ComposeMachine();
         StateHasChanged();
+    }
+
+    private void DestroyMachine()
+    {
+        if (_context is not null)
+            _context.IsValid = false;
+
+        if (!string.IsNullOrWhiteSpace(_machineName))
+            FsmApi.Interaction.DestroyFiniteStateMachine(_machineName, _processingGroup);
+
+        _handle = null;
+        _context = null;
     }
 
     private void UpdateState(string state, string[] states)
