@@ -102,15 +102,9 @@
             return;
 
         _context.StartRequested = true;
-
-        // Deferred FSM_API transitions can require a tick to evaluate the signal,
-        // then another to expose the destination state, then one to deliver OnEnter.
-        // Bound the startup sequence so the lab remains deterministic and responsive.
-        for (var tick = 0; tick < 3 && CurrentState != StateNames[1]; tick++)
-            StepMachine();
-
-        if (CurrentState == StateNames[1])
-            StepMachine();
+        // The signal tick selects Running. A later explicit runtime tick delivers
+        // its OnEnter callback, making the FSM's lifecycle visible to the visitor.
+        StepMachine();
     }
 
     private void StepMachine()
