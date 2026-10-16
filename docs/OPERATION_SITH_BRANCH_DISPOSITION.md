@@ -50,3 +50,19 @@ The disposition below is based on comparing branch tips to `development`, checki
 - Keep the current development version when it contains newer lifecycle or correctness fixes.
 - The repository's `docs/DOCUMENTATION_INDEX.md` and `docs/FUNCTIONALITY_PRESERVATION.md` are the authoritative starting points for architecture and migration context.
 - This inventory records evidence and a proposed disposition. The repository owner performs the final branch deletion.
+
+
+## Follow-up preservation checks (2026-10-16)
+
+A second pass compared additional branch-head files directly with `development` by blob SHA and inspected the content where hashes differ.
+
+- Acoustic Studio: the manifest, GUI builder, integration guide, and focused tests checked in this pass are byte-identical to `development`.
+- Aerial Traffic: the manifest, focused tests, and integration guide checked in this pass are byte-identical to `development`.
+- Movement/Gestures: `MovementLab.razor`, `GesturesRenderer.razor`, `AiExchangeTextBuilder.cs`, its focused tests, and `docs/integrations/GESTURES_MOVEMENT_LAB.md` checked in this pass are byte-identical to `development`.
+- Digiten World: `CityLab.razor`, `Digitens.razor`, `docs/EXPERIENCE_CATALOG.md`, and `docs/SINGULARITY_CITY_LIVING_WORLD.md` checked in this pass are byte-identical to `development`. The branch's `SingularityCitySliceTests.cs` differs only in the spelling of three xUnit predicate assertions; the development version uses the equivalent predicate overload. No branch-only behavior was found in those lines.
+- Moniker: both `MonikerExperienceMicroBundle.cs` and `MonikerSwayBehaviorMicroBundle.cs` are byte-identical to `development`. The branch's older `docs/FUNCTIONALITY_PRESERVATION.md` had a more explicit description of the stationary Moniker plus independently selectable kelp-sway behavior. That architecture detail has now been restored to the canonical development ledger in commit `59d53b9`; the older branch version should not replace the newer ledger wholesale.
+- Soldier Field: the dossier, research-demonstrations data, research-trial schema, soldier-part records, and smoke test sampled in the earlier pass are byte-identical to `development`.
+- Replay Lab: the branch's `ReplayLab.razor` and Physics handoff guide are older than the development versions. Development's page is the current canonical fixture and its guide has a more accurate current integration/navigation description. Do not merge the old page or doc over development.
+- Welcome/audience branch: its `WelcomeExperience.razor.cs` disposal implementation is older; development uses guarded disposal and `DestroyMachine()`. The branch's host-manifest test also predates the current destinations, Replay Lab and ProtocolAi Terminal assertions, and unsafe-embed URL validation. Preserve development's version; do not merge the stale test or component code over it.
+
+These checks strengthen the evidence that several work branches are historical staging refs, but they are still a targeted sample, not a complete audit of every file unique to each branch. The final branch-deletion clearance must wait until all branch-only paths and relevant commit history have been reviewed, and any valuable branch-only documentation has been migrated.
