@@ -6,6 +6,8 @@ Singularity City is a science-fiction city that should feel inhabited, connected
 
 ## The city has several kinds of life
 
+The shared-world direction and scale hierarchy are documented in [Singularity City: Zoomable World and Reusable Experiences](SINGULARITY_CITY_ZOOMABLE_WORLD_AND_EXPERIENCES.md). The Workshop master map now also renders named starter Digiten markers with their sample goal descriptions; these are inspectable presentation samples, not yet a persistent or citywide citizen schedule.
+
 - **Digitens:** persistent digital citizens with identities, places, goals, and movement. A visible avatar is not the same thing as durable citizen/world state.
 - **Ground circulation:** streets, walkable public space, station approaches, plazas, and paths. Crowd occupancy must respect blocked cells and prevent two actors from claiming the same cell.
 - **Air circulation:** abundant flying cars and hover vehicles, with recognizable routes, altitude bands, pickup/drop-off points, and landing or charging areas. Air traffic is its own transport layer; it should not be drawn as if cars were driving on streets.
