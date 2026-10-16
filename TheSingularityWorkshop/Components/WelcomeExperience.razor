@@ -96,10 +96,13 @@
             return;
 
         _context.StartRequested = true;
-        StepMachine();
 
-        // FSM_API marks the destination state as not-yet-entered on transition.
-        // A second tick delivers the destination state's OnEnter lifecycle callback.
+        // Deferred FSM_API transitions can require a tick to evaluate the signal,
+        // then another to expose the destination state, then one to deliver OnEnter.
+        // Bound the startup sequence so the lab remains deterministic and responsive.
+        for (var tick = 0; tick < 3 && CurrentState != StateNames[1]; tick++)
+            StepMachine();
+
         if (CurrentState == StateNames[1])
             StepMachine();
     }
