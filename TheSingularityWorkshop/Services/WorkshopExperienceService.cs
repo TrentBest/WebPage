@@ -50,6 +50,13 @@ public sealed class WorkshopExperienceService : IDisposable
             ? moniker!.Composition
             : null;
 
+    public string? MonikerBehaviorClass =>
+        RuntimeAssembly?.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
+            (ulong)MonikerSwayBehaviorMicroBundle.BundleId,
+            out var sway) == true
+            ? sway!.PresentationClass
+            : null;
+
     public LivingGuiExperienceMicroBundle? PrimaryExperienceComposition =>
         RuntimeAssembly?.TryGetBundle<LivingGuiExperienceMicroBundle>(
             (ulong)LivingGuiExperienceMicroBundle.BundleId,
@@ -113,13 +120,17 @@ public sealed class WorkshopExperienceService : IDisposable
         if (primaryExperience?.MicroBundles is not { Count: > 0 } primaryBundles)
             throw new InvalidOperationException("The manifest-selected primary Experience has no MicroBundles.");
 
-        // The manifest supplies only the primary Experience root. Its MicroBundle
-        // declares the canonical Moniker dependency, so FSM_COS closes the graph.
+        // Startup presentation and the primary Experience are both manifest-selected
+        // roots. FSM_COS closes their shared dependency graph into one RuntimeAssembly.
+        var roots = primaryBundles
+            .Select(root => root.ToRuntimeManifestEntry())
+            .ToList();
+        if (CurrentManifestExperience?.MicroBundles is { Count: > 0 } startupBundles)
+            roots.InsertRange(0, startupBundles.Select(root => root.ToRuntimeManifestEntry()));
+
         RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
             RuntimeId: 1,
-            Bundles: primaryBundles
-                .Select(root => root.ToRuntimeManifestEntry())
-                .ToArray()));
+            Bundles: roots.ToArray()));
 
         var hasMoniker = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
@@ -127,10 +138,17 @@ public sealed class WorkshopExperienceService : IDisposable
         var hasPrimary = RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
             LivingGuiExperienceMicroBundle.BundleId,
             out _);
+        var startupSelected = CurrentManifestExperience?.MicroBundles is { Count: > 0 };
+        var hasMonikerExperience = !startupSelected ||
+            RuntimeAssembly.TryGetBundle<MonikerExperienceMicroBundle>(
+                (ulong)MonikerExperienceMicroBundle.BundleId, out _);
+        var hasSwayBehavior = !startupSelected ||
+            RuntimeAssembly.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
+                (ulong)MonikerSwayBehaviorMicroBundle.BundleId, out _);
 
-        if (!hasMoniker || !hasPrimary)
+        if (!hasMonikerExperience || !hasSwayBehavior || !hasMoniker || !hasPrimary)
             throw new InvalidOperationException(
-                "FSM_COS did not compose the manifest-selected primary Experience and its canonical Moniker dependency.");
+                "FSM_COS did not compose the manifest-selected Moniker Experience, its stationary Moniker and sway behavior, and the primary Experience.");
 
         if (RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
                 (ulong)MonikerMicroBundle.BundleId,
