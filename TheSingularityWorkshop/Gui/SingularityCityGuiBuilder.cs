@@ -32,7 +32,8 @@ public static class SingularityCityGuiBuilder
         Action<double, double> moveSelectedStructure,
         Action changeSelectedKind,
         Action resetDraft,
-        Action<double> setZoom)
+        Action<double> setZoom,
+        IReadOnlyList<SpatialAirTrafficSnapshot>? airTraffic = null)
     {
         var camera = new SpatialCamera(avatarX, avatarY, zoom).Clamped();
         var selected = structures.FirstOrDefault(x => x.Id == selectedStructureId);
@@ -45,7 +46,7 @@ public static class SingularityCityGuiBuilder
             .Attribute("id", "singularity-city-experience");
 
         root.Content(Styles(receiver));
-        root.Content(World(receiver, structures, digitens, camera, onKeyDown, onWorldClick, selectStructure, selectedStructureId));
+        root.Content(World(receiver, structures, digitens, camera, onKeyDown, onWorldClick, selectStructure, selectedStructureId, airTraffic));
         root.Content(AvatarMarker(receiver, avatarLabel));
         root.Content(Header(receiver, status, structures.Count, digitens.Count));
         root.Content(SelectedPanel(receiver, selected, selectedStructureId, moveSelectedStructure, changeSelectedKind, resetDraft));
@@ -81,7 +82,8 @@ public static class SingularityCityGuiBuilder
         Action<KeyboardEventArgs> onKeyDown,
         Func<MouseEventArgs, Task> onWorldClick,
         Func<string, Task> selectStructure,
-        string? selectedStructureId)
+        string? selectedStructureId,
+        IReadOnlyList<SpatialAirTrafficSnapshot>? airTraffic)
     {
         var world = WorkshopGui.Panel(receiver)
             .Style("position", "absolute").Style("inset", "0")
@@ -105,6 +107,9 @@ public static class SingularityCityGuiBuilder
             plane.Content(Structure(receiver, structure, camera.Zoom, selectedStructureId, selectStructure));
         foreach (var digiten in digitens)
             plane.Content(DigitenMarker(receiver, digiten, camera.Zoom));
+        if (airTraffic is not null)
+            foreach (var vehicle in airTraffic)
+                plane.Content(AirTrafficMarker(receiver, vehicle));
         world.Content(plane);
         return world;
     }
@@ -203,6 +208,35 @@ public static class SingularityCityGuiBuilder
             .Child(WorkshopGui.Element(receiver, "text").Attribute("x", ".9").Attribute("y", ".2")
                 .Attribute("font-size", "1.25").Attribute("font-weight", "800").Attribute("font-family", "monospace")
                 .Attribute("fill", White).Text(digiten.Name));
+    }
+
+    private static ElementBuilder AirTrafficMarker(object receiver, SpatialAirTrafficSnapshot vehicle)
+    {
+        var p = vehicle.Position;
+        var accent = vehicle.AltitudeBand switch
+        {
+            1 => Cyan,
+            2 => Magenta,
+            _ => Gold
+        };
+        var group = WorkshopGui.Element(receiver, "g")
+            .Attribute("class", "city-air-vehicle")
+            .Attribute("data-vehicle-id", vehicle.VehicleId)
+            .Attribute("data-model-id", vehicle.ModelId)
+            .Attribute("data-lane-id", vehicle.LaneId)
+            .Attribute("data-altitude-band", vehicle.AltitudeBand)
+            .Attribute("data-route-progress", vehicle.RouteProgress.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture))
+            .Attribute("transform", $"translate({p.X:0.##} {p.Y:0.##})")
+            .Attribute("aria-label", $"Aerial vehicle {vehicle.VehicleId}, model {vehicle.ModelId}, altitude lane {vehicle.AltitudeBand}, route progress {vehicle.RouteProgress:P0}")
+            .Attribute("pointer-events", "none")
+            .Title($"{vehicle.ModelId} · {vehicle.VehicleId} · {vehicle.LaneId} · lane {vehicle.AltitudeBand}");
+        group.Child(WorkshopGui.Element(receiver, "path")
+            .Attribute("d", "M0 -0.85L0.7 0L0 0.85L-0.7 0Z")
+            .Attribute("fill", accent).Attribute("stroke", White).Attribute("stroke-width", ".16"));
+        group.Child(WorkshopGui.Element(receiver, "circle")
+            .Attribute("r", (0.85 + (vehicle.AltitudeBand * 0.28)).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))
+            .Attribute("fill", "none").Attribute("stroke", accent).Attribute("stroke-opacity", ".8").Attribute("stroke-width", ".13"));
+        return group;
     }
 
     private static ElementBuilder AvatarMarker(object receiver, string avatarLabel)
