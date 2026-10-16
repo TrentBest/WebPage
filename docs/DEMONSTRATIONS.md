@@ -11,7 +11,7 @@ The Demonstrations gallery is a WebPage-hosted Experience, not a separate demo s
 | Event Horizon Buckets — Renderer Architecture | Experimental architecture model | Read the bucket/cache/invalidation explanation and inspect the renderer pull request |
 | Soldier Field — Exoskeleton and Event Horizon Lab | Live WebPage experience; exploratory WebGPU lab | View the soldier, inspect 38 stable part records, download preliminary cut sheets, and scale per-horizon stress workloads |
 
-Soldier Field is the first entry with an embedded destination inside WebPage. It is a browser adapter hosting the exploratory WebGPU lab, not a production .NET Visualize backend. The other entries remain source-only or locally runnable as described. A source link is not a run link. A source link is not a run link. Build success is not evidence of a native GPU run, and the Event Horizon entry does not invent simulated performance measurements.
+The Singularity City, Digitens, and Soldier Field entries have same-origin embedded destinations inside WebPage. City Lab and Digitens are early planning/data slices; Soldier Field hosts an exploratory WebGPU lab, not a production .NET Visualize backend. The remaining entries stay source-only or locally runnable as described. A source link is not a run link. A source link is not a run link. Build success is not evidence of a native GPU run, and the Event Horizon entry does not invent simulated performance measurements.
 
 ## Candidate: Living Water World
 
