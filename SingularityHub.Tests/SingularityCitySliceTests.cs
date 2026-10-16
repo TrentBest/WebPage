@@ -21,7 +21,7 @@ public sealed class SingularityCitySliceTests
     public void CityHasStableSoccerArenaIdentityInsideWorldBounds()
     {
         var structures = SingularityCityCatalog.Structures;
-        var arena = Assert.Single(structures.Where(structure => structure.Id == "city-soccer-arena"));
+        var arena = Assert.Single(structures, structure => structure.Id == "city-soccer-arena");
 
         Assert.Equal("Singularity Soccer Arena", arena.Name);
         Assert.Equal(SpatialCityStructureKind.Culture, arena.Kind);
@@ -89,8 +89,8 @@ public sealed class SingularityCitySliceTests
         Assert.Equal(first, repeat);
         Assert.Equal(first.Count, later.Count);
 
-        var vehicleAtFirst = Assert.Single(first.Where(snapshot => snapshot.VehicleId == "air-vehicle-001"));
-        var vehicleLater = Assert.Single(later.Where(snapshot => snapshot.VehicleId == "air-vehicle-001"));
+        var vehicleAtFirst = Assert.Single(first, snapshot => snapshot.VehicleId == "air-vehicle-001");
+        var vehicleLater = Assert.Single(later, snapshot => snapshot.VehicleId == "air-vehicle-001");
 
         Assert.NotEqual(vehicleAtFirst.Position, vehicleLater.Position);
         Assert.InRange(vehicleAtFirst.RouteProgress, 0, 1);
