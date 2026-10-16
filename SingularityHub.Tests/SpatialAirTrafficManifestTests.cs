@@ -44,6 +44,41 @@ public sealed class SpatialAirTrafficManifestTests
         Assert.Equal(1, firstVehicle.AltitudeBand);
     }
 
+    [Fact]
+    public void CityTrafficAddsStableVehiclesAcrossFourPresentationAltitudeBands()
+    {
+        var manifest = SpatialAirTrafficManifest.CreateCityTraffic();
+
+        Assert.Equal("singularity-air-traffic", manifest.Id);
+        Assert.Equal(12, manifest.Vehicles.Count);
+        Assert.Equal(
+            manifest.Vehicles.Count,
+            manifest.Vehicles.Select(vehicle => vehicle.Id).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.Equal(4, manifest.Vehicles.Max(vehicle => vehicle.AltitudeBand));
+        Assert.All(manifest.Vehicles, vehicle =>
+        {
+            Assert.False(string.IsNullOrWhiteSpace(vehicle.LaneId));
+            Assert.True(vehicle.TravelSeconds > 0);
+            Assert.True(vehicle.PhaseSeconds >= 0);
+        });
+        Assert.Equal("air-vehicle-012", manifest.FindVehicle("AIR-VEHICLE-012")?.Id);
+    }
+
+    [Fact]
+    public void CityTrafficSnapshotsAreDeterministicAndIncludeEveryDeclaredVehicle()
+    {
+        var manifest = SpatialAirTrafficManifest.CreateCityTraffic();
+
+        var first = manifest.SnapshotAt(23);
+        var repeat = manifest.SnapshotAt(23);
+
+        Assert.Equal(12, first.Count);
+        Assert.Equal(first, repeat);
+        Assert.Equal(
+            manifest.Vehicles.Select(vehicle => vehicle.Id).OrderBy(id => id),
+            first.Select(snapshot => snapshot.VehicleId).OrderBy(id => id));
+    }
+
     [Theory]
     [InlineData(-1)]
     [InlineData(double.NaN)]
