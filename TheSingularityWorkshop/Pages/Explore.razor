@@ -90,7 +90,7 @@
     private readonly SpatialBehaviorBuilderModel BehaviorBuilder = new("OnUpdate");
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
-    private readonly SpatialAirTrafficManifest AirTrafficManifest = SpatialAirTrafficManifest.CreateDefault();
+    private readonly SpatialAirTrafficManifest AirTrafficManifest = SpatialAirTrafficManifest.CreateCityTraffic();
     private IReadOnlyList<SpatialAirTrafficSnapshot> airTrafficSnapshots = [];
     private CancellationTokenSource? airTrafficCts;
     private DateTimeOffset airTrafficEpochUtc = DateTimeOffset.UtcNow;
