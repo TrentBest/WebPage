@@ -418,10 +418,10 @@
     }
 
     private ElementBuilder Action(string label, Action action, string accent, bool breathe)
-        => WorkshopGui.Button(this)
+    {
+        var button = WorkshopGui.Button(this)
             .Label(label)
             .Attribute("class", breathe ? "welcome-fsm-action welcome-fsm-action-breathing" : "welcome-fsm-action")
-            .Attribute("disabled", !breathe)
             .Style("padding", ".75rem .8rem")
             .Style("border", $"1px solid {accent}66")
             .Style("background", $"{accent}0c")
@@ -432,7 +432,14 @@
             .Style("cursor", breathe ? "pointer" : "default")
             .Style("opacity", breathe ? "1" : ".38")
             .Style("animation", breathe ? "welcomeFsmBreath 1.45s ease-in-out infinite" : "none")
-            .Style("box-shadow", breathe ? $"0 0 22px {accent}55" : "none")
-            .OnClick(action);
+            .Style("box-shadow", breathe ? $"0 0 22px {accent}55" : "none");
+
+        // Boolean HTML attributes are enabled by presence, not by the string
+        // value "false". Add disabled only for controls that are actually gated.
+        if (!breathe)
+            button.Attribute("disabled", "disabled");
+
+        return button.OnClick(action);
+    }
 
 }
