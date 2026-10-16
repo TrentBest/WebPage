@@ -24,15 +24,6 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Setup Node.js for Renderer source smoke
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-      - name: Install Playwright Chromium for Renderer source smoke
-        run: |
-          npm install --no-save --package-lock=false playwright
-          npx playwright install --with-deps chromium
-
       # Keep browser automation isolated from the application's .NET dependency graph.
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -244,6 +235,14 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
+      - name: Setup Node.js for Renderer source smoke
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Install Playwright Chromium for Renderer source smoke
+        run: |
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
       - name: Restore WebPage from checked-out Workshop source
         working-directory: WebPage
         run: dotnet restore TheSingularityWorkshop/TheSingularityWorkshop.csproj -p:WorkshopUseRepositorySources=true
