@@ -22,6 +22,7 @@ public sealed class ExploreSpatialExperienceTests
 
         Assert.Equal(
             [
+                "acoustic-studio-lab",
                 "aec-remote-office",
                 "blueprint-library",
                 "forge",
