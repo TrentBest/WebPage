@@ -63,9 +63,12 @@ try {
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
   // FSM_API advances the current-state name on one tick; the new state's OnEnter
   // callback occurs on the next tick. Assert state first, then verify actual lifecycle callbacks.
-  await page.locator(".welcome-fsm-current-state").waitFor({ state: "visible" });
-  await page.waitForFunction(() => document.querySelector(".welcome-fsm-current-state")?.textContent?.trim() === "Running", null, { timeout: 10_000 });
-  const tick = page.getByRole("button", { name: "TICK RUNTIME" });
+  // A previous/hidden Welcome surface can remain mounted during hub transitions.
+  // Wait for the *visible* FSM state, not the first matching node anywhere in the DOM.
+  await page.locator(".welcome-fsm-current-state:visible").waitFor({ state: "visible" });
+  await page.waitForFunction(() => [...document.querySelectorAll(".welcome-fsm-current-state")]
+    .some(el => el.getClientRects().length > 0 && el.textContent?.trim() === "Running"), null, { timeout: 10_000 });
+  const tick = page.locator("button.welcome-fsm-action:visible").filter({ hasText: "TICK RUNTIME" });
   await tick.click(); // enters Running and delivers its OnEnter callback
   await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
   await tick.click(); // first Running update
