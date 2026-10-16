@@ -36,7 +36,8 @@ public static class SpatialTransitStationGuiBuilder
         double avatarY,
         Action<KeyboardEventArgs> onKeyDown,
         Func<MouseEventArgs, Task> onWorldClick,
-        TransitTrainSpecification trainSpecification)
+        TransitTrainSpecification trainSpecification,
+        SpatialTransitJourneySnapshot? journeySnapshot)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0")
@@ -47,11 +48,44 @@ public static class SpatialTransitStationGuiBuilder
 
         root.Content(Styles(receiver));
         root.Content(Header(receiver, userName, manifest));
+        if (journeySnapshot is { } journey)
+            root.Content(JourneyStatusPanel(receiver, journey));
         root.Content(Station(receiver, manifest, selectedDestinationId, trainVisible, selectPlatform, boardTrain, avatarX, avatarY, onKeyDown, onWorldClick, trainSpecification));
         root.Content(PassengerFlow(receiver, manifest));
         root.Content(OperationsKiosk(receiver, microGameActive, microGameScore, microGameRound, microGameTargetId, manifest, startMicroGame, selectMicroGamePlatform));
         root.Content(ExitButton(receiver, exit));
         return root;
+    }
+
+    private static ElementBuilder JourneyStatusPanel(object receiver, SpatialTransitJourneySnapshot journey)
+    {
+        var color = journey.Status switch
+        {
+            SpatialTransitJourneyStatus.Waiting => Yellow,
+            SpatialTransitJourneyStatus.Boarding => Cyan,
+            SpatialTransitJourneyStatus.InTransit => Magenta,
+            SpatialTransitJourneyStatus.Arrived => Green,
+            _ => White
+        };
+
+        return WorkshopGui.Element(receiver, "div")
+            .Style("position", "fixed").Style("right", "1.4rem").Style("top", "1rem")
+            .Style("z-index", "35").Style("width", "min(22rem, 42vw)")
+            .Style("padding", "1rem").Style("border", $"1px solid {color}66")
+            .Style("background", "rgba(1,4,10,.94)").Style("box-shadow", $"0 0 28px {color}18")
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("color", color).Style("font-size", ".65rem")
+                .Style("letter-spacing", ".16em").Text($"JOURNEY // {journey.Status.ToString().ToUpperInvariant()}"))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".55rem").Style("color", White)
+                .Style("font-size", ".5rem").Style("letter-spacing", ".08em")
+                .Text($"{journey.OriginPlatformId} → {journey.DestinationId}"))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("height", ".2rem").Style("margin-top", ".7rem")
+                .Style("background", "#ffffff18")
+                .Content(WorkshopGui.Element(receiver, "div")
+                    .Style("height", "100%").Style("width", $"{journey.Progress * 100d:0.##}%")
+                    .Style("background", color).Style("transition", "width .2s linear")));
     }
 
     private static ElementBuilder Header(object receiver, string userName, SpatialTransitManifest manifest)
