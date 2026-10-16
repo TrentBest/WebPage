@@ -94,6 +94,9 @@
     private readonly SpatialShipDesignManifest ShipDesignManifest = SpatialShipDesignManifest.CreateDefault();
     private readonly TransitTrainMicroBundle TransitTrain = new(7301, TransitTrainSpecification.WorkshopHoEmu());
     private readonly SpatialLaboratoryManifest LaboratoryManifest = SpatialLaboratoryManifest.CreateDefault();
+    private readonly SpatialAcousticStudioManifest AcousticStudioManifest = SpatialAcousticStudioManifest.CreateDefault();
+    private string selectedAcousticSourceId = "source-vocal";
+    private string selectedAcousticListenerId = "listener-control";
     private SpatialLinework MansionStructure = SingularityMansionLineworkFactory.Create();
     private SpatialLineStyle forgeStyle = SpatialLineStyleCatalog.Neon;
     private bool drawingLine;
@@ -174,6 +177,7 @@
         Router.RegisterEntryPoint("space-elevator", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("singularity-station", new SpatialPoint(50, 78));
         Router.RegisterEntryPoint("singularity-island", new SpatialPoint(50, 78));
+        Router.RegisterEntryPoint("acoustic-studio-lab", new SpatialPoint(50, 78));
         foreach (var interactable in Scene.Interactables)
         {
             if (interactable.Place is not null)
@@ -316,6 +320,17 @@
 
         if (insideRoomId == "maze")
             return SpatialAuthoredMazeExperienceGuiBuilder.Build(this, SpatialMazeCatalog.Showcase, Experience.User.DisplayName, new SpatialPoint(AvatarX, AvatarY), SpatialMazeCatalog.Participants, MazeLeaderboard, SelectLeaderboardEntry, selectedLeaderboardEntry, HandleKeyDown, ExitRoom, mazeZoom, SetMazeZoom, mazeFinished);
+
+        if (insideRoomId == "acoustic-studio-lab")
+            return SpatialAcousticStudioLabGuiBuilder.Build(
+                this,
+                AcousticStudioManifest,
+                Experience.User.DisplayName,
+                selectedAcousticSourceId,
+                selectedAcousticListenerId,
+                SelectAcousticStudioSource,
+                SelectAcousticStudioListener,
+                ExitRoom);
 
         if (insideRoomId == "singularity-shipyard")
             return SpatialShipyardGuiBuilder.Build(this, ShipyardManifest, ShipDesignManifest, Experience.User.DisplayName, ExitRoom);
@@ -1907,6 +1922,18 @@
             previous = point;
         }
         return total;
+    }
+
+    private void SelectAcousticStudioSource(string sourceId)
+    {
+        AcousticStudioManifest.ResolveSource(sourceId);
+        selectedAcousticSourceId = sourceId;
+    }
+
+    private void SelectAcousticStudioListener(string listenerId)
+    {
+        AcousticStudioManifest.ResolveListener(listenerId);
+        selectedAcousticListenerId = listenerId;
     }
 
     private void ExitRoom()
