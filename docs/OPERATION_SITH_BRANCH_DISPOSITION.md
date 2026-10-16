@@ -74,3 +74,17 @@ The remaining differing blobs are shared-path revisions, not files absent from d
 - **Two genuine branch-only artifacts were found and preserved before deletion clearance:** `docs/integrations/SINGULARITY_CITY_SOCCER_ARENA.md` and `TheSingularityWorkshop/wwwroot/Visualize/07-gui-svg-connected-points.svg`. Both were absent from development before this pass. The soccer arena plan is now added and indexed; the SVG is now added and linked from the documentation index. Their source blobs came from `work/digiten-world-slice`. Commits: `56c8a97` (arena plan), `fea17dc` (SVG), `118a38a` (index links).
 - The stale Welcome/audience branch also contains older lifecycle/test logic and a responsive-spacing variation in About Us; those are superseded by current development's visitor-isolated FSM lifecycle, correct deferred OnEnter behavior, actual machine cleanup, boolean HTML attribute handling, current destination manifest, and broader browser journey. Preserve development; no merge is warranted.
 - The old Replay Lab branch is also superseded in both UI and integration guide. The development version retains the explicit "fixture only" boundary while adding the current event ledger, accessible stepping and current navigation/galleries; do not recover its older page by overwriting development.
+
+
+## Final CI gate — passed (2026-10-16)
+
+The preservation gate passed on development commit `e6695266fe9ae781815af5476b9d332f729cc894` (`fix: register soccer arena building program`).
+
+- Workflow run [38976924671](https://github.com/TrentBest/WebPage/actions/runs/38976924671) completed successfully.
+- The main test job passed restore/build, WebPage browser-host smoke journey, SingularityHub tests with TRX/coverage/hang diagnostics, LivingGui Experience tests, Pong Experience tests, test-result/coverage artifact upload, and Codecov upload.
+- The Workshop repository-source integration job passed its multi-repository restore/build and live Renderer source smoke test.
+- The run published the `test-results-and-coverage` artifact.
+- The previously identified city-catalog mismatch was fixed by registering the `city-soccer-arena` building program; the existing 20-structure purpose-driven-program test was not weakened.
+- A fresh branch search still returns exactly 11 branches: `master`, `development`, and the nine extra refs listed above. The completed recursive tree audit found zero branch-only file paths on those nine refs; the final catalog change adds no new path.
+
+**Disposition:** the nine extra branches are now ready for the repository owner to delete under Operation Sith. This is clearance, not authorization for an agent to delete branches. Keep `master` untouched. A nullable-dereference compiler warning in `BuildingPlanProposalParser.cs` was observed in the earlier build output and is separate from this branch-preservation gate; it remains a cleanup item if still present.
