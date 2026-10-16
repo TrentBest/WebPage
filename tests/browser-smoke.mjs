@@ -41,7 +41,7 @@ try {
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   const initialLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  const expectedLinks = ["Welcome", "Demonstrations", "Movement Lab", "Replay Lab", "Economy", "Digitens", "Singularity Architecture", "ProtocolAi Terminal"];
+  const expectedLinks = ["Welcome", "Demonstrations", "Movement Lab", "Replay Lab", "Economy", "Digitens", "Singularity Architecture", "ProtocolAi Terminal", "About Us"];
   if (initialLinks.length !== expectedLinks.length || expectedLinks.some((label, i) => initialLinks[i] !== label)) {
     throw new Error(`The hub navigation must expose core destinations plus manifest-declared gallery entries; found: ${initialLinks.join(", ")}.`);
   }
@@ -58,6 +58,8 @@ try {
   }
 
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: "REVEAL THE FSM" }).click();
+  await page.getByRole("button", { name: "SEND START SIGNAL" }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
   // FSM_API advances the current-state name on one tick; the new state's OnEnter
   // callback occurs on the next tick. Assert state first, then verify actual lifecycle callbacks.
