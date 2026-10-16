@@ -19,7 +19,7 @@ If the canonical owner does not yet exist, the WebPage implementation is **migra
 
 ## Current composition versus current execution
 
-The manifest → FSM_COS composition path is real and proven:
+The manifest → FSM_COS composition path now declares the startup Moniker Experience and its separately selectable presentation behavior:
 
 ```text
 host manifest
@@ -71,6 +71,7 @@ The existing runtime currently proves the following behavior and therefore estab
 ### Complete
 
 - Host manifest loading/validation.
+- Manifest-selected startup Moniker Experience root and sway behavior.
 - Manifest-selected primary root.
 - FSM_COS dependency closure.
 - 2102 → 2110 dependency declaration.
