@@ -7,7 +7,10 @@
       "kind": "Moniker",
       "presentationSeconds": 3,
       "microBundles": [
-        { "bundleId": 2101, "version": "1.0.0" }
+        {
+          "bundleId": 2101,
+          "version": "1.0.0"
+        }
       ]
     }
   ],
@@ -181,6 +184,22 @@
       "requirements": "No special browser capability is required.",
       "requiredHostCapabilities": [],
       "diagramKind": null
+    },
+    {
+      "id": "soldier-field-webgpu",
+      "title": "Soldier Field — Exoskeleton and Event Horizon Lab",
+      "summary": "Inspect an original science-fiction exoskeleton trooper, select semantic parts, derive preliminary engineering cut sheets, and scale independent per-horizon GPU workloads.",
+      "whyItMatters": "Stable semantic part records can feed the rendered soldier, cut sheets, future research boards, and geometry-quality variants from one source of truth.",
+      "status": "Live WebPage experience — exploratory WebGPU lab",
+      "whatItProves": "A same-origin WebGPU geometry lab with 38 stable semantic part records, a versioned engineering-data schema, downloadable data-derived cut sheets, and per-horizon stress telemetry.",
+      "whatItDoesNotProve": "Certified BIM, fabrication-ready geometry, production Renderer bucket integration, pixel-accurate obstruction handling, GPU timestamp measurements, or controlled performance gains.",
+      "launchMode": "Run in WebPage",
+      "runInstructions": "Open the embedded lab in a browser with WebGPU support. Inspect semantic parts and download preliminary JSON cut sheets. Population controls are a stress harness, not physical occupancy.",
+      "sourceUrl": "https://github.com/TrentBest/TheSingularityWorkshop.Visualize/pull/7",
+      "requirements": "A browser with WebGPU support. Part data are preliminary and are not manufacturing instructions.",
+      "requiredHostCapabilities": [],
+      "diagramKind": null,
+      "embeddedExperienceUrl": "/experiences/soldier-field/index.html"
     }
   ]
 }
