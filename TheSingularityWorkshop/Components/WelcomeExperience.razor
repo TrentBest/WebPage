@@ -111,7 +111,10 @@
 
     private void StepMachine()
     {
-        if (!IsRunning)
+        // The control is guarded here as well as presented with an availability
+        // state. This keeps a stale DOM disabled attribute from blocking a valid
+        // visitor tick if a renderer retains boolean attributes across rerenders.
+        if (!IsRunning || !CanTick)
             return;
 
         FsmApi.Interaction.Update(_processingGroup);
@@ -440,8 +443,12 @@
             .Style("box-shadow", breathe ? $"0 0 22px {accent}55" : "none");
 
         // Boolean HTML attributes are enabled by presence, not by the string
-        // value "false". Add disabled only for controls that are actually gated.
-        if (!breathe)
+        // value "false". Keep the runtime tick focusable and guard its action
+        // in StepMachine: a renderer that retains a prior disabled attribute
+        // must not strand the visitor after the FSM enters Running. aria-disabled
+        // and the visual state still communicate when a tick is not actionable.
+        button.Attribute("aria-disabled", breathe ? "false" : "true");
+        if (!breathe && label != "TICK RUNTIME")
             button.Attribute("disabled", "disabled");
 
         return button.OnClick(action);
