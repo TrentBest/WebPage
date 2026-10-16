@@ -15,8 +15,8 @@ Make the WebPage host manifest the startup authority and make the repository exp
 
 The current manifest contains:
 
-- one startup Moniker presentation;
-- one primary running Experience: Living GUI;
+- one startup Moniker Experience root (2101), declaring stationary Moniker (2110) and independent sway behavior (2111);
+- one primary running Experience: Living GUI (2102);
 - Deep Dive restart/telemetry intent.
 
 The model permits more than one startup Experience. The concrete sample currently uses one.
@@ -53,9 +53,9 @@ The host must not confuse the two by requesting the same dependency twice.
 
 ## Current primary Experience
 
-The current primary root is 2102 — LivingGuiExperienceMicroBundle.
+The current primary root is 2102 — LivingGuiExperienceMicroBundle. The startup root is 2101 — MonikerExperienceMicroBundle, which declares 2110 — MonikerMicroBundle and 2111 — MonikerSwayBehaviorMicroBundle as separate dependencies.
 
-Its declared dependency is 2110 — MonikerMicroBundle.
+The browser reads the canonical Moniker node and maps the selected presentation-class hint to CSS; the sway behavior is selected by the manifest and resolved by FSM_COS.
 
 The manifest names 2102. FSM_COS discovers 2110 through the MicroBundle dependency contract.
 
