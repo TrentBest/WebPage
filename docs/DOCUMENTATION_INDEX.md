@@ -16,6 +16,7 @@
 - [Singularity City Living World](SINGULARITY_CITY_LIVING_WORLD.md) — the current Digitens and City Lab slice, its honest limits, and the next integration seams.
 - [Singularity City Soccer Arena](integrations/SINGULARITY_CITY_SOCCER_ARENA.md) — future integration plan for the civic venue, Soccer MicroBundle, Gestures, and explicit evidence boundaries.
 - [Experience Catalog](EXPERIENCE_CATALOG.md) — the host’s available experiences and their current maturity boundaries.
+- [GUI.SVG connected-points sample](../TheSingularityWorkshop/wwwroot/Visualize/07-gui-svg-connected-points.svg) — animated SVG evidence of a connected point route manifested through GUI.SVG.
 - [Demonstrations](DEMONSTRATIONS.md) — manifest-backed proofs, launch modes, evidence, and limitations.
 - [Gestures & Movement Lab](../TheSingularityWorkshop/Pages/Gestures.razor) — browser learning surface for the engine-neutral CPU reference, its current maturity, and the unimplemented rig/Renderer handoff.
 
