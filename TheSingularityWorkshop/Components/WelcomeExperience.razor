@@ -102,9 +102,11 @@
             return;
 
         _context.StartRequested = true;
-        // The signal tick selects Running. A later explicit runtime tick delivers
-        // its OnEnter callback, making the FSM's lifecycle visible to the visitor.
+        // The signal tick selects Running; a second tick delivers its OnEnter
+        // callback before the visitor begins manually stepping the running state.
         StepMachine();
+        if (CurrentState == StateNames[1])
+            StepMachine();
     }
 
     private void StepMachine()
