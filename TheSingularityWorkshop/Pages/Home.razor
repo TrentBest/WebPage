@@ -385,13 +385,20 @@
 
             if (!string.IsNullOrWhiteSpace(selected.EmbeddedExperienceUrl))
             {
+                var embeddedDescription = selected.Id switch
+                {
+                    "soldier-field-webgpu" => "This experience hosts the exploratory Visualize Soldier Field WebGPU lab. WebGPU support is required; telemetry is not a production benchmark.",
+                    "singularity-city-digitens" => "This is an early Digitens data and living-world slice. It does not claim autonomous citizens or a persistent city simulation.",
+                    "singularity-city-lab" => "This is a city-planning prototype with selectable visual skins and historical/speculative eras; future chapters are fictional planning scenarios.",
+                    _ => "This same-origin experience is hosted by WebPage."
+                };
                 builder.OpenElement(sequence++, "section");
                 builder.AddAttribute(sequence++, "class", "demonstration-embedded-experience");
                 builder.OpenElement(sequence++, "h2");
                 builder.AddContent(sequence++, "LIVE EXPERIENCE");
                 builder.CloseElement();
                 builder.OpenElement(sequence++, "p");
-                builder.AddContent(sequence++, "This experience is served by the WebPage host and composed from the Visualize Soldier Field browser lab. WebGPU support is required; telemetry is exploratory, not a production benchmark.");
+                builder.AddContent(sequence++, embeddedDescription);
                 builder.CloseElement();
                 builder.OpenElement(sequence++, "iframe");
                 builder.AddAttribute(sequence++, "src", selected.EmbeddedExperienceUrl);
