@@ -7,11 +7,11 @@ public partial class WelcomeExperience : IDisposable
 {
     public void Dispose()
     {
+        if (_disposed)
+            return;
+
         _disposed = true;
-        if (_context is not null)
-            _context.IsValid = false;
-        _handle = null;
-        _context = null;
+        DestroyMachine();
     }
 }
 
