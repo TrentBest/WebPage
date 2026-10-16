@@ -30,6 +30,38 @@ public sealed record SpatialAirTrafficManifest(
                     new SpatialPoint(12, 70), new SpatialPoint(88, 76), 3, 72, 25)
             ]);
 
+    /// <summary>
+    /// Creates the denser city-scale sky traffic used by the living-world map.
+    /// The compact default remains available for focused tests and small scenes.
+    /// These are deterministic presentation routes, not flight-control simulation.
+    /// </summary>
+    public static SpatialAirTrafficManifest CreateCityTraffic()
+    {
+        var baseline = CreateDefault();
+        return baseline with
+        {
+            Vehicles = baseline.Vehicles.Concat(
+            [
+                new SpatialAirTrafficVehicle("air-vehicle-005", "hover-cab", "central-express-lane",
+                    new SpatialPoint(4, 34), new SpatialPoint(96, 38), 2, 48, 4),
+                new SpatialAirTrafficVehicle("air-vehicle-006", "aero-limo", "upper-east-corridor",
+                    new SpatialPoint(90, 8), new SpatialPoint(10, 16), 3, 64, 13),
+                new SpatialAirTrafficVehicle("air-vehicle-007", "neon-runner", "market-shuttle-lane",
+                    new SpatialPoint(12, 24), new SpatialPoint(78, 28), 1, 34, 7),
+                new SpatialAirTrafficVehicle("air-vehicle-008", "orbital-shuttle", "station-approach-lane",
+                    new SpatialPoint(8, 82), new SpatialPoint(92, 72), 4, 80, 31),
+                new SpatialAirTrafficVehicle("air-vehicle-009", "hover-cab", "port-connector-lane",
+                    new SpatialPoint(94, 88), new SpatialPoint(26, 58), 2, 58, 19),
+                new SpatialAirTrafficVehicle("air-vehicle-010", "aero-limo", "university-connector-lane",
+                    new SpatialPoint(6, 6), new SpatialPoint(70, 44), 3, 66, 22),
+                new SpatialAirTrafficVehicle("air-vehicle-011", "neon-runner", "arena-event-lane",
+                    new SpatialPoint(96, 62), new SpatialPoint(42, 84), 1, 38, 11),
+                new SpatialAirTrafficVehicle("air-vehicle-012", "orbital-shuttle", "intermodal-high-lane",
+                    new SpatialPoint(22, 92), new SpatialPoint(84, 34), 4, 76, 37)
+            ]).ToArray()
+        };
+    }
+
     /// <summary>Resolves a vehicle by stable identity, ignoring identifier casing.</summary>
     public SpatialAirTrafficVehicle? FindVehicle(string id)
         => Vehicles.FirstOrDefault(vehicle =>
