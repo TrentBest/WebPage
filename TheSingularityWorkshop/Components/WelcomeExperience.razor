@@ -103,10 +103,12 @@
 
         _context.StartRequested = true;
 
-        // One explicit tick selects Running. Leave its deferred OnEnter and all
-        // subsequent updates to the visitor's TICK RUNTIME control; looping here
-        // can consume the first Running update before the visitor gets control.
-        StepMachine();
+        // Starting is a distinct signal, not a runtime tick: CanTick is false
+        // while the machine is still Ready. Advance the dedicated group once to
+        // evaluate StartRequested and select Running, then leave the deferred
+        // OnEnter and all later updates to the visitor's TICK RUNTIME control.
+        FsmApi.Interaction.Update(_processingGroup);
+        StateHasChanged();
     }
 
     private void StepMachine()
