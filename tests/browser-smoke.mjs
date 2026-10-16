@@ -63,7 +63,8 @@ try {
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
   // FSM_API advances the current-state name on one tick; the new state's OnEnter
   // callback occurs on the next tick. Assert state first, then verify actual lifecycle callbacks.
-  await page.getByText("Running", { exact: true }).first().waitFor({ state: "visible" });
+  await page.locator(".welcome-fsm-current-state").waitFor({ state: "visible" });
+  await page.waitForFunction(() => document.querySelector(".welcome-fsm-current-state")?.textContent?.trim() === "Running", null, { timeout: 10_000 });
   const tick = page.getByRole("button", { name: "TICK RUNTIME" });
   await tick.click(); // enters Running and delivers its OnEnter callback
   await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
