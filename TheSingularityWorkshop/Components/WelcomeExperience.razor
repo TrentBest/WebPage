@@ -251,6 +251,7 @@
 
         machine.Content(WorkshopGui.Element(this, "div")
             .Attribute("class", "welcome-fsm-current-state")
+            .Attribute("data-welcome-lab", _labId)
             .Style("display", "flex")
             .Style("align-items", "center")
             .Style("justify-content", "center")
@@ -419,6 +420,7 @@
         var button = WorkshopGui.Button(this)
             .Label(label)
             .Attribute("class", breathe ? "welcome-fsm-action welcome-fsm-action-breathing" : "welcome-fsm-action")
+            .Attribute("data-welcome-lab", _labId)
             .Style("padding", ".75rem .8rem")
             .Style("border", $"1px solid {accent}66")
             .Style("background", $"{accent}0c")
