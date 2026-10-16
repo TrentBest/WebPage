@@ -449,9 +449,16 @@
         // in StepMachine: a renderer that retains a prior disabled attribute
         // must not strand the visitor after the FSM enters Running. aria-disabled
         // and the visual state still communicate when a tick is not actionable.
-        button.Attribute("aria-disabled", breathe ? "false" : "true");
-        if (!breathe && label != "TICK RUNTIME")
-            button.Attribute("disabled", "disabled");
+        // The runtime tick intentionally remains actionable at the DOM level:
+        // the FSM state can change between render passes, and this GUI builder
+        // does not reliably remove a previously emitted ARIA state attribute.
+        // StepMachine is the source of truth and rejects ticks outside valid states.
+        if (label != "TICK RUNTIME")
+        {
+            button.Attribute("aria-disabled", breathe ? "false" : "true");
+            if (!breathe)
+                button.Attribute("disabled", "disabled");
+        }
 
         return button.OnClick(action);
     }
