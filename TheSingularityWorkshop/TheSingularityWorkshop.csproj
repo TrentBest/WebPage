@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(WorkshopUseRepositorySources)' == 'true'">
-    <DefineConstants>$(DefineConstants);WORKSHOP_USE_REPOSITORY_SOURCES</DefineConstants>
+    <DefineConstants>$(DefineConstants);WORKSHOP_USE_REPOSITORY_SOURCES;WORKSHOP_USE_RENDERER_SOURCE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +32,8 @@
     <ProjectReference Include="..\..\TheSingularityWorkshop.GUI\src\Blazor\TheSingularityWorkshop.GUI.Blazor.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.ProtocolAi\TheSingularityWorkshop.ProtocolAi.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.GrammarAi\TheSingularityWorkshop.GrammarAi.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.Renderer\TheSingularityWorkshop.Renderer.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.Visualize\TheSingularityWorkshop.Visualize.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\SingularityHub\SingularityHub.csproj" />
   </ItemGroup>
 
@@ -56,6 +58,8 @@
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.GUI\src\Blazor\TheSingularityWorkshop.GUI.Blazor.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.GUI on development." />
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.ProtocolAi\TheSingularityWorkshop.ProtocolAi.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.ProtocolAi on development." />
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.GrammarAi\TheSingularityWorkshop.GrammarAi.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.GrammarAi on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.Renderer\TheSingularityWorkshop.Renderer.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.Renderer on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.Visualize\TheSingularityWorkshop.Visualize.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.Visualize on development." />
   </Target>
 
 </Project>
