@@ -68,6 +68,7 @@ try {
   const tick = page.getByRole("button", { name: "TICK RUNTIME" });
   await tick.click(); // advances the Running lifecycle toward its terminal state
   await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
+  await tick.click(); // deliver OnEnter after the terminal state has been selected
   await page.getByText("OnEnter → Complete", { exact: false }).waitFor({ state: "visible" });
 
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
