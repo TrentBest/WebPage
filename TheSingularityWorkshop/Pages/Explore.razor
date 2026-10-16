@@ -91,7 +91,7 @@
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
     private readonly SpatialAirTrafficManifest AirTrafficManifest = SpatialAirTrafficManifest.CreateCityTraffic();
-    private readonly IReadOnlyList<SpatialDigiten> CityOverviewDigitens = SpatialDigitenCatalog.CreateStarterPopulation();
+    private readonly IReadOnlyList<SpatialDigiten> CityOverviewDigitens = SpatialDigitenCatalog.CreateCityOverviewPopulation();
     private CancellationTokenSource? transitJourneyCts;
     private SpatialTransitJourneySnapshot? transitJourneySnapshot;
     private IReadOnlyList<SpatialAirTrafficSnapshot> airTrafficSnapshots = [];
