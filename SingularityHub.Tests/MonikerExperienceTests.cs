@@ -18,7 +18,7 @@ public sealed class MonikerExperienceTests
           "manifestId": "webpage-host",
           "version": "1.0.0",
           "startup": [
-            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
+            { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [{ "bundleId": 2101, "version": "1.0.0" }], "presentationSeconds": 3 }
           ],
           "running": [
             { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }
@@ -66,7 +66,12 @@ public sealed class MonikerExperienceTests
         // Composition remains available across startup presentation; this
         // compatibility entry point must not advance the host lifecycle.
         Assert.Equal("Moniker", service.CurrentState);
-        Assert.True(service.RuntimeAssembly!.TryGetBundle<MonikerMicroBundle>(
+        Assert.True(service.RuntimeAssembly!.TryGetBundle<MonikerExperienceMicroBundle>(
+            (ulong)MonikerExperienceMicroBundle.BundleId, out _));
+        Assert.True(service.RuntimeAssembly.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
+            (ulong)MonikerSwayBehaviorMicroBundle.BundleId, out _));
+        Assert.Equal(MonikerSwayBehaviorMicroBundle.PresentationClass, service.MonikerBehaviorClass);
+        Assert.True(service.RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
             (ulong)MonikerMicroBundle.BundleId,
             out _));
         Assert.True(service.RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
@@ -95,7 +100,7 @@ public sealed class MonikerExperienceTests
               "manifestId": "webpage-host",
               "version": "1.0.0",
               "startup": [
-                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }
+                { "name": "THE SINGULARITY WORKSHOP", "kind": "Moniker", "microBundles": [{ "bundleId": 2101, "version": "1.0.0" }], "presentationSeconds": 3 }
               ],
               "running": [
                 { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }
