@@ -48,7 +48,13 @@
     private int TickCount => _context?.UpdateCount ?? 0;
     private bool IsRunning => _context?.IsValid == true && _handle?.IsValid == true;
 
-    protected override void OnInitialized() => ComposeMachine();
+    protected override void OnInitialized()
+    {
+        // The Welcome lab owns a dedicated processing group; no visitor's ticks
+        // may advance another visitor's machine.
+        FsmApi.Create.CreateProcessingGroup(_processingGroup);
+        ComposeMachine();
+    }
 
     private void ComposeMachine()
     {
