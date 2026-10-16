@@ -31,6 +31,8 @@ Primary sources:
 
 ## Direction: one city, multiple renderers
 
+The zoomable city-to-room navigation model, inhabitable vehicle experiences, Digiten data cards, civic life, and future hero/villain composition are specified in [Singularity City: Zoomable World and Reusable Experiences](SINGULARITY_CITY_ZOOMABLE_WORLD_AND_EXPERIENCES.md). The current map surfaces are separate foundations; the document defines the target shared-world contract and a staged implementation path.
+
 The city must have one authoritative spatial and semantic model. A floor plan, city overview, building facade, interior, and table-level perspective are views over that model. Switching renderers must not create a duplicate person, building, seat, or transaction.
 
 The Workshop is the fixed center anchor. Other city objects may be repositioned, replaced with another building archetype, or reconfigured through explicit authoring capabilities. A city editor should express changes as edits to the world model, not as ad hoc DOM mutations or hard-coded per-page coordinates. The Digitens page's current city layout explorer is only a browser-local concept sketch; it does not persist changes or modify runtime city objects.
