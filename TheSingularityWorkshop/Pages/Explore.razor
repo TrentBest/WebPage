@@ -1551,6 +1551,7 @@
             return;
 
         cancellation.Cancel();
+        cancellation.Dispose();
         transitJourneySnapshot = null;
     }
 
