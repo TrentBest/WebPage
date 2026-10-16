@@ -70,6 +70,7 @@ public sealed class WebPageHostManifestTests
             wwwroot, "Workshop", "Forge", "StreamingAssets", "Experiences", "webpage-host.manifest.json"));
         var manifest = WebPageHostManifestParser.Parse(manifestJson);
 
+        Assert.Equal(2101UL, Assert.Single(manifest.Startup[0].MicroBundles!).BundleId);
         Assert.Equal(new[] { "Welcome", "Demonstrations", "Singularity Architecture", "Movement Lab", "Replay Lab" }, manifest.Hub.Select(item => item.Name));
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "AnyApp");
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "Support");
