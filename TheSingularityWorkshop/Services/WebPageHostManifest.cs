@@ -79,6 +79,24 @@ public static class WebPageHostManifestParser
             throw new InvalidOperationException(
                 "Every demonstration must declare a stable ID, title, and source URL.");
 
+        foreach (var demonstration in demonstrations)
+        {
+            var embeddedUrl = demonstration.EmbeddedExperienceUrl;
+            if (string.IsNullOrWhiteSpace(embeddedUrl))
+                continue;
+
+            // Embedded surfaces are same-origin browser presentation, not arbitrary external navigation.
+            if (!embeddedUrl.StartsWith("/", StringComparison.Ordinal) ||
+                embeddedUrl.StartsWith("//", StringComparison.Ordinal) ||
+                embeddedUrl.Contains('\\') ||
+                embeddedUrl.Contains("://", StringComparison.Ordinal) ||
+                embeddedUrl.Split('/').Any(segment => string.Equals(segment, "..", StringComparison.Ordinal)))
+            {
+                throw new InvalidOperationException(
+                    $"Demonstration '{demonstration.Id}' must declare an absolute-path, same-origin embedded experience URL.");
+            }
+        }
+
         return manifest;
     }
 
