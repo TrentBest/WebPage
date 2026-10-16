@@ -16,7 +16,8 @@ public static partial class SpatialWorkshopMapGuiBuilder
         Action<SpatialMapScope>? setScope = null,
         SpatialWorkshopArrangement? arrangement = null,
         ElementBuilder? hubIdentityDock = null,
-        IReadOnlyList<SpatialAirTrafficSnapshot>? airTraffic = null)
+        IReadOnlyList<SpatialAirTrafficSnapshot>? airTraffic = null,
+        IReadOnlyList<SpatialDigiten>? cityDigitens = null)
     {
         var root = WorkshopGui.Panel(receiver)
             .Style("position", "fixed").Style("inset", "0").Style("z-index", "200")
@@ -99,7 +100,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
         layout.Content(scope == SpatialMapScope.Workshop
             ? Map(receiver, scene, avatarX, avatarY, selectDestination, zoom, setZoom, arrangement)
             : scope == SpatialMapScope.City
-                ? CityMap(receiver, avatarX, avatarY, selectDestination, zoom, setZoom, airTraffic)
+                ? CityMap(receiver, avatarX, avatarY, selectDestination, zoom, setZoom, airTraffic, cityDigitens)
                 : scope == SpatialMapScope.World
                     ? WorldMap(receiver, avatarX, avatarY, zoom, setZoom)
                     : SolarSystemMap(receiver, zoom, setZoom));
@@ -289,7 +290,7 @@ public static partial class SpatialWorkshopMapGuiBuilder
         return svg;
     }
 
-    private static ElementBuilder CityMap(object receiver, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, IReadOnlyList<SpatialAirTrafficSnapshot>? airTraffic)
+    private static ElementBuilder CityMap(object receiver, double avatarX, double avatarY, Func<string, Task> selectDestination, double zoom, Action<double>? setZoom, IReadOnlyList<SpatialAirTrafficSnapshot>? airTraffic, IReadOnlyList<SpatialDigiten>? cityDigitens)
     {
         var map = MapFrame(receiver, zoom, setZoom);
         map.Content(WorkshopGui.Element(receiver, "svg").Attribute("viewBox", "0 0 100 100")
@@ -310,6 +311,47 @@ public static partial class SpatialWorkshopMapGuiBuilder
                 .Content(WorkshopGui.Element(receiver, "span").Style("display", "block").Style("padding", ".2rem")
                     .Style("font-size", "clamp(.35rem,.46vw,.55rem)").Style("color", accent)
                     .Style("font-weight", "700").Text(structure.Name)));
+        }
+
+        if (cityDigitens is not null)
+        {
+            foreach (var digiten in cityDigitens)
+            {
+                var activity = digiten.Goal.Description;
+                var marker = WorkshopGui.Element(receiver, "div")
+                    .Class("workshop-map-interactable")
+                    .Style("position", "absolute")
+                    .Style("left", $"{digiten.Position.X:0.###}%")
+                    .Style("top", $"{digiten.Position.Y:0.###}%")
+                    .Style("transform", "translate(-50%,-50%)")
+                    .Style("z-index", "7")
+                    .Style("display", "flex")
+                    .Style("align-items", "center")
+                    .Style("gap", ".22rem")
+                    .Style("padding", ".18rem .28rem")
+                    .Style("border", $"1px solid {Green}88")
+                    .Style("background", "rgba(1,8,14,.92)")
+                    .Style("color", White)
+                    .Style("font-size", "clamp(.38rem,.5vw,.58rem)")
+                    .Style("white-space", "nowrap")
+                    .Style("cursor", "help")
+                    .Title($"{digiten.Name} // {activity} // sample city presence")
+                    .Attribute("tabindex", "0")
+                    .AriaLabel($"{digiten.Name}. Current goal: {activity}. Sample city presence marker.")
+                    .Content(WorkshopGui.Element(receiver, "span")
+                        .Style("display", "inline-block")
+                        .Style("width", ".38rem").Style("height", ".38rem")
+                        .Style("flex", "0 0 auto")
+                        .Style("border", $"1px solid {Green}")
+                        .Style("border-radius", "50%")
+                        .Style("background", Green)
+                        .Style("box-shadow", $"0 0 7px {Green}"))
+                    .Content(WorkshopGui.Element(receiver, "span")
+                        .Style("display", "flex").Style("flex-direction", "column").Style("gap", ".08rem")
+                        .Content(WorkshopGui.Element(receiver, "strong").Style("font-size", "inherit").Text(digiten.Name))
+                        .Content(WorkshopGui.Element(receiver, "small").Style("font-size", ".82em").Style("color", "#a6c3cf").Text(activity)));
+                map.Content(marker);
+            }
         }
 
         if (airTraffic is not null)
