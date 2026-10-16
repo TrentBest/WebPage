@@ -24,6 +24,15 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Setup Node.js for Renderer source smoke
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Install Playwright Chromium for Renderer source smoke
+        run: |
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+
       # Keep browser automation isolated from the application's .NET dependency graph.
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -241,3 +250,38 @@ jobs:
       - name: Build WebPage from checked-out Workshop source
         working-directory: WebPage
         run: dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore -p:WorkshopUseRepositorySources=true
+
+      - name: Smoke-test live Renderer source integration
+        working-directory: WebPage
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --project TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-build -p:WorkshopUseRepositorySources=true --no-launch-profile --urls http://127.0.0.1:5261 > /tmp/webpage-renderer-source.log 2>&1 &
+          host_pid=$!
+          cleanup() {
+            kill "$host_pid" 2>/dev/null || true
+            wait "$host_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          ready=false
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:5261/digitens -o /tmp/digitens.html; then
+              ready=true
+              break
+            fi
+            if ! kill -0 "$host_pid" 2>/dev/null; then
+              cat /tmp/webpage-renderer-source.log
+              exit 1
+            fi
+            sleep 2
+          done
+
+          if [ "$ready" != true ]; then
+            cat /tmp/webpage-renderer-source.log
+            echo "Renderer source-mode WebPage host did not become ready within 60 seconds."
+            exit 1
+          fi
+
+          WORKSHOP_BASE_URL=http://127.0.0.1:5261 WORKSHOP_SCREENSHOT=TestResults/Browser/renderer-source-smoke.png node tests/renderer-source-smoke.mjs
