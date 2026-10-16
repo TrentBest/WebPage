@@ -1,10 +1,19 @@
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.FSM_API
 @using FsmApi = TheSingularityWorkshop.FSM_API.FSM_API
 @using TheSingularityWorkshop.Gui
 @implements IDisposable
 
 @BuildWelcome()
+
+<style>
+    @@keyframes welcomeFsmBreath {
+        0%, 100% { filter: brightness(.9) saturate(.9); transform: scale(1); }
+        50% { filter: brightness(1.65) saturate(1.5); transform: scale(1.035); }
+    }
+    .welcome-fsm-action-breathing { will-change: transform, filter; }
+</style>
 
 @code {
     private const string Cyan = "#00eaff";
@@ -21,18 +30,25 @@
     private WelcomeLabContext? _context;
     private string _machineName = string.Empty;
     private bool _disposed;
+    private bool _showLab;
+    private bool _transitioning;
+    private string _selectedMachine = "Lifecycle";
+    private string[] StateNames => _selectedMachine switch
+    {
+        "Movement" => new[] { "Idle", "Walking", "Jumping" },
+        "Spellcasting" => new[] { "Idle", "Casting Magic", "Complete" },
+        _ => new[] { "Ready", "Running", "Complete" }
+    };
+    private bool IsComplete => CurrentState == StateNames[^1];
+    private bool CanStart => CurrentState == StateNames[0];
+    private bool CanTick => CurrentState == StateNames[1];
+    private bool CanReset => IsComplete;
 
     private string CurrentState => _handle?.CurrentState ?? "NOT COMPOSED";
     private int TickCount => _context?.UpdateCount ?? 0;
     private bool IsRunning => _context?.IsValid == true && _handle?.IsValid == true;
 
-    protected override void OnInitialized()
-    {
-        // FSM_API updates are addressed to processing groups. Create the group
-        // explicitly before registering this visitor's finite-state machine.
-        FsmApi.Create.CreateProcessingGroup(_processingGroup);
-        ComposeMachine();
-    }
+    protected override void OnInitialized() => ComposeMachine();
 
     private void ComposeMachine()
     {
@@ -52,40 +68,40 @@
             processRate: -1,
             processingGroup: _processingGroup);
 
-        machine.State("Ready",
-            onEnter: _ => Record("OnEnter → Ready"),
-            onUpdate: _ => Record("OnUpdate → Ready"),
-            onExit: _ => Record("OnExit → Ready"));
+        var states = StateNames;
+        foreach (var state in states)
+        {
+            var capturedState = state;
+            machine.State(capturedState,
+                onEnter: _ => Record($"OnEnter → {capturedState}"),
+                onUpdate: _ => UpdateState(capturedState, states),
+                onExit: _ => Record($"OnExit → {capturedState}"));
+        }
 
-        machine.State("Running",
-            onEnter: _ => Record("OnEnter → Running"),
-            onUpdate: _ =>
-            {
-                _context.UpdateCount++;
-                Record($"OnUpdate → Running // tick {_context.UpdateCount}");
-            },
-            onExit: _ => Record("OnExit → Running"));
-
-        machine.State("Complete",
-            onEnter: _ => Record("OnEnter → Complete"),
-            onUpdate: _ => Record("OnUpdate → Complete"),
-            onExit: _ => Record("OnExit → Complete"));
-
-        machine.WithInitialState("Ready");
-        machine.Transition("Ready", "Running", ctx => ((WelcomeLabContext)ctx).StartRequested);
-        machine.Transition("Running", "Complete", ctx => ((WelcomeLabContext)ctx).UpdateCount >= 3);
+        machine.WithInitialState(states[0]);
+        machine.Transition(states[0], states[1], ctx => ((WelcomeLabContext)ctx).StartRequested);
+        machine.Transition(states[1], states[2], ctx => ((WelcomeLabContext)ctx).UpdateCount >= 2);
         machine.BuildDefinition();
 
         _handle = FsmApi.Create.CreateInstance(_machineName, _context, _processingGroup);
+
+        // Enter Ready during composition so the first visitor signal is evaluated
+        // as a signal, rather than being consumed by the FSM's initial lifecycle step.
+        FsmApi.Interaction.Update(_processingGroup);
     }
 
     private void Begin()
     {
-        if (_context is null || !_context.IsValid || CurrentState == "Complete")
+        if (_context is null || !_context.IsValid || !CanStart)
             return;
 
         _context.StartRequested = true;
         StepMachine();
+
+        // FSM_API marks the destination state as not-yet-entered on transition.
+        // A second tick delivers the destination state's OnEnter lifecycle callback.
+        if (CurrentState == StateNames[1])
+            StepMachine();
     }
 
     private void StepMachine()
@@ -99,23 +115,23 @@
 
     private void Reset()
     {
-        // Replace this lab's machine, not merely its context. Otherwise the old
-        // FSM remains registered in the processing group and receives future ticks.
-        DestroyMachine();
+        if (_context is not null)
+            _context.IsValid = false;
+
+        // The unique processing group belongs only to this visitor's lab instance.
+        // A reset creates a fresh FSM rather than resetting a shared/global machine.
         ComposeMachine();
         StateHasChanged();
     }
 
-    private void DestroyMachine()
+    private void UpdateState(string state, string[] states)
     {
-        if (_context is not null)
-            _context.IsValid = false;
+        if (state == states[1] && _context is not null)
+            _context.UpdateCount++;
 
-        if (!string.IsNullOrWhiteSpace(_machineName))
-            FsmApi.Interaction.DestroyFiniteStateMachine(_machineName, _processingGroup);
-
-        _handle = null;
-        _context = null;
+        Record(state == states[1] && _context is not null
+            ? $"OnUpdate → {state} // tick {_context.UpdateCount}"
+            : $"OnUpdate → {state}");
     }
 
     private void Record(string entry)
@@ -127,12 +143,12 @@
 
     private RenderFragment BuildWelcome()
     {
-        var stateAccent = CurrentState switch
+        var stateIndex = Array.IndexOf(StateNames, CurrentState);
+        var stateAccent = stateIndex switch
         {
-            "Ready" => Cyan,
-            "Running" => Magenta,
-            "Complete" => Green,
-            _ => Yellow
+            0 => Cyan,
+            1 => Magenta,
+            _ => Green
         };
 
         var root = WorkshopGui.Panel(this)
@@ -141,7 +157,10 @@
             .Style("height", "100%")
             .Style("min-height", "0")
             .Style("box-sizing", "border-box")
-            .Style("overflow", "auto")
+            .Style("overflow", "hidden")
+            .Style("transition", "opacity 650ms ease, transform 850ms cubic-bezier(.2,.8,.2,1)")
+            .Style("opacity", _transitioning ? "0" : "1")
+            .Style("transform", _transitioning ? "scale(.94)" : "scale(1)")
             .Style("padding", "clamp(1rem,3vw,2.5rem)")
             .Style("background", "radial-gradient(ellipse at 50% 0%,rgba(0,234,255,.08),transparent 45%),#020711")
             .Style("color", "#f4fbff")
@@ -168,9 +187,35 @@
             .Style("line-height", "1.7")
             .Text("The Workshop builds experiences from explicit state, composable capabilities, and shared GUI grammar. Start with a real finite-state machine below: you control the signal, the FSM_API runtime drives transitions, and the lifecycle trace records what actually happens."));
 
+        if (!_showLab)
+        {
+            root.Content(WorkshopGui.Element(this, "p")
+                .Style("max-width", "56ch")
+                .Style("margin-top", "1.5rem")
+                .Style("color", "#d8faff")
+                .Style("font-size", "clamp(1rem,2vw,1.3rem)")
+                .Style("line-height", "1.6")
+                .Text("First, meet the idea in words. A system waits. You give it a signal. It changes state. Then we open the controls and let you drive the runtime."));
+            root.Content(WorkshopGui.Button(this)
+                .Label("REVEAL THE FSM")
+                .Style("margin-top", "1rem")
+                .Style("padding", ".9rem 1.1rem")
+                .Style("border", "1px solid " + Cyan)
+                .Style("background", Cyan + "18")
+                .Style("color", Cyan)
+                .Style("font-family", "inherit")
+                .Style("font-weight", "800")
+                .Style("letter-spacing", ".12em")
+                .Style("cursor", "pointer")
+                .Style("animation", "welcomeFsmBreath 1.45s ease-in-out infinite")
+                .Style("box-shadow", "0 0 22px " + Cyan + "55")
+                .OnClick(RevealLab));
+            return root.Build();
+        }
+
         var workspace = WorkshopGui.MultiPanel(this)
             .Style("display", "grid")
-            .Style("grid-template-columns", "minmax(0,1.1fr) minmax(260px,.9fr)")
+            .Style("grid-template-columns", "repeat(auto-fit,minmax(min(100%,320px),1fr))")
             .Style("gap", "1rem")
             .Style("align-items", "stretch")
             .Style("margin-top", "1.2rem");
@@ -194,8 +239,9 @@
             .Style("min-height", "8rem")
             .Style("margin", ".8rem 0")
             .Style("border", $"1px solid {stateAccent}55")
-            .Style("background", $"{stateAccent}0b")
-            .Style("color", stateAccent)
+            .Style("background", stateAccent)
+            .Style("color", Ink)
+            .Style("box-shadow", $"0 0 36px {stateAccent}44")
             .Style("font-size", "clamp(1.7rem,4vw,3rem)")
             .Style("font-weight", "800")
             .Style("letter-spacing", ".08em")
@@ -206,15 +252,17 @@
             .Style("grid-template-columns", "repeat(3,minmax(0,1fr))")
             .Style("gap", ".4rem");
 
-        foreach (var state in new[] { "Ready", "Running", "Complete" })
+        var cardIndex = 0;
+        foreach (var state in StateNames)
         {
             var active = string.Equals(CurrentState, state, StringComparison.Ordinal);
-            var accent = state switch { "Ready" => Cyan, "Running" => Magenta, _ => Green };
+            var accent = cardIndex++ switch { 0 => Cyan, 1 => Magenta, _ => Green };
             var stateCard = WorkshopGui.Panel(this)
                 .Style("padding", ".7rem .4rem")
                 .Style("text-align", "center")
                 .Style("border", $"1px solid {accent}{(active ? "cc" : "33")}")
-                .Style("background", active ? $"{accent}16" : "rgba(255,255,255,.015)");
+                .Style("background", active ? accent : "rgba(255,255,255,.015)")
+                .Style("color", active ? Ink : accent);
             stateCard.Content(WorkshopGui.Element(this, "div")
                 .Style("color", accent)
                 .Style("font-size", ".58rem")
@@ -229,9 +277,36 @@
             .Style("flex-wrap", "wrap")
             .Style("gap", ".5rem")
             .Style("margin-top", "1rem");
-        controls.Content(Action("SEND START SIGNAL", Begin, Cyan));
-        controls.Content(Action("TICK RUNTIME", StepMachine, Magenta));
-        controls.Content(Action("RESET MACHINE", Reset, Yellow));
+        controls.Content(Action("SEND START SIGNAL", Begin, Cyan, CanStart));
+        controls.Content(Action("TICK RUNTIME", StepMachine, Magenta, CanTick));
+        controls.Content(Action("RESET MACHINE", Reset, Yellow, CanReset));
+
+        var samplePicker = WorkshopGui.Element(this, "select")
+            .Attribute("aria-label", "Choose an example finite-state machine")
+            .Style("width", "100%")
+            .Style("margin-top", "1rem")
+            .Style("padding", ".75rem")
+            .Style("border", "1px solid rgba(0,234,255,.35)")
+            .Style("background", "#071321")
+            .Style("color", "#f4fbff")
+            .Style("font-family", "inherit")
+            .Style("font-size", ".75rem")
+            .Attribute("value", _selectedMachine)
+            .Attribute("onchange", MachineChanged);
+        foreach (var sample in new[] { "Lifecycle", "Movement", "Spellcasting" })
+            samplePicker.Child(WorkshopGui.Element(this, "option").Attribute("value", sample).Text(sample switch
+            {
+                "Movement" => "Movement — Idle, Walking, Jumping",
+                "Spellcasting" => "Spellcasting — Idle, Casting Magic, Complete",
+                _ => "Lifecycle — Ready, Running, Complete"
+            }));
+        machine.Content(WorkshopGui.Element(this, "div")
+            .Style("margin-top", "1.1rem")
+            .Style("color", Cyan)
+            .Style("font-size", ".58rem")
+            .Style("letter-spacing", ".12em")
+            .Text("CHOOSE AN FSM EXAMPLE"));
+        machine.Content(samplePicker);
         machine.Content(controls);
 
         machine.Content(WorkshopGui.Element(this, "p")
@@ -240,7 +315,7 @@
             .Style("font-family", "system-ui,sans-serif")
             .Style("font-size", ".75rem")
             .Style("line-height", "1.6")
-            .Text($"UPDATE COUNT // {TickCount} — Running transitions to Complete after three updates. The runtime instance and processing group are isolated to this lab."));
+            .Text($"UPDATE COUNT // {TickCount} — {StateNames[1]} transitions to {StateNames[2]} after two runtime updates. Choose another sample above to compose a fresh FSM."));
 
         var trace = WorkshopGui.Panel(this)
             .Style("min-width", "0")
@@ -296,9 +371,35 @@
         return root.Build();
     }
 
-    private ElementBuilder Action(string label, Action action, string accent)
+    private async Task RevealLab()
+    {
+        if (_showLab || _transitioning)
+            return;
+        _transitioning = true;
+        StateHasChanged();
+        await Task.Delay(720);
+        _showLab = true;
+        _transitioning = false;
+        StateHasChanged();
+    }
+
+    private EventCallback<ChangeEventArgs> MachineChanged => EventCallback.Factory.Create<ChangeEventArgs>(this, ChangeMachine);
+
+    private void ChangeMachine(ChangeEventArgs args)
+    {
+        var next = args.Value?.ToString();
+        if (next is not ("Lifecycle" or "Movement" or "Spellcasting"))
+            return;
+        _selectedMachine = next;
+        ComposeMachine();
+        StateHasChanged();
+    }
+
+    private ElementBuilder Action(string label, Action action, string accent, bool breathe)
         => WorkshopGui.Button(this)
             .Label(label)
+            .Attribute("class", breathe ? "welcome-fsm-action welcome-fsm-action-breathing" : "welcome-fsm-action")
+            .Attribute("disabled", !breathe)
             .Style("padding", ".75rem .8rem")
             .Style("border", $"1px solid {accent}66")
             .Style("background", $"{accent}0c")
@@ -306,25 +407,10 @@
             .Style("font-family", "inherit")
             .Style("font-size", ".6rem")
             .Style("letter-spacing", ".08em")
-            .Style("cursor", "pointer")
+            .Style("cursor", breathe ? "pointer" : "default")
+            .Style("opacity", breathe ? "1" : ".38")
+            .Style("animation", breathe ? "welcomeFsmBreath 1.45s ease-in-out infinite" : "none")
+            .Style("box-shadow", breathe ? $"0 0 22px {accent}55" : "none")
             .OnClick(action);
 
-    public void Dispose()
-    {
-        if (_disposed)
-            return;
-
-        _disposed = true;
-        DestroyMachine();
-    }
-
-    private sealed class WelcomeLabContext : IStateContext
-    {
-        internal static int NextContextId;
-        public string Name { get; set; } = "WelcomeLab";
-        public int Context_ID { get; set; }
-        public bool IsValid { get; set; } = true;
-        public bool StartRequested { get; set; }
-        public int UpdateCount { get; set; }
-    }
 }
