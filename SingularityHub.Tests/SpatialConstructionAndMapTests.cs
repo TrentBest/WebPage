@@ -63,4 +63,26 @@ public sealed class SpatialConstructionAndMapTests
 
         Assert.True(site.X > lab.Bounds.X + lab.Bounds.Width);
     }
+    [Fact(DisplayName = "City overview binds Digiten markers to stable positions and inspectable activity")]
+    public void CityOverviewRendersInspectableDigitenPresence()
+    {
+        var map = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Gui", "SpatialWorkshopMapGuiBuilder.Rendering.cs"));
+        var explore = File.ReadAllText(Path.Combine(
+            AppContext.BaseDirectory,
+            "..", "..", "..", "..",
+            "TheSingularityWorkshop", "Pages", "Explore.razor"));
+
+        Assert.Contains("IReadOnlyList<SpatialDigiten>? cityDigitens = null", map);
+        Assert.Contains("left", map);
+        Assert.Contains("digiten.Position.X", map);
+        Assert.Contains("digiten.Position.Y", map);
+        Assert.Contains("digiten.Goal.Description", map);
+        Assert.Contains("sample city presence marker", map);
+        Assert.Contains("SpatialDigitenCatalog.CreateStarterPopulation()", explore);
+        Assert.Contains("CityOverviewDigitens", explore);
+    }
+
 }
