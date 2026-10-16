@@ -9,8 +9,9 @@ The Demonstrations gallery is a WebPage-hosted Experience, not a separate demo s
 | GPU Instancing — Browser WebGPU Proof | Runnable locally; not hosted by WebPage | Read the scope and limitations, inspect the proof branch, and follow the local server instructions |
 | Native WPF / Direct3D 12 Surface Proof | Experimental, source-only | Read the native-surface scope and inspect the sample source |
 | Event Horizon Buckets — Renderer Architecture | Experimental architecture model | Read the bucket/cache/invalidation explanation and inspect the renderer pull request |
+| Soldier Field — Exoskeleton and Event Horizon Lab | Live WebPage experience; exploratory WebGPU lab | View the soldier, inspect 38 stable part records, download preliminary cut sheets, and scale per-horizon stress workloads |
 
-None of these entries has a verified runnable destination inside WebPage, so the gallery deliberately does not show a **Run demonstration** button. A source link is not a run link. Build success is not evidence of a native GPU run, and the Event Horizon entry does not invent simulated performance measurements.
+Soldier Field is the first entry with an embedded destination inside WebPage. It is a browser adapter hosting the exploratory WebGPU lab, not a production .NET Visualize backend. The other entries remain source-only or locally runnable as described. A source link is not a run link. A source link is not a run link. Build success is not evidence of a native GPU run, and the Event Horizon entry does not invent simulated performance measurements.
 
 ## Candidate: Living Water World
 
