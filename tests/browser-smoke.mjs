@@ -63,9 +63,9 @@ try {
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
   // FSM_API advances the current-state name on one tick; the new state's OnEnter
   // callback occurs on the next tick. Assert state first, then verify actual lifecycle callbacks.
-  // Hub transitions can leave an old Welcome surface mounted while it fades away.
-  // Match the state and its control within the same actually-visible component instance.
-  await page.waitForFunction(() => {
+  // Each Welcome lab stamps its state and controls with the same instance identity.
+  // Use that identity directly instead of guessing component boundaries in generated HTML.
+  const welcomeLabHandle = await page.waitForFunction(() => {
     const isActuallyVisible = element => {
       for (let node = element; node instanceof HTMLElement; node = node.parentElement) {
         const style = getComputedStyle(node);
@@ -74,21 +74,23 @@ try {
       }
       return element.getClientRects().length > 0;
     };
-    return [...document.querySelectorAll(".welcome-fsm-current-state")].some(state => {
+    for (const state of document.querySelectorAll(".welcome-fsm-current-state")) {
       if (state.textContent?.trim() !== "Running" || !isActuallyVisible(state))
-        return false;
-      for (let node = state.parentElement; node; node = node.parentElement) {
-        const tick = [...node.querySelectorAll("button.welcome-fsm-action")]
-          .find(button => button.textContent?.includes("TICK RUNTIME"));
-        if (tick)
-          return isActuallyVisible(tick) && !tick.disabled;
-      }
-      return false;
-    });
+        continue;
+      const labId = state.getAttribute("data-welcome-lab");
+      if (!labId)
+        continue;
+      const tick = [...document.querySelectorAll("button.welcome-fsm-action")]
+        .find(button => button.getAttribute("data-welcome-lab") === labId
+          && button.textContent?.includes("TICK RUNTIME"));
+      if (tick && isActuallyVisible(tick) && !tick.disabled)
+        return labId;
+    }
+    return false;
   }, null, { timeout: 15_000 });
-  const runningState = page.locator(".welcome-fsm-current-state").filter({ hasText: /^Running$/ });
-  const welcomeRoot = runningState.locator("xpath=ancestor::*[.//button[contains(@class, 'welcome-fsm-action') and contains(., 'TICK RUNTIME')]][1]");
-  const tick = welcomeRoot.locator("button.welcome-fsm-action").filter({ hasText: "TICK RUNTIME" });
+  const welcomeLabId = await welcomeLabHandle.jsonValue();
+  const tick = page.locator(`button.welcome-fsm-action[data-welcome-lab="${welcomeLabId}"]`)
+    .filter({ hasText: "TICK RUNTIME" });
   await tick.click(); // enters Running and delivers its OnEnter callback
   await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
   await tick.click(); // first Running update
