@@ -65,9 +65,9 @@ try {
   // callback occurs on the next tick. Assert state first, then verify actual lifecycle callbacks.
   await page.locator(".welcome-fsm-current-state").waitFor({ state: "visible" });
   await page.waitForFunction(() => document.querySelector(".welcome-fsm-current-state")?.textContent?.trim() === "Running", null, { timeout: 10_000 });
-  await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
   const tick = page.getByRole("button", { name: "TICK RUNTIME" });
-  await tick.click(); // first Running update
+  await tick.click(); // enters Running and delivers its OnEnter callback
+  await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
   await tick.click(); // second Running update requests Complete
   await tick.click(); // enters Complete on the following update
   await page.getByText("OnEnter → Complete", { exact: false }).waitFor({ state: "visible" });
