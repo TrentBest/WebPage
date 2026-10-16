@@ -27,7 +27,7 @@ html, body {
 
 /* The landing experience is intentionally a viewport-filling surface.
    Other pages retain the normal article scroll behavior. */
-main:has(.hypervisor-shell) article {
+main > article.content:has(.hypervisor-shell) {
     overflow: hidden;
 }
 
