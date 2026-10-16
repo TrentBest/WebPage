@@ -37,4 +37,23 @@ public sealed class SpatialDigitenSimulationTests
 
         Assert.False(digiten.HasRoute);
     }
+    [Fact]
+    public void CityOverviewPopulationHasStableDistinctIdentitiesAndCityScaleGoals()
+    {
+        var digitens = SpatialDigitenCatalog.CreateCityOverviewPopulation();
+
+        Assert.Equal(4, digitens.Count);
+        Assert.Equal(digitens.Count, digitens.Select(x => x.Id).Distinct().Count());
+        Assert.All(digitens, digiten =>
+        {
+            Assert.StartsWith("city-resident-", digiten.Id);
+            Assert.InRange(digiten.Position.X, 0, 100);
+            Assert.InRange(digiten.Position.Y, 0, 100);
+            Assert.False(string.IsNullOrWhiteSpace(digiten.Goal.Description));
+        });
+
+        Assert.DoesNotContain(digitens, x => x.Id == "digiten.mayor");
+        Assert.DoesNotContain(digitens, x => x.Name == "Mayor Mara");
+    }
+
 }
