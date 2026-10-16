@@ -108,9 +108,6 @@
         // leaving the visitor in control of subsequent runtime ticks.
         for (var tick = 0; tick < 3 && CurrentState != StateNames[1]; tick++)
             StepMachine();
-
-        if (CurrentState == StateNames[1])
-            StepMachine();
     }
 
     private void StepMachine()
