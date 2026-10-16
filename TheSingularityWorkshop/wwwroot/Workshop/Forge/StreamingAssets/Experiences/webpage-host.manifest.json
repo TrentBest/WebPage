@@ -168,7 +168,8 @@
       "sourceUrl": "https://github.com/TrentBest/WebPage/tree/development/TheSingularityWorkshop/Pages/Digitens.razor",
       "requirements": "No special browser capability is required.",
       "requiredHostCapabilities": [],
-      "diagramKind": null
+      "diagramKind": null,
+      "embeddedExperienceUrl": "/digitens"
     },
     {
       "id": "singularity-city-lab",
@@ -183,7 +184,8 @@
       "sourceUrl": "https://github.com/TrentBest/WebPage/tree/development/TheSingularityWorkshop/Pages/CityLab.razor",
       "requirements": "No special browser capability is required.",
       "requiredHostCapabilities": [],
-      "diagramKind": null
+      "diagramKind": null,
+      "embeddedExperienceUrl": "/city-lab"
     },
     {
       "id": "soldier-field-webgpu",
