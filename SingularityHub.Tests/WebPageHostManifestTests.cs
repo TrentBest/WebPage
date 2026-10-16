@@ -100,6 +100,9 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("/replay-lab", replayLab.Route);
         Assert.Empty(replayLab.MicroBundles!);
 
+        var soldierField = Assert.Single(manifest.Demonstrations!, item => item.Id == "soldier-field-webgpu");
+        Assert.Equal("/experiences/soldier-field/index.html", soldierField.EmbeddedExperienceUrl);
+
         Assert.NotNull(manifest.Capabilities);
         Assert.Equal(new[] { "Rendering", "ProtocolAi Terminal" }, manifest.Capabilities!.Select(capability => capability.Name));
         var rendering = Assert.Single(manifest.Capabilities!, capability => capability.Name == "Rendering");
@@ -148,6 +151,36 @@ public sealed class WebPageHostManifestTests
           "running": [
             { "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": " " }], "presentationSeconds": 0 }
           ],
+          "deepDive": { "experience": "LIVING GUI", "restartFromManifest": true, "telemetry": true }
+        }
+        """;
+
+        Assert.Throws<InvalidOperationException>(() => WebPageHostManifestParser.Parse(json));
+    }
+
+    [Fact]
+    public void EmbeddedDemonstrationsRejectExternalAndProtocolRelativeUrls()
+    {
+        const string json = """
+        {
+          "manifestId": "webpage-host",
+          "version": "1.0.0",
+          "startup": [{ "name": "MONIKER", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }],
+          "running": [{ "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }],
+          "demonstrations": [{
+            "id": "unsafe-embed",
+            "title": "Unsafe embed",
+            "summary": "Test",
+            "whyItMatters": "Test",
+            "status": "Test",
+            "whatItProves": "Test",
+            "whatItDoesNotProve": "Test",
+            "launchMode": "Test",
+            "runInstructions": "Test",
+            "sourceUrl": "https://example.com/source",
+            "requirements": "Test",
+            "embeddedExperienceUrl": "//example.com/remote.html"
+          }],
           "deepDive": { "experience": "LIVING GUI", "restartFromManifest": true, "telemetry": true }
         }
         """;
