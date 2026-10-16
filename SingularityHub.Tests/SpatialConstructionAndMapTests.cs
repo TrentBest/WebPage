@@ -81,7 +81,7 @@ public sealed class SpatialConstructionAndMapTests
         Assert.Contains("digiten.Position.Y", map);
         Assert.Contains("digiten.Goal.Description", map);
         Assert.Contains("sample city presence marker", map);
-        Assert.Contains("SpatialDigitenCatalog.CreateStarterPopulation()", explore);
+        Assert.Contains("SpatialDigitenCatalog.CreateCityOverviewPopulation()", explore);
         Assert.Contains("CityOverviewDigitens", explore);
     }
 
