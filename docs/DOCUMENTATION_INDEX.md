@@ -14,6 +14,7 @@
 - [Brave1 Public Demonstration](BRAVE1_PUBLIC_DEMONSTRATION.md) — the public-facing MVP story, claim boundaries, and pre-submission deployment checklist.
 - [Singularity City Experience](SINGULARITY_CITY_EXPERIENCE.md) — spatial-world source foundations, Digitens, MicroBundle/provider boundaries, multiple renderers, and the editable city direction with explicit current/future claim boundaries.
 - [Singularity City Living World](SINGULARITY_CITY_LIVING_WORLD.md) — the current Digitens and City Lab slice, its honest limits, and the next integration seams.
+- [Singularity City Soccer Arena](integrations/SINGULARITY_CITY_SOCCER_ARENA.md) — future integration plan for the civic venue, Soccer MicroBundle, Gestures, and explicit evidence boundaries.
 - [Experience Catalog](EXPERIENCE_CATALOG.md) — the host’s available experiences and their current maturity boundaries.
 - [Demonstrations](DEMONSTRATIONS.md) — manifest-backed proofs, launch modes, evidence, and limitations.
 - [Gestures & Movement Lab](../TheSingularityWorkshop/Pages/Gestures.razor) — browser learning surface for the engine-neutral CPU reference, its current maturity, and the unimplemented rig/Renderer handoff.
