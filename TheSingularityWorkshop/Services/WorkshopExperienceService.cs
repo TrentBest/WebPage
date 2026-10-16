@@ -53,8 +53,8 @@ public sealed class WorkshopExperienceService : IDisposable
     public string? MonikerBehaviorClass =>
         RuntimeAssembly?.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
             (ulong)MonikerSwayBehaviorMicroBundle.BundleId,
-            out var sway) == true
-            ? sway!.PresentationClass
+            out _) == true
+            ? MonikerSwayBehaviorMicroBundle.PresentationClass
             : null;
 
     public LivingGuiExperienceMicroBundle? PrimaryExperienceComposition =>
