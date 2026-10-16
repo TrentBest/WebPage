@@ -63,12 +63,32 @@ try {
   await page.getByRole("button", { name: "SEND START SIGNAL" }).click();
   // FSM_API advances the current-state name on one tick; the new state's OnEnter
   // callback occurs on the next tick. Assert state first, then verify actual lifecycle callbacks.
-  // A previous/hidden Welcome surface can remain mounted during hub transitions.
-  // Wait for the *visible* FSM state, not the first matching node anywhere in the DOM.
-  await page.locator(".welcome-fsm-current-state:visible").waitFor({ state: "visible" });
-  await page.waitForFunction(() => [...document.querySelectorAll(".welcome-fsm-current-state")]
-    .some(el => el.getClientRects().length > 0 && el.textContent?.trim() === "Running"), null, { timeout: 10_000 });
-  const tick = page.locator("button.welcome-fsm-action:visible").filter({ hasText: "TICK RUNTIME" });
+  // Hub transitions can leave an old Welcome surface mounted while it fades away.
+  // Match the state and its control within the same actually-visible component instance.
+  await page.waitForFunction(() => {
+    const isActuallyVisible = element => {
+      for (let node = element; node instanceof HTMLElement; node = node.parentElement) {
+        const style = getComputedStyle(node);
+        if (style.display === "none" || style.visibility === "hidden" || Number(style.opacity) === 0)
+          return false;
+      }
+      return element.getClientRects().length > 0;
+    };
+    return [...document.querySelectorAll(".welcome-fsm-current-state")].some(state => {
+      if (state.textContent?.trim() !== "Running" || !isActuallyVisible(state))
+        return false;
+      for (let node = state.parentElement; node; node = node.parentElement) {
+        const tick = [...node.querySelectorAll("button.welcome-fsm-action")]
+          .find(button => button.textContent?.includes("TICK RUNTIME"));
+        if (tick)
+          return isActuallyVisible(tick) && !tick.disabled;
+      }
+      return false;
+    });
+  }, null, { timeout: 15_000 });
+  const runningState = page.locator(".welcome-fsm-current-state").filter({ hasText: /^Running$/ });
+  const welcomeRoot = runningState.locator("xpath=ancestor::*[.//button[contains(@class, 'welcome-fsm-action') and contains(., 'TICK RUNTIME')]][1]");
+  const tick = welcomeRoot.locator("button.welcome-fsm-action").filter({ hasText: "TICK RUNTIME" });
   await tick.click(); // enters Running and delivers its OnEnter callback
   await page.getByText("OnEnter → Running", { exact: false }).waitFor({ state: "visible" });
   await tick.click(); // first Running update
