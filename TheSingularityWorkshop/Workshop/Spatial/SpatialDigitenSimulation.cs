@@ -70,5 +70,22 @@ namespace TheSingularityWorkshop.Gui
         new("digiten-04", "Sol", new SpatialPoint(53.5, 53.5), new SpatialDigitenGoal("research", "Reach the science district", new SpatialPoint(14.5, 74.5)))
         ];
 
+        /// <summary>Creates distinct, city-scale sample citizens for the overview map.</summary>
+        /// <remarks>
+        /// These are presentation/demo actors with stable identities and explicit goals. They are
+        /// intentionally distinct from civic-office identities such as Mayor Mara and Councilor Ivo.
+        /// </remarks>
+        public static IReadOnlyList<SpatialDigiten> CreateCityOverviewPopulation()
+            => [
+                new("city-resident-001", "Tavi", new SpatialPoint(66.5, 49.5),
+                    new SpatialDigitenGoal("transit", "Head to the intermodal transit hub", new SpatialPoint(74.5, 57.5))),
+                new("city-resident-002", "Orin", new SpatialPoint(31.5, 16.5),
+                    new SpatialDigitenGoal("market", "Visit the public market", new SpatialPoint(34.5, 12.5))),
+                new("city-resident-003", "Luma", new SpatialPoint(10.5, 70.5),
+                    new SpatialDigitenGoal("research", "Report to the science park", new SpatialPoint(14.5, 74.5))),
+                new("city-resident-004", "Kest", new SpatialPoint(79.5, 88.5),
+                    new SpatialDigitenGoal("port", "Report to the deepwater port", new SpatialPoint(85, 84.5)))
+            ];
+
     }
 }
