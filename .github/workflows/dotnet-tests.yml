@@ -218,6 +218,19 @@ jobs:
           repository: TrentBest/TheSingularityWorkshop.GrammarAi
           ref: development
           path: TheSingularityWorkshop.GrammarAi
+
+      - name: Checkout Renderer development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.Renderer
+          ref: development
+          path: TheSingularityWorkshop.Renderer
+      - name: Checkout Visualize development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.Visualize
+          ref: development
+          path: TheSingularityWorkshop.Visualize
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
