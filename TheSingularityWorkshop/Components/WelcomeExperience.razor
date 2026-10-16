@@ -411,6 +411,7 @@
         var next = args.Value?.ToString();
         if (next is not ("Lifecycle" or "Movement" or "Spellcasting"))
             return;
+        DestroyMachine();
         _selectedMachine = next;
         ComposeMachine();
         StateHasChanged();
