@@ -97,6 +97,28 @@ jobs:
           grep -q '<title>The Singularity Workshop</title>' /tmp/webpage-index.html
           curl --fail --silent http://127.0.0.1:5260/_framework/blazor.boot.json -o /tmp/webpage-blazor.boot.json
           grep -q '"resources"' /tmp/webpage-blazor.boot.json
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/index.html -o /tmp/soldier-field.html
+          grep -q 'Soldier Field — Event Horizon Scaling Lab' /tmp/soldier-field.html
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-part-records.json -o /tmp/soldier-part-records.json
+          grep -q '"recordCount": 38' /tmp/soldier-part-records.json
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-cut-sheet.mjs -o /tmp/soldier-cut-sheet.mjs
+          grep -q 'deriveCutSheet' /tmp/soldier-cut-sheet.mjs
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/research-demonstrations.json -o /tmp/research-demonstrations.json
+          grep -q '"id": "plate-impact"' /tmp/research-demonstrations.json
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/research-demonstrations.schema.json -o /tmp/research-demonstrations.schema.json
+          grep -q '"mostFrequentlyHitArmorPartId"' /tmp/research-demonstrations.schema.json
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-geometry.js -o /tmp/soldier-geometry.js
+          grep -q 'buildPartGeometry' /tmp/soldier-geometry.js
+          grep -q 'thermalGlow' /tmp/soldier-field.html
+          grep -q 'playFiringAudioCue' /tmp/soldier-field.html
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/research-trial.schema.json -o /tmp/research-trial.schema.json
+          grep -q 'Workshop Research Trial Record' /tmp/research-trial.schema.json
+          curl --fail --silent http://127.0.0.1:5260/experiences/soldier-field/soldier-research-simulation.mjs -o /tmp/soldier-research-simulation.mjs
+          grep -q 'function fireDemonstration' /tmp/soldier-research-simulation.mjs
+          grep -q 'partConditions' /tmp/soldier-research-simulation.mjs
+          echo "WebPage host served the Soldier Field lab, semantic part records, cut-sheet module, research catalog/schema, trial schema, and persistent simulation state."
+          WORKSHOP_BASE_URL=http://127.0.0.1:5260 node tests/soldier-field-smoke.mjs
+
           echo "WebPage host served its landing HTML and Blazor boot manifest."
 
           mkdir -p TestResults/Browser
