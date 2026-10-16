@@ -54,9 +54,13 @@ This plan records the intended direction. It does **not** assert that flying-car
 
 ## First aerial-traffic model slice
 
-The city work branch now includes `SpatialAirTrafficManifest`, a renderer-independent aerial-route model. Its default manifest declares four stable vehicle identities, model IDs, origin/destination coordinates, corridor IDs, discrete altitude bands, travel durations, and phase offsets. `SnapshotAt(elapsedSeconds)` produces repeatable position snapshots without starting a clock or mutating the manifest; the route moves out and back between its declared endpoints.
+The city now has two explicit aerial traffic profiles:
 
-This is intentionally a small, inspectable first slice. **It is not yet a city traffic simulation.** Altitude bands are discrete presentation lanes rather than physical heights; routes do not yet negotiate intersections, avoid collisions, respond to buildings, dispatch for passengers, or connect to the taxi passenger lifecycle. The GUI builder has not yet been wired to consume these snapshots, so this commit alone does not make flying cars visible in the city.
+- `CreateDefault()` retains the compact four-vehicle fixture for focused tests and small scenes.
+- `CreateCityTraffic()` extends that fixture to twelve stable vehicle identities for the city map, with varied vehicle models, routes, corridor IDs, discrete altitude bands, travel durations, and phase offsets.
 
-The accompanying tests cover stable unique IDs, declared altitude bands, case-insensitive lookup, repeatable snapshots, route progression, and invalid elapsed times. Treat these tests as intended coverage until the branch's CI actually reports a result.
+`SnapshotAt(elapsedSeconds)` derives repeatable positions without starting a clock or mutating the manifest. The Explore host now selects the denser city profile and advances its snapshots on the existing one-second city-map loop. The renderer places these vehicles in the aerial layer, distinct from the ground-level citizen markers.
 
+This makes the sky visibly busier in the current city-map experience, but it remains a bounded presentation model—not a full flight simulation. Altitude bands are discrete presentation lanes rather than physical heights; routes do not yet negotiate intersections, avoid collisions, respond to buildings, dispatch for passengers, or connect to the taxi passenger lifecycle.
+
+The next step is to connect transport destinations to a real journey lifecycle: a passenger request, pickup, movement, arrival, and drop-off should be observable as state rather than inferred from a moving icon. Ground crowd occupancy, station operations, and aerial routing remain distinct systems and should be integrated through explicit contracts rather than duplicated in the page.
