@@ -142,8 +142,15 @@
 
     private void UpdateState(string state, string[] states)
     {
-        if (state == states[1] && _context is not null)
+        // The FSM_API defers OnEnter until the next processing-group tick.
+        // Do not count an update for a state before its entry callback has
+        // actually occurred; otherwise a transition tick can consume the
+        // visitor's update budget before TICK RUNTIME becomes available.
+        if (state == states[1] && _context is not null &&
+            _events.Contains($"OnEnter → {state}"))
+        {
             _context.UpdateCount++;
+        }
 
         Record(state == states[1] && _context is not null
             ? $"OnUpdate → {state} // tick {_context.UpdateCount}"
