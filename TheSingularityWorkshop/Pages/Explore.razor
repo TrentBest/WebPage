@@ -91,6 +91,8 @@
     private readonly LeaderboardMicroBundle MazeLeaderboard = CreateMazeLeaderboard();
     private readonly SpatialTransitManifest TransitManifest = SpatialTransitManifest.CreateDefault();
     private readonly SpatialAirTrafficManifest AirTrafficManifest = SpatialAirTrafficManifest.CreateCityTraffic();
+    private CancellationTokenSource? transitJourneyCts;
+    private SpatialTransitJourneySnapshot? transitJourneySnapshot;
     private IReadOnlyList<SpatialAirTrafficSnapshot> airTrafficSnapshots = [];
     private CancellationTokenSource? airTrafficCts;
     private DateTimeOffset airTrafficEpochUtc = DateTimeOffset.UtcNow;
@@ -343,7 +345,7 @@
             return SingularityGovernmentGuiBuilder.Build(this, Experience.User.DisplayName, DateTimeOffset.UtcNow, ExitRoom, TakeCivicOffice, occupiedCivicOfficeId);
 
         if (insideRoomId == "singularity-transit")
-            return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform, AvatarX, AvatarY, HandleKeyDown, HandleTransitWorldClick, TransitTrain.Specification);
+            return SpatialTransitStationGuiBuilder.Build(this, TransitManifest, Experience.User.DisplayName, selectedTransitDestinationId, transitTrainVisible, SelectTransitPlatform, BoardTransitTrain, ExitRoom, transitMicroGameActive, transitMicroGameScore, transitMicroGameRound, transitMicroGameTargetId, StartTransitMicroGame, SelectTransitMicroGamePlatform, AvatarX, AvatarY, HandleKeyDown, HandleTransitWorldClick, TransitTrain.Specification, transitJourneySnapshot);
 
         if (insideRoomId == "singularity-island")
             return SpatialIslandExperienceGuiBuilder.Build(this, Island, Experience.User.DisplayName, EnterIslandAttraction, ExitRoom);
@@ -1465,21 +1467,91 @@
 
     private void BoardTransitTrain(string destinationId)
     {
-        if (!transitTrainVisible || selectedTransitDestinationId != destinationId)
+        if (!transitTrainVisible || selectedTransitDestinationId != destinationId || transitJourneyCts is not null)
             return;
 
         var destination = TransitManifest.Destinations.FirstOrDefault(item => item.Id == destinationId);
-        if (destination == default)
+        var platform = TransitManifest.Platforms.FirstOrDefault(item => item.DestinationId == destinationId);
+        if (destination == default || platform == default)
             return;
 
         transitTrainVisible = false;
-        Router.Enter(destination.SceneId, new SpatialPoint(AvatarX, AvatarY));
-        var entry = Router.GetEntryPoint(destination.SceneId);
-        Experience.Navigation.MoveTo(entry.X, entry.Y);
-        insideRoomId = destination.SceneId;
+        _ = RunTransitJourney(destination, platform);
+    }
 
-        if (destination.SceneId == LaboratoryManifest.Id)
-            selectedLaboratoryFloorId = LaboratoryManifest.Floors.FirstOrDefault().Id;
+    private async Task RunTransitJourney(SpatialTransitDestination destination, SpatialTransitPlatform platform)
+    {
+        var cancellation = new CancellationTokenSource();
+        transitJourneyCts = cancellation;
+        var journey = new SpatialTransitJourney(
+            $"journey-{destination.Id}",
+            Experience.User.DisplayName,
+            platform.Id,
+            destination.Id,
+            RequestedAtSeconds: 0,
+            PickupSeconds: 2,
+            BoardingSeconds: 3,
+            TravelSeconds: 8,
+            ArrivalDwellSeconds: 1);
+        var epochUtc = DateTimeOffset.UtcNow;
+        transitJourneySnapshot = journey.SnapshotAt(0);
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(250));
+            while (await timer.WaitForNextTickAsync(cancellation.Token))
+            {
+                var elapsedSeconds = (DateTimeOffset.UtcNow - epochUtc).TotalSeconds;
+                var snapshot = journey.SnapshotAt(elapsedSeconds);
+                await InvokeAsync(() =>
+                {
+                    transitJourneySnapshot = snapshot;
+                    StateHasChanged();
+                });
+
+                if (snapshot.Status != SpatialTransitJourneyStatus.Completed)
+                    continue;
+
+                await Task.Delay(TimeSpan.FromMilliseconds(350), cancellation.Token);
+                if (insideRoomId != "singularity-transit")
+                    return;
+
+                Router.Enter(destination.SceneId, new SpatialPoint(AvatarX, AvatarY));
+                var entry = Router.GetEntryPoint(destination.SceneId);
+                Experience.Navigation.MoveTo(entry.X, entry.Y);
+                insideRoomId = destination.SceneId;
+                transitJourneySnapshot = null;
+
+                if (destination.SceneId == LaboratoryManifest.Id)
+                    selectedLaboratoryFloorId = LaboratoryManifest.Floors.FirstOrDefault().Id;
+
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            if (ReferenceEquals(transitJourneyCts, cancellation))
+            {
+                transitJourneyCts = null;
+                cancellation.Dispose();
+            }
+        }
+    }
+
+    private void StopTransitJourney()
+    {
+        var cancellation = transitJourneyCts;
+        transitJourneyCts = null;
+        if (cancellation is null)
+            return;
+
+        cancellation.Cancel();
+        transitJourneySnapshot = null;
     }
 
     private void SelectLaboratoryFloor(string floorId)
@@ -2075,6 +2147,7 @@
 
         if (insideRoomId == "singularity-transit")
         {
+            StopTransitJourney();
             selectedTransitDestinationId = null;
             transitTrainVisible = false;
             transitMicroGameActive = false;
@@ -2092,6 +2165,7 @@
     public void Dispose()
     {
         StopAirTrafficLoop();
+        StopTransitJourney();
         softwareOfficeCinematicCts?.Cancel();
         softwareOfficeCinematicCts?.Dispose();
         holodeckCts?.Cancel();
