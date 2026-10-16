@@ -151,6 +151,36 @@
       "requirements": "No special browser capability is required to read the explanation. Renderer source and tests are required to inspect implementation evidence.",
       "requiredHostCapabilities": [],
       "diagramKind": "event-horizon-buckets"
+    },
+    {
+      "id": "singularity-city-digitens",
+      "title": "Singularity City — Digitens Living-World Slice",
+      "summary": "Explore the current Digiten identity/place model, city topics, and the boundary between authored demonstration data and future autonomous routines.",
+      "whyItMatters": "A city showcase becomes credible when its citizens, places, and systems have explicit identities and honest implementation boundaries.",
+      "status": "Runnable WebPage experience — early slice",
+      "whatItProves": "The routed Digitens experience, current catalog-backed city information, and a visitor-facing explanation of the living-world architecture.",
+      "whatItDoesNotProve": "Autonomous Digiten behavior, persistent city simulation, production Renderer integration, or fully simulated transport and commerce.",
+      "launchMode": "Open experience",
+      "runInstructions": "Open /digitens in this WebPage checkout. The page distinguishes current data and demonstrations from systems that remain planned.",
+      "sourceUrl": "https://github.com/TrentBest/WebPage/tree/development/TheSingularityWorkshop/Pages/Digitens.razor",
+      "requirements": "No special browser capability is required.",
+      "requiredHostCapabilities": [],
+      "diagramKind": null
+    },
+    {
+      "id": "singularity-city-lab",
+      "title": "Singularity City Lab — Three Skins and Historical Eras",
+      "summary": "Inspect a city-generation planning surface with selectable visual skins and historical/speculative eras.",
+      "whyItMatters": "The same spatial identity can support multiple presentations without confusing visual style with world data.",
+      "status": "Runnable WebPage experience — planning prototype",
+      "whatItProves": "A visitor can inspect the authored city model across visual treatments and historical/speculative framing.",
+      "whatItDoesNotProve": "A historically complete city model, a live procedural urban simulation, or production Renderer integration.",
+      "launchMode": "Open experience",
+      "runInstructions": "Open /city-lab in this WebPage checkout. Future-era chapters are explicitly fictional planning scenarios.",
+      "sourceUrl": "https://github.com/TrentBest/WebPage/tree/development/TheSingularityWorkshop/Pages/CityLab.razor",
+      "requirements": "No special browser capability is required.",
+      "requiredHostCapabilities": [],
+      "diagramKind": null
     }
   ]
 }
