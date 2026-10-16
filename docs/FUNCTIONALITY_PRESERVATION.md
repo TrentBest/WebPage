@@ -19,19 +19,22 @@ If the canonical owner does not yet exist, the WebPage implementation is **migra
 
 ## Current composition versus current execution
 
-The manifest → FSM_COS composition path now declares the startup Moniker Experience and its separately selectable presentation behavior:
+The manifest declares two distinct lifecycle roots: startup presentation (Moniker Experience, bundle 2101) and the running primary Experience (Living GUI, bundle 2102). The startup root composes the stationary canonical Moniker (bundle 2110) with the separately selectable kelp-sway presentation behavior (bundle 2111). The primary Experience also resolves its canonical Moniker dependency. These are composition declarations; they do not imply that the browser's current presentation clock or Living GUI simulation is already executed by the composed RuntimeAssembly.
 
 ```text
 host manifest
-    ↓
-Living GUI root 2102
-    ↓
-declared Moniker dependency 2110
-    ↓
-FSM_COS
-    ↓
-RuntimeAssembly
+    ├── startup root 2101: Moniker Experience
+    │       ├── dependency 2110: stationary Moniker
+    │       └── dependency 2111: kelp-sway behavior
+    └── running root 2102: Living GUI
+              └── dependency 2110: canonical Moniker
+                       ↓
+                    FSM_COS
+                       ↓
+                 RuntimeAssembly
 ```
+
+The browser reads canonical word content from `MonikerMicroBundle`. `MonikerSwayBehaviorMicroBundle` declares the optional `moniker-kelp-sway` presentation capability; WebPage maps that capability to browser CSS. CSS is the browser manifestation, not the source of Moniker identity or the selector for which behavior is composed. The manifest's startup entry names bundle 2101, while the two dependencies are resolved by the experience composition.
 
 However, the browser manifestation is **not yet fully driven by that RuntimeAssembly**.
 
