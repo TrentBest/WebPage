@@ -16,6 +16,12 @@ The experience should join two complementary workflows:
 
 Keep these workflows visibly related but conceptually distinct. A creator may author a soundtrack or an intentional cinematic effect. A simulated sword impact, metal panel, engine, electrical arc, breaking object, or footstep should not need a hand-authored “play this SFX now” instruction to become audible. The physical model should produce a justified acoustic source; the acoustic environment and listener then determine the observation.
 
+## Film production and reusable sets
+
+Singularity Studios is also the Workshop's own film-production campus: enormous indoor stages, reusable sets and props, camera placements, camera/lighting rigs, shot plans, choreography, and takes. This production workflow is specified in [`SINGULARITY_STUDIOS_PRODUCTION_MODEL.md`](../SINGULARITY_STUDIOS_PRODUCTION_MODEL.md). Sound & Acoustics is one capability inside that broader studio—not the definition of the entire studio.
+
+Keep the production model data-first: canonical assets are referenced by stable identity/version, while placements, overrides, camera paths, cues, and takes are separate records. Multiple camera views must observe the same scene entities rather than cloning the world. A large indoor battle stage is a scale target to measure, not a claim of current renderer capacity.
+
 ## Where it belongs
 
 - Add **Singularity Studios** as a first-class destination in the WebPage / Singularity City discovery journey, alongside Labs, schools, arenas, dojos, transit, and other city experiences.
