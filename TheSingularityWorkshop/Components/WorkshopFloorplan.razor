@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 @implements IDisposable
 
 <section class="workshop-floorplan" aria-label="The Singularity Workshop floor plan">
@@ -156,6 +157,10 @@
             {
                 <button class="inspector-action" @onclick="OpenLaboratory">ENTER FSM_API STATION ↗</button>
             }
+            else if (SelectedRoom == "forge")
+            {
+                <button class="inspector-action" @onclick="OpenForge">ENTER THE FORGE ↗</button>
+            }
             else if (SelectedRoom == "observatory")
             {
                 <button class="inspector-action" @onclick='() => Explain("observatory")'>EXPLORE CELESTIAL WORKFLOW</button>
@@ -216,7 +221,7 @@
     {
         ["hall"] = new("ARRIVAL // YOU ARE HERE", "The Workshop", "Welcome, friend, to The Singularity Workshop. This is a working stronghold for assembling capabilities into experiences. Explore the rooms; each tool will explain what it contributes."),
         ["laboratory"] = new("DISCOVERY // DEMONSTRATIONS + SANDBOXES", "The Singularity Laboratory", "Find demonstrations as stations. This first station exposes the live FSM_API lifecycle lab, where you can send a signal, tick the runtime, and inspect the real trace. Future stations will let you prescribe existing MicroBundles and compare real model outputs."),
-        ["forge"] = new("AUTHORING // MICROBUNDLES + EXPERIENCES", "The Forge", "The Forge is where reusable MicroBundles and Experiences are constructed. These assembly benches communicate the intended authoring workspace; a general MicroBundle/Experience authoring tool is not implemented yet."),
+        ["forge"] = new("CONSTRUCTION // FSM + REUSABLE BLOCKS", "The Forge", "The existing FSM Forge lets you construct state-machine behavior from state, transition, condition, and lifecycle-action scaffolds, then inspect a preview driven by real FSM_API. This is a real construction tool; full MicroBundle and Experience authoring remains a broader future capability."),
         ["observatory"] = new("CELESTIAL DESIGN // COMPOSITION", "The Observatory", "Build a solar system by taking planets, moons, and other celestial bodies from parts buckets, then place, stretch, and arrange them until the orbits and layout suit your design. This is the intended workflow; the interactive celestial editor is a future capability."),
         ["globe"] = new("WORLD DESIGN // GLOBE", "The World Globe", "A solar system is the container, not the terrain editor. Select a globe to spin and inspect the world, then move into map and land editing for its geography. The globe workflow is a design target, not yet a live simulation."),
         ["drafting"] = new("MAPS // EXPEDITIONS + CARTOGRAPHERS", "The Drafting Wing", "Drafting tables hold maps for expeditions, commissioned cartographers, and authored territories. Choose a map to continue into its own world-editing tools. These tables illustrate the planned workflow; no cartographer hiring system is claimed here.")
@@ -279,6 +284,12 @@
     }
 
     private void CloseLaboratory() => _showLaboratory = false;
+
+    private void OpenForge()
+    {
+        _ = JS.InvokeVoidAsync("eval", "window.speechSynthesis?.cancel()");
+        Navigation.NavigateTo("/explore?room=forge");
+    }
 
     public void Dispose()
     {
