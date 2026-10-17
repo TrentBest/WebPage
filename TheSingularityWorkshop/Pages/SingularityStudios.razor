@@ -100,7 +100,7 @@
                 <a href="https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-observation.run.json">SERIALIZED RUN RECORD ↗</a>
             </div>
             <h3>Controlled distance sweep</h3>
-            <p>Same source and reference level; only listener distance changes. This makes the current propagation rule inspectable before room acoustics are introduced.</p>
+            <p>Same source and reference level; only listener distance changes. This establishes the free-field baseline before comparing a geometrically reflected path.</p>
             <a href="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Physics/development/docs/experiments/acoustic-distance-sweep.svg">
                 <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Physics/development/docs/experiments/acoustic-distance-sweep.svg" alt="Generated acoustic distance sweep: estimated level falls from 80 dB SPL at one metre to 60 dB SPL at ten metres, with propagation delays increasing by distance" loading="lazy" />
             </a>
@@ -108,7 +108,16 @@
                 <a href="https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-distance-sweep.md">DISTANCE SWEEP & ASSUMPTIONS ↗</a>
                 <a href="https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-distance-sweep.run.json">SERIALIZED SWEEP RECORD ↗</a>
             </div>
-            <small>Model output · the Physics CI is responsible for reproducing the JSON record and matching SVG. No room response or generated audio is claimed.</small>
+            <h3>First-order room reflection</h3>
+            <p>A bounded 10 m room model computes one specular path from the maximum-X wall. The direct and reflected levels are separate estimates; they are not combined into a room response or waveform.</p>
+            <a href="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Physics/development/docs/experiments/first-order-room-reflection.svg">
+                <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Physics/development/docs/experiments/first-order-room-reflection.svg" alt="Generated room plan showing the source, listener, direct path, and one reflected path from the maximum-X wall" loading="lazy" />
+            </a>
+            <div class="studios-proof-links">
+                <a href="https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/first-order-room-reflection.md">ROOM PATH EXPERIMENT ↗</a>
+                <a href="https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/first-order-room-reflection.run.json">SERIALIZED ROOM RUN ↗</a>
+            </div>
+            <small>Model output · Physics CI reproduces the JSON record and verifies the matching SVG. This is first-order path metadata, not synthesized or mixed room audio.</small>
         </div>
     </section>
 
