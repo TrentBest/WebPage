@@ -234,14 +234,22 @@ try {
   await (await openNavigationFor("Singularity Laboratory")).click();
   await (await openNavigationFor("Singularity Architecture")).click();
   await (await openNavigationFor("Singularity City")).click();
+  // City Lab deliberately uses BareLayout, so the Workshop navigation rail is not
+  // present on that route. Verify its own return link instead of expecting the rail
+  // to survive a layout boundary.
+  await page.getByRole("heading", { name: "Singularity City Lab", exact: false }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByRole("link", { name: /digitens/i }).click();
+  await page.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+
+  // Economy is independently addressable; entering its host tab restores the rail
+  // and the route-derived progression state, after which Digitens is a real nav link.
+  await page.goto(baseUrl + "/?tab=economy", { waitUntil: "domcontentloaded" });
+  const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
+  await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await (await openNavigationFor("Digitens")).click();
   const digitens = page.frameLocator('iframe[title="Digitens: digital citizens of the Singularity World"]');
   await digitens.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await digitens.getByRole("heading", { name: "The Workshop stays at the heart of the city.", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
-
-  await (await openNavigationFor("Economy")).click();
-  const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
-  await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
 
   // Movement Lab exposes geometry inspection without claiming a simulated attempt.
   await (await openNavigationFor("Movement Lab")).click();
