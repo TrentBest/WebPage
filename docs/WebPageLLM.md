@@ -86,7 +86,7 @@ Separately, `Workshop.MicroBundles.MicroBundle` is a Hub-level lifecycle shell i
 
 ## Progress log
 
-- 2026-10-17: Corrected the Forge return smoke test to use its own `← RETURN TO WORKSHOP` control instead of browser history. The Forge is an in-place room, so browser Back can leave the Workshop rather than return to the map. Added a dedicated `04-forge.png` screenshot; validation is running in [WebPage workflow 39069246796](https://github.com/TrentBest/WebPage/actions/runs/39069246796).
+- 2026-10-17: Corrected the Forge return smoke test to use its actual `← EXIT FORGE` control instead of browser history. The Forge is an in-place room, so browser Back can leave the Workshop rather than return to the map. The first correction confirmed the navigation assumption but revealed that the button label differed from the other Forge GUI's return label; the test now matches `SpatialForgeGuiBuilder`. A fresh browser run is triggered by commit `1f0e532d750911494b9ca3298b06f378467641d3`.
 - 2026-10-17: Confirmed the existing `/replay-lab` route is a truthful local fixture, updated its integration handoff, and kept physical replay/share/remix explicitly unavailable pending Physics contracts.
 - 2026-10-17: Verified the WebPage FSM_COS/domain-contract boundary and recorded the distinction between the WebPage-owned RenderingMicroBundle placeholder and a real Renderer-owned capability in Renderer issue #15.
 - 2026-10-17: Added the first Experience-owned Workshop Showcase manifest and moved the current six-entry demonstration catalog into the Experiences repository.
