@@ -1,7 +1,7 @@
 # WebPageLLM — Runtime Host Refactor
 
 **Branch:** `development`  
-**Status:** host-manifest switching/reset is implemented as an initial slice. The explicit entry scene and illustrative Replay Lab are present on `development`; the Forge return path is implemented, and the browser smoke now preserves the existing first-contact/gateway FSM before checking the Welcome destination; this latest correction is awaiting CI. Repository-backed Experience artifact loading and Experience-manifest switching remain unimplemented.
+**Status:** host-manifest switching/reset is implemented as an initial slice. The explicit entry scene and illustrative Replay Lab are present on `development`; the Forge return path is implemented, and the browser smoke now preserves the existing first-contact/gateway FSM for both the Forge return and a later direct Welcome navigation; the newest test correction is awaiting CI. Repository-backed Experience artifact loading and Experience-manifest switching remain unimplemented.
 
 ## Mission
 
