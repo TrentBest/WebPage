@@ -124,7 +124,7 @@ Choose the guide that answers your question; the README stays an orientation and
 - [**Package Ecosystem**](docs/PACKAGE_ECOSYSTEM.md) — package ownership and why each external dependency is present.
 - [**Usage**](docs/USAGE.md) — local setup and the host's runtime shape.
 - [**Brave1 Public Demonstration**](docs/BRAVE1_PUBLIC_DEMONSTRATION.md) — the public MVP story, claim boundaries, and pre-submission checks.
-- [**Documentation Index**](docs/DOCUMENTATION_INDEX.md) — the broader guide catalogue.
+- [**Singularity City Composition Contract**](docs/SINGULARITY_CITY_MICROBUNDLE_COMPOSITION.md) — how city capabilities become a manifest-composed Experience in the single WebPage host.\n- [**Zoomable City World**](docs/SINGULARITY_CITY_ZOOMABLE_WORLD_AND_EXPERIENCES.md) — shared city-to-room navigation, vehicles, Digitens, and renderer boundaries.\n- [**Documentation Index**](docs/DOCUMENTATION_INDEX.md) — the broader guide catalogue.
 - [**Documentation Standard**](docs/DOCUMENTATION_STANDARD.md) — how WebPage applies the shared Workshop documentation rules.
 
 Canonical external documentation: [FSM_COS](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS), [FSM_API](https://github.com/TrentBest/FSM_API), and [MicroBundleDomain](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain).
