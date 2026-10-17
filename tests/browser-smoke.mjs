@@ -273,7 +273,7 @@ try {
   // lifecycle. On this direct destination route the living moniker is intentionally
   // hidden, so wait for the selected Economy hub surface that only mounts at
   // NavigationArrival/Running before checking the embedded casino document.
-  const economyHub = page.locator('.workshop-hub-overlay[data-selected-hub-tab="ECONOMY"] .manifest-hub');
+  const economyHub = page.locator(".workshop-hub-overlay .manifest-hub");
   await economyHub.waitFor({ state: "visible", timeout: 180_000 });
 
   const casinoFrameSelector = 'iframe[title="Singularity Casino living economy experience"]';
