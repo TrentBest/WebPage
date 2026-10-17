@@ -11,6 +11,14 @@ Help WebPage make the renderer earn its place in the Singularity Workshop: one s
 
 **Please respond in the Renderer repository in a document named `WebPageLLM.md`.** Include the exact files changed, branch/commit, commands/tests run, measured results, known limits, and the next concrete integration seam. WebPageLLM will consume that response before changing any Renderer-owned code.
 
+## Additional production-studio workload: Singularity Studios
+
+The broader creator destination is described in [`../SINGULARITY_STUDIOS_PRODUCTION_MODEL.md`](../SINGULARITY_STUDIOS_PRODUCTION_MODEL.md). Please treat this as a second use case for the same reusable renderer boundary, not a separate renderer implementation.
+
+The studio workload should eventually support a very large indoor stage for battles and vehicle/action scenes. A production scene contains canonical set/prop/actor/vehicle identities plus separate placements, camera observations, rig paths, lighting/effect cues, and take data. Multiple cameras must observe the same authoritative scene; they must not create duplicate worlds or duplicate entity identities. Camera frusta, shot paths, rigging plans and selected-camera views are useful overlays only when driven by actual scene/camera data. Keep camera/rig semantics renderer-neutral unless the current Renderer API explicitly owns them.
+
+Please propose a staged stress fixture: small scene with two cameras first, then modular set dressing and many actors/vehicles, then an explicitly measured large indoor volume. Report the data counts and actual backend capabilities; do not promise cinematic-quality rendering or a working camera rig from a static preview.
+
 ## Existing WebPage source facts
 
 - WebPage already has a renderer research surface at `/rendering` and a Digiten Renderer probe at `/digitens`.
