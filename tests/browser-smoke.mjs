@@ -159,6 +159,22 @@ try {
   await page.goto(baseUrl + "/about-us", { waitUntil: "domcontentloaded" });
   await page.getByText("We are not building one giant application.", { exact: true }).waitFor({ state: "visible", timeout: 15000 });
 
+  // The Physics replay experience must be catalog-driven, not a duplicate hardcoded card.
+  await page.goto(`${baseUrl}/?tab=demonstrations`, { waitUntil: "domcontentloaded" });
+  await page.locator(".demonstration-grid").waitFor({ state: "visible", timeout: 15_000 });
+  const replayCards = page.locator(".demonstration-card")
+    .filter({ hasText: "Physics Replay Lab — Shareable Moments Prototype" });
+  const replayCardCount = await replayCards.count();
+  if (replayCardCount !== 1) {
+    throw new Error(`The manifest must expose exactly one Physics Replay Lab demonstration card; found ${replayCardCount}.`);
+  }
+  await replayCards.getByRole("link", { name: "READ EXPLANATION", exact: true }).click();
+  await page.getByRole("heading", { name: "Physics Replay Lab — Shareable Moments Prototype", exact: true })
+    .waitFor({ state: "visible", timeout: 15_000 });
+  await page.frameLocator('iframe[title="Physics Replay Lab — Shareable Moments Prototype"]')
+    .getByRole("heading", { name: "Replay Lab", exact: true })
+    .waitFor({ state: "visible", timeout: 15_000 });
+
   // Direct URLs remain available; entering a deeper experience may reveal related destinations.
   await page.goto(baseUrl + "/digitens", { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15000 });
