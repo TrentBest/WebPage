@@ -94,6 +94,8 @@ try {
   const studioPlanSvg = await studioPlanResponse.text();
   assert.match(studioPlanSvg, /Singularity Studios production plan/);
   assert.match(studioPlanSvg, /Renderer policy.*Visualize.*GUI\.SVG/);
+  assert.match(studioPlanSvg, /Interactive=\d+/);
+  assert.match(studioPlanSvg, /Distant=\d+/);
   assert.match(studioPlanSvg, /draw-/);
   assert.doesNotMatch(studioPlanSvg, /data-render-status="static-fallback"/);
   console.log("Singularity Studios source integration: stage zones, reusable asset footprints, scene placements, cameras, and lighting markers were submitted through Visualize and emitted by the GUI.SVG adapter.");

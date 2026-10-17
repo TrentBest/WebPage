@@ -40,13 +40,13 @@ var cameraMaterial = Material(16, new Vector4(1f, 0.20f, 0.80f, 1));
 var lightMaterial = Material(17, new Vector4(0.75f, 0.86f, 1f, 1));
 
 var commands = new List<RenderDrawCommand>();
-var observer = new Vector3(0, 0, 1.4f);
+var observer = new Vector3(0, 0, 0.1f);
 var representationPolicy = new ObserverRepresentationPolicy(
 [
-    new RepresentationHorizonRule(new EventHorizon("Interactive", 1.05, 16), RepresentationTarget.Interactive),
-    new RepresentationHorizonRule(new EventHorizon("Near", 1.25, 8), RepresentationTarget.Near),
-    new RepresentationHorizonRule(new EventHorizon("Distant", 1.65, 4), RepresentationTarget.Distant),
-    new RepresentationHorizonRule(new EventHorizon("Aggregate", 2.2, 2), RepresentationTarget.Aggregate),
+    new RepresentationHorizonRule(new EventHorizon("Interactive", 0.15, 16), RepresentationTarget.Interactive),
+    new RepresentationHorizonRule(new EventHorizon("Near", 0.3, 8), RepresentationTarget.Near),
+    new RepresentationHorizonRule(new EventHorizon("Distant", 0.5, 4), RepresentationTarget.Distant),
+    new RepresentationHorizonRule(new EventHorizon("Aggregate", 0.8, 2), RepresentationTarget.Aggregate),
     new RepresentationHorizonRule(new EventHorizon("Semantic", 10, 1), RepresentationTarget.Semantic)
 ]);
 ulong nextEntityId = 1;
@@ -103,19 +103,19 @@ foreach (var light in data.GetProperty("lightingRigPlacements").EnumerateArray()
 var frame = new RenderFrame(
     new RenderView(observer, Matrix4x4.Identity, Matrix4x4.Identity),
     commands);
+var representationSummary = string.Join(", ", commands.GroupBy(command => command.Representation)
+    .OrderBy(group => group.Key)
+    .Select(group => $"{group.Key}={group.Count()}"));
 await using var visualizer = new Visualizer(
     new GuiSvgVisualizerBackend(
         outputPath,
         backgroundColor: "#030a14",
         gridColor: "#16404e",
-        sceneLabel: $"Singularity Studios production plan · Renderer policy → Visualize → GUI.SVG · {stageWidth.ToString(CultureInfo.InvariantCulture)}m × {stageDepth.ToString(CultureInfo.InvariantCulture)}m · authored data",
+        sceneLabel: $"Singularity Studios production plan · Renderer policy → Visualize → GUI.SVG · {representationSummary} · {stageWidth.ToString(CultureInfo.InvariantCulture)}m × {stageDepth.ToString(CultureInfo.InvariantCulture)}m · authored data",
         drawGrid: true),
     catalog);
 var result = await visualizer.RenderAsync(frame, new RendererFrameAdapter());
-var representationCounts = commands.GroupBy(command => command.Representation)
-    .OrderBy(group => group.Key)
-    .Select(group => $"{group.Key}={group.Count()}");
-Console.WriteLine($"Singularity Studios plan: {result.SubmittedDrawCount} draw commands; {string.Join(", ", representationCounts)} -> {outputPath}");
+Console.WriteLine($"Singularity Studios plan: {result.SubmittedDrawCount} draw commands; {representationSummary} -> {outputPath}");
 
 void AddZoneOutline(string label, JsonElement bounds, RenderResourceId material)
 {
