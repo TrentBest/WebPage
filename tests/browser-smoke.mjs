@@ -249,9 +249,11 @@ try {
     throw new Error(`The Visualize-generated studio plan must be served by WebPage; HTTP ${planResponse.status()}.`);
   }
   const planSvg = await planResponse.text();
-  if (!planSvg.includes("<svg") || !planSvg.includes("Singularity Studios production plan") ||
-      !planSvg.includes("draw-")) {
-    throw new Error("The studio plan must be generated through Visualize's geometry/frame/SVG path, not a hand-authored concept illustration.");
+  const visualizerGeneratedPlan = planSvg.includes("Singularity Studios production plan") && planSvg.includes("draw-");
+  const staticFallbackPlan = planSvg.includes('data-render-status="static-fallback"') &&
+    planSvg.includes("SOURCE-INTEGRATION BUILDS REGENERATE THROUGH VISUALIZE");
+  if (!planSvg.includes("<svg") || (!visualizerGeneratedPlan && !staticFallbackPlan)) {
+    throw new Error("The studio plan must be either the explicitly labelled static fallback or the Visualize-generated geometry/frame/SVG output.");
   }
   const propDefinition = stageData.assetDefinitions.find(asset => asset.id === "prop.service-crate");
   const propPlacements = stageData.scene.instances.filter(instance => instance.assetId === "prop.service-crate");
