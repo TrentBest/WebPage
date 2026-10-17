@@ -391,7 +391,7 @@ public sealed class IncrementalVersionTests
         Assert.True(welcome >= 0 && welcome < architecture && architecture < city
             && city < economy && economy < specialist && specialist < deeper && deeper < aboutUs,
             "Discovery stages must reveal in order, with the compatibility About Us link outside every stage gate.");
-        Assert.Contains("\"demonstrations\" => 2", nav);
+        Assert.Contains("\"singularity-laboratory\" or \"demonstrations\" => 2", nav);
         Assert.Contains("\"city-lab\" or \"singularity-city\" => 4", nav);
         Assert.Contains("\"replay-lab\" or \"singularity-studios\" => 7", nav);
     }
