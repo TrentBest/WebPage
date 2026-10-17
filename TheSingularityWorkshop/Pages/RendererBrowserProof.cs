@@ -25,7 +25,7 @@ internal sealed class RendererBrowserProof
         TheSingularityWorkshop.Renderer.RendererRepresentation.Interactive;
 
     public bool IsConnected => true;
-    public string ModeLabel => "SOURCE MODE // ACTUAL RENDERER REDUCER";
+    public string ModeLabel => "SOURCE MODE // RENDERER REDUCER + VISUALIZE FRAME ADAPTER";
     public IReadOnlyList<RendererBrowserMark> Marks { get; private set; } = Array.Empty<RendererBrowserMark>();
     public RendererBrowserProofMetrics Metrics { get; private set; } = new(0, 0, 0, 0, "Interactive");
 
