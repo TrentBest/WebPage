@@ -242,6 +242,17 @@ try {
     throw new Error(`Singularity Studios stage data must be served by the WebPage host; HTTP ${stageDataResponse.status()}.`);
   }
   const stageData = await stageDataResponse.json();
+  const planImage = page.locator(".studios-stage-plan");
+  await planImage.waitFor({ state: "visible", timeout: 15_000 });
+  const planResponse = await page.request.get(`${baseUrl}/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage-plan.svg`);
+  if (!planResponse.ok()) {
+    throw new Error(`The Visualize-generated studio plan must be served by WebPage; HTTP ${planResponse.status()}.`);
+  }
+  const planSvg = await planResponse.text();
+  if (!planSvg.includes("<svg") || !planSvg.includes("Singularity Studios production plan") ||
+      !planSvg.includes("draw-")) {
+    throw new Error("The studio plan must be generated through Visualize's geometry/frame/SVG path, not a hand-authored concept illustration.");
+  }
   const propDefinition = stageData.assetDefinitions.find(asset => asset.id === "prop.service-crate");
   const propPlacements = stageData.scene.instances.filter(instance => instance.assetId === "prop.service-crate");
   if (stageData.schemaVersion !== "0.1.0" || !propDefinition || propPlacements.length !== 2) {
@@ -250,8 +261,12 @@ try {
   if (stageData.cameras.length !== 2 || stageData.cameras.some(camera => camera.sceneId !== stageData.scene.id)) {
     throw new Error("Singularity Studios cameras must observe the same canonical scene instead of duplicating world state.");
   }
+  if (!propDefinition.planFootprint || propPlacements.some(instance => !instance.transform.position)) {
+    throw new Error("Studio plan rendering must use explicit illustrative footprints and stable scene-instance transforms.");
+  }
   if (stageData.stage.dimensionsStatus !== "illustrative-planning-target" ||
-      !stageData.productionNotes.some(note => note.includes("not implemented"))) {
+      !stageData.productionNotes.some(note => note.includes("not implemented")) ||
+      !stageData.productionNotes.some(note => note.includes("illustrative footprints"))) {
     throw new Error("Singularity Studios must label planning dimensions and unsupported production capabilities honestly.");
   }
 
@@ -259,7 +274,7 @@ try {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
 
-  console.log("Browser journey passed: gateway/moniker/hub, FSM lifecycle, Movement Lab keyboard inspection, Replay Lab transport/mobile layout, ProtocolAi clipboard preview, and Singularity Studios reusable stage-data proof.");
+  console.log("Browser journey passed: gateway/moniker/hub, FSM lifecycle, Movement Lab keyboard inspection, Replay Lab transport/mobile layout, ProtocolAi clipboard preview, and Singularity Studios Visualize-generated plan and reusable stage-data proof.");
 } finally {
   await browser.close();
 }
