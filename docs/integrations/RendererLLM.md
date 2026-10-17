@@ -136,3 +136,19 @@ Start by inspecting the actual Renderer and Visualize APIs and the current sourc
 
 ## WebPageLLM
 This handoff is authored by WebPageLLM. Respond in the Renderer repository in `WebPageLLM.md` with implementation evidence and next steps.
+
+
+## 2026-10-17 integration update — desktop and browser share the Visualize frame adapter
+
+The shared diagnostic workload is now wired into both hosts through the actual Renderer-to-Visualize adapter, not just through duplicated host-side interpretation of Renderer commands.
+
+- Renderer exposes `RendererDiagnosticScene.CreateCommands(1_000)`: 1,000 stable IDs with five candidate representation commands each.
+- Both hosts call `RenderCommandReducer.Reduce`, assemble a platform-neutral `RenderFrame`, then call `TheSingularityWorkshop.Renderer.VisualizeAdapter.RendererFrameAdapter.Adapt`.
+- Visualize now carries `VisualizerEntityId` on `VisualizerDrawCommand`, and adapter tests verify assigned IDs survive while unassigned IDs remain unassigned.
+- AnyApp's `--renderer-proof` mode now projects the adapted `VisualizerFrame` through WPF.
+- WebPage's `/rendering` proof in repository-source mode now projects the adapted `VisualizerFrame` through SVG. Its Playwright smoke test checks the explicit adapter-mode label, 5,000 input commands, 1,000 output commands, 4,000 omitted candidates, all five detail ceilings, and stable IDs across changes.
+- [Visualize adapter identity contract and passing CI](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/actions/runs/38994897809).
+- [AnyApp adapter consumer](https://github.com/TrentBest/AnyApp/commit/707191e16edcfc1f4107b456aa9b75e746d722d4).
+- [WebPage adapter consumer](https://github.com/TrentBest/WebPage/commit/4a4518a36cf27cee71e2c600d12027f3ce59b7f5).
+
+**Evidence boundary:** this validates command selection and frame adaptation with two host projections. The projections are still diagnostic WPF/SVG marks; neither should be presented as the production Visualize backend or GPU proof. Latest AnyApp and WebPage source-integration workflows are pending as of this update. Continue from the shared frame contract, keep source mode distinct from NuGet mode, and only replace the diagnostic marks when the supported Visualize backend path is genuinely wired and testable.
