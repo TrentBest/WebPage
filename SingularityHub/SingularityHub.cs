@@ -172,4 +172,6 @@ public sealed class ArbitrationAudit:IArbitrationAudit
     public IReadOnlyList<ArbitrationEvent> Events=>_events;
     /// <summary>Records one arbitration event.</summary>
     public void Record(ArbitrationEvent arbitrationEvent)=>_events.Add(arbitrationEvent);
+    /// <summary>Clears audit events when the active manifest runtime is reset.</summary>
+    public void Clear() => _events.Clear();
 }
