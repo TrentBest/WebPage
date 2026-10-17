@@ -26,6 +26,12 @@ Relevant paths:
 
 Please inspect the current Visualize repository before proposing new APIs. Do not assume it uses a specific graphics API, that GPU upload exists, or that the current RGBA line buffer is already consumed by a GPU backend.
 
+## Additional reusable production geometry: Singularity Studios
+
+The production data direction is described in [`../SINGULARITY_STUDIOS_PRODUCTION_MODEL.md`](../SINGULARITY_STUDIOS_PRODUCTION_MODEL.md). Please extend the reusable data-to-visualization story beyond city infrastructure to production stages, modular sets, props, camera/rig overlays and multiple views of one scene.
+
+A useful first fixture is a stage floor plan with a few modular set pieces, props, two camera placements and one rig path. The same canonical asset should be instanced in two locations/scenes without copying or mutating its source definition. Stable asset IDs and instance IDs must remain distinct. A later scale tier can expand toward a giant indoor battle stage with repeated modular buildings, terrain sections, debris, vehicles and crowds. This is a proposed workload, not a current capacity claim. The SVG/plan view should be generated from deterministic source records rather than hand-authored as a pretend simulation.
+
 ## Stress specimen: a city that can be inspected at every scale
 
 Build a deterministic, seedable visualization fixture for a dense transit district with:
