@@ -134,7 +134,7 @@ void AddTriangle(string label, float size, float centerX, float centerZ, float y
 
 VisualizerResourceId Material(int id, Vector4 color)
 {
-    var resourceId = new VisualizerResourceId(id);
+    var resourceId = new VisualizerResourceId((ulong)id);
     catalog.SetMaterial(resourceId, new VisualizerMaterial(1, color));
     return resourceId;
 }
