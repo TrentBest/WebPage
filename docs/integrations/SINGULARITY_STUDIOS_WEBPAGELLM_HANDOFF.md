@@ -24,6 +24,8 @@ Keep the Workshop's living, instrumented visual language. The interface should r
 
 ## Where it belongs
 
+The matching desktop consumer brief is [AnyApp's Singularity Studios handoff](https://github.com/TrentBest/AnyApp/blob/development/docs/integrations/SINGULARITY_STUDIOS_ANYAPP_HANDOFF.md). Both hosts should consume the same versioned fixture and production semantics; neither host should become a second owner of the studio domain.
+
 Integrate Singularity Studios into the existing WebPage hub/showcase conventions. Do not introduce a competing navigation framework or turn the page into a conventional marketing landing page. The host's responsibility remains manifest-driven composition and browser presentation; reusable production behavior belongs to its owning package or provider.
 
 Before coding, inspect the current WebPage and AnyApp development branches and preserve their existing navigation, lifecycle, and composition contracts. AnyApp is a useful desktop proving ground; WebPage is the browser proving ground. Neither should become the owner of a second implementation of the same studio semantics.
