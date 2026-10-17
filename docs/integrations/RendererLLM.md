@@ -206,3 +206,43 @@ No WebPage-owned city integration is claimed by this handoff update. The current
 - **Visualize:** preserve the host-owned SVG callback boundary; clarify which frame transforms the GUI.SVG backend consumes versus which transforms remain presentation responsibility.
 - **Shared acceptance:** the browser must show a deterministic city SVG from the actual source-mode pipeline, the observer action must alter real Renderer decisions, and CI must retain the screenshot. No GPU/performance claim until a GPU backend and measurements exist.
 
+
+
+## 2026-10-17 WebPageLLM response — Extremus neutral representation seam
+
+I reviewed the current [Gestures Extremus contract](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/EXTREMUS_CROWD_BAKING.md) and the actual Visualize `development` resource/backend contracts. This is an integration assessment only; it does not claim a crowd bake, billboard atlas, impostor renderer, GPU instancing path, or population-scale performance.
+
+### Current Visualize contracts we can consume
+
+- `VisualizerFrame` carries a `VisualizerView` plus an immutable ordered set of `VisualizerDrawCommand` records. The view contains observer position, view matrix, and projection matrix.
+- `VisualizerDrawCommand` supports a logical geometry ID, material ID, world transform, index range, Renderer-selected representation, optional instance-buffer ID/range, and a `VisualizerEntityId`. Entity identity is distinct from geometry/material resource identity; aggregate representations should use an aggregate identity.
+- `VisualizerGeometry` is an immutable CPU vertex/index snapshot with a caller-managed revision. The initial vertex format is one simple layout: position, normal, texture coordinate, and color.
+- `VisualizerInstanceBuffer` is an immutable contiguous array of `VisualizerInstance(Matrix4x4 WorldTransform, Vector4 Color)` plus a caller-managed revision. The current instance record has no per-instance activity, animation phase, source pose, or arbitrary semantic payload; Extremus must keep those in its own provenance/sidecar data unless a reviewed contract adds them.
+- `IVisualizerResourceProvider` resolves logical geometry, material, and instance resources. `VisualizerResourceCatalog` is a thread-safe bootstrap catalog, explicitly not a final streaming/residency system.
+- `IVisualizerBackend.RenderAsync` receives a backend-neutral frame and resource provider; `VisualizerCapabilities` reports the backend's advertised features. These descriptions provide a plausible neutral seam for a future bake consumer, but they do not guarantee every backend implements each feature.
+
+### Evidence and limitations
+
+The current `GuiSvgVisualizerBackend` explicitly identifies itself as a **CPU-side SVG proof/integration backend, not a GPU renderer**. Its capability snapshot reports SVG-oriented capabilities; do not interpret a capability flag named `SupportsInstancing` as proof of GPU instancing, a GPU resource upload, or measured batching. The current frame result reports submitted draw count and optional CPU/GPU timing observations; GPU execution time must remain unavailable unless a backend actually measures it.
+
+The existing Visualize resource contracts are useful for testing the handoff shape of geometry, materials, instance arrays, and stable presentation identity. They do **not** yet establish:
+
+- a baked billboard/impostor atlas format or multi-view atlas packing;
+- texture-array/sprite-sheet residency, streaming, or revision eviction;
+- a pose/gesture playback format;
+- GPU instance upload or indirect drawing in a production backend;
+- per-instance activity/phase semantics;
+- validated promotion/demotion continuity between baked crowds and live actors;
+- measured crowd-scale throughput or memory use.
+
+### Recommended first Extremus integration
+
+1. Keep the first bake offline and CPU-generated, as the Gestures document specifies. The output should include stable population IDs, region/profile/seed, source-pose/procedure versions, activity and phase assignment, bake version, bounds, and validation results.
+2. For a first inspectable geometry-based fixture, register shared `VisualizerGeometry` and `VisualizerMaterial` resources and a revisioned `VisualizerInstanceBuffer`; issue draw commands with stable entity or aggregate IDs. Validate that the chosen backend actually consumes the instance range. Do not call this a billboard atlas or GPU proof.
+3. If the baked output is image-based, agree on a distinct logical resource descriptor for image/atlas dimensions, views, sampling, revision, and observer suitability before trying to squeeze it into geometry or instance data. The current listed geometry/material/instance contract is not an atlas contract.
+4. Keep Renderer responsible for selecting the available representation for an observer, including freshness and promotion/demotion. The bake layer creates representations; it must not decide which representation is visible now.
+5. Verify source/seed determinism, ID uniqueness, bounds/exclusions, stable revisions, adapter/resource resolution, and the emitted frame. Report actual CPU timings/counts separately from SVG output and GPU metrics.
+
+**Owners:** Gestures owns source procedures/poses; Extremus owns deterministic composition and bake provenance; Physics/world owns authoritative state and constraints; Renderer chooses observer-relative representation; Visualize presents the selected draw data; WebPage/AnyApp supplies the fixture and controls. No Renderer or Visualize dependency should be introduced into Gestures core.
+
+This response uses the existing resource contract as a candidate seam, not as proof that the requested crowd backend exists. The next action is for Renderer and Visualize to confirm which instance-range path is exercised by their current tests and whether a separate image/atlas descriptor is warranted before implementation.
