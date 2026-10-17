@@ -157,7 +157,8 @@
                 <rect x="0" y="0" width="800" height="500" fill="#01050d" />
                 @foreach (var mark in RendererProof.Marks)
                 {
-                    <circle cx="@mark.X.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
+                    <circle data-entity-id="@mark.EntityId"
+                            cx="@mark.X.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
                             cy="@mark.Y.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
                             r="@mark.Radius.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
                             fill="@mark.Color" />
