@@ -149,7 +149,8 @@ try {
   // The Forge is an in-place Workshop room, not a browser route. Return through its
   // owned exit control rather than browser history, which exits the Workshop.
   await page.getByRole("button", { name: "← EXIT FORGE", exact: true }).click();
-  await page.locator(".workshop-map").waitFor({ state: "visible", timeout: 15_000 });
+  await page.locator('.manifest-hub[data-selected-hub-tab="WELCOME"]').waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByRole("heading", { name: /welcome/i }).first().waitFor({ state: "visible", timeout: 15_000 });
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
   const expandedLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
