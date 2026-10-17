@@ -23,7 +23,7 @@ This is a coordinated workload, not a WebPage-only scene. Keep the following own
 - The versioned stage JSON remains conceptual planning data, with reusable definitions separate from placements and two cameras referencing the same scene identity.
 - The source-mode plan generator routes draw commands through Renderer policy and `RenderFrame`, adapts with `RendererFrameAdapter`, then submits to Visualize's GUI.SVG backend. Package-only builds use the explicitly labelled static fallback.
 - This is wiring proof only when source-mode build and smoke checks pass. GUI.SVG currently draws submitted commands; this is not measured LOD work reduction, a camera's rendered view, GPU output, or evidence that the illustrative 1000 m × 600 m × 80 m stage is supported.
-- The fixture needs explicit coordinate-frame metadata before Studio, camera, Gesture, and Physics contracts are treated as one world-space convention. The plan projects X/Z to 2D; its current representation thresholds are normalized plan units, not physical metre thresholds.
+- The fixture now declares an X-width/Y-elevation/Z-depth coordinate convention and X/Z plan projection. Treat this as a fixture-level declaration until the studio/camera/Gesture/Physics owners review a shared world-space contract. The plan projects X/Z to 2D; its current representation thresholds are normalized plan units, not physical metre thresholds.
 - Next: verify CI; make the coordinate convention explicit; add a real two-camera observation of the same scene; then integrate a small reusable take/task fixture with Gestures. Keep acoustic path evidence as a separate, accurately labelled Studio sub-experience.
 
 

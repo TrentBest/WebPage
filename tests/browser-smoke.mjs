@@ -255,6 +255,13 @@ try {
   if (!planSvg.includes("<svg") || (!visualizerGeneratedPlan && !staticFallbackPlan)) {
     throw new Error("The studio plan must be either the explicitly labelled static fallback or the Visualize-generated geometry/frame/SVG output.");
   }
+  if (stageData.coordinateFrame?.handedness !== "right-handed" ||
+      stageData.coordinateFrame.axes.x !== "stage-width" ||
+      stageData.coordinateFrame.axes.y !== "elevation" ||
+      stageData.coordinateFrame.axes.z !== "stage-depth" ||
+      stageData.coordinateFrame.planProjection.verticalAxis !== "z") {
+    throw new Error("Singularity Studios must declare its world coordinate frame and plan projection explicitly.");
+  }
   const propDefinition = stageData.assetDefinitions.find(asset => asset.id === "prop.service-crate");
   const propPlacements = stageData.scene.instances.filter(instance => instance.assetId === "prop.service-crate");
   if (stageData.schemaVersion !== "0.1.0" || !propDefinition || propPlacements.length !== 2) {

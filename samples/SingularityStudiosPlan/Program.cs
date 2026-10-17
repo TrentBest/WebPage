@@ -14,6 +14,19 @@ var outputPath = args.Length > 0
 
 using var document = JsonDocument.Parse(File.ReadAllText(sourcePath));
 var data = document.RootElement;
+var coordinateFrame = data.GetProperty("coordinateFrame");
+var axes = coordinateFrame.GetProperty("axes");
+var planProjection = coordinateFrame.GetProperty("planProjection");
+if (axes.GetProperty("x").GetString() != "stage-width" ||
+    axes.GetProperty("y").GetString() != "elevation" ||
+    axes.GetProperty("z").GetString() != "stage-depth" ||
+    planProjection.GetProperty("horizontalAxis").GetString() != "x" ||
+    planProjection.GetProperty("verticalAxis").GetString() != "z" ||
+    planProjection.GetProperty("omittedAxis").GetString() != "y")
+{
+    throw new InvalidDataException("The studio plan renderer requires the declared X-width, Y-elevation, Z-depth coordinate convention.");
+}
+
 var stage = data.GetProperty("stage");
 var dimensions = stage.GetProperty("dimensions");
 var stageWidth = dimensions.GetProperty("width").GetSingle();

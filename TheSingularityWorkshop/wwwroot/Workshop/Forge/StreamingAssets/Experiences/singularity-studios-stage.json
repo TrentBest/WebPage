@@ -243,5 +243,22 @@
     "The proposed stage dimensions are planning data only. Validate stage-scale limits against the chosen runtime before making performance claims.",
     "Rendering, physical collision, lighting simulation, acoustic simulation, recording, and take management are not implemented by this data file.",
     "The planFootprint fields are illustrative footprints used only to produce a readable top-down preview; they are not measured asset dimensions."
-  ]
+  ],
+  "coordinateFrame": {
+    "id": "singularity-studios.stage-world.y-up.v1",
+    "status": "authored-fixture-convention",
+    "handedness": "right-handed",
+    "origin": "stage floor corner at minimum X, Y, and Z",
+    "axes": {
+      "x": "stage-width",
+      "y": "elevation",
+      "z": "stage-depth"
+    },
+    "planProjection": {
+      "horizontalAxis": "x",
+      "verticalAxis": "z",
+      "omittedAxis": "y",
+      "status": "top-down-plan-projection"
+    }
+  }
 }
