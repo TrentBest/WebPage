@@ -1,0 +1,273 @@
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<section class="workshop-floorplan" aria-label="The Singularity Workshop floor plan">
+    <header class="floorplan-header">
+        <div>
+            <div class="floorplan-kicker">THE SINGULARITY WORKSHOP // FIELD GUIDE 001</div>
+            <h1>Welcome, friend.</h1>
+            <p>Choose a place. Discover what it makes possible.</p>
+        </div>
+        <div class="floorplan-controls">
+            <button class="floorplan-voice @(VoiceEnabled ? "active" : "")" @onclick="ToggleVoice" aria-pressed="@VoiceEnabled">
+                @(VoiceEnabled ? "VOICE ON" : "VOICE OFF")
+            </button>
+            <a class="floorplan-about" href="/about-us">ABOUT THE WORKSHOP ↗</a>
+        </div>
+    </header>
+
+    <div class="floorplan-stage">
+        <svg class="workshop-map" viewBox="0 0 1200 720" role="img" aria-labelledby="workshop-map-title workshop-map-desc" preserveAspectRatio="xMidYMid meet">
+            <title id="workshop-map-title">Top-down schematic of The Singularity Workshop</title>
+            <desc id="workshop-map-desc">An interactive dragon-warrior inspired stronghold plan with a forge, assembly benches, observatory, globe room, and cartographer drafting wing.</desc>
+            <defs>
+                <pattern id="blueprint-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+                    <path d="M24 0H0V24" fill="none" stroke="#21465b" stroke-width=".7" opacity=".58" />
+                </pattern>
+                <pattern id="stone-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <path d="M0 0V9" stroke="#426072" stroke-width="1" opacity=".42" />
+                </pattern>
+                <linearGradient id="forge-glow" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#ffb347" stop-opacity=".95" />
+                    <stop offset="1" stop-color="#ff3c24" stop-opacity=".25" />
+                </linearGradient>
+                <filter id="blueprint-glow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="4" result="blur" />
+                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+            </defs>
+            <rect width="1200" height="720" fill="#061321" />
+            <rect width="1200" height="720" fill="url(#blueprint-grid)" />
+
+            <!-- Outer wall: a fortified, dragon-scale silhouette drawn as a plan, not a rendered game scene. -->
+            <path d="M95 145 L145 95 L255 95 L290 66 L340 95 L860 95 L910 66 L960 95 L1060 95 L1105 145 L1105 575 L1055 625 L940 625 L900 654 L850 625 L350 625 L300 654 L250 625 L145 625 L95 575 Z"
+                  fill="#0b2030" stroke="#7ba9bd" stroke-width="3" />
+            <path d="M115 160 L160 116 L260 116 L294 90 L341 116 L859 116 L906 90 L952 116 L1044 116 L1085 160 L1085 560 L1040 604 L943 604 L900 630 L850 604 L350 604 L300 630 L251 604 L160 604 L115 560 Z"
+                  fill="none" stroke="#2b6076" stroke-width="1.4" stroke-dasharray="8 5" />
+            <text x="600" y="48" text-anchor="middle" class="map-label map-title">THE WORKSHOP // TOP-DOWN PLAN</text>
+            <text x="600" y="676" text-anchor="middle" class="map-note">SELECT A WORK AREA • HOVER TO INSPECT • CAPABILITIES MAY ADD NEW ROOMS</text>
+
+            <!-- Entry / central hall -->
+            <path d="M485 140 H715 V225 H760 V475 H715 V560 H485 V475 H440 V225 H485 Z"
+                  class="room-outline" />
+            <path d="M510 160 H690 V245 H735 V455 H690 V540 H510 V455 H465 V245 H510 Z"
+                  fill="url(#stone-hatch)" stroke="#355e72" stroke-width="1.5" />
+            <path d="M600 188 V512 M490 350 H710" stroke="#527b8d" stroke-width="1.2" stroke-dasharray="5 6" />
+            <g class="map-room" role="button" tabindex="0" aria-label="Central Hall" @onclick="() => SelectRoom("hall")" @onmouseenter="() => HoverRoom("hall")" @onfocus="() => HoverRoom("hall")" @onkeydown="e => HandleRoomKey(e, "hall")">
+                <rect x="520" y="280" width="160" height="140" rx="2" class="room-hit" />
+                <path d="M550 310 L600 285 L650 310 L650 390 L600 415 L550 390 Z" class="sigil" />
+                <path d="M570 350 L600 320 L630 350 L600 380 Z" class="sigil-inner" />
+                <text x="600" y="446" text-anchor="middle" class="map-label">CENTRAL HALL</text>
+            </g>
+
+            <!-- Forge -->
+            <g class="map-room @(SelectedRoom == "forge" ? "selected" : "")" role="button" tabindex="0" aria-label="Forge: live FSM workshop" @onclick="() => SelectRoom("forge")" @onmouseenter="() => HoverRoom("forge")" @onfocus="() => HoverRoom("forge")" @onkeydown="e => HandleRoomKey(e, "forge")">
+                <path d="M155 170 H410 V325 H375 V365 H155 Z" class="room-hit" />
+                <path d="M170 185 H395 V310 H360 V345 H170 Z" class="room-outline" />
+                <rect x="205" y="210" width="145" height="90" class="forge-bed" />
+                <path d="M218 282 L242 230 L264 270 L285 222 L316 281 L340 241" fill="none" stroke="#ffd28a" stroke-width="4" filter="url(#blueprint-glow)" />
+                <path d="M193 195 H370 M193 318 H345" class="map-detail" />
+                <text x="282" y="335" text-anchor="middle" class="map-label">THE FORGE</text>
+                <text x="282" y="355" text-anchor="middle" class="map-small">FSM • BEHAVIOR • LIFECYCLE</text>
+            </g>
+
+            <!-- Assembly benches -->
+            <g class="map-room @(SelectedRoom == "assembly" ? "selected" : "")" role="button" tabindex="0" aria-label="Assembly benches: compose MicroBundles" @onclick="() => SelectRoom("assembly")" @onmouseenter="() => HoverRoom("assembly")" @onfocus="() => HoverRoom("assembly")" @onkeydown="e => HandleRoomKey(e, "assembly")">
+                <path d="M155 400 H410 V550 H155 Z" class="room-hit" />
+                <path d="M170 415 H395 V535 H170 Z" class="room-outline" />
+                @for (var i = 0; i < 3; i++)
+                {
+                    <g>
+                        <rect x="190" y="435" width="185" height="23" class="bench" />
+                        <rect x="190" y="435" width="185" height="23" transform="translate(0 @(i * 28))" class="bench" />
+                    </g>
+                }
+                <circle cx="218" cy="447" r="5" class="bundle-dot cyan" />
+                <circle cx="252" cy="475" r="5" class="bundle-dot magenta" />
+                <circle cx="290" cy="503" r="5" class="bundle-dot amber" />
+                <text x="282" y="526" text-anchor="middle" class="map-label">ASSEMBLY BENCHES</text>
+                <text x="282" y="546" text-anchor="middle" class="map-small">MICROBUNDLES • COMPOSITION</text>
+            </g>
+
+            <!-- Observatory and celestial parts buckets -->
+            <g class="map-room @(SelectedRoom == "observatory" ? "selected" : "")" role="button" tabindex="0" aria-label="Observatory: assemble solar systems" @onclick="() => SelectRoom("observatory")" @onmouseenter="() => HoverRoom("observatory")" @onfocus="() => HoverRoom("observatory")" @onkeydown="e => HandleRoomKey(e, "observatory")">
+                <path d="M790 170 H1035 V365 H790 Z" class="room-hit" />
+                <path d="M805 185 H1020 V350 H805 Z" class="room-outline" />
+                <circle cx="910" cy="268" r="62" class="orbit orbit-outer" />
+                <circle cx="910" cy="268" r="39" class="orbit" />
+                <circle cx="910" cy="268" r="13" class="sun" />
+                <circle cx="965" cy="244" r="7" class="planet" />
+                <circle cx="878" cy="235" r="5" class="moon" />
+                <circle cx="891" cy="301" r="9" class="planet planet-blue" />
+                <path d="M830 210 L849 210 L849 229 L830 229 Z M974 309 L993 309 L993 328 L974 328 Z" class="parts-bucket" />
+                <text x="910" y="338" text-anchor="middle" class="map-label">OBSERVATORY</text>
+                <text x="910" y="358" text-anchor="middle" class="map-small">PLANETS • MOONS • ORBITS</text>
+            </g>
+
+            <!-- Globe room -->
+            <g class="map-room @(SelectedRoom == "globe" ? "selected" : "")" role="button" tabindex="0" aria-label="World globe: spin and inspect the world" @onclick="() => SelectRoom("globe")" @onmouseenter="() => HoverRoom("globe")" @onfocus="() => HoverRoom("globe")" @onkeydown="e => HandleRoomKey(e, "globe")">
+                <path d="M790 400 H1035 V550 H790 Z" class="room-hit" />
+                <path d="M805 415 H1020 V535 H805 Z" class="room-outline" />
+                <circle cx="910" cy="474" r="47" class="globe" />
+                <ellipse cx="910" cy="474" rx="20" ry="47" class="globe-line" />
+                <ellipse cx="910" cy="474" rx="47" ry="18" class="globe-line" />
+                <path d="M880 452 L898 439 L910 447 L920 442 L936 458 L928 471 L915 475 L910 493 L896 486 L891 468 Z" class="globe-land" />
+                <text x="910" y="526" text-anchor="middle" class="map-label">WORLD GLOBE</text>
+                <text x="910" y="546" text-anchor="middle" class="map-small">SPIN • INSPECT • CHOOSE A WORLD</text>
+            </g>
+
+            <!-- Cartographers' drafting wing -->
+            <g class="map-room @(SelectedRoom == "drafting" ? "selected" : "")" role="button" tabindex="0" aria-label="Drafting wing: maps and expeditions" @onclick="() => SelectRoom("drafting")" @onmouseenter="() => HoverRoom("drafting")" @onfocus="() => HoverRoom("drafting")" @onkeydown="e => HandleRoomKey(e, "drafting")">
+                <path d="M450 155 H750 V210 H735 V245 H465 V210 H450 Z" class="room-hit" />
+                <path d="M465 164 H735 V202 H720 V235 H480 V202 H465 Z" class="room-outline" />
+                @for (var i = 0; i < 3; i++)
+                {
+                    <g transform="translate(@(495 + i * 78) 174)">
+                        <rect x="0" y="0" width="58" height="46" class="draft-table" />
+                        <path d="M7 8 L50 8 M7 16 L44 16 M7 24 L34 24 M7 32 L47 32" class="map-detail" />
+                    </g>
+                }
+                <text x="600" y="228" text-anchor="middle" class="map-small">CARTOGRAPHERS' DRAFTING WING</text>
+            </g>
+
+            <!-- Compass, scale and legend -->
+            <g transform="translate(1020 580)">
+                <circle cx="0" cy="0" r="22" fill="none" stroke="#517f94" stroke-width="1.5" />
+                <path d="M0 -17 L5 0 L0 17 L-5 0 Z" fill="#8bd8e8" />
+                <text x="0" y="-30" text-anchor="middle" class="map-small">N</text>
+            </g>
+            <path d="M470 585 H570 M470 579 V591 M520 579 V591 M570 579 V591" stroke="#7196a9" stroke-width="2" />
+            <text x="520" y="605" text-anchor="middle" class="map-small">SCHEMATIC SCALE // NOT TO SURVEY</text>
+        </svg>
+    </div>
+
+    <aside class="room-inspector" aria-live="polite">
+        <div class="inspector-mark">✦</div>
+        <div class="inspector-copy">
+            <div class="inspector-kicker">@CurrentRoom.Kicker</div>
+            <h2>@CurrentRoom.Title</h2>
+            <p>@CurrentRoom.Description</p>
+        </div>
+        <div class="inspector-actions">
+            @if (SelectedRoom == "forge")
+            {
+                <button class="inspector-action" @onclick="OpenForge">ENTER THE FORGE ↗</button>
+            }
+            else if (SelectedRoom == "observatory")
+            {
+                <button class="inspector-action" @onclick="() => Explain("observatory")">EXPLORE CELESTIAL WORKFLOW</button>
+            }
+            else if (SelectedRoom == "globe")
+            {
+                <button class="inspector-action" @onclick="() => Explain("globe")">INSPECT THE WORLD WORKFLOW</button>
+            }
+            else if (SelectedRoom == "drafting")
+            {
+                <button class="inspector-action" @onclick="() => Explain("drafting")">EXPLORE MAP WORKFLOW</button>
+            }
+        </div>
+    </aside>
+
+    <div class="floorplan-footer">
+        <span>BLUEPRINT 001 // INTERACTIVE CONCEPT</span>
+        <span>INSTALLED MICRO-BUNDLES MAY EXTEND THIS FLOOR PLAN</span>
+    </div>
+
+    @if (_showForge)
+    {
+        <div class="forge-overlay" role="dialog" aria-modal="true" aria-label="Live FSM Forge">
+            <div class="forge-overlay-head">
+                <div><span>WORKSHOP FACILITY // FORGE</span><h2>Behavior, made visible.</h2></div>
+                <button class="forge-close" @onclick="CloseForge" aria-label="Close the Forge">CLOSE ×</button>
+            </div>
+            <WelcomeExperience />
+        </div>
+    }
+</section>
+
+<style>
+    .workshop-floorplan{position:absolute;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:.55rem;padding:clamp(.7rem,1.5vw,1.4rem);box-sizing:border-box;overflow:hidden;background:radial-gradient(ellipse at 50% 50%,rgba(0,234,255,.07),transparent 58%),#061321;color:#eaf8ff;font-family:Consolas,'Courier New',monospace}
+    .floorplan-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-width:0}.floorplan-kicker,.inspector-kicker{color:#65cde0;font-size:clamp(.52rem,.8vw,.68rem);letter-spacing:.18em}.floorplan-header h1{margin:.25rem 0;font-size:clamp(1.3rem,2.8vw,2.7rem);line-height:1;letter-spacing:.02em}.floorplan-header p{margin:.35rem 0 0;color:#9bb9c8;font:400 clamp(.68rem,.95vw,.85rem)/1.4 system-ui,sans-serif}.floorplan-controls{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:.55rem}.floorplan-voice,.floorplan-about{display:inline-flex;align-items:center;justify-content:center;padding:.55rem .7rem;border:1px solid #2b6579;background:rgba(7,25,39,.85);color:#b8f5ff;text-decoration:none;font:700 .62rem Consolas,'Courier New',monospace;letter-spacing:.1em;cursor:pointer}.floorplan-voice.active{border-color:#ffbd5a;color:#ffd69a;box-shadow:0 0 18px #ff8a2233}.floorplan-stage{position:relative;min-height:0;overflow:hidden;border:1px solid #244c61;background:#061321;box-shadow:inset 0 0 35px #020711}.workshop-map{display:block;width:100%;height:100%;min-height:0}.map-title{font-size:15px;letter-spacing:4px;fill:#9be8f3}.map-label{font-size:13px;letter-spacing:2px;fill:#cdebf2;pointer-events:none}.map-small{font-size:9px;letter-spacing:1.2px;fill:#77a7b9;pointer-events:none}.map-note{font-size:10px;letter-spacing:2px;fill:#4c8299}.room-outline{fill:#0b1c2a;stroke:#5d8ca1;stroke-width:2}.room-hit{fill:#102d3d;fill-opacity:.48;stroke:#34647a;stroke-width:1.3}.map-room{cursor:pointer;outline:none}.map-room:hover .room-hit,.map-room:focus .room-hit,.map-room.selected .room-hit{fill:#1c5268;fill-opacity:.68;stroke:#67e7f5;stroke-width:2.5;filter:url(#blueprint-glow)}.map-room:hover .map-label,.map-room:focus .map-label,.map-room.selected .map-label{fill:#fff}.forge-bed{fill:url(#forge-glow);stroke:#ffb95d;stroke-width:2}.map-detail{fill:none;stroke:#6794a8;stroke-width:1.1}.bench{fill:#14364a;stroke:#5b899e;stroke-width:1.4}.bundle-dot{stroke:#dffaff;stroke-width:1}.bundle-dot.cyan{fill:#00eaff}.bundle-dot.magenta{fill:#ff2cff}.bundle-dot.amber{fill:#ffd34d}.orbit{fill:none;stroke:#6ca7bf;stroke-width:1.4;stroke-dasharray:5 5}.orbit-outer{stroke:#3c7e98;stroke-dasharray:2 5}.sun{fill:#ffd16a;filter:url(#blueprint-glow)}.planet{fill:#ff8d6b;stroke:#ffd5a5;stroke-width:1}.planet-blue{fill:#61c5e5}.moon{fill:#d9e8e9}.parts-bucket{fill:#0b2636;stroke:#5c9bb1;stroke-width:1.5}.globe{fill:#0b2b3c;stroke:#82d7e8;stroke-width:2}.globe-line{fill:none;stroke:#478ca7;stroke-width:1.2}.globe-land{fill:#64ad83;stroke:#9bd5a7;stroke-width:1}.draft-table{fill:#0e2b3d;stroke:#7aafc0;stroke-width:1.3}.sigil{fill:none;stroke:#c18cff;stroke-width:2;opacity:.6}.sigil-inner{fill:none;stroke:#6ae8f2;stroke-width:2}.room-inspector{display:flex;align-items:center;gap:1rem;min-height:5.5rem;padding:.8rem 1rem;border:1px solid #2a5c70;background:linear-gradient(90deg,#0b2433,#081724);box-sizing:border-box}.inspector-mark{display:flex;align-items:center;justify-content:center;width:2.3rem;height:2.3rem;flex:0 0 2.3rem;border:1px solid #75d9e8;color:#75d9e8;font-size:1.1rem}.inspector-copy{min-width:0;flex:1}.inspector-copy h2{margin:.2rem 0;font-size:clamp(.9rem,1.5vw,1.25rem);letter-spacing:.07em}.inspector-copy p{margin:0;color:#a9c3cf;font:400 clamp(.65rem,.9vw,.8rem)/1.45 system-ui,sans-serif}.inspector-actions{display:flex;gap:.4rem;flex-wrap:wrap}.inspector-action,.forge-close{padding:.65rem .8rem;border:1px solid #57b5c9;background:#0a2b3b;color:#dffaff;font:700 .62rem Consolas,'Courier New',monospace;letter-spacing:.08em;cursor:pointer}.floorplan-footer{display:flex;justify-content:space-between;gap:.8rem;color:#456f83;font-size:.52rem;letter-spacing:.12em}.forge-overlay{position:absolute;inset:.5rem;z-index:10;display:flex;flex-direction:column;gap:.5rem;overflow:hidden;padding:.8rem;border:1px solid #f0a24a;background:#061321;box-shadow:0 0 0 100vmax #020711cc}.forge-overlay-head{display:flex;align-items:center;justify-content:space-between;gap:1rem}.forge-overlay-head span{color:#ffbd5a;font-size:.58rem;letter-spacing:.18em}.forge-overlay-head h2{margin:.25rem 0;font-size:1.2rem}.forge-overlay > :last-child{position:relative;min-height:0;flex:1}
+    @@media(max-width:760px){.workshop-floorplan{gap:.4rem;padding:.5rem}.floorplan-header{align-items:flex-start}.floorplan-header p{display:none}.floorplan-controls{max-width:45%}.floorplan-voice,.floorplan-about{font-size:.5rem;padding:.4rem}.room-inspector{gap:.55rem;padding:.55rem;min-height:4.5rem}.inspector-mark{display:none}.inspector-actions{max-width:32%}.inspector-action{font-size:.5rem;padding:.5rem}.floorplan-footer{font-size:.42rem}.floorplan-footer span:last-child{display:none}.map-label{font-size:15px}.map-small{font-size:11px}}
+    @@media(max-height:600px){.floorplan-header h1{font-size:1.2rem}.floorplan-kicker{font-size:.5rem}.floorplan-header p{display:none}.room-inspector{min-height:4rem;padding:.45rem .7rem}.inspector-copy p{font-size:.68rem}.floorplan-footer{font-size:.45rem}}
+    @@media(prefers-reduced-motion:reduce){.map-room:hover .room-hit{filter:none}}
+</style>
+
+@code {
+    private string SelectedRoom { get; set; } = "hall";
+    private bool VoiceEnabled { get; set; }
+    private bool _showForge;
+
+    private sealed record RoomInfo(string Kicker, string Title, string Description);
+
+    private static readonly Dictionary<string, RoomInfo> Rooms = new(StringComparer.Ordinal)
+    {
+        ["hall"] = new("ARRIVAL // YOU ARE HERE", "The Workshop", "Welcome, friend, to The Singularity Workshop. This is a working stronghold for assembling capabilities into experiences. Explore the rooms; each tool will explain what it contributes."),
+        ["forge"] = new("BEHAVIOR // FSM_API", "The Forge", "Shape behavior and lifecycle with finite-state machines. The live Forge lab lets you send a signal, tick the runtime, and inspect the real lifecycle trace."),
+        ["assembly"] = new("COMPOSITION // MICROBUNDLES + FSM_COS", "Assembly Benches", "Focused capabilities arrive as MicroBundles. FSM_COS resolves their dependency closure and composes an Experience. Installed bundles can contribute their own Workshop facilities."),
+        ["observatory"] = new("CELESTIAL DESIGN // COMPOSITION", "The Observatory", "Build a solar system by taking planets, moons, and other celestial bodies from parts buckets, then place, stretch, and arrange them until the orbits and layout suit your design. This is the intended workflow; the interactive celestial editor is a future capability."),
+        ["globe"] = new("WORLD DESIGN // GLOBE", "The World Globe", "A solar system is the container, not the terrain editor. Select a globe to spin and inspect the world, then move into map and land editing for its geography. The globe workflow is a design target, not yet a live simulation."),
+        ["drafting"] = new("MAPS // EXPEDITIONS + CARTOGRAPHERS", "The Drafting Wing", "Drafting tables hold maps for expeditions, commissioned cartographers, and authored territories. Choose a map to continue into its own world-editing tools. These tables illustrate the planned workflow; no cartographer hiring system is claimed here.")
+    };
+
+    private RoomInfo CurrentRoom => Rooms.TryGetValue(SelectedRoom, out var room) ? room : Rooms["hall"];
+
+    private void HoverRoom(string room)
+    {
+        if (!Rooms.ContainsKey(room))
+            return;
+        SelectedRoom = room;
+        if (VoiceEnabled)
+            _ = SpeakAsync(CurrentRoom.Description);
+    }
+
+    private void SelectRoom(string room)
+    {
+        if (!Rooms.ContainsKey(room))
+            return;
+        SelectedRoom = room;
+        if (VoiceEnabled)
+            _ = SpeakAsync(CurrentRoom.Description);
+    }
+
+    private void ToggleVoice()
+    {
+        VoiceEnabled = !VoiceEnabled;
+        if (VoiceEnabled)
+            _ = SpeakAsync("Welcome, friend, to The Singularity Workshop. Hover over a room to discover what it makes possible.");
+        else
+            _ = JS.InvokeVoidAsync("eval", "window.speechSynthesis?.cancel()");
+    }
+
+    private void Explain(string room)
+    {
+        if (!Rooms.ContainsKey(room))
+            return;
+        SelectedRoom = room;
+        if (VoiceEnabled)
+            _ = SpeakAsync(CurrentRoom.Description);
+    }
+
+    private async Task SpeakAsync(string text)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("eval", $"(()=>{{const s=window.speechSynthesis;if(!s)return;s.cancel();const u=new SpeechSynthesisUtterance({System.Text.Json.JsonSerializer.Serialize(text)});u.rate=0.94;u.pitch=0.88;s.speak(u);}})()");
+        }
+        catch (JSException)
+        {
+            // Speech is an optional browser capability; the visual field guide remains complete.
+        }
+    }
+
+    private void OpenForge() => _showForge = true;
+    private void CloseForge() => _showForge = false;
+
+    private void HandleRoomKey(KeyboardEventArgs e, string room)
+    {
+        if (e.Key is "Enter" or " ")
+            SelectRoom(room);
+    }
+}
