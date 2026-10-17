@@ -1,98 +1,122 @@
-# WebPage Creation Architecture — WebApp-Adjacent, FSM_COS-Driven
+# WebPage as a Manifest-Defined WebApp
 
-> **Purpose:** evolve WebPage from a hand-authored, monolithic presentation/runtime toward a manifest-driven Workshop experience that can, in theory, author and compose webpages using the Workshop's own WebApp technology.
+> **Architectural invariant:** WebPage should ultimately be a WebApp—AnyApp's web manifestation—not a compiled website whose identity and behaviors are fixed in Razor pages. The compiled host supplies stable runtime machinery; manifests, Experiences, and MicroBundles define what the running application is.
 
-## Corrected architectural interpretation
+## The correction
 
-**WebApp is not a deployment target.** It is the Workshop's browser-application technology/manifestation, analogous to AnyApp's desktop manifestation. Choosing a web server, static host, WebAssembly, or Interactive Server is a separate implementation and deployment decision; none of those choices defines what WebApp means.
+WebPage is currently a Blazor WebAssembly application and a proving ground for Workshop capabilities. That implementation fact must not define the target architecture.
 
-WebPage predates WebApp and is the Workshop's public proving ground and authoring experience. The goal is not simply to rewrite WebPage using a different hosting framework. The goal is for WebPage to demonstrate the Workshop's ability to describe, compose, present, and eventually create webpages from declared Experiences and capabilities.
+**WebApp is AnyApp for the web.** A WebApp is a manifest-driven application host. WebPage should ultimately be one concrete WebApp running on that host, with its visible identity, routes, rooms, interactions, and behaviors composed from declared Experiences and MicroBundles. It should be possible to redefine the WebPage experience without recompiling the host, within the capabilities exposed by its installed runtime and trusted MicroBundles.
 
-The intended conceptual flow is:
+This is stronger than loading a manifest that selects one hard-coded Razor page. The manifest must be authoritative for the application composition, and the host must interpret it rather than silently reconstructing a fixed default application in code.
 
-```text
-WEBPAGE / WORKSHOP AUTHORING EXPERIENCE
-       │ create, configure, preview
-       ▼
-PAGE MANIFEST + CONFIGURATION
-       │ declares the intended Experience and capabilities
-       ▼
-MICROBUNDLE DOMAIN / REPOSITORY
-       │ describes and locates capabilities
-       ▼
-FSM_COS → RuntimeAssembly
-       │ composes requested capability/dependency closure
-       ▼
-WEBAPP BROWSER MANIFESTATION
-       │ renders the composed Experience
-       ▼
-CREATED WEBPAGE
-```
+## Target architecture
 
-AnyApp is a sibling manifestation for desktop experiences. WebPage and WebApp must consume canonical package/runtime behavior rather than becoming separate copies of FSM_COS or of reusable Experience logic.
+~~~text
+COMPILED WEBAPP HOST (stable machinery)
+  ├─ manifest/configuration loader
+  ├─ capability and artifact resolution
+  ├─ lifecycle + FSM_API execution integration
+  ├─ FSM_COS composition boundary
+  ├─ browser input / rendering / navigation adapters
+  └─ policy, validation, and failure handling
+                 |
+                 v
+WEBAPP MANIFEST + CONFIGURATION
+  ├─ identity / entry Experience
+  ├─ available and active Experiences
+  ├─ MicroBundle roots and configuration
+  ├─ navigation / presentation declarations
+  └─ permissions and compatibility requirements
+                 |
+                 v
+EXPERIENCE COMPOSITION
+  ├─ Experiences describe the environments and journeys
+  └─ MicroBundles provide reusable capabilities and behaviors
+                 |
+                 v
+FSM_COS resolves dependency closure → RuntimeAssembly
+                 |
+                 v
+HOST INTERPRETS AND RUNS THE DECLARED COMPOSITION
+                 |
+                 v
+A WEBAPP THAT CAN BE REDEFINED WITHOUT RECOMPILING ITS HOST
+~~~
 
-## Current / Direction / Future
+The host is the machinery, not the application definition. The manifest is the application-level declaration, not merely startup decoration. Experiences compose what the user encounters; MicroBundles provide reusable behavior and capabilities. FSM_COS owns dependency closure and composition; FSM_API owns state-machine semantics and execution primitives. WebPage owns browser-specific adapters and presentation mechanics, not a second copy of those responsibilities.
 
-### Current — verified from the WebPage development branch
+## What “without recompiling” means
 
-- The main WebPage project uses `Microsoft.NET.Sdk.BlazorWebAssembly`.
-- It directly references FSM_API 1.0.13, MicroBundleDomain 1.0.1, FSM_COS 0.1.0-alpha.5, GUI.Blazor 0.1.0-alpha.8, ProtocolAi, and GrammarAi.
-- The host manifest contract already describes startup Experiences, hub destinations, running Experiences, supporting capabilities, and Deep Dive behavior; tests cover parsing and important manifest invariants.
-- The public Forge code already contains an FSM workbench, executable definition model, preview runtime, condition/signal support, and scaffolding, with tests for authoring and preview lifecycle. This is real FSM authoring capability, but it is not yet a general webpage artifact editor or a demonstrated bridge from Forge output to a page consumed by WebApp.
-- Startup manifest composition resolves the Living GUI root (2102) and its declared Moniker dependency (2110) through FSM_COS.
-- The composed `RuntimeAssembly` exists, but browser execution still depends on the transitional `FSMManagerService → PageFSM → LivingGuiFsm → PageStateContext` path.
-- The sibling `TrentBest/TheSingularityWorkshop.WebApp` repository has a real .NET 8 ASP.NET Core Razor Components host on its `development` branch, using Interactive Server rendering. Its startup registers `WebAppMicroBundleCatalog`, `WebAppCosRuntime`, and `WebAppExperienceRuntime`.
-- `WebAppCosRuntime` composes a `RuntimeManifest` through `FsmCos` and verifies that the host-owned Moniker bundle is present in the resulting `RuntimeAssembly`. This proves an actual FSM_COS startup path, but the Moniker bundle is still a temporary local compatibility bundle (BundleId 3101), not yet a verified published Experiences artifact.
-- `WebAppExperienceRuntime` defines the Gateway → LivingGui → Moniker → Gravity → Running lifecycle and independently instantiated living actors driven through FSM_API. `Components/Pages/Home.razor` presents that runtime and renders the composed Moniker through `BlazorGuiRenderer`.
-- WebApp's current vertical slice is a working browser manifestation, not yet evidence that it can author arbitrary pages: its host still constructs a fixed landing Experience, its MicroBundle catalog resolves only the local Moniker bundle, and its roadmap defers Forge integration until artifact and manifest boundaries stabilize.
-- WebPage already owns two important pieces of the eventual authoring story—the host/page manifest contract and FSM Forge authoring/preview. The missing proof is the bridge between them: a page artifact produced from authoring inputs, composed through the canonical runtime boundary, then consumed and presented by WebApp without host-specific duplicate behavior.
-- The current WebPage deployment workflow uploads published `wwwroot` to Azure Static Web Apps. This describes today's WebPage deployment path only; it does not define the WebApp architecture.
+The target is **runtime redefinition through data and already-available capabilities**, not magical execution of arbitrary new code.
 
-### Direction — next implementation slices
+Without recompiling the host, an authorized manifest/configuration update should be able to change, where supported:
 
-1. **Connect existing authoring to the browser manifestation.** WebPage already has `WebPageHostManifest`, FSM Forge definitions/workbench/preview/scaffolding, and tests. WebApp already has FSM_COS composition and GUI.Blazor presentation, but only for a fixed landing Experience. Define the smallest explicit artifact contract that bridges these existing pieces; do not rebuild FSM Forge or pretend the fixed WebApp landing page is already a general page builder.
-2. **Dependency/release checkpoint.** Verify the HeadlessAi candidate's exact branch, tests, package contents, documentation, and disabled publication gate. Verify the MicroBundleDomain and FSM_COS contracts WebPage intends to consume. Do not infer package readiness from an open PR or an older green run.
-3. **Define the webpage artifact contract.** Establish what a created page consists of: manifest, configuration, selected Experiences/MicroBundles, presentation metadata/assets, and any required routing or sharing metadata. Reuse existing contracts where they exist; do not invent APIs in a package that does not own them.
-4. **Prove author → compose → preview.** Start with one small, manifest-driven page authored through the Workshop path. Prove the manifest is the source of composition, FSM_COS resolves the intended dependency closure, and the browser presents the composed Experience.
-5. **Separate rendering from runtime ownership.** WebApp owns browser-specific presentation and interaction. FSM_API owns state-machine execution; FSM_COS owns composition; MicroBundleDomain owns canonical capability contracts. Reusable Experience behavior belongs to its canonical package, not duplicated in each host.
-6. **Preserve existing WebPage behavior.** Keep current entry/Moniker, Living GUI, routing, JavaScript interop, browser storage, and Deep Dive behavior until replacements are executable and regression-tested.
-7. **Choose deployment only after runtime requirements are known.** Determine whether the selected WebApp rendering mode requires a running ASP.NET Core process or can be served statically. Then align deployment configuration with that proven choice. Do not switch to Interactive Server or change the production host merely because it was mistaken for the meaning of WebApp.
-8. **Public release proof.** Update the functionality ledger, architecture docs, tests, and visual evidence. Prepare the WebPage update for review; do not promote, publish, or deploy it without explicit approval.
+- which Experience opens first and which Experiences are available;
+- the navigation and room/scene composition;
+- which compatible MicroBundles participate and how they are configured;
+- the behavior, presentation, and content contributed by those Experiences and MicroBundles;
+- the composition's transitions and lifecycle within the host's declared runtime contracts.
 
-### Future — not yet claimed
+A manifest cannot conjure a capability that is neither installed nor resolvable. New executable code may require a separately trusted, versioned MicroBundle artifact and may be subject to compatibility, security, and policy checks. The host must validate manifests, resolve dependencies, report missing/incompatible capabilities, and fail predictably. Reconfiguration must not require a rebuild merely because the application's composition changed.
 
-- WebPage's existing manifest and Forge authoring tools are connected to a page artifact that WebApp can consume and configure.
-- A created page can be previewed and presented by WebApp without hand-written host-specific runtime behavior.
-- The browser is fully driven by canonical Experience runtime state rather than transitional WebPage lifecycle classes.
-- A completed author → compose → preview → publish → share flow.
-- A production-ready public Workshop.
+## Ownership and boundaries
 
-## Non-negotiable preservation gates
+| Concern | Canonical owner |
+|---|---|
+| State-machine semantics and execution primitives | FSM_API |
+| MicroBundle identity and contract | MicroBundleDomain |
+| Dependency closure, loading, arbitration, convergence, RuntimeAssembly | FSM_COS |
+| Environment, user journey, declared composition | Experience and its manifest contracts |
+| Reusable behavior and capability | The MicroBundle/package that owns it |
+| Browser input, rendering adapters, URL integration, browser lifecycle | WebApp host |
+| WebPage's own selected identity/content | WebPage's WebApp manifest, Experiences, and MicroBundles—not hard-coded page-specific runtime logic |
 
-A refactor must preserve and prove:
+AnyApp and WebApp are sibling host manifestations. AnyApp supplies the desktop-specific lifecycle and presentation boundary; WebApp supplies the browser-specific one. Neither should fork the reusable Experience behavior or FSM_COS composition logic.
 
-- the first-contact / Moniker / primary Experience sequence;
-- manifest-selected Experience and FSM_COS dependency closure;
-- deep-link routing and not-found behavior;
-- JavaScript interop, viewport sizing, and browser storage;
-- the Living GUI's 100-slot population, independent organism FSMs in one processing group, deterministic target distribution, travel, planting, growth, reproduction, parent recovery, gravity, and arrival/navigation sequence;
-- Deep Dive's distinction between manifest-requested roots, resolved dependency closure, declared dependencies, and browser presentation;
-- responsive behavior and the existing visual identity;
-- the created-page artifact can be consumed by the chosen WebApp presentation path.
+## Current implementation facts — not target-state claims
 
-Do not delete `PageFSM`, `LivingGuiFsm`, `PageStateContext`, or `FSMManagerService` until replacement behavior is executable, tested, consumed by WebPage, and documented.
+The development branch already has useful foundations:
 
-## Release and branch discipline
+- a host manifest contract and startup/primary Experience declarations;
+- FSM_COS composition that resolves a primary root and its declared dependency closure;
+- a real RuntimeAssembly artifact;
+- browser presentation and navigation;
+- FSM Forge authoring/preview scaffolding.
 
-- Work on `development` or a short-lived branch based on it.
-- Keep `master` stable and untouched until explicit promotion approval.
-- Keep NuGet publication disabled by default; a successful build or package artifact is not publication authorization.
-- Do not merge the FSM_COS alpha.6 integration branch while it is explicitly gated on package availability unless the owner chooses a documented alternative.
-- Do not describe a proposed PR, a local package, or a source-based CI run as a published NuGet dependency.
-- If a dependency's required contract is unavailable, document the blocker and keep the existing behavior rather than fabricating a compatibility API.
+But the current host still has transitional page-specific lifecycle/runtime paths, and significant behavior is expressed in compiled Razor/C# code. A manifest selecting an Experience does **not** by itself prove that the whole application can be redefined without recompilation. Forge authoring/preview does not yet prove that an authored application artifact can be loaded by WebApp as the authoritative runtime definition.
 
-## Definition of done
+These are explicit gaps to close, not capabilities to claim as already complete.
 
-This direction is review-ready when the actual WebApp implementation has been inspected, the page-artifact contract is grounded in real package APIs, one author → compose → preview vertical slice works, existing WebPage behavior remains proven, runtime ownership is not duplicated, documentation matches the implementation, relevant CI/tests pass, and release/deployment remain under explicit owner control.
+## Migration sequence
 
-*The manifest describes the page. The composition system assembles its capabilities. WebApp presents the Experience. WebPage helps create it.*
+1. **Inventory behavior currently hard-coded in the host.** Identify navigation, room selection, entry sequence, stateful interactions, and presentation behavior. Record each behavior, its current owner, tests, and intended MicroBundle/Experience owner.
+2. **Define the versioned WebApp manifest contract.** Ground it in existing package contracts. It must describe the application composition, not just a fixed list of boot screens. Include schema/version compatibility, capability references/configuration, routing/presentation declarations, and failure behavior where supported.
+3. **Make manifest interpretation authoritative.** The host must not override a supplied manifest with hard-coded page identity, default room lists, or parallel lifecycle rules. Any defaults must be explicit, documented, and distinguishable from manifest-specified values.
+4. **Move behavior into Experiences and MicroBundles.** Keep the browser host generic. Put reusable behavior in its canonical package; use WebPage-local bundles only for truly host-specific adapters or experiments.
+5. **Connect author → compose → run.** An authored manifest and its selected artifacts must pass through the canonical composition boundary, produce a resolved RuntimeAssembly, and drive the actual browser Experience. Preview must exercise the same contracts as runtime, not a decorative parallel implementation.
+6. **Prove hot redefinition.** With one built host instance, change a test manifest/configuration and demonstrate a meaningfully different application composition without rebuilding the host. Verify lifecycle cleanup, dependency resolution, and errors for unavailable capabilities.
+7. **Retire duplicate implementation only after parity.** Preserve the existing opening sequence, routing, browser storage/JS interop, Living GUI behavior, and Deep Dive behavior through executable tests before deleting transitional paths.
+8. **Verify and document.** Add contract tests, runtime integration tests, and browser smoke tests; update the functionality-preservation ledger and this document from observed behavior. Keep master untouched and do not publish or deploy without explicit approval.
+
+## Proof obligations
+
+A meaningful proof must demonstrate all of the following:
+
+1. The host loads a versioned manifest at runtime.
+2. The manifest—not a hard-coded page branch—selects the Experience and declared capabilities.
+3. FSM_COS resolves the requested roots and dependency closure; the resulting RuntimeAssembly is inspectable.
+4. The host executes/presents that resolved composition rather than a duplicate compiled experience path.
+5. A manifest/configuration change produces a different running WebApp without recompilation.
+6. Missing, incompatible, or unauthorized MicroBundles fail visibly and safely.
+7. Existing WebPage journeys and behavior-preservation tests remain green.
+8. CI verifies the same contract; documentation distinguishes current proof from future direction.
+
+## Branch and release discipline
+
+- Work on development; preserve the two-branch Sith policy (master and development only).
+- Do not modify or promote master without explicit approval.
+- Do not publish packages or deploy a public site without explicit approval.
+- Do not invent APIs or claim that planned dynamic loading, runtime replacement, or general authoring is already implemented.
+
+> **The host is compiled once. The WebApp is defined by its manifest. Experiences compose the environment. MicroBundles supply the behaviors. The runtime makes that composition real.**
