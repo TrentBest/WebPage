@@ -1,7 +1,7 @@
 using System.Text.Json;
 using TheSingularityWorkshop.Services;
 using TheSingularityWorkshop.Infrastructure.Hub;
-using TheSingularityWorkshop.SingularityHub;
+using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.MicroBundles;
@@ -273,7 +273,7 @@ public sealed class WebPageHostManifestTests
         {
             BaseAddress = new Uri("https://localhost/")
         };
-        var hub = new HubRuntime(new SingularityHub());
+        var hub = new HubRuntime(new HubKernel());
         using var service = new WorkshopExperienceService(client, hub);
 
         await service.SwitchManifestAsync("manifest-a.json");
@@ -310,7 +310,7 @@ public sealed class WebPageHostManifestTests
         {
             BaseAddress = new Uri("https://localhost/")
         };
-        using var service = new WorkshopExperienceService(client, new HubRuntime(new SingularityHub()));
+        using var service = new WorkshopExperienceService(client, new HubRuntime(new HubKernel()));
 
         await Assert.ThrowsAsync<ArgumentException>(() => service.SwitchManifestAsync("https://example.com/manifest.json"));
         await Assert.ThrowsAsync<ArgumentException>(() => service.SwitchManifestAsync("../manifest.json"));
