@@ -46,7 +46,9 @@ try {
   const initialPipelineMetrics = await pipelineMetrics.textContent() ?? "";
   assert.match(initialPipelineMetrics, /candidate commands\s+[\d,]+ → submitted\s+[\d,]+/);
   assert.match(initialPipelineMetrics, /CPU SVG proof, not GPU rendering/);
-  assert.ok(await pipelineSurface.locator("path").count() > 0, "GUI.SVG must manifest actual submitted city geometry.");
+  const submittedGeometry = page.locator('.pipeline-surface svg path[fill]:not([fill="none"])');
+  assert.ok(await submittedGeometry.count() > 0, "GUI.SVG must manifest actual submitted city geometry.");
+  const initialGeometry = await submittedGeometry.evaluateAll(nodes => nodes.map(node => node.getAttribute("d")));
   await page.getByRole("button", { name: "Pipeline move forward", exact: true }).click();
   await page.waitForFunction(
     previous => document.querySelector(".pipeline-readout p")?.textContent !== previous,
@@ -56,6 +58,8 @@ try {
   await page.screenshot({ path: process.env.CITY_PIPELINE_SCREENSHOT ?? "TestResults/Browser/singularity-city-pipeline.png", fullPage: true });
   const afterMovePipelineMetrics = await pipelineMetrics.textContent() ?? "";
   assert.notEqual(afterMovePipelineMetrics, initialPipelineMetrics, "Observer movement must change the live Renderer pipeline readout.");
+  const movedGeometry = await submittedGeometry.evaluateAll(nodes => nodes.map(node => node.getAttribute("d")));
+  assert.notDeepEqual(movedGeometry, initialGeometry, "Observer movement must change the projected GUI.SVG geometry, not just the readout.");
   await page.getByRole("button", { name: "Pipeline move back", exact: true }).click();
   await page.waitForFunction(
     previous => document.querySelector(".pipeline-readout p")?.textContent !== previous,
