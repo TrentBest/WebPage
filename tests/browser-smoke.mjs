@@ -41,7 +41,7 @@ try {
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   const initialLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  const expectedLinks = ["Welcome", "About Us"];
+  const expectedLinks = ["Welcome", "Singularity Laboratory", "About Us"];
   if (initialLinks.length !== expectedLinks.length || expectedLinks.some((label, i) => initialLinks[i] !== label)) {
     throw new Error(`The hub navigation must expose core destinations plus manifest-declared gallery entries; found: ${initialLinks.join(", ")}.`);
   }
