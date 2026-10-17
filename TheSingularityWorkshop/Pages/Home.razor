@@ -736,6 +736,9 @@
 
         this.firstRender = true;
         var returningVisitor = await JS.InvokeAsync<bool>("interop.workshopVisited");
+        // The monolith is a first-visit gate. Preserve the existing return-visitor
+        // journey when browser navigation reloads the root route after entry.
+        _entryRequested = returningVisitor;
         await Experience.InitializeAsync(returningVisitor);
     }
 
