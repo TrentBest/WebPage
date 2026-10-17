@@ -5,6 +5,8 @@
 **Source branches:** `development`  
 **Do not publish or deploy from this brief.**
 
+The matching native desktop consumer brief is [AnyApp's Singularity Studios handoff](https://github.com/TrentBest/AnyApp/blob/development/docs/integrations/SINGULARITY_STUDIOS_ANYAPP_HANDOFF.md). Both hosts are intended to consume the same versioned production data; this document does not establish a final shared API.
+
 ## The experience
 
 **Singularity Studios is a data-driven digital filming studio, not a static showcase page.** A visitor should be able to assemble a production from reusable stage, set, performer, crew, equipment, camera, cue, and shot data; inspect how the pieces are bound together; and eventually replay the same take with changed blocking or camera coverage.
