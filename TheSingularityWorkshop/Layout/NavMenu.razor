@@ -3,11 +3,12 @@
 @inject WorkshopExperienceService Experience
 @inject FSMManagerService FSM
 @inject NavigationManager Navigation
+@inject Microsoft.JSInterop.IJSRuntime JS
 @implements IDisposable
 
 <div class="workshop-nav-shell @(collapseNavMenu ? "collapsed" : "expanded")">
     <div class="workshop-nav-head">
-        <a class="navbar-brand workshop-brand" href="/" aria-label="Return to the living Workshop moniker" title="Return to the living Workshop moniker">
+        <a class="navbar-brand workshop-brand" href="/" @onclick="ResetNavigation" aria-label="Return to the living Workshop moniker" title="Return to the living Workshop moniker">
             <span class="brand-word"><span class="brand-letter blue">T</span><span class="brand-letter magenta">H</span><span class="brand-letter orange">E</span></span>
             <span class="brand-word"><span class="brand-letter red">S</span><span class="brand-letter yellow">I</span><span class="brand-letter green">N</span><span class="brand-letter blue">G</span><span class="brand-letter magenta">U</span><span class="brand-letter orange">L</span><span class="brand-letter red">A</span><span class="brand-letter yellow">R</span><span class="brand-letter green">I</span><span class="brand-letter blue">T</span><span class="brand-letter magenta">Y</span></span>
             <span class="brand-word"><span class="brand-letter orange">W</span><span class="brand-letter red">O</span><span class="brand-letter yellow">R</span><span class="brand-letter green">K</span><span class="brand-letter blue">S</span><span class="brand-letter magenta">H</span><span class="brand-letter orange">O</span><span class="brand-letter red">P</span></span>
@@ -85,8 +86,10 @@
 </style>
 
 @code {
+    private const string DestinationSelectedKey = "workshop.navigation.destination-selected";
     private bool collapseNavMenu = true;
     private bool welcomeSelected;
+    private bool _hasSelectedDestination;
     private int _progressionStage;
 
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
@@ -122,16 +125,43 @@
             welcomeSelected = true;
 
         AdvanceProgressionForDestination(name);
+        MarkDestinationSelected();
         collapseNavMenu = true;
     }
 
     private void CollapseNavMenu()
     {
+        MarkDestinationSelected();
         collapseNavMenu = true;
     }
 
-    protected override void OnInitialized()
+    private void ResetNavigation()
     {
+        _hasSelectedDestination = false;
+        welcomeSelected = false;
+        _progressionStage = 0;
+        collapseNavMenu = false;
+        _ = JS.InvokeVoidAsync("sessionStorage.removeItem", DestinationSelectedKey);
+    }
+
+    private void MarkDestinationSelected()
+    {
+        _hasSelectedDestination = true;
+        _ = JS.InvokeVoidAsync("sessionStorage.setItem", DestinationSelectedKey, "true");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var stored = await JS.InvokeAsync<string?>("sessionStorage.getItem", DestinationSelectedKey);
+            _hasSelectedDestination = string.Equals(stored, "true", StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Microsoft.JSInterop.JSException)
+        {
+            // The menu remains usable when session storage is unavailable.
+        }
+
         SyncNavigationState();
         Navigation.LocationChanged += HandleLocationChanged;
         Experience.StateChanged += HandleExperienceStateChanged;
@@ -158,19 +188,32 @@
         var progressionTarget = requestedTab ?? path;
         if (!string.Equals(progressionTarget, "welcome", StringComparison.OrdinalIgnoreCase))
             AdvanceProgressionForDestination(progressionTarget);
-        if (isHubDestination || !string.IsNullOrEmpty(path))
+        var isLandingTab = string.Equals(requestedTab, "welcome", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(requestedTab, "moniker", StringComparison.OrdinalIgnoreCase);
+        if (!string.IsNullOrEmpty(path) || (isHubDestination && !isLandingTab))
         {
+            MarkDestinationSelected();
             collapseNavMenu = true;
         }
-        // The rail remains collapsed on root arrivals and browser Back.
-        // Visitors explicitly open it with the toggle; route changes collapse it again.
+        else if (!_hasSelectedDestination &&
+            (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running))
+        {
+            collapseNavMenu = false;
+        }
     }
 
     private void HandleExperienceStateChanged()
         => _ = InvokeAsync(StateHasChanged);
 
     private void HandleFSMStateChanged(string state)
-        => _ = InvokeAsync(StateHasChanged);
+        => _ = InvokeAsync(() =>
+        {
+            if (!_hasSelectedDestination &&
+                (state == PageFSM.NavigationArrival || state == PageFSM.Running))
+                collapseNavMenu = false;
+
+            StateHasChanged();
+        });
 
     public void Dispose()
     {
