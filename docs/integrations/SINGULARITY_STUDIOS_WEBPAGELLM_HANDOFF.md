@@ -1,11 +1,31 @@
 # Singularity Studios — WebPageLLM Integration Brief
 
 **Audience:** WebPageLLM, AnyApp, and contributors building the Workshop's public-facing experiences  
-**Status:** design handoff; this document does not claim a working studio simulator, camera system, renderer integration, or audio pipeline  
+**Status:** living integration handoff; an initial source-mode Renderer → Visualize → GUI.SVG plan proof is wired, but this does not claim a working studio simulator, camera-view renderer, production GPU path, or complete audio pipeline  
 **Source branches:** `development`  
 **Do not publish or deploy from this brief.**
 
 The matching native desktop consumer brief is [AnyApp's Singularity Studios handoff](https://github.com/TrentBest/AnyApp/blob/development/docs/integrations/SINGULARITY_STUDIOS_ANYAPP_HANDOFF.md). Both hosts are intended to consume the same versioned production data; this document does not establish a final shared API.
+
+## Cross-repository guidance reviewed — 2026-10-17
+
+This is a coordinated workload, not a WebPage-only scene. Keep the following owner documents active while implementing:
+
+- **Renderer:** [Renderer's WebPageLLM response](https://github.com/TrentBest/TheSingularityWorkshop.Renderer/blob/development/docs/WebPageLLM.md) and [WebPage's Renderer handoff](RendererLLM.md). Renderer owns observer-relative representation choices, command reduction, refresh/freshness policy, and frame assembly. Its 5,000-candidate/1,000-entity diagnostic workload is useful prior evidence, not the studio scene or GPU evidence.
+- **Visualize:** [Visualize's WebPageLLM coordination handoff](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/blob/development/docs/integrations/WebPageLLM.md) and [city rendering integration contract](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/blob/development/docs/integrations/SINGULARITY_CITY_RENDERING_HANDOFF.md). Visualize owns backend-neutral geometry/material/instance presentation and backend manifestation. GUI.SVG is inspectable CPU-side output, not GPU-performance proof.
+- **Gestures:** [Singularity Studios procedure plan](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/SINGULARITY_STUDIOS_GESTURE_PLAN.md). Reuse performer, crew, and equipment procedures by definition ID and bind them to stage/rig anchors. The production task graph coordinates them; Gestures does not own shot editing, physical contact, or audio mixing.
+- **Physics:** [acoustic world model](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/ACOUSTIC_WORLD_MODEL.md), [living acoustic demo](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/ACOUSTIC_LIVING_DEMO.md), and the [Castle Siege response channel](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/PhysicsCastlesLLM.md) for that separate attraction. Physics owns physical outcomes and model-derived acoustic observations. The first-order room-reflection slice provides geometric path metadata, not synthesized room audio.
+- **AnyApp:** [desktop consumer handoff](https://github.com/TrentBest/AnyApp/blob/development/docs/integrations/SINGULARITY_STUDIOS_ANYAPP_HANDOFF.md). Browser and desktop should consume the same versioned production fixture, not maintain parallel schemas.
+- **Economy:** [Economy/WebPage handoff](https://github.com/TrentBest/TheSingularityWorkshop.Economy/blob/development/docs/ECONOMY_SYSTEMS_ROADMAP_AND_WEBPAGE_HANDOFF.md) is relevant later for optional creator shops, ownership, or simulated commerce. It is not a dependency of the first stage/camera proof.
+
+### Current implementation checkpoint
+
+- The versioned stage JSON remains conceptual planning data, with reusable definitions separate from placements and two cameras referencing the same scene identity.
+- The source-mode plan generator routes draw commands through Renderer policy and `RenderFrame`, adapts with `RendererFrameAdapter`, then submits to Visualize's GUI.SVG backend. Package-only builds use the explicitly labelled static fallback.
+- This is wiring proof only when source-mode build and smoke checks pass. GUI.SVG currently draws submitted commands; this is not measured LOD work reduction, a camera's rendered view, GPU output, or evidence that the illustrative 1000 m × 600 m × 80 m stage is supported.
+- The fixture needs explicit coordinate-frame metadata before Studio, camera, Gesture, and Physics contracts are treated as one world-space convention. The plan projects X/Z to 2D; its current representation thresholds are normalized plan units, not physical metre thresholds.
+- Next: verify CI; make the coordinate convention explicit; add a real two-camera observation of the same scene; then integrate a small reusable take/task fixture with Gestures. Keep acoustic path evidence as a separate, accurately labelled Studio sub-experience.
+
 
 ## The experience
 
