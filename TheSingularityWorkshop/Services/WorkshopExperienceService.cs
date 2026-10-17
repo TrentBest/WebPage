@@ -1,11 +1,10 @@
 using TheSingularityWorkshop.FSM_COS;
 using DomainMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
 using TheSingularityWorkshop.Infrastructure.Hub;
-using TheSingularityWorkshop.SingularityHub;
+using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.Experiences;
 using TheSingularityWorkshop.Workshop.MicroBundles;
-using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 
 namespace TheSingularityWorkshop.Services;
 
@@ -98,7 +97,7 @@ public sealed class WorkshopExperienceService : IDisposable
         RuntimeAssembly? candidatePrimary = null;
         var candidateHubAssemblies = new Dictionary<string, RuntimeAssembly>(StringComparer.OrdinalIgnoreCase);
         var candidateCapabilities = new Dictionary<string, RuntimeAssembly>(StringComparer.OrdinalIgnoreCase);
-        HubKernel? candidateHub = null;
+        HubBundle? candidateHubBundle = null;
         var activated = false;
 
         try
@@ -145,14 +144,12 @@ public sealed class WorkshopExperienceService : IDisposable
             ComposeManifestHubBundles(candidateManifest, runtimeBase, candidateHubAssemblies);
             ComposeManifestCapabilities(candidateManifest, runtimeBase, candidateCapabilities);
 
-            candidateHub = new HubKernel();
             if (candidatePrimary.TryGetBundle<MonikerMicroBundle>(
                     (ulong)MonikerMicroBundle.BundleId, out var moniker) &&
-                moniker is TheSingularityWorkshop.SingularityHub.IMicroBundle hubBundle)
+                moniker is HubBundle hubBundle)
             {
-                candidateHub.LoadBundle(hubBundle);
+                candidateHubBundle = hubBundle;
             }
-            var candidateArbitrationMutations = candidateHub.ExecuteArbitrationPipeline();
 
             var candidateDemonstrations = new DemonstrationRegistry(
                 candidateManifest.Demonstrations,
@@ -161,9 +158,9 @@ public sealed class WorkshopExperienceService : IDisposable
             var oldPrimary = RuntimeAssembly;
             var oldHubAssemblies = _hubRuntimeAssemblies.Values.ToArray();
             var oldCapabilities = _capabilityRuntimeAssemblies.Values.ToArray();
-            var oldHub = _hubRuntime.Hub;
+            var oldHubBundles = _hubRuntime.Hub.LoadedBundles.Cast<object>().ToArray();
 
-            _hubRuntime.ReplaceHub(candidateHub, candidateArbitrationMutations);
+            _hubRuntime.ActivateManifestBundle(candidateHubBundle);
             Manifest = candidateManifest;
             Demonstrations = candidateDemonstrations;
             CurrentManifestExperience = startupExperience;
@@ -181,7 +178,7 @@ public sealed class WorkshopExperienceService : IDisposable
                 (oldPrimary?.Bundles ?? Array.Empty<DomainMicroBundle>()).Cast<object>()
                     .Concat(oldHubAssemblies.SelectMany(assembly => assembly.Bundles).Cast<object>())
                     .Concat(oldCapabilities.SelectMany(assembly => assembly.Bundles).Cast<object>())
-                    .Concat(oldHub.LoadedBundles.Cast<object>()));
+                    .Concat(oldHubBundles));
             SetState("Moniker");
         }
         catch (Exception exception)
@@ -193,7 +190,7 @@ public sealed class WorkshopExperienceService : IDisposable
                     candidatePrimary,
                     candidateHubAssemblies.Values,
                     candidateCapabilities.Values,
-                    candidateHub?.LoadedBundles.Cast<object>() ?? Array.Empty<object>());
+                    Array.Empty<object>());
             }
             throw;
         }
