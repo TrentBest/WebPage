@@ -48,15 +48,24 @@ internal sealed class RendererBrowserProof
     private void Refresh()
     {
         var result = TheSingularityWorkshop.Renderer.RenderCommandReducer.Reduce(_candidates, _detail);
-        Marks = result.Commands.Select(command =>
+        var sourceFrame = new TheSingularityWorkshop.Renderer.RenderFrame(
+            new TheSingularityWorkshop.Renderer.RenderView(
+                System.Numerics.Vector3.Zero,
+                System.Numerics.Matrix4x4.Identity,
+                System.Numerics.Matrix4x4.Identity),
+            result.Commands);
+        var visualizerFrame = new TheSingularityWorkshop.Renderer.VisualizeAdapter.RendererFrameAdapter()
+            .Adapt(sourceFrame);
+
+        Marks = visualizerFrame.Commands.Select(command =>
         {
             var (radius, color) = command.Representation switch
             {
-                TheSingularityWorkshop.Renderer.RendererRepresentation.Semantic => (1.4, "#5f788c"),
-                TheSingularityWorkshop.Renderer.RendererRepresentation.Aggregate => (2.0, "#00a8ff"),
-                TheSingularityWorkshop.Renderer.RendererRepresentation.Distant => (2.6, "#00eaff"),
-                TheSingularityWorkshop.Renderer.RendererRepresentation.Near => (3.4, "#ff2fff"),
-                TheSingularityWorkshop.Renderer.RendererRepresentation.Interactive => (4.4, "#ffd34d"),
+                TheSingularityWorkshop.Visualize.VisualizerRepresentation.Semantic => (1.4, "#5f788c"),
+                TheSingularityWorkshop.Visualize.VisualizerRepresentation.Aggregate => (2.0, "#00a8ff"),
+                TheSingularityWorkshop.Visualize.VisualizerRepresentation.Distant => (2.6, "#00eaff"),
+                TheSingularityWorkshop.Visualize.VisualizerRepresentation.Near => (3.4, "#ff2fff"),
+                TheSingularityWorkshop.Visualize.VisualizerRepresentation.Interactive => (4.4, "#ffd34d"),
                 _ => (2.0, "#ffffff")
             };
             return new RendererBrowserMark(
@@ -71,7 +80,7 @@ internal sealed class RendererBrowserProof
         Metrics = new RendererBrowserProofMetrics(
             result.Metrics.EntitiesRepresented,
             result.Metrics.InputCommands,
-            result.Metrics.OutputCommands,
+            visualizerFrame.Commands.Count,
             result.Metrics.OmittedCommands,
             _detail.ToString());
     }
