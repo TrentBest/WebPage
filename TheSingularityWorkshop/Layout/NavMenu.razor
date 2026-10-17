@@ -26,16 +26,32 @@
             {
                 <NavLink class="nav-link" href="@HubTabHref(item.Name)" @onclick="() => SelectHubDestination(item.Name)">@item.Name</NavLink>
             }
-            @foreach (var item in Experience.Manifest?.Hub.Where(item =>
-                string.Equals(item.Kind, "ExperienceGallery", StringComparison.OrdinalIgnoreCase))
-                ?? Array.Empty<WebPageManifestHubItem>())
+            @if (_progressionStage >= 1)
             {
-                <NavLink class="nav-link" href="@(item.Route ?? HubTabHref(item.Name))" @onclick="CollapseNavMenu">@item.Name</NavLink>
+                @foreach (var item in Experience.Manifest?.Hub.Where(item =>
+                    string.Equals(item.Kind, "ExperienceGallery", StringComparison.OrdinalIgnoreCase))
+                    ?? Array.Empty<WebPageManifestHubItem>())
+                {
+                    <NavLink class="nav-link" href="@(item.Route ?? HubTabHref(item.Name))" @onclick="() => SelectHubDestination(item.Name)">@item.Name</NavLink>
+                }
             }
-            <NavLink class="nav-link" href="/?tab=economy" @onclick="SelectEconomyDestination">Economy</NavLink>
-            <NavLink class="nav-link" href="/?tab=digitens" @onclick="SelectDigitensDestination">Digitens</NavLink>
-            <NavLink class="nav-link" href="/architecture" @onclick="CollapseNavMenu">Singularity Architecture</NavLink>
-            <NavLink class="nav-link" href="/protocolai-terminal" @onclick="CollapseNavMenu">ProtocolAi Terminal</NavLink>
+            @if (_progressionStage >= 2)
+            {
+                <NavLink class="nav-link" href="/architecture" @onclick='() => SelectHubDestination("Singularity Architecture")'>Singularity Architecture</NavLink>
+            }
+            @if (_progressionStage >= 3)
+            {
+                <NavLink class="nav-link" href="/city-lab" @onclick='() => SelectHubDestination("City Lab")'>Singularity City</NavLink>
+            }
+            @if (_progressionStage >= 4)
+            {
+                <NavLink class="nav-link" href="/?tab=economy" @onclick="SelectEconomyDestination">Economy</NavLink>
+                <NavLink class="nav-link" href="/?tab=digitens" @onclick="SelectDigitensDestination">Digitens</NavLink>
+            }
+            @if (_progressionStage >= 5)
+            {
+                <NavLink class="nav-link" href="/protocolai-terminal" @onclick='() => SelectHubDestination("ProtocolAi Terminal")'>ProtocolAi Terminal</NavLink>
+            }
             <NavLink class="nav-link about-link" href="/about-us" @onclick="CollapseNavMenu">About Us</NavLink>
         </div>
     }
@@ -55,12 +71,30 @@
     private bool collapseNavMenu = true;
     private bool welcomeSelected;
     private bool _hasSelectedDestination;
+    private int _progressionStage;
 
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
     private void SelectEconomyDestination() => SelectHubDestination("Economy");
 
     private void SelectDigitensDestination() => SelectHubDestination("Digitens");
+
+    private void AdvanceProgressionForDestination(string? destination)
+    {
+        var normalized = (destination ?? string.Empty).Trim().ToLowerInvariant().Replace(' ', '-');
+        var stage = normalized switch
+        {
+            "welcome" => 1,
+            "demonstrations" => 2,
+            "singularity-architecture" or "architecture" => 3,
+            "city-lab" or "singularity-city" => 4,
+            "economy" or "digitens" => 5,
+            "protocolai-terminal" => 6,
+            _ => 0
+        };
+
+        _progressionStage = Math.Max(_progressionStage, stage);
+    }
 
     private static string HubTabHref(string name) =>
         $"/?tab={Uri.EscapeDataString(name.Trim().ToLowerInvariant().Replace(' ', '-'))}";
@@ -70,6 +104,7 @@
         if (string.Equals(name, "Welcome", StringComparison.OrdinalIgnoreCase))
             welcomeSelected = true;
 
+        AdvanceProgressionForDestination(name);
         _hasSelectedDestination = true;
         collapseNavMenu = true;
     }
@@ -97,9 +132,13 @@
         var query = relative.Contains('?') ? relative[(relative.IndexOf('?') + 1)..] : string.Empty;
         var path = relative.Split('?', 2)[0].Trim('/');
         var queryParts = query.Split('&', StringSplitOptions.RemoveEmptyEntries);
-        var isWelcome = queryParts.Any(part => part.Equals("tab=welcome", StringComparison.OrdinalIgnoreCase));
+        var requestedTab = queryParts
+            .FirstOrDefault(part => part.StartsWith("tab=", StringComparison.OrdinalIgnoreCase))?
+            .Split('=', 2)[1];
+        var isWelcome = string.Equals(requestedTab, "welcome", StringComparison.OrdinalIgnoreCase);
         var isHubDestination = queryParts.Any(part => part.StartsWith("tab=", StringComparison.OrdinalIgnoreCase));
         welcomeSelected = isWelcome || welcomeSelected;
+        AdvanceProgressionForDestination(requestedTab ?? path);
         if (isHubDestination || !string.IsNullOrEmpty(path))
         {
             _hasSelectedDestination = true;
