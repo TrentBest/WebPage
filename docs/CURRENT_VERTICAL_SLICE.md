@@ -4,10 +4,10 @@ Read this before changing the active WebPage startup.
 
 ## Branch discipline
 
-- development is the integration branch.
-- master is the stable promotion target.
-- Short-lived exploratory branches start from development, merge after proof/CI, then get deleted.
-- Do not accumulate long-lived feature branches.
+- Only two branches are permitted: `master` and `development`.
+- `development` is the integration branch; `master` is the stable promotion target.
+- Work directly on `development`; do not create feature, experiment, release, or other branches.
+- Never change `master` unless promotion is explicitly requested.
 
 ## Current objective
 
