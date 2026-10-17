@@ -145,21 +145,11 @@ try {
   await page.getByRole("button", { name: "STATE +", exact: true }).click();
   await page.getByText("01 STATES // STRUCTURE ONLY", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByText("TRANSITIONS // FROM → TO", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
-  await page.goBack({ waitUntil: "domcontentloaded" });
-  try {
-    await page.locator(".workshop-map").waitFor({ state: "visible", timeout: 15_000 });
-  } catch (error) {
-    console.error("Workshop return-navigation diagnostics:", JSON.stringify({
-      url: page.url(),
-      entrySceneCount: await page.locator(".entry-monolith-stage").count(),
-      firstContactCount: await page.locator(".first-contact-stage").count(),
-      runningSurfaceCount: await page.locator(".workshop-running-surface").count(),
-      manifestHubCount: await page.locator(".manifest-hub").count(),
-      workshopMapCount: await page.locator(".workshop-map").count(),
-      visibleText: (await page.locator("body").innerText()).slice(0, 1200)
-    }));
-    throw error;
-  }
+  await page.screenshot({ path: outputDir + "/04-forge.png", fullPage: true });
+  // The Forge is an in-place Workshop room, not a browser route. Return through its
+  // owned navigation control rather than browser history, which exits the Workshop.
+  await page.getByRole("button", { name: "← RETURN TO WORKSHOP", exact: true }).click();
+  await page.locator(".workshop-map").waitFor({ state: "visible", timeout: 15_000 });
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
   const expandedLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
