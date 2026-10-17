@@ -271,7 +271,7 @@ public sealed class IncrementalVersionTests
         Assert.Contains("aria-pressed", home);
         Assert.Contains("builder.AddAttribute(sequence++, \"onclick\"", home);
         Assert.Contains("\"name\": \"Welcome\"", manifest);
-        Assert.Contains("\"name\": \"Demonstrations\"", manifest);
+        Assert.Contains("\"name\": \"Singularity Laboratory\"", manifest);
         Assert.Contains("\"name\": \"Singularity Architecture\"", manifest);
         Assert.DoesNotContain("\"name\": \"Support\"", manifest);
         Assert.DoesNotContain("\"name\": \"Ecosystem\"", manifest);
