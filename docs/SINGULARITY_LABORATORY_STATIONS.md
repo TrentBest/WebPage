@@ -1,6 +1,6 @@
 # Singularity Laboratory — Station and Experiment Contract
 
-**Status:** architecture contract and implementation plan. The Laboratory's full station catalogue and MicroBundle prescription workflow are not yet implemented by this document.
+**Status:** architecture contract and implementation plan. The floorplan now exposes the existing live FSM_API lifecycle interaction as the first Laboratory station. The full station catalogue and MicroBundle prescription workflow are not yet implemented.
 
 ## Purpose
 
