@@ -33,6 +33,40 @@ try {
 
   await page.screenshot({ path: process.env.WORKSHOP_SCREENSHOT ?? "renderer-source-smoke.png", fullPage: true });
   console.log("Renderer source integration: Semantic → Interactive → Distant transitions passed through the real FSM_API-backed RendererComputationMachine.");
+
+  await page.goto(`${baseUrl}/rendering`, { waitUntil: "networkidle" });
+  await page.getByRole("heading", { name: "Test the same Renderer decisions in the browser." }).waitFor({
+    state: "visible",
+    timeout: 20_000
+  });
+
+  const proofMetrics = page.locator(".renderer-proof-metrics");
+  await proofMetrics.waitFor({ state: "visible", timeout: 10_000 });
+  assert.match(await proofMetrics.textContent() ?? "", /Candidate commands\s*5,000/);
+  assert.match(await proofMetrics.textContent() ?? "", /Selected commands\s*1,000/);
+  assert.match(await proofMetrics.textContent() ?? "", /Omitted commands\s*4,000/);
+  assert.equal(await page.locator(".renderer-proof-svg circle").count(), 1_000);
+
+  const detailCases = [
+    ["SEMANTIC", "#5f788c"],
+    ["AGGREGATE", "#00a8ff"],
+    ["DISTANT", "#00eaff"],
+    ["NEAR", "#ff2fff"],
+    ["INTERACTIVE", "#ffd34d"]
+  ];
+  for (const [label, expectedColor] of detailCases) {
+    await page.getByRole("button", { name: label, exact: true }).click();
+    await page.waitForFunction(
+      expected => document.querySelector(".renderer-proof-metrics")?.textContent?.includes(`Detail ${expected}`),
+      label,
+      { timeout: 10_000 }
+    );
+    assert.equal(await page.locator(".renderer-proof-svg circle").count(), 1_000);
+    assert.equal(await page.locator(".renderer-proof-svg circle").first().getAttribute("fill"), expectedColor);
+    assert.match(await proofMetrics.textContent() ?? "", /Omitted commands\s*4,000/);
+  }
+
+  console.log("Renderer browser host: the shared 5,000-command workload reduced to 1,000 stable entities at all five detail ceilings; SVG projection and metrics matched the selected representation.");
 } finally {
   await browser.close();
 }
