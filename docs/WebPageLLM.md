@@ -54,7 +54,7 @@ These are the beginning of the move, not yet the runtime source consumed by WebP
 
 ## Progress log
 
-- 2026-10-17: Added the first Experience-owned Workshop Showcase manifest and moved initial WebGPU-instancing, native WPF/D3D12-surface, and Renderer Event Horizon demonstration records into the Experiences repository.
+- 2026-10-17: Added the first Experience-owned Workshop Showcase manifest and moved the current six-entry demonstration catalog into the Experiences repository.
 - 2026-10-17: Added candidate-based host-manifest switching/recomposition, active-manifest reset, fresh bundle factories, session-scoped Hub replacement, and Hub-lab controls; added tests for switch, reset, rollback, and safe paths.
 - 2026-10-17: Updated the WebPage orchestration contract to link to the Experience-owned artifacts.
 - Remaining: wire the host to resolve the Experience-owned manifest and content through the canonical repository/cache boundary; add user-facing selection; move the remaining demonstration/journey catalog; replace compiled route/presentation behavior only after the replacement is proven.
