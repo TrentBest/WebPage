@@ -111,3 +111,48 @@ A future installed MicroBundle may contribute a facility or station only through
 7. **Verification:** add catalogue tests and browser journey tests, then validate the real station launch and outputs. Do not publish/deploy or promote branches as part of this work.
 
 *The Laboratory lets us ask, "What happens if…?" The Forge lets us build the thing that makes a new answer possible.*
+
+
+## School science is a first-class Laboratory use case
+
+The Laboratory is intended to cover the sciences taught in school and the deeper mathematics behind them, not merely showcase game-physics demos. Teachers should be able to open a station during a lesson, set initial conditions, reveal governing equations, change one variable, and show students the consequences. Students should be able to reproduce the run and progress from an intuitive picture to a mathematical explanation.
+
+Every lesson should support: a question and prediction; explicit model/assumptions/units/validity limits; inspectable measurements and axes; a progressive mathematics ladder (intuition, diagram and variables, governing equation, derivation, worked numerical example, limiting cases, error analysis and extensions); controlled baseline/variant runs; and teacher-facing objectives, prerequisites, discussion questions and common misconceptions.
+
+### Science-station coverage roadmap
+
+This is a coverage roadmap, not a claim that every solver exists. Every station must show its maturity and authoritative model before presenting results as physics-backed.
+
+| Station family | Questions and demonstrations |
+|---|---|
+| Classical mechanics and gravity | Free fall, vertical throw, inclined plane, pendulum, orbit, projectile motion, momentum/collisions, energy conservation, terminal velocity when drag is modeled, and reference frames. |
+| Moving-train cannonball | Fire vertically relative to a moving train; show train and ground observers simultaneously; explain inherited horizontal velocity, vector components and ideal assumptions. |
+| Fluids and hydrodynamics | Arbitrary-shaped basins/landscapes, depth and pressure, buoyancy, toy boats, waves/reflections, rivers/channels, flow around terrain/buildings, dams/spillways, rainfall/runoff, drainage and water-driven erosion. |
+| Earth systems and geology | Plate motion and boundaries, mountain building, faults/earthquakes, volcano formation and eruption stages, Ring of Fire, lava/ash/deposit layers, stratification, sediment transport/deposition, glacial and river striations, weathering, erosion, soil formation and terrain evolution over time slices. |
+| Weather and climate | Heating/cooling, pressure/wind, humidity/condensation, precipitation, supported storm models, climate/biome conditions and terrain-water-weather feedback. Do not label generative weather a validated forecast. |
+| Thermodynamics and energy | Temperature versus heat, conduction/convection/radiation, phase changes, expansion, engines/efficiency, energy transfer and coupled thermal/fluid demonstrations where supported. |
+| Electricity, magnetism and waves | Charge/current/voltage/resistance, circuits/power, magnetic fields, induction, frequency, amplitude, interference and propagation. State actual model scope. |
+| Materials and chemistry | Density, strength, elasticity, fracture, corrosion/weathering, mixing, reactions and phase-change demonstrations when the corresponding model exists. Separate visual effects from computed state. |
+| Astronomy and planetary science | Gravity/orbits, seasons, day/night, tides where modeled, planetary formation, and stars-to-surface evolution through tectonics, atmosphere, weathering, erosion, climate and biomes. |
+| Scientific method and mathematics | Measurement, units, dimensional analysis, graphing, uncertainty, numerical error, conservation checks, sensitivity analysis and analytical-versus-numerical comparison. |
+
+### Canonical example: cannonball fired vertically from a moving train
+
+For an ideal train moving at constant horizontal velocity, a cannonball launched vertically relative to the train inherits the train's horizontal velocity at launch. Ignoring air resistance and assuming constant train velocity, the ground-frame trajectory has horizontal motion from the train and vertical motion from gravity; in the train frame, the ideal trajectory remains above the cannon. Show both observers simultaneously. Drag, wind or train acceleration must be declared as separate model extensions.
+
+Display the ideal equations and their assumptions:
+
+- Horizontal position: x(t) = x₀ + vₓt
+- Vertical position: y(t) = y₀ + vᵧ₀t − ½gt²
+- Vertical velocity: vᵧ(t) = vᵧ₀ − gt
+
+Label axes, SI units, launch state and observer frame. Derive the result from constant acceleration instead of treating animation as proof, and compare numerical integration against the analytical reference solution.
+
+### Teacher and student workflows
+
+- **Teacher:** select station and course depth, choose a prompt, establish a baseline, project the visualization, reveal equations step by step, and save/share a reproducible lesson configuration when supported.
+- **Student:** predict, run, inspect measurements, alter a supported parameter, compare with baseline, explain the result, then optionally descend into the derivation.
+- **Truthfulness:** label model version, assumptions, units, supported controls and unavailable capabilities. Never present fabricated data or decorative effects as solver results, or claim validation without reference tests.
+- **Progressive depth:** one experiment should serve introductory science and advanced study through progressively deeper explanations, without contradictory simulations.
+
+Implementation should be catalogue-first, then connect stations to domain-owned models one by one. Prioritize the canonical gravity/reference-frame station and a verified hydrodynamics/terrain experiment. Tectonics, volcanism, weathering, striations and coupled Earth-system evolution remain explicit goals whose solver status must be checked independently. The Laboratory hosts experiments; the Forge constructs reusable new model capabilities or authored Experiences.
