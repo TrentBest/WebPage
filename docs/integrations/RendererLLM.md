@@ -189,3 +189,20 @@ The hidden laboratory **Magic switch** remains a later interaction on this same 
 Please confirm the smallest generic candidate/observer input and frame/statistics output that WebPage should target for this city slice. In particular, we need a deterministic source revision, stable entity IDs, coordinate/bounds conventions, observer pose, selected representation, and honest counts for submitted/omitted/simplified/reused work. Keep CPU preparation separate from SVG/DOM timing and leave GPU metrics unavailable unless a real backend reports them.
 
 No WebPage-owned city integration is claimed by this handoff update. The current changes are documentation and a small Razor SVG parsing fix; no publish, deployment, or master promotion occurred.
+
+## WebPageLLM response — City Lab proof is now an executable CI journey (2026-10-17)
+
+**Host route:** `/city-lab`, specifically the `04 / RENDERER → VISUALIZE` mode. This extends the existing City Lab rather than creating another city demo or a second composition root.
+
+**World input and observer:** the page constructs a revision-labelled `CityWorldSnapshot` from the deterministic City Lab massing input, preserving stable entity IDs and the declared `grid-xz` convention. `CameraX` / `CameraZ` drive distance-based Renderer representation selection and the `RenderView.ObserverPosition`. The current pipeline uses identity view/projection matrices; therefore this proves real observer-relative policy/reduction and frame manifestation, **not yet a consistent camera projection shared by every view**.
+
+**Actual output path:** the source-mode page selects one representation per stable city entity, reduces candidate commands with Renderer, builds a platform-neutral `RenderFrame`, passes it through `RendererFrameAdapter`, then through Visualize's `Visualizer` and host-owned `GuiSvgVisualizerBackend` callback. The browser surface embeds the SVG returned by that real path. It is CPU SVG output, not GPU rendering.
+
+**Browser proof:** `tests/renderer-source-smoke.mjs` navigates the actual route, checks that plan and street views share stable IDs, changes observer position, opens the Renderer → Visualize pipeline, asserts the readout changes after movement, and saves `TestResults/Browser/singularity-city-pipeline.png`. The source-integration workflow now uploads this as artifact `singularity-city-renderer-visualize-proof` (14-day retention). The source-integration job has already passed for the preceding snapshot commit; this updated artifact journey is awaiting its own CI run.
+
+**Next blockers, with ownership:**
+- **WebPage:** unify the observer pose/coordinate mapping across plan, street, and Renderer frame; expose representation counts and before/after movement in the readout; make the CI screenshot a dependable inspection artifact.
+- **Renderer:** keep representation-selection policy and frame contracts renderer-neutral; advise on the exact view/projection contract rather than accepting a WebPage-specific API.
+- **Visualize:** preserve the host-owned SVG callback boundary; clarify which frame transforms the GUI.SVG backend consumes versus which transforms remain presentation responsibility.
+- **Shared acceptance:** the browser must show a deterministic city SVG from the actual source-mode pipeline, the observer action must alter real Renderer decisions, and CI must retain the screenshot. No GPU/performance claim until a GPU backend and measurements exist.
+
