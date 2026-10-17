@@ -26,7 +26,7 @@ The visual vocabulary is a dragon-warrior-inspired stronghold drawn as a technic
 
 The component includes an explicit **VOICE ON/OFF** control. When enabled, it uses browser speechSynthesis to speak the welcome and the hovered room's explanation. This is an accessible prototype for spoken discovery, not a recorded Workshop voice, not SFX Studio output, and not evidence of Physics-driven audio.
 
-Opening sound effects are **not yet wired**. Do not generate a generic chime and label it as the SFX Studio/Physics system. Coordinate the actual sound asset/contract with the SFX/virtual-production owner and Physics before adding sound:
+Opening sound effects are **not yet wired**. The existing [Physics free-field observation](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-observation.md) calculates distance, propagation delay, estimated received level, and direction for an idealized source/listener pair; its run record and SVG are model metadata, **not a generated or playable waveform**. Singularity Studios currently presents an explicitly labelled external reference recording, not a Workshop arrival cue. Do not reuse it as if it were the finished sound design or generate a generic chime and label it as the SFX Studio/Physics system. Coordinate the actual sound asset/contract with the SFX/virtual-production owner and Physics before adding sound:
 
 1. SFX Studio owns authored sound identity, source assets, and any production mix/voice direction it actually exposes.
 2. Physics may provide event/impact/acoustic context only through a real contract; WebPage must not invent physical audio events or simulate a physics engine to trigger them.
