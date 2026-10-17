@@ -1,7 +1,7 @@
 # WebPageLLM — Runtime Host Refactor
 
 **Branch:** `development`  
-**Status:** active migration; runtime artifact loading and switching are not yet implemented.
+**Status:** host-manifest switching/reset is implemented as an initial slice; repository-backed Experience artifact loading and Experience-manifest switching are not yet implemented.
 
 ## Mission
 
@@ -12,7 +12,7 @@ Make WebPage an intentionally small WebApp host. It should load the selected Exp
 The first repository-owned showcase artifacts are now in [TheSingularityWorkshop.Experiences](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/tree/development/experiences/WorkshopShowcase):
 
 - [manifest.json](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/manifest.json) — Experience identity/version and versioned startup/running/capability roots.
-- [demonstrations.json](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/demonstrations.json) — initial moved demonstration records.
+- [demonstrations.json](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/demonstrations.json) — complete current six-entry demonstration catalog, copied from the legacy host manifest.
 - [Experience README](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/README.md) — ownership and migration status.
 - [Experience-side handoff](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/WebPageLLM_HANDOFF.md) — host contract and coordination.
 
