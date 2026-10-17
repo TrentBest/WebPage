@@ -50,4 +50,18 @@ public sealed class CityWorldSnapshotTests
         Assert.Throws<ArgumentOutOfRangeException>(() => new CityWorldEntity("building.infinity", "tower", 0, double.PositiveInfinity, 1));
         Assert.Throws<ArgumentOutOfRangeException>(() => new CityWorldEntity("building.invalid-floors", "tower", 0, 0, -1));
     }
+
+    [Fact]
+    public void CityLabUsesTheRevisionedSnapshotForSpatialProjectionsAndStableCellIds()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var page = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "CityLab.razor"));
+
+        Assert.Contains("CityWorldSnapshot.Create(", page);
+        Assert.Contains("city-massing-v1-density-", page);
+        Assert.Contains("var id = row * 1000 + col * 10 + local + 1;", page);
+        Assert.True(page.Split("foreach (var building in WorldSnapshot.Entities)", StringSplitOptions.None).Length - 1 >= 3,
+            "Plan, street projection, and Renderer candidate generation must consume the shared city snapshot.");
+    }
+
 }
