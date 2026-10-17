@@ -119,4 +119,4 @@ A useful first implementation is not a giant crime simulation. It is a coherent 
 
 ## Renderer collaboration boundary
 
-No separate Visualize/Renderer LLM is required just to continue the WebPage world model and experience contracts. Bring one in when we are ready to implement or optimize the renderer itself. The handoff should include this document, the canonical spatial contracts, concrete sample snapshots, expected LOD transitions, and tests—so the renderer builds on real data rather than inventing a parallel world.
+The Visualize/Renderer collaborator is available. Coordinate through the explicit integration contract in [Singularity City: MicroBundle Composition Contract](SINGULARITY_CITY_MICROBUNDLE_COMPOSITION.md), this document, canonical spatial contracts, representative snapshots, expected LOD transitions, and tests. The goal is one renderer over shared world data—not a parallel world model, renderer framework, or GPU-specific design invented inside WebPage.
