@@ -49,6 +49,31 @@
         </a>
     </section>
 
+    <section class="manifest-controls" aria-label="Active runtime manifest">
+        <div class="eyebrow">RUNTIME MANIFEST // RESET + SWITCH</div>
+        <h2>THE HOST IS NOT THE EXPERIENCE.</h2>
+        <p class="hint">Select a same-origin host-manifest asset. The candidate is validated and composed before it replaces the active runtime.</p>
+        <dl>
+            <dt>Active manifest</dt><dd>@(Experience.Manifest?.ManifestId ?? "—")</dd>
+            <dt>Manifest version</dt><dd>@(Experience.Manifest?.Version ?? "—")</dd>
+            <dt>Active source</dt><dd>@Experience.ActiveManifestPath</dd>
+        </dl>
+        <label for="manifest-source">Manifest asset path</label>
+        <input id="manifest-source" type="text" @bind="SelectedManifestPath" spellcheck="false" autocomplete="off" />
+        <div class="actions">
+            <button class="primary" @onclick="SwitchManifest">SWITCH ACTIVE MANIFEST</button>
+            <button class="secondary" @onclick="ReloadManifest">RESET / RELOAD ACTIVE</button>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(ManifestActionError))
+        {
+            <p class="manifest-error" role="alert">@ManifestActionError</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Experience.LastManifestError))
+        {
+            <p class="manifest-error" role="status">Last load error: @Experience.LastManifestError</p>
+        }
+    </section>
+
     <section class="control-grid">
         <div class="control-panel">
             <div class="eyebrow">LIVE PRESENTATION PROFILE</div>
@@ -123,6 +148,10 @@ p{line-height:1.6}
 .telemetry-card{background:#050c18;padding:1.25rem}
 .telemetry-card strong{display:block;font-size:1.6rem;margin:.45rem 0}
 .telemetry-card small{opacity:.5}
+.manifest-controls{max-width:1200px;margin:0 auto 2rem;border:1px solid rgba(0,234,255,.24);background:rgba(5,12,24,.82);padding:1.6rem}
+.manifest-controls label{display:block;margin:1rem 0 .4rem;font-size:.82rem}
+.manifest-controls input[type=text]{box-sizing:border-box;width:100%;padding:.75rem;background:#020711;color:#eefcff;border:1px solid rgba(0,234,255,.35);font:inherit}
+.manifest-error{color:#ffb8b8;overflow-wrap:anywhere}
 .control-grid{max-width:1200px;margin:auto;display:grid;grid-template-columns:1.25fr .75fr;gap:2rem}
 .control-panel,.architecture-panel{border:1px solid rgba(0,234,255,.16);background:rgba(5,12,24,.82);padding:1.6rem}
 .control-panel label{display:flex;justify-content:space-between;margin:1.05rem 0 .35rem;font-size:.82rem}
@@ -150,6 +179,35 @@ dt{opacity:.55}dd{margin:0}
 
 @code {
     private WorkshopPresentationProfile Profile => WorkshopPresentationProfile.Current;
+    private string SelectedManifestPath { get; set; } = "Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json";
+    private string? ManifestActionError { get; set; }
+
+    private async Task SwitchManifest()
+    {
+        try
+        {
+            await Experience.SwitchManifestAsync(SelectedManifestPath.Trim());
+            ManifestActionError = null;
+        }
+        catch (Exception exception)
+        {
+            ManifestActionError = exception.Message;
+        }
+    }
+
+    private async Task ReloadManifest()
+    {
+        try
+        {
+            await Experience.RestartFromManifestAsync(Experience.IsDeepDive);
+            SelectedManifestPath = Experience.ActiveManifestPath;
+            ManifestActionError = null;
+        }
+        catch (Exception exception)
+        {
+            ManifestActionError = exception.Message;
+        }
+    }
 
     private void RunAgain()
     {
