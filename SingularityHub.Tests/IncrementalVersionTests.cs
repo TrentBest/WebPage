@@ -330,4 +330,20 @@ public sealed class IncrementalVersionTests
         Assert.Contains("FSM.StateChanged += HandleFSMStateChanged;", nav);
         Assert.Contains("FSM.StateChanged -= HandleFSMStateChanged;", nav);
     }
+
+    [ArchitectureTest(0, 0, 199)] [Fact(DisplayName = "V0.0.199 — City_World_Snapshot_Provides_Revisioned_Stable_Entity_And_Coordinate_Contract")]
+    public void V0_0_199CityWorldSnapshotProvidesRevisionedStableEntityAndCoordinateContract()
+    {
+        var snapshot = TheSingularityWorkshop.Workshop.City.CityWorldSnapshot.Create(
+            "city-revision-1",
+            [
+                new TheSingularityWorkshop.Workshop.City.CityWorldEntity("building.2", "lowrise", 4, 7, 3),
+                new TheSingularityWorkshop.Workshop.City.CityWorldEntity("building.1", "tower", 2, 5, 24)
+            ]);
+
+        Assert.Equal("city-revision-1", snapshot.Revision);
+        Assert.Equal("grid-xz; +X east; +Z south; origin at grid cell (0,0)", snapshot.CoordinateConvention);
+        Assert.Equal(new[] { "building.1", "building.2" }, snapshot.Entities.Select(entity => entity.Id));
+    }
+
 }
