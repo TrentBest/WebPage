@@ -3,42 +3,75 @@ using DomainMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using TheSingularityWorkshop.Workshop.Rendering;
 
-
 namespace TheSingularityWorkshop.Workshop.Composition;
 
+/// <summary>
+/// Creates fresh MicroBundle instances for each composition request.
+/// A runtime catalog must not hand a bundle instance already owned by another RuntimeAssembly
+/// to a later composition; runtime switching requires isolated bundle lifetimes.
+/// </summary>
 public sealed class WorkshopCompositionCatalog : IMicroBundleCatalog
 {
-    private readonly IReadOnlyDictionary<ulong, DomainMicroBundle> _bundles;
+    private readonly IReadOnlyDictionary<ulong, Func<DomainMicroBundle>> _factories;
 
     public WorkshopCompositionCatalog()
     {
-        var protocol = new ProtocolAiCompositionBundle();
-        var grammar = new GrammarAiCompositionBundle();
-        var aiExchange = new AiExchangeCompositionBundle();
-        var moniker = new MonikerMicroBundle();
-        var monikerSway = new MonikerSwayBehaviorMicroBundle();
-        var monikerExperience = new MonikerExperienceMicroBundle();
-        var livingGui = new LivingGuiExperienceMicroBundle();
-        var rendering = new RenderingMicroBundle();
-
-        _bundles = new Dictionary<ulong, DomainMicroBundle>
-        {
-            [moniker.Descriptor.Id] = moniker,
-            [monikerSway.Descriptor.Id] = monikerSway,
-            [monikerExperience.Descriptor.Id] = monikerExperience,
-            [livingGui.Id] = livingGui,
-            [rendering.Id] = rendering,
-            [protocol.Id] = protocol,
-            [grammar.Id] = grammar,
-            [aiExchange.Id] = aiExchange
-        };
+        var factories = new Dictionary<ulong, Func<DomainMicroBundle>>();
+        Register(factories, () => new MonikerMicroBundle());
+        Register(factories, () => new MonikerSwayBehaviorMicroBundle());
+        Register(factories, () => new MonikerExperienceMicroBundle());
+        Register(factories, () => new LivingGuiExperienceMicroBundle());
+        Register(factories, () => new RenderingMicroBundle());
+        Register(factories, () => new ProtocolAiCompositionBundle());
+        Register(factories, () => new GrammarAiCompositionBundle());
+        Register(factories, () => new AiExchangeCompositionBundle());
+        _factories = factories;
     }
 
-    public bool TryResolve(ulong bundleId, out DomainMicroBundle? bundle) =>
-        _bundles.TryGetValue(bundleId, out bundle);
+    public bool TryResolve(ulong bundleId, out DomainMicroBundle? bundle)
+    {
+        if (!_factories.TryGetValue(bundleId, out var factory))
+        {
+            bundle = null;
+            return false;
+        }
 
-    public bool TryResolve(ulong bundleId, string version, out DomainMicroBundle? bundle) =>
-        _bundles.TryGetValue(bundleId, out bundle) &&
-        bundle.Descriptor is not null &&
-        string.Equals(bundle.Descriptor.Version, version, StringComparison.Ordinal);
+        bundle = factory();
+        return true;
+    }
+
+    public bool TryResolve(ulong bundleId, string version, out DomainMicroBundle? bundle)
+    {
+        if (!TryResolve(bundleId, out bundle) || bundle is null)
+            return false;
+
+        if (bundle.Descriptor is not null &&
+            string.Equals(bundle.Descriptor.Version, version, StringComparison.Ordinal))
+            return true;
+
+        if (bundle is IDisposable disposable)
+            disposable.Dispose();
+
+        bundle = null;
+        return false;
+    }
+
+    private static void Register(
+        IDictionary<ulong, Func<DomainMicroBundle>> factories,
+        Func<DomainMicroBundle> factory)
+    {
+        // Inspect a prototype only to discover the canonical domain identity. Dispose it
+        // immediately so the catalog itself does not retain a runtime-owned instance.
+        var prototype = factory();
+        var id = prototype.Descriptor.Id;
+        if (!factories.TryAdd(id, factory))
+        {
+            if (prototype is IDisposable disposable)
+                disposable.Dispose();
+            throw new InvalidOperationException($"Duplicate MicroBundle ID {id} in the WebPage composition catalog.");
+        }
+
+        if (prototype is IDisposable owned)
+            owned.Dispose();
+    }
 }
