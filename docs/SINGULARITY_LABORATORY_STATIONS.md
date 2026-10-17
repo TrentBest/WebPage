@@ -63,6 +63,10 @@ The current WebPage Demonstrations gallery is a manifest-backed **metadata regis
 
 Do not conflate a source link with a run link, a passing build with a runtime proof, or metadata discovery with an executable MicroBundle-backed Experience. Existing demonstrations should become Laboratory stations as their launch mode and evidence support them; do not relabel every gallery entry as runnable.
 
+## Cross-cutting observer experiment
+
+The Renderer / Visualize handoff asks for a deliberately hidden **Magic switch** as a physical 3D interactable in the Laboratory. It should switch between top-down plan and first-person observation of the same world, then switch back, without cloning the world or losing stable entity identity. WebPage owns the interaction and observer-mode transition; world content owns the switch's identity and placement; Renderer owns observer-relative representation decisions; Visualize manifests the selected frame. Keep it a discoverable secret rather than a prominent global UI control. Until a true first-person scene and shared-world transition are evidenced, label the capability as a prototype/plan rather than a finished realistic experience.
+
 ## The experiment prescription loop
 
 The intended visitor workflow is:
