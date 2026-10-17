@@ -214,3 +214,16 @@ A source inspection of `TheSingularityWorkshop/Pages/CityLab.razor` confirms the
 4. Add deterministic tests for snapshot revision, entity identity, coordinate mapping, and consistency between view projections. Keep SVG output as the observable baseline; add timing/allocation metrics only when they can be measured and reported honestly.
 
 This is an audit finding and implementation target, not a claim that the snapshot extraction or shared camera contract is already complete. Do not build a fake 3D switch or claim a GPU path as a shortcut around these missing contracts.
+
+
+## WebPage implementation update — revisioned City Lab snapshot (2026-10-17)
+
+WebPage development now has an initial `CityWorldSnapshot` contract and City Lab consumes it for the top-down plan, street projection, and Renderer candidate generation.
+
+- Contract: [CityWorldSnapshot.cs](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Workshop/City/CityWorldSnapshot.cs). It carries an explicit source revision, a documented grid-XZ convention (+X east, +Z south), stable IDs, kind, coordinates, and floor count; it rejects duplicate IDs and invalid coordinates.
+- Host integration: [CityLab.razor](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Pages/CityLab.razor). The deterministic massing generator now derives IDs from grid cell and local slot rather than an incrementing list counter, so a building that remains in the same generated cell keeps its ID when density changes. The pipeline readout displays the snapshot revision.
+- Proof: [CityWorldSnapshotTests.cs](https://github.com/TrentBest/WebPage/blob/development/SingularityHub.Tests/CityWorldSnapshotTests.cs) covers revision, coordinate convention, deterministic ordering, duplicate rejection, invalid coordinates, and checks that the plan, street, and Renderer paths consume the snapshot. Incremental heartbeat is **V0.0.199**.
+
+### Remaining boundary
+
+This is the first shared data contract, not yet a unified world/runtime. The isometric SVG still consumes the same generated building records for its face geometry; the current snapshot revision identifies the massing algorithm version and density input, not a persisted or content-addressed world revision. Street projection and Renderer still calculate observer transforms separately; the Renderer view still uses identity matrices, so camera yaw parity is not solved. The source-mode CI run must finish before this change is called verified. No GPU or deployment claim is implied.
