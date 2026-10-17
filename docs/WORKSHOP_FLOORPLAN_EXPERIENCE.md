@@ -15,7 +15,7 @@ Welcome is a place, not a long scrolling brochure. The floor plan fills its avai
 
 - **Central Hall** — welcome and orientation.
 - **The Singularity Laboratory** — now contains the existing live FSM_API lifecycle demonstration as its first station. The broader catalogue and MicroBundle prescription/sandbox workflow are planned, not yet universal runtime capabilities.
-- **The Forge** — represents the construction/authoring workspace for reusable MicroBundles and Experiences. Its assembly benches are currently schematic; general authoring tooling is not implemented, so the Forge must not claim to open the live FSM_API lab.
+- **The Forge** — now opens the existing FSM Forge through `/explore?room=forge`. It provides real FSM_API-backed construction scaffolds for states, transitions, conditions, and lifecycle actions, with a live preview. Authoring complete MicroBundles and Experiences remains a broader future capability.
 - **Assembly Benches / Forge** — explain MicroBundles and the FSM_COS composition boundary. A future installed bundle may contribute a facility only through an actual, discoverable capability contract.
 - **Observatory** — establishes the intended celestial assembly workflow: choose planets, moons, and bodies from parts buckets, then place and resize them. This is a concept today, not a functioning solar-system editor.
 - **World Globe** — communicates that world-level terrain work happens through a selected globe, not by editing the solar-system container. Interactive globe manipulation remains planned.
