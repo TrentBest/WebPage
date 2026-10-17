@@ -2,12 +2,13 @@
 
 This repository is an active engineering proving ground and public learning resource.
 
-## Branch safety
+## Branch safety — Operation Sith
 
-- development is active engineering.
-- master is the stable promotion target.
-- Do not modify master during ordinary development.
-- Short-lived exploratory branches start from development, merge after proof/CI, then get deleted.
+- Only `master` and `development` are permitted branches.
+- `development` is the active integration and engineering branch; make ordinary changes directly on it.
+- `master` is the stable promotion target. Never modify it during ordinary development or promote without explicit instruction.
+- Do not create feature, exploratory, experiment, release, or temporary branches.
+- Do not delete branches; the repository owner handles cleanup of any legacy branches.
 - Preserve valuable behavior before replacing it.
 
 ## Package-first rule
