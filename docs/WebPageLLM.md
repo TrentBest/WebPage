@@ -35,7 +35,7 @@ Separately, `Workshop.MicroBundles.MicroBundle` is a Hub-level lifecycle shell i
 
 **Direction:** a real Renderer-owned capability should implement the domain contract and be selected as an optional manifest root. The shared core, WebPage host without that root, and non-rendering Experiences must remain free of Renderer/Visualize/GUI.SVG/graphics-backend dependencies.
 
-**Future:** the Renderer-owned opt-in bundle and rendering-free control are tracked in [Renderer issue #15](https://github.com/TrentBest/TheSingularityWorkshop.Renderer/issues/15). Source inspection here does not substitute for its build, automated integration tests, and CI evidence.
+**Current integration proof (2026-10-17):** Renderer issue #15 now has passing CI evidence in [run 39069183165](https://github.com/TrentBest/TheSingularityWorkshop.Renderer/actions/runs/39069183165). Its `FsmCosRendering` sample proves that a manifest can select the exact Renderer-owned `RendererMicroBundle` through FSM_COS and observe its load context; `FsmCosWithoutRendering` proves a separate FSM_COS consumer builds and runs without Renderer/Visualize/GUI.SVG references. This is a meaningful composition/dependency-boundary milestone, **not** proof that Visualize is loaded, a graphics backend activates, pixels are rendered, or GPU performance exists. The Renderer bundle remains a lifecycle/identity shell; WebPage still needs the next consumer-visible adapter contract and a real end-to-end Renderer → Visualize frame proof.
 
 ## Singularity City / Universe presentation contract
 
@@ -84,7 +84,7 @@ Separately, `Workshop.MicroBundles.MicroBundle` is a Hub-level lifecycle shell i
 
 ## Progress log
 
-- 2026-10-17: Restored the founder-established monolith entry/advisory before the existing first-contact → gateway → Living GUI → Moniker → hub sequence; updated the browser smoke test to exercise the explicit entry click. The first workflow run exposed the stale expectation; the corrected sequence is awaiting a fresh passing run.
+- 2026-10-17: Corrected the Forge return smoke test to use its own `← RETURN TO WORKSHOP` control instead of browser history. The Forge is an in-place room, so browser Back can leave the Workshop rather than return to the map. Added a dedicated `04-forge.png` screenshot; validation is running in [WebPage workflow 39069246796](https://github.com/TrentBest/WebPage/actions/runs/39069246796).
 - 2026-10-17: Confirmed the existing `/replay-lab` route is a truthful local fixture, updated its integration handoff, and kept physical replay/share/remix explicitly unavailable pending Physics contracts.
 - 2026-10-17: Verified the WebPage FSM_COS/domain-contract boundary and recorded the distinction between the WebPage-owned RenderingMicroBundle placeholder and a real Renderer-owned capability in Renderer issue #15.
 - 2026-10-17: Added the first Experience-owned Workshop Showcase manifest and moved the current six-entry demonstration catalog into the Experiences repository.
