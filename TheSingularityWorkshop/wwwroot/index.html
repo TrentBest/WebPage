@@ -165,6 +165,9 @@
 
         window.interop = {
             workshopVisited:function(){ return localStorage.getItem("WorkshopVisited") === "true"; },
+            getSessionValue:function(key){ return window.sessionStorage.getItem(key); },
+            setSessionValue:function(key,value){ window.sessionStorage.setItem(key,value); },
+            removeSessionValue:function(key){ window.sessionStorage.removeItem(key); },
             playFirstContactSound:function(){
                 try{
                     const C=window.AudioContext||window.webkitAudioContext;
