@@ -7,7 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../TheSingularityWorkshop.Visualize/TheSingularityWorkshop.Visualize.csproj" />
+    <ProjectReference Include="../../../TheSingularityWorkshop.Visualize/TheSingularityWorkshop.Visualize.csproj" />
     <ProjectReference Include="../../TheSingularityWorkshop.Visualize/integrations/RendererAdapter/TheSingularityWorkshop.Renderer.VisualizeAdapter.csproj" />
   </ItemGroup>
 </Project>
