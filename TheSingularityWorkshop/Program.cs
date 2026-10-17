@@ -36,8 +36,10 @@ internal class Program
         builder.Services.AddScoped<WorkshopAssetLibrary>();
 
         // The WebPage hosts the concrete Hub but owns no Hub mechanics.
-        builder.Services.AddSingleton<SingularityHub>();
-        builder.Services.AddSingleton<HubRuntime>();
+        // Hub state belongs to one browser session. Scoped lifetimes are required for
+        // independent active manifests and prevent one visitor's runtime from leaking to another.
+        builder.Services.AddScoped<SingularityHub>();
+        builder.Services.AddScoped<HubRuntime>();
 
         await builder.Build().RunAsync();
     }
