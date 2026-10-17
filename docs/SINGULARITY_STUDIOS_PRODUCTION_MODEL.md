@@ -15,7 +15,7 @@ The first reusable-data slice now exists in WebPage as an explicitly illustrativ
 - [Singularity Studios plan renderer](../samples/SingularityStudiosPlan/Program.cs) reads that JSON and submits stage zones, reusable-set footprints, prop instances, camera markers, and lighting placements through Visualize's `VisualizerFrame` and `GuiSvgVisualizerBackend` path. The WebPage build generates the SVG before static-asset discovery; the page displays that generated plan instead of the former hand-authored stage schematic.
 - The renderer consumes explicit `planFootprint` fields for the set and crate definitions. Those footprints are marked illustrative and are not claimed to be measured asset dimensions.
 
-**What this proves:** a small, host-served, versioned production-data example; a renderer-backed top-down SVG presentation from that data; and an automated check of selected reuse/identity and generated-output invariants. The current GUI.SVG adapter is a CPU-side SVG presentation path, not a production GPU renderer.
+**What this proves:** a small, host-served, versioned production-data example; a source-integration path that renders a top-down SVG from that data through Visualize; and an automated browser check that distinguishes generated output from the static fallback. The current GUI.SVG adapter is a CPU-side SVG presentation path, not a production GPU renderer.
 
 **What it does not prove:** a canonical production-domain package, a JSON Schema or full validator, authoring/editing UI, save/reload workflow, GPU-backed production rendering, camera-rig execution, acoustic simulation, or capacity to render the illustrative giant-stage dimensions. The dimensions are planning targets, not measured runtime limits.
 
