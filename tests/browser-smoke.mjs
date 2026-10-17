@@ -218,33 +218,33 @@ try {
     await page.locator(".workshop-nav-toggle").click();
   }
   // Navigation reveals destinations progressively; advance the real navigation FSM
-  // rather than assuming later destinations exist after a fresh session load.
-  await page.getByRole("link", { name: "Welcome", exact: true }).waitFor({ state: "visible" });
-  await page.getByRole("link", { name: "Welcome", exact: true }).click();
-  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
-  await page.getByRole("link", { name: "Singularity Laboratory", exact: true }).waitFor({ state: "visible" });
-  await page.getByRole("link", { name: "Singularity Laboratory", exact: true }).click();
-  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
-  await page.getByRole("link", { name: "Singularity Architecture", exact: true }).waitFor({ state: "visible" });
-  await page.getByRole("link", { name: "Singularity Architecture", exact: true }).click();
-  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
-  await page.getByRole("link", { name: "Singularity City", exact: true }).waitFor({ state: "visible" });
-  await page.getByRole("link", { name: "Singularity City", exact: true }).click();
-  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
-  await page.getByRole("link", { name: "Digitens", exact: true }).waitFor({ state: "visible" });
-  await page.getByRole("link", { name: "Digitens", exact: true }).click();
+  // rather than assuming later destinations exist after a fresh session load. A route
+  // transition can leave the rail either expanded or collapsed, so inspect state
+  // instead of blindly clicking a button whose accessible name changes with that state.
+  const openNavigationFor = async (destination) => {
+    const link = page.getByRole("link", { name: destination, exact: true });
+    if (!(await link.isVisible().catch(() => false))) {
+      const expandButton = page.getByRole("button", { name: /expand workshop navigation/i });
+      if (await expandButton.isVisible().catch(() => false)) await expandButton.click();
+    }
+    await link.waitFor({ state: "visible" });
+    return link;
+  };
+  await (await openNavigationFor("Welcome")).click();
+  await (await openNavigationFor("Singularity Laboratory")).click();
+  await (await openNavigationFor("Singularity Architecture")).click();
+  await (await openNavigationFor("Singularity City")).click();
+  await (await openNavigationFor("Digitens")).click();
   const digitens = page.frameLocator('iframe[title="Digitens: digital citizens of the Singularity World"]');
   await digitens.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await digitens.getByRole("heading", { name: "The Workshop stays at the heart of the city.", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
 
-  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
-  await page.getByRole("link", { name: "Economy", exact: true }).click();
+  await (await openNavigationFor("Economy")).click();
   const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
   await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
 
   // Movement Lab exposes geometry inspection without claiming a simulated attempt.
-  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
-  await page.getByRole("link", { name: "Movement Lab", exact: true }).click();
+  await (await openNavigationFor("Movement Lab")).click();
   await page.getByRole("heading", { name: "Movement Lab", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   const hurdle = page.getByRole("button", { name: /hurdle-01/i });
   await hurdle.focus();
