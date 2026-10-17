@@ -46,6 +46,8 @@ A WEBAPP THAT CAN BE REDEFINED WITHOUT RECOMPILING ITS HOST
 
 The host is the machinery, not the application definition. The manifest is the application-level declaration, not merely startup decoration. Experiences compose what the user encounters; MicroBundles provide reusable behavior and capabilities. FSM_COS owns dependency closure and composition; FSM_API owns state-machine semantics and execution primitives. WebPage owns browser-specific adapters and presentation mechanics, not a second copy of those responsibilities.
 
+For the operational sequence and acceptance gates, see [WebApp Showcase Orchestration and Living Documentation](WEBAPP_SHOWCASE_ORCHESTRATION.md). That contract also requires GUI.SVG or the owning renderer to produce visual evidence from the real model wherever a concept can be shown, while clearly distinguishing SVG presentation from FSM execution and GPU rendering.
+
 ## What “without recompiling” means
 
 The target is **runtime redefinition through data and already-available capabilities**, not magical execution of arbitrary new code.
