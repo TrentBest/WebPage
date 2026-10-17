@@ -65,6 +65,12 @@
                 <span class="lab-eyebrow">REAL FRAME PATH / RENDERER → FRAME ADAPTER → VISUALIZE → GUI.SVG</span>
                 <p>@_pipelineStatus</p>
             </div>
+            <div class="camera-controls" role="group" aria-label="Move observer for Renderer pipeline">
+                <button @onclick="MoveLeft" aria-label="Pipeline move left">← LEFT</button>
+                <button @onclick="MoveForward" aria-label="Pipeline move forward">↑ PIPELINE FORWARD</button>
+                <button @onclick="MoveBack" aria-label="Pipeline move backward">↓ BACK</button>
+                <button @onclick="MoveRight" aria-label="Pipeline move right">RIGHT →</button>
+            </div>
             @if (PipelineAvailable && !string.IsNullOrWhiteSpace(_pipelineSvg))
             {
                 <div class="pipeline-surface" role="img" aria-label="City buildings manifested from Renderer draw commands through Visualize and GUI.SVG">
