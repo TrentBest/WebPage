@@ -411,17 +411,25 @@
         }
 
         var preparationElapsed = System.Diagnostics.Stopwatch.GetElapsedTime(preparationStarted);
+        var observerPosition = new System.Numerics.Vector3(
+            (float)((CameraX - 10.5) / 12d),
+            (float)((8.5 - CameraZ) / 10d),
+            0f);
+        var view = System.Numerics.Matrix4x4.CreateTranslation(-observerPosition.X, -observerPosition.Y, 0f) *
+            System.Numerics.Matrix4x4.CreateRotationZ((float)(-CameraYaw * Math.PI / 180d));
+        // The current city massing is a 2D grid plane. This orthographic mapping keeps the
+        // observer-relative scene inside GUI.SVG's 100 × 56.25 viewBox; it is not an FPS camera.
+        var projection = System.Numerics.Matrix4x4.CreateScale(28f, -28f, 1f) *
+            System.Numerics.Matrix4x4.CreateTranslation(50f, 28.125f, 0f);
         var frame = new TheSingularityWorkshop.Renderer.RenderFrame(
-            new TheSingularityWorkshop.Renderer.RenderView(
-                new System.Numerics.Vector3((float)((CameraX - 10.5) / 12d), (float)((8.5 - CameraZ) / 10d), 0f),
-                System.Numerics.Matrix4x4.Identity,
-                System.Numerics.Matrix4x4.Identity),
+            new TheSingularityWorkshop.Renderer.RenderView(observerPosition, view, projection),
             selectedCommands);
         var manifestationStarted = System.Diagnostics.Stopwatch.GetTimestamp();
         await using var visualizer = new TheSingularityWorkshop.Visualize.Visualizer(
             new TheSingularityWorkshop.Visualize.GuiSvg.GuiSvgVisualizerBackend(
                 svg => _pipelineSvg = svg,
-                sceneLabel: "Singularity City · Renderer reduction → Visualize frame adapter → GUI.SVG",
+                projectWithCamera: true,
+                sceneLabel: "Singularity City · observer-relative Renderer frame → Visualize → GUI.SVG",
                 backgroundColor: "#07131d",
                 gridColor: "#234657"),
             catalog);
