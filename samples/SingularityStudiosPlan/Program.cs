@@ -1,0 +1,157 @@
+using System.Globalization;
+using System.Numerics;
+using System.Text.Json;
+using TheSingularityWorkshop.Visualize;
+using TheSingularityWorkshop.Visualize.GuiSvg;
+
+var root = FindWorkspaceRoot();
+var sourcePath = Path.Combine(root, "TheSingularityWorkshop", "wwwroot", "Workshop", "Forge", "StreamingAssets", "Experiences", "singularity-studios-stage.json");
+var outputPath = args.Length > 0
+    ? Path.GetFullPath(args[0])
+    : Path.Combine(root, "TheSingularityWorkshop", "wwwroot", "Workshop", "Forge", "StreamingAssets", "Experiences", "singularity-studios-stage-plan.svg");
+
+using var document = JsonDocument.Parse(File.ReadAllText(sourcePath));
+var data = document.RootElement;
+var stage = data.GetProperty("stage");
+var dimensions = stage.GetProperty("dimensions");
+var stageWidth = dimensions.GetProperty("width").GetSingle();
+var stageDepth = dimensions.GetProperty("depth").GetSingle();
+if (stageWidth <= 0 || stageDepth <= 0)
+    throw new InvalidDataException("Stage plan dimensions must be positive.");
+
+var scale = 0.9f / stageWidth;
+var catalog = new VisualizerResourceCatalog();
+var quadId = new VisualizerResourceId(1);
+var cameraId = new VisualizerResourceId(2);
+catalog.SetGeometry(quadId, Quad());
+catalog.SetGeometry(cameraId, Triangle());
+
+var stageMaterial = Material(10, new Vector4(0.025f, 0.055f, 0.09f, 1));
+var zoneMainMaterial = Material(11, new Vector4(0.035f, 0.20f, 0.24f, 1));
+var zoneRailMaterial = Material(12, new Vector4(0.16f, 0.08f, 0.22f, 1));
+var zoneServiceMaterial = Material(13, new Vector4(0.20f, 0.14f, 0.045f, 1));
+var setMaterial = Material(14, new Vector4(0.02f, 0.68f, 0.76f, 1));
+var propMaterial = Material(15, new Vector4(1f, 0.72f, 0.28f, 1));
+var cameraMaterial = Material(16, new Vector4(1f, 0.20f, 0.80f, 1));
+var lightMaterial = Material(17, new Vector4(0.75f, 0.86f, 1f, 1));
+
+var commands = new List<VisualizerDrawCommand>();
+AddRect("stage-floor", stageWidth, stageDepth, stageWidth / 2, stageDepth / 2, stageMaterial);
+AddRect("stage-boundary-north", stageWidth, 2, stageWidth / 2, 1, lightMaterial);
+AddRect("stage-boundary-south", stageWidth, 2, stageWidth / 2, stageDepth - 1, lightMaterial);
+AddRect("stage-boundary-west", 2, stageDepth, 1, stageDepth / 2, lightMaterial);
+AddRect("stage-boundary-east", 2, stageDepth, stageWidth - 1, stageDepth / 2, lightMaterial);
+
+foreach (var zone in stage.GetProperty("zones").EnumerateArray())
+{
+    var bounds = zone.GetProperty("bounds");
+    var material = zone.GetProperty("id").GetString() switch
+    {
+        "zone.main-set" => zoneMainMaterial,
+        "zone.camera-rail" => zoneRailMaterial,
+        _ => zoneServiceMaterial
+    };
+    AddRect(zone.GetProperty("id").GetString()!, bounds.GetProperty("width").GetSingle(),
+        bounds.GetProperty("depth").GetSingle(),
+        bounds.GetProperty("x").GetSingle() + bounds.GetProperty("width").GetSingle() / 2,
+        bounds.GetProperty("z").GetSingle() + bounds.GetProperty("depth").GetSingle() / 2,
+        material);
+}
+
+var definitions = data.GetProperty("assetDefinitions").EnumerateArray()
+    .ToDictionary(item => item.GetProperty("id").GetString()!, item => item);
+foreach (var instance in data.GetProperty("scene").GetProperty("instances").EnumerateArray())
+{
+    var assetId = instance.GetProperty("assetId").GetString()!;
+    var definition = definitions[assetId];
+    var footprint = definition.GetProperty("planFootprint");
+    var position = instance.GetProperty("transform").GetProperty("position");
+    var width = footprint.GetProperty("width").GetSingle();
+    var depth = footprint.GetProperty("depth").GetSingle();
+    var material = definition.GetProperty("kind").GetString() == "set" ? setMaterial : propMaterial;
+    AddRect(instance.GetProperty("id").GetString()!, width, depth,
+        position.GetProperty("x").GetSingle(), position.GetProperty("z").GetSingle(), material);
+}
+
+foreach (var camera in data.GetProperty("cameras").EnumerateArray())
+{
+    var transform = camera.GetProperty("transform");
+    var position = transform.GetProperty("position");
+    var yaw = transform.GetProperty("rotationDegrees").GetProperty("y").GetSingle();
+    AddTriangle(camera.GetProperty("id").GetString()!, 12,
+        position.GetProperty("x").GetSingle(), position.GetProperty("z").GetSingle(), yaw, cameraMaterial);
+}
+
+foreach (var light in data.GetProperty("lightingRigPlacements").EnumerateArray())
+{
+    var position = light.GetProperty("position");
+    AddRect(light.GetProperty("id").GetString()!, 10, 10,
+        position.GetProperty("x").GetSingle(), position.GetProperty("z").GetSingle(), lightMaterial);
+}
+
+var frame = new VisualizerFrame(
+    new VisualizerView(Vector3.Zero, Matrix4x4.Identity, Matrix4x4.Identity),
+    commands);
+await using var visualizer = new Visualizer(
+    new GuiSvgVisualizerBackend(
+        outputPath,
+        backgroundColor: "#030a14",
+        gridColor: "#16404e",
+        sceneLabel: $"Singularity Studios production plan · {stageWidth.ToString(CultureInfo.InvariantCulture)}m × {stageDepth.ToString(CultureInfo.InvariantCulture)}m · authored data",
+        drawGrid: true),
+    catalog);
+var result = await visualizer.RenderAsync(frame);
+Console.WriteLine($"Singularity Studios plan: {result.SubmittedDrawCount} draw commands -> {outputPath}");
+
+void AddRect(string label, float width, float depth, float centerX, float centerZ, VisualizerResourceId material)
+{
+    var x = (centerX - stageWidth / 2) * scale;
+    var y = (stageDepth / 2 - centerZ) * scale;
+    var transform = Matrix4x4.CreateScale(width * scale, depth * scale, 1) *
+        Matrix4x4.CreateTranslation(x, y, 0);
+    commands.Add(new VisualizerDrawCommand(quadId, material, transform, 6, 0, 0, VisualizerRepresentation.Near));
+}
+
+void AddTriangle(string label, float size, float centerX, float centerZ, float yawDegrees, VisualizerResourceId material)
+{
+    var x = (centerX - stageWidth / 2) * scale;
+    var y = (stageDepth / 2 - centerZ) * scale;
+    var transform = Matrix4x4.CreateScale(size * scale, size * scale, 1) *
+        Matrix4x4.CreateRotationZ(yawDegrees * MathF.PI / 180f) *
+        Matrix4x4.CreateTranslation(x, y, 0);
+    commands.Add(new VisualizerDrawCommand(cameraId, material, transform, 3, 0, 0, VisualizerRepresentation.Near));
+}
+
+VisualizerResourceId Material(int id, Vector4 color)
+{
+    var resourceId = new VisualizerResourceId(id);
+    catalog.SetMaterial(resourceId, new VisualizerMaterial(1, color));
+    return resourceId;
+}
+
+static VisualizerGeometry Quad() => new(1,
+[
+    Vertex(-0.5f, -0.5f), Vertex(-0.5f, 0.5f),
+    Vertex(0.5f, 0.5f), Vertex(0.5f, -0.5f)
+], [0, 1, 2, 0, 2, 3]);
+
+static VisualizerGeometry Triangle() => new(1,
+[
+    Vertex(0, 0.65f), Vertex(-0.48f, -0.4f), Vertex(0.48f, -0.4f)
+], [0, 1, 2]);
+
+static VisualizerVertex Vertex(float x, float y) =>
+    new(new Vector3(x, y, 0), Vector3.UnitZ, Vector2.Zero, Vector4.One);
+
+static string FindWorkspaceRoot()
+{
+    var current = new DirectoryInfo(Directory.GetCurrentDirectory());
+    while (current is not null)
+    {
+        if (File.Exists(Path.Combine(current.FullName, "TheSingularityWorkshop", "TheSingularityWorkshop.csproj")))
+            return current.FullName;
+        current = current.Parent;
+    }
+
+    throw new DirectoryNotFoundException("Could not locate the WebPage repository root.");
+}
