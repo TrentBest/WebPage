@@ -41,9 +41,9 @@ try {
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   const initialLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  const expectedLinks = ["Welcome", "Singularity Laboratory", "About Us"];
+  const expectedLinks = ["Welcome", "About Us"];
   if (initialLinks.length !== expectedLinks.length || expectedLinks.some((label, i) => initialLinks[i] !== label)) {
-    throw new Error(`The hub navigation must expose core destinations plus manifest-declared gallery entries; found: ${initialLinks.join(", ")}.`);
+    throw new Error(`The first hub view must expose only the Welcome and About Us routes; found: ${initialLinks.join(", ")}.`);
   }
 
   await page.getByRole("link", { name: "Welcome", exact: true }).click();
