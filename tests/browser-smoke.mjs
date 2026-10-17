@@ -149,7 +149,16 @@ try {
   // The Forge is an in-place Workshop room, not a browser route. Return through its
   // owned exit control rather than browser history, which exits the Workshop.
   await page.getByRole("button", { name: "← EXIT FORGE", exact: true }).click();
-  await page.locator('.workshop-hub-overlay[data-selected-hub-tab="WELCOME"] .manifest-hub').waitFor({ state: "visible", timeout: 15_000 });
+  // A fresh host load restores the requested destination but must not skip the
+  // first-contact/gateway FSM. Complete that existing entry beat before asserting
+  // that the selected Welcome floorplan is visible.
+  await page.getByText("IF AN IMAGE IS WORTH A THOUSAND WORDS...", { exact: true })
+    .waitFor({ state: "visible", timeout: 30_000 });
+  await page.getByText("HOW MANY WORDS IS A LIVING IMAGE WORTH?", { exact: true })
+    .waitFor({ state: "visible", timeout: 30_000 });
+  await page.getByRole("button", { name: /enter the singularity workshop/i }).click();
+  await page.locator('.workshop-hub-overlay[data-selected-hub-tab="WELCOME"] .manifest-hub')
+    .waitFor({ state: "visible", timeout: 180_000 });
   await page.getByRole("heading", { name: /welcome/i }).first().waitFor({ state: "visible", timeout: 15_000 });
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
