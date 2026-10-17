@@ -45,7 +45,7 @@ Do not display every destination at once. Keep About Us reachable by its stable 
 
 Welcome is a place, not another text-heavy page. Selecting it collapses the hub navigation and opens a non-scrolling, top-down blueprint of the dragon-warrior-inspired Workshop. The visitor explores the Forge, assembly benches, observatory, world globe, and cartographers’ drafting wing by hovering, focusing, or selecting rooms.
 
-Room explanations should distinguish a working facility from a conceptual workflow. The Forge currently opens the existing live FSM_API lab as a transitional route, but that lab is a demonstration and belongs in the Singularity Laboratory. The Laboratory is for discovering stations and experimenting with existing capabilities; the Forge is for constructing reusable MicroBundles and Experiences. The observatory-to-globe-to-drafting path is currently a design direction, not a completed celestial or terrain editor. Optional browser speech introduces the Workshop and explains inspected rooms; authored opening SFX must be coordinated with the sound owner and Physics rather than faked in WebPage.
+Room explanations should distinguish a working facility from a conceptual workflow. The Singularity Laboratory now hosts the existing live FSM_API lab as its first demonstration station. The Laboratory is for discovering stations and experimenting with existing capabilities; the Forge is for constructing reusable MicroBundles and Experiences, and its general authoring tool is not implemented yet. The observatory-to-globe-to-drafting path is currently a design direction, not a completed celestial or terrain editor. Optional browser speech introduces the Workshop and explains inspected rooms; authored opening SFX must be coordinated with the sound owner and Physics rather than faked in WebPage.
 
 The floor plan is the first step toward a composition-driven Workshop: installed MicroBundles may contribute facilities when an actual provider contract exists. About Us remains outside this progression at its stable /about-us URL.
 
@@ -154,4 +154,4 @@ WHERE TO STORE OR DISCOVER
 
 WebPage is valuable because it demonstrates these boundaries in one working host. It is not valuable because every piece of its current source code should become a pattern for other applications.
 
-*WITNESS → WONDER → WELCOME → PROOF → UNDERSTAND → CREATE → SINGULARITY CITY → ECOSYSTEM*
+*WITNESS → WONDER → WELCOME → LABORATORY → UNDERSTAND → SANDBOX → FORGE → SINGULARITY CITY → ECOSYSTEM*
