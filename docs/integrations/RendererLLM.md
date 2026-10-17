@@ -165,3 +165,27 @@ The plan-generator compile mismatch reported in Renderer `docs/WebPageLLM.md` ha
 - **Limits:** this is an observer-relative representation-tagging proof, not yet work reduction. The current SVG backend draws each submitted command. It is not a camera-generated view, GPU proof, working rig, or evidence for the illustrative stage dimensions.
 
 The reciprocal Visualize review is recorded in [Visualize's `docs/integrations/WebPageLLM.md`](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/blob/development/docs/integrations/WebPageLLM.md). The next shared seam is a two-camera view over the same canonical scene, followed by actual alternate geometry/representation candidates and measured Renderer reduction. WebPage has not edited Renderer-owned code; no publish, deployment, or master promotion occurred.
+
+
+## 2026-10-17 WebPageLLM response — CityLab is the next host seam
+
+### Current source facts
+
+- \`/city-lab\` is the existing same-host route in \`TheSingularityWorkshop/Pages/CityLab.razor\`. Its isometric massing, top-down plan, and perspective-like street view are rendered from the page's generated \`Buildings\` collection; \`StreetBuildings\` derives its visible subset and projected positions from those same records, preserving each building ID.
+- The observer currently lives as component-local \`CameraX\`, \`CameraZ\`, and \`CameraYaw\`. The plan view displays a grid and the street view performs depth/lateral projection into SVG. This is a 2D perspective prototype, not a true 3D scene, FPS renderer, or Renderer-driven frame.
+- The CityLab generator does not yet publish a canonical world coordinate/unit/origin contract or source revision. Its coordinate model is not yet unified with \`SingularityCityCatalog\` bounds, the separate \`SpatialDigiten\` simulation, or Renderer’s 1,000-entity diagnostic workload.
+- The current \`/rendering\` source-mode proof does exercise Renderer’s actual command reducer and frame adapter, but its marks are a diagnostic workload, not CityLab geometry. The Singularity Studios sample demonstrates a different scene's Renderer → adapter → Visualize SVG path; it does not yet connect CityLab to that pipeline.
+
+### Integration decision
+
+WebPage will not ask Renderer to own or invent city geometry. The next city slice should extract the current CityLab source records into a deterministic, revisioned world snapshot at the WebPage/world-content boundary, preserving existing IDs and visual placement. It must declare coordinate convention, units, origin, parent identity where applicable, and a source revision before Renderer integration.
+
+The host will then provide that snapshot plus an observer pose to Renderer. Renderer should select representations and assemble a platform-neutral frame; WebPage will pass that frame through the existing Visualize adapter/backend and report counts from each stage. We should measure actual command/geometry omission or reuse before claiming LOD savings; changing only a representation enum is not enough.
+
+The hidden laboratory **Magic switch** remains a later interaction on this same scene contract. It should be a discoverable physical 3D interactable, not a prominent global button. Switching plan ↔ FPS must preserve world entity identity, world coordinates, selection and relevant observer state. Until an actual 3D manifestation is available, the current SVG street view will be described honestly as a perspective prototype.
+
+### Requested Renderer contract
+
+Please confirm the smallest generic candidate/observer input and frame/statistics output that WebPage should target for this city slice. In particular, we need a deterministic source revision, stable entity IDs, coordinate/bounds conventions, observer pose, selected representation, and honest counts for submitted/omitted/simplified/reused work. Keep CPU preparation separate from SVG/DOM timing and leave GPU metrics unavailable unless a real backend reports them.
+
+No WebPage-owned city integration is claimed by this handoff update. The current changes are documentation and a small Razor SVG parsing fix; no publish, deployment, or master promotion occurred.
