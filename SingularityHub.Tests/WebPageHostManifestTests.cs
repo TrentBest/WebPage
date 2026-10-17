@@ -316,6 +316,53 @@ public sealed class WebPageHostManifestTests
         await Assert.ThrowsAsync<ArgumentException>(() => service.SwitchManifestAsync("../manifest.json"));
     }
 
+    [Fact]
+    public void ManifestParserRejectsDuplicateDemonstrationIdsIgnoringCase()
+    {
+        const string json = """
+        {
+          "manifestId": "webpage-host",
+          "version": "1.0.0",
+          "startup": [{ "name": "MONIKER", "kind": "Moniker", "microBundles": [], "presentationSeconds": 3 }],
+          "running": [{ "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }],
+          "demonstrations": [
+            {
+              "id": "same-proof",
+              "title": "First proof",
+              "summary": "Test",
+              "whyItMatters": "Test",
+              "status": "Test",
+              "whatItProves": "Test",
+              "whatItDoesNotProve": "Test",
+              "launchMode": "Test",
+              "runInstructions": "Test",
+              "sourceUrl": "https://example.com/first",
+              "requirements": "Test"
+            },
+            {
+              "id": "SAME-PROOF",
+              "title": "Second proof",
+              "summary": "Test",
+              "whyItMatters": "Test",
+              "status": "Test",
+              "whatItProves": "Test",
+              "whatItDoesNotProve": "Test",
+              "launchMode": "Test",
+              "runInstructions": "Test",
+              "sourceUrl": "https://example.com/second",
+              "requirements": "Test"
+            }
+          ],
+          "deepDive": { "experience": "LIVING GUI", "restartFromManifest": true, "telemetry": true }
+        }
+        """;
+
+        var exception = Assert.Throws<InvalidOperationException>(
+            () => WebPageHostManifestParser.Parse(json));
+
+        Assert.Contains("SAME-PROOF", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
     private sealed class ManifestHandler(IReadOnlyDictionary<string, string> manifests) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(
