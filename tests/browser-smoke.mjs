@@ -147,8 +147,8 @@ try {
   await page.getByText("TRANSITIONS // FROM → TO", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.screenshot({ path: outputDir + "/04-forge.png", fullPage: true });
   // The Forge is an in-place Workshop room, not a browser route. Return through its
-  // owned navigation control rather than browser history, which exits the Workshop.
-  await page.getByRole("button", { name: "← RETURN TO WORKSHOP", exact: true }).click();
+  // owned exit control rather than browser history, which exits the Workshop.
+  await page.getByRole("button", { name: "← EXIT FORGE", exact: true }).click();
   await page.locator(".workshop-map").waitFor({ state: "visible", timeout: 15_000 });
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
