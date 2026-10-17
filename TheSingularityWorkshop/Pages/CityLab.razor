@@ -101,7 +101,7 @@
                 }
                 @foreach (var district in Districts)
                 {
-                    <text class="plan-district-label" x="@district.LabelX" y="@district.LabelY">@district.Name</text>
+                    <g @key="district.Id"><text class="plan-district-label" x="@district.LabelX" y="@district.LabelY">@district.Name</text></g>
                 }
                 @foreach (var building in Buildings)
                 {
