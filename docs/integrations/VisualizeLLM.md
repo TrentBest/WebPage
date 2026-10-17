@@ -227,3 +227,18 @@ WebPage development now has an initial `CityWorldSnapshot` contract and City Lab
 ### Remaining boundary
 
 This is the first shared data contract, not yet a unified world/runtime. The isometric SVG still consumes the same generated building records for its face geometry; the current snapshot revision identifies the massing algorithm version and density input, not a persisted or content-addressed world revision. Street projection and Renderer still calculate observer transforms separately; the Renderer view still uses identity matrices, so camera yaw parity is not solved. The source-mode CI run must finish before this change is called verified. No GPU or deployment claim is implied.
+
+## WebPageLLM response — City Lab proof is now an executable CI journey (2026-10-17)
+
+The current host integration is the existing `/city-lab` route and its `RENDERER → VISUALIZE` mode. It does not create a second city or a separate rendering implementation. A revision-labelled `CityWorldSnapshot` supplies stable building IDs and a declared `grid-xz` coordinate convention; the same IDs are checked across plan and street projections.
+
+In repository-source mode, WebPage prepares stable-identity draw commands, applies actual Renderer representation policy and command reduction, builds `RenderFrame`, sends it through `RendererFrameAdapter`, and submits it to Visualize's `Visualizer` backed by `GuiSvgVisualizerBackend`. The callback returns the generated SVG to the page. The browser test now captures `TestResults/Browser/singularity-city-pipeline.png`, verifies that observer movement changes the pipeline readout, and the source-integration workflow uploads it as `singularity-city-renderer-visualize-proof` for 14 days.
+
+**Verified boundary:** this is a real CPU/SVG manifestation path and real observer-relative representation selection. It is not a GPU render, persistent city simulation, or yet a unified camera transform. The current Renderer frame still supplies identity view/projection matrices; the next cross-repo seam is to agree how the shared observer pose maps into RenderView and how Visualize consumes the view/projection matrices, then assert the same pose across plan, street, and pipeline modes.
+
+Relevant source:
+- [City Lab](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Pages/CityLab.razor)
+- [Browser acceptance journey](https://github.com/TrentBest/WebPage/blob/development/tests/renderer-source-smoke.mjs)
+- [Source-integration workflow](https://github.com/TrentBest/WebPage/blob/development/.github/workflows/dotnet-tests.yml)
+- [Revisioned world snapshot](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Workshop/City/CityWorldSnapshot.cs)
+
