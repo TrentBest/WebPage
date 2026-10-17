@@ -41,7 +41,7 @@ try {
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   const initialLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  const expectedLinks = ["Welcome", "Demonstrations", "Movement Lab", "Replay Lab", "Singularity Studios", "Economy", "Digitens", "Singularity Architecture", "ProtocolAi Terminal", "About Us"];
+  const expectedLinks = ["Welcome", "About Us"];
   if (initialLinks.length !== expectedLinks.length || expectedLinks.some((label, i) => initialLinks[i] !== label)) {
     throw new Error(`The hub navigation must expose core destinations plus manifest-declared gallery entries; found: ${initialLinks.join(", ")}.`);
   }
@@ -64,6 +64,8 @@ try {
     throw new Error(`The collapsed navigation should leave only the expander rail; width was ${sidebarWidth}px.`);
   }
 
+  await page.getByRole("heading", { name: "Welcome, friend." }).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: "ENTER THE FORGE ↗" }).click();
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "REVEAL THE FSM" }).click();
   await page.getByRole("button", { name: "SEND START SIGNAL" }).waitFor({ state: "visible" });
@@ -105,16 +107,24 @@ try {
   await tick.click(); // deliver OnEnter after the terminal state has been selected
   await page.getByText("OnEnter → Complete", { exact: false }).waitFor({ state: "visible" });
 
+  await page.getByRole("button", { name: "CLOSE ×", exact: true }).click();
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
   const expandedLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  if (expandedLinks.some(label => ["Ecosystem", "Schedule Consultation", "Institutions"].includes(label))) {
-    throw new Error("Removed destination tabs must not reappear in the hub.");
+  if (expandedLinks.length !== 2 || expandedLinks[0] !== "Welcome" || expandedLinks[1] !== "About Us") {
+    throw new Error("The first hub view should expose only Welcome and the always-available About Us route; found: " + expandedLinks.join(", ") + ".");
   }
-  await page.screenshot({ path: `${outputDir}/03-welcome.png`, fullPage: true });
+  await page.screenshot({ path: outputDir + "/03-welcome.png", fullPage: true });
 
-  // Exercise the additional destinations after the original Welcome/FSM journey.
-  // That keeps the pre-existing state-transition proof independent of iframe navigation.
+  // About Us remains directly addressable for existing external and Unity package links.
+  await page.goto(baseUrl + "/about-us", { waitUntil: "domcontentloaded" });
+  await page.getByText("We are not building one giant application.", { exact: true }).waitFor({ state: "visible", timeout: 15000 });
+
+  // Direct URLs remain available; entering a deeper experience may reveal related destinations.
+  await page.goto(baseUrl + "/digitens", { waitUntil: "networkidle" });
+  await page.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15000 });
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "Digitens", exact: true }).waitFor({ state: "visible" });
   await page.getByRole("link", { name: "Digitens", exact: true }).click();
   const digitens = page.frameLocator('iframe[title="Digitens: digital citizens of the Singularity World"]');
   await digitens.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
