@@ -53,7 +53,16 @@ try {
     initialPipelineMetrics,
     { timeout: 10_000 }
   );
-  console.log("Singularity City pipeline: source-mode city entities passed through Renderer policy/reduction, RendererFrameAdapter, Visualize, and the host-owned GUI.SVG sink; observer movement refreshed the submitted frame.");
+  await page.screenshot({ path: process.env.CITY_PIPELINE_SCREENSHOT ?? "TestResults/Browser/singularity-city-pipeline.png", fullPage: true });
+  const afterMovePipelineMetrics = await pipelineMetrics.textContent() ?? "";
+  assert.notEqual(afterMovePipelineMetrics, initialPipelineMetrics, "Observer movement must change the live Renderer pipeline readout.");
+  await page.getByRole("button", { name: "Pipeline move back", exact: true }).click();
+  await page.waitForFunction(
+    previous => document.querySelector(".pipeline-readout p")?.textContent !== previous,
+    afterMovePipelineMetrics,
+    { timeout: 10_000 }
+  );
+  console.log("Singularity City pipeline: source-mode city entities passed through Renderer policy/reduction, RendererFrameAdapter, Visualize, and the host-owned GUI.SVG sink; observer movement refreshed the submitted frame. Screenshot saved.");
 
   await page.goto(`${baseUrl}/digitens`, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({
