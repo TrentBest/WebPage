@@ -28,7 +28,9 @@ try {
   const afterMove = await page.locator(".stage-topline").textContent();
   assert.notEqual(afterMove, beforeMove, "Moving the observer must change camera state.");
   await page.getByRole("button", { name: /TURN/i }).last().click();
-  await page.getByText(/YAW 12°/).waitFor({ state: "visible", timeout: 5_000 });
+  const cameraReadout = page.locator(".stage-topline span").last();
+  await cameraReadout.waitFor({ state: "visible", timeout: 5_000 });
+  assert.match(await cameraReadout.textContent() ?? "", /YAW 12°/);
   await page.getByRole("button", { name: /CITY OVERVIEW/i }).click();
   await page.screenshot({ path: process.env.CITY_LAB_SCREENSHOT ?? "singularity-city-overview.png", fullPage: true });
   console.log(`Singularity City: ${planIds.length} stable building IDs are shared between top-down plan and observer-relative street projection; movement and yaw controls passed.`);
