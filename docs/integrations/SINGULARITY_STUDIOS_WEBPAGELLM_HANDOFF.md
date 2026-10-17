@@ -56,6 +56,8 @@ Use reusable procedure definitions with parameters and provider-supplied semanti
 
 Reference handoff: [Singularity Studios Gesture Plan](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/SINGULARITY_STUDIOS_GESTURE_PLAN.md).
 
+The current [`GestureEvaluator`](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/src/TheSingularityWorkshop.Gestures/GestureEvaluator.cs) is a stateless pose sampler: it does not own pause/resume state, interruption, looping, blending, task scheduling, anchor resolution, or authoritative physical outcomes. See the new [Gesture Evaluation Lifecycle contract](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/GESTURE_EVALUATION_LIFECYCLE.md) before wiring a studio timeline or claiming a running procedure lifecycle.
+
 ### Physics
 
 Physics owns collisions, contact, constraints, forces, obstruction, breakage, and physical outcomes. A gesture reaching the end of its requested time interval does not prove that a hand grasped a prop, a dolly cleared a performer, a cable connected, or a set piece locked.
