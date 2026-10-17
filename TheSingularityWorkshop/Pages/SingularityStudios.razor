@@ -23,42 +23,15 @@
             <p class="studios-data-note">A small, explicit data fixture: one reusable set, two placements of the same prop definition, two cameras observing the same scene, and separate rig definitions. The giant-stage dimensions are illustrative planning targets—not verified runtime capacity.</p>
         </div>
         <div class="studios-stage-art">
-            <svg viewBox="0 0 720 460" role="img" aria-labelledby="stage-title stage-desc">
-                <title id="stage-title">Conceptual Singularity Studios soundstage</title>
-                <desc id="stage-desc">A schematic indoor production stage with a central set, camera positions, a camera rail, lighting rigs, and sound coverage. This is a concept illustration, not a rendered production scene.</desc>
-                <defs>
-                    <pattern id="studio-grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#16404e" stroke-width="1"/></pattern>
-                    <linearGradient id="studio-glow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00eaff" stop-opacity=".2"/><stop offset="1" stop-color="#ff2cff" stop-opacity=".04"/></linearGradient>
-                </defs>
-                <rect width="720" height="460" fill="#030a14"/>
-                <rect width="720" height="460" fill="url(#studio-grid)"/>
-                <path d="M70 370 L360 205 L650 370 L360 430Z" fill="url(#studio-glow)" stroke="#1e6072"/>
-                <path d="M70 100 L360 25 L650 100 L650 370 L360 430 L70 370Z" fill="none" stroke="#236074" stroke-width="2"/>
-                <path d="M70 100L360 205L650 100M360 205V430M150 79V352M570 79V352M70 190L360 300L650 190" fill="none" stroke="#123848" stroke-width="1.5"/>
-                <g fill="#0b2636" stroke="#00eaff" stroke-width="1.5">
-                    <path d="M265 295L365 238L455 286L355 344Z"/>
-                    <path d="M265 295V220L365 164V238Z"/>
-                    <path d="M365 238V164L455 212V286Z"/>
-                    <path d="M295 278V237L328 218V259Z" fill="#123d4b"/>
-                    <path d="M390 276V234L426 253V295Z" fill="#123d4b"/>
-                </g>
-                <g stroke="#ff2cff" stroke-width="2" fill="none">
-                    <path d="M135 132H585M175 150H545"/>
-                    <path d="M180 132V176M540 132V176"/>
-                    <circle cx="180" cy="178" r="9"/><circle cx="540" cy="178" r="9"/>
-                    <path d="M180 187L163 220H197Z" fill="#ff2cff" fill-opacity=".16"/>
-                    <path d="M540 187L523 220H557Z" fill="#ff2cff" fill-opacity=".16"/>
-                </g>
-                <g fill="#00eaff" stroke="#00eaff">
-                    <path d="M115 315L145 298L162 308L132 326Z"/><path d="M132 326V350L145 343V318Z"/><circle cx="137" cy="312" r="6"/>
-                    <path d="M580 315L610 298L627 308L597 326Z"/><path d="M597 326V350L610 343V318Z"/><circle cx="602" cy="312" r="6"/>
-                </g>
-                <g fill="#d8fbff" font-family="monospace" font-size="11" letter-spacing="1">
-                    <text x="92" y="58">LIGHTING TRUSS A</text><text x="458" y="58">LIGHTING TRUSS B</text>
-                    <text x="78" y="285">CAM A</text><text x="570" y="285">CAM B</text>
-                    <text x="270" y="390">REUSABLE SET / SCENE DATA</text><text x="280" y="448" fill="#00eaff">CONCEPT SCHEMATIC · NOT RENDER OUTPUT</text>
-                </g>
-            </svg>
+            <img class="studios-stage-plan" src="/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage-plan.svg" alt="Top-down production plan generated from the versioned Singularity Studios stage data through Visualize and the GUI.SVG adapter" />
+            <div class="studios-plan-legend" aria-label="Production plan legend">
+                <span><i class="plan-zone"></i>Stage zones</span>
+                <span><i class="plan-set"></i>Reusable set footprint</span>
+                <span><i class="plan-prop"></i>Prop placements</span>
+                <span><i class="plan-camera"></i>Camera viewpoints</span>
+                <span><i class="plan-rig"></i>Lighting rig placements</span>
+            </div>
+            <p class="studios-plan-note">Generated plan view · same stage and scene IDs as the JSON fixture. Footprints are explicitly illustrative; this is the CPU-side SVG presentation path, not a GPU-performance claim.</p>
         </div>
     </section>
 
@@ -162,7 +135,16 @@
     .studios-hero-copy h2,.studios-audio h2 { max-width:40rem; margin:.8rem 0 1rem; font-size:clamp(1.8rem,3.7vw,3.5rem); line-height:1.04; letter-spacing:-.04em; }
     .studios-hero-copy p,.studio-card p,.studios-audio p { color:#adc2ce; line-height:1.75; }
     .studios-stage-art { overflow:hidden; border:1px solid #174151; background:#030a14; box-shadow:0 0 50px #00eaff0c; }
-    .studios-stage-art svg,.studios-acoustic-map svg { display:block; width:100%; height:auto; }
+    .studios-stage-art svg,.studios-acoustic-map svg,.studios-stage-plan { display:block; width:100%; height:auto; }
+    .studios-plan-legend { display:flex; flex-wrap:wrap; gap:.7rem 1rem; padding:.8rem; border-top:1px solid #174151; color:#adc2ce; font:.65rem Consolas,monospace; }
+    .studios-plan-legend span { display:flex; align-items:center; gap:.4rem; }
+    .studios-plan-legend i { display:inline-block; width:.65rem; height:.65rem; border:1px solid #d8fbff; }
+    .studios-plan-legend .plan-zone { background:#0b333d; }
+    .studios-plan-legend .plan-set { background:#05adba; }
+    .studios-plan-legend .plan-prop { background:#ffb848; }
+    .studios-plan-legend .plan-camera { background:#ff33cc; transform:rotate(45deg); }
+    .studios-plan-legend .plan-rig { background:#bfdbff; }
+    .studios-plan-note { margin:.2rem 1rem 1rem; color:#819ba9; font-size:.72rem; line-height:1.5; }
     .studios-tags { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:1.4rem; }
     .studios-tags span { padding:.45rem .6rem; border:1px solid #1c4757; color:#b9eff7; font: .62rem Consolas,monospace; letter-spacing:.06em; }
     .studios-data-link { display:inline-flex; margin-top:1.1rem; padding:.75rem .9rem; border:1px solid #00eaff66; color:#00eaff; text-decoration:none; font:.68rem Consolas,monospace; letter-spacing:.08em; }
