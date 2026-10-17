@@ -21,7 +21,7 @@ These are the beginning of the move, not yet the runtime source consumed by WebP
 ## Current WebPage debt confirmed from source
 
 - `WorkshopExperienceService.InitializeAsync` loads `wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json` by default.
-- `WorkshopExperienceService.SwitchManifestAsync(path)` now loads a same-origin relative host-manifest asset, composes a candidate primary/hub/capability runtime, and swaps it into the scoped Hub only after composition succeeds. `RestartFromManifestAsync` now reloads the active host-manifest path.
+- `WorkshopExperienceService.SwitchManifestAsync(path)` now loads a same-origin relative host-manifest asset, composes a candidate primary/hub/capability runtime, and activates its manifest-owned bundle set in the stable session-scoped Hub only after composition succeeds, preserving the Hub instance held by PageFSM. `RestartFromManifestAsync` now reloads the active host-manifest path.
 - `WorkshopCompositionCatalog` now creates fresh bundle instances instead of returning long-lived shared instances. Hub and HubRuntime DI lifetimes are scoped per browser session.
 - The Hub lab now exposes the active manifest identity/version/source, a same-origin manifest-path selector, switch action, and reset/reload action.
 - Tests cover switching between two host manifests, reloading/recomposing the active manifest, preserving the active composition when a candidate manifest is invalid, and rejecting external/traversal paths. The host build and repository-source integration have passed in an earlier workflow run; the full browser journey and test suite are still running on the latest commits.
@@ -55,6 +55,6 @@ These are the beginning of the move, not yet the runtime source consumed by WebP
 ## Progress log
 
 - 2026-10-17: Added the first Experience-owned Workshop Showcase manifest and moved the current six-entry demonstration catalog into the Experiences repository.
-- 2026-10-17: Added candidate-based host-manifest switching/recomposition, active-manifest reset, fresh bundle factories, session-scoped Hub replacement, and Hub-lab controls; added tests for switch, reset, rollback, and safe paths.
+- 2026-10-17: Added candidate-based host-manifest switching/recomposition, active-manifest reset, fresh bundle factories, stable Hub manifest-state reset/activation, and Hub-lab controls; added tests for switch, reset, rollback, and safe paths.
 - 2026-10-17: Updated the WebPage orchestration contract to link to the Experience-owned artifacts.
 - Remaining: wire the host to resolve the Experience-owned manifest and content through the canonical repository/cache boundary; add user-facing selection; move the remaining demonstration/journey catalog; replace compiled route/presentation behavior only after the replacement is proven.
