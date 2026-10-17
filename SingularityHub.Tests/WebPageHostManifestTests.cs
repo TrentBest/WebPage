@@ -286,7 +286,7 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("showcase-b", service.Manifest!.ManifestId);
         Assert.Equal("/b", Assert.Single(service.Manifest.Hub).Route);
         Assert.NotSame(firstAssembly, service.RuntimeAssembly);
-        Assert.NotSame(firstHub, hub.Hub);
+        Assert.Same(firstHub, hub.Hub);
         Assert.Equal("manifest-b.json", service.ActiveManifestPath);
 
         var beforeReset = service.RuntimeAssembly;
