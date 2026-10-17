@@ -234,7 +234,7 @@
         else if (string.Equals(_selectedHubTab, "WELCOME", StringComparison.OrdinalIgnoreCase))
         {
             // Welcome is a hands-on Experience composed through the Workshop GUI builders.
-            builder.OpenComponent<TheSingularityWorkshop.Components.WelcomeExperience>(sequence++);
+            builder.OpenComponent<TheSingularityWorkshop.Components.WorkshopFloorplan>(sequence++);
             builder.CloseComponent();
         }
         else if (string.Equals(_selectedHubTab, "ECONOMY", StringComparison.OrdinalIgnoreCase))
