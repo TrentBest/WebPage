@@ -748,6 +748,12 @@
             ? "MONIKER"
             : requestedTab.Replace('-', ' ').Trim().ToUpperInvariant();
 
+        // A direct, explicit hub URL is already a navigation intent. In particular,
+        // browser-back to /?tab=welcome must restore the chosen destination instead
+        // of resurrecting the first-visit monolith over it.
+        if (!string.IsNullOrWhiteSpace(requestedTab))
+            _entryRequested = true;
+
         _selectedDemonstrationId = DemonstrationRoutes.ReadSelectedId(uri.Query);
     }
 
