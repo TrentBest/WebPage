@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
 @inject IJSRuntime JS
+@implements IDisposable
 
 <section class="workshop-floorplan" aria-label="The Singularity Workshop floor plan">
     <header class="floorplan-header">
@@ -271,8 +272,24 @@
         }
     }
 
-    private void OpenForge() => _showForge = true;
+    private void OpenForge()
+    {
+        _showForge = true;
+        _ = JS.InvokeVoidAsync("eval", "window.speechSynthesis?.cancel()");
+    }
+
     private void CloseForge() => _showForge = false;
+
+    public void Dispose()
+    {
+        try
+        {
+            _ = JS.InvokeVoidAsync("eval", "window.speechSynthesis?.cancel()");
+        }
+        catch (JSException)
+        {
+        }
+    }
 
     private void HandleRoomKey(KeyboardEventArgs e, string room)
     {
