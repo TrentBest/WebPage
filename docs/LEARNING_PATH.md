@@ -9,11 +9,13 @@ MONIKER
    ↓ one clear invitation
 WELCOME — what problem are we solving?
    ↓ show me
-PROOF — let me see something real
+LABORATORY — discover stations and inspect real demonstrations
    ↓ how does it work?
 UNDERSTAND — FSM_API + FSM_COS + MicroBundles
-   ↓ let me try
-CREATE — use the ideas, not just read about them
+   ↓ experiment with existing capabilities
+SANDBOX — prescribe MicroBundles, configure, run, compare
+   ↓ build something reusable
+FORGE — author MicroBundles and Experiences
    ↓ what can this become?
 SINGULARITY CITY — Digitens and a living-world direction
    ↓ reveal the wider system
@@ -43,17 +45,17 @@ Do not display every destination at once. Keep About Us reachable by its stable 
 
 Welcome is a place, not another text-heavy page. Selecting it collapses the hub navigation and opens a non-scrolling, top-down blueprint of the dragon-warrior-inspired Workshop. The visitor explores the Forge, assembly benches, observatory, world globe, and cartographers’ drafting wing by hovering, focusing, or selecting rooms.
 
-Room explanations should distinguish a working facility from a conceptual workflow. The Forge opens the existing live FSM_API lab. The observatory-to-globe-to-drafting path is currently a design direction, not a completed celestial or terrain editor. Optional browser speech introduces the Workshop and explains inspected rooms; authored opening SFX must be coordinated with the sound owner and Physics rather than faked in WebPage.
+Room explanations should distinguish a working facility from a conceptual workflow. The Forge currently opens the existing live FSM_API lab as a transitional route, but that lab is a demonstration and belongs in the Singularity Laboratory. The Laboratory is for discovering stations and experimenting with existing capabilities; the Forge is for constructing reusable MicroBundles and Experiences. The observatory-to-globe-to-drafting path is currently a design direction, not a completed celestial or terrain editor. Optional browser speech introduces the Workshop and explains inspected rooms; authored opening SFX must be coordinated with the sound owner and Physics rather than faked in WebPage.
 
 The floor plan is the first step toward a composition-driven Workshop: installed MicroBundles may contribute facilities when an actual provider contract exists. About Us remains outside this progression at its stable /about-us URL.
 
-### 2 — Proof: show, do not merely promise
+### 2 — Laboratory: find a station and experiment
 
-Introduce a small number of source-backed demonstrations. Prefer one compelling, working vertical slice over a large catalogue of disconnected links.
+The Singularity Laboratory is the home for demonstrations as discoverable stations grouped by scientific and engineering field. It is also the easiest next place to try an idea before entering the Forge: visitors should be able to prescribe already-available MicroBundles, configure declared parameters, run a real sandbox, and compare observations when the owning model supports those operations.
 
-Every proof surface labels what is **working**, **experimental**, or **planned**. A screenshot, SVG, conceptual diagram, CPU projection, or GPU result must be identified accurately. Link to source and tests where they substantiate the claim.
+The current Demonstrations gallery is a manifest-backed metadata registry, not a universal executable Experience loader. Keep launch mode and maturity honest: source-only is not runnable here, a build is not a browser/GPU proof, and a model-level replay executor is not a playable physics world. Each station should expose its package owner, assumptions, units, valid ranges, evidence, and limitations. Preserve a baseline when comparing parameter changes.
 
-After a visitor inspects proof, reveal the deeper explanation.
+See [Singularity Laboratory Stations](SINGULARITY_LABORATORY_STATIONS.md) for the station contract and current implementation gates.
 
 ### 3 — Understand: reveal the architecture
 
@@ -66,11 +68,11 @@ Teach the responsibility boundaries in the order a newcomer needs them:
 
 Explain the reason for each boundary before introducing its vocabulary. The existing [About Us page](/about-us) remains the stable, directly addressable overview for people who want the broader explanation immediately.
 
-### 4 — Create: let the visitor participate
+### 4 — Forge: construct reusable blocks
 
-Once the visitor understands the premise, expose hands-on creation and inspection surfaces. Make the next step an action: change a parameter, inspect a state, compose a capability, or run a verified demonstration.
+The Forge is for authoring the fundamental blocks: MicroBundles and Experiences. A visitor who merely wants to combine existing capabilities, tune declared parameters, or compare runs should stay in the Laboratory. A creator enters the Forge to define a new reusable capability or environment, validate its declarations, and make it available for later composition.
 
-Do not imply a tool is runnable when it is only a source explanation.
+Do not duplicate domain solvers in WebPage, and do not imply a tool is runnable when it is only a source explanation.
 
 ### 5 — Singularity City: make the consequences visible
 
