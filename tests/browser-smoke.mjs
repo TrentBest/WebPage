@@ -8,6 +8,11 @@ const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
   page.on("pageerror", error => browserErrors.push(error.message));
+  const failedRequests = [];
+  page.on("requestfailed", request => failedRequests.push({
+    url: request.url(),
+    error: request.failure()?.errorText ?? "unknown request failure"
+  }));
 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
   // Preserve the founder-established entry beat before the existing first-contact
@@ -241,6 +246,17 @@ try {
   await page.getByRole("link", { name: /digitens/i }).click();
   await page.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
 
+  // Verify the casino asset independently before testing the gateway-to-iframe
+  // journey. This separates a host/static-file failure from a navigation/lifecycle failure.
+  const casinoAsset = await page.request.get(`${baseUrl}/economy/casino-floor.html`);
+  if (!casinoAsset.ok()) {
+    throw new Error(`Casino economy asset must be served by the WebPage host; HTTP ${casinoAsset.status()}.`);
+  }
+  const casinoAssetHtml = await casinoAsset.text();
+  if (!casinoAssetHtml.includes("<h1>SINGULARITY CASINO</h1>")) {
+    throw new Error("Casino economy asset response did not contain its expected heading.");
+  }
+
   // Economy is independently addressable; entering its host tab restores the rail
   // and the route-derived progression state, after which Digitens is a real nav link.
   await page.goto(baseUrl + "/?tab=economy", { waitUntil: "domcontentloaded" });
@@ -252,8 +268,23 @@ try {
     .waitFor({ state: "visible", timeout: 30_000 });
   await page.locator(".enter-workshop").waitFor({ state: "visible", timeout: 45_000 });
   await page.locator(".enter-workshop").click();
-  const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
-  await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  const casinoFrameSelector = 'iframe[title="Singularity Casino living economy experience"]';
+  const casino = page.frameLocator(casinoFrameSelector);
+  try {
+    await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  } catch (error) {
+    const frameDiagnostics = await Promise.all(page.frames().map(async frame => ({
+      url: frame.url(),
+      body: await frame.locator("body").innerText({ timeout: 1_000 }).catch(() => "<body unavailable>")
+    })));
+    throw new Error([
+      "Casino iframe did not expose its expected heading after gateway entry.",
+      `Iframe element count: ${await page.locator(casinoFrameSelector).count()}.`,
+      `Frame diagnostics: ${JSON.stringify(frameDiagnostics)}`,
+      `Failed requests: ${JSON.stringify(failedRequests)}`,
+      `Original wait failure: ${error.message}`
+    ].join("\\n"));
+  }
   await (await openNavigationFor("Digitens")).click();
   const digitens = page.frameLocator('iframe[title="Digitens: digital citizens of the Singularity World"]');
   await digitens.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
