@@ -268,7 +268,16 @@ try {
     .waitFor({ state: "visible", timeout: 30_000 });
   await page.locator(".enter-workshop").waitFor({ state: "visible", timeout: 45_000 });
   await page.locator(".enter-workshop").click();
+
+  // The gateway click requests entry; it does not synchronously skip the PageFSM
+  // lifecycle. On this direct destination route the living moniker is intentionally
+  // hidden, so wait for the selected Economy hub surface that only mounts at
+  // NavigationArrival/Running before checking the embedded casino document.
+  const economyHub = page.locator('.workshop-hub-overlay[data-selected-hub-tab="ECONOMY"] .manifest-hub');
+  await economyHub.waitFor({ state: "visible", timeout: 180_000 });
+
   const casinoFrameSelector = 'iframe[title="Singularity Casino living economy experience"]';
+  await page.locator(casinoFrameSelector).waitFor({ state: "visible", timeout: 15_000 });
   const casino = page.frameLocator(casinoFrameSelector);
   try {
     await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
