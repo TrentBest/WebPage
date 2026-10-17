@@ -37,6 +37,16 @@ Separately, `Workshop.MicroBundles.MicroBundle` is a Hub-level lifecycle shell i
 
 **Future:** the Renderer-owned opt-in bundle and rendering-free control are tracked in [Renderer issue #15](https://github.com/TrentBest/TheSingularityWorkshop.Renderer/issues/15). Source inspection here does not substitute for its build, automated integration tests, and CI evidence.
 
+## Singularity City / Universe presentation contract
+
+**Current:** WebPage's 2D floor plan, hub, labs, and terminals are the semi-diegetic entry layer: the visitor can see the Workshop's conceptual spaces while using browser-native controls. The manifest declares destinations and demonstrations; those entries should be the single source for discoverability, not duplicated hardcoded feature cards. The Physics Replay Lab is now declared in the host manifest's demonstration catalog and embeds its existing route as an explicitly illustrative fixture.
+
+**Direction:** present each repository's real capability as an inspectable station/Experience in the shared Singularity City/Universe. Show the source/evidence boundary at the station: what runs now, what data it uses, and what remains unavailable. Keep navigation in the Workshop world rather than turning the showcase into a generic SaaS feature grid.
+
+**Future:** 3D diegetic tooling can appear as in-world instruments, terminals, workbenches, and observatories. Those are alternate manifestations of the same Experience identity and capability graph—not new owners of semantics. They must consume the same manifest/artifact contracts, FSM_COS composition results, and FSM_API lifecycle behavior; the 3D scene must not become a second runtime.
+
+**Limit:** the current hub still has compiled route/presentation adapters and is not a fully simulated 3D universe. Do not claim that a destination is MicroBundle-backed merely because it appears as a station.
+
 ## Current WebPage debt confirmed from source
 
 - `WorkshopExperienceService.InitializeAsync` loads `wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json` by default.
@@ -45,7 +55,7 @@ Separately, `Workshop.MicroBundles.MicroBundle` is a Hub-level lifecycle shell i
 - The Hub lab now exposes the active manifest identity/version/source, a same-origin manifest-path selector, switch action, and reset/reload action.
 - Tests cover switching between two host manifests, reloading/recomposing the active manifest, preserving the active composition when a candidate manifest is invalid, and rejecting external/traversal paths. The browser smoke test initially failed because it expected first-contact labels before the restored entry scene; the entry action was separated from the PageFSM gateway signal and `tests/browser-smoke.mjs` was updated. The corrected commits are on `development`; a fresh passing workflow/browser run is not yet verified.
 - This is an initial host-manifest switching slice, not the final repository-backed Experience loader. Hub destinations still have empty `microBundles` arrays, route behavior is partly compiled, and the new Experience-owned `workshop-showcase` manifest/content are not yet consumed by WebPage.
-- The manifest declares a `Replay Lab` destination and `/replay-lab` is implemented as a deterministic illustrative fixture with scrub/play controls and explicit unsupported states. It is not connected to Physics world/checkpoint reconstruction; the integration handoff records the next verified contract needed.
+- The manifest declares a `Replay Lab` destination and a `physics-replay-lab` demonstration entry; the previous hardcoded gallery card was removed so the manifest is the single catalog source. `/replay-lab` remains a deterministic illustrative fixture with scrub/play controls and explicit unsupported states. It is not connected to Physics world/checkpoint reconstruction; the integration handoff records the next verified contract needed.
 - The current hub runtime has no demonstrated transactional reset/replacement lifecycle. Do not dispose/reuse runtime objects casually or mutate active state before candidate composition succeeds.
 
 ## Required refactor order
