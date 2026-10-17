@@ -85,7 +85,9 @@ The current development source has real foundations:
 - The host's composition catalog currently registers known MicroBundle implementations. This is not yet proof of loading arbitrary new executable bundle artifacts at runtime.
 - The current manifest has startup bundle 2101, primary bundle 2102, and capability roots for Rendering (4100) and ProtocolAi Terminal (4099).
 - The manifest's hub destinations currently declare empty `microBundles` lists. Their routes and visible behavior are still partly implemented in compiled host pages/components.
-- `RestartFromManifestAsync` currently resets selected startup/primary entries and state; it does not fetch a new manifest or rebuild the assemblies.
+- `SwitchManifestAsync(path)` now loads a candidate same-origin host-manifest path, composes a new primary assembly, optional hub/capability assemblies, and a fresh scoped Hub, then activates the candidate only after success. `RestartFromManifestAsync` reloads the currently selected host-manifest path.
+- The composition catalog now creates fresh MicroBundle instances for each resolve, which is required to avoid sharing runtime-owned objects across activations. Hub/HubRuntime are scoped to a browser session.
+- The new switch path is covered by tests for two host-manifest configurations, failed-candidate rollback, and external/traversal-path rejection. CI is the authority for the result; do not claim green until it completes.
 - The Experience repository now has the initial `workshop-showcase` definition at [experiences/WorkshopShowcase/manifest.json](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/manifest.json), plus a repository-owned initial demonstration catalog at [demonstrations.json](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/demonstrations.json). These are migration artifacts; the WebPage host does not consume them yet, and the old in-host demonstration definitions must not be deleted until runtime resolution and visitor journeys are tested.
 
 Therefore the host has **manifest loading and composition**, but the full application is not yet manifest-authoritative and hot-redefinition has not been proven. Do not describe the current implementation as arbitrary runtime bundle loading.
@@ -94,7 +96,7 @@ Therefore the host has **manifest loading and composition**, but the full applic
 
 Implement this as a vertical slice with tests, not as a second page framework:
 
-1. **One explicit manifest-loading boundary.** Select an Experience identity/version, resolve its manifest and referenced content through the Experience/MicroBundle repository boundary (with an explicit local bootstrap/cache path), then validate schema/version, required sections, root versions, digests, and permitted references before changing active state.
+1. **One explicit manifest-loading boundary.** The first slice now switches legacy host-manifest asset paths. Next, select an Experience identity/version, resolve its manifest and referenced content through the Experience/MicroBundle repository boundary (with an explicit local bootstrap/cache path), then validate schema/version, required sections, root versions, digests, and permitted references before changing active state.
 2. **Compose into a candidate runtime.** Resolve startup, primary Experience, and explicitly selected destination/capability roots through FSM_COS. Do not silently substitute hard-coded roots when a supplied manifest is invalid.
 3. **Activate only after success.** Keep the currently active composition until the candidate has validated and composed successfully. Report missing, incompatible, or unauthorized roots clearly.
 4. **Present the resolved composition.** The browser host must route to an Experience/provider selected by manifest data. A manifest entry that only changes a label or URL is not a meaningful redefinition proof.
