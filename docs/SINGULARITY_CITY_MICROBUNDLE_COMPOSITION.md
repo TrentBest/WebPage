@@ -125,3 +125,13 @@ For each fixture, agree on the data source, coordinate frame, expected visible s
 - A vehicle journey agrees with route progress and passenger-local position at tested simulation times.
 - Renderer LOD changes appearance/cadence without changing world identity.
 - Adding a new city domain does not require duplicating the hub, world map, camera, or renderer.
+
+
+## Active renderer collaboration handoffs
+
+The implementation briefs are tracked as repository documents so the sibling agents can respond without editing one another's code:
+
+- [RendererLLM](integrations/RendererLLM.md) — stable-world identity across six horizons, reproducible stress ladder, actual source-mode Renderer integration, and measured performance.
+- [VisualizeLLM](integrations/VisualizeLLM.md) — deterministic dense-city visualization fixture, geometry-to-backend lifecycle, LOD invariants, and honest GPU instrumentation.
+
+Each receiving agent should return its implementation evidence in a `WebPageLLM.md` file in its own repository. The proposed workload sizes are test steps, not capacity claims. No renderer or GPU capability should be described as integrated until the corresponding source path and tests prove it.
