@@ -268,8 +268,20 @@
 
     private async Task EnterWorkshop()
     {
-        await JS.InvokeVoidAsync("interop.markWorkshopVisited");
+        // The explicit gateway click is the authoritative entry signal. Advance the
+        // PageFSM before the best-effort browser persistence write so a missing or
+        // disconnected JS interop cannot strand the visitor at Gateway.
         FSM.RequestEnter();
+
+        try
+        {
+            await JS.InvokeVoidAsync("interop.markWorkshopVisited");
+        }
+        catch (JSException)
+        {
+            // Remembering the visit improves the next load but must never own entry.
+            // The current navigation proceeds through the FSM regardless.
+        }
     }
 
     private void SelectHubTab(string tab)
