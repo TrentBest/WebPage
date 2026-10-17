@@ -230,11 +230,36 @@ try {
   await page.waitForFunction(() => document.querySelector("#ai-llm-response")?.value === "browser smoke response fixture", null, { timeout: 10_000 });
   await page.getByText(/NO HOST PROCESSOR ATTACHED; NO ACTUATION OCCURRED/).waitFor({ state: "visible", timeout: 10_000 });
 
+  // Singularity Studios must expose a downloadable, versioned stage-data artifact.
+  // The cameras share one scene identity and repeated props reference one canonical asset definition.
+  await page.goto(`${baseUrl}/singularity-studios`, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  await page.locator(".studios-header h1").waitFor({ state: "visible", timeout: 15_000 });
+  const stageDataLink = page.getByRole("link", { name: /inspect \/ download the versioned stage data/i });
+  await stageDataLink.waitFor({ state: "visible", timeout: 10_000 });
+  await page.locator(".studios-audio audio[controls]").waitFor({ state: "visible", timeout: 10_000 });
+  const stageDataResponse = await page.request.get(`${baseUrl}/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage.json`);
+  if (!stageDataResponse.ok()) {
+    throw new Error(`Singularity Studios stage data must be served by the WebPage host; HTTP ${stageDataResponse.status()}.`);
+  }
+  const stageData = await stageDataResponse.json();
+  const propDefinition = stageData.assetDefinitions.find(asset => asset.id === "prop.service-crate");
+  const propPlacements = stageData.scene.instances.filter(instance => instance.assetId === "prop.service-crate");
+  if (stageData.schemaVersion !== "0.1.0" || !propDefinition || propPlacements.length !== 2) {
+    throw new Error("Singularity Studios must preserve one versioned prop definition referenced by multiple scene placements.");
+  }
+  if (stageData.cameras.length !== 2 || stageData.cameras.some(camera => camera.sceneId !== stageData.scene.id)) {
+    throw new Error("Singularity Studios cameras must observe the same canonical scene instead of duplicating world state.");
+  }
+  if (stageData.stage.dimensionsStatus !== "illustrative-planning-target" ||
+      !stageData.productionNotes.some(note => note.includes("not implemented"))) {
+    throw new Error("Singularity Studios must label planning dimensions and unsupported production capabilities honestly.");
+  }
+
   if (browserErrors.length > 0) {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
 
-  console.log("Browser journey passed: gateway/moniker/hub, FSM lifecycle, Movement Lab keyboard inspection, Replay Lab transport/mobile layout, and ProtocolAi clipboard preview.");
+  console.log("Browser journey passed: gateway/moniker/hub, FSM lifecycle, Movement Lab keyboard inspection, Replay Lab transport/mobile layout, ProtocolAi clipboard preview, and Singularity Studios reusable stage-data proof.");
 } finally {
   await browser.close();
 }
