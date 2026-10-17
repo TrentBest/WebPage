@@ -18,6 +18,12 @@ The first repository-owned showcase artifacts are now in [TheSingularityWorkshop
 
 These are the beginning of the move, not yet the runtime source consumed by WebPage. Keep the current in-host manifest/content until the replacement has been exercised and validated; avoid a premature delete-and-break migration.
 
+## Repository integration boundary verified
+
+The Experience repository's source key is `workshop-showcase`; its numeric Experience ID is intentionally pending reservation. The current MicroBundleRepository core already defines `ExperienceArtifactAddress`, `ExperienceArtifact`, and `IExperienceCatalog`, but its REST host currently exposes health/list/get/put routes for MicroBundle artifacts only—not an Experience manifest/publication endpoint. WebPage cannot truthfully claim to load the Experience-owned manifest through MicroBundleRepository until that delivery contract is exposed and connected.
+
+Do not work around this by treating an arbitrary GitHub URL as trusted executable authority. The host needs a configured Experience source/publication address, immutable version/hash validation, and the existing repository boundary for executable MicroBundle artifacts.
+
 ## Current WebPage debt confirmed from source
 
 - `WorkshopExperienceService.InitializeAsync` loads `wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json` by default.
