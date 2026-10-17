@@ -20,6 +20,7 @@
             <button class="view-button @(_viewMode == "isometric" ? "active" : "")" aria-pressed="@(_viewMode == "isometric")" @onclick='() => SetViewMode("isometric")'>01 / CITY OVERVIEW</button>
             <button class="view-button @(_viewMode == "plan" ? "active" : "")" aria-pressed="@(_viewMode == "plan")" @onclick='() => SetViewMode("plan")'>02 / TOP-DOWN PLAN</button>
             <button class="view-button @(_viewMode == "street" ? "active" : "")" aria-pressed="@(_viewMode == "street")" @onclick='() => SetViewMode("street")'>03 / STREET VIEW</button>
+            <button class="view-button @(_viewMode == "pipeline" ? "active" : "")" aria-pressed="@(_viewMode == "pipeline")" disabled="@(!PipelineAvailable)" @onclick='() => SetViewMode("pipeline")'>04 / RENDERER → VISUALIZE</button>
         </div>
     </header>
 
@@ -58,7 +59,24 @@
 
     <section class="lab-stage" aria-label="Procedural city model">
         <div class="stage-topline"><span>@ViewTitle</span><span>ONE DETERMINISTIC WORLD · @Buildings.Count STRUCTURES · @(_viewMode == "street" ? "CAMERA " + CameraX.ToString("0.0") + "," + CameraZ.ToString("0.0") + " / YAW " + CameraYaw.ToString("0") + "°" : "STABLE BUILDING IDS")</span></div>
-        @if (_viewMode == "street")
+        @if (_viewMode == "pipeline")
+        {
+            <div class="pipeline-readout">
+                <span class="lab-eyebrow">REAL FRAME PATH / RENDERER → FRAME ADAPTER → VISUALIZE → GUI.SVG</span>
+                <p>@_pipelineStatus</p>
+            </div>
+            @if (PipelineAvailable && !string.IsNullOrWhiteSpace(_pipelineSvg))
+            {
+                <div class="pipeline-surface" role="img" aria-label="City buildings manifested from Renderer draw commands through Visualize and GUI.SVG">
+                    @((MarkupString)_pipelineSvg)
+                </div>
+            }
+            else
+            {
+                <div class="pipeline-unavailable">The live pipeline view is available in repository-source mode. The existing city views remain the host-side SVG prototype.</div>
+            }
+        }
+        else if (_viewMode == "street")
         {
             <div class="camera-controls" role="group" aria-label="Move the first-person observer">
                 <button @onclick="TurnLeft" aria-label="Turn left">↶ TURN</button>
@@ -228,7 +246,7 @@
 .city-lab.metro{--bg:#101821;--panel:#18232b;--ink:#f0eee8;--muted:#aeb9bc;--line:#52616a;--accent:#f4bb68;--accent2:#76c9d1;--ground:#27353c}
 .city-lab.solarpunk{--bg:#edf4e9;--panel:#dce9dc;--ink:#19372f;--muted:#506d62;--line:#a8c7b5;--accent:#1d8065;--accent2:#d28b46;--ground:#d4e7d9}
 .lab-header{max-width:1500px;margin:0 auto 1.5rem}.lab-back,.lab-footer a{color:var(--accent);text-decoration:none;font-weight:800;font-size:.72rem;letter-spacing:.14em}.lab-eyebrow{font-size:.68rem;letter-spacing:.18em;color:var(--accent);font-weight:800;margin-top:1.2rem}.lab-header h1{font-size:clamp(2.6rem,7vw,6.4rem);line-height:.94;letter-spacing:-.065em;margin:.6rem 0 1rem}.lab-header h1 em{color:var(--accent);font-style:normal}.lab-header>p{max-width:780px;color:var(--muted);font-size:1.05rem;line-height:1.65}.lab-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1.5rem}.skin-button{display:grid;grid-template-columns:3rem 1fr;grid-template-rows:auto auto;gap:.15rem .8rem;text-align:left;padding:1rem;background:var(--panel);border:1px solid var(--line);color:var(--ink);cursor:pointer}.skin-button>span{grid-row:1/3;width:3rem;height:3rem;border-radius:50%;border:3px solid var(--accent);background:linear-gradient(135deg,#060912,#ff2dd0,#00eaff)}.skin-button.metro>span{background:linear-gradient(135deg,#26343c,#f2ba6a,#76c9d1);border-color:#f4bb68}.skin-button.solarpunk>span{background:linear-gradient(135deg,#edf4e9,#7ab99b,#d28b46);border-color:#1d8065}.skin-button strong{font-size:.78rem;letter-spacing:.08em}.skin-button small{color:var(--muted);font-size:.75rem}.skin-button.active{border-color:var(--accent);box-shadow:inset 0 -3px var(--accent)}.city-history{max-width:1500px;margin:1rem auto 1.25rem;padding:clamp(1rem,3vw,2rem);background:var(--panel);border:1px solid var(--line)}.history-heading h2{font-size:clamp(1.6rem,4vw,3.2rem);line-height:1.05;letter-spacing:-.04em;margin:.5rem 0}.history-heading>p{max-width:900px;color:var(--muted);line-height:1.65}.history-timeline{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1.5rem 0}.era-button{min-height:115px;display:flex;flex-direction:column;align-items:flex-start;gap:.45rem;padding:.85rem;background:var(--bg);border:1px solid var(--line);border-top:3px solid var(--line);color:var(--ink);text-align:left;cursor:pointer}.era-button.active,.era-button:focus-visible{border-color:var(--accent);border-top-color:var(--accent);outline:none}.era-year{font:800 .7rem ui-monospace,monospace;color:var(--accent);letter-spacing:.08em}.era-button strong{font-size:.83rem;line-height:1.2}.era-button small{margin-top:auto;color:var(--muted);font-size:.62rem;line-height:1.4}.history-chapter{display:grid;grid-template-columns:minmax(150px,.7fr) minmax(0,2fr);gap:1.5rem;padding:1.25rem 0 0;border-top:1px solid var(--line)}.chapter-era{display:flex;flex-direction:column;align-items:flex-start;gap:.4rem}.chapter-era span{font:800 .85rem ui-monospace,monospace;color:var(--accent)}.chapter-era strong{font-size:1.35rem;line-height:1.1}.chapter-era small{color:var(--muted);font-size:.68rem;letter-spacing:.08em}.chapter-summary{font-size:1rem;line-height:1.7;margin-top:0}.chapter-story dl{display:grid;gap:.65rem}.chapter-story dl>div{display:grid;grid-template-columns:minmax(115px,.5fr) minmax(0,2fr);gap:1rem}.chapter-story dt{font-size:.62rem;letter-spacing:.12em;font-weight:900;color:var(--accent)}.chapter-story dd{margin:0;color:var(--muted);font-size:.82rem;line-height:1.6}.chapter-boundary{padding:.7rem .9rem;border-left:3px solid var(--accent2);font-size:.72rem;line-height:1.55;color:var(--muted)}
-.view-controls{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:1rem;padding:.8rem 0;border-top:1px solid var(--line)}.view-controls .lab-eyebrow{margin:0 1rem 0 0}.view-button,.camera-controls button{padding:.7rem .85rem;background:var(--panel);border:1px solid var(--line);color:var(--ink);font:800 .65rem ui-monospace,monospace;letter-spacing:.06em;cursor:pointer}.view-button.active,.view-button:focus-visible{border-color:var(--accent);box-shadow:inset 0 -3px var(--accent);outline:none}.lab-stage{max-width:1500px;margin:0 auto;background:var(--panel);border:1px solid var(--line);overflow:hidden}.camera-controls{display:flex;gap:.4rem;flex-wrap:wrap;padding:.7rem 1rem;background:var(--bg)}.camera-controls button:hover{border-color:var(--accent);color:var(--accent)}.street-render{height:auto;min-height:420px}.street-road{fill:var(--ground);stroke:var(--accent);stroke-opacity:.25;stroke-width:2}.street-lane{fill:none;stroke:var(--accent);stroke-opacity:.4;stroke-width:2;stroke-dasharray:9 12}.street-curb{fill:none;stroke:var(--accent2);stroke-opacity:.5;stroke-width:3}.street-building rect{fill:var(--accent);fill-opacity:.32;stroke:var(--accent);stroke-opacity:.7;stroke-width:1}.street-building.tower rect,.street-building.landmark rect{fill:var(--accent2);fill-opacity:.48;stroke:var(--accent2)}.street-building path{fill:none;stroke:var(--ink);stroke-opacity:.6;stroke-width:1}.street-hud{fill:var(--accent);font:700 12px ui-monospace,monospace;letter-spacing:1px}.plan-ground{fill:var(--ground)}.plan-grid{fill:none;stroke:var(--accent);stroke-opacity:.14;stroke-width:.7}.plan-district-label{fill:var(--accent2);font:700 10px ui-monospace,monospace;letter-spacing:1px;opacity:.8}.plan-building{fill:var(--accent);fill-opacity:.65;stroke:var(--accent);stroke-width:.7}.plan-building.tower,.plan-building.landmark{fill:var(--accent2);fill-opacity:.9;stroke:var(--ink)}.plan-building.lowrise{fill:var(--accent);fill-opacity:.4}.plan-observer circle{fill:var(--panel);stroke:var(--accent2);stroke-width:2}.plan-observer path{fill:var(--accent2)}.plan-map-label{fill:var(--muted);font:700 10px ui-monospace,monospace;letter-spacing:1px}.stage-topline,.stage-footer{display:flex;justify-content:space-between;gap:1rem;padding:.85rem 1rem;color:var(--muted);font:700 .63rem/1.5 ui-monospace,monospace;letter-spacing:.1em}.city-render{display:block;width:100%;height:auto;min-height:350px;background:var(--ground)}.ground-grid{stroke:var(--accent);stroke-opacity:.17}.atmosphere-top{stop-color:var(--panel)}.atmosphere-bottom{stop-color:var(--ground)}.district-plane{fill:var(--accent);fill-opacity:.035;stroke:var(--accent);stroke-opacity:.2;stroke-width:1.1;stroke-dasharray:5 7}.district-label{fill:var(--muted);font-size:11px;font-weight:800;letter-spacing:2px;opacity:.75}.city-road{fill:none;stroke:var(--accent);stroke-opacity:.23;stroke-width:2;stroke-dasharray:4 5}.building-left{fill:var(--accent);fill-opacity:.3;stroke:var(--accent);stroke-opacity:.4;stroke-width:.65}.building-right{fill:var(--accent2);fill-opacity:.32;stroke:var(--accent2);stroke-opacity:.5;stroke-width:.65}.building-roof{fill:var(--ink);fill-opacity:.72;stroke:var(--accent);stroke-opacity:.7;stroke-width:.65}.building-windows{fill:none;stroke:var(--ink);stroke-opacity:.6;stroke-width:.7}.building.landmark .building-roof{fill:var(--accent);fill-opacity:.95}.building-crown{fill:var(--accent2);fill-opacity:.8;stroke:var(--ink);stroke-opacity:.6;stroke-width:.7}.metro .building-left{fill:#7f9ca4;fill-opacity:.55}.metro .building-right{fill:#d6a86e;fill-opacity:.5}.metro .building-roof{fill:#d9e0d9;fill-opacity:.78}.metro .building-windows{stroke:#283944;stroke-opacity:.9}.solarpunk .building-left{fill:#5d9e7c;fill-opacity:.55}.solarpunk .building-right{fill:#d28b46;fill-opacity:.35}.solarpunk .building-roof{fill:#b7d9c0;fill-opacity:.95}.solarpunk .building-windows{stroke:#2f6a56;stroke-opacity:.85}.solarpunk .building-crown{fill:#8ccda0}.anchor-halo{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:3 4}.anchor-core{fill:var(--accent);stroke:var(--ink);stroke-width:1}.anchor-cross{stroke:var(--accent);stroke-width:1.4}.anchor-label{font:800 11px ui-monospace,monospace;fill:var(--ink);letter-spacing:1.5px}.anchor-subtitle{font:700 7px ui-monospace,monospace;fill:var(--accent);letter-spacing:1px}.lab-readout{max-width:1500px;margin:1rem auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}.readout-card{padding:1rem;background:var(--panel);border:1px solid var(--line)}.readout-label{display:block;color:var(--accent);font-size:.6rem;font-weight:800;letter-spacing:.14em}.readout-card>strong{display:block;font-size:clamp(1.5rem,3vw,2.6rem);margin:.6rem 0}.readout-card strong small{font-size:.8rem;color:var(--muted)}.readout-card p{margin:0;color:var(--muted);font-size:.75rem;line-height:1.5}.density-panel{max-width:1500px;margin:0 auto;padding:clamp(1rem,3vw,2rem);border:1px solid var(--line);background:var(--panel)}.density-panel h2{font-size:clamp(1.4rem,3vw,2.5rem);margin:.4rem 0}.density-panel p{max-width:850px;color:var(--muted);line-height:1.65}.density-panel label{display:flex;justify-content:space-between;gap:1rem;margin-top:1.5rem;font-size:.85rem}.density-panel input,.density-panel select{width:100%;accent-color:var(--accent);margin-top:1rem;padding:.7rem;background:var(--bg);border:1px solid var(--line);color:var(--ink)}.profile-facts{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.2rem;margin-top:.7rem;padding:.8rem;background:var(--bg);border-left:3px solid var(--accent)}.profile-facts strong{font-size:.85rem}.profile-facts span,.profile-facts a{font-size:.72rem;color:var(--muted)}.profile-facts a{color:var(--accent)}.model-source{font-size:.78rem!important}.model-source a{color:var(--accent);font-weight:800}.density-scale{display:flex;justify-content:space-between;color:var(--muted);font-size:.7rem}.model-boundary{border-left:3px solid var(--accent2);padding-left:1rem;font-size:.76rem!important}.lab-footer{max-width:1500px;margin:1.5rem auto;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;color:var(--muted);font-size:.65rem;letter-spacing:.1em}.reference-studies{max-width:1500px;margin:1rem auto;padding:clamp(1rem,3vw,2rem);border:1px solid var(--line);background:var(--panel)}.reference-studies h2{font-size:clamp(1.4rem,3vw,2.4rem);margin:.5rem 0 1rem}.reference-studies>p{max-width:850px;color:var(--muted);line-height:1.6;font-size:.8rem}.reference-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}.reference-links a{display:grid;gap:.5rem;padding:1rem;border:1px solid var(--line);color:var(--ink);text-decoration:none}.reference-links a:hover,.reference-links a:focus-visible{border-color:var(--accent)}.reference-links a strong{color:var(--accent)}.reference-links a span{color:var(--muted);font-size:.78rem;line-height:1.5}@@media(max-width:980px){.history-timeline{grid-template-columns:repeat(3,minmax(0,1fr))}}@@media(max-width:760px){.history-timeline{grid-template-columns:repeat(2,minmax(0,1fr))}.history-chapter{grid-template-columns:1fr}.chapter-story dl>div{grid-template-columns:1fr;gap:.25rem}.lab-controls{grid-template-columns:1fr}.reference-links{grid-template-columns:1fr}.lab-readout{grid-template-columns:repeat(2,minmax(0,1fr))}.stage-topline,.stage-footer{font-size:.52rem}.city-render{min-height:240px}.density-panel label{display:grid}.lab-footer{line-height:1.6}}@@media(prefers-reduced-motion:reduce){.skin-button{transition:none}}
+.view-controls{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:1rem;padding:.8rem 0;border-top:1px solid var(--line)}.view-controls .lab-eyebrow{margin:0 1rem 0 0}.view-button,.camera-controls button{padding:.7rem .85rem;background:var(--panel);border:1px solid var(--line);color:var(--ink);font:800 .65rem ui-monospace,monospace;letter-spacing:.06em;cursor:pointer}.view-button.active,.view-button:focus-visible{border-color:var(--accent);box-shadow:inset 0 -3px var(--accent);outline:none}.lab-stage{max-width:1500px;margin:0 auto;background:var(--panel);border:1px solid var(--line);overflow:hidden}.pipeline-readout{padding:.75rem 1rem;background:var(--bg);border-bottom:1px solid var(--line)}.pipeline-readout p{margin:.45rem 0 0;color:var(--muted);font:700 .7rem/1.6 ui-monospace,monospace}.pipeline-surface{width:100%;background:#07131d}.pipeline-surface svg{display:block;width:100%;height:auto;max-height:760px}.pipeline-unavailable{padding:2rem;color:var(--muted);line-height:1.6}.view-button:disabled{opacity:.4;cursor:not-allowed}.camera-controls{display:flex;gap:.4rem;flex-wrap:wrap;padding:.7rem 1rem;background:var(--bg)}.camera-controls button:hover{border-color:var(--accent);color:var(--accent)}.street-render{height:auto;min-height:420px}.street-road{fill:var(--ground);stroke:var(--accent);stroke-opacity:.25;stroke-width:2}.street-lane{fill:none;stroke:var(--accent);stroke-opacity:.4;stroke-width:2;stroke-dasharray:9 12}.street-curb{fill:none;stroke:var(--accent2);stroke-opacity:.5;stroke-width:3}.street-building rect{fill:var(--accent);fill-opacity:.32;stroke:var(--accent);stroke-opacity:.7;stroke-width:1}.street-building.tower rect,.street-building.landmark rect{fill:var(--accent2);fill-opacity:.48;stroke:var(--accent2)}.street-building path{fill:none;stroke:var(--ink);stroke-opacity:.6;stroke-width:1}.street-hud{fill:var(--accent);font:700 12px ui-monospace,monospace;letter-spacing:1px}.plan-ground{fill:var(--ground)}.plan-grid{fill:none;stroke:var(--accent);stroke-opacity:.14;stroke-width:.7}.plan-district-label{fill:var(--accent2);font:700 10px ui-monospace,monospace;letter-spacing:1px;opacity:.8}.plan-building{fill:var(--accent);fill-opacity:.65;stroke:var(--accent);stroke-width:.7}.plan-building.tower,.plan-building.landmark{fill:var(--accent2);fill-opacity:.9;stroke:var(--ink)}.plan-building.lowrise{fill:var(--accent);fill-opacity:.4}.plan-observer circle{fill:var(--panel);stroke:var(--accent2);stroke-width:2}.plan-observer path{fill:var(--accent2)}.plan-map-label{fill:var(--muted);font:700 10px ui-monospace,monospace;letter-spacing:1px}.stage-topline,.stage-footer{display:flex;justify-content:space-between;gap:1rem;padding:.85rem 1rem;color:var(--muted);font:700 .63rem/1.5 ui-monospace,monospace;letter-spacing:.1em}.city-render{display:block;width:100%;height:auto;min-height:350px;background:var(--ground)}.ground-grid{stroke:var(--accent);stroke-opacity:.17}.atmosphere-top{stop-color:var(--panel)}.atmosphere-bottom{stop-color:var(--ground)}.district-plane{fill:var(--accent);fill-opacity:.035;stroke:var(--accent);stroke-opacity:.2;stroke-width:1.1;stroke-dasharray:5 7}.district-label{fill:var(--muted);font-size:11px;font-weight:800;letter-spacing:2px;opacity:.75}.city-road{fill:none;stroke:var(--accent);stroke-opacity:.23;stroke-width:2;stroke-dasharray:4 5}.building-left{fill:var(--accent);fill-opacity:.3;stroke:var(--accent);stroke-opacity:.4;stroke-width:.65}.building-right{fill:var(--accent2);fill-opacity:.32;stroke:var(--accent2);stroke-opacity:.5;stroke-width:.65}.building-roof{fill:var(--ink);fill-opacity:.72;stroke:var(--accent);stroke-opacity:.7;stroke-width:.65}.building-windows{fill:none;stroke:var(--ink);stroke-opacity:.6;stroke-width:.7}.building.landmark .building-roof{fill:var(--accent);fill-opacity:.95}.building-crown{fill:var(--accent2);fill-opacity:.8;stroke:var(--ink);stroke-opacity:.6;stroke-width:.7}.metro .building-left{fill:#7f9ca4;fill-opacity:.55}.metro .building-right{fill:#d6a86e;fill-opacity:.5}.metro .building-roof{fill:#d9e0d9;fill-opacity:.78}.metro .building-windows{stroke:#283944;stroke-opacity:.9}.solarpunk .building-left{fill:#5d9e7c;fill-opacity:.55}.solarpunk .building-right{fill:#d28b46;fill-opacity:.35}.solarpunk .building-roof{fill:#b7d9c0;fill-opacity:.95}.solarpunk .building-windows{stroke:#2f6a56;stroke-opacity:.85}.solarpunk .building-crown{fill:#8ccda0}.anchor-halo{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:3 4}.anchor-core{fill:var(--accent);stroke:var(--ink);stroke-width:1}.anchor-cross{stroke:var(--accent);stroke-width:1.4}.anchor-label{font:800 11px ui-monospace,monospace;fill:var(--ink);letter-spacing:1.5px}.anchor-subtitle{font:700 7px ui-monospace,monospace;fill:var(--accent);letter-spacing:1px}.lab-readout{max-width:1500px;margin:1rem auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}.readout-card{padding:1rem;background:var(--panel);border:1px solid var(--line)}.readout-label{display:block;color:var(--accent);font-size:.6rem;font-weight:800;letter-spacing:.14em}.readout-card>strong{display:block;font-size:clamp(1.5rem,3vw,2.6rem);margin:.6rem 0}.readout-card strong small{font-size:.8rem;color:var(--muted)}.readout-card p{margin:0;color:var(--muted);font-size:.75rem;line-height:1.5}.density-panel{max-width:1500px;margin:0 auto;padding:clamp(1rem,3vw,2rem);border:1px solid var(--line);background:var(--panel)}.density-panel h2{font-size:clamp(1.4rem,3vw,2.5rem);margin:.4rem 0}.density-panel p{max-width:850px;color:var(--muted);line-height:1.65}.density-panel label{display:flex;justify-content:space-between;gap:1rem;margin-top:1.5rem;font-size:.85rem}.density-panel input,.density-panel select{width:100%;accent-color:var(--accent);margin-top:1rem;padding:.7rem;background:var(--bg);border:1px solid var(--line);color:var(--ink)}.profile-facts{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.2rem;margin-top:.7rem;padding:.8rem;background:var(--bg);border-left:3px solid var(--accent)}.profile-facts strong{font-size:.85rem}.profile-facts span,.profile-facts a{font-size:.72rem;color:var(--muted)}.profile-facts a{color:var(--accent)}.model-source{font-size:.78rem!important}.model-source a{color:var(--accent);font-weight:800}.density-scale{display:flex;justify-content:space-between;color:var(--muted);font-size:.7rem}.model-boundary{border-left:3px solid var(--accent2);padding-left:1rem;font-size:.76rem!important}.lab-footer{max-width:1500px;margin:1.5rem auto;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;color:var(--muted);font-size:.65rem;letter-spacing:.1em}.reference-studies{max-width:1500px;margin:1rem auto;padding:clamp(1rem,3vw,2rem);border:1px solid var(--line);background:var(--panel)}.reference-studies h2{font-size:clamp(1.4rem,3vw,2.4rem);margin:.5rem 0 1rem}.reference-studies>p{max-width:850px;color:var(--muted);line-height:1.6;font-size:.8rem}.reference-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}.reference-links a{display:grid;gap:.5rem;padding:1rem;border:1px solid var(--line);color:var(--ink);text-decoration:none}.reference-links a:hover,.reference-links a:focus-visible{border-color:var(--accent)}.reference-links a strong{color:var(--accent)}.reference-links a span{color:var(--muted);font-size:.78rem;line-height:1.5}@@media(max-width:980px){.history-timeline{grid-template-columns:repeat(3,minmax(0,1fr))}}@@media(max-width:760px){.history-timeline{grid-template-columns:repeat(2,minmax(0,1fr))}.history-chapter{grid-template-columns:1fr}.chapter-story dl>div{grid-template-columns:1fr;gap:.25rem}.lab-controls{grid-template-columns:1fr}.reference-links{grid-template-columns:1fr}.lab-readout{grid-template-columns:repeat(2,minmax(0,1fr))}.stage-topline,.stage-footer{font-size:.52rem}.city-render{min-height:240px}.density-panel label{display:grid}.lab-footer{line-height:1.6}}@@media(prefers-reduced-motion:reduce){.skin-button{transition:none}}
 </style>
 
 @code {
@@ -245,13 +263,187 @@
     };
     private string StageLeftLabel => _viewMode switch { "plan" => "TOP-DOWN / SPATIAL INDEX", "street" => "STREET / OBSERVER-RELATIVE", _ => "OBSERVE THE WHOLE" };
     private string StageRightLabel => _viewMode switch { "plan" => "SELECT A DIFFERENT VIEW", "street" => "MOVE / TURN THE OBSERVER", _ => "ZOOM INTO A DISTRICT NEXT" };
-    private void SetViewMode(string mode) => _viewMode = mode;
-    private void MoveForward() { CameraZ = Math.Min(16.5, CameraZ + .75); }
-    private void MoveBack() { CameraZ = Math.Max(.5, CameraZ - .75); }
-    private void MoveLeft() { CameraX = Math.Max(.5, CameraX - .75); }
-    private void MoveRight() { CameraX = Math.Min(21.5, CameraX + .75); }
-    private void TurnLeft() { CameraYaw = (CameraYaw - 12 + 360) % 360; }
-    private void TurnRight() { CameraYaw = (CameraYaw + 12) % 360; }
+    private string _pipelineSvg = string.Empty;
+    private string _pipelineStatus = "Select this view to submit the city snapshot through Renderer and Visualize.";
+    private bool PipelineAvailable
+    {
+        get
+        {
+#if WORKSHOP_USE_REPOSITORY_SOURCES
+            return true;
+#else
+            return false;
+#endif
+        }
+    }
+
+    private async Task SetViewMode(string mode)
+    {
+        _viewMode = mode;
+        if (mode == "pipeline" && PipelineAvailable)
+            await RenderPipelineAsync();
+    }
+
+    private async Task MoveForward()
+    {
+        CameraZ = Math.Min(16.5, CameraZ + .75);
+        await RefreshPipelineIfActive();
+    }
+    private async Task MoveBack()
+    {
+        CameraZ = Math.Max(.5, CameraZ - .75);
+        await RefreshPipelineIfActive();
+    }
+    private async Task MoveLeft()
+    {
+        CameraX = Math.Max(.5, CameraX - .75);
+        await RefreshPipelineIfActive();
+    }
+    private async Task MoveRight()
+    {
+        CameraX = Math.Min(21.5, CameraX + .75);
+        await RefreshPipelineIfActive();
+    }
+    private async Task TurnLeft()
+    {
+        CameraYaw = (CameraYaw - 12 + 360) % 360;
+        await RefreshPipelineIfActive();
+    }
+    private async Task TurnRight()
+    {
+        CameraYaw = (CameraYaw + 12) % 360;
+        await RefreshPipelineIfActive();
+    }
+
+    private Task RefreshPipelineIfActive() =>
+        _viewMode == "pipeline" && PipelineAvailable ? RenderPipelineAsync() : Task.CompletedTask;
+
+    private async Task RenderPipelineAsync()
+    {
+#if WORKSHOP_USE_REPOSITORY_SOURCES
+        _pipelineStatus = "Building stable entity candidates and reducing each entity to the observer-selected detail ceiling…";
+        var catalog = new TheSingularityWorkshop.Visualize.VisualizerResourceCatalog();
+        var geometrySizes = new (float Width, float Height)[]
+        {
+            (0.006f, 0.006f), // Semantic
+            (0.011f, 0.009f), // Aggregate
+            (0.017f, 0.013f), // Distant
+            (0.023f, 0.017f), // Near
+            (0.029f, 0.021f)  // Interactive
+        };
+        var colors = new[]
+        {
+            new System.Numerics.Vector4(0.48f, 0.62f, 0.70f, 1f),
+            new System.Numerics.Vector4(0.66f, 0.40f, 0.88f, 1f),
+            new System.Numerics.Vector4(0.95f, 0.64f, 0.30f, 1f),
+            new System.Numerics.Vector4(0.16f, 0.72f, 0.92f, 1f),
+            new System.Numerics.Vector4(0.22f, 0.95f, 0.80f, 1f)
+        };
+        for (var i = 0; i < 5; i++)
+        {
+            var geometryId = new TheSingularityWorkshop.Visualize.VisualizerResourceId((ulong)(i + 1));
+            var materialId = new TheSingularityWorkshop.Visualize.VisualizerResourceId((ulong)(i + 11));
+            catalog.SetGeometry(geometryId, CreatePipelineQuad());
+            catalog.SetMaterial(materialId, new TheSingularityWorkshop.Visualize.VisualizerMaterial(1, colors[i]));
+        }
+
+        var policy = new TheSingularityWorkshop.Renderer.ObserverRepresentationPolicy(
+        [
+            new TheSingularityWorkshop.Renderer.RepresentationHorizonRule(
+                new TheSingularityWorkshop.Renderer.EventHorizon("Interactive", 0.18, 16),
+                TheSingularityWorkshop.Renderer.RepresentationTarget.Interactive),
+            new TheSingularityWorkshop.Renderer.RepresentationHorizonRule(
+                new TheSingularityWorkshop.Renderer.EventHorizon("Near", 0.32, 8),
+                TheSingularityWorkshop.Renderer.RepresentationTarget.Near),
+            new TheSingularityWorkshop.Renderer.RepresentationHorizonRule(
+                new TheSingularityWorkshop.Renderer.EventHorizon("Distant", 0.52, 4),
+                TheSingularityWorkshop.Renderer.RepresentationTarget.Distant),
+            new TheSingularityWorkshop.Renderer.RepresentationHorizonRule(
+                new TheSingularityWorkshop.Renderer.EventHorizon("Aggregate", 0.85, 2),
+                TheSingularityWorkshop.Renderer.RepresentationTarget.Aggregate),
+            new TheSingularityWorkshop.Renderer.RepresentationHorizonRule(
+                new TheSingularityWorkshop.Renderer.EventHorizon("Semantic", 10, 1),
+                TheSingularityWorkshop.Renderer.RepresentationTarget.Semantic)
+        ]);
+
+        var selectedCommands = new List<TheSingularityWorkshop.Renderer.RenderDrawCommand>();
+        var inputCount = 0;
+        foreach (var building in Buildings)
+        {
+            var worldX = (float)((building.GridX - 10.5) / 12d);
+            var worldY = (float)((8.5 - building.GridZ) / 10d);
+            var dx = building.GridX - CameraX;
+            var dz = building.GridZ - CameraZ;
+            var distance = Math.Sqrt(dx * dx + dz * dz) / 10d;
+            var ceiling = ToRendererRepresentation(policy.Select(distance).Representation);
+            var entityId = new TheSingularityWorkshop.Renderer.RenderEntityId((ulong)building.Id);
+            var candidates = new List<TheSingularityWorkshop.Renderer.RenderDrawCommand>(5);
+            for (var level = 0; level < 5; level++)
+            {
+                var size = geometrySizes[level];
+                var transform = System.Numerics.Matrix4x4.CreateScale(size.Width, size.Height, 1f) *
+                    System.Numerics.Matrix4x4.CreateTranslation(worldX, worldY, 0f);
+                candidates.Add(new TheSingularityWorkshop.Renderer.RenderDrawCommand(
+                    new TheSingularityWorkshop.Renderer.RenderResourceId((ulong)(level + 1)),
+                    new TheSingularityWorkshop.Renderer.RenderResourceId((ulong)(level + 11)),
+                    transform,
+                    6,
+                    0,
+                    0,
+                    (TheSingularityWorkshop.Renderer.RendererRepresentation)level,
+                    entity: entityId));
+            }
+
+            inputCount += candidates.Count;
+            var reduced = TheSingularityWorkshop.Renderer.RenderCommandReducer.Reduce(candidates, ceiling);
+            selectedCommands.AddRange(reduced.Commands);
+        }
+
+        var frame = new TheSingularityWorkshop.Renderer.RenderFrame(
+            new TheSingularityWorkshop.Renderer.RenderView(
+                new System.Numerics.Vector3((float)((CameraX - 10.5) / 12d), (float)((8.5 - CameraZ) / 10d), 0f),
+                System.Numerics.Matrix4x4.Identity,
+                System.Numerics.Matrix4x4.Identity),
+            selectedCommands);
+        await using var visualizer = new TheSingularityWorkshop.Visualize.Visualizer(
+            new TheSingularityWorkshop.Visualize.GuiSvg.GuiSvgVisualizerBackend(
+                svg => _pipelineSvg = svg,
+                sceneLabel: "Singularity City · Renderer reduction → Visualize frame adapter → GUI.SVG",
+                backgroundColor: "#07131d",
+                gridColor: "#234657"),
+            catalog);
+        await visualizer.RenderAsync(frame, new TheSingularityWorkshop.Renderer.VisualizeAdapter.RendererFrameAdapter());
+        var representationCounts = string.Join(" · ", selectedCommands
+            .GroupBy(command => command.Representation)
+            .OrderBy(group => group.Key)
+            .Select(group => $"{group.Key} {group.Count()}"));
+        _pipelineStatus = $"Stable buildings {Buildings.Count} · candidate commands {inputCount:N0} → submitted {selectedCommands.Count:N0} · reduced {inputCount - selectedCommands.Count:N0} · {representationCounts} · CPU SVG proof, not GPU rendering.";
+#else
+        await Task.CompletedTask;
+        _pipelineStatus = "Repository-source mode is required to use the Renderer → Visualize → GUI.SVG integration.";
+#endif
+    }
+
+#if WORKSHOP_USE_REPOSITORY_SOURCES
+    private static TheSingularityWorkshop.Visualize.VisualizerGeometry CreatePipelineQuad() => new(1,
+    [
+        new TheSingularityWorkshop.Visualize.VisualizerVertex(new System.Numerics.Vector3(-0.5f, -0.5f, 0), System.Numerics.Vector3.UnitZ, System.Numerics.Vector2.Zero, System.Numerics.Vector4.One),
+        new TheSingularityWorkshop.Visualize.VisualizerVertex(new System.Numerics.Vector3(-0.5f, 0.5f, 0), System.Numerics.Vector3.UnitZ, System.Numerics.Vector2.Zero, System.Numerics.Vector4.One),
+        new TheSingularityWorkshop.Visualize.VisualizerVertex(new System.Numerics.Vector3(0.5f, 0.5f, 0), System.Numerics.Vector3.UnitZ, System.Numerics.Vector2.Zero, System.Numerics.Vector4.One),
+        new TheSingularityWorkshop.Visualize.VisualizerVertex(new System.Numerics.Vector3(0.5f, -0.5f, 0), System.Numerics.Vector3.UnitZ, System.Numerics.Vector2.Zero, System.Numerics.Vector4.One)
+    ], [0, 1, 2, 0, 2, 3]);
+
+    private static TheSingularityWorkshop.Renderer.RendererRepresentation ToRendererRepresentation(
+        TheSingularityWorkshop.Renderer.RepresentationTarget target) => target switch
+    {
+        TheSingularityWorkshop.Renderer.RepresentationTarget.Semantic => TheSingularityWorkshop.Renderer.RendererRepresentation.Semantic,
+        TheSingularityWorkshop.Renderer.RepresentationTarget.Aggregate => TheSingularityWorkshop.Renderer.RendererRepresentation.Aggregate,
+        TheSingularityWorkshop.Renderer.RepresentationTarget.Distant => TheSingularityWorkshop.Renderer.RendererRepresentation.Distant,
+        TheSingularityWorkshop.Renderer.RepresentationTarget.Near => TheSingularityWorkshop.Renderer.RendererRepresentation.Near,
+        TheSingularityWorkshop.Renderer.RepresentationTarget.Interactive => TheSingularityWorkshop.Renderer.RendererRepresentation.Interactive,
+        _ => throw new ArgumentOutOfRangeException(nameof(target), target, "Unknown representation target.")
+    };
+#endif
 
     private sealed record StreetBuilding(int Id, string Kind, double Depth, double X, double Top, double Width, double Height, string Windows);
     private List<StreetBuilding> StreetBuildings
@@ -331,7 +523,7 @@
     private void SelectNoirSkin() => SetSkin("noir");
     private void SelectMetroSkin() => SetSkin("metro");
     private void SelectHarmonySkin() => SetSkin("solarpunk");
-    private void OnDensityChanged(ChangeEventArgs args)
+    private async Task OnDensityChanged(ChangeEventArgs args)
     {
         if (int.TryParse(args.Value?.ToString(), out var density))
         {
@@ -339,10 +531,11 @@
             _selectedEra = "custom";
             SetDensity(density);
             StateHasChanged();
+            await RefreshPipelineIfActive();
         }
     }
 
-    private void ApplySelectedProfile()
+    private async Task ApplySelectedProfile()
     {
         _selectedEra = "custom";
         if (CityProfiles.FirstOrDefault(profile => profile.Id == _selectedProfile) is { } profile)
@@ -352,9 +545,10 @@
         else if (_selectedProfile == "arcology")
             SetDensity(50000);
         StateHasChanged();
+        await RefreshPipelineIfActive();
     }
 
-    private void SelectEra(string eraId)
+    private async Task SelectEra(string eraId)
     {
         _selectedEra = eraId;
         if (SelectedEra is { } era)
@@ -362,6 +556,7 @@
             _selectedProfile = era.Id == "modern" ? "manhattan" : "custom";
             SetDensity(era.DensityPerKm2);
         }
+        await RefreshPipelineIfActive();
     }
 
     private CityHistoryEra? SelectedEra => CityEras.FirstOrDefault(era => era.Id == _selectedEra);
