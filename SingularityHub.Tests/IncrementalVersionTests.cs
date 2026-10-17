@@ -396,4 +396,38 @@ public sealed class IncrementalVersionTests
         Assert.Contains("\"replay-lab\" or \"singularity-studios\" => 7", nav);
     }
 
+    [ArchitectureTest(0, 0, 203)] [Fact(DisplayName = "V0.0.203 — Welcome_Enters_The_Interactive_Workshop_Floorplan")]
+    public void V0_0_203WelcomeEntersTheInteractiveWorkshopFloorplan()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
+        var floorplan = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "WorkshopFloorplan.razor"));
+
+        Assert.Contains("OpenComponent<TheSingularityWorkshop.Components.WorkshopFloorplan>", home);
+        Assert.Contains("THE WORKSHOP // TOP-DOWN PLAN", floorplan);
+        Assert.Contains("CENTRAL HALL", floorplan);
+        Assert.Contains("THE FORGE", floorplan);
+        Assert.Contains("OBSERVATORY", floorplan);
+        Assert.Contains("WORLD GLOBE", floorplan);
+        Assert.Contains("CARTOGRAPHERS' DRAFTING WING", floorplan);
+        Assert.Contains("position:absolute;inset:0", floorplan);
+        Assert.Contains("overflow:hidden", floorplan);
+    }
+
+    [ArchitectureTest(0, 0, 204)] [Fact(DisplayName = "V0.0.204 — Workshop_Floorplan_Keeps_Conceptual_Tools_And_Optional_Voice_Honest")]
+    public void V0_0_204WorkshopFloorplanKeepsConceptualToolsAndOptionalVoiceHonest()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var floorplan = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "WorkshopFloorplan.razor"));
+        var docs = File.ReadAllText(Path.Combine(root, "docs", "WORKSHOP_FLOORPLAN_EXPERIENCE.md"));
+        var aboutUs = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "AboutUs.razor"));
+
+        Assert.Contains("VOICE ON", floorplan);
+        Assert.Contains("speechSynthesis", floorplan);
+        Assert.Contains("HandleRoomKey", floorplan);
+        Assert.Contains("The interactive celestial editor is a future capability.", floorplan);
+        Assert.Contains("Opening sound effects are **not yet wired**.", docs);
+        Assert.StartsWith("@page \"/about-us\"", aboutUs);
+    }
+
 }
