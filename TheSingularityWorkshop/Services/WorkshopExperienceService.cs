@@ -2,6 +2,7 @@ using TheSingularityWorkshop.FSM_COS;
 using DomainMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
 using TheSingularityWorkshop.Infrastructure.Hub;
 using HubBundle = TheSingularityWorkshop.SingularityHub.IMicroBundle;
+using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.Experiences;
 using TheSingularityWorkshop.Workshop.MicroBundles;
