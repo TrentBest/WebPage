@@ -1,6 +1,6 @@
 namespace TheSingularityWorkshop.Pages;
 
-internal sealed record RendererBrowserMark(double X, double Y, double Radius, string Color, string Representation);
+internal sealed record RendererBrowserMark(ulong EntityId, double X, double Y, double Radius, string Color, string Representation);
 
 internal sealed record RendererBrowserProofMetrics(
     int EntitiesRepresented,
@@ -60,6 +60,7 @@ internal sealed class RendererBrowserProof
                 _ => (2.0, "#ffffff")
             };
             return new RendererBrowserMark(
+                command.Entity.Value,
                 (command.WorldTransform.M41 + 1d) * 400d,
                 (command.WorldTransform.M42 + 1d) * 250d,
                 radius,
