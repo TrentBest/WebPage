@@ -87,7 +87,6 @@
 @code {
     private bool collapseNavMenu = true;
     private bool welcomeSelected;
-    private bool _hasSelectedDestination;
     private int _progressionStage;
 
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
@@ -123,7 +122,6 @@
             welcomeSelected = true;
 
         AdvanceProgressionForDestination(name);
-        _hasSelectedDestination = true;
         collapseNavMenu = true;
     }
 
@@ -166,30 +164,15 @@
             _hasSelectedDestination = true;
             collapseNavMenu = true;
         }
-        else
-        {
-            // Keep the rail collapsed when browser Back returns to the root after
-            // a destination was selected. A fresh landing still expands it.
-            if (!_hasSelectedDestination &&
-                (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running))
-                collapseNavMenu = false;
-        }
+        // The rail remains collapsed on root arrivals and browser Back.
+        // Visitors explicitly open it with the toggle; route changes collapse it again.
     }
 
     private void HandleExperienceStateChanged()
         => _ = InvokeAsync(StateHasChanged);
 
     private void HandleFSMStateChanged(string state)
-        => _ = InvokeAsync(() =>
-        {
-            // Reveal the available destinations when the hub arrives. Once a
-            // destination is selected, keep the rail collapsed for its content.
-            if (!_hasSelectedDestination &&
-                (state == PageFSM.NavigationArrival || state == PageFSM.Running))
-                collapseNavMenu = false;
-
-            StateHasChanged();
-        });
+        => _ = InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
