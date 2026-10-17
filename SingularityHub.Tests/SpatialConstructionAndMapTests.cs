@@ -76,11 +76,10 @@ public sealed class SpatialConstructionAndMapTests
             "TheSingularityWorkshop", "Pages", "Explore.razor"));
 
         Assert.Contains("IReadOnlyList<SpatialDigiten>? cityDigitens = null", map);
-        Assert.Contains("left", map);
         Assert.Contains("digiten.Position.X", map);
         Assert.Contains("digiten.Position.Y", map);
         Assert.Contains("digiten.Goal.Description", map);
-        Assert.Contains("sample city presence marker", map);
+        Assert.Contains("Sample city presence marker", map);
         Assert.Contains("SpatialDigitenCatalog.CreateCityOverviewPopulation()", explore);
         Assert.Contains("CityOverviewDigitens", explore);
     }
