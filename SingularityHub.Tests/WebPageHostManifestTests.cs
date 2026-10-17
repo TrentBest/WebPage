@@ -71,7 +71,7 @@ public sealed class WebPageHostManifestTests
         var manifest = WebPageHostManifestParser.Parse(manifestJson);
 
         Assert.Equal(2101UL, Assert.Single(manifest.Startup[0].MicroBundles!).BundleId);
-        Assert.Equal(new[] { "Welcome", "Demonstrations", "Singularity Architecture", "Movement Lab", "Replay Lab" }, manifest.Hub.Select(item => item.Name));
+        Assert.Equal(new[] { "Welcome", "Demonstrations", "Singularity Architecture", "Movement Lab", "Replay Lab", "Singularity Studios" }, manifest.Hub.Select(item => item.Name));
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "AnyApp");
         Assert.DoesNotContain(manifest.Hub, item => item.Name == "Support");
 
@@ -99,6 +99,11 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("ExperienceGallery", replayLab.Kind);
         Assert.Equal("/replay-lab", replayLab.Route);
         Assert.Empty(replayLab.MicroBundles!);
+
+        var studios = Assert.Single(manifest.Hub, item => item.Name == "Singularity Studios");
+        Assert.Equal("ExperienceGallery", studios.Kind);
+        Assert.Equal("/singularity-studios", studios.Route);
+        Assert.Empty(studios.MicroBundles!);
 
         var soldierField = Assert.Single(manifest.Demonstrations!, item => item.Id == "soldier-field-webgpu");
         Assert.Equal("/experiences/soldier-field/index.html", soldierField.EmbeddedExperienceUrl);
