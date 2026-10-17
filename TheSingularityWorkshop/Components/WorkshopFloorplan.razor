@@ -197,9 +197,18 @@
 
 @code {
     private string SelectedRoom { get; set; } = "hall";
-    private bool VoiceEnabled { get; set; }
+    private bool VoiceEnabled { get; set; } = true;
+    private bool _welcomeSpoken;
     private bool _showForge;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && VoiceEnabled && !_welcomeSpoken)
+        {
+            _welcomeSpoken = true;
+            await SpeakAsync("Welcome, friend, to The Singularity Workshop. Hover over a room to discover what it makes possible.");
+        }
+    }
     private sealed record RoomInfo(string Kicker, string Title, string Description);
 
     private static readonly Dictionary<string, RoomInfo> Rooms = new(StringComparer.Ordinal)
