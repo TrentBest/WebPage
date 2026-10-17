@@ -127,6 +127,12 @@ try {
   await page.getByText("OnEnter → Complete", { exact: false }).waitFor({ state: "visible" });
 
   await page.getByRole("button", { name: "Close the Laboratory station", exact: true }).click();
+  await page.getByRole("button", { name: "Forge: construct MicroBundles and Experiences", exact: true }).hover();
+  await page.getByRole("button", { name: "ENTER THE FORGE ↗", exact: true }).click();
+  await page.getByText("WORKBENCH // AUTHORING", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByText("LIVE FORGE // PREVIEW", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.goBack({ waitUntil: "domcontentloaded" });
+  await page.locator(".workshop-map").waitFor({ state: "visible", timeout: 15_000 });
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
   const expandedLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
@@ -312,7 +318,7 @@ try {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
 
-  console.log("Browser journey passed: gateway/moniker/hub, Welcome floorplan with distinct Laboratory and Forge roles, FSM lifecycle station, Movement Lab keyboard inspection, Replay Lab transport/mobile layout, ProtocolAi clipboard preview, and Singularity Studios Visualize-generated plan and reusable stage-data proof.");
+  console.log("Browser journey passed: gateway/moniker/hub, Welcome floorplan with distinct Laboratory and Forge roles, FSM lifecycle station and live FSM Forge authoring preview, Movement Lab keyboard inspection, Replay Lab transport/mobile layout, ProtocolAi clipboard preview, and Singularity Studios Visualize-generated plan and reusable stage-data proof.");
 } finally {
   await browser.close();
 }
