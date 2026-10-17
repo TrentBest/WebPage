@@ -11,6 +11,7 @@
 
   <PropertyGroup Condition="'$(WorkshopUseRepositorySources)' == 'true'">
     <DefineConstants>$(DefineConstants);WORKSHOP_USE_REPOSITORY_SOURCES;WORKSHOP_USE_RENDERER_SOURCE</DefineConstants>
+    <WorkshopSourceRoot>$(MSBuildThisFileDirectory)..\..\</WorkshopSourceRoot>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,6 +35,7 @@
     <ProjectReference Include="..\..\TheSingularityWorkshop.GrammarAi\TheSingularityWorkshop.GrammarAi.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.Renderer\TheSingularityWorkshop.Renderer.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.Visualize\TheSingularityWorkshop.Visualize.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.Visualize\integrations\RendererAdapter\TheSingularityWorkshop.Renderer.VisualizeAdapter.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\SingularityHub\SingularityHub.csproj" />
   </ItemGroup>
 
