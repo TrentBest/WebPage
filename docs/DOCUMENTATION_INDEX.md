@@ -8,6 +8,7 @@
 - [PROVING_GROUND_MIGRATION.md](PROVING_GROUND_MIGRATION.md) — explicit WebPage-to-package extraction contract, FSM_COS startup boundary, and branch consolidation rules.
 - [WEBAPP_HOST_MIGRATION.md](WEBAPP_HOST_MIGRATION.md) — WebPage creation architecture, WebApp's browser-manifestation role, author → compose → preview direction, behavior-preservation gates, and release discipline.
 - [WEBAPP_SHOWCASE_ORCHESTRATION.md](WEBAPP_SHOWCASE_ORCHESTRATION.md) — runtime manifest loading, FSM_COS composition, Experience-owned showcase artifacts, and GUI.SVG living-proof requirements.
+- [EXPERIENCE_EXTRACTION_MAP.md](EXPERIENCE_EXTRACTION_MAP.md) — source-backed ownership map for moving showcase content, visitor journeys, and destination behavior out of WebPage without breaking current journeys.
 - [WebPageLLM.md](WebPageLLM.md) — active runtime-host refactor handoff, Experience repository boundary, reset/switch/reload acceptance gates, and remaining implementation debt.
 - [integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md](integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md) — truthful host integration plan for Gesture evaluation, Renderer constraints, and evidence boundaries.
 
