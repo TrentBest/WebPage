@@ -374,4 +374,26 @@ public sealed class IncrementalVersionTests
         Assert.Contains("AdvanceProgressionForDestination(requestedTab ?? path);", nav);
     }
 
+    [ArchitectureTest(0, 0, 202)] [Fact(DisplayName = "V0.0.202 — Workshop_Discovery_Reveals_One_Layer_At_A_Time_And_Keeps_About_Us_Outside_The_Gate")]
+    public void V0_0_202WorkshopDiscoveryRevealsOneLayerAtATimeAndKeepsAboutUsOutsideTheGate()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var nav = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "NavMenu.razor"));
+
+        var welcome = nav.IndexOf("if (_progressionStage >= 1)", StringComparison.Ordinal);
+        var architecture = nav.IndexOf("if (_progressionStage >= 2)", StringComparison.Ordinal);
+        var city = nav.IndexOf("if (_progressionStage >= 3)", StringComparison.Ordinal);
+        var economy = nav.IndexOf("if (_progressionStage >= 4)", StringComparison.Ordinal);
+        var specialist = nav.IndexOf("if (_progressionStage >= 5)", StringComparison.Ordinal);
+        var deeper = nav.IndexOf("if (_progressionStage >= 6)", StringComparison.Ordinal);
+        var aboutUs = nav.IndexOf("href=\"/about-us\"", StringComparison.Ordinal);
+
+        Assert.True(welcome >= 0 && welcome < architecture && architecture < city
+            && city < economy && economy < specialist && specialist < deeper && deeper < aboutUs,
+            "Discovery stages must reveal in order, with the compatibility About Us link outside every stage gate.");
+        Assert.Contains("\"demonstrations\" => 2", nav);
+        Assert.Contains("\"city-lab\" or \"singularity-city\" => 4", nav);
+        Assert.Contains("\"replay-lab\" or \"singularity-studios\" => 7", nav);
+    }
+
 }
