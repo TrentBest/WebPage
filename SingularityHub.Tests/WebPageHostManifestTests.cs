@@ -289,6 +289,12 @@ public sealed class WebPageHostManifestTests
         Assert.NotSame(firstHub, hub.Hub);
         Assert.Equal("manifest-b.json", service.ActiveManifestPath);
 
+        var beforeReset = service.RuntimeAssembly;
+        await service.RestartFromManifestAsync(deepDive: true);
+        Assert.Equal("showcase-b", service.Manifest!.ManifestId);
+        Assert.NotSame(beforeReset, service.RuntimeAssembly);
+        Assert.True(service.IsDeepDive);
+
         var activeAssembly = service.RuntimeAssembly;
         await Assert.ThrowsAnyAsync<Exception>(() => service.SwitchManifestAsync("invalid.json"));
         Assert.Equal("showcase-b", service.Manifest!.ManifestId);
