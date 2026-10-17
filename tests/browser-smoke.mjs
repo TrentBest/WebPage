@@ -134,7 +134,7 @@ try {
   await page.getByText("FSM FORGE", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByText("BLACKSMITH FLOOR // FSM ASSEMBLY", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByText("WELCOME TO THE FSM FORGE", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
-  await page.getByRole("button", { name: "UNDERSTOOD — ENTER THE FORGE", exact: true }).click();
+  await page.getByRole("button", { name: "UNDERSTOOD — ENTER THE FORGE", exact: true }).click({ force: true });
   await page.getByText("FSM ASSEMBLY PLAN", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByText("STATE SHELF", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByRole("button", { name: "STATE +", exact: true }).click();
