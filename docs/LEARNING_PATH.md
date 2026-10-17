@@ -39,15 +39,13 @@ The animated moniker is the first impression. Give the visitor room to notice it
 
 Do not display every destination at once. Keep About Us reachable by its stable URL and through a low-emphasis utility link.
 
-### 1 — Welcome: explain why this exists
+### 1 — Welcome: enter the Workshop
 
-Answer three questions in plain language:
+Welcome is a place, not another text-heavy page. Selecting it collapses the hub navigation and opens a non-scrolling, top-down blueprint of the dragon-warrior-inspired Workshop. The visitor explores the Forge, assembly benches, observatory, world globe, and cartographers’ drafting wing by hovering, focusing, or selecting rooms.
 
-- What problem are we trying to solve?
-- Why does the Workshop separate capabilities instead of becoming one giant application?
-- What can a visitor actually see or do here?
+Room explanations should distinguish a working facility from a conceptual workflow. The Forge opens the existing live FSM_API lab. The observatory-to-globe-to-drafting path is currently a design direction, not a completed celestial or terrain editor. Optional browser speech introduces the Workshop and explains inspected rooms; authored opening SFX must be coordinated with the sound owner and Physics rather than faked in WebPage.
 
-This is an invitation, not a long static brochure. Use a short sequence of words and visuals, with a single next action. Selecting that action reveals the next discovery destination.
+The floor plan is the first step toward a composition-driven Workshop: installed MicroBundles may contribute facilities when an actual provider contract exists. About Us remains outside this progression at its stable /about-us URL.
 
 ### 2 — Proof: show, do not merely promise
 
