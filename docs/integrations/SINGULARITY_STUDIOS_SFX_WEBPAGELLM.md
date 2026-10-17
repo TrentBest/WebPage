@@ -114,3 +114,19 @@ This does not prohibit creative sound design. It separates **authored creative a
 - Build, tests, browser smoke checks, and any evidence-generation checks pass before claiming the slice complete.
 
 **North star:** Singularity Studios should let people create sound, hear sound, and understand why a world sounds the way it does—without confusing creative authorship with physical causality.
+
+
+## 2026-10-17 WebPageLLM update — Welcome floorplan needs an authored arrival cue
+
+The Welcome destination now enters an interactive top-down blueprint of the Workshop, with a Forge, MicroBundle assembly benches, observatory, world globe, and cartographers' drafting wing. The visitor receives a browser speech-synthesis greeting and can opt into spoken room explanations. **No authored opening SFX asset is wired yet.**
+
+This is a concrete request to the Singularity Studios / SFX owner, coordinated with Physics:
+
+1. Identify an existing authored cue suitable for a short Workshop arrival, or author one through the actual SFX workflow. Provide a stable asset ID/path, format, duration, sample rate/channels, source/licence, and playback/loop policy. Do not point Welcome at the current external T-rex reference recording and imply it is our opening sound.
+2. Keep the fixed welcome cue separate from physical sound generation. The existing Physics free-field observation model provides distance, propagation delay, estimated received level, and direction; its [serialized run record](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-observation.run.json) is propagation metadata, not a waveform. The [current experiment limits](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-observation.md) explicitly exclude waveform synthesis and room effects.
+3. If future forge impacts or physical interactions need sound, use the physical-causality chain already specified above. Physics should identify existing contact/event contracts first; do not invent a WebPage-only acoustic API.
+4. WebPage owns trigger, voice/effects preferences, mute/cancel, and browser fallback. The first entry should play at most one short cue; hovering should not repeatedly restart the opening cue. Room narration remains optional and should not overlap with other speech.
+
+**Art direction:** a short forged-metal resonance, low warm room tone, restrained ember/air texture, and a brief transition swell. It should evoke an inhabited engineering stronghold, not a loud fantasy trailer.
+
+Please answer with current source evidence and a minimal asset contract. A conceptual cue, external reference recording, or physics metadata must retain its truthful label. No package publish, deployment, or master promotion is requested.
