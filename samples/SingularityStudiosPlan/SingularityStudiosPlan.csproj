@@ -8,6 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../../TheSingularityWorkshop.Visualize/TheSingularityWorkshop.Visualize.csproj" />
-    <ProjectReference Include="../../TheSingularityWorkshop.Visualize/integrations/RendererAdapter/TheSingularityWorkshop.Renderer.VisualizeAdapter.csproj" />
+    <ProjectReference Include="../../../TheSingularityWorkshop.Visualize/integrations/GuiSvg/TheSingularityWorkshop.Visualize.GUI.SVG.csproj" />
   </ItemGroup>
 </Project>
