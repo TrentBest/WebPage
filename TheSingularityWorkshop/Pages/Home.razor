@@ -95,10 +95,27 @@
 @@media(max-height:600px){.welcome-signal{bottom:.8rem}.welcome-signal h1{margin:.35rem 0;font-size:1rem}.welcome-signal p{font-size:.68rem}}
 @@media(prefers-reduced-motion:reduce){.welcome-signal,.welcome-signal .welcome-eyebrow{animation:none}}
 
+
+.entry-monolith-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(1rem,2.5vh,1.5rem);overflow:hidden;isolation:isolate;padding:1.25rem;box-sizing:border-box;background:radial-gradient(ellipse at 50% 42%,rgba(0,234,255,.09),transparent 38%),radial-gradient(ellipse at 50% 80%,rgba(255,44,255,.055),transparent 42%),#020711;color:#fff}
+.entry-monolith-stage::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(0,234,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(0,234,255,.055) 1px,transparent 1px);background-size:44px 44px;transform:perspective(650px) rotateX(62deg) scale(1.8) translateY(18%);transform-origin:center bottom;opacity:.4}
+.entry-monolith-btn{position:relative;z-index:1;width:min(50vw,620px);height:min(48vh,480px);min-width:min(280px,88vw);min-height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0;border:2px solid #00eaff;border-radius:18px;background:rgba(3,10,22,.82);cursor:pointer;box-shadow:0 0 16px rgba(0,234,255,.42),0 0 45px rgba(0,234,255,.13),inset 0 0 35px rgba(0,234,255,.06);transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease}
+.entry-monolith-btn:hover{transform:scale(1.025);border-color:#ff2cff;box-shadow:0 0 20px rgba(255,44,255,.48),0 0 60px rgba(0,234,255,.18)}
+.entry-monolith-btn:focus-visible{outline:3px solid #ffd34d;outline-offset:5px}
+.entry-monolith-image{width:min(74%,390px);max-height:72%;object-fit:contain;filter:drop-shadow(0 0 20px rgba(0,234,255,.2))}
+.entry-monolith-label{position:absolute;left:0;right:0;bottom:7%;padding:0 .5rem;color:#fff;font:900 clamp(1rem,2.4vw,2rem)/1.2 Consolas,'Courier New',monospace;letter-spacing:.16em;text-align:center;text-shadow:0 0 12px #00eaff,0 0 28px rgba(255,44,255,.3)}
+.entry-warning{z-index:1;width:min(680px,92%);box-sizing:border-box;padding:.8rem 1.15rem .95rem;text-align:center;background:rgba(20,10,2,.94);border:3px solid #ff6600;border-radius:4px;box-shadow:0 0 16px rgba(255,102,0,.2),inset 0 0 20px rgba(255,102,0,.04)}
+.entry-warning-header{display:flex;justify-content:center;align-items:center;gap:.7rem;margin-bottom:.5rem;color:#ff9933;font:800 clamp(.65rem,1vw,.82rem)/1.4 Consolas,'Courier New',monospace;letter-spacing:.12em}
+.entry-warning-body{color:#dceaf2;font:500 clamp(.68rem,.95vw,.82rem)/1.65 Consolas,'Courier New',monospace}
+.entry-warning-body strong{color:#fff}
+.entry-composition-error{margin:.5rem 0 0;color:#ffd0d0;font-size:.8rem;overflow-wrap:anywhere}
+@@media(max-width:600px){.entry-monolith-btn{width:92%;height:38vh;min-height:190px}.entry-warning{width:96%;padding:.7rem}.entry-warning-header{letter-spacing:.04em}}
+@@media(prefers-reduced-motion:reduce){.entry-monolith-btn{transition:none}}
+
 </style>
 
 @code {
     private bool firstRender;
+    private bool _entryRequested;
     private string _selectedHubTab = "MONIKER";
     private string? _selectedDemonstrationId;
 
@@ -112,6 +129,59 @@
 
     private RenderFragment BuildExperienceContent() => builder =>
     {
+        // Preserve the founder-established entry beat. The runtime may compose
+        // behind this surface, but the visitor explicitly enters before the
+        // PageFSM-driven living GUI / Moniker / hub sequence is presented.
+        if (!_entryRequested)
+        {
+            builder.OpenElement(0, "section");
+            builder.AddAttribute(1, "class", "entry-monolith-stage");
+            builder.AddAttribute(2, "aria-label", "Enter The Singularity Workshop");
+
+            builder.OpenElement(3, "button");
+            builder.AddAttribute(4, "type", "button");
+            builder.AddAttribute(5, "class", "entry-monolith-btn");
+            builder.AddAttribute(6, "onclick", EventCallback.Factory.Create(this, EnterWorkshop));
+            builder.AddAttribute(7, "aria-label", "Enter The Singularity Workshop");
+            builder.OpenElement(8, "img");
+            builder.AddAttribute(9, "class", "entry-monolith-image");
+            builder.AddAttribute(10, "src", "/Images/TheSingularityWorkshopLogo.png");
+            builder.AddAttribute(11, "alt", "The Singularity Workshop");
+            builder.CloseElement();
+            builder.OpenElement(12, "span");
+            builder.AddAttribute(13, "class", "entry-monolith-label");
+            builder.AddContent(14, "ENTER THE WORKSHOP");
+            builder.CloseElement();
+            builder.CloseElement();
+
+            builder.OpenElement(15, "aside");
+            builder.AddAttribute(16, "class", "entry-warning");
+            builder.AddAttribute(17, "role", "note");
+            builder.OpenElement(18, "div");
+            builder.AddAttribute(19, "class", "entry-warning-header");
+            builder.AddContent(20, "⚠ SYSTEM ADVISORY: MANIFEST-DRIVEN RUNTIME ⚠");
+            builder.CloseElement();
+            builder.OpenElement(21, "div");
+            builder.AddAttribute(22, "class", "entry-warning-body");
+            builder.AddContent(23, "You are entering a live browser experience assembled from declared capabilities. ");
+            builder.OpenElement(24, "strong");
+            builder.AddContent(25, "FSM_COS");
+            builder.CloseElement();
+            builder.AddContent(26, " composes the requested MicroBundles; the browser host presents the result. Some lifecycle paths remain transitional.");
+            builder.CloseElement();
+            if (!string.IsNullOrWhiteSpace(Experience.LastManifestError))
+            {
+                builder.OpenElement(27, "p");
+                builder.AddAttribute(28, "class", "entry-composition-error");
+                builder.AddAttribute(29, "role", "alert");
+                builder.AddContent(30, "Experience composition failed: " + Experience.LastManifestError);
+                builder.CloseElement();
+            }
+            builder.CloseElement();
+            builder.CloseElement();
+            return;
+        }
+
         if (Experience.Manifest is null)
         {
             builder.OpenElement(0, "section");
@@ -192,7 +262,9 @@
     private async Task EnterWorkshop()
     {
         await JS.InvokeVoidAsync("interop.markWorkshopVisited");
+        _entryRequested = true;
         FSM.RequestEnter();
+        await InvokeAsync(StateHasChanged);
     }
 
     private void SelectHubTab(string tab)
