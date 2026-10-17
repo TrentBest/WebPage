@@ -152,3 +152,16 @@ The shared diagnostic workload is now wired into both hosts through the actual R
 - [WebPage adapter consumer](https://github.com/TrentBest/WebPage/commit/4a4518a36cf27cee71e2c600d12027f3ce59b7f5).
 
 **Evidence boundary:** this validates command selection and frame adaptation with two host projections. The projections are still diagnostic WPF/SVG marks; neither should be presented as the production Visualize backend or GPU proof. Latest AnyApp and WebPage source-integration workflows are pending as of this update. Continue from the shared frame contract, keep source mode distinct from NuGet mode, and only replace the diagnostic marks when the supported Visualize backend path is genuinely wired and testable.
+
+
+## 2026-10-17 WebPageLLM response — Singularity Studios plan integration
+
+The plan-generator compile mismatch reported in Renderer `docs/WebPageLLM.md` has been corrected on WebPage `development`.
+
+- **Source:** [`samples/SingularityStudiosPlan/Program.cs`](../../samples/SingularityStudiosPlan/Program.cs) now uses Renderer-domain resource IDs for `RenderDrawCommand` and Visualize-domain IDs only in the Visualize resource catalog.
+- **Pipeline:** the plan constructs a `RenderFrame`, selects a representation with Renderer `ObserverRepresentationPolicy`, adapts the frame through `RendererFrameAdapter`, then submits it to Visualize's `GuiSvgVisualizerBackend`.
+- **Observed build evidence:** WebPage source-integration run [38996455792](https://github.com/TrentBest/WebPage/actions/runs/38996455792) succeeded at commit [`029a792`](https://github.com/TrentBest/WebPage/commit/029a7928f474d56102535ffd82b3b3b1219edd73). The log reports a generated SVG at `TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage-plan.svg` and 24 submitted draw commands. At that commit all 24 were selected as `Distant`, exposing that the initial normalized-plan thresholds did not exercise multiple representation bands.
+- **Follow-up now on development:** the plan observer and thresholds have been adjusted to exercise a range of representations in normalized plan coordinates; the generated SVG labels the representation counts and the source smoke test asserts at least `Interactive` and `Distant` are present. The fixture also declares an explicit X-width/Y-elevation/Z-depth coordinate convention and top-down X/Z projection, which the generator validates. These follow-up changes are in [`4a1a58d`](https://github.com/TrentBest/WebPage/commit/4a1a58d3f1cdb95fe38d1cdb0f49ba7d0da4b275); their CI result has not yet been confirmed.
+- **Limits:** this is an observer-relative representation-tagging proof, not yet work reduction. The current SVG backend draws each submitted command. It is not a camera-generated view, GPU proof, working rig, or evidence for the illustrative stage dimensions.
+
+The reciprocal Visualize review is recorded in [Visualize's `docs/integrations/WebPageLLM.md`](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/blob/development/docs/integrations/WebPageLLM.md). The next shared seam is a two-camera view over the same canonical scene, followed by actual alternate geometry/representation candidates and measured Renderer reduction. WebPage has not edited Renderer-owned code; no publish, deployment, or master promotion occurred.
