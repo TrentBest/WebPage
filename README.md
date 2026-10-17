@@ -127,6 +127,7 @@ Choose the guide that answers your question; the README stays an orientation and
 - [**Singularity City Composition Contract**](docs/SINGULARITY_CITY_MICROBUNDLE_COMPOSITION.md) — how city capabilities become a manifest-composed Experience in the single WebPage host.
 - [**Zoomable City World**](docs/SINGULARITY_CITY_ZOOMABLE_WORLD_AND_EXPERIENCES.md) — shared city-to-room navigation, vehicles, Digitens, and renderer boundaries.
 - [**Renderer Stress Campaign**](docs/integrations/RendererLLM.md) — measurable scene/LOD stress ladder and Renderer LLM handoff.
+- [**Singularity Studios / Sound & Acoustics**](docs/integrations/SINGULARITY_STUDIOS_SFX_WEBPAGELLM.md) — WebPageLLM brief for the creator-studio destination, reference audio, and evidence-backed physical acoustics.
 - [**Visualize Stress Campaign**](docs/integrations/VisualizeLLM.md) — geometry-to-GPU workload, visualization invariants and Visualize LLM handoff.
 - [**Documentation Index**](docs/DOCUMENTATION_INDEX.md) — the broader guide catalogue.
 - [**Documentation Standard**](docs/DOCUMENTATION_STANDARD.md) — how WebPage applies the shared Workshop documentation rules.
