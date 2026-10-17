@@ -3,6 +3,8 @@ using System.Numerics;
 using System.Text.Json;
 using TheSingularityWorkshop.Visualize;
 using TheSingularityWorkshop.Visualize.GuiSvg;
+using TheSingularityWorkshop.Renderer;
+using TheSingularityWorkshop.Renderer.VisualizeAdapter;
 
 var root = FindWorkspaceRoot();
 var sourcePath = Path.Combine(root, "TheSingularityWorkshop", "wwwroot", "Workshop", "Forge", "StreamingAssets", "Experiences", "singularity-studios-stage.json");
@@ -23,6 +25,8 @@ var scale = 0.9f / stageWidth;
 var catalog = new VisualizerResourceCatalog();
 var quadId = new VisualizerResourceId(1);
 var cameraId = new VisualizerResourceId(2);
+var quadRenderId = new RenderResourceId(1);
+var cameraRenderId = new RenderResourceId(2);
 catalog.SetGeometry(quadId, Quad());
 catalog.SetGeometry(cameraId, Triangle());
 
@@ -35,7 +39,17 @@ var propMaterial = Material(15, new Vector4(1f, 0.72f, 0.28f, 1));
 var cameraMaterial = Material(16, new Vector4(1f, 0.20f, 0.80f, 1));
 var lightMaterial = Material(17, new Vector4(0.75f, 0.86f, 1f, 1));
 
-var commands = new List<VisualizerDrawCommand>();
+var commands = new List<RenderDrawCommand>();
+var observer = new Vector3(0, 0, 1.4f);
+var representationPolicy = new ObserverRepresentationPolicy(
+[
+    new RepresentationHorizonRule(new EventHorizon("Interactive", 1.05, 16), RepresentationTarget.Interactive),
+    new RepresentationHorizonRule(new EventHorizon("Near", 1.25, 8), RepresentationTarget.Near),
+    new RepresentationHorizonRule(new EventHorizon("Distant", 1.65, 4), RepresentationTarget.Distant),
+    new RepresentationHorizonRule(new EventHorizon("Aggregate", 2.2, 2), RepresentationTarget.Aggregate),
+    new RepresentationHorizonRule(new EventHorizon("Semantic", 10, 1), RepresentationTarget.Semantic)
+]);
+ulong nextEntityId = 1;
 AddRect("stage-floor", stageWidth, stageDepth, stageWidth / 2, stageDepth / 2, stageMaterial);
 foreach (var zone in stage.GetProperty("zones").EnumerateArray())
 {
@@ -86,8 +100,8 @@ foreach (var light in data.GetProperty("lightingRigPlacements").EnumerateArray()
         position.GetProperty("x").GetSingle(), position.GetProperty("z").GetSingle(), lightMaterial);
 }
 
-var frame = new VisualizerFrame(
-    new VisualizerView(Vector3.Zero, Matrix4x4.Identity, Matrix4x4.Identity),
+var frame = new RenderFrame(
+    new RenderView(observer, Matrix4x4.Identity, Matrix4x4.Identity),
     commands);
 await using var visualizer = new Visualizer(
     new GuiSvgVisualizerBackend(
@@ -97,7 +111,7 @@ await using var visualizer = new Visualizer(
         sceneLabel: $"Singularity Studios production plan · {stageWidth.ToString(CultureInfo.InvariantCulture)}m × {stageDepth.ToString(CultureInfo.InvariantCulture)}m · authored data",
         drawGrid: true),
     catalog);
-var result = await visualizer.RenderAsync(frame);
+var result = await visualizer.RenderAsync(frame, new RendererFrameAdapter());
 Console.WriteLine($"Singularity Studios plan: {result.SubmittedDrawCount} draw commands -> {outputPath}");
 
 void AddZoneOutline(string label, JsonElement bounds, VisualizerResourceId material)
@@ -113,23 +127,27 @@ void AddZoneOutline(string label, JsonElement bounds, VisualizerResourceId mater
     AddRect(label + "-east", thickness, depth, x + width - thickness / 2, z + depth / 2, material);
 }
 
-void AddRect(string label, float width, float depth, float centerX, float centerZ, VisualizerResourceId material)
+void AddRect(string label, float width, float depth, float centerX, float centerZ, RenderResourceId material)
 {
     var x = (centerX - stageWidth / 2) * scale;
     var y = (stageDepth / 2 - centerZ) * scale;
     var transform = Matrix4x4.CreateScale(width * scale, depth * scale, 1) *
         Matrix4x4.CreateTranslation(x, y, 0);
-    commands.Add(new VisualizerDrawCommand(quadId, material, transform, 6, 0, 0, VisualizerRepresentation.Near));
+    var worldCenter = new Vector3(x, y, 0);
+    var representation = ToRendererRepresentation(representationPolicy.Select(Vector3.Distance(observer, worldCenter)).Representation);
+    commands.Add(new RenderDrawCommand(quadRenderId, material, transform, 6, 0, 0, representation, entity: new RenderEntityId(nextEntityId++)));
 }
 
-void AddTriangle(string label, float size, float centerX, float centerZ, float yawDegrees, VisualizerResourceId material)
+void AddTriangle(string label, float size, float centerX, float centerZ, float yawDegrees, RenderResourceId material)
 {
     var x = (centerX - stageWidth / 2) * scale;
     var y = (stageDepth / 2 - centerZ) * scale;
     var transform = Matrix4x4.CreateScale(size * scale, size * scale, 1) *
         Matrix4x4.CreateRotationZ(yawDegrees * MathF.PI / 180f) *
         Matrix4x4.CreateTranslation(x, y, 0);
-    commands.Add(new VisualizerDrawCommand(cameraId, material, transform, 3, 0, 0, VisualizerRepresentation.Near));
+    var worldCenter = new Vector3(x, y, 0);
+    var representation = ToRendererRepresentation(representationPolicy.Select(Vector3.Distance(observer, worldCenter)).Representation);
+    commands.Add(new RenderDrawCommand(cameraRenderId, material, transform, 3, 0, 0, representation, entity: new RenderEntityId(nextEntityId++)));
 }
 
 VisualizerResourceId Material(int id, Vector4 color)
@@ -152,6 +170,16 @@ static VisualizerGeometry Triangle() => new(1,
 
 static VisualizerVertex Vertex(float x, float y) =>
     new(new Vector3(x, y, 0), Vector3.UnitZ, Vector2.Zero, Vector4.One);
+
+static RendererRepresentation ToRendererRepresentation(RepresentationTarget target) => target switch
+{
+    RepresentationTarget.Semantic => RendererRepresentation.Semantic,
+    RepresentationTarget.Aggregate => RendererRepresentation.Aggregate,
+    RepresentationTarget.Distant => RendererRepresentation.Distant,
+    RepresentationTarget.Near => RendererRepresentation.Near,
+    RepresentationTarget.Interactive => RendererRepresentation.Interactive,
+    _ => throw new ArgumentOutOfRangeException(nameof(target), target, "Unknown Renderer representation.")
+};
 
 static string FindWorkspaceRoot()
 {
