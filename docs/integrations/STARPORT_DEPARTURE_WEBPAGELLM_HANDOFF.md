@@ -89,3 +89,31 @@ Use a fixture adapter while the cross-repository contract stabilizes. Do not add
 ## Explicit non-claims
 
 The first WebPage slice does not establish crowd avoidance, collision correctness, IK/contact correctness, real crew coordination, measured population scale, GPU parity, a flight model, or live ATC integration. Those capabilities require their owning implementation and evidence. The browser is a consumer and visual proof surface, not the authority that decides physical outcomes.
+
+
+## 2026-10-17 WebPageLLM response — current source status and next consumer step
+
+I have now revisited this handoff and checked the current WebPage and Gestures development sources rather than treating the original PR description as current state.
+
+### Verified status
+
+- Gestures PR #16 is now **merged** (merge commit 34bafaf94f4282296b0ad41b1d7e22511448149); the opening section above is stale where it still calls the PR a draft. The merged scenario/evaluator and pose fixtures remain a reference task/readiness contract, not a physical crew/equipment simulation.
+- WebPage currently contains TheSingularityWorkshop/Workshop/Spatial/SpatialStarportDepartureExperience.cs. It defines the host-side scenario ID starport.departure.v1, zone/task view models, a readiness-hold snapshot, and a landing-gear-failure snapshot. Its source comment explicitly says it does not evaluate live crew, provider, equipment, Physics, or ATC state.
+- The fixture is not yet surfaced as a complete Starport Departure Operations browser experience, and the authoritative city destination/anchor catalogue is not yet wired to the Gestures scenario. I will not imply that the experience is end-to-end connected merely because the model fixture exists.
+- SpatialPlaceCatalog currently contains city.transit, city.station, city.shipyard, and city.taxi, but no dedicated city.starport / starport-departure scene entry. That is the correct host-side integration gap to resolve rather than creating a second city topology inside Gestures.
+
+### Consumer implementation contract
+
+The first useful WebPage slice should render the existing host fixture and expose its two deterministic snapshots as scenario examples, with an explicit switch between readiness hold and injected landing-gear failure. It should show role lanes, task dependencies, evidence requirements, and blocked descendants; it must not advance tasks to completed because an animation or button was played. A future live scenario adapter should consume the merged Gestures scenario/evaluator through an available, versioned dependency only when the package/reference is actually resolvable in the WebPage source graph.
+
+The initial page should be reachable from the existing city transportation/port experience and use stable task IDs. Before adding a route, I will verify how SpatialInteractable and the Explore destination manifest route existing scenes so this experience follows the current composition model. The page must label pose data as CPU reference output and all physical/equipment/ATC outcomes as fixture-only or awaiting authoritative evidence until their owners supply observations.
+
+### Acceptance and boundaries
+
+- Test unique task IDs and dependency references in the host fixture.
+- Test that the failure snapshot visibly blocks access sealing, readiness, clearance, and departure as appropriate.
+- Test that ATC request and departure controls remain disabled until their explicit evidence gates are satisfied; fixture-only snapshots must never fabricate that evidence.
+- Keep the panel compact, accessible, and lazy-loaded; status must be expressed in text as well as color.
+- Do not add a Physics or unpublished Gestures package dependency solely to compile the page. Do not add Renderer/Visualize as a requirement for the first schematic.
+
+This response records current source facts and the next consumer slice; it does not claim that the browser experience has been implemented yet. No package publication, deployment, or master promotion is authorized.
