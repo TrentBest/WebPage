@@ -176,3 +176,23 @@ Visualize added a host-owned SVG output constructor to `GuiSvgVisualizerBackend`
 - Coordination note: [Visualize's response to WebPageLLM](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/commit/792bae5cb910d1e06485ef2df2ca48e2600e01e6).
 - This removes the backend's file-output assumption for a browser host; it does not itself connect CityLab to Renderer/Visualize and is not GPU proof. The constructor is not yet build/test verified.
 - Next integration: in source mode, build stable city entity IDs and alternate representation candidates from the WebPage world snapshot, reduce them with Renderer, adapt the resulting frame, and render the sink's SVG on the page. Keep the existing host SVG as a clearly labelled fallback until that end-to-end path is tested.
+
+
+## CPU capacity and additive GPU strategy — WebPage host contract (2026-10-17)
+
+The objective is to measure how far the system can go on CPU while designing for GPU execution **in addition to CPU**, never as a replacement requirement. A host may have many CPU cores, a capable GPU, a weak GPU, or no usable GPU; the world and frame contracts must remain useful across those configurations.
+
+### What City Lab must measure
+
+- Preserve one stable world snapshot, entity IDs, observer pose, and source revision across backend changes.
+- Keep CPU-side world updates, simulation, visibility/representation policy, scheduling, and frame preparation independently measurable from manifestation cost.
+- Establish CPU SVG as the first observable baseline, but do not treat SVG serialization or command counts as a proxy for raster/GPU performance.
+- Add repeatable workloads at increasing scale (for example 1k, 10k, 100k, and larger entities when memory and test duration permit). Record actual entities, candidate commands, selected/submitted commands, omitted candidates, generated primitives/bytes, elapsed time, allocations, and peak memory where available.
+- Measure cold and warm runs separately; report median and tail latency over repeated runs. Keep machine/runtime/build configuration with each result. Benchmark runs should be opt-in or separately labelled so normal CI stays deterministic and fast.
+- Change observer position, zoom, and representation thresholds during a workload. Measure the policy/reduction and manifestation costs separately, and check that stable identities and deterministic selection survive threshold crossings in both directions.
+
+### CPU + GPU is a capability matrix, not a fork
+
+Renderer should remain responsible for observer-relative selection, work reduction/scheduling, and frame intent. Visualize should expose backend capabilities and manifestation implementations. WebPage owns the persistent world, observer interaction, and the presentation of truthful metrics. A future GPU backend should consume the same platform-neutral frame/resource contracts where feasible; it may introduce explicit upload/compute stages, but must not require deleting or bypassing the CPU path. CPU-only, GPU-enabled, and hybrid configurations should be selectable and comparable against the same fixture.
+
+Do not report GPU timing until a real GPU backend exposes measured timing. Do not claim automatic hardware saturation, optimal scheduling, 3D correctness, or performance wins from a backend's existence alone. The first milestone is an honest CPU baseline with a scalable workload and visible counters; the next is a measured CPU/GPU/hybrid comparison without changing world identity or semantics.
