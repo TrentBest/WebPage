@@ -14,10 +14,11 @@ The first reusable-data slice now exists in WebPage as an explicitly illustrativ
 - The browser smoke test fetches the artifact and checks its version, repeated prop reference, shared camera scene identity, and evidence disclosures.
 - [Singularity Studios plan renderer](../samples/SingularityStudiosPlan/Program.cs) reads that JSON, selects an observer-relative representation per authored draw item using Renderer’s `ObserverRepresentationPolicy`, creates a `RenderFrame`, adapts it through `RendererFrameAdapter`, and submits the adapted frame to Visualize’s `GuiSvgVisualizerBackend`. The WebPage build invokes this generator before static-asset discovery in repository-source mode.
 - The renderer consumes explicit `planFootprint` fields for the set and crate definitions. Those footprints are marked illustrative and are not claimed to be measured asset dimensions.
+- Physics now supplies a separate, bounded [first-order room-reflection experiment](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/first-order-room-reflection.md) with a C#-generated run record and SVG. This proves a geometric reflected-path metadata slice only—not a soundstage acoustic response or audible waveform.
 
 **What this proves:** a small, host-served, versioned production-data example; an initial source-integration path through Renderer policy → RendererFrameAdapter → Visualize → GUI.SVG; and a browser smoke check that distinguishes generated output from the static fallback. The current GUI.SVG adapter is a CPU-side SVG presentation path. It draws each submitted command and does not yet prove LOD work reduction, a production GPU renderer, or performance at the illustrative stage scale.
 
-**What it does not prove:** a canonical production-domain package, a JSON Schema or full validator, authoring/editing UI, save/reload workflow, GPU-backed production rendering, camera-rig execution, acoustic simulation, or capacity to render the illustrative giant-stage dimensions. The dimensions are planning targets, not measured runtime limits.
+**What it does not prove:** a canonical production-domain package, a JSON Schema or full validator, authoring/editing UI, save/reload workflow, GPU-backed production rendering, camera-rig execution, waveform-generating room-acoustics simulation, or capacity to render the illustrative giant-stage dimensions. The dimensions are planning targets, not measured runtime limits.
 
 ## The ambition
 
