@@ -346,4 +346,18 @@ public sealed class IncrementalVersionTests
         Assert.Equal(new[] { "building.1", "building.2" }, snapshot.Entities.Select(entity => entity.Id));
     }
 
+    [ArchitectureTest(0, 0, 200)] [Fact(DisplayName = "V0.0.200 — Preserve_About_Us_Compatibility_Route_For_Existing_Unity_Package_Links")]
+    public void V0_0_200PreserveAboutUsCompatibilityRouteForExistingUnityPackageLinks()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var aboutUs = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "AboutUs.razor"));
+        var nav = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "NavMenu.razor"));
+
+        Assert.StartsWith("@page \"/about-us\"", aboutUs);
+        Assert.Contains("href=\"/about-us\"", nav);
+        Assert.Contains("We are not building one giant application.", aboutUs);
+        Assert.Contains("FSM_API", aboutUs);
+        Assert.Contains("FSM_COS", aboutUs);
+    }
+
 }
