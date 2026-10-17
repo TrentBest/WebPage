@@ -108,11 +108,14 @@ await using var visualizer = new Visualizer(
         outputPath,
         backgroundColor: "#030a14",
         gridColor: "#16404e",
-        sceneLabel: $"Singularity Studios production plan · {stageWidth.ToString(CultureInfo.InvariantCulture)}m × {stageDepth.ToString(CultureInfo.InvariantCulture)}m · authored data",
+        sceneLabel: $"Singularity Studios production plan · Renderer policy → Visualize → GUI.SVG · {stageWidth.ToString(CultureInfo.InvariantCulture)}m × {stageDepth.ToString(CultureInfo.InvariantCulture)}m · authored data",
         drawGrid: true),
     catalog);
 var result = await visualizer.RenderAsync(frame, new RendererFrameAdapter());
-Console.WriteLine($"Singularity Studios plan: {result.SubmittedDrawCount} draw commands -> {outputPath}");
+var representationCounts = commands.GroupBy(command => command.Representation)
+    .OrderBy(group => group.Key)
+    .Select(group => $"{group.Key}={group.Count()}");
+Console.WriteLine($"Singularity Studios plan: {result.SubmittedDrawCount} draw commands; {string.Join(", ", representationCounts)} -> {outputPath}");
 
 void AddZoneOutline(string label, JsonElement bounds, VisualizerResourceId material)
 {
@@ -150,11 +153,10 @@ void AddTriangle(string label, float size, float centerX, float centerZ, float y
     commands.Add(new RenderDrawCommand(cameraRenderId, material, transform, 3, 0, 0, representation, entity: new RenderEntityId(nextEntityId++)));
 }
 
-VisualizerResourceId Material(int id, Vector4 color)
+RenderResourceId Material(ulong id, Vector4 color)
 {
-    var resourceId = new VisualizerResourceId((ulong)id);
-    catalog.SetMaterial(resourceId, new VisualizerMaterial(1, color));
-    return resourceId;
+    catalog.SetMaterial(new VisualizerResourceId(id), new VisualizerMaterial(1, color));
+    return new RenderResourceId(id);
 }
 
 static VisualizerGeometry Quad() => new(1,
