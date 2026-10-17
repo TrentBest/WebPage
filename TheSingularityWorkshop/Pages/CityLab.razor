@@ -436,7 +436,7 @@
             .GroupBy(command => command.Representation)
             .OrderBy(group => group.Key)
             .Select(group => $"{group.Key} {group.Count()}"));
-        _pipelineStatus = $"Stable buildings {Buildings.Count} · candidate commands {inputCount:N0} → submitted {selectedCommands.Count:N0} · reduced {inputCount - selectedCommands.Count:N0} · {representationCounts} · policy/reduction {preparationElapsed.TotalMilliseconds:0.###} ms · frame path {manifestationElapsed.TotalMilliseconds:0.###} ms · backend-reported CPU submission {backendTiming} · SVG {svgBytes:N0} bytes / {svgDrawPaths:N0} draw paths · CPU SVG proof, not GPU rendering.";
+        _pipelineStatus = $"Snapshot {WorldSnapshot.Revision} · stable buildings {WorldSnapshot.Entities.Count} · candidate commands {inputCount:N0} → submitted {selectedCommands.Count:N0} · reduced {inputCount - selectedCommands.Count:N0} · {representationCounts} · policy/reduction {preparationElapsed.TotalMilliseconds:0.###} ms · frame path {manifestationElapsed.TotalMilliseconds:0.###} ms · backend-reported CPU submission {backendTiming} · SVG {svgBytes:N0} bytes / {svgDrawPaths:N0} draw paths · CPU SVG proof, not GPU rendering.";
 #else
         await Task.CompletedTask;
         _pipelineStatus = "Repository-source mode is required to use the Renderer → Visualize → GUI.SVG integration.";
