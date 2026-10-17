@@ -425,7 +425,7 @@ public sealed class IncrementalVersionTests
         Assert.Contains("VOICE ON", floorplan);
         Assert.Contains("speechSynthesis", floorplan);
         Assert.Contains("HandleRoomKey", floorplan);
-        Assert.Contains("not a functioning solar-system editor.", floorplan);
+        Assert.Contains("interactive celestial editor is a future capability.", floorplan);
         Assert.Contains("Opening sound effects are **not yet wired**.", docs);
         Assert.StartsWith("@page \"/about-us\"", aboutUs);
     }
