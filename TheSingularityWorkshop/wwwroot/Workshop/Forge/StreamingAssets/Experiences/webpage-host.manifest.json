@@ -26,9 +26,9 @@
       "microBundles": []
     },
     {
-      "name": "Demonstrations",
+      "name": "Singularity Laboratory",
       "kind": "ExperienceGallery",
-      "description": "Inspect interactive proofs and architecture experiments from the Workshop, with their evidence, maturity, limitations, and source.",
+      "description": "Discover demonstrations as stations, inspect evidence and maturity, and experiment with existing Workshop capabilities where a real runnable model is available.",
       "deploymentUrl": null,
       "aboutUrl": "/about-us",
       "bridgeEndpoint": null,
