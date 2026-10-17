@@ -60,7 +60,7 @@ try {
   assert.notEqual(afterMovePipelineMetrics, initialPipelineMetrics, "Observer movement must change the live Renderer pipeline readout.");
   const movedGeometry = await submittedGeometry.evaluateAll(nodes => nodes.map(node => node.getAttribute("d")));
   assert.notDeepEqual(movedGeometry, initialGeometry, "Observer movement must change the projected GUI.SVG geometry, not just the readout.");
-  await page.getByRole("button", { name: "Pipeline move back", exact: true }).click();
+  await page.getByRole("button", { name: "Pipeline move backward", exact: true }).click();
   await page.waitForFunction(
     previous => document.querySelector(".pipeline-readout p")?.textContent !== previous,
     afterMovePipelineMetrics,
