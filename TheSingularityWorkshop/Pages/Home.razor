@@ -116,6 +116,7 @@
 @code {
     private bool firstRender;
     private bool _entryRequested;
+    private bool _explicitHubRouteRequested;
     private string _selectedHubTab = "MONIKER";
     private string? _selectedDemonstrationId;
 
@@ -713,7 +714,8 @@
         var returningVisitor = await JS.InvokeAsync<bool>("interop.workshopVisited");
         // The monolith is a first-visit gate. Preserve the existing return-visitor
         // journey when browser navigation reloads the root route after entry.
-        _entryRequested = returningVisitor
+        _entryRequested = _explicitHubRouteRequested
+            || returningVisitor
             || FSM.Context.EnterRequested
             || FSM.CurrentState is PageFSM.GatewayExit
                 or PageFSM.LivingGuiIgnition
@@ -751,7 +753,8 @@
         // A direct, explicit hub URL is already a navigation intent. In particular,
         // browser-back to /?tab=welcome must restore the chosen destination instead
         // of resurrecting the first-visit monolith over it.
-        if (!string.IsNullOrWhiteSpace(requestedTab))
+        _explicitHubRouteRequested = !string.IsNullOrWhiteSpace(requestedTab);
+        if (_explicitHubRouteRequested)
             _entryRequested = true;
 
         _selectedDemonstrationId = DemonstrationRoutes.ReadSelectedId(uri.Query);
