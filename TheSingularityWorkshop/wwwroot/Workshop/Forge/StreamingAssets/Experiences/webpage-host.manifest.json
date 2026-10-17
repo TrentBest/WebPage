@@ -18,7 +18,7 @@
     {
       "name": "Welcome",
       "kind": "Welcome",
-      "description": "Enter a top-down, interactive Workshop floor plan. Discover the Forge, MicroBundle assembly benches, celestial observatory, world globe, and cartographers’ drafting wing; the live FSM_API Forge lab is available from the floor plan.",
+      "description": "Enter a top-down, interactive Workshop floor plan. Discover the Forge, MicroBundle assembly benches, celestial observatory, world globe, and cartographers’ drafting wing; the live FSM_API lifecycle demonstration is available from the Laboratory station; the Forge opens the FSM construction preview.",
       "deploymentUrl": null,
       "aboutUrl": "/about-us",
       "bridgeEndpoint": null,
