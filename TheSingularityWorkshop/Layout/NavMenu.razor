@@ -156,7 +156,11 @@
         var isWelcome = string.Equals(requestedTab, "welcome", StringComparison.OrdinalIgnoreCase);
         var isHubDestination = queryParts.Any(part => part.StartsWith("tab=", StringComparison.OrdinalIgnoreCase));
         welcomeSelected = isWelcome || welcomeSelected;
-        AdvanceProgressionForDestination(requestedTab ?? path);
+        // Merely landing on the Welcome route must not reveal the next destination.
+        // Progression advances when the visitor explicitly selects a destination.
+        var progressionTarget = requestedTab ?? path;
+        if (!string.Equals(progressionTarget, "welcome", StringComparison.OrdinalIgnoreCase))
+            AdvanceProgressionForDestination(progressionTarget);
         if (isHubDestination || !string.IsNullOrEmpty(path))
         {
             _hasSelectedDestination = true;
