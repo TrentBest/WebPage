@@ -149,6 +149,7 @@ try {
   await page.goto(baseUrl + "/digitens", { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({ state: "visible", timeout: 15000 });
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "Singularity Laboratory", exact: true }).waitFor({ state: "visible" });
   await page.getByRole("link", { name: "Digitens", exact: true }).waitFor({ state: "visible" });
   await page.getByRole("link", { name: "Digitens", exact: true }).click();
   const digitens = page.frameLocator('iframe[title="Digitens: digital citizens of the Singularity World"]');
