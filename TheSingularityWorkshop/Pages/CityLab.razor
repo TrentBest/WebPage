@@ -416,7 +416,6 @@
                 System.Numerics.Matrix4x4.Identity),
             selectedCommands);
         var manifestationStarted = System.Diagnostics.Stopwatch.GetTimestamp();
-        var backendElapsed = TimeSpan.Zero;
         await using var visualizer = new TheSingularityWorkshop.Visualize.Visualizer(
             new TheSingularityWorkshop.Visualize.GuiSvg.GuiSvgVisualizerBackend(
                 svg => _pipelineSvg = svg,
@@ -426,14 +425,16 @@
             catalog);
         var frameResult = await visualizer.RenderAsync(frame, new TheSingularityWorkshop.Renderer.VisualizeAdapter.RendererFrameAdapter());
         var manifestationElapsed = System.Diagnostics.Stopwatch.GetElapsedTime(manifestationStarted);
-        backendElapsed = frameResult.Elapsed;
+        var backendTiming = frameResult.CpuSubmissionTime is { } cpuSubmissionTime
+            ? $"{cpuSubmissionTime.TotalMilliseconds:0.###} ms"
+            : "not reported";
         var svgBytes = System.Text.Encoding.UTF8.GetByteCount(_pipelineSvg ?? string.Empty);
         var svgDrawPaths = (_pipelineSvg ?? string.Empty).Split("draw-", StringSplitOptions.None).Length - 1;
         var representationCounts = string.Join(" · ", selectedCommands
             .GroupBy(command => command.Representation)
             .OrderBy(group => group.Key)
             .Select(group => $"{group.Key} {group.Count()}"));
-        _pipelineStatus = $"Stable buildings {Buildings.Count} · candidate commands {inputCount:N0} → submitted {selectedCommands.Count:N0} · reduced {inputCount - selectedCommands.Count:N0} · {representationCounts} · policy/reduction {preparationElapsed.TotalMilliseconds:0.###} ms · frame path {manifestationElapsed.TotalMilliseconds:0.###} ms · SVG backend {backendElapsed.TotalMilliseconds:0.###} ms · SVG {svgBytes:N0} bytes / {svgDrawPaths:N0} draw paths · CPU SVG proof, not GPU rendering.";
+        _pipelineStatus = $"Stable buildings {Buildings.Count} · candidate commands {inputCount:N0} → submitted {selectedCommands.Count:N0} · reduced {inputCount - selectedCommands.Count:N0} · {representationCounts} · policy/reduction {preparationElapsed.TotalMilliseconds:0.###} ms · frame path {manifestationElapsed.TotalMilliseconds:0.###} ms · backend-reported CPU submission {backendTiming} · SVG {svgBytes:N0} bytes / {svgDrawPaths:N0} draw paths · CPU SVG proof, not GPU rendering.";
 #else
         await Task.CompletedTask;
         _pipelineStatus = "Repository-source mode is required to use the Renderer → Visualize → GUI.SVG integration.";
