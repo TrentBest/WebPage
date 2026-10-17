@@ -20,9 +20,42 @@
     },
     "dimensionsStatus": "illustrative-planning-target",
     "zones": [
-      { "id": "zone.main-set", "name": "Main Set", "bounds": { "x": 100, "y": 0, "z": 80, "width": 800, "depth": 440, "height": 40 } },
-      { "id": "zone.camera-rail", "name": "Camera Rail", "bounds": { "x": 30, "y": 0, "z": 0, "width": 940, "depth": 560, "height": 18 } },
-      { "id": "zone.service", "name": "Service and Load-In", "bounds": { "x": 0, "y": 0, "z": 0, "width": 1000, "depth": 40, "height": 80 } }
+      {
+        "id": "zone.main-set",
+        "name": "Main Set",
+        "bounds": {
+          "x": 100,
+          "y": 0,
+          "z": 80,
+          "width": 800,
+          "depth": 440,
+          "height": 40
+        }
+      },
+      {
+        "id": "zone.camera-rail",
+        "name": "Camera Rail",
+        "bounds": {
+          "x": 30,
+          "y": 0,
+          "z": 0,
+          "width": 940,
+          "depth": 560,
+          "height": 18
+        }
+      },
+      {
+        "id": "zone.service",
+        "name": "Service and Load-In",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1000,
+          "depth": 40,
+          "height": 80
+        }
+      }
     ]
   },
   "assetDefinitions": [
@@ -31,14 +64,24 @@
       "version": "1.0.0",
       "kind": "set",
       "name": "Modular Industrial Courtyard",
-      "description": "Reusable modular walls, platforms, access doors, and industrial dressing."
+      "description": "Reusable modular walls, platforms, access doors, and industrial dressing.",
+      "planFootprint": {
+        "width": 260,
+        "depth": 180,
+        "status": "illustrative-plan-footprint"
+      }
     },
     {
       "id": "prop.service-crate",
       "version": "1.0.0",
       "kind": "prop",
       "name": "Service Crate",
-      "description": "Reusable scenery prop; physical collision and material contracts are not asserted by this fixture."
+      "description": "Reusable scenery prop; physical collision and material contracts are not asserted by this fixture.",
+      "planFootprint": {
+        "width": 8,
+        "depth": 6,
+        "status": "illustrative-plan-footprint"
+      }
     }
   ],
   "scene": {
@@ -49,27 +92,90 @@
         "id": "instance.main-courtyard",
         "assetId": "set.modular-industrial-courtyard",
         "assetVersion": "1.0.0",
-        "transform": { "position": { "x": 500, "y": 0, "z": 280 }, "rotationDegrees": { "x": 0, "y": 0, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }
+        "transform": {
+          "position": {
+            "x": 500,
+            "y": 0,
+            "z": 280
+          },
+          "rotationDegrees": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        }
       },
       {
         "id": "instance.crate-west",
         "assetId": "prop.service-crate",
         "assetVersion": "1.0.0",
-        "transform": { "position": { "x": 260, "y": 0, "z": 230 }, "rotationDegrees": { "x": 0, "y": 15, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }
+        "transform": {
+          "position": {
+            "x": 260,
+            "y": 0,
+            "z": 230
+          },
+          "rotationDegrees": {
+            "x": 0,
+            "y": 15,
+            "z": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        }
       },
       {
         "id": "instance.crate-east",
         "assetId": "prop.service-crate",
         "assetVersion": "1.0.0",
-        "transform": { "position": { "x": 740, "y": 0, "z": 330 }, "rotationDegrees": { "x": 0, "y": -20, "z": 0 }, "scale": { "x": 1, "y": 1, "z": 1 } }
+        "transform": {
+          "position": {
+            "x": 740,
+            "y": 0,
+            "z": 330
+          },
+          "rotationDegrees": {
+            "x": 0,
+            "y": -20,
+            "z": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        }
       }
     ],
     "note": "Both crate placements reference the same canonical prop definition; scene instances own their placement."
   },
   "rigDefinitions": [
-    { "id": "rig.rail-camera", "version": "1.0.0", "kind": "camera-rail", "name": "Floor Camera Rail" },
-    { "id": "rig.overhead-camera", "version": "1.0.0", "kind": "overhead-camera-mount", "name": "Overhead Camera Mount" },
-    { "id": "rig.overhead-lighting", "version": "1.0.0", "kind": "lighting-truss", "name": "Overhead Lighting Truss" }
+    {
+      "id": "rig.rail-camera",
+      "version": "1.0.0",
+      "kind": "camera-rail",
+      "name": "Floor Camera Rail"
+    },
+    {
+      "id": "rig.overhead-camera",
+      "version": "1.0.0",
+      "kind": "overhead-camera-mount",
+      "name": "Overhead Camera Mount"
+    },
+    {
+      "id": "rig.overhead-lighting",
+      "version": "1.0.0",
+      "kind": "lighting-truss",
+      "name": "Overhead Lighting Truss"
+    }
   ],
   "cameras": [
     {
@@ -77,7 +183,18 @@
       "name": "Camera A — Rail",
       "sceneId": "scene.giant-stage-blocking-01",
       "rigId": "rig.rail-camera",
-      "transform": { "position": { "x": 180, "y": 3, "z": 160 }, "rotationDegrees": { "x": -4, "y": 35, "z": 0 } },
+      "transform": {
+        "position": {
+          "x": 180,
+          "y": 3,
+          "z": 160
+        },
+        "rotationDegrees": {
+          "x": -4,
+          "y": 35,
+          "z": 0
+        }
+      },
       "intent": "Ground-level action coverage"
     },
     {
@@ -85,18 +202,46 @@
       "name": "Camera B — Overhead",
       "sceneId": "scene.giant-stage-blocking-01",
       "rigId": "rig.overhead-camera",
-      "transform": { "position": { "x": 500, "y": 22, "z": 300 }, "rotationDegrees": { "x": -90, "y": 0, "z": 0 } },
+      "transform": {
+        "position": {
+          "x": 500,
+          "y": 22,
+          "z": 300
+        },
+        "rotationDegrees": {
+          "x": -90,
+          "y": 0,
+          "z": 0
+        }
+      },
       "intent": "Wide blocking and continuity overview"
     }
   ],
   "lightingRigPlacements": [
-    { "id": "lighting.truss-north", "rigId": "rig.overhead-lighting", "position": { "x": 500, "y": 70, "z": 120 } },
-    { "id": "lighting.truss-south", "rigId": "rig.overhead-lighting", "position": { "x": 500, "y": 70, "z": 440 } }
+    {
+      "id": "lighting.truss-north",
+      "rigId": "rig.overhead-lighting",
+      "position": {
+        "x": 500,
+        "y": 70,
+        "z": 120
+      }
+    },
+    {
+      "id": "lighting.truss-south",
+      "rigId": "rig.overhead-lighting",
+      "position": {
+        "x": 500,
+        "y": 70,
+        "z": 440
+      }
+    }
   ],
   "productionNotes": [
     "Asset definitions are reusable, versioned records; placements are separate scene instances.",
     "Camera A and Camera B observe the same canonical scene ID; do not clone the world per camera.",
     "The proposed stage dimensions are planning data only. Validate stage-scale limits against the chosen runtime before making performance claims.",
-    "Rendering, physical collision, lighting simulation, acoustic simulation, recording, and take management are not implemented by this data file."
+    "Rendering, physical collision, lighting simulation, acoustic simulation, recording, and take management are not implemented by this data file.",
+    "The planFootprint fields are illustrative footprints used only to produce a readable top-down preview; they are not measured asset dimensions."
   ]
 }
