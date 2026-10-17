@@ -2084,7 +2084,7 @@
         ExitRoom();
 
         if (returnToWelcomeFloorplan)
-            NavigationManager.NavigateTo("/?tab=welcome");
+            NavigationManager.NavigateTo("/?tab=welcome", forceLoad: true);
         else
             ShowWorkshopMap();
     }
