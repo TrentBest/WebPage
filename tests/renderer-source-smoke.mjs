@@ -46,6 +46,13 @@ try {
   assert.match(await proofMetrics.textContent() ?? "", /Selected commands\s*1,000/);
   assert.match(await proofMetrics.textContent() ?? "", /Omitted commands\s*4,000/);
   assert.equal(await page.locator(".renderer-proof-svg circle").count(), 1_000);
+  const baselineEntityIds = await page.locator(".renderer-proof-svg circle").evaluateAll(
+    nodes => nodes.map(node => node.getAttribute("data-entity-id"))
+  );
+  assert.deepEqual(
+    baselineEntityIds,
+    Array.from({ length: 1_000 }, (_, index) => String(index + 1))
+  );
 
   const detailCases = [
     ["SEMANTIC", "#5f788c"],
@@ -62,6 +69,10 @@ try {
       { timeout: 10_000 }
     );
     assert.equal(await page.locator(".renderer-proof-svg circle").count(), 1_000);
+    const currentEntityIds = await page.locator(".renderer-proof-svg circle").evaluateAll(
+      nodes => nodes.map(node => node.getAttribute("data-entity-id"))
+    );
+    assert.deepEqual(currentEntityIds, baselineEntityIds);
     assert.equal(await page.locator(".renderer-proof-svg circle").first().getAttribute("fill"), expectedColor);
     assert.match(await proofMetrics.textContent() ?? "", /Omitted commands\s*4,000/);
   }
