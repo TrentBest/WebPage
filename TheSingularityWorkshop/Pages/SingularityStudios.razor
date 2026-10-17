@@ -19,6 +19,8 @@
             <p>Singularity Studios is the Workshop's planned home for film, virtual production, choreography, and sound. Imagine indoor stages large enough for a full-scale sci-fi battle: sets, terrain, buildings, vehicles, performers, camera paths, motion rigs, lighting, and sound all describing one reusable scene.</p>
             <p>The aim is not to hand-build every shot from scratch. A stage becomes structured, versioned data that can be revisited, rearranged, rendered from another camera, or reused in another production.</p>
             <div class="studios-tags"><span>VIRTUAL PRODUCTION</span><span>CAMERA & RIGS</span><span>REUSABLE SET DATA</span><span>GIANT INDOOR STAGES</span></div>
+            <a class="studios-data-link" href="/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage.json" download>INSPECT / DOWNLOAD THE VERSIONED STAGE DATA ↗</a>
+            <p class="studios-data-note">A small, explicit data fixture: one reusable set, two placements of the same prop definition, two cameras observing the same scene, and separate rig definitions. The giant-stage dimensions are illustrative planning targets—not verified runtime capacity.</p>
         </div>
         <div class="studios-stage-art">
             <svg viewBox="0 0 720 460" role="img" aria-labelledby="stage-title stage-desc">
@@ -141,6 +143,9 @@
     .studios-stage-art svg,.studios-acoustic-map svg { display:block; width:100%; height:auto; }
     .studios-tags { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:1.4rem; }
     .studios-tags span { padding:.45rem .6rem; border:1px solid #1c4757; color:#b9eff7; font: .62rem Consolas,monospace; letter-spacing:.06em; }
+    .studios-data-link { display:inline-flex; margin-top:1.1rem; padding:.75rem .9rem; border:1px solid #00eaff66; color:#00eaff; text-decoration:none; font:.68rem Consolas,monospace; letter-spacing:.08em; }
+    .studios-data-link:hover,.studios-data-link:focus-visible { border-color:#ff2cff; color:#fff; }
+    .studios-data-note { max-width:46rem; color:#819ba9; font-size:.82rem; line-height:1.6; }
     .studios-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; padding:1.5rem 0 3rem; }
     .studio-card { display:flex; flex-direction:column; min-height:14rem; padding:1.3rem; border:1px solid #1b3545; background:linear-gradient(145deg,#0a1421,#050b14); }
     .studio-card h2 { margin:.9rem 0 .2rem; font-size:1.35rem; }
