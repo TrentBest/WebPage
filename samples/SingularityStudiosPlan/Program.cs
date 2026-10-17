@@ -117,7 +117,7 @@ var representationCounts = commands.GroupBy(command => command.Representation)
     .Select(group => $"{group.Key}={group.Count()}");
 Console.WriteLine($"Singularity Studios plan: {result.SubmittedDrawCount} draw commands; {string.Join(", ", representationCounts)} -> {outputPath}");
 
-void AddZoneOutline(string label, JsonElement bounds, VisualizerResourceId material)
+void AddZoneOutline(string label, JsonElement bounds, RenderResourceId material)
 {
     var x = bounds.GetProperty("x").GetSingle();
     var z = bounds.GetProperty("z").GetSingle();
