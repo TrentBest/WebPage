@@ -21,9 +21,9 @@ public sealed class HubRuntime
     }
 
     /// <summary>Replaces the session Hub after a candidate manifest has composed successfully.</summary>
-    public void ReplaceHub(HubKernel hub)
+    public void ReplaceHub(HubKernel hub, int arbitrationMutations = 0)
     {
         Hub = hub ?? throw new ArgumentNullException(nameof(hub));
-        ArbitrationMutations = 0;
+        ArbitrationMutations = arbitrationMutations;
     }
 }
