@@ -70,6 +70,11 @@ try {
   await floorplanVoice.waitFor({ state: "visible" });
   await page.getByRole("button", { name: "Observatory: assemble solar systems", exact: true }).hover();
   await page.locator(".inspector-copy h2").getByText("The Observatory", { exact: true }).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: "Forge: construct MicroBundles and Experiences", exact: true }).hover();
+  await page.locator(".inspector-copy h2").getByText("The Forge", { exact: true }).waitFor({ state: "visible" });
+  await page.getByText(/general MicroBundle\/Experience authoring tool is not implemented yet/i).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: "Laboratory: live FSM_API demonstration station", exact: true }).hover();
+  await page.locator(".inspector-copy h2").getByText("The Singularity Laboratory", { exact: true }).waitFor({ state: "visible" });
   await floorplanVoice.click(); // Mute browser speech so the remaining browser journey is quiet.
   await page.getByRole("button", { name: "VOICE OFF", exact: true }).waitFor({ state: "visible" });
   const floorplanDimensions = await page.evaluate(() => ({
@@ -79,7 +84,7 @@ try {
   if (floorplanDimensions.document > floorplanDimensions.viewport + 2) {
     throw new Error("The Welcome floor plan must fit the viewport without page scrolling: " + JSON.stringify(floorplanDimensions));
   }
-  await page.getByRole("button", { name: "ENTER THE FORGE ↗" }).click();
+  await page.getByRole("button", { name: "ENTER FSM_API STATION ↗" }).click();
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "REVEAL THE FSM" }).click();
   await page.getByRole("button", { name: "SEND START SIGNAL" }).waitFor({ state: "visible" });
@@ -121,7 +126,7 @@ try {
   await tick.click(); // deliver OnEnter after the terminal state has been selected
   await page.getByText("OnEnter → Complete", { exact: false }).waitFor({ state: "visible" });
 
-  await page.getByRole("button", { name: "CLOSE ×", exact: true }).click();
+  await page.getByRole("button", { name: "Close the Laboratory station", exact: true }).click();
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
   const expandedLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
@@ -307,7 +312,7 @@ try {
     throw new Error(`Browser JavaScript errors detected:\n${browserErrors.join("\n")}`);
   }
 
-  console.log("Browser journey passed: gateway/moniker/hub, FSM lifecycle, Movement Lab keyboard inspection, Replay Lab transport/mobile layout, ProtocolAi clipboard preview, and Singularity Studios Visualize-generated plan and reusable stage-data proof.");
+  console.log("Browser journey passed: gateway/moniker/hub, Welcome floorplan with distinct Laboratory and Forge roles, FSM lifecycle station, Movement Lab keyboard inspection, Replay Lab transport/mobile layout, ProtocolAi clipboard preview, and Singularity Studios Visualize-generated plan and reusable stage-data proof.");
 } finally {
   await browser.close();
 }
