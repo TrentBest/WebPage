@@ -407,6 +407,8 @@ public sealed class IncrementalVersionTests
         Assert.Contains("THE WORKSHOP // TOP-DOWN PLAN", floorplan);
         Assert.Contains("CENTRAL HALL", floorplan);
         Assert.Contains("THE FORGE", floorplan);
+        Assert.Contains("SINGULARITY LAB", floorplan);
+        Assert.Contains("ENTER FSM_API STATION ↗", floorplan);
         Assert.Contains("OBSERVATORY", floorplan);
         Assert.Contains("WORLD GLOBE", floorplan);
         Assert.Contains("CARTOGRAPHERS' DRAFTING WING", floorplan);
@@ -428,6 +430,23 @@ public sealed class IncrementalVersionTests
         Assert.Contains("interactive celestial editor is a future capability.", floorplan);
         Assert.Contains("Opening sound effects are **not yet wired**.", docs);
         Assert.StartsWith("@page \"/about-us\"", aboutUs);
+    }
+
+
+    [ArchitectureTest(0, 0, 205)] [Fact(DisplayName = "V0.0.205 — Laboratory_Experiments_Are_Distinct_From_Forge_Construction")]
+    public void V0_0_205LaboratoryExperimentsAreDistinctFromForgeConstruction()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var floorplan = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "WorkshopFloorplan.razor"));
+        var laboratory = File.ReadAllText(Path.Combine(root, "docs", "SINGULARITY_LABORATORY_STATIONS.md"));
+        var demonstrations = File.ReadAllText(Path.Combine(root, "docs", "DEMONSTRATIONS.md"));
+
+        Assert.Contains("Laboratory: live FSM_API demonstration station", floorplan);
+        Assert.Contains("Forge: construct MicroBundles and Experiences", floorplan);
+        Assert.Contains("general MicroBundle/Experience authoring tool is not implemented yet.", floorplan);
+        Assert.Contains("The Laboratory is the Workshop's discovery and experimentation environment.", laboratory);
+        Assert.Contains("The Forge is not the Laboratory.", laboratory);
+        Assert.Contains("metadata discovery", demonstrations);
     }
 
 }
