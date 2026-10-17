@@ -64,4 +64,10 @@
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.Visualize\TheSingularityWorkshop.Visualize.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.Visualize on development." />
   </Target>
 
+
+  <Target Name="GenerateSingularityStudiosStagePlan" BeforeTargets="ResolveStaticWebAssetsInputs"
+          Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="dotnet run --project &quot;$(MSBuildProjectDirectory)\..\samples\SingularityStudiosPlan\SingularityStudiosPlan.csproj&quot; --configuration $(Configuration) -- &quot;$(MSBuildProjectDirectory)\wwwroot\Workshop\Forge\StreamingAssets\Experiences\singularity-studios-stage-plan.svg&quot;" />
+  </Target>
+
 </Project>
