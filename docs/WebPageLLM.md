@@ -17,6 +17,8 @@ The first repository-owned showcase artifacts are now in [TheSingularityWorkshop
 - [Experience README](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/README.md) — ownership and migration status.
 - [Experience-side handoff](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/WebPageLLM_HANDOFF.md) — host contract and coordination.
 
+A second authored Experience now exists separately at [Experiences/CastleSiege](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/tree/development/experiences/CastleSiege). Its stable battlespace IDs, Y-up/metre content convention, schema/example, and preforge handoff are the source for Castle Siege scene content. This is **not** the `workshop-showcase` catalog and is not yet loaded by WebPage. The WebPage consumer handoff is [CASTLE_SIEGE_PHYSICS_HANDOFF.md](integrations/CASTLE_SIEGE_PHYSICS_HANDOFF.md); it requires explicit coordinate conversion to Physics's real frame and forbids treating authored bounds or fixture trajectories as validated physical outcomes.
+
 These are the beginning of the move, not yet the runtime source consumed by WebPage. Keep the current in-host manifest/content until the replacement has been exercised and validated; avoid a premature delete-and-break migration.
 
 ## Repository integration boundary verified
