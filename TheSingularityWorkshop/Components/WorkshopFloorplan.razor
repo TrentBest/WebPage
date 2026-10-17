@@ -55,7 +55,7 @@
             <path d="M510 160 H690 V245 H735 V455 H690 V540 H510 V455 H465 V245 H510 Z"
                   fill="url(#stone-hatch)" stroke="#355e72" stroke-width="1.5" />
             <path d="M600 188 V512 M490 350 H710" stroke="#527b8d" stroke-width="1.2" stroke-dasharray="5 6" />
-            <g class="map-room" role="button" tabindex="0" aria-label="Central Hall" @onclick="() => SelectRoom("hall")" @onmouseenter="() => HoverRoom("hall")" @onfocus="() => HoverRoom("hall")" @onkeydown="e => HandleRoomKey(e, "hall")">
+            <g class="map-room" role="button" tabindex="0" aria-label="Central Hall" @onclick='() => SelectRoom("hall")' @onmouseenter='() => HoverRoom("hall")' @onfocus='() => HoverRoom("hall")' @onkeydown='e => HandleRoomKey(e, "hall")'>
                 <rect x="520" y="280" width="160" height="140" rx="2" class="room-hit" />
                 <path d="M550 310 L600 285 L650 310 L650 390 L600 415 L550 390 Z" class="sigil" />
                 <path d="M570 350 L600 320 L630 350 L600 380 Z" class="sigil-inner" />
@@ -63,7 +63,7 @@
             </g>
 
             <!-- Forge -->
-            <g class="map-room @(SelectedRoom == "forge" ? "selected" : "")" role="button" tabindex="0" aria-label="Forge: live FSM workshop" @onclick="() => SelectRoom("forge")" @onmouseenter="() => HoverRoom("forge")" @onfocus="() => HoverRoom("forge")" @onkeydown="e => HandleRoomKey(e, "forge")">
+            <g class="map-room @(SelectedRoom == "forge" ? "selected" : "")" role="button" tabindex="0" aria-label="Forge: live FSM workshop" @onclick='() => SelectRoom("forge")' @onmouseenter='() => HoverRoom("forge")' @onfocus='() => HoverRoom("forge")' @onkeydown='e => HandleRoomKey(e, "forge")'>
                 <path d="M155 170 H410 V325 H375 V365 H155 Z" class="room-hit" />
                 <path d="M170 185 H395 V310 H360 V345 H170 Z" class="room-outline" />
                 <rect x="205" y="210" width="145" height="90" class="forge-bed" />
@@ -74,7 +74,7 @@
             </g>
 
             <!-- Assembly benches -->
-            <g class="map-room @(SelectedRoom == "assembly" ? "selected" : "")" role="button" tabindex="0" aria-label="Assembly benches: compose MicroBundles" @onclick="() => SelectRoom("assembly")" @onmouseenter="() => HoverRoom("assembly")" @onfocus="() => HoverRoom("assembly")" @onkeydown="e => HandleRoomKey(e, "assembly")">
+            <g class="map-room @(SelectedRoom == "assembly" ? "selected" : "")" role="button" tabindex="0" aria-label="Assembly benches: compose MicroBundles" @onclick='() => SelectRoom("assembly")' @onmouseenter='() => HoverRoom("assembly")' @onfocus='() => HoverRoom("assembly")' @onkeydown='e => HandleRoomKey(e, "assembly")'>
                 <path d="M155 400 H410 V550 H155 Z" class="room-hit" />
                 <path d="M170 415 H395 V535 H170 Z" class="room-outline" />
                 @for (var i = 0; i < 3; i++)
@@ -92,7 +92,7 @@
             </g>
 
             <!-- Observatory and celestial parts buckets -->
-            <g class="map-room @(SelectedRoom == "observatory" ? "selected" : "")" role="button" tabindex="0" aria-label="Observatory: assemble solar systems" @onclick="() => SelectRoom("observatory")" @onmouseenter="() => HoverRoom("observatory")" @onfocus="() => HoverRoom("observatory")" @onkeydown="e => HandleRoomKey(e, "observatory")">
+            <g class="map-room @(SelectedRoom == "observatory" ? "selected" : "")" role="button" tabindex="0" aria-label="Observatory: assemble solar systems" @onclick='() => SelectRoom("observatory")' @onmouseenter='() => HoverRoom("observatory")' @onfocus='() => HoverRoom("observatory")' @onkeydown='e => HandleRoomKey(e, "observatory")'>
                 <path d="M790 170 H1035 V365 H790 Z" class="room-hit" />
                 <path d="M805 185 H1020 V350 H805 Z" class="room-outline" />
                 <circle cx="910" cy="268" r="62" class="orbit orbit-outer" />
@@ -107,7 +107,7 @@
             </g>
 
             <!-- Globe room -->
-            <g class="map-room @(SelectedRoom == "globe" ? "selected" : "")" role="button" tabindex="0" aria-label="World globe: spin and inspect the world" @onclick="() => SelectRoom("globe")" @onmouseenter="() => HoverRoom("globe")" @onfocus="() => HoverRoom("globe")" @onkeydown="e => HandleRoomKey(e, "globe")">
+            <g class="map-room @(SelectedRoom == "globe" ? "selected" : "")" role="button" tabindex="0" aria-label="World globe: spin and inspect the world" @onclick='() => SelectRoom("globe")' @onmouseenter='() => HoverRoom("globe")' @onfocus='() => HoverRoom("globe")' @onkeydown='e => HandleRoomKey(e, "globe")'>
                 <path d="M790 400 H1035 V550 H790 Z" class="room-hit" />
                 <path d="M805 415 H1020 V535 H805 Z" class="room-outline" />
                 <circle cx="910" cy="474" r="47" class="globe" />
@@ -119,7 +119,7 @@
             </g>
 
             <!-- Cartographers' drafting wing -->
-            <g class="map-room @(SelectedRoom == "drafting" ? "selected" : "")" role="button" tabindex="0" aria-label="Drafting wing: maps and expeditions" @onclick="() => SelectRoom("drafting")" @onmouseenter="() => HoverRoom("drafting")" @onfocus="() => HoverRoom("drafting")" @onkeydown="e => HandleRoomKey(e, "drafting")">
+            <g class="map-room @(SelectedRoom == "drafting" ? "selected" : "")" role="button" tabindex="0" aria-label="Drafting wing: maps and expeditions" @onclick='() => SelectRoom("drafting")' @onmouseenter='() => HoverRoom("drafting")' @onfocus='() => HoverRoom("drafting")' @onkeydown='e => HandleRoomKey(e, "drafting")'>
                 <path d="M450 155 H750 V210 H735 V245 H465 V210 H450 Z" class="room-hit" />
                 <path d="M465 164 H735 V202 H720 V235 H480 V202 H465 Z" class="room-outline" />
                 @for (var i = 0; i < 3; i++)
@@ -157,15 +157,15 @@
             }
             else if (SelectedRoom == "observatory")
             {
-                <button class="inspector-action" @onclick="() => Explain("observatory")">EXPLORE CELESTIAL WORKFLOW</button>
+                <button class="inspector-action" @onclick='() => Explain("observatory")'>EXPLORE CELESTIAL WORKFLOW</button>
             }
             else if (SelectedRoom == "globe")
             {
-                <button class="inspector-action" @onclick="() => Explain("globe")">INSPECT THE WORLD WORKFLOW</button>
+                <button class="inspector-action" @onclick='() => Explain("globe")'>INSPECT THE WORLD WORKFLOW</button>
             }
             else if (SelectedRoom == "drafting")
             {
-                <button class="inspector-action" @onclick="() => Explain("drafting")">EXPLORE MAP WORKFLOW</button>
+                <button class="inspector-action" @onclick='() => Explain("drafting")'>EXPLORE MAP WORKFLOW</button>
             }
         </div>
     </aside>
