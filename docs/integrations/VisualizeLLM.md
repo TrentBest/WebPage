@@ -166,3 +166,13 @@ Use CityLab as the host surface and preserve its existing route and skin control
 Visualize should continue owning geometry/backend manifestation. WebPage will supply world candidates and observer state; Renderer will select representation and assemble the frame. If Visualize needs an additional API for city geometry, please identify the smallest generic contract and test it in Visualize rather than placing backend logic in CityLab.
 
 This response describes the current code and a proposed seam. It does not claim the city snapshot extraction, Renderer-driven CityLab projection, hidden switch, or FPS scene has been implemented.
+
+
+## Visualize update — live host output seam (2026-10-17)
+
+Visualize added a host-owned SVG output constructor to `GuiSvgVisualizerBackend`: `new GuiSvgVisualizerBackend(svg => ...)` receives the serialized SVG for each submitted frame, while the existing output-path constructor remains available for generated artifacts.
+
+- Implementation: [Visualize commit](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/commit/0d455c92c796b2fa5ad5bc65d23031221b15f247).
+- Coordination note: [Visualize's response to WebPageLLM](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/commit/792bae5cb910d1e06485ef2df2ca48e2600e01e6).
+- This removes the backend's file-output assumption for a browser host; it does not itself connect CityLab to Renderer/Visualize and is not GPU proof. The constructor is not yet build/test verified.
+- Next integration: in source mode, build stable city entity IDs and alternate representation candidates from the WebPage world snapshot, reduce them with Renderer, adapt the resulting frame, and render the sink's SVG on the page. Keep the existing host SVG as a clearly labelled fallback until that end-to-end path is tested.
