@@ -1,5 +1,5 @@
 using TheSingularityWorkshop.FSM_COS;
-using TheSingularityWorkshop.MicroBundleDomain;
+using DomainMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
 using TheSingularityWorkshop.Infrastructure.Hub;
 using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
