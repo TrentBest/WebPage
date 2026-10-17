@@ -11,6 +11,9 @@
 
 ## Start here
 
+- [Singularity Studios Production Model](SINGULARITY_STUDIOS_PRODUCTION_MODEL.md) — reusable studio, giant indoor stages, set/prop libraries, camera and rig data, shot/take workflow, and proof obligations.
+- [Singularity Studios / Sound & Acoustics handoff](integrations/SINGULARITY_STUDIOS_SFX_WEBPAGELLM.md) — physical sound causality, audio provenance, and the first bounded acoustic experience.
+
 - [Brave1 Public Demonstration](BRAVE1_PUBLIC_DEMONSTRATION.md) — the public-facing MVP story, claim boundaries, and pre-submission deployment checklist.
 - [Singularity City Experience](SINGULARITY_CITY_EXPERIENCE.md) — spatial-world source foundations, Digitens, MicroBundle/provider boundaries, multiple renderers, and the editable city direction with explicit current/future claim boundaries.
 - [Singularity City Living World](SINGULARITY_CITY_LIVING_WORLD.md) — the current Digitens and City Lab slice, its honest limits, and the next integration seams.
