@@ -36,6 +36,7 @@
     <ProjectReference Include="..\..\TheSingularityWorkshop.Renderer\TheSingularityWorkshop.Renderer.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.Visualize\TheSingularityWorkshop.Visualize.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.Visualize\integrations\RendererAdapter\TheSingularityWorkshop.Renderer.VisualizeAdapter.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" AdditionalProperties="WorkshopUseRepositorySources=true;WorkshopSourceRoot=$(WorkshopSourceRoot)" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.Visualize\integrations\GuiSvg\TheSingularityWorkshop.Visualize.GUI.SVG.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" AdditionalProperties="WorkshopUseRepositorySources=true;WorkshopSourceRoot=$(WorkshopSourceRoot)" />
     <ProjectReference Include="..\SingularityHub\SingularityHub.csproj" />
   </ItemGroup>
 
