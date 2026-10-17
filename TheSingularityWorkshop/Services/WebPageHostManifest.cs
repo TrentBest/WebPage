@@ -79,6 +79,13 @@ public static class WebPageHostManifestParser
             throw new InvalidOperationException(
                 "Every demonstration must declare a stable ID, title, and source URL.");
 
+        var duplicateDemonstrationId = demonstrations
+            .GroupBy(item => item.Id, StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicateDemonstrationId is not null)
+            throw new InvalidOperationException(
+                $"Demonstration ID '{duplicateDemonstrationId.Key}' is duplicated.");
+
         foreach (var demonstration in demonstrations)
         {
             var embeddedUrl = demonstration.EmbeddedExperienceUrl;
