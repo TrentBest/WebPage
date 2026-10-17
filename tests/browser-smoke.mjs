@@ -250,7 +250,8 @@ try {
     .waitFor({ state: "visible", timeout: 30_000 });
   await page.getByText("HOW MANY WORDS IS A LIVING IMAGE WORTH?", { exact: true })
     .waitFor({ state: "visible", timeout: 30_000 });
-  await page.getByRole("button", { name: /enter the singularity workshop/i }).click();
+  await page.locator(".enter-workshop").waitFor({ state: "visible", timeout: 45_000 });
+  await page.locator(".enter-workshop").click();
   const casino = page.frameLocator('iframe[title="Singularity Casino living economy experience"]');
   await casino.getByRole("heading", { name: "SINGULARITY CASINO", exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await (await openNavigationFor("Digitens")).click();
