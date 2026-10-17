@@ -1,7 +1,7 @@
 # WebPageLLM — Runtime Host Refactor
 
 **Branch:** `development`  
-**Status:** host-manifest switching/reset is implemented as an initial slice; repository-backed Experience artifact loading and Experience-manifest switching are not yet implemented.
+**Status:** host-manifest switching/reset is implemented as an initial slice. The explicit entry scene and illustrative Replay Lab are present on `development`; the entry/browser-smoke correction is committed, but no passing workflow result for the corrected sequence is verified yet. Repository-backed Experience artifact loading and Experience-manifest switching remain unimplemented.
 
 ## Mission
 
@@ -25,14 +25,27 @@ The Experience repository's source key is `workshop-showcase`; its numeric Exper
 
 Do not work around this by treating an arbitrary GitHub URL as trusted executable authority. The host needs a configured Experience source/publication address, immutable version/hash validation, and the existing repository boundary for executable MicroBundle artifacts.
 
+## Rendering capability boundary — source-verified
+
+**Current:** `WorkshopCompositionCatalog` is an `IMicroBundleCatalog` for the canonical `TheSingularityWorkshop.MicroBundleDomain.IMicroBundle` contract. `WorkshopExperienceService.SwitchManifestAsync` converts declared roots to `RuntimeManifest`, calls `FsmCos.Execute`, verifies selected bundles in `RuntimeAssembly`, and activates only after candidate composition succeeds. This confirms the primary WebPage path goes through FSM_COS.
+
+The WebPage-owned `Workshop.Rendering.RenderingMicroBundle` (ID 4100, version 0.1.0) currently declares ProtocolAi and GrammarAi dependencies and produces semantic rendering-intent/perception data. It is **not** proof that the Renderer or Visualize packages are loaded or that GPU rendering occurs.
+
+Separately, `Workshop.MicroBundles.MicroBundle` is a Hub-level lifecycle shell implementing `TheSingularityWorkshop.SingularityHub.IMicroBundle`; it is not the type consumed by the FSM_COS catalog. `MonikerMicroBundle` explicitly implements both the domain and Hub contracts. There is no general automatic Hub-to-domain bridge: dual-contract behavior is implemented per bundle where needed.
+
+**Direction:** a real Renderer-owned capability should implement the domain contract and be selected as an optional manifest root. The shared core, WebPage host without that root, and non-rendering Experiences must remain free of Renderer/Visualize/GUI.SVG/graphics-backend dependencies.
+
+**Future:** the Renderer-owned opt-in bundle and rendering-free control are tracked in [Renderer issue #15](https://github.com/TrentBest/TheSingularityWorkshop.Renderer/issues/15). Source inspection here does not substitute for its build, automated integration tests, and CI evidence.
+
 ## Current WebPage debt confirmed from source
 
 - `WorkshopExperienceService.InitializeAsync` loads `wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json` by default.
 - `WorkshopExperienceService.SwitchManifestAsync(path)` now loads a same-origin relative host-manifest asset, composes a candidate primary/hub/capability runtime, and activates its manifest-owned bundle set in the stable session-scoped Hub only after composition succeeds, preserving the Hub instance held by PageFSM. `RestartFromManifestAsync` now reloads the active host-manifest path.
 - `WorkshopCompositionCatalog` now creates fresh bundle instances instead of returning long-lived shared instances. Hub and HubRuntime DI lifetimes are scoped per browser session.
 - The Hub lab now exposes the active manifest identity/version/source, a same-origin manifest-path selector, switch action, and reset/reload action.
-- Tests cover switching between two host manifests, reloading/recomposing the active manifest, preserving the active composition when a candidate manifest is invalid, and rejecting external/traversal paths. The host build and repository-source integration have passed in an earlier workflow run; the full browser journey and test suite are still running on the latest commits.
+- Tests cover switching between two host manifests, reloading/recomposing the active manifest, preserving the active composition when a candidate manifest is invalid, and rejecting external/traversal paths. The browser smoke test initially failed because it expected first-contact labels before the restored entry scene; the entry action was separated from the PageFSM gateway signal and `tests/browser-smoke.mjs` was updated. The corrected commits are on `development`; a fresh passing workflow/browser run is not yet verified.
 - This is an initial host-manifest switching slice, not the final repository-backed Experience loader. Hub destinations still have empty `microBundles` arrays, route behavior is partly compiled, and the new Experience-owned `workshop-showcase` manifest/content are not yet consumed by WebPage.
+- The manifest declares a `Replay Lab` destination and `/replay-lab` is implemented as a deterministic illustrative fixture with scrub/play controls and explicit unsupported states. It is not connected to Physics world/checkpoint reconstruction; the integration handoff records the next verified contract needed.
 - The current hub runtime has no demonstrated transactional reset/replacement lifecycle. Do not dispose/reuse runtime objects casually or mutate active state before candidate composition succeeds.
 
 ## Required refactor order
@@ -61,6 +74,9 @@ Do not work around this by treating an arbitrary GitHub URL as trusted executabl
 
 ## Progress log
 
+- 2026-10-17: Restored the founder-established monolith entry/advisory before the existing first-contact → gateway → Living GUI → Moniker → hub sequence; updated the browser smoke test to exercise the explicit entry click. The first workflow run exposed the stale expectation; the corrected sequence is awaiting a fresh passing run.
+- 2026-10-17: Confirmed the existing `/replay-lab` route is a truthful local fixture, updated its integration handoff, and kept physical replay/share/remix explicitly unavailable pending Physics contracts.
+- 2026-10-17: Verified the WebPage FSM_COS/domain-contract boundary and recorded the distinction between the WebPage-owned RenderingMicroBundle placeholder and a real Renderer-owned capability in Renderer issue #15.
 - 2026-10-17: Added the first Experience-owned Workshop Showcase manifest and moved the current six-entry demonstration catalog into the Experiences repository.
 - 2026-10-17: Added candidate-based host-manifest switching/recomposition, active-manifest reset, fresh bundle factories, stable Hub manifest-state reset/activation, and Hub-lab controls; added tests for switch, reset, rollback, and safe paths.
 - 2026-10-17: Updated the WebPage orchestration contract to link to the Experience-owned artifacts.
