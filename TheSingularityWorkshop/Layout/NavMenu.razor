@@ -29,7 +29,8 @@
             @if (_progressionStage >= 1)
             {
                 @foreach (var item in Experience.Manifest?.Hub.Where(item =>
-                    string.Equals(item.Name, "Demonstrations", StringComparison.OrdinalIgnoreCase))
+                    (string.Equals(item.Name, "Singularity Laboratory", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(item.Name, "Demonstrations", StringComparison.OrdinalIgnoreCase)))
                     ?? Array.Empty<WebPageManifestHubItem>())
                 {
                     <NavLink class="nav-link" href="@(item.Route ?? HubTabHref(item.Name))" @onclick="() => SelectHubDestination(item.Name)">@item.Name</NavLink>
