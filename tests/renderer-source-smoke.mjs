@@ -40,6 +40,11 @@ try {
     timeout: 20_000
   });
 
+  await page.getByText("SOURCE MODE // RENDERER REDUCER + VISUALIZE FRAME ADAPTER", { exact: true }).waitFor({
+    state: "visible",
+    timeout: 10_000
+  });
+
   const proofMetrics = page.locator(".renderer-proof-metrics");
   await proofMetrics.waitFor({ state: "visible", timeout: 10_000 });
   assert.match(await proofMetrics.textContent() ?? "", /Candidate commands\s*5,000/);
