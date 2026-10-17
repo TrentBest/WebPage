@@ -156,3 +156,26 @@ Label axes, SI units, launch state and observer frame. Derive the result from co
 - **Progressive depth:** one experiment should serve introductory science and advanced study through progressively deeper explanations, without contradictory simulations.
 
 Implementation should be catalogue-first, then connect stations to domain-owned models one by one. Prioritize the canonical gravity/reference-frame station and a verified hydrodynamics/terrain experiment. Tectonics, volcanism, weathering, striations and coupled Earth-system evolution remain explicit goals whose solver status must be checked independently. The Laboratory hosts experiments; the Forge constructs reusable new model capabilities or authored Experiences.
+
+
+## Evidence map against Physics development source (2026-10-17)
+
+This is the current implementation boundary, checked against Physics' [capability catalog](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/PHYSICS_CAPABILITY_CATALOG.md), [learning path](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/LEARNING_PATH.md), and [gap register](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/PHYSICS_GAP_REGISTER.md). A source type is not by itself a finished Laboratory station; WebPage still needs to connect it to a declared experiment, display actual run output, and expose the model's limits.
+
+| Learning area | Confirmed Physics source | Current evidence boundary |
+|---|---|---|
+| Free fall / constant acceleration | `Physics/Kinematics/ConstantAccelerationSolver.cs`, `Physics/Experiments/ConstantAccelerationExperiment.cs` | Analytical 1D state advancement and versioned sampled run records; not a general force-driven body solver. |
+| Projectile launch / target | `Physics/Kinematics/ProjectileState.cs`, `Physics/Experiments/ProjectileTrajectoryExperiment.cs`, `Physics/Collision/ProjectileTargetIntersection.cs`, `Physics/Collision/ProjectileImpactDiagnostics.cs` | Analytical 3D point trajectory, fixed-step records, point-vs-fixed-AABB intersection, incoming impact diagnostics. No drag, moving targets, launch mechanism, masonry damage or structural failure. |
+| Moving-train cannonball | Existing analytical projectile/constant-acceleration primitives | Can be assembled as a carefully declared frame-comparison lesson; no dedicated train scenario or enforced frame-transform abstraction exists yet. A frame label is metadata, not an axis convention. |
+| Water / terrain | `Physics/Hydrodynamics/ShallowWaterBasin2D.cs`, `Physics/Hydrodynamics/BathymetricShallowWaterBasin2D.cs`, `Physics/Hydrodynamics/LinearWaveBasin1D.cs` | Bounded shallow-water and wave models. Bathymetric model supports fixed uneven terrain and wet/dry cells; no boat coupling, flow around buildings, rainfall/runoff, sediment transport or erosion. Not full 3D fluid dynamics. |
+| Volcanic terrain | `Physics/Geology/VolcanicTerrain2D.cs` | Deterministic prescribed-volume, idealized cone deposition onto a 2D elevation field. No eruption dynamics, plate tectonics, ash, lava transport, cooling, weathering or erosion. |
+| Heat / energy | `Physics/Thermodynamics/ThermalConduction.cs`, `Physics/Thermodynamics/LumpedThermalState.cs`, `Physics/Experiments/ElectricalThermalCouplingExperiment.cs` | Lumped thermal accounting, bounded two-body conduction, and a first electrical-load-to-thermal coupling experiment. Conductivity/absorbed fraction are declared inputs; no spatial heat equation, phase change, convection/radiation or general reaction model. |
+| Electricity | `Physics/Electricity/ElectricalGrid.cs` | Bounded ideal fixed-voltage DC/resistive-load accounting; not a general circuit/transient or electromagnetic-field solver. |
+| Sound | `Physics/Acoustics/FreeFieldAcoustics.cs`, `Physics/Acoustics/AcousticRoomBox.cs`, `Physics/Acoustics/FirstOrderRoomReflections.cs` | Analytical free-field observations and bounded first-order rectangular-room reflection path metadata; no waveform/audio rendering, diffraction, occlusion or general room acoustics. |
+| Replay / time | `Physics/Universe/LogicalTimeLedger.cs`, checkpoint/branch/lineage and replay-plan types | Time/history contracts exist; they do not by themselves restore a coupled world or make a WebPage scrubber authoritative replay. |
+
+**Not confirmed as implemented solvers:** plate tectonics, earthquakes/fault dynamics, general weather/climate, atmospheric circulation, weathering, erosion, sediment transport/deposition, stratigraphy/striations, chemistry/reaction kinetics, and coupled planetary evolution. Keep these visible as planned learning destinations, but clearly mark them *planned* and do not generate solver-backed measurements until Physics supplies a tested model and evidence.
+
+### Integration rule
+
+For every station, link to the owning model and focused tests, state the model ID/version, units, frame, assumptions and validity limits, and show only values emitted by the actual run. Where possible, display an analytical/reference comparison and a conservation or error residual. Keep the baseline immutable and create a distinct run for each supported variant. WebPage owns the lesson and presentation; Physics owns equations, numerical state, validation and run results. No model should be duplicated in Razor or inferred from decorative rendering.
