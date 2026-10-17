@@ -73,7 +73,7 @@
 
   <Target Name="GenerateSingularityStudiosStagePlan" BeforeTargets="ResolveStaticWebAssetsInputs"
           Condition="'$(DesignTimeBuild)' != 'true' and '$(WorkshopUseRepositorySources)' == 'true'">
-    <Exec Command="dotnet run --project &quot;$(MSBuildProjectDirectory)\..\samples\SingularityStudiosPlan\SingularityStudiosPlan.csproj&quot; --configuration $(Configuration) -- &quot;$(MSBuildProjectDirectory)\wwwroot\Workshop\Forge\StreamingAssets\Experiences\singularity-studios-stage-plan.svg&quot;" />
+    <Exec Command="dotnet run --project &quot;$(MSBuildProjectDirectory)/../samples/SingularityStudiosPlan/SingularityStudiosPlan.csproj&quot; --configuration $(Configuration) -- &quot;$(MSBuildProjectDirectory)/wwwroot/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage-plan.svg&quot;" />
   </Target>
 
 </Project>
