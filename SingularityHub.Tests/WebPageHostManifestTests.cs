@@ -145,6 +145,24 @@ public sealed class WebPageHostManifestTests
     }
 
     [Fact]
+    public void CompositionCatalogCreatesIsolatedBundleInstancesForSeparateRuntimeCompositions()
+    {
+        var catalog = new WorkshopCompositionCatalog();
+
+        Assert.True(catalog.TryResolve(2102, "1.0.0", out var first));
+        Assert.True(catalog.TryResolve(2102, "1.0.0", out var second));
+
+        Assert.NotNull(first);
+        Assert.NotNull(second);
+        Assert.NotSame(first, second);
+
+        if (first is IDisposable firstDisposable)
+            firstDisposable.Dispose();
+        if (second is IDisposable secondDisposable)
+            secondDisposable.Dispose();
+    }
+
+    [Fact]
     public void ManifestParserRejectsUnversionedMicroBundleRoots()
     {
         const string json = """
