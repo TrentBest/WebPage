@@ -360,4 +360,18 @@ public sealed class IncrementalVersionTests
         Assert.Contains("FSM_COS", aboutUs);
     }
 
+    [ArchitectureTest(0, 0, 201)] [Fact(DisplayName = "V0.0.201 — About_Us_Compatibility_Route_Is_Independent_Of_Progressive_Hub_Discovery")]
+    public void V0_0_201AboutUsCompatibilityRouteIsIndependentOfProgressiveHubDiscovery()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
+        var aboutUs = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "AboutUs.razor"));
+        var nav = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Layout", "NavMenu.razor"));
+
+        Assert.StartsWith("@page \"/about-us\"", aboutUs);
+        Assert.Contains("href=\"/about-us\"", nav);
+        Assert.Contains("if (_progressionStage >= 1)", nav);
+        Assert.Contains("if (_progressionStage >= 5)", nav);
+        Assert.Contains("AdvanceProgressionForDestination(requestedTab ?? path);", nav);
+    }
+
 }
