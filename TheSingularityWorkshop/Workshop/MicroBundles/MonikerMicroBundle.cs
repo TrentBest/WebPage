@@ -138,6 +138,7 @@ public sealed class MonikerMicroBundle :
     {
         if (_disposed) return;
         FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_fsmName, _processingGroup);
+        FSM_API.FSM_API.Interaction.RemoveProcessingGroup(_processingGroup);
         _disposed = true;
     }
 
