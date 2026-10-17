@@ -270,7 +270,7 @@
             return ConferenceRoomGuiBuilder.Build(this, ConferenceJoined, JoinConference, LeaveConference, ExitRoom);
 
         if (insideRoomId == "forge")
-            return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitRoom);
+            return SpatialForgeGuiBuilder.Build(this, Experience.User.DisplayName, AvatarX, AvatarY, HandleKeyDown, (x, y) => _ = MoveForgeTo(x, y), ExitForge);
 
         if (behaviorBuilderVisible)
             return SpatialBehaviorBuilderGuiBuilder.Build(this, BehaviorBuilder, AddBehaviorElseIf, CloseBehaviorBuilder);
@@ -2072,6 +2072,14 @@
     {
         AcousticStudioManifest.ResolveListener(listenerId);
         selectedAcousticListenerId = listenerId;
+    }
+
+    private void ExitForge()
+    {
+        // The Forge is entered from the Workshop campus map. Leaving it should restore
+        // that navigation surface instead of leaving the visitor in a hidden-map state.
+        ExitRoom();
+        ShowWorkshopMap();
     }
 
     private void ExitRoom()
