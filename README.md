@@ -106,7 +106,7 @@ dotnet run --project TheSingularityWorkshop/TheSingularityWorkshop.csproj
 
 Open the local URL printed by the ASP.NET Core host. The verified opening journey is **gateway → Workshop moniker → `WELCOME` hub**. The automated Chromium smoke test follows that same path in [GitHub Actions](https://github.com/TrentBest/WebPage/actions/workflows/dotnet-tests.yml); its screenshots are retained with the run's test-results artifact.
 
-**What this proves:** the host starts, serves its Blazor boot manifest, and the opening browser journey reaches the manifest-driven hub without page-level JavaScript errors. See the [successful browser-journey run](https://github.com/TrentBest/WebPage/actions/runs/38025120464) for the current verified checkpoint.
+**What this proves:** the host starts, serves its Blazor boot manifest, and the opening browser journey reaches the manifest-driven hub without page-level JavaScript errors. See the [successful browser-journey run](https://github.com/TrentBest/WebPage/actions/runs/38990067011) for the current verified checkpoint.
 
 **What it does not prove:** that every visible behavior is already driven solely by RuntimeAssembly, that every manifest entry is dynamically interchangeable, or that a public deployment is available. Those remain explicit migration and release checks. For exact current startup roots and test obligations, see [Current Vertical Slice](docs/CURRENT_VERTICAL_SLICE.md).
 
