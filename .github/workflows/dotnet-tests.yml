@@ -285,3 +285,13 @@ jobs:
 
           mkdir -p TestResults/Browser
           WORKSHOP_BASE_URL=http://127.0.0.1:5261 WORKSHOP_SCREENSHOT=TestResults/Browser/renderer-source-smoke.png node tests/renderer-source-smoke.mjs
+
+      - name: Upload city rendering proof screenshot
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: singularity-city-renderer-visualize-proof
+          path: |
+            WebPage/TestResults/Browser/singularity-city-pipeline.png
+          retention-days: 14
+          if-no-files-found: warn
