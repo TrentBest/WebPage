@@ -4,6 +4,19 @@
 **Owner:** WebPage integration/presentation; domain contracts belong in their owning Workshop packages.  
 **Branch:** `development`. Do not publish or deploy from this brief.
 
+## Current proof on development
+
+The first reusable-data slice now exists in WebPage as an explicitly illustrative fixture:
+
+- [Versioned giant-stage data](../TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage.json) defines the proposed stage dimensions, zones, reusable asset definitions, separate scene placements, rig definitions, camera placements, and lighting-rig placements.
+- Two prop placements reference one canonical prop definition; two cameras reference the same scene identity. Camera views are observations of one scene, not copied worlds.
+- [Singularity Studios page](../TheSingularityWorkshop/Pages/SingularityStudios.razor) exposes the JSON as a downloadable artifact. The schematic SVG remains a conceptual illustration and is not generated from this JSON yet.
+- The browser smoke test fetches the artifact and checks its version, repeated prop reference, shared camera scene identity, and evidence disclosures.
+
+**What this proves:** a small, host-served, versioned production-data example and an automated check of selected reuse/identity invariants.
+
+**What it does not prove:** a canonical production-domain package, a JSON Schema or full validator, authoring/editing UI, save/reload workflow, renderer-generated SVG, camera-rig execution, acoustic simulation, or capacity to render the illustrative giant-stage dimensions. The dimensions are planning targets, not measured runtime limits.
+
 ## The ambition
 
 **Singularity Studios is our own Hollywood studio—inside Singularity City.** It is a place where a creator can build a set, arrange actors and props, rig cameras and lights, choreograph action, capture takes, and reuse the resulting production data instead of rebuilding the same world for every shot or project.
