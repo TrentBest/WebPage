@@ -2076,10 +2076,17 @@
 
     private void ExitForge()
     {
-        // The Forge is entered from the Workshop campus map. Leaving it should restore
-        // that navigation surface instead of leaving the visitor in a hidden-map state.
+        // The Home floorplan launches the Forge through /explore?room=forge.
+        // Return that visitor to the Home Welcome floorplan; a Forge entered from
+        // within the spatial world should instead reopen its own Workshop map overlay.
+        var returnToWelcomeFloorplan = string.Equals(
+            RequestedRoom, "forge", StringComparison.OrdinalIgnoreCase);
         ExitRoom();
-        ShowWorkshopMap();
+
+        if (returnToWelcomeFloorplan)
+            NavigationManager.NavigateTo("/?tab=welcome");
+        else
+            ShowWorkshopMap();
     }
 
     private void ExitRoom()
