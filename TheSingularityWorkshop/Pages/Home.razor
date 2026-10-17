@@ -713,7 +713,16 @@
         var returningVisitor = await JS.InvokeAsync<bool>("interop.workshopVisited");
         // The monolith is a first-visit gate. Preserve the existing return-visitor
         // journey when browser navigation reloads the root route after entry.
-        _entryRequested = returningVisitor;
+        _entryRequested = returningVisitor
+            || FSM.Context.EnterRequested
+            || FSM.CurrentState is PageFSM.GatewayExit
+                or PageFSM.LivingGuiIgnition
+                or PageFSM.LivingGuiPopulating
+                or PageFSM.MonikerReveal
+                or PageFSM.Gravity
+                or PageFSM.LivingGuiDissipating
+                or PageFSM.NavigationArrival
+                or PageFSM.Running;
         await Experience.InitializeAsync(returningVisitor);
     }
 
