@@ -83,6 +83,19 @@ try {
   }
 
   console.log("Renderer browser host: the shared 5,000-command workload reduced to 1,000 stable entities at all five detail ceilings; SVG projection and metrics matched the selected representation.");
+
+  // Singularity Studios must render its authored floor plan through the source Visualize adapter.
+  await page.goto(`${baseUrl}/singularity-studios`, { waitUntil: "networkidle" });
+  await page.locator(".studios-stage-plan").waitFor({ state: "visible", timeout: 15_000 });
+  const studioPlanResponse = await page.request.get(
+    `${baseUrl}/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage-plan.svg`
+  );
+  assert.equal(studioPlanResponse.status(), 200);
+  const studioPlanSvg = await studioPlanResponse.text();
+  assert.match(studioPlanSvg, /Singularity Studios production plan/);
+  assert.match(studioPlanSvg, /draw-/);
+  assert.doesNotMatch(studioPlanSvg, /data-render-status="static-fallback"/);
+  console.log("Singularity Studios source integration: stage zones, reusable asset footprints, scene placements, cameras, and lighting markers were submitted through Visualize and emitted by the GUI.SVG adapter.");
 } finally {
   await browser.close();
 }
