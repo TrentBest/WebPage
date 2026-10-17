@@ -33,17 +33,16 @@ public static class BuildingPlanProposalParser
         try
         {
             var envelope = JsonSerializer.Deserialize<ProposalEnvelope>(response, JsonOptions);
+            var data = envelope?.Plan;
             if (!string.Equals(envelope?.Kind, "building-plan-proposal", StringComparison.Ordinal)
-                || envelope.Plan is null
-                || envelope.Plan.Rooms is null
-                || envelope.Plan.Walls is null
-                || envelope.Plan.Openings is null)
+                || data is null
+                || data.Rooms is null
+                || data.Walls is null
+                || data.Openings is null)
             {
                 return Rejected(
                     "Expected a building-plan-proposal JSON object containing a plan with rooms, walls, and openings.");
             }
-
-            var data = envelope.Plan;
             var plan = new BuildingPlan(
                 data.Id ?? string.Empty,
                 data.Name ?? string.Empty,
