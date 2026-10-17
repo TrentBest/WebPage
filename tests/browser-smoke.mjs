@@ -202,7 +202,15 @@ try {
   // /digitens is independently addressable; its standalone page does not own the
   // Workshop navigation rail. Return to the host hub before testing hub navigation.
   await page.goto(baseUrl + "/?tab=welcome", { waitUntil: "domcontentloaded" });
-  await page.locator(".workshop-map").waitFor({ state: "visible", timeout: 60_000 });
+  // The explicit Welcome destination survives a fresh load, but the host still
+  // honors its first-contact/gateway FSM before rendering the selected floorplan.
+  await page.getByText("IF AN IMAGE IS WORTH A THOUSAND WORDS...", { exact: true })
+    .waitFor({ state: "visible", timeout: 30_000 });
+  await page.getByText("HOW MANY WORDS IS A LIVING IMAGE WORTH?", { exact: true })
+    .waitFor({ state: "visible", timeout: 30_000 });
+  await page.getByRole("button", { name: /enter the singularity workshop/i }).click();
+  await page.locator('.workshop-hub-overlay[data-selected-hub-tab="WELCOME"] .manifest-hub')
+    .waitFor({ state: "visible", timeout: 180_000 });
   await page.getByRole("button", { name: /expand workshop navigation/i }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "Singularity Laboratory", exact: true }).waitFor({ state: "visible" });
