@@ -34,6 +34,9 @@ public sealed class SingularityRouting : ISingularityRouting
         return _routes.Remove(path);
     }
 
+    /// <summary>Clears manifest-owned route registrations.</summary>
+    public void Clear() => _routes.Clear();
+
     /// <summary>Attempts to resolve a route by path.</summary>
     public bool TryResolve(string path, out SingularityRoute route)
     {
