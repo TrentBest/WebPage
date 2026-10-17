@@ -65,6 +65,20 @@ try {
   }
 
   await page.getByRole("heading", { name: "Welcome, friend." }).waitFor({ state: "visible" });
+  await page.locator(".workshop-map").waitFor({ state: "visible" });
+  const floorplanVoice = page.getByRole("button", { name: "VOICE ON", exact: true });
+  await floorplanVoice.waitFor({ state: "visible" });
+  await page.getByRole("button", { name: "Observatory: assemble solar systems", exact: true }).hover();
+  await page.locator(".inspector-copy h2").getByText("The Observatory", { exact: true }).waitFor({ state: "visible" });
+  await floorplanVoice.click(); // Mute browser speech so the remaining browser journey is quiet.
+  await page.getByRole("button", { name: "VOICE OFF", exact: true }).waitFor({ state: "visible" });
+  const floorplanDimensions = await page.evaluate(() => ({
+    viewport: window.innerHeight,
+    document: document.documentElement.scrollHeight
+  }));
+  if (floorplanDimensions.document > floorplanDimensions.viewport + 2) {
+    throw new Error("The Welcome floor plan must fit the viewport without page scrolling: " + JSON.stringify(floorplanDimensions));
+  }
   await page.getByRole("button", { name: "ENTER THE FORGE ↗" }).click();
   await page.getByRole("heading", { name: "Make a system. Change its state. Watch it respond." }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "REVEAL THE FSM" }).click();
