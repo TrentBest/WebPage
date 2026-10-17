@@ -20,10 +20,11 @@ These are the beginning of the move, not yet the runtime source consumed by WebP
 
 ## Current WebPage debt confirmed from source
 
-- `WorkshopExperienceService.InitializeAsync` loads `wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json`.
-- The host's `WorkshopCompositionCatalog` contains a compiled dictionary of known MicroBundle implementations. It is not a repository-backed executable artifact loader.
-- Hub destinations have empty `microBundles` arrays, and route behavior is still partly implemented in compiled page components.
-- `RestartFromManifestAsync` resets selected entries/state but does not fetch, validate, or recompose a manifest.
+- `WorkshopExperienceService.InitializeAsync` loads `wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json` by default.
+- `WorkshopExperienceService.SwitchManifestAsync(path)` now loads a same-origin relative host-manifest asset, composes a candidate primary/hub/capability runtime, and swaps it into the scoped Hub only after composition succeeds. `RestartFromManifestAsync` now reloads the active host-manifest path.
+- `WorkshopCompositionCatalog` now creates fresh bundle instances instead of returning long-lived shared instances. Hub and HubRuntime DI lifetimes are scoped per browser session.
+- Tests have been added for switching between two host manifests, preserving the active composition when a candidate manifest is invalid, and rejecting external/traversal paths. Their CI result is pending until the workflow completes.
+- This is an initial host-manifest switching slice, not the final repository-backed Experience loader. Hub destinations still have empty `microBundles` arrays, route behavior is partly compiled, and the new Experience-owned `workshop-showcase` manifest/content are not yet consumed by WebPage.
 - The current hub runtime has no demonstrated transactional reset/replacement lifecycle. Do not dispose/reuse runtime objects casually or mutate active state before candidate composition succeeds.
 
 ## Required refactor order
@@ -53,5 +54,6 @@ These are the beginning of the move, not yet the runtime source consumed by WebP
 ## Progress log
 
 - 2026-10-17: Added the first Experience-owned Workshop Showcase manifest and moved initial WebGPU-instancing, native WPF/D3D12-surface, and Renderer Event Horizon demonstration records into the Experiences repository.
+- 2026-10-17: Added candidate-based host-manifest switching/recomposition, active-manifest reset, fresh bundle factories, and session-scoped Hub replacement; added tests for switch, rollback, and safe paths.
 - 2026-10-17: Updated the WebPage orchestration contract to link to the Experience-owned artifacts.
-- Remaining: WebPage still loads its legacy static manifest and does not yet consume these new files at runtime; reset/switch/recompose behavior is still outstanding.
+- Remaining: wire the host to resolve the Experience-owned manifest and content through the canonical repository/cache boundary; add user-facing selection; move the remaining demonstration/journey catalog; replace compiled route/presentation behavior only after the replacement is proven.
