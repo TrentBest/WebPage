@@ -39,6 +39,13 @@ public sealed class SingularityHubConfiguration : ISingularityHubConfiguration
         return true;
     }
 
+    /// <summary>Clears all manifest-owned Hub definitions and paths.</summary>
+    public void Clear()
+    {
+        _hubs.Clear();
+        _paths.Clear();
+    }
+
     /// <summary>Gets a Hub definition by identity.</summary>
     /// <param name="hubId">Stable Hub identity.</param>
     /// <param name="definition">Resolved definition when present.</param>
