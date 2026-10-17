@@ -171,7 +171,7 @@
             // Keep the rail collapsed when browser Back returns to the root after
             // a destination was selected. A fresh landing still expands it.
             if (!_hasSelectedDestination &&
-                FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)
+                (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running))
                 collapseNavMenu = false;
         }
     }
