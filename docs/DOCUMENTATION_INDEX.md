@@ -14,6 +14,7 @@
 - [Singularity Studios Production Model](SINGULARITY_STUDIOS_PRODUCTION_MODEL.md) — reusable studio, giant indoor stages, set/prop libraries, camera and rig data, shot/take workflow, and proof obligations.
 - [Singularity Studios / Sound & Acoustics handoff](integrations/SINGULARITY_STUDIOS_SFX_WEBPAGELLM.md) — physical sound causality, audio provenance, and the first bounded acoustic experience.
 - [Workshop Welcome Floorplan](WORKSHOP_FLOORPLAN_EXPERIENCE.md) — interactive blueprint, room discovery, optional voice, future MicroBundle facilities, and SFX/Physics boundaries.
+- [Singularity Laboratory Stations](SINGULARITY_LABORATORY_STATIONS.md) — station catalogue, evidence/maturity rules, MicroBundle experiment prescription, sandbox workflow, and the Laboratory-versus-Forge boundary.
 
 - [Brave1 Public Demonstration](BRAVE1_PUBLIC_DEMONSTRATION.md) — the public-facing MVP story, claim boundaries, and pre-submission deployment checklist.
 - [Singularity City Experience](SINGULARITY_CITY_EXPERIENCE.md) — spatial-world source foundations, Digitens, MicroBundle/provider boundaries, multiple renderers, and the editable city direction with explicit current/future claim boundaries.
@@ -22,6 +23,7 @@
 - [Experience Catalog](EXPERIENCE_CATALOG.md) — the host’s available experiences and their current maturity boundaries.
 - [GUI.SVG connected-points sample](../TheSingularityWorkshop/wwwroot/Visualize/07-gui-svg-connected-points.svg) — animated SVG evidence of a connected point route manifested through GUI.SVG.
 - [Demonstrations](DEMONSTRATIONS.md) — manifest-backed proofs, launch modes, evidence, and limitations.
+- [Singularity Laboratory Stations](SINGULARITY_LABORATORY_STATIONS.md) — how those proofs become discoverable stations without overstating execution or maturity.
 - [Gestures & Movement Lab](../TheSingularityWorkshop/Pages/Gestures.razor) — browser learning surface for the engine-neutral CPU reference, its current maturity, and the unimplemented rig/Renderer handoff.
 
 | Order | Document | Purpose |
