@@ -46,7 +46,7 @@ The Laboratory's existing spatial design describes a research tower organized by
 | Plasma & Field Studies | plasma and electromagnetic-field experiments | Use authoritative domain observations; keep visual manifestation separate from calculation. |
 | Fluids & Hydraulics | water, waves, boats, terrain interaction | Living Water World is a candidate, not a runnable station until WebPage advances the actual Physics solver and browser verification passes. |
 | Cosmic Scale | solar-system arrangement and celestial bodies | Keep this separate from selected-world/globe editing and from map/terrain drafting. Current Welcome Observatory is conceptual. |
-| FSM Physics Simulation | process groups, lifecycle, deterministic model experiments | Use actual FSM_API/FSM_COS/Physics contracts; never imply that model-level replay already restores and plays a full physical world. |
+| FSM Physics Simulation | the live FSM_API lifecycle station, process groups, and deterministic model experiments | The current lifecycle lab is runnable from the Welcome floorplan. Use actual FSM_API/FSM_COS/Physics contracts; never imply that model-level replay already restores and plays a full physical world. |
 
 These are catalogue groupings, not a claim that every station is currently executable.
 
