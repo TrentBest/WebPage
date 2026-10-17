@@ -65,6 +65,12 @@
   </Target>
 
 
+  <ItemGroup>
+    <!-- The file is generated during the build, so declare it explicitly before it exists. -->
+    <Content Remove="wwwroot\\Workshop\\Forge\\StreamingAssets\\Experiences\\singularity-studios-stage-plan.svg" />
+    <Content Include="wwwroot\\Workshop\\Forge\\StreamingAssets\\Experiences\\singularity-studios-stage-plan.svg" />
+  </ItemGroup>
+
   <Target Name="GenerateSingularityStudiosStagePlan" BeforeTargets="ResolveStaticWebAssetsInputs"
           Condition="'$(DesignTimeBuild)' != 'true'">
     <Exec Command="dotnet run --project &quot;$(MSBuildProjectDirectory)\..\samples\SingularityStudiosPlan\SingularityStudiosPlan.csproj&quot; --configuration $(Configuration) -- &quot;$(MSBuildProjectDirectory)\wwwroot\Workshop\Forge\StreamingAssets\Experiences\singularity-studios-stage-plan.svg&quot;" />
