@@ -1,5 +1,7 @@
 using System.Text.Json;
 using TheSingularityWorkshop.Services;
+using TheSingularityWorkshop.Infrastructure.Hub;
+using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.MicroBundles;
@@ -238,4 +240,91 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("1.0.0", manifest.Running[0].MicroBundles![0].Version);
         Assert.Equal(2110UL, (ulong)MonikerMicroBundle.BundleId);
     }
+    [Fact]
+    public async Task SwitchingManifestActivatesNewCompositionAndInvalidManifestKeepsActiveRuntime()
+    {
+        const string manifestA = """
+        {
+          "manifestId": "showcase-a",
+          "version": "1.0.0",
+          "startup": [{ "name": "MONIKER A", "kind": "Moniker", "microBundles": [{ "bundleId": 2101, "version": "1.0.0" }], "presentationSeconds": 3 }],
+          "hub": [{ "name": "Welcome A", "kind": "Welcome", "description": "A", "deploymentUrl": null, "aboutUrl": "/about-us", "bridgeEndpoint": null, "route": "/a", "microBundles": [] }],
+          "running": [{ "name": "LIVING GUI A", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }],
+          "deepDive": { "experience": "LIVING GUI A", "restartFromManifest": true, "telemetry": true }
+        }
+        """;
+        const string manifestB = """
+        {
+          "manifestId": "showcase-b",
+          "version": "1.0.0",
+          "startup": [{ "name": "MONIKER B", "kind": "Moniker", "microBundles": [{ "bundleId": 2101, "version": "1.0.0" }], "presentationSeconds": 3 }],
+          "hub": [{ "name": "Welcome B", "kind": "Welcome", "description": "B", "deploymentUrl": null, "aboutUrl": "/about-us", "bridgeEndpoint": null, "route": "/b", "microBundles": [] }],
+          "running": [{ "name": "LIVING GUI B", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }],
+          "deepDive": { "experience": "LIVING GUI B", "restartFromManifest": true, "telemetry": true }
+        }
+        """;
+
+        using var client = new HttpClient(new ManifestHandler(new Dictionary<string, string>
+        {
+            ["manifest-a.json"] = manifestA,
+            ["manifest-b.json"] = manifestB,
+            ["invalid.json"] = "{ invalid json"
+        }))
+        {
+            BaseAddress = new Uri("https://localhost/")
+        };
+        var hub = new HubRuntime(new SingularityHub());
+        using var service = new WorkshopExperienceService(client, hub);
+
+        await service.SwitchManifestAsync("manifest-a.json");
+        var firstAssembly = service.RuntimeAssembly;
+        var firstHub = hub.Hub;
+        Assert.Equal("showcase-a", service.Manifest!.ManifestId);
+        Assert.Equal("/a", Assert.Single(service.Manifest.Hub).Route);
+
+        await service.SwitchManifestAsync("manifest-b.json");
+        Assert.Equal("showcase-b", service.Manifest!.ManifestId);
+        Assert.Equal("/b", Assert.Single(service.Manifest.Hub).Route);
+        Assert.NotSame(firstAssembly, service.RuntimeAssembly);
+        Assert.NotSame(firstHub, hub.Hub);
+        Assert.Equal("manifest-b.json", service.ActiveManifestPath);
+
+        var activeAssembly = service.RuntimeAssembly;
+        await Assert.ThrowsAnyAsync<Exception>(() => service.SwitchManifestAsync("invalid.json"));
+        Assert.Equal("showcase-b", service.Manifest!.ManifestId);
+        Assert.Same(activeAssembly, service.RuntimeAssembly);
+        Assert.Equal("manifest-b.json", service.ActiveManifestPath);
+        Assert.NotNull(service.LastManifestError);
+    }
+
+    [Fact]
+    public async Task ManifestSwitchRejectsExternalAndTraversalPathsBeforeFetching()
+    {
+        using var client = new HttpClient(new ManifestHandler(new Dictionary<string, string>()))
+        {
+            BaseAddress = new Uri("https://localhost/")
+        };
+        using var service = new WorkshopExperienceService(client, new HubRuntime(new SingularityHub()));
+
+        await Assert.ThrowsAsync<ArgumentException>(() => service.SwitchManifestAsync("https://example.com/manifest.json"));
+        await Assert.ThrowsAsync<ArgumentException>(() => service.SwitchManifestAsync("../manifest.json"));
+    }
+
+    private sealed class ManifestHandler(IReadOnlyDictionary<string, string> manifests) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            var path = request.RequestUri?.AbsolutePath.TrimStart('/') ?? string.Empty;
+            if (!manifests.TryGetValue(path, out var content))
+                return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
+
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new StringContent(content, System.Text.Encoding.UTF8, "application/json")
+            });
+        }
+    }
+
 }
