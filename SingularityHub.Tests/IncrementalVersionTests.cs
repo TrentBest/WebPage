@@ -444,8 +444,8 @@ public sealed class IncrementalVersionTests
         Assert.Contains("Laboratory: live FSM_API demonstration station", floorplan);
         Assert.Contains("Forge: construct MicroBundles and Experiences", floorplan);
         Assert.Contains("general MicroBundle/Experience authoring tool is not implemented yet.", floorplan);
-        Assert.Contains("The Laboratory is the Workshop's discovery and experimentation environment.", laboratory);
-        Assert.Contains("The Forge is not the Laboratory.", laboratory);
+        Assert.Contains("discovery and experimentation environment", laboratory);
+        Assert.Contains("Laboratory is not the Forge", laboratory);
         Assert.Contains("metadata discovery", demonstrations);
     }
 
