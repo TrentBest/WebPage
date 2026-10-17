@@ -7,7 +7,8 @@
 - [PACKAGE_ECOSYSTEM.md](PACKAGE_ECOSYSTEM.md) — map each active capability to the Workshop package that owns it and identify WebPage-only responsibilities.
 - [PROVING_GROUND_MIGRATION.md](PROVING_GROUND_MIGRATION.md) — explicit WebPage-to-package extraction contract, FSM_COS startup boundary, and branch consolidation rules.
 - [WEBAPP_HOST_MIGRATION.md](WEBAPP_HOST_MIGRATION.md) — WebPage creation architecture, WebApp's browser-manifestation role, author → compose → preview direction, behavior-preservation gates, and release discipline.
-- [WEBAPP_SHOWCASE_ORCHESTRATION.md](WEBAPP_SHOWCASE_ORCHESTRATION.md) — runtime manifest loading, FSM_COS composition, WebPage showcase orchestration, and GUI.SVG living-proof requirements.
+- [WEBAPP_SHOWCASE_ORCHESTRATION.md](WEBAPP_SHOWCASE_ORCHESTRATION.md) — runtime manifest loading, FSM_COS composition, Experience-owned showcase artifacts, and GUI.SVG living-proof requirements.
+- [WebPageLLM.md](WebPageLLM.md) — active runtime-host refactor handoff, Experience repository boundary, reset/switch/reload acceptance gates, and remaining implementation debt.
 - [integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md](integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md) — truthful host integration plan for Gesture evaluation, Renderer constraints, and evidence boundaries.
 
 ## Start here
@@ -41,9 +42,10 @@
 | 10 | CURRENT_VERTICAL_SLICE.md | Active implementation and proof obligations |
 | 11 | PROVING_GROUND_MIGRATION.md | Extraction plan and architecture ownership contract |
 | 12 | WEBAPP_HOST_MIGRATION.md | WebPage creation, WebApp relationship, and acceptance gates |
-| 13 | WEBAPP_SHOWCASE_ORCHESTRATION.md | Manifest orchestration, runtime composition, and living visual evidence |
-| 14 | integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md | Gesture/Renderer integration contract and claim limits |
-| 15 | DOCUMENTATION_STANDARD.md | How WebPage applies the Workshop documentation rules |
+| 13 | WEBAPP_SHOWCASE_ORCHESTRATION.md | Manifest orchestration, Experience-owned artifacts, runtime composition, and living visual evidence |
+| 14 | WebPageLLM.md | Runtime host refactor handoff and reset/switch/reload contract |
+| 15 | integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md | Gesture/Renderer integration contract and claim limits |
+| 16 | DOCUMENTATION_STANDARD.md | How WebPage applies the Workshop documentation rules |
 
 ## Read architecture as a chain
 
