@@ -1,6 +1,6 @@
 {
   "manifestId": "webpage-host",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "startup": [
     {
       "name": "THE SINGULARITY WORKSHOP",
@@ -63,6 +63,16 @@
       "aboutUrl": "/replay-lab",
       "bridgeEndpoint": null,
       "route": "/replay-lab",
+      "microBundles": []
+    },
+    {
+      "name": "Singularity Studios",
+      "kind": "ExperienceGallery",
+      "description": "Explore the virtual-production vision, reusable soundstage data, SFX, and the boundary between reference audio and physical acoustics.",
+      "deploymentUrl": null,
+      "aboutUrl": "/singularity-studios",
+      "bridgeEndpoint": null,
+      "route": "/singularity-studios",
       "microBundles": []
     }
   ],
