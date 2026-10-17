@@ -8,7 +8,7 @@ namespace TheSingularityWorkshop.Services
     /// <summary>
     /// Compatibility facade over the real page-level FSM.
     /// FSM_API owns progression; the application heartbeat advances the page FSM,
-    /// while the registered SingularityHub singleton owns the process-group scheduler.
+    /// while the session-scoped SingularityHub instance owns the process-group scheduler.
     /// </summary>
     public sealed class FSMManagerService : IDisposable
     {
