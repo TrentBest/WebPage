@@ -129,8 +129,17 @@ try {
   await page.getByRole("button", { name: "Close the Laboratory station", exact: true }).click();
   await page.getByRole("button", { name: "Forge: construct MicroBundles and Experiences", exact: true }).hover();
   await page.getByRole("button", { name: "ENTER THE FORGE ↗", exact: true }).click();
-  await page.getByText("WORKBENCH // AUTHORING", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
-  await page.getByText("LIVE FORGE // PREVIEW", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  // Assert the actual diegetic FSM assembly floor, not obsolete labels from an unimplemented
+  // authoring/preview screen. The current Forge exposes its structure-only contract explicitly.
+  await page.getByText("FSM FORGE", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByText("BLACKSMITH FLOOR // FSM ASSEMBLY", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByText("WELCOME TO THE FSM FORGE", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByRole("button", { name: "UNDERSTOOD — ENTER THE FORGE", exact: true }).click();
+  await page.getByText("FSM ASSEMBLY PLAN", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByText("STATE SHELF", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByRole("button", { name: "STATE +", exact: true }).click();
+  await page.getByText("01 STATES // STRUCTURE ONLY", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByText("TRANSITIONS // FROM → TO", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.goBack({ waitUntil: "domcontentloaded" });
   await page.locator(".workshop-map").waitFor({ state: "visible", timeout: 15_000 });
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
