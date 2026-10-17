@@ -120,7 +120,7 @@ A runtime manifest can select only capabilities that the host can resolve. Insta
 
 ## Cross-repository ownership
 
-The Experience-owned showcase manifest and first demonstration catalog now live in [TheSingularityWorkshop.Experiences](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/tree/development/experiences/WorkshopShowcase). Track the reciprocal host integration in [`docs/WebPageLLM.md`](WebPageLLM.md) and the Experience repository's [`WebPageLLM_HANDOFF.md`](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/WebPageLLM_HANDOFF.md). Do not treat these first files as a completed runtime artifact pipeline.
+The Experience-owned showcase manifest and first demonstration catalog now live in [TheSingularityWorkshop.Experiences](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/tree/development/experiences/WorkshopShowcase). Track the reciprocal host integration in [`docs/WebPageLLM.md`](WebPageLLM.md) and the Experience repository's [`WebPageLLM_HANDOFF.md`](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/WebPageLLM_HANDOFF.md). Do not treat these first files as a completed runtime artifact pipeline. The concrete extraction order and current duplicate source locations are listed in [EXPERIENCE_EXTRACTION_MAP.md](EXPERIENCE_EXTRACTION_MAP.md).
 
 ## Coordination contract
 
