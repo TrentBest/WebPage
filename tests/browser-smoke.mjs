@@ -10,6 +10,11 @@ try {
   page.on("pageerror", error => browserErrors.push(error.message));
 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  // Preserve the founder-established entry beat before the existing first-contact
+  // labels and gateway. The entry click is not itself the PageFSM entry signal.
+  await page.locator(".entry-monolith-btn").waitFor({ state: "visible", timeout: 30_000 });
+  await page.screenshot({ path: `${outputDir}/00-entry.png`, fullPage: true });
+  await page.getByRole("button", { name: /enter the singularity workshop/i }).click();
   await page.getByText("IF AN IMAGE IS WORTH A THOUSAND WORDS...", { exact: true }).waitFor({ state: "visible", timeout: 30_000 });
   await page.getByText("HOW MANY WORDS IS A LIVING IMAGE WORTH?", { exact: true }).waitFor({ state: "visible", timeout: 30_000 });
   await page.locator(".enter-workshop").waitFor({ state: "visible", timeout: 45_000 });
