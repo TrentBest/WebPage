@@ -52,6 +52,13 @@ try {
     throw new Error("Selecting Welcome must retract the navigation to the expander only.");
   }
   await page.locator(".workshop-running-surface.destination-selected .living-experience-panel > .first-contact-stage").waitFor({ state: "hidden" });
+  // The rail deliberately animates between expanded and collapsed widths. Wait for
+  // the real layout to reach its target before asserting the final geometry; sampling
+  // mid-transition makes this smoke test intermittently fail at fractional widths.
+  await page.waitForFunction(() => {
+    const sidebar = document.querySelector(".workshop-sidebar");
+    return sidebar && sidebar.getBoundingClientRect().width <= 60;
+  }, null, { timeout: 5_000 });
   const sidebarWidth = await page.locator(".workshop-sidebar").evaluate(el => el.getBoundingClientRect().width);
   if (sidebarWidth > 60) {
     throw new Error(`The collapsed navigation should leave only the expander rail; width was ${sidebarWidth}px.`);
