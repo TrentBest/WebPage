@@ -126,6 +126,52 @@
         }
     </section>
 
+    <section class="rendering-section renderer-host-proof">
+        <div class="rendering-kicker">06 // SHARED COMMAND WORKLOAD</div>
+        <h2>Test the same Renderer decisions in the browser.</h2>
+        <p>
+            This deterministic diagnostic scene supplies five representation candidates for each stable entity.
+            In repository-source mode, the controls call the actual Renderer command reducer; package mode stays
+            visibly disconnected. The SVG is a browser-host diagnostic projection, not a Visualize backend or GPU proof.
+        </p>
+        <div class="renderer-proof-toolbar">
+            <span class="research-status">@RendererProof.ModeLabel</span>
+            @foreach (var detail in RendererBrowserProof.DetailOptions)
+            {
+                <button type="button"
+                        disabled="@(!RendererProof.IsConnected)"
+                        aria-pressed="@(string.Equals(RendererProof.Metrics.SelectedDetail, detail, StringComparison.OrdinalIgnoreCase))"
+                        @onclick="() => RendererProof.SetDetail(detail)">@detail.ToUpperInvariant()</button>
+            }
+        </div>
+        @if (RendererProof.IsConnected)
+        {
+            <div class="renderer-proof-metrics">
+                <span>Entities <strong>@RendererProof.Metrics.EntitiesRepresented.ToString("N0")</strong></span>
+                <span>Candidate commands <strong>@RendererProof.Metrics.InputCommands.ToString("N0")</strong></span>
+                <span>Selected commands <strong>@RendererProof.Metrics.OutputCommands.ToString("N0")</strong></span>
+                <span>Omitted commands <strong>@RendererProof.Metrics.OmittedCommands.ToString("N0")</strong></span>
+                <span>Detail <strong>@RendererProof.Metrics.SelectedDetail.ToUpperInvariant()</strong></span>
+            </div>
+            <svg class="renderer-proof-svg" viewBox="0 0 800 500" role="img" aria-label="One thousand stable diagnostic entities represented at the selected detail ceiling">
+                <rect x="0" y="0" width="800" height="500" fill="#01050d" />
+                @foreach (var mark in RendererProof.Marks)
+                {
+                    <circle cx="@mark.X.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
+                            cy="@mark.Y.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
+                            r="@mark.Radius.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
+                            fill="@mark.Color" />
+                }
+            </svg>
+        }
+        else
+        {
+            <div class="ai-observation-card unavailable">
+                THE LIVE REDUCER IS NOT CONNECTED IN THIS BUILD. Run WebPage source mode to enable the shared workload.
+            </div>
+        }
+    </section>
+
     <footer class="rendering-footer">
         <a href="about-us">UNDERSTAND THE ARCHITECTURE</a>
         <span>RENDERING IS THE ACTIVE WORKSHOP TAB</span>
@@ -160,6 +206,7 @@
     .research-list strong{color:#eafcff}
     .perception-probe{margin-top:1.5rem;padding:1rem;border:1px solid rgba(255,47,255,.2);background:rgba(255,47,255,.025)}.probe-control{display:block;margin-top:1rem;color:#91aab4;font-size:.62rem;letter-spacing:.08em}.probe-control strong{color:#eafcff}.probe-control input{display:block;width:100%;margin-top:.8rem;accent-color:#ff2cff}.probe-scale{display:grid;grid-template-columns:repeat(6,1fr);gap:.35rem;margin-top:1rem}.probe-band{padding:.65rem .45rem;border:1px solid rgba(0,234,255,.12);opacity:.55}.probe-band.active{opacity:1;border-color:#ff2cff;background:rgba(255,47,255,.08)}.probe-band span,.probe-band small{display:block}.probe-band span{color:#00eaff;font-size:.55rem}.probe-band small{margin-top:.3rem;color:#718e99;font-size:.5rem}.probe-observation{margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(0,234,255,.1)}
     .ai-observation-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:.6rem;margin-top:1.5rem}.ai-observation-card{min-width:0;padding:1rem;border:1px solid rgba(0,234,255,.18);background:rgba(0,234,255,.025)}.ai-observation-card.unavailable{color:#ffd34d}.ai-label{display:block;color:#00eaff;font-size:.55rem;letter-spacing:.16em;margin-bottom:.6rem}.ai-observation-card pre{margin:0;white-space:pre-wrap;color:#c8d9df;font:500 .72rem/1.55 Consolas,'Courier New',monospace}
+    .renderer-proof-toolbar{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;margin:1rem 0}.renderer-proof-toolbar .research-status{margin:0;max-width:100%;overflow-wrap:anywhere}.renderer-proof-toolbar button{padding:.55rem .7rem;background:#04121e;border:1px solid rgba(0,234,255,.25);color:#eafcff;font:600 .58rem Consolas,monospace;cursor:pointer}.renderer-proof-toolbar button[aria-pressed=true]{border-color:#ff2fff;color:#ff2fff}.renderer-proof-toolbar button:disabled{opacity:.35;cursor:not-allowed}.renderer-proof-metrics{display:flex;gap:.5rem;flex-wrap:wrap;margin:.75rem 0}.renderer-proof-metrics span{padding:.6rem .75rem;border:1px solid rgba(0,234,255,.16);color:#91aab4;font-size:.6rem}.renderer-proof-metrics strong{display:block;margin-top:.25rem;color:#eafcff;font-size:.85rem}.renderer-proof-svg{display:block;width:100%;height:auto;max-height:65vh;border:1px solid rgba(0,234,255,.15);background:#01050d}
     .rendering-footer{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:2rem 0 4rem}
     .rendering-footer a{color:#00eaff;text-decoration:none;font-size:.58rem;letter-spacing:.1em}
     .rendering-footer a:hover{color:#ff2cff}
@@ -168,6 +215,8 @@
 </style>
 
 @code {
+    private RendererBrowserProof RendererProof { get; } = new();
+
     private double ProbeDistance { get; set; } = 3d;
 
     private RenderingPerceptionBand ProbeBand =>
