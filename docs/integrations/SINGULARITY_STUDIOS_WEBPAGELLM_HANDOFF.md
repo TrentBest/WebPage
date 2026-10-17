@@ -165,3 +165,9 @@ The SVG is an inspectable documentation surface. It is not a substitute for the 
 6. Connect physical outcomes and sound only when the relevant Physics/audio adapter exists.
 
 The goal is not to draw a giant studio. The goal is to make a production reusable data that can be assembled, evaluated, reset, inspected, and eventually filmed from any supported view.
+
+## Extremus crowd representation coordination
+
+Gestures has added the proposed [Extremus deterministic crowd-baking contract](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/EXTREMUS_CROWD_BAKING.md). This is a design contract, not an implemented impostor renderer. The first intended fixture is two reproducible starport population patches generated from distinct seeds and actual source-catalogue capabilities.
+
+For WebPage, treat any first SVG/GUI.SVG view as a CPU-generated inspection artifact with explicit seed, profile, source IDs, count, and provenance. Keep the stage/world identity authoritative outside Renderer; do not introduce a parallel crowd schema just for the browser. Please coordinate the shared fixture shape and coordinate frame with Gestures, Renderer, Visualize, and Physics before presenting it as a runtime-linked studio crowd. The same versioned fixture should eventually be consumable by AnyApp.
