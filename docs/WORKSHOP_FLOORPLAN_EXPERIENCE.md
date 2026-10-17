@@ -14,7 +14,7 @@ Welcome is a place, not a long scrolling brochure. The floor plan fills its avai
 ## First floor plan
 
 - **Central Hall** — welcome and orientation.
-- **The Forge** — links to the existing live FSM_API lab. The lab is a real FSM_API-backed interaction, separate from the floor-plan illustration.
+- **The Forge** — currently opens the existing live FSM_API lab as a transitional path. Architecturally, the FSM_API lab is a demonstration that belongs in the Singularity Laboratory; the Forge should become the construction/authoring workspace for reusable MicroBundles and Experiences. Preserve the working lab until a verified Laboratory station replaces this path.
 - **Assembly Benches** — explain MicroBundles and the FSM_COS composition boundary. A future installed bundle may contribute a facility only through an actual, discoverable capability contract.
 - **Observatory** — establishes the intended celestial assembly workflow: choose planets, moons, and bodies from parts buckets, then place and resize them. This is a concept today, not a functioning solar-system editor.
 - **World Globe** — communicates that world-level terrain work happens through a selected globe, not by editing the solar-system container. Interactive globe manipulation remains planned.
@@ -35,6 +35,12 @@ Opening sound effects are **not yet wired**. The existing [Physics free-field ob
 5. Document the exact asset source, licence, format, trigger, and integration test before claiming the opening sound is implemented.
 
 Suggested sound design brief for the coordinating owner: short forged-metal resonance, low warm room tone, subtle ember/air texture, and a restrained transition swell. Avoid a loud fantasy sting or constant loop; this should feel like entering a working place, not a game trailer.
+
+## Laboratory and Forge boundary
+
+The floorplan is the visitor's orientation surface; the **Singularity Laboratory** is where visitors discover demonstrations as stations, compose existing MicroBundles into an experiment, prescribe the bundle set for a sandbox, and inspect evidence. The **Forge** is where creators construct reusable MicroBundles and Experiences. This is a deliberate distinction: experimentation with existing ingredients should not require entering the authoring environment.
+
+See [Singularity Laboratory — Station and Experiment Contract](SINGULARITY_LABORATORY_STATIONS.md) for the station families, evidence rules, current demonstration maturity, and implementation gates. The current FSM_API lab still opens from the Forge room for continuity, but that placement is transitional and should move only when the Laboratory has a verified replacement route.
 
 ## Composition path for future facilities
 
