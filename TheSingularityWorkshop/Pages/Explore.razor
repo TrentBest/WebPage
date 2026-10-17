@@ -220,7 +220,7 @@
 
             if (gardenVisitResolved && RequestedRoom is "engineering" or "forge")
             {
-                insideRoomId = "engineering";
+                insideRoomId = RequestedRoom == "forge" ? "forge" : "engineering";
                 await InvokeAsync(StateHasChanged);
             }
 
