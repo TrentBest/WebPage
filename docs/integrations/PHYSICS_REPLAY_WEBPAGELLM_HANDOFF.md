@@ -1,7 +1,7 @@
 # Physics Replay / Shareable Moments — WebPageLLM Integration Brief
 
 **Audience:** WebPageLLM and anyone implementing the Workshop's public-facing experience  
-**Status:** updated integration brief; Physics now has a tested model-driven single-segment replay executor, but there is not yet a concrete world adapter or browser playback experience  
+**Status:** Physics has tested model-level replay and fork-aware route coordination. WebPage now contains a local illustrative `/replay-lab` experience with scrubbing, playback of fixture data, event markers, Physics evidence links, and explicit unavailable states. It is not connected to Physics checkpoints or a reconstructed physical world; browser verification remains outstanding.  
 **Source branch:** `development` in both repositories  
 **Do not publish or deploy from this brief.**
 
@@ -44,7 +44,7 @@ The [Physics build-and-test run](https://github.com/TrentBest/TheSingularityWork
 
 Make it a first-class **experience/demo**, not a paragraph buried in documentation and not a generic SaaS feature card.
 
-**Suggested placement:** a new **Moments** or **Replay Lab** destination within the Workshop showcase/navigation, alongside other living demonstrations. If the current navigation is being reorganized, use the existing showcase/hub convention rather than adding a separate competing navigation system. Keep it discoverable from the main Workshop hub.
+**Current placement:** the manifest already declares a **Replay Lab** destination at `/replay-lab`, and `TheSingularityWorkshop/Pages/ReplayLab.razor` implements the local fixture. Keep it discoverable through the existing Workshop hub; do not add a competing navigation system.
 
 Suggested visitor journey:
 
@@ -58,10 +58,15 @@ Visual direction: preserve the Workshop's living, instrumented aesthetic. The ti
 
 ## What to integrate now versus later
 
-### Now: prepare a truthful integration point
+### Current: truthful illustrative browser surface
 
-- Add the **Moments / Replay Lab** destination and an intentionally small visual prototype if it fits the current hub architecture.
-- Label it clearly as an **experimental preview** until real replay is connected.
+- [x] Add the **Replay Lab** destination using the existing manifest/hub convention.
+- [x] Provide a small local timeline fixture with a visible playhead, event markers, keyboard-accessible scrubbing, and explicit fixture status.
+- [x] Link to the Physics replay executor and solver-backed/route replay tests.
+- [x] Mark the browser-world adapter as unavailable and sharing/remix as not implemented.
+- [ ] Verify the route and interaction in a real browser; source inspection is not browser evidence.
+
+Keep it clearly labeled as an **illustrative preview** until real world replay is connected.
 - Use a deterministic, explicitly labeled illustrative fixture only if a visual prototype needs sample data. Do not imply that fixture is a Physics-generated replay or that controls reconstruct a physical world.
 - Keep the replay UI behind a small, replaceable adapter boundary. Do not couple the page to Physics internals, parse opaque checkpoint bytes in the browser, or invent an API that the Physics package does not expose.
 - Show a capability/status panel distinguishing **implemented**, **in progress**, and **planned**. A button must either work, explain why it is unavailable, or be disabled; it must not pretend to save, restore, scrub, or share.
@@ -80,22 +85,20 @@ A likely eventual separation is:
 
 Do not assume that reversing time is implemented by running updates backward. General physics operations are not necessarily invertible. The initial trustworthy route is checkpoint + ordered history replay.
 
-## Acceptance checks for the first visible prototype
+## Prototype acceptance status and remaining verification
 
-- A visitor can find it from the Workshop hub without disrupting the existing landing experience.
-- The selected moment and scrub range are visually clear and keyboard-accessible.
-- The UI communicates when data is illustrative versus produced by the real Physics implementation.
-- Unavailable playback, remix, and sharing are visibly unavailable rather than simulated as successful.
-- Opening the experience does not trigger expensive background work before it is needed.
-- The page remains responsive while the visitor interacts; measure load and interaction latency rather than relying on appearance alone.
-- The implementation is small enough to replace as the real adapter and portable moment format mature.
+- **Source-level present:** the host manifest declares `/replay-lab`; the route provides event markers, a range slider, step controls, play/pause for fixture data, and a local event ledger.
+- **Source-level present:** the page labels the scene illustrative, links to Physics implementation/test evidence, and states that no data is uploaded/shared.
+- **Source-level present:** physical world reconstruction is marked unavailable; portable sharing/remix is explicitly not implemented.
+- **Not yet verified:** browser navigation and keyboard interaction, responsive layout, console/runtime errors, and whether entry from the hub preserves the intended landing sequence.
+- **Not yet measured:** route load and interaction latency. Do not claim performance based on visual inspection.
 
 ## What WebPageLLM should do next
 
-1. Read this brief and the linked Physics design contract; inspect `TimelineReplayExecutor` and its tests to understand the actual model-level seam.
-2. Inspect the current WebPage navigation/hub and place the entry using the existing architecture.
-3. Implement the smallest truthful, lazy-loaded visual prototype—or only the navigation/empty state if no real fixture is appropriate.
-4. Keep the fixture visibly illustrative; do not make claims or UI affordances for physical replay, sharing, hosting, or remix until those paths work end to end.
-5. Report the exact files changed, how to launch the local browser experience, and what Trent should click/test. Leave release/deploy actions untouched.
+1. Browser-verify `/replay-lab` and its entry from the manifest hub; check keyboard use, mobile/desktop layout, console output, and the complete opening sequence.
+2. Keep the fixture visibly illustrative. Do not connect arbitrary opaque checkpoint bytes or invent a browser-facing Physics API.
+3. Coordinate the next implementation with the Physics owner: a concrete world/solver adapter and independently verifiable deterministic reconstruction example must exist before this page can claim physical replay.
+4. Define a portable moment contract only when its checkpoint, event, asset, version, and compatibility requirements are grounded in actual Physics code.
+5. Report exact files changed, test evidence, and the local click path. Leave release/deploy actions untouched.
 
 This is an integration handoff, not permission to publish or deploy. The goal is to bring the work into view early enough for human eyes and a real browser to validate it while the underlying reconstruction capability is built.
