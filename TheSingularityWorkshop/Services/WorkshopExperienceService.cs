@@ -152,7 +152,7 @@ public sealed class WorkshopExperienceService : IDisposable
             {
                 candidateHub.LoadBundle(hubBundle);
             }
-            candidateHub.ExecuteArbitrationPipeline();
+            var candidateArbitrationMutations = candidateHub.ExecuteArbitrationPipeline();
 
             var candidateDemonstrations = new DemonstrationRegistry(
                 candidateManifest.Demonstrations,
@@ -163,7 +163,7 @@ public sealed class WorkshopExperienceService : IDisposable
             var oldCapabilities = _capabilityRuntimeAssemblies.Values.ToArray();
             var oldHub = _hubRuntime.Hub;
 
-            _hubRuntime.ReplaceHub(candidateHub);
+            _hubRuntime.ReplaceHub(candidateHub, candidateArbitrationMutations);
             Manifest = candidateManifest;
             Demonstrations = candidateDemonstrations;
             CurrentManifestExperience = startupExperience;
