@@ -174,7 +174,15 @@ try {
 
   // The Physics replay experience must be catalog-driven, not a duplicate hardcoded card.
   await page.goto(`${baseUrl}/?tab=demonstrations`, { waitUntil: "domcontentloaded" });
-  await page.locator(".demonstration-grid").waitFor({ state: "visible", timeout: 15_000 });
+  // Explicit destination URLs bypass the first-visit monolith, but do not fabricate
+  // completion of the PageFSM first-contact/gateway lifecycle.
+  await page.getByText("IF AN IMAGE IS WORTH A THOUSAND WORDS...", { exact: true })
+    .waitFor({ state: "visible", timeout: 30_000 });
+  await page.getByText("HOW MANY WORDS IS A LIVING IMAGE WORTH?", { exact: true })
+    .waitFor({ state: "visible", timeout: 30_000 });
+  await page.locator(".enter-workshop").waitFor({ state: "visible", timeout: 45_000 });
+  await page.locator(".enter-workshop").click();
+  await page.locator(".demonstration-grid").waitFor({ state: "visible", timeout: 180_000 });
   const replayCards = page.locator(".demonstration-card")
     .filter({ hasText: "Physics Replay Lab — Shareable Moments Prototype" });
   const replayCardCount = await replayCards.count();
