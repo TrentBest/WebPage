@@ -212,8 +212,21 @@ try {
   await page.locator('.workshop-hub-overlay[data-selected-hub-tab="WELCOME"] .manifest-hub')
     .waitFor({ state: "visible", timeout: 180_000 });
   await page.getByRole("button", { name: /expand workshop navigation/i }).waitFor({ state: "visible" });
+  // Navigation reveals destinations progressively; advance the real navigation FSM
+  // rather than assuming later destinations exist after a fresh session load.
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "Welcome", exact: true }).waitFor({ state: "visible" });
+  await page.getByRole("link", { name: "Welcome", exact: true }).click();
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "Singularity Laboratory", exact: true }).waitFor({ state: "visible" });
+  await page.getByRole("link", { name: "Singularity Laboratory", exact: true }).click();
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "Singularity Architecture", exact: true }).waitFor({ state: "visible" });
+  await page.getByRole("link", { name: "Singularity Architecture", exact: true }).click();
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
+  await page.getByRole("link", { name: "Singularity City", exact: true }).waitFor({ state: "visible" });
+  await page.getByRole("link", { name: "Singularity City", exact: true }).click();
+  await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "Digitens", exact: true }).waitFor({ state: "visible" });
   await page.getByRole("link", { name: "Digitens", exact: true }).click();
   const digitens = page.frameLocator('iframe[title="Digitens: digital citizens of the Singularity World"]');
