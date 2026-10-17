@@ -6,6 +6,33 @@ const browser = await chromium.launch({ headless: true });
 
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+
+  // The same deterministic city must remain identifiable across overview, plan, and street observation.
+  await page.goto(`${baseUrl}/city-lab`, { waitUntil: "networkidle" });
+  await page.getByRole("heading", { name: /Singularity City Lab/i }).waitFor({ state: "visible", timeout: 20_000 });
+  await page.getByRole("button", { name: /TOP-DOWN PLAN/i }).click();
+  const planBuildings = page.locator(".plan-building[data-entity-id]");
+  await planBuildings.first().waitFor({ state: "visible", timeout: 10_000 });
+  const planIds = await planBuildings.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-entity-id")));
+  assert.ok(planIds.length > 200, `Expected a city-scale plan, received ${planIds.length} buildings.`);
+  assert.equal(new Set(planIds).size, planIds.length, "Plan building identities must be unique.");
+
+  await page.getByRole("button", { name: /STREET VIEW/i }).click();
+  const streetBuildings = page.locator(".street-building[data-entity-id]");
+  await streetBuildings.first().waitFor({ state: "visible", timeout: 10_000 });
+  const streetIds = await streetBuildings.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-entity-id")));
+  assert.ok(streetIds.length > 0, "First-person projection must show city buildings.");
+  assert.ok(streetIds.every(id => planIds.includes(id)), "Street view must reuse canonical plan building IDs.");
+  const beforeMove = await page.locator(".stage-topline").textContent();
+  await page.getByRole("button", { name: "FORWARD", exact: false }).click();
+  const afterMove = await page.locator(".stage-topline").textContent();
+  assert.notEqual(afterMove, beforeMove, "Moving the observer must change camera state.");
+  await page.getByRole("button", { name: /TURN/i }).last().click();
+  await page.getByText(/YAW 12°/).waitFor({ state: "visible", timeout: 5_000 });
+  await page.getByRole("button", { name: /CITY OVERVIEW/i }).click();
+  await page.screenshot({ path: process.env.CITY_LAB_SCREENSHOT ?? "singularity-city-overview.png", fullPage: true });
+  console.log(`Singularity City: ${planIds.length} stable building IDs are shared between top-down plan and observer-relative street projection; movement and yaw controls passed.`);
+
   await page.goto(`${baseUrl}/digitens`, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({
     state: "visible",
