@@ -47,6 +47,26 @@ public sealed class SingularityHub : ISingularityHub
         _processGroups.Where(pair=>pair.Value==ProcessGroupState.Active)
             .Select(pair=>new ProcessGroupSnapshot(pair.Key,pair.Value)).ToArray();
 
+    /// <summary>
+    /// Clears manifest-owned bundle/runtime registrations while preserving the Hub scheduler
+    /// process groups registered by the active PageFSM.
+    /// </summary>
+    public void ResetManifestRuntime()
+    {
+        _warehouseIdentities.Clear();
+        _availableBundles.Clear();
+        _loadedBundles.Clear();
+        _loadingBundles.Clear();
+        _loadAttempts.Clear();
+
+        if (Routing is SingularityRouting routing)
+            routing.Clear();
+        if (Configuration is SingularityHubConfiguration configuration)
+            configuration.Clear();
+        if (Audit is ArbitrationAudit audit)
+            audit.Clear();
+    }
+
     /// <summary>Registers one process group, optionally under an existing parent.</summary>
     public SingularityHub RegisterProcessGroup(string processGroup,string? parentProcessGroup=null)
     {
