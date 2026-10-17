@@ -86,7 +86,7 @@ This contract is a target workflow. The current demonstration registry does not 
 
 The Forge is where a creator builds or changes the reusable ingredients and authored environments. It should provide authoring tools for MicroBundles and Experiences and validate their declarations against canonical contracts. It should not become the place visitors must enter just to inspect a demo or change a sandbox parameter.
 
-The existing Welcome floorplan currently opens the legacy FSM_API interactive lab from its room labeled **Forge**. That is a transitional placement, not the intended product boundary. The FSM_API lab is a demonstration and should be discoverable from the Laboratory; the Forge should ultimately open construction/authoring workflows. Do not remove the live lab until a verified Laboratory entry replaces the path.
+The Welcome floorplan now separates the existing live FSM_API lifecycle demonstration into the **Singularity Laboratory** and routes **The Forge** to the existing FSM Forge at `/explore?room=forge`. The FSM Forge already provides real state/transition/condition/action scaffolds and a live FSM_API preview. It is a first construction tool, not yet a general MicroBundle/Experience authoring system.
 
 A future installed MicroBundle may contribute a facility or station only through a stable, discoverable provider contract after composition actually resolves it. A manifest label by itself is not proof of an installed capability.
 
