@@ -37,11 +37,6 @@ var lightMaterial = Material(17, new Vector4(0.75f, 0.86f, 1f, 1));
 
 var commands = new List<VisualizerDrawCommand>();
 AddRect("stage-floor", stageWidth, stageDepth, stageWidth / 2, stageDepth / 2, stageMaterial);
-AddRect("stage-boundary-north", stageWidth, 2, stageWidth / 2, 1, lightMaterial);
-AddRect("stage-boundary-south", stageWidth, 2, stageWidth / 2, stageDepth - 1, lightMaterial);
-AddRect("stage-boundary-west", 2, stageDepth, 1, stageDepth / 2, lightMaterial);
-AddRect("stage-boundary-east", 2, stageDepth, stageWidth - 1, stageDepth / 2, lightMaterial);
-
 foreach (var zone in stage.GetProperty("zones").EnumerateArray())
 {
     var bounds = zone.GetProperty("bounds");
@@ -51,15 +46,17 @@ foreach (var zone in stage.GetProperty("zones").EnumerateArray())
         "zone.camera-rail" => zoneRailMaterial,
         _ => zoneServiceMaterial
     };
-    AddRect(zone.GetProperty("id").GetString()!, bounds.GetProperty("width").GetSingle(),
-        bounds.GetProperty("depth").GetSingle(),
-        bounds.GetProperty("x").GetSingle() + bounds.GetProperty("width").GetSingle() / 2,
-        bounds.GetProperty("z").GetSingle() + bounds.GetProperty("depth").GetSingle() / 2,
-        material);
+    AddZoneOutline(zone.GetProperty("id").GetString()!, bounds, material);
 }
 
 var definitions = data.GetProperty("assetDefinitions").EnumerateArray()
     .ToDictionary(item => item.GetProperty("id").GetString()!, item => item);
+// Draw the stage boundary after zone outlines so it remains visible at the perimeter.
+AddRect("stage-boundary-north", stageWidth, 2, stageWidth / 2, 1, lightMaterial);
+AddRect("stage-boundary-south", stageWidth, 2, stageWidth / 2, stageDepth - 1, lightMaterial);
+AddRect("stage-boundary-west", 2, stageDepth, 1, stageDepth / 2, lightMaterial);
+AddRect("stage-boundary-east", 2, stageDepth, stageWidth - 1, stageDepth / 2, lightMaterial);
+
 foreach (var instance in data.GetProperty("scene").GetProperty("instances").EnumerateArray())
 {
     var assetId = instance.GetProperty("assetId").GetString()!;
@@ -102,6 +99,19 @@ await using var visualizer = new Visualizer(
     catalog);
 var result = await visualizer.RenderAsync(frame);
 Console.WriteLine($"Singularity Studios plan: {result.SubmittedDrawCount} draw commands -> {outputPath}");
+
+void AddZoneOutline(string label, JsonElement bounds, VisualizerResourceId material)
+{
+    var x = bounds.GetProperty("x").GetSingle();
+    var z = bounds.GetProperty("z").GetSingle();
+    var width = bounds.GetProperty("width").GetSingle();
+    var depth = bounds.GetProperty("depth").GetSingle();
+    const float thickness = 3;
+    AddRect(label + "-north", width, thickness, x + width / 2, z + thickness / 2, material);
+    AddRect(label + "-south", width, thickness, x + width / 2, z + depth - thickness / 2, material);
+    AddRect(label + "-west", thickness, depth, x + thickness / 2, z + depth / 2, material);
+    AddRect(label + "-east", thickness, depth, x + width - thickness / 2, z + depth / 2, material);
+}
 
 void AddRect(string label, float width, float depth, float centerX, float centerZ, VisualizerResourceId material)
 {
