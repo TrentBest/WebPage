@@ -1,0 +1,57 @@
+# WebPageLLM — Runtime Host Refactor
+
+**Branch:** `development`  
+**Status:** active migration; runtime artifact loading and switching are not yet implemented.
+
+## Mission
+
+Make WebPage an intentionally small WebApp host. It should load the selected Experience manifest and versioned MicroBundle artifacts at runtime, ask FSM_COS to compose them, and present the resulting capabilities. The showcase's domain content and behavior belong in the Experiences repository and owning MicroBundles—not compiled WebPage pages.
+
+## Cross-repository source of truth
+
+The first repository-owned showcase artifacts are now in [TheSingularityWorkshop.Experiences](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/tree/development/experiences/WorkshopShowcase):
+
+- [manifest.json](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/manifest.json) — Experience identity/version and versioned startup/running/capability roots.
+- [demonstrations.json](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/demonstrations.json) — initial moved demonstration records.
+- [Experience README](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/README.md) — ownership and migration status.
+- [Experience-side handoff](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/WorkshopShowcase/WebPageLLM_HANDOFF.md) — host contract and coordination.
+
+These are the beginning of the move, not yet the runtime source consumed by WebPage. Keep the current in-host manifest/content until the replacement has been exercised and validated; avoid a premature delete-and-break migration.
+
+## Current WebPage debt confirmed from source
+
+- `WorkshopExperienceService.InitializeAsync` loads `wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json`.
+- The host's `WorkshopCompositionCatalog` contains a compiled dictionary of known MicroBundle implementations. It is not a repository-backed executable artifact loader.
+- Hub destinations have empty `microBundles` arrays, and route behavior is still partly implemented in compiled page components.
+- `RestartFromManifestAsync` resets selected entries/state but does not fetch, validate, or recompose a manifest.
+- The current hub runtime has no demonstrated transactional reset/replacement lifecycle. Do not dispose/reuse runtime objects casually or mutate active state before candidate composition succeeds.
+
+## Required refactor order
+
+1. **Define the repository boundary.** Select Experience identity/version; resolve its manifest and content using the canonical Experience/MicroBundle repository path. Define trusted immutable identity/digest, cache/bootstrap behavior, size limits, compatibility, and allowed-origin policy. Do not use arbitrary browser-supplied URLs as executable authority.
+2. **Keep host configuration small.** WebPage-specific settings remain host-owned (base path, browser capabilities, initial Experience selection, authentication/session adapters). Experience identity, journeys, demo metadata, behavior, and required bundles move to Experiences/MicroBundles.
+3. **Separate resolution from activation.** Parse and validate into a candidate object, resolve versioned roots, compose through FSM_COS, and only then atomically activate. A bad manifest leaves the active runtime intact.
+4. **Make reset and switching real.** Reset reloads/recomposes the selected manifest. Switch selects another valid manifest. Reload detects changed content only under an explicit version/identity policy. Surface active identity/version, status, and failure reason.
+5. **Correct lifecycle ownership.** Audit MicroBundle factories, FSM_COS assembly lifetimes, hub registration, event subscriptions, and disposal before enabling repeated activation. Do not reuse disposed bundle instances or leave old Hub registrations active.
+6. **Present selected Experience data.** Replace compiled page-specific selection with manifest/content-driven routing and package-owned providers. Keep browser-specific route/viewport/input integration in WebPage.
+7. **Prove redefinition.** With one host build, switch between two valid Experience manifests and verify a meaningful change in composition and visitor behavior. Test reset, invalid manifest, unavailable artifact, incompatible version, and rollback.
+8. **Move incrementally.** Migrate demonstration and journey data from the legacy WebPage manifest to the Experience repository. Remove each old copy only after tests prove the replacement.
+9. **Living documentation.** Use GUI.SVG or the owning Visualize/Renderer boundary to show real state/model changes. Label what a visual proves and does not prove; do not present an SVG animation as FSM execution or GPU proof.
+
+## Acceptance gates
+
+- [ ] Two-branch Sith policy: work on `development`; leave `master` untouched.
+- [ ] Existing visitor journeys remain functional during migration.
+- [ ] Candidate failure cannot corrupt the active Experience.
+- [ ] Reset, switch, and reload have distinct, tested semantics.
+- [ ] Experience data is repository-owned; WebPage contains host adapters, not duplicated showcase domain behavior.
+- [ ] Composition is delegated to FSM_COS and state-machine semantics to FSM_API.
+- [ ] No arbitrary code execution from JSON or browser input.
+- [ ] Tests/build/browser evidence are recorded before claiming the refactor complete.
+- [ ] No package publish or deployment without explicit authorization.
+
+## Progress log
+
+- 2026-10-17: Added the first Experience-owned Workshop Showcase manifest and moved initial WebGPU-instancing, native WPF/D3D12-surface, and Renderer Event Horizon demonstration records into the Experiences repository.
+- 2026-10-17: Updated the WebPage orchestration contract to link to the Experience-owned artifacts.
+- Remaining: WebPage still loads its legacy static manifest and does not yet consume these new files at runtime; reset/switch/recompose behavior is still outstanding.
