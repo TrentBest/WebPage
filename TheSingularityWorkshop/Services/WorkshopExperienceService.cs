@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.MicroBundleDomain;
 using TheSingularityWorkshop.Infrastructure.Hub;
@@ -6,16 +5,18 @@ using TheSingularityWorkshop.SingularityHub;
 using TheSingularityWorkshop.Workshop.Composition;
 using TheSingularityWorkshop.Workshop.Experiences;
 using TheSingularityWorkshop.Workshop.MicroBundles;
+using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 
 namespace TheSingularityWorkshop.Services;
 
 public sealed class WorkshopExperienceService : IDisposable
 {
-    private const string ManifestPath = "Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json";
+    private const string DefaultManifestPath = "Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json";
 
     private readonly HttpClient _httpClient;
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
     private readonly HubRuntime _hubRuntime;
+    private ulong _runtimeGeneration;
     private bool _disposed;
 
     public event Action? StateChanged;
@@ -24,6 +25,9 @@ public sealed class WorkshopExperienceService : IDisposable
     public bool IsFirstVisit { get; private set; }
     public bool IsInitialized { get; private set; }
     public bool IsDeepDive { get; private set; }
+    public string ActiveManifestPath { get; private set; } = DefaultManifestPath;
+    public string? LastManifestError { get; private set; }
+    public string? LastRuntimeCleanupError { get; private set; }
     public WebPageHostManifest? Manifest { get; private set; }
     public DemonstrationRegistry? Demonstrations { get; private set; }
     public WebPageManifestExperience? CurrentManifestExperience { get; private set; }
@@ -37,191 +41,274 @@ public sealed class WorkshopExperienceService : IDisposable
     private readonly Dictionary<string, RuntimeAssembly> _capabilityRuntimeAssemblies =
         new(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>FSM_COS assemblies for the manifest-declared hub destinations.</summary>
     public IReadOnlyDictionary<string, RuntimeAssembly> HubRuntimeAssemblies => _hubRuntimeAssemblies;
-
-    /// <summary>FSM_COS assemblies for supporting capabilities that are not top-level hub destinations.</summary>
     public IReadOnlyDictionary<string, RuntimeAssembly> CapabilityRuntimeAssemblies => _capabilityRuntimeAssemblies;
 
     public GuiNode? MonikerComposition =>
         RuntimeAssembly?.TryGetBundle<MonikerMicroBundle>(
-            (ulong)MonikerMicroBundle.BundleId,
-            out var moniker) == true
+            (ulong)MonikerMicroBundle.BundleId, out var moniker) == true
             ? moniker!.Composition
             : null;
 
     public string? MonikerBehaviorClass =>
         RuntimeAssembly?.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
-            (ulong)MonikerSwayBehaviorMicroBundle.BundleId,
-            out _) == true
+            (ulong)MonikerSwayBehaviorMicroBundle.BundleId, out _) == true
             ? MonikerSwayBehaviorMicroBundle.PresentationClass
             : null;
 
     public LivingGuiExperienceMicroBundle? PrimaryExperienceComposition =>
         RuntimeAssembly?.TryGetBundle<LivingGuiExperienceMicroBundle>(
-            (ulong)LivingGuiExperienceMicroBundle.BundleId,
-            out var primary) == true
+            LivingGuiExperienceMicroBundle.BundleId, out var primary) == true
             ? primary
             : null;
 
-    /// <summary>
-    /// The Hub's ProtocolAi terminal composition. It is a separate FSM_COS assembly,
-    /// so the primary Experience does not need to depend on authoring tools.
-    /// </summary>
     public AiExchangeCompositionBundle? AiExchangeComposition =>
         _capabilityRuntimeAssemblies.Values
             .Select(assembly => assembly.TryGetBundle<AiExchangeCompositionBundle>(
-                AiExchangeCompositionBundle.BundleId,
-                out var ai) ? ai : null)
+                AiExchangeCompositionBundle.BundleId, out var ai) ? ai : null)
             .FirstOrDefault(ai => ai is not null);
 
     public WorkshopExperienceService(HttpClient httpClient, HubRuntime hubRuntime)
     {
-        _httpClient = httpClient;
-        _hubRuntime = hubRuntime;
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _hubRuntime = hubRuntime ?? throw new ArgumentNullException(nameof(hubRuntime));
     }
 
     public async Task InitializeAsync(bool returningVisitor = false)
     {
+        ThrowIfDisposed();
         if (IsInitialized)
             return;
 
-        IsInitialized = true;
         IsFirstVisit = !returningVisitor;
         SetState("ManifestLoading");
-
-        var manifestJson = await _httpClient.GetStringAsync(ManifestPath);
-        Manifest = WebPageHostManifestParser.Parse(manifestJson);
-        Demonstrations = new DemonstrationRegistry(
-            Manifest.Demonstrations,
-            hostCapabilities: ["WebPage", "Browser"]);
-
-        if (Manifest.Startup.Count == 0)
-            throw new InvalidOperationException("The WebPage host manifest contains no startup Experience.");
-
-        if (Manifest.Running.Count == 0)
-            throw new InvalidOperationException("The WebPage host manifest contains no primary running Experience.");
-
-        CurrentManifestExperience = Manifest.Startup[0];
-        PrimaryManifestExperience = Manifest.Running[0];
-
-        ComposePrimaryExperience();
-        ComposeManifestHubBundles();
-        ComposeManifestCapabilities();
-
-        // This is composition metadata, not a presentation clock. PageFSM owns
-        // gateway, population, reveal, gravity, and navigation timing.
-        SetState("Moniker");
-    }
-
-    private void ComposePrimaryExperience()
-    {
-        var primaryExperience = PrimaryManifestExperience;
-        if (primaryExperience?.MicroBundles is not { Count: > 0 } primaryBundles)
-            throw new InvalidOperationException("The manifest-selected primary Experience has no MicroBundles.");
-
-        // Startup presentation and the primary Experience are both manifest-selected
-        // roots. FSM_COS closes their shared dependency graph into one RuntimeAssembly.
-        var roots = primaryBundles
-            .Select(root => root.ToRuntimeManifestEntry())
-            .ToList();
-        if (CurrentManifestExperience?.MicroBundles is { Count: > 0 } startupBundles)
-            roots.InsertRange(0, startupBundles.Select(root => root.ToRuntimeManifestEntry()));
-
-        RuntimeAssembly = _compositionSystem.Execute(new RuntimeManifest(
-            RuntimeId: 1,
-            Bundles: roots.ToArray()));
-
-        var hasMoniker = RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
-            (ulong)MonikerMicroBundle.BundleId,
-            out _);
-        var hasPrimary = RuntimeAssembly.TryGetBundle<LivingGuiExperienceMicroBundle>(
-            LivingGuiExperienceMicroBundle.BundleId,
-            out _);
-        var startupSelected = CurrentManifestExperience?.MicroBundles is { Count: > 0 };
-        var hasMonikerExperience = !startupSelected ||
-            RuntimeAssembly.TryGetBundle<MonikerExperienceMicroBundle>(
-                (ulong)MonikerExperienceMicroBundle.BundleId, out _);
-        var hasSwayBehavior = !startupSelected ||
-            RuntimeAssembly.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
-                (ulong)MonikerSwayBehaviorMicroBundle.BundleId, out _);
-
-        if (!hasMonikerExperience || !hasSwayBehavior || !hasMoniker || !hasPrimary)
-            throw new InvalidOperationException(
-                "FSM_COS did not compose the manifest-selected Moniker Experience, its stationary Moniker and sway behavior, and the primary Experience.");
-
-        if (RuntimeAssembly.TryGetBundle<MonikerMicroBundle>(
-                (ulong)MonikerMicroBundle.BundleId,
-                out var moniker) &&
-            moniker is TheSingularityWorkshop.SingularityHub.IMicroBundle hubBundle)
-        {
-            _hubRuntime.Hub.LoadBundle(hubBundle);
-        }
-
-        _hubRuntime.ArbitrateManifest();
-    }
-
-    private void ComposeManifestHubBundles()
-    {
-        _hubRuntimeAssemblies.Clear();
-
-        var hubItems = Manifest?.Hub ?? Array.Empty<WebPageManifestHubItem>();
-        for (var index = 0; index < hubItems.Count; index++)
-        {
-            var item = hubItems[index];
-            if (item.MicroBundles is null || item.MicroBundles.Count == 0)
-                continue;
-
-            var assembly = _compositionSystem.Execute(new RuntimeManifest(
-                RuntimeId: 100UL + (ulong)index,
-                Bundles: item.MicroBundles
-                    .Select(root => root.ToRuntimeManifestEntry())
-                    .ToArray()));
-
-            _hubRuntimeAssemblies[item.Name] = assembly;
-        }
-    }
-
-    private void ComposeManifestCapabilities()
-    {
-        _capabilityRuntimeAssemblies.Clear();
-
-        var capabilities = Manifest?.Capabilities ?? Array.Empty<WebPageManifestCapability>();
-        foreach (var capability in capabilities)
-        {
-            if (capability.MicroBundles is null || capability.MicroBundles.Count == 0)
-                continue;
-
-            var assembly = _compositionSystem.Execute(new RuntimeManifest(
-                RuntimeId: (ulong)(200UL + (ulong)_capabilityRuntimeAssemblies.Count),
-                Bundles: capability.MicroBundles
-                    .Select(root => root.ToRuntimeManifestEntry())
-                    .ToArray()));
-
-            _capabilityRuntimeAssemblies[capability.Name] = assembly;
-        }
+        await SwitchManifestAsync(DefaultManifestPath);
     }
 
     /// <summary>
-    /// Compatibility entry point. The actual landing transition is owned by
-    /// FSMManagerService/PageFSM; this service only composes manifest capabilities.
+    /// Loads and composes a candidate host manifest, then atomically activates it.
+    /// The source must be a same-origin relative asset path. Executable MicroBundle
+    /// artifacts must be resolved by the trusted repository/provider boundary, not URLs.
     /// </summary>
+    public async Task SwitchManifestAsync(string manifestPath)
+    {
+        ThrowIfDisposed();
+        ValidateManifestPath(manifestPath);
+
+        RuntimeAssembly? candidatePrimary = null;
+        var candidateHubAssemblies = new Dictionary<string, RuntimeAssembly>(StringComparer.OrdinalIgnoreCase);
+        var candidateCapabilities = new Dictionary<string, RuntimeAssembly>(StringComparer.OrdinalIgnoreCase);
+        HubKernel? candidateHub = null;
+        var activated = false;
+
+        try
+        {
+            var manifestJson = await _httpClient.GetStringAsync(manifestPath);
+            var candidateManifest = WebPageHostManifestParser.Parse(manifestJson);
+
+            if (candidateManifest.Startup is not { Count: > 0 })
+                throw new InvalidOperationException("The selected host manifest contains no startup Experience.");
+            if (candidateManifest.Running is not { Count: > 0 })
+                throw new InvalidOperationException("The selected host manifest contains no primary running Experience.");
+
+            var startupExperience = candidateManifest.Startup[0];
+            var primaryExperience = candidateManifest.Running[0];
+            if (primaryExperience.MicroBundles is not { Count: > 0 } primaryBundles)
+                throw new InvalidOperationException("The manifest-selected primary Experience has no MicroBundles.");
+
+            var generation = checked(++_runtimeGeneration);
+            var runtimeBase = checked(generation * 1000UL);
+            var roots = primaryBundles.Select(root => root.ToRuntimeManifestEntry()).ToList();
+            if (startupExperience.MicroBundles is { Count: > 0 } startupBundles)
+                roots.InsertRange(0, startupBundles.Select(root => root.ToRuntimeManifestEntry()));
+
+            candidatePrimary = _compositionSystem.Execute(new RuntimeManifest(
+                RuntimeId: runtimeBase + 1,
+                Bundles: roots.ToArray()));
+
+            var hasMoniker = candidatePrimary.TryGetBundle<MonikerMicroBundle>(
+                (ulong)MonikerMicroBundle.BundleId, out _);
+            var hasPrimary = candidatePrimary.TryGetBundle<LivingGuiExperienceMicroBundle>(
+                LivingGuiExperienceMicroBundle.BundleId, out _);
+            var startupSelected = startupExperience.MicroBundles is { Count: > 0 };
+            var hasMonikerExperience = !startupSelected ||
+                candidatePrimary.TryGetBundle<MonikerExperienceMicroBundle>(
+                    (ulong)MonikerExperienceMicroBundle.BundleId, out _);
+            var hasSwayBehavior = !startupSelected ||
+                candidatePrimary.TryGetBundle<MonikerSwayBehaviorMicroBundle>(
+                    (ulong)MonikerSwayBehaviorMicroBundle.BundleId, out _);
+
+            if (!hasMonikerExperience || !hasSwayBehavior || !hasMoniker || !hasPrimary)
+                throw new InvalidOperationException(
+                    "FSM_COS did not compose the selected Moniker Experience, stationary Moniker, sway behavior, and primary Experience.");
+
+            ComposeManifestHubBundles(candidateManifest, runtimeBase, candidateHubAssemblies);
+            ComposeManifestCapabilities(candidateManifest, runtimeBase, candidateCapabilities);
+
+            candidateHub = new HubKernel();
+            if (candidatePrimary.TryGetBundle<MonikerMicroBundle>(
+                    (ulong)MonikerMicroBundle.BundleId, out var moniker) &&
+                moniker is TheSingularityWorkshop.SingularityHub.IMicroBundle hubBundle)
+            {
+                candidateHub.LoadBundle(hubBundle);
+            }
+            candidateHub.ExecuteArbitrationPipeline();
+
+            var candidateDemonstrations = new DemonstrationRegistry(
+                candidateManifest.Demonstrations,
+                hostCapabilities: ["WebPage", "Browser"]);
+
+            var oldPrimary = RuntimeAssembly;
+            var oldHubAssemblies = _hubRuntimeAssemblies.Values.ToArray();
+            var oldCapabilities = _capabilityRuntimeAssemblies.Values.ToArray();
+            var oldHub = _hubRuntime.Hub;
+
+            _hubRuntime.ReplaceHub(candidateHub);
+            Manifest = candidateManifest;
+            Demonstrations = candidateDemonstrations;
+            CurrentManifestExperience = startupExperience;
+            PrimaryManifestExperience = primaryExperience;
+            RuntimeAssembly = candidatePrimary;
+            ReplaceAssemblies(_hubRuntimeAssemblies, candidateHubAssemblies);
+            ReplaceAssemblies(_capabilityRuntimeAssemblies, candidateCapabilities);
+            ActiveManifestPath = manifestPath;
+            IsInitialized = true;
+            IsDeepDive = false;
+            LastManifestError = null;
+            activated = true;
+
+            DisposeRuntimeObjects(
+                (oldPrimary?.Bundles ?? Array.Empty<DomainMicroBundle>()).Cast<object>()
+                    .Concat(oldHubAssemblies.SelectMany(assembly => assembly.Bundles).Cast<object>())
+                    .Concat(oldCapabilities.SelectMany(assembly => assembly.Bundles).Cast<object>())
+                    .Concat(oldHub.LoadedBundles.Cast<object>()));
+            SetState("Moniker");
+        }
+        catch (Exception exception)
+        {
+            if (!activated)
+            {
+                LastManifestError = exception.Message;
+                DisposeCandidateRuntime(
+                    candidatePrimary,
+                    candidateHubAssemblies.Values,
+                    candidateCapabilities.Values,
+                    candidateHub?.LoadedBundles.Cast<object>() ?? Array.Empty<object>());
+            }
+            throw;
+        }
+    }
+
+    private void ComposeManifestHubBundles(
+        WebPageHostManifest manifest,
+        ulong runtimeBase,
+        IDictionary<string, RuntimeAssembly> assemblies)
+    {
+        var hubItems = manifest.Hub ?? Array.Empty<WebPageManifestHubItem>();
+        for (var index = 0; index < hubItems.Count; index++)
+        {
+            var item = hubItems[index];
+            if (item.MicroBundles is not { Count: > 0 } roots)
+                continue;
+
+            assemblies[item.Name] = _compositionSystem.Execute(new RuntimeManifest(
+                RuntimeId: runtimeBase + 100UL + (ulong)index,
+                Bundles: roots.Select(root => root.ToRuntimeManifestEntry()).ToArray()));
+        }
+    }
+
+    private void ComposeManifestCapabilities(
+        WebPageHostManifest manifest,
+        ulong runtimeBase,
+        IDictionary<string, RuntimeAssembly> assemblies)
+    {
+        var capabilities = manifest.Capabilities ?? Array.Empty<WebPageManifestCapability>();
+        var index = 0UL;
+        foreach (var capability in capabilities)
+        {
+            if (capability.MicroBundles is not { Count: > 0 } roots)
+                continue;
+
+            assemblies[capability.Name] = _compositionSystem.Execute(new RuntimeManifest(
+                RuntimeId: runtimeBase + 200UL + index,
+                Bundles: roots.Select(root => root.ToRuntimeManifestEntry()).ToArray()));
+            index++;
+        }
+    }
+
+    private static void ReplaceAssemblies(
+        IDictionary<string, RuntimeAssembly> destination,
+        IReadOnlyDictionary<string, RuntimeAssembly> source)
+    {
+        destination.Clear();
+        foreach (var pair in source)
+            destination.Add(pair.Key, pair.Value);
+    }
+
+    private void DisposeCandidateRuntime(
+        RuntimeAssembly? primary,
+        IEnumerable<RuntimeAssembly> hubAssemblies,
+        IEnumerable<RuntimeAssembly> capabilities,
+        IEnumerable<object> hubBundles)
+    {
+        DisposeRuntimeObjects(
+            (primary?.Bundles ?? Array.Empty<DomainMicroBundle>()).Cast<object>()
+                .Concat(hubAssemblies.SelectMany(assembly => assembly.Bundles).Cast<object>())
+                .Concat(capabilities.SelectMany(assembly => assembly.Bundles).Cast<object>())
+                .Concat(hubBundles));
+    }
+
+    private void DisposeRuntimeObjects(IEnumerable<object> objects)
+    {
+        var seen = new HashSet<object>(ReferenceEqualityComparer.Instance);
+        foreach (var value in objects)
+        {
+            if (!seen.Add(value) || value is not IDisposable disposable)
+                continue;
+
+            try
+            {
+                disposable.Dispose();
+            }
+            catch (Exception exception)
+            {
+                LastRuntimeCleanupError = exception.Message;
+            }
+        }
+    }
+
+    private static void ValidateManifestPath(string manifestPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(manifestPath);
+        if (manifestPath.StartsWith("//", StringComparison.Ordinal) ||
+            manifestPath.StartsWith("/", StringComparison.Ordinal) ||
+            manifestPath.Contains("://", StringComparison.Ordinal) ||
+            manifestPath.Contains('\\') ||
+            manifestPath.Contains('?') ||
+            manifestPath.Contains('#') ||
+            manifestPath.Split('/').Any(segment => segment is "." or "..") ||
+            manifestPath.Any(char.IsControl))
+        {
+            throw new ArgumentException(
+                "Manifest selection must be a same-origin relative asset path without traversal, query, or fragment.",
+                nameof(manifestPath));
+        }
+    }
+
     public void RequestEntry()
     {
         if (Manifest is null)
             throw new InvalidOperationException("The Workshop manifest must be composed before entry.");
     }
 
-    public Task RestartFromManifestAsync(bool deepDive)
+    /// <summary>Reloads and recomposes the currently active manifest from its configured source.</summary>
+    public async Task RestartFromManifestAsync(bool deepDive)
     {
         if (Manifest is null)
             throw new InvalidOperationException("The Workshop manifest must be composed before restarting.");
 
+        await SwitchManifestAsync(ActiveManifestPath);
         IsDeepDive = deepDive;
-        CurrentManifestExperience = Manifest.Startup[0];
-        PrimaryManifestExperience = Manifest.Running[0];
-        SetState("Moniker");
-        return Task.CompletedTask;
     }
 
     public void SetCriticalMassReached() => SetState("CriticalMass");
@@ -229,7 +316,6 @@ public sealed class WorkshopExperienceService : IDisposable
     public void SetState(string state)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(state);
-
         if (CurrentState == state)
             return;
 
@@ -237,11 +323,22 @@ public sealed class WorkshopExperienceService : IDisposable
         StateChanged?.Invoke();
     }
 
+    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
+
     public void Dispose()
     {
         if (_disposed)
             return;
 
         _disposed = true;
+        DisposeCandidateRuntime(
+            RuntimeAssembly,
+            _hubRuntimeAssemblies.Values,
+            _capabilityRuntimeAssemblies.Values,
+            _hubRuntime.Hub.LoadedBundles.Cast<object>());
+        _hubRuntimeAssemblies.Clear();
+        _capabilityRuntimeAssemblies.Clear();
+        RuntimeAssembly = null;
+        Manifest = null;
     }
 }
