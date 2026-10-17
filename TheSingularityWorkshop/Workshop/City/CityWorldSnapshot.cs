@@ -28,9 +28,11 @@ public sealed class CityWorldSnapshot
         ArgumentException.ThrowIfNullOrWhiteSpace(revision);
         ArgumentNullException.ThrowIfNull(entities);
 
-        var ordered = entities.OrderBy(entity => entity.Id, StringComparer.Ordinal).ToArray();
-        if (ordered.Any(entity => entity is null))
+        var source = entities.ToArray();
+        if (source.Any(entity => entity is null))
             throw new ArgumentException("A city snapshot cannot contain a null entity.", nameof(entities));
+
+        var ordered = source.OrderBy(entity => entity.Id, StringComparer.Ordinal).ToArray();
 
         var duplicate = ordered
             .GroupBy(entity => entity.Id, StringComparer.Ordinal)
