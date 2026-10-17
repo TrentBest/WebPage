@@ -72,7 +72,7 @@ try {
   await page.locator(".inspector-copy h2").getByText("The Observatory", { exact: true }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "Forge: construct MicroBundles and Experiences", exact: true }).hover();
   await page.locator(".inspector-copy h2").getByText("The Forge", { exact: true }).waitFor({ state: "visible" });
-  await page.getByText(/general MicroBundle\/Experience authoring tool is not implemented yet/i).waitFor({ state: "visible" });
+  await page.getByText(/full MicroBundle and Experience authoring remains a broader future capability/i).waitFor({ state: "visible" });
   await page.getByRole("button", { name: "Laboratory: live FSM_API demonstration station", exact: true }).hover();
   await page.locator(".inspector-copy h2").getByText("The Singularity Laboratory", { exact: true }).waitFor({ state: "visible" });
   await floorplanVoice.click(); // Mute browser speech so the remaining browser journey is quiet.
