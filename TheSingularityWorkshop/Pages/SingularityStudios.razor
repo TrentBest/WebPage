@@ -115,6 +115,19 @@
             </svg>
             <p>Conceptual causality map · not measured output</p>
         </div>
+        <div class="studios-model-proof">
+            <div class="studios-index">06 / EXECUTABLE PHYSICS EVIDENCE</div>
+            <h2>Source-to-listener observation</h2>
+            <p>This is the companion experiment's generated SVG, rendered from a serialized observation produced by <code>FreeFieldAcoustics.Observe</code>. It reports a 5 m path, estimated propagation delay, and free-field level—not an audio waveform.</p>
+            <a href="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Physics/development/docs/experiments/acoustic-observation.svg">
+                <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Physics/development/docs/experiments/acoustic-observation.svg" alt="Generated free-field acoustic observation showing source and listener, five metre separation, propagation delay, and estimated received sound-pressure level" loading="lazy" />
+            </a>
+            <div class="studios-proof-links">
+                <a href="https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-observation.md">EXPERIMENT & ASSUMPTIONS ↗</a>
+                <a href="https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-observation.run.json">SERIALIZED RUN RECORD ↗</a>
+            </div>
+            <small>Model output · the Physics CI is responsible for reproducing the JSON record and matching SVG. No room response or generated audio is claimed.</small>
+        </div>
     </section>
 
     <footer class="studios-footer">
@@ -154,7 +167,7 @@
     .studios-audio audio { display:block; width:min(100%,32rem); margin:1.3rem 0 .75rem; }
     .studios-audio-link { display:inline-block; margin:.4rem 0 1rem; }
     .studios-audio small { display:block; max-width:38rem; color:#819ba9; line-height:1.5; }
-    .studios-acoustic-map p { margin:.5rem 0 0; color:#819ba9; font: .65rem Consolas,monospace; text-align:center; }
+    .studios-acoustic-map p { margin:.5rem 0 0; color:#819ba9; font: .65rem Consolas,monospace; text-align:center; }\n    .studios-model-proof { grid-column:1 / -1; padding:1.3rem; border:1px solid #174151; background:#050d17; }\n    .studios-model-proof h2 { margin:.7rem 0; font-size:clamp(1.5rem,3vw,2.2rem); }\n    .studios-model-proof p,.studios-model-proof small { color:#adc2ce; line-height:1.65; }\n    .studios-model-proof img { display:block; width:100%; max-width:720px; height:auto; margin:1rem auto; border:1px solid #174151; }\n    .studios-proof-links { display:flex; flex-wrap:wrap; gap:1.2rem; margin:1rem 0; }\n    .studios-proof-links a { color:#00eaff; text-decoration:none; font:.68rem Consolas,monospace; letter-spacing:.08em; }\n    .studios-model-proof small { display:block; }
     .studios-footer { display:flex; flex-wrap:wrap; align-items:center; gap:1.5rem; padding:2rem 0 1rem; }
     .studios-footer div { flex:1 1 18rem; }
     .studios-footer strong { color:#ff2cff; font: .7rem Consolas,monospace; letter-spacing:.16em; }
