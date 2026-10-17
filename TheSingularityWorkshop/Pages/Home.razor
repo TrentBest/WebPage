@@ -140,7 +140,7 @@
             builder.OpenElement(3, "button");
             builder.AddAttribute(4, "type", "button");
             builder.AddAttribute(5, "class", "entry-monolith-btn");
-            builder.AddAttribute(6, "onclick", EventCallback.Factory.Create(this, EnterWorkshop));
+            builder.AddAttribute(6, "onclick", EventCallback.Factory.Create(this, EnterEntryScene));
             builder.AddAttribute(7, "aria-label", "Enter The Singularity Workshop");
             builder.OpenElement(8, "img");
             builder.AddAttribute(9, "class", "entry-monolith-image");
@@ -257,12 +257,18 @@
         builder.CloseComponent();
     };
 
+    private async Task EnterEntryScene()
+    {
+        // The monolith is a presentation gate, not the FSM entry signal. Keep the
+        // existing first-contact and gateway interaction after the visitor enters.
+        _entryRequested = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
     private async Task EnterWorkshop()
     {
         await JS.InvokeVoidAsync("interop.markWorkshopVisited");
-        _entryRequested = true;
         FSM.RequestEnter();
-        await InvokeAsync(StateHasChanged);
     }
 
     private void SelectHubTab(string tab)
