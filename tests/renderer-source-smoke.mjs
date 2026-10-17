@@ -35,6 +35,26 @@ try {
   await page.screenshot({ path: process.env.CITY_LAB_SCREENSHOT ?? "singularity-city-overview.png", fullPage: true });
   console.log(`Singularity City: ${planIds.length} stable building IDs are shared between top-down plan and observer-relative street projection; movement and yaw controls passed.`);
 
+  // Source mode must submit the city through Renderer reduction and the actual Visualize GUI.SVG backend.
+  const pipelineButton = page.getByRole("button", { name: /RENDERER.*VISUALIZE/i });
+  assert.equal(await pipelineButton.isEnabled(), true, "The source-mode build must expose the live Renderer/Visualize path.");
+  await pipelineButton.click();
+  const pipelineSurface = page.locator(".pipeline-surface svg");
+  await pipelineSurface.waitFor({ state: "visible", timeout: 15_000 });
+  const pipelineMetrics = page.locator(".pipeline-readout p");
+  await pipelineMetrics.waitFor({ state: "visible", timeout: 10_000 });
+  const initialPipelineMetrics = await pipelineMetrics.textContent() ?? "";
+  assert.match(initialPipelineMetrics, /candidate commands\s+[\d,]+ → submitted\s+[\d,]+/);
+  assert.match(initialPipelineMetrics, /CPU SVG proof, not GPU rendering/);
+  assert.ok(await pipelineSurface.locator("path").count() > 0, "GUI.SVG must manifest actual submitted city geometry.");
+  await page.getByRole("button", { name: "Pipeline move forward", exact: true }).click();
+  await page.waitForFunction(
+    previous => document.querySelector(".pipeline-readout p")?.textContent !== previous,
+    initialPipelineMetrics,
+    { timeout: 10_000 }
+  );
+  console.log("Singularity City pipeline: source-mode city entities passed through Renderer policy/reduction, RendererFrameAdapter, Visualize, and the host-owned GUI.SVG sink; observer movement refreshed the submitted frame.");
+
   await page.goto(`${baseUrl}/digitens`, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "DIGITENS", exact: true }).waitFor({
     state: "visible",
