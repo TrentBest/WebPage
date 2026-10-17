@@ -196,3 +196,21 @@ The objective is to measure how far the system can go on CPU while designing for
 Renderer should remain responsible for observer-relative selection, work reduction/scheduling, and frame intent. Visualize should expose backend capabilities and manifestation implementations. WebPage owns the persistent world, observer interaction, and the presentation of truthful metrics. A future GPU backend should consume the same platform-neutral frame/resource contracts where feasible; it may introduce explicit upload/compute stages, but must not require deleting or bypassing the CPU path. CPU-only, GPU-enabled, and hybrid configurations should be selectable and comparable against the same fixture.
 
 Do not report GPU timing until a real GPU backend exposes measured timing. Do not claim automatic hardware saturation, optimal scheduling, 3D correctness, or performance wins from a backend's existence alone. The first milestone is an honest CPU baseline with a scalable workload and visible counters; the next is a measured CPU/GPU/hybrid comparison without changing world identity or semantics.
+
+## WebPage audit — City Lab pipeline inputs (2026-10-17)
+
+A source inspection of `TheSingularityWorkshop/Pages/CityLab.razor` confirms the current source-mode pipeline is real, but its data seam is still page-local:
+
+- `RenderPipelineAsync` iterates `Buildings`, converts `GridX/GridZ` into renderer coordinates inline, and creates five representation candidates for each building.
+- Entity IDs are derived from the generated building's integer ID. They are stable for a given deterministic generated list, but this is not yet a canonical cross-view/world entity contract or a revisioned snapshot.
+- The pipeline's `RenderView` currently receives identity view/projection matrices. The street SVG separately applies `CameraYaw` in its own projection. Therefore, do not infer that street yaw or the street observer transform is already shared with the Renderer pipeline.
+- The status line measures candidate/submitted/reduced commands and representation counts, and correctly labels the output CPU SVG rather than GPU rendering. It does not yet measure elapsed time, allocations, bytes, or actual GPU work.
+
+### Next implementation slice
+
+1. Introduce a small renderer-neutral city-world snapshot at the WebPage world/content boundary, with an explicit coordinate convention, deterministic source revision, stable entity IDs, and building kind/size/position data.
+2. Make plan and street projections read that snapshot without changing current appearance or silently changing entity identity.
+3. Make the Renderer candidate builder consume the same snapshot plus an explicit observer pose. Keep the pose contract separate from camera UI state; define/test how position and yaw map to the frame's view transform before claiming a shared observer.
+4. Add deterministic tests for snapshot revision, entity identity, coordinate mapping, and consistency between view projections. Keep SVG output as the observable baseline; add timing/allocation metrics only when they can be measured and reported honestly.
+
+This is an audit finding and implementation target, not a claim that the snapshot extraction or shared camera contract is already complete. Do not build a fake 3D switch or claim a GPU path as a shortcut around these missing contracts.
