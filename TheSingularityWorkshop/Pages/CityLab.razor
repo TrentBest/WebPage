@@ -253,7 +253,7 @@
     private void TurnLeft() { CameraYaw = (CameraYaw - 12 + 360) % 360; }
     private void TurnRight() { CameraYaw = (CameraYaw + 12) % 360; }
 
-    private sealed record StreetBuilding(int Id, string Kind, double X, double Top, double Width, double Height, string Windows);
+    private sealed record StreetBuilding(int Id, string Kind, double Depth, double X, double Top, double Width, double Height, string Windows);
     private List<StreetBuilding> StreetBuildings
     {
         get
@@ -268,16 +268,16 @@
                 var depth = dx * Math.Sin(radians) + dz * Math.Cos(radians);
                 if (depth < .8 || depth > 24 || Math.Abs(lateral / depth) > 3.3) continue;
                 var scale = 170d / depth;
-                var width = Math.Clamp(20d / depth, 1.2, 42);
+                var width = Math.Clamp(90d / depth, 2, 110);
                 var height = Math.Clamp(building.Floors * 0.72 * scale, 2, 460);
                 var x = 500 + lateral * scale;
                 var baseY = 310 + 400 / depth;
                 var top = baseY - height;
                 if (x + width < 0 || x - width > 1000 || baseY < 300 || top > 620) continue;
                 var windows = $"M {x - width * .22:0.##} {top + 4:0.##} V {baseY - 2:0.##} M {x + width * .22:0.##} {top + 4:0.##} V {baseY - 2:0.##}";
-                result.Add(new StreetBuilding(building.Id, building.Kind, x - width / 2, top, width, Math.Max(1, baseY - top), windows));
+                result.Add(new StreetBuilding(building.Id, building.Kind, depth, x - width / 2, top, width, Math.Max(1, baseY - top), windows));
             }
-            return result.OrderByDescending(item => item.Height).ToList();
+            return result.OrderByDescending(item => item.Depth).ToList();
         }
     }
     private string _selectedEra = "modern";
