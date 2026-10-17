@@ -127,7 +127,6 @@
 
     private void CollapseNavMenu()
     {
-        _hasSelectedDestination = true;
         collapseNavMenu = true;
     }
 
@@ -161,7 +160,6 @@
             AdvanceProgressionForDestination(progressionTarget);
         if (isHubDestination || !string.IsNullOrEmpty(path))
         {
-            _hasSelectedDestination = true;
             collapseNavMenu = true;
         }
         // The rail remains collapsed on root arrivals and browser Back.
