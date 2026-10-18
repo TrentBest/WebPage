@@ -23,6 +23,32 @@ Welcome is a place, not a long scrolling brochure. The floor plan fills its avai
 
 The visual vocabulary is a dragon-warrior-inspired stronghold drawn as a technical plan: dark blueprint field, measured lines, stone/fortification silhouette, forge heat, orbits, and drafting tables. Keep labels legible and the panel non-scrolling; adapt the SVG viewBox and room inspector on small screens rather than adding page scroll.
 
+## Player-local arrival and camera policy
+
+**Design requirement: entering a large place must not automatically frame the entire building.** The building may span a campus, city block, megastructure, or effectively unbounded complex; its size must not dictate the player's initial framing.
+
+Use the Diablo-style area-transition principle as a presentation reference, not as a requirement to copy its exact camera or art direction:
+
+- **Spawn at a meaningful local anchor.** The entry transition resolves to the player's actual arrival position (for the Workshop, initially the threshold / central-hall arrival anchor), not the building's geometric center unless that is truly where the player arrives.
+- **Frame the player and nearby playable space.** The initial camera should show the player, the immediate room, nearby exits/interactables, and enough context to understand where they are. Do not zoom out to fit the whole structure.
+- **Keep world scale independent of camera scale.** Camera translation and zoom change perception only; they must never rewrite world coordinates, room dimensions, or object positions. The existing SpatialCamera type in TheSingularityWorkshop.Gui already expresses this separation and avatar-centering policy; future in-world presentation should use that contract rather than inventing a second coordinate model.
+- **Reveal the complex progressively.** Let movement and transitions expose adjacent rooms. Use a separate map/overview affordance for orientation; an overview is a deliberate mode, not the default arrival shot.
+- **Make transitions local and legible.** A door/portal/route transition should resolve the destination area and spawn anchor, briefly transition the view, then settle on the new local camera framing. Preserve player identity and appropriate state across the transition.
+- **Scale beyond one screen.** Large complexes must be represented as connected areas or spatial regions, not as one giant image that shrinks the player to a speck. Streaming, LOD, and update cadence are implementation concerns for the rendering/spatial owners; WebPage should not fake those capabilities in the schematic.
+
+### Current versus intended behavior
+
+The current WorkshopFloorplan is explicitly a **schematic orientation map** (viewBox="0 0 1200 720"), not a live player-controlled scene. Its overview is appropriate for choosing a destination and must not be misrepresented as the eventual in-world camera. The local-arrival rule applies when a destination opens as an explorable spatial experience; the floorplan remains a separate map/selection surface unless it is deliberately given a local-room mode with working navigation back to the overview.
+
+### Acceptance checks for an explorable spatial destination
+
+- Initial arrival frames the player's spawn anchor and nearby navigable space; the whole building is not fitted to the viewport by default.
+- Changing zoom preserves the player's screen-space anchor and does not mutate world coordinates.
+- A map/overview is explicitly invoked and can return to the player-following/local view.
+- Moving to another area transitions to that area's spawn anchor rather than recentering on the entire complex.
+- Large areas can extend beyond the viewport without breaking navigation, selection, or interaction.
+- Tests cover camera centering, zoom clamping, area-transition anchoring, and the separation between world coordinates and camera transforms.
+
 ## Voice and sound
 
 The component includes an explicit **VOICE ON/OFF** control. When enabled, it uses browser speechSynthesis to speak the welcome and the hovered room's explanation. This is an accessible prototype for spoken discovery, not a recorded Workshop voice, not SFX Studio output, and not evidence of Physics-driven audio.
