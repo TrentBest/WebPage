@@ -265,3 +265,26 @@ Please inspect the current observer/view/projection and area-transition seams an
 WebPage currently has `TheSingularityWorkshop.Gui.SpatialCamera`, which expresses avatar-centering and camera-only zoom, plus tests for centering and zoom clamping. The current `WorkshopFloorplan` is a fixed-viewBox SVG schematic for choosing destinations; it is not yet a player-controlled game scene and must remain honestly described as a map. The next in-world experience should consume a renderer-neutral observer/scene contract rather than turning the schematic into a fake game engine.
 
 **Ownership boundary:** domain/world content owns area topology, stable entity IDs, and spawn anchors; Renderer owns observer-relative representation and frame decisions; Visualize owns manifestation/backend pathways; WebPage owns navigation, destination selection, and browser-host presentation. Please identify exact existing files/API/tests and report what is implemented versus only proposed. Do not edit WebPage files from the Renderer repository; respond in your repo's `WebPageLLM.md`.
+
+
+## Verified contract review — Renderer development snapshot (2026-10-18)
+
+I inspected the current Renderer source after the camera-framing handoff. This records facts WebPage can safely build on while the dedicated area-transition response remains pending.
+
+- `RenderView` currently carries a finite `System.Numerics.Vector3 ObserverPosition`, a world-to-view `Matrix4x4 View`, and a view-to-clip `Matrix4x4 Projection`. Its constructor rejects non-finite observer coordinates and matrix elements.
+- `RenderFrame` is a platform-neutral snapshot of that view and an ordered, read-only list of `RenderDrawCommand` values. It does not currently carry a destination-area ID, spawn anchor, scene revision, or player identity.
+- `ObserverDistance` and `ObserverRepresentationPolicy` select a horizon/representation from observer-to-entity distance. `ObserverRepresentationCoordinator` connects this selection to FSM-backed representation state and horizon bucket freshness. Its own remarks explicitly leave actual representation preparation and frame building to the host; it is not a scheduler or graphics backend.
+- The Visualize-side `RendererFrameAdapter` preserves the observer/view/projection and draw-command/resource/entity identifiers, but it cannot preserve a scene revision that `RenderFrame` does not contain. Numeric resource IDs alone do not prove upload, lifetime, or disposal behavior.
+- Renderer has recently added finite view/projection and draw-transform validation, and its observer-scale policy documentation is a useful adjacent contract. These are useful foundations, but they do **not** yet establish a reusable area-transition/spawn-anchor API.
+
+### Consequence for the player-local camera request
+
+Do not add an area ID or spawn-anchor field to `RenderFrame` merely to make it a navigation model. The narrower next seam is likely a world/experience-owned destination record (stable area identity + stable anchor + coordinate frame) translated by the host into an observer pose and ordinary `RenderView`. Renderer can then select observer-relative representations and produce frame commands. If Renderer identifies an existing reusable world-coordinate/observer-pose type, prefer it over a parallel WebPage camera abstraction.
+
+Before implementing a cross-area contract, the Renderer workstream still needs to answer in its own `WebPageLLM.md`:
+1. Whether any existing type already models an observer pose independently of a render view.
+2. The agreed world-unit and coordinate-frame assumptions for `ObserverPosition`.
+3. Whether transition continuity is entirely host/domain-owned or whether a small renderer-neutral observer transition primitive already exists.
+4. The smallest testable contract for moving from an arrival anchor to player-following observation while preserving world coordinates.
+
+No WebPage implementation change is implied by this contract review. The current WebPage `SpatialCamera` remains the camera-centering/zoom component; the fixed-viewBox Workshop floorplan remains a destination-selection schematic, not a live scene.
