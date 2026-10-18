@@ -1,3 +1,5 @@
+![The Singularity Workshop animated moniker](https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Renderer/development/docs/assets/moniker.svg)
+
 # Soldier Field — Event Horizon Scaling Lab
 
 This is a visible soldier-first rendering target, not a triangle placeholder. The WebGPU page imports a separate, deterministic geometry asset whose stable semantic part IDs describe the modular armor, articulated chassis, helmet/visor, six provisional neural-shunt endpoints, life-support pack, and held tool silhouette. It avoids contemporary national military imagery and requires no downloaded model or external image. The current mesh is an intentional silhouette blockout; its component inventory is ready to refine without rewriting the renderer.
@@ -65,3 +67,14 @@ Frame interval includes browser scheduling. JavaScript encode/submit timing is n
 6. Add procedural breath/grunt audio, a visibly glowing barrel, animated heat distortion, and sensor-aware presentation without confusing these effects with measured temperatures.
 7. Capture GPU timestamps where supported, warm-up runs, repeated trials, and initial ×10/×100 scaling curves.
 5. Increase practical population limits only as buffer/memory constraints and measurements justify it.
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/TheSingularityWorkshop" aria-label="The Singularity Workshop living avatar">
+    <img src="https://raw.githubusercontent.com/TrentBest/WebPage/development/TheSingularityWorkshop/wwwroot/Images/TheSingularityWorkshopLivingAvatar.svg" alt="The Singularity Workshop living avatar — a digital vortex converging on its central eye" width="112" />
+  </a><br />
+  <strong>The Singularity Workshop</strong><br />
+  <em>If a picture is worth a thousand words, what is a living picture worth?</em><br />
+  <a href="https://github.com/TrentBest">GitHub</a> · <a href="https://www.patreon.com/TheSingularityWorkshop">Support the Workshop</a>
+</p>
