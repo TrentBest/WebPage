@@ -12,6 +12,13 @@
 - [WebPageLLM.md](WebPageLLM.md) — active runtime-host refactor handoff, Experience repository boundary, reset/switch/reload acceptance gates, and remaining implementation debt.
 - [integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md](integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md) — truthful host integration plan for Gesture evaluation, Renderer constraints, and evidence boundaries.
 
+## Cross-repository coordination
+
+- [PhysicsLLM.md](coordination/PhysicsLLM.md) — Physics replay, contact/impact/acoustics, and the current host boundary.
+- [PhysicsCastlesLLM.md](coordination/PhysicsCastlesLLM.md) — Castle Siege destination, authored-scene slice, and Physics capability gates.
+- [RendererLLM.md](coordination/RendererLLM.md) — frame contract, Renderer integration blocker, shared city snapshot, and evidence gates.
+- [VisualizeLLM.md](coordination/VisualizeLLM.md) — GUI.SVG source-backed output, deterministic fixtures, and honest CPU/GPU metrics.
+
 ## Start here
 
 - [Diegetic WYSIWYG and Living Documentation](DIEGETIC_WYSIWYG_AND_LIVING_DOCUMENTATION.md) — how source-backed visuals, GUI.SVG, authoring, preview, provenance, and evidence fit together.
