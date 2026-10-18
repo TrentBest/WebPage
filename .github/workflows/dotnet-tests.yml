@@ -284,7 +284,7 @@ jobs:
           fi
 
           mkdir -p TestResults/Browser
-          WORKSHOP_BASE_URL=http://127.0.0.1:5261 WORKSHOP_SCREENSHOT=TestResults/Browser/renderer-source-smoke.png node tests/renderer-source-smoke.mjs
+          WORKSHOP_BASE_URL=http://127.0.0.1:5261 WORKSHOP_SCREENSHOT=TestResults/Browser/renderer-source-smoke.png CITY_PIPELINE_SCREENSHOT=TestResults/Browser/singularity-city-pipeline.png node tests/renderer-source-smoke.mjs
 
       - name: Upload city rendering proof screenshot
         if: always()
