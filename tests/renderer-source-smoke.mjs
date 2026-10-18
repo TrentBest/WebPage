@@ -77,15 +77,32 @@ try {
       paintedArea: visible.reduce((sum, path) => {
         const box = path.getBoundingClientRect();
         return sum + box.width * box.height;
-      }, 0)
+      }, 0),
+      svgRect: { left: svgRect.left, top: svgRect.top, right: svgRect.right, bottom: svgRect.bottom },
+      samples: paths.slice(0, 5).map(path => {
+        const box = path.getBoundingClientRect();
+        const style = getComputedStyle(path);
+        return {
+          d: (path.getAttribute("d") ?? "").slice(0, 100),
+          rect: { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height },
+          fill: style.fill,
+          display: style.display,
+          visibility: style.visibility,
+          opacity: style.opacity,
+          fillOpacity: style.fillOpacity,
+          transform: path.getAttribute("transform"),
+          parentTransform: path.parentElement?.getAttribute("transform")
+        };
+      })
     };
   });
   assert.ok(visibleGeometry.viewBox.width > 0 && visibleGeometry.viewBox.height > 0,
     "GUI.SVG must declare a non-empty viewBox.");
   assert.ok(visibleGeometry.viewport.width > 0 && visibleGeometry.viewport.height > 0,
     "GUI.SVG must have a non-empty rendered viewport.");
+  await page.screenshot({ path: process.env.CITY_PIPELINE_SCREENSHOT ?? "TestResults/Browser/singularity-city-pipeline.png", fullPage: true });
   assert.ok(visibleGeometry.visibleCount >= 50,
-    `Expected at least 50 painted city paths intersecting the SVG viewBox; found ${visibleGeometry.visibleCount}/${visibleGeometry.pathCount}.`);
+    `Expected at least 50 painted city paths intersecting the rendered SVG viewport; found ${visibleGeometry.visibleCount}/${visibleGeometry.pathCount}. Geometry diagnostics: ${JSON.stringify({ viewport: visibleGeometry.viewport, svgRect: visibleGeometry.svgRect, samples: visibleGeometry.samples })}`);
   assert.ok(visibleGeometry.paintedArea > 1,
     `Submitted city geometry must occupy visible area inside the viewBox; got ${visibleGeometry.paintedArea}.`);
   await page.getByRole("button", { name: "Pipeline move forward", exact: true }).click();
