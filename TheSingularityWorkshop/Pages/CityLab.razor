@@ -417,10 +417,12 @@
             0f);
         var view = System.Numerics.Matrix4x4.CreateTranslation(-observerPosition.X, -observerPosition.Y, 0f) *
             System.Numerics.Matrix4x4.CreateRotationZ((float)(-CameraYaw * Math.PI / 180d));
-        // The current city massing is a 2D grid plane. This orthographic mapping keeps the
-        // observer-relative scene inside GUI.SVG's 100 × 56.25 viewBox; it is not an FPS camera.
-        var projection = System.Numerics.Matrix4x4.CreateScale(28f, -28f, 1f) *
-            System.Numerics.Matrix4x4.CreateTranslation(50f, 28.125f, 0f);
+        // Renderer supplies clip-space coordinates to the SVG backend. The backend maps
+        // normalized device coordinates into its 100 × 56.25 viewBox, so this matrix must
+        // normalize the city's already-centered 2D grid rather than pre-map it into SVG units.
+        // X spans roughly ±0.9 world units; Y spans roughly ±1.0. The backend performs the
+        // final clip-to-SVG mapping. This is an orthographic 2D proof, not an FPS camera.
+        var projection = System.Numerics.Matrix4x4.CreateScale(0.56f, 1f, 1f);
         var frame = new TheSingularityWorkshop.Renderer.RenderFrame(
             new TheSingularityWorkshop.Renderer.RenderView(observerPosition, view, projection),
             selectedCommands);
