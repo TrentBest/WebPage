@@ -371,7 +371,7 @@ public sealed class IncrementalVersionTests
         Assert.Contains("href=\"/about-us\"", nav);
         Assert.Contains("if (_progressionStage >= 1)", nav);
         Assert.Contains("if (_progressionStage >= 5)", nav);
-        Assert.Contains("AdvanceProgressionForDestination(requestedTab ?? path);", nav);
+        Assert.Contains("AdvanceProgressionForDestination(progressionTarget);", nav);
     }
 
     [ArchitectureTest(0, 0, 202)] [Fact(DisplayName = "V0.0.202 — Workshop_Discovery_Reveals_One_Layer_At_A_Time_And_Keeps_About_Us_Outside_The_Gate")]
