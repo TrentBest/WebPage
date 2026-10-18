@@ -95,6 +95,21 @@ The final schema must be validated against the real WebApp/AnyApp manifest conve
 - Do not download large audio assets until needed. Prefer short, compressed, licensed/original assets; document attribution and license for every non-original asset.
 - Avoid playing sound on hover by default. Use deliberate activation or meaningful state transitions; keep cues short and quiet.
 
+## Narrator voice direction: Female Power
+
+The welcome narrator should project **female power**: the mature, resonant authority of a great documentary storyteller, combined with the dark, mythic, battle-worn atmosphere of the original *Warcraft: Orcs & Humans* opening. The target is an original voice, not a direct imitation or clone of Morgan Freeman or any specific performer.
+
+- **Voice character:** mature contralto or low mezzo; full chest resonance, controlled grain, clear diction, and a little breath at phrase edges.
+- **Performance:** measured, deliberate, assured. Let important words land; avoid rushed announcer cadence, chirpy assistant energy, and constant theatrical growling.
+- **Emotional register:** awe, conviction, restrained menace only where appropriate, and the feeling that the Workshop has a long history and a serious purpose.
+- **Processing:** subtle saturation and compression, gentle low-mid warmth, restrained darkening, and a short cavernous/stone-and-metal reverb. Preserve intelligibility; avoid excessive bass, distortion, or muddy consonants.
+- **Spatial story:** before entry, the narrator can feel as if heard through the heavy Workshop door. On entry, the voice becomes clearer and more present as the ambience opens up.
+- **Pacing:** short configured lines, with pauses between them. Never narrate every hover or read the whole interface automatically.
+
+**Provider strategy:** keep narration behind a provider abstraction. Browser speech synthesis is useful for a quick functional prototype, but available voices and prosody vary by browser and operating system, and its output cannot be assumed to pass through the same effects chain as ordinary audio assets. For a consistent signature voice, prefer a properly licensed/generated narration asset (or a separately configured speech service) that can be processed and mixed through the audio runtime. Keep the narration text in the manifest so the provider can be changed without rewriting the experience.
+
+**Example delivery direction (not required final script):** “Beyond this door, ideas become instruments… and instruments become worlds.” Deliver it with calm authority, a deliberate pause, and a rising sense of scale—not as a shout.
+
 ## Sound palette
 
 | Domain | Sound character | Trigger policy |
