@@ -53,29 +53,37 @@ try {
   // non-zero geometry inside the actual viewBox and is painted with visible styles.
   const visibleGeometry = await pipelineSurface.evaluate(svg => {
     const viewBox = svg.viewBox.baseVal;
+    const svgRect = svg.getBoundingClientRect();
     const paths = [...svg.querySelectorAll('path[fill]:not([fill="none"])')];
+    // getBBox() is in each path's local SVG user space and ignores ancestor
+    // transforms. Use client rects so the test measures the final transformed
+    // geometry in browser viewport coordinates, then intersect with the SVG's
+    // rendered viewport rather than comparing unlike coordinate systems.
     const visible = paths.filter(path => {
-      const box = path.getBBox();
+      const box = path.getBoundingClientRect();
       const style = getComputedStyle(path);
       const opacity = Number(style.opacity) * Number(style.fillOpacity);
       const intersects = box.width > 0 && box.height > 0 &&
-        box.x < viewBox.x + viewBox.width && box.x + box.width > viewBox.x &&
-        box.y < viewBox.y + viewBox.height && box.y + box.height > viewBox.y;
+        box.left < svgRect.right && box.right > svgRect.left &&
+        box.top < svgRect.bottom && box.bottom > svgRect.top;
       return intersects && style.display !== "none" && style.visibility !== "hidden" &&
         opacity > 0 && style.fill !== "none";
     });
     return {
       viewBox: { x: viewBox.x, y: viewBox.y, width: viewBox.width, height: viewBox.height },
+      viewport: { width: svgRect.width, height: svgRect.height },
       pathCount: paths.length,
       visibleCount: visible.length,
       paintedArea: visible.reduce((sum, path) => {
-        const box = path.getBBox();
+        const box = path.getBoundingClientRect();
         return sum + box.width * box.height;
       }, 0)
     };
   });
   assert.ok(visibleGeometry.viewBox.width > 0 && visibleGeometry.viewBox.height > 0,
     "GUI.SVG must declare a non-empty viewBox.");
+  assert.ok(visibleGeometry.viewport.width > 0 && visibleGeometry.viewport.height > 0,
+    "GUI.SVG must have a non-empty rendered viewport.");
   assert.ok(visibleGeometry.visibleCount >= 50,
     `Expected at least 50 painted city paths intersecting the SVG viewBox; found ${visibleGeometry.visibleCount}/${visibleGeometry.pathCount}.`);
   assert.ok(visibleGeometry.paintedArea > 1,
