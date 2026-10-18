@@ -1,6 +1,6 @@
 # Working Task List — Self-Priming Handoff
 
-> **Last updated:** 2026-10-09  
+> **Last updated:** 2026-10-18  
 > **Active workstream:** FSM_COS pause gate → WebPage public launch  
 > **Primary branch:** `development`  
 > **No-publish rule:** Never publish a NuGet package without explicit user approval. Keep NuGet workflow publish gates at `&& false` by default.
@@ -23,6 +23,13 @@ When resuming, do the following without asking the user to repeat context:
 FSM_COS is being brought to a **bounded pause point**, not declared feature-complete or release-ready. Its kernel should remain minimal and compose capability MicroBundles without taking hard dependencies on every package. WebPage is the next proving ground: the site must demonstrate that the manifest and FSM_COS-produced `RuntimeAssembly` meaningfully drive the Experience, rather than merely compose successfully before a parallel host-owned runtime takes over.
 
 Reference: [FSM_COS Pause Point](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/docs/PAUSE_POINT.md)
+
+## Latest verified snapshot — 2026-10-18
+
+- WebPage `development` head `e165e051f9a64bb5c61626c2d990b59beb7e367e` ([commit](https://github.com/TrentBest/WebPage/commit/e165e051f9a64bb5c61626c2d990b59beb7e367e)) passed [.NET Tests run 39082180156](https://github.com/TrentBest/WebPage/actions/runs/39082180156). Both jobs passed: browser-host/repository-source integration and the main test job. The main job passed the host build, full Playwright browser journey, SingularityHub tests, LivingGui tests, Pong tests, and test-results/coverage artifact upload. The Codecov upload step completed without failing the workflow.
+- The preceding stale-expectation failures are resolved at the current head: the manifest assertion now uses `Singularity Laboratory`, and the About Us navigation assertion was aligned to current navigation logic. The older run on `58f9ef0` failed; do not treat it as current-head status.
+- FSM_COS `development` head `3c0f69b31a725e9a8dc73115a27f1c04faa5623a` passed run [39081995554](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/actions/runs/39081995554); kernel remains at the bounded pause point. No merge to `master`, public deployment, or NuGet publication was performed in this verification pass.
+- Browser automation covers the desktop Workshop journey and a narrow-width Replay Lab viewport. The separate launch task to visually inspect the public experience at desktop and mobile/narrow sizes remains open; automated screenshots are evidence, not a claim of completed manual visual review.
 
 ## Prioritized tasks
 
