@@ -14,6 +14,8 @@
 
 ## Start here
 
+- [Diegetic WYSIWYG and Living Documentation](DIEGETIC_WYSIWYG_AND_LIVING_DOCUMENTATION.md) — how source-backed visuals, GUI.SVG, authoring, preview, provenance, and evidence fit together.
+
 - [Singularity Studios Production Model](SINGULARITY_STUDIOS_PRODUCTION_MODEL.md) — reusable studio, giant indoor stages, set/prop libraries, camera and rig data, shot/take workflow, and proof obligations.
 - [Singularity Studios / Sound & Acoustics handoff](integrations/SINGULARITY_STUDIOS_SFX_WEBPAGELLM.md) — physical sound causality, audio provenance, and the first bounded acoustic experience.
 - [Workshop Welcome Floorplan](WORKSHOP_FLOORPLAN_EXPERIENCE.md) — interactive blueprint, room discovery, optional voice, future MicroBundle facilities, and SFX/Physics boundaries.
