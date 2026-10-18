@@ -82,7 +82,7 @@ public sealed class WebPageHostManifestTests
         Assert.Equal("/", welcome.Route);
         Assert.Empty(welcome.MicroBundles!);
 
-        var demonstrations = Assert.Single(manifest.Hub, item => item.Name == "Demonstrations");
+        var demonstrations = Assert.Single(manifest.Hub, item => item.Name == "Singularity Laboratory");
         Assert.Equal("ExperienceGallery", demonstrations.Kind);
         Assert.Equal("/?tab=demonstrations", demonstrations.Route);
         Assert.Empty(demonstrations.MicroBundles!);
