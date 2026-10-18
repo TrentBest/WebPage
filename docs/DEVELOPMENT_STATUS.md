@@ -32,9 +32,11 @@ transitional WebPage PageFSM/LivingGuiFsm currently drives browser execution
 
 ## Current public surface
 
-AnyApp is the active cross-host demonstration.
+The current manifest exposes Welcome, Singularity Laboratory, Singularity Architecture, Movement Lab, Replay Lab, and Singularity Studios. These are the current public entry points; do not describe AnyApp as the active hub item unless the manifest changes.
 
 The repository documentation is the deeper learning surface while the runtime architecture is being stabilized.
+
+The release gate is tracked in [`WEBPAGE_READINESS.md`](WEBPAGE_READINESS.md). The latest observed .NET CI run passed; the Azure Static Web Apps workflow was skipped, so no deployment is claimed.
 
 ## Known transitional code
 
