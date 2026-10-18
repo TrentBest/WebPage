@@ -49,6 +49,37 @@ try {
   const submittedGeometry = page.locator('.pipeline-surface svg path[fill]:not([fill="none"])');
   assert.ok(await submittedGeometry.count() > 0, "GUI.SVG must manifest actual submitted city geometry.");
   const initialGeometry = await submittedGeometry.evaluateAll(nodes => nodes.map(node => node.getAttribute("d")));
+  // SVG path existence is not visual proof: ensure the submitted city massing has
+  // non-zero geometry inside the actual viewBox and is painted with visible styles.
+  const visibleGeometry = await pipelineSurface.evaluate(svg => {
+    const viewBox = svg.viewBox.baseVal;
+    const paths = [...svg.querySelectorAll('path[fill]:not([fill="none"])')];
+    const visible = paths.filter(path => {
+      const box = path.getBBox();
+      const style = getComputedStyle(path);
+      const opacity = Number(style.opacity) * Number(style.fillOpacity);
+      const intersects = box.width > 0 && box.height > 0 &&
+        box.x < viewBox.x + viewBox.width && box.x + box.width > viewBox.x &&
+        box.y < viewBox.y + viewBox.height && box.y + box.height > viewBox.y;
+      return intersects && style.display !== "none" && style.visibility !== "hidden" &&
+        opacity > 0 && style.fill !== "none";
+    });
+    return {
+      viewBox: { x: viewBox.x, y: viewBox.y, width: viewBox.width, height: viewBox.height },
+      pathCount: paths.length,
+      visibleCount: visible.length,
+      paintedArea: visible.reduce((sum, path) => {
+        const box = path.getBBox();
+        return sum + box.width * box.height;
+      }, 0)
+    };
+  });
+  assert.ok(visibleGeometry.viewBox.width > 0 && visibleGeometry.viewBox.height > 0,
+    "GUI.SVG must declare a non-empty viewBox.");
+  assert.ok(visibleGeometry.visibleCount >= 50,
+    `Expected at least 50 painted city paths intersecting the SVG viewBox; found ${visibleGeometry.visibleCount}/${visibleGeometry.pathCount}.`);
+  assert.ok(visibleGeometry.paintedArea > 1,
+    `Submitted city geometry must occupy visible area inside the viewBox; got ${visibleGeometry.paintedArea}.`);
   await page.getByRole("button", { name: "Pipeline move forward", exact: true }).click();
   await page.waitForFunction(
     previous => document.querySelector(".pipeline-readout p")?.textContent !== previous,
