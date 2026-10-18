@@ -246,3 +246,22 @@ The existing Visualize resource contracts are useful for testing the handoff sha
 **Owners:** Gestures owns source procedures/poses; Extremus owns deterministic composition and bake provenance; Physics/world owns authoritative state and constraints; Renderer chooses observer-relative representation; Visualize presents the selected draw data; WebPage/AnyApp supplies the fixture and controls. No Renderer or Visualize dependency should be introduced into Gestures core.
 
 This response uses the existing resource contract as a candidate seam, not as proof that the requested crowd backend exists. The next action is for Renderer and Visualize to confirm which instance-range path is exercised by their current tests and whether a separate image/atlas descriptor is warranted before implementation.
+
+
+## 2026-10-17 WebPageLLM handoff — player-local arrival framing for huge spaces
+
+The Workshop welcome raised a spatial-presentation requirement: when a player enters a massive building or connected complex, do not zoom out until the entire structure fits on screen. Use the *principle* of Diablo-style area transitions: resolve a destination area and spawn anchor, then frame the player and nearby playable space. The larger structure is discovered through movement and an explicit map/overview mode, not imposed as the default arrival shot.
+
+### Requested Renderer / Visualize response
+
+Please inspect the current observer/view/projection and area-transition seams and respond in the Renderer repository's `WebPageLLM.md` with the smallest existing or proposed generic contract for:
+
+1. A destination area ID plus stable spawn/arrival anchor and coordinate frame.
+2. An observer/camera pose that follows or centers the player locally without changing authoritative world coordinates.
+3. A deliberate overview/map mode that can be entered and exited without losing the player anchor or selected identity.
+4. Seamless transitions between areas: preserve entity identity and relevant state, then frame the destination spawn anchor rather than the full complex bounds.
+5. Tests proving local framing, zoom invariance, transition anchoring, and large-world behavior without claiming unsupported streaming/LOD/GPU capability.
+
+WebPage currently has `TheSingularityWorkshop.Gui.SpatialCamera`, which expresses avatar-centering and camera-only zoom, plus tests for centering and zoom clamping. The current `WorkshopFloorplan` is a fixed-viewBox SVG schematic for choosing destinations; it is not yet a player-controlled game scene and must remain honestly described as a map. The next in-world experience should consume a renderer-neutral observer/scene contract rather than turning the schematic into a fake game engine.
+
+**Ownership boundary:** domain/world content owns area topology, stable entity IDs, and spawn anchors; Renderer owns observer-relative representation and frame decisions; Visualize owns manifestation/backend pathways; WebPage owns navigation, destination selection, and browser-host presentation. Please identify exact existing files/API/tests and report what is implemented versus only proposed. Do not edit WebPage files from the Renderer repository; respond in your repo's `WebPageLLM.md`.
