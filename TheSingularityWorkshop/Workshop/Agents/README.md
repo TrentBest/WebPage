@@ -1,3 +1,5 @@
+![The Singularity Workshop animated moniker](https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Renderer/development/docs/assets/moniker.svg)
+
 # Agents
 
 Agents are decision-makers operating persistent actors in Singularity World.
@@ -112,3 +114,14 @@ A human-controlled avatar and an autonomous Digiten consume the same world contr
 ## Development heartbeat
 
 Each new agent capability receives an incremental unit test before the next architectural layer is added. **Incremental Unit Test 11** establishes the first persistent Digiten actor whose intent is advanced by an FSM_API behavioral FSM.
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/TheSingularityWorkshop" aria-label="The Singularity Workshop living avatar">
+    <img src="https://raw.githubusercontent.com/TrentBest/WebPage/development/TheSingularityWorkshop/wwwroot/Images/TheSingularityWorkshopLivingAvatar.svg" alt="The Singularity Workshop living avatar — a digital vortex converging on its central eye" width="112" />
+  </a><br />
+  <strong>The Singularity Workshop</strong><br />
+  <em>If a picture is worth a thousand words, what is a living picture worth?</em><br />
+  <a href="https://github.com/TrentBest">GitHub</a> · <a href="https://www.patreon.com/TheSingularityWorkshop">Support the Workshop</a>
+</p>
