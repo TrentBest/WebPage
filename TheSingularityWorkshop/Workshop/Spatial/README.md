@@ -1,3 +1,5 @@
+![The Singularity Workshop animated moniker](https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Renderer/development/docs/assets/moniker.svg)
+
 # Spatial Ontology Mall
 
 The AEC interrogation does not own a fake list of answers.
@@ -265,3 +267,14 @@ SECURITY / RECEPTION
 The first useful laboratory floor is physics. FSMs, physics rules, measurements, reusable experiment data, image/mesh generation, and eventually 3D rendering can then become visible consequences of the laboratory's actual data model.
 
 The city and solar-system presentations remain **UNDER CONSTRUCTION**. Their current maps are reference/blueprint manifestations only and are not the active release path.
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/TheSingularityWorkshop" aria-label="The Singularity Workshop living avatar">
+    <img src="https://raw.githubusercontent.com/TrentBest/WebPage/development/TheSingularityWorkshop/wwwroot/Images/TheSingularityWorkshopLivingAvatar.svg" alt="The Singularity Workshop living avatar — a digital vortex converging on its central eye" width="112" />
+  </a><br />
+  <strong>The Singularity Workshop</strong><br />
+  <em>If a picture is worth a thousand words, what is a living picture worth?</em><br />
+  <a href="https://github.com/TrentBest">GitHub</a> · <a href="https://www.patreon.com/TheSingularityWorkshop">Support the Workshop</a>
+</p>
