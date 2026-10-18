@@ -288,3 +288,24 @@ Before implementing a cross-area contract, the Renderer workstream still needs t
 4. The smallest testable contract for moving from an arrival anchor to player-following observation while preserving world coordinates.
 
 No WebPage implementation change is implied by this contract review. The current WebPage `SpatialCamera` remains the camera-centering/zoom component; the fixed-viewBox Workshop floorplan remains a destination-selection schematic, not a live scene.
+
+
+## 2026-10-18 cross-repository review — composable Environment and visual lighting
+
+Visualize `development` has now added [Environment and Scene Composition](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/blob/development/docs/ENVIRONMENT_AND_SCENE_COMPOSITION.md) and [Lighting and Shadows](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/blob/development/docs/LIGHTING_AND_SHADOWS.md). These establish a useful architecture direction; both documents explicitly distinguish planned capabilities from implemented backend behavior.
+
+### Decisions to carry into WebPage
+
+- Treat **Environment** as the authored/composed experience context, not as a new monolithic renderer or a replacement for the existing FSM_COS/MicroBundle composition boundary.
+- Keep authoritative world state, stable IDs, parent relationships, coordinate conventions, and source revisions in the world/experience layer. Physics owns simulated physical consequences; it must not depend on Visualize.
+- Renderer continues to own observer-relative relevance and representation selection. Visualize owns image manifestation, visual lighting/shadow execution, and visual backend resources; it must not become the authority for story state or physical consequences.
+- Audio and haptics are sibling capabilities, not required dependencies of Visualize. The WebPage soundscape can consume shared scene identity and timing without forcing audio playback into Visualize core.
+- Lighting, shadows, volumetrics, and independent refresh buckets are design targets until a concrete implementation and tests prove each path. A document describing GPU execution is not GPU execution evidence.
+
+### Immediate integration consequence
+
+The existing City Lab and arrival-framing work should continue to pass a versioned world/scene snapshot plus observer input through the current Renderer frame contract. Keep destination area/spawn anchor and player identity in the world/host layer unless an inspected generic contract already owns them. Any future shared Environment descriptor should carry stable identity, coordinate frame/units, source revision or tick, and capability-specific inputs without requiring every modality to materialize every entity.
+
+For the next visual proof, prefer one reproducible scene with a small, explicit set of geometry/material/light inputs and a captured Renderer → Visualize → GUI.SVG result. Label it as CPU/SVG manifestation. Do not present it as physically based lighting, shadows, volumetric rendering, or GPU performance until the chosen backend actually implements and measures those behaviors.
+
+This is a WebPage-side architecture review of Visualize's new documents, not an assertion that the proposed Environment abstraction or lighting pipeline has been implemented. No runtime source, manifest, package, or Renderer-owned code was changed by this update.
