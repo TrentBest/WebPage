@@ -496,4 +496,19 @@ public sealed class IncrementalVersionTests
     }
 
 
+    [ArchitectureTest(0, 0, 208)] [Fact(DisplayName = "V0.0.208 — Remote_Experience_Manifest_Can_Be_Selected_At_Startup")]
+    public void V0_0_208RemoteExperienceManifestCanBeSelectedAtStartup()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var service = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs"));
+        var program = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Program.cs"));
+        var docs = File.ReadAllText(Path.Combine(root, "docs", "AZURE_BLOB_EXPERIENCE_DELIVERY.md"));
+
+        Assert.Contains("ExperienceArtifacts:ManifestPath", program);
+        Assert.Contains("initialManifestPath", service);
+        Assert.Contains("SwitchManifestAsync(_initialManifestPath)", service);
+        Assert.Contains("ExperienceArtifacts:ManifestPath", docs);
+        Assert.Contains("DefaultManifestPath", service);
+    }
+
 }
