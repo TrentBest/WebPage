@@ -68,7 +68,7 @@ public sealed class WebPageHostManifestTests
     [InlineData("not-a-version")]
     public void ManifestParserRejectsUnsupportedSchemaVersions(string version)
     {
-        var json = $"""
+        var json = $$"""
         {
           "manifestId": "webpage-host",
           "version": "{{version}}",
