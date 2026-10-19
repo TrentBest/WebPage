@@ -58,6 +58,22 @@ declared dependency
 
 WebPage must not request 2110 separately just because it is presented before the primary Experience.
 
+## Source-backed living evidence map
+
+These links are the current implementation/evidence trail, not a claim that the composition-to-execution migration is finished.
+
+| Claim / boundary | Source of truth | Evidence available now | Boundary still to prove |
+|---|---|---|---|
+| Host manifest declares startup, primary Experience, and capabilities | [Host manifest](../TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json) | Versioned JSON input; startup Moniker is bundle 2101 and primary Living GUI is bundle 2102 | Manifest selection and composition do not alone prove the selected primary Experience owns all browser execution |
+| WebPage requests composition and exposes the assembled result | [WorkshopExperienceService](../TheSingularityWorkshop/Services/WorkshopExperienceService.cs) | Source exposes `RuntimeAssembly`, primary composition and selected Experience properties | RuntimeAssembly-to-host-execution/observation bridge remains a release gate |
+| Browser surface is a presentation composed by the host | [Home.razor](../TheSingularityWorkshop/Pages/Home.razor) | Root GUI is built from the active page/service state; the page injects both composition and FSM services | The page currently has parallel composition and page-FSM responsibilities; do not describe this as a fully migrated runtime |
+| Page progression is driven by FSM_API through the compatibility service | [FSMManagerService](../TheSingularityWorkshop/Services/FSMManagerService.cs) and [PageFSM](../TheSingularityWorkshop/Services/PageFSM.cs) | A 33 ms heartbeat calls `Page.Update()`; PageFSM exposes explicit states and nested Living GUI runtime | Preserve this behavior until the canonical host path has equivalent tested behavior |
+| Living GUI population is independently stateful | [LivingGuiFsm](../TheSingularityWorkshop/Services/LivingGuiFsm.cs) | Organism FSM pool and lifecycle are visible in source | Runtime visualization must bind to current context/state, not to a hand-authored depiction |
+| Lifecycle and reproduction have deterministic test evidence | [LivingGuiRuntimeTests](../SingularityHub.Tests/LivingGuiRuntimeTests.cs), [LivingGuiReproductionTests](../SingularityHub.Tests/LivingGuiReproductionTests.cs) | Tests assert root/child creation, independent lifecycle phases, growth/reproduction and position inheritance | These tests establish code-level behavior; they do not by themselves prove the browser's rendered state matches every runtime observation |
+
+**How to read this map:** code links are implementation evidence; test links are executable behavioral evidence; the shared SVG above is only an architecture illustration. A future live panel should show at least the selected manifest/Experience, composition status, page-FSM state, Living GUI population/phase, and a source/test link for each claim. Until such a panel is implemented and tested, label it as a proposed inspection view rather than an existing feature.
+
+
 ## Transitional areas
 
 The repository still contains older page-FSM, first-contact, catalog, demo, and exploration implementations.
