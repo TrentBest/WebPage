@@ -1,5 +1,10 @@
 # Singularity City: MicroBundle Composition Contract
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status:** architecture contract and integration plan. This document does not claim that the complete city is already a single composed runtime.
 
 ## The rule

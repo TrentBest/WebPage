@@ -1,5 +1,10 @@
 # Singularity Laboratory — Station and Experiment Contract
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status:** architecture contract and implementation plan. The floorplan now exposes the existing live FSM_API lifecycle interaction as the first Laboratory station. The full station catalogue and MicroBundle prescription workflow are not yet implemented.
 
 ## Purpose

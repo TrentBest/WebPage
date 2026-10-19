@@ -1,5 +1,10 @@
 # Singularity City: Zoomable World and Reusable Experiences
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status:** design contract and implementation sequence. This document distinguishes existing foundations from work still required; it does not claim a persistent city, street-level renderer, simulated train, or living crime system already exists.
 
 ## Product thesis
