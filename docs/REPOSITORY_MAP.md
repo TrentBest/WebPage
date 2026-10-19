@@ -1,5 +1,10 @@
 # WebPage Repository Map
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 WebPage is both a browser application and a teaching/proving ground for The Singularity Workshop.
 
 The repository is intentionally split by responsibility. When code appears to duplicate a capability already owned by a Workshop package, that is a migration signal—not permission to create a second implementation.

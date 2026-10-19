@@ -1,5 +1,10 @@
 # Singularity City: Living World Plan
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status:** implementation plan grounded in current WebPage work; not a claim that all listed systems are already running together.
 
 Singularity City is a science-fiction city that should feel inhabited, connected, and in motion—not a skyline render with decorative dots. The Workshop is an anchor inside a larger world. Digitens have their own lives and destinations; transportation connects neighborhoods; public places create reasons to gather; and the same world should support both everyday activity and special events such as a soccer match.

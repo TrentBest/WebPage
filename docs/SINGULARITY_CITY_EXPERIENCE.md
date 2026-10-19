@@ -1,5 +1,10 @@
 # Singularity City Experience
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 Singularity City is the initial spatial anchor of Singularity World: a massive floating city in the Pacific Ocean. The Singularity Workshop remains at the city's center. The city is not a static backdrop; it is an editable, navigable environment in which Digitens live and work, and in which creators can compose and publish MicroBundle-backed Experiences.
