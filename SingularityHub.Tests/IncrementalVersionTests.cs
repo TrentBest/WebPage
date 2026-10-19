@@ -526,4 +526,19 @@ public sealed class IncrementalVersionTests
         Assert.Contains("1 MiB", docs);
     }
 
+
+    [ArchitectureTest(0, 0, 210)] [Fact(DisplayName = "V0.0.210 — Experience_Manifest_Loading_Propagates_Cancellation")]
+    public void V0_0_210ExperienceManifestLoadingPropagatesCancellation()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var service = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs"));
+
+        Assert.Contains("InitializeAsync(bool returningVisitor = false, CancellationToken cancellationToken = default)", service);
+        Assert.Contains("SwitchManifestAsync(string manifestPath, CancellationToken cancellationToken = default)", service);
+        Assert.Contains("ReadManifestJsonAsync(manifestUri, cancellationToken)", service);
+        Assert.Contains("ResponseHeadersRead,\n            cancellationToken", service);
+        Assert.Contains("ReadAsStreamAsync(cancellationToken)", service);
+        Assert.Contains("buffer.AsMemory(0, buffer.Length), cancellationToken", service);
+        Assert.Contains("buffer.AsMemory(0, bytesRead), cancellationToken", service);
+    }
 }
