@@ -588,4 +588,16 @@ public sealed class IncrementalVersionTests
         Assert.Contains("await service.SwitchManifestAsync(\"manifest.json\")", tests);
     }
 
+    [ArchitectureTest(0, 0, 215)] [Fact(DisplayName = "V0.0.215 — Experience_Manifest_HTTP_Cancellation_Is_Behaviorally_Validated")]
+    public void V0_0_215ExperienceManifestHttpCancellationIsBehaviorallyValidated()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WebPageHostManifestTests.cs"));
+
+        Assert.Contains("ManifestSwitchPropagatesCancellationToHttpRequest", tests);
+        Assert.Contains("SwitchManifestAsync(\\"manifest.json\\", cancellation.Token)", tests);
+        Assert.Contains("Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken)", tests);
+        Assert.Contains("ThrowsAnyAsync<OperationCanceledException>", tests);
+    }
+
 }
