@@ -1,3 +1,4 @@
+using System.Text;
 using TheSingularityWorkshop.FSM_COS;
 using DomainMicroBundle = TheSingularityWorkshop.MicroBundleDomain.IMicroBundle;
 using TheSingularityWorkshop.Infrastructure.Hub;
@@ -12,6 +13,7 @@ namespace TheSingularityWorkshop.Services;
 public sealed class WorkshopExperienceService : IDisposable
 {
     private const string DefaultManifestPath = "Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json";
+    private const long MaxManifestBytes = 1024 * 1024;
 
     private readonly HttpClient _httpClient;
     private readonly ExperienceArtifactUriResolver _artifactUriResolver;
@@ -124,7 +126,7 @@ public sealed class WorkshopExperienceService : IDisposable
         try
         {
             var manifestUri = _artifactUriResolver.Resolve(manifestPath);
-            var manifestJson = await _httpClient.GetStringAsync(manifestUri);
+            var manifestJson = await ReadManifestJsonAsync(manifestUri);
             var candidateManifest = WebPageHostManifestParser.Parse(manifestJson);
 
             if (candidateManifest.Startup is not { Count: > 0 })
@@ -357,6 +359,31 @@ public sealed class WorkshopExperienceService : IDisposable
 
         CurrentState = state;
         StateChanged?.Invoke();
+    }
+
+    private async Task<string> ReadManifestJsonAsync(Uri manifestUri)
+    {
+        using var response = await _httpClient.GetAsync(
+            manifestUri,
+            HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+
+        if (response.Content.Headers.ContentLength is > MaxManifestBytes)
+            throw new InvalidDataException($"Experience manifest exceeds the {MaxManifestBytes}-byte limit.");
+
+        await using var stream = await response.Content.ReadAsStreamAsync();
+        using var content = new MemoryStream();
+        var buffer = new byte[81920];
+        int bytesRead;
+        while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length))) > 0)
+        {
+            if (content.Length + bytesRead > MaxManifestBytes)
+                throw new InvalidDataException($"Experience manifest exceeds the {MaxManifestBytes}-byte limit.");
+
+            await content.WriteAsync(buffer.AsMemory(0, bytesRead));
+        }
+
+        return Encoding.UTF8.GetString(content.ToArray());
     }
 
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
