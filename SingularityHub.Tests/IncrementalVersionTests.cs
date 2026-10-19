@@ -650,7 +650,7 @@ public sealed class IncrementalVersionTests
 
         Assert.Contains("CreateLinkedTokenSource(cancellationToken)", service);
         Assert.Contains("timeout.CancelAfter(_manifestFetchTimeout)", service);
-        Assert.Contains("ResponseHeadersRead,\\n            fetchToken", service);
+        Assert.Contains("ResponseHeadersRead,\n            fetchToken", service);
         Assert.Contains("ReadAsStreamAsync(fetchToken)", service);
         Assert.Contains("ManifestSwitchPropagatesCancellationToHttpRequest", tests);
         Assert.Contains("ManifestSwitchTimesOutWhenManifestFetchExceedsConfiguredLimit", tests);
