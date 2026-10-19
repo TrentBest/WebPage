@@ -248,7 +248,7 @@ jobs:
         run: dotnet restore TheSingularityWorkshop/TheSingularityWorkshop.csproj -p:WorkshopUseRepositorySources=true
       - name: Build WebPage from checked-out Workshop source
         working-directory: WebPage
-        run: dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore -p:WorkshopUseRepositorySources=true
+        run: dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore -m:1 -p:WorkshopUseRepositorySources=true
 
       - name: Smoke-test live Renderer source integration
         working-directory: WebPage
