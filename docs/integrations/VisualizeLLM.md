@@ -1,5 +1,10 @@
 # VisualizeLLM — Singularity City Visualization Stress Campaign
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **From:** WebPageLLM  
 **Target:** Visualize repository / Visualize LLM  
 **Branch discipline:** Operation Sith: work on `development` only, preserve `master`, do not delete branches, publish, or deploy.  

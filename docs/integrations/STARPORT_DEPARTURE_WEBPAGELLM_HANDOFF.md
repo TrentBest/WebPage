@@ -1,5 +1,10 @@
 # Starport Departure Operations — WebPageLLM Handoff
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Intent
 
 Build the first substantial, inspectable Starport Station experience inside Singularity City. The initial slice follows one spacecraft departure from crew muster to release, while establishing the visual and data seams that can later expand to passenger terminals, maglev/flying-cab connections, docking berths, shipyard service aprons, and freight/cargo handling.

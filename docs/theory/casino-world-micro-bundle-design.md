@@ -1,5 +1,10 @@
 # Casino World: Micro-Bundle Composition and View Transitions
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 Status: design direction for the WebPage Economy prototype. This document describes intended behavior; it does not claim that the current browser prototype is connected to production economy or runtime services.
 
 ## Experience principle
