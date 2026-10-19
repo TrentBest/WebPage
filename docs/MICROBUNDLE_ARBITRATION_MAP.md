@@ -1,5 +1,10 @@
 # MicroBundle Arbitration Map
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 This is the working map for turning the current collection of MicroBundles into an interoperable capability system.
 
 The goal is not to make every bundle depend on every other bundle. The goal is to identify semantic structure, missing coordination bundles, and places where arbitration can compose capabilities without creating hard references between implementations.

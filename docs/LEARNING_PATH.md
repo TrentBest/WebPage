@@ -1,5 +1,10 @@
 # WebPage Learning Path
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 The Workshop should not greet a new visitor with the entire ecosystem at once. It should let curiosity pull the next layer into view.
 
 The intended experience is a progression, not a conventional website menu:
