@@ -45,6 +45,16 @@ try {
   await page.getByRole("button", { name: "CLOSE RUNTIME OBSERVATION", exact: true }).waitFor({ state: "visible" });
   const observationPanel = page.getByRole("complementary", { name: "Live runtime observation snapshot" });
   await observationPanel.getByText("Page state", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Host manifest", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Selected primary Experience", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Composition", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText(/ASSEMBLED · runtime \d+ · \d+ bundles/).waitFor({ state: "visible" });
+  await observationPanel.getByText("Execution owner", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("WebPage compatibility PageFSM", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Manifest lifecycle binding", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("NOT BOUND", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByRole("link", { name: "PageFSM source", exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByRole("link", { name: "Browser journey test", exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Living GUI state", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Population", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Observation only — does not imply that the manifest-selected RuntimeAssembly owns lifecycle execution.", { exact: true }).waitFor({ state: "visible" });
