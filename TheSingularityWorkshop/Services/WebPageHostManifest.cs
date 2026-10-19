@@ -64,6 +64,10 @@ public static class WebPageHostManifestParser
         var manifest = JsonSerializer.Deserialize<WebPageHostManifest>(json, Options)
             ?? throw new InvalidOperationException("The WebPage host manifest is empty.");
 
+        if (!Version.TryParse(manifest.Version, out var schemaVersion) || schemaVersion.Major != 1)
+            throw new InvalidOperationException(
+                $"Unsupported WebPage host manifest version '{manifest.Version}'. Supported major version is 1.");
+
         ValidateBundles(manifest.Startup.SelectMany(x => x.MicroBundles ?? Array.Empty<WebPageManifestBundle>()));
         ValidateBundles(manifest.Running.SelectMany(x => x.MicroBundles ?? Array.Empty<WebPageManifestBundle>()));
         ValidateBundles((manifest.Hub ?? Array.Empty<WebPageManifestHubItem>())
