@@ -475,6 +475,7 @@ public sealed class IncrementalVersionTests
         var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
         var resolverPath = Path.Combine(root, "TheSingularityWorkshop", "Services", "ExperienceArtifactUriResolver.cs");
         var servicePath = Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs");
+        var programPath = Path.Combine(root, "TheSingularityWorkshop", "Program.cs");
         var testsPath = Path.Combine(root, "SingularityHub.Tests", "ExperienceArtifactUriResolverTests.cs");
         var docsPath = Path.Combine(root, "docs", "AZURE_BLOB_EXPERIENCE_DELIVERY.md");
 
@@ -482,11 +483,13 @@ public sealed class IncrementalVersionTests
         Assert.True(File.Exists(testsPath));
         var resolver = File.ReadAllText(resolverPath);
         var service = File.ReadAllText(servicePath);
+        var program = File.ReadAllText(programPath);
         var tests = File.ReadAllText(testsPath);
         var docs = File.ReadAllText(docsPath);
 
         Assert.Contains("UriSchemeHttps", resolver);
         Assert.Contains("experienceArtifactBaseUri", service);
+        Assert.Contains("ExperienceArtifacts:BaseUri", program);
         Assert.Contains("GetStringAsync(manifestUri)", service);
         Assert.Contains("RejectsUnsafeManifestPaths", tests);
         Assert.Contains("This is the first source seam", docs);
