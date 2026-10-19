@@ -16,6 +16,8 @@ public sealed class WorkshopExperienceService : IDisposable
     private readonly HttpClient _httpClient;
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
     private readonly HubRuntime _hubRuntime;
+    private readonly FSMManagerService _executionHost;
+    private readonly WorkshopExperienceCatalog _experienceCatalog;
     private ulong _runtimeGeneration;
     private bool _disposed;
 
@@ -68,10 +70,16 @@ public sealed class WorkshopExperienceService : IDisposable
                 AiExchangeCompositionBundle.BundleId, out var ai) ? ai : null)
             .FirstOrDefault(ai => ai is not null);
 
-    public WorkshopExperienceService(HttpClient httpClient, HubRuntime hubRuntime)
+    public WorkshopExperienceService(
+        HttpClient httpClient,
+        HubRuntime hubRuntime,
+        FSMManagerService executionHost,
+        WorkshopExperienceCatalog experienceCatalog)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _hubRuntime = hubRuntime ?? throw new ArgumentNullException(nameof(hubRuntime));
+        _executionHost = executionHost ?? throw new ArgumentNullException(nameof(executionHost));
+        _experienceCatalog = experienceCatalog ?? throw new ArgumentNullException(nameof(experienceCatalog));
     }
 
     public async Task InitializeAsync(bool returningVisitor = false)
@@ -116,6 +124,17 @@ public sealed class WorkshopExperienceService : IDisposable
             if (primaryExperience.MicroBundles is not { Count: > 0 } primaryBundles)
                 throw new InvalidOperationException("The manifest-selected primary Experience has no MicroBundles.");
 
+            var declaredPrimaryBundleIds = primaryBundles.Select(bundle => bundle.BundleId).ToHashSet();
+            var experienceMatches = _experienceCatalog.Experiences
+                .Where(experience => experience.MicroBundleIds.Count > 0 &&
+                    experience.MicroBundleIds.All(declaredPrimaryBundleIds.Contains))
+                .ToArray();
+            if (experienceMatches.Length != 1)
+                throw new InvalidOperationException(experienceMatches.Length == 0
+                    ? $"No registered Workshop Experience matches primary MicroBundles: {string.Join(", ", declaredPrimaryBundleIds.Order())}."
+                    : $"Multiple Workshop Experiences match primary MicroBundles: {string.Join(", ", declaredPrimaryBundleIds.Order())}.");
+            var candidateSelectedExperience = experienceMatches[0];
+
             var generation = checked(++_runtimeGeneration);
             var runtimeBase = checked(generation * 1000UL);
             var roots = primaryBundles.Select(root => root.ToRuntimeManifestEntry()).ToList();
@@ -142,6 +161,10 @@ public sealed class WorkshopExperienceService : IDisposable
                 throw new InvalidOperationException(
                     "FSM_COS did not compose the selected Moniker Experience, stationary Moniker, sway behavior, and primary Experience.");
 
+            var candidateExecutionRuntime = _executionHost.PrepareManifestExecution(
+                candidateSelectedExperience,
+                candidatePrimary);
+
             ComposeManifestHubBundles(candidateManifest, runtimeBase, candidateHubAssemblies);
             ComposeManifestCapabilities(candidateManifest, runtimeBase, candidateCapabilities);
 
@@ -162,10 +185,12 @@ public sealed class WorkshopExperienceService : IDisposable
             var oldHubBundles = _hubRuntime.Hub.LoadedBundles.Cast<object>().ToArray();
 
             _hubRuntime.ActivateManifestBundle(candidateHubBundle);
+            _executionHost.ActivateExecutionRuntime(candidateExecutionRuntime);
             Manifest = candidateManifest;
             Demonstrations = candidateDemonstrations;
             CurrentManifestExperience = startupExperience;
             PrimaryManifestExperience = primaryExperience;
+            SelectedExperience = candidateSelectedExperience;
             RuntimeAssembly = candidatePrimary;
             ReplaceAssemblies(_hubRuntimeAssemblies, candidateHubAssemblies);
             ReplaceAssemblies(_capabilityRuntimeAssemblies, candidateCapabilities);

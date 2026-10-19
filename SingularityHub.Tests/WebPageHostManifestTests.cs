@@ -273,12 +273,21 @@ public sealed class WebPageHostManifestTests
         {
             BaseAddress = new Uri("https://localhost/")
         };
-        var hub = new HubRuntime(new HubKernel());
-        using var service = new WorkshopExperienceService(client, hub);
+        var hubKernel = new HubKernel();
+        var hub = new HubRuntime(hubKernel);
+        using var executionHost = new FSMManagerService(hubKernel);
+        var originalPage = executionHost.Page;
+        using var service = new WorkshopExperienceService(
+            client, hub, executionHost, new WorkshopExperienceCatalog());
 
         await service.SwitchManifestAsync("manifest-a.json");
         var firstAssembly = service.RuntimeAssembly;
+        var firstExecutionRuntime = executionHost.ExecutionRuntime;
         var firstHub = hub.Hub;
+        Assert.Equal(3002UL, service.SelectedExperience!.Id);
+        Assert.True(firstExecutionRuntime.IsManifestBound);
+        Assert.Same(originalPage, firstExecutionRuntime.Page);
+        Assert.Equal(firstAssembly!.RuntimeId, firstExecutionRuntime.RuntimeAssembly!.RuntimeId);
         Assert.Equal("showcase-a", service.Manifest!.ManifestId);
         Assert.Equal("/a", Assert.Single(service.Manifest.Hub).Route);
 
@@ -288,6 +297,11 @@ public sealed class WebPageHostManifestTests
         Assert.NotSame(firstAssembly, service.RuntimeAssembly);
         Assert.Same(firstHub, hub.Hub);
         Assert.Equal("manifest-b.json", service.ActiveManifestPath);
+        Assert.NotSame(firstExecutionRuntime, executionHost.ExecutionRuntime);
+        Assert.True(executionHost.ExecutionRuntime.IsManifestBound);
+        Assert.Equal(service.RuntimeAssembly!.RuntimeId, executionHost.ExecutionRuntime.RuntimeAssembly!.RuntimeId);
+        Assert.Same(originalPage, executionHost.ExecutionRuntime.Page);
+        Assert.Equal("LIVING GUI", executionHost.ExecutionRuntime.Experience!.Name);
 
         var beforeReset = service.RuntimeAssembly;
         await service.RestartFromManifestAsync(deepDive: true);
@@ -296,9 +310,11 @@ public sealed class WebPageHostManifestTests
         Assert.True(service.IsDeepDive);
 
         var activeAssembly = service.RuntimeAssembly;
+        var activeExecutionRuntime = executionHost.ExecutionRuntime;
         await Assert.ThrowsAnyAsync<Exception>(() => service.SwitchManifestAsync("invalid.json"));
         Assert.Equal("showcase-b", service.Manifest!.ManifestId);
         Assert.Same(activeAssembly, service.RuntimeAssembly);
+        Assert.Same(activeExecutionRuntime, executionHost.ExecutionRuntime);
         Assert.Equal("manifest-b.json", service.ActiveManifestPath);
         Assert.NotNull(service.LastManifestError);
     }
@@ -310,7 +326,10 @@ public sealed class WebPageHostManifestTests
         {
             BaseAddress = new Uri("https://localhost/")
         };
-        using var service = new WorkshopExperienceService(client, new HubRuntime(new HubKernel()));
+        var hubKernel = new HubKernel();
+        using var executionHost = new FSMManagerService(hubKernel);
+        using var service = new WorkshopExperienceService(
+            client, new HubRuntime(hubKernel), executionHost, new WorkshopExperienceCatalog());
 
         await Assert.ThrowsAsync<ArgumentException>(() => service.SwitchManifestAsync("https://example.com/manifest.json"));
         await Assert.ThrowsAsync<ArgumentException>(() => service.SwitchManifestAsync("../manifest.json"));

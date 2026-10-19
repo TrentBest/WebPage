@@ -50,14 +50,14 @@ try {
   await observationPanel.getByText("Composition", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText(/ASSEMBLED · runtime \d+ · \d+ bundles/).waitFor({ state: "visible" });
   await observationPanel.getByText("Execution owner", { exact: true }).waitFor({ state: "visible" });
-  await observationPanel.getByText("WebPage compatibility PageFSM", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Manifest-bound host adapter: LIVING GUI → preserved PageFSM", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Manifest lifecycle binding", { exact: true }).waitFor({ state: "visible" });
-  await observationPanel.getByText("NOT BOUND", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("BOUND TO HOST ADAPTER", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByRole("link", { name: "PageFSM source", exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByRole("link", { name: "Browser journey test", exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Living GUI state", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Population", { exact: true }).waitFor({ state: "visible" });
-  await observationPanel.getByText("Observation only — composition is not execution. The manifest-selected RuntimeAssembly is assembled, but it does not own the current PageFSM lifecycle.", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Observation only — composition is not execution. The manifest-selected RuntimeAssembly is assembled, while the bound host adapter currently delegates lifecycle ticks to the preserved PageFSM implementation.", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Sample 0", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByRole("button", { name: "REFRESH SNAPSHOT", exact: true }).click();
   await observationPanel.getByText("Sample 1", { exact: true }).waitFor({ state: "visible" });

@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TheSingularityWorkshop.FSM_COS;
+using TheSingularityWorkshop.SingularityHub;
 using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 
 namespace TheSingularityWorkshop.Services
@@ -18,8 +20,10 @@ namespace TheSingularityWorkshop.Services
         private readonly PeriodicTimer _heartbeat = new(TimeSpan.FromMilliseconds(HeartbeatMilliseconds));
         private readonly Task _heartbeatTask;
         private bool _disposed;
+        private IExperienceExecutionRuntime _executionRuntime = default!;
 
         public PageFSM Page { get; }
+        public IExperienceExecutionRuntime ExecutionRuntime => Volatile.Read(ref _executionRuntime);
         public PageStateContext Context => Page.Context;
         public string CurrentState => Page.CurrentState;
         public string LivingGuiState => Page.LivingGuiState;
@@ -27,7 +31,7 @@ namespace TheSingularityWorkshop.Services
         public bool LivingGuiIsValid => Page.LivingGuiIsValid;
         public TimeSpan MonikerPresentationDuration => Page.MonikerPresentationDuration;
         /// <summary>Point-in-time observation of the canonical page/Living GUI runtime.</summary>
-        public PageFSM.RuntimeObservation Observation => Page.ObserveRuntime();
+        public PageFSM.RuntimeObservation Observation => ExecutionRuntime.Observe();
 
         public event Action<string>? StateChanged
         {
@@ -49,7 +53,28 @@ namespace TheSingularityWorkshop.Services
         public FSMManagerService(HubKernel hub)
         {
             Page = new PageFSM(hub);
+            _executionRuntime = new PageFsmExecutionRuntime(Page);
             _heartbeatTask = RunHeartbeatAsync(_shutdown.Token);
+        }
+
+        /// <summary>Prepares a manifest-bound adapter without changing the active runtime.</summary>
+        public IExperienceExecutionRuntime PrepareManifestExecution(IExperience experience, RuntimeAssembly assembly)
+        {
+            ArgumentNullException.ThrowIfNull(experience);
+            ArgumentNullException.ThrowIfNull(assembly);
+            return new PageFsmExecutionRuntime(Page, experience, assembly);
+        }
+
+        /// <summary>Routes future ticks and observations through a validated Experience adapter.</summary>
+        public void ActivateExecutionRuntime(IExperienceExecutionRuntime runtime)
+        {
+            ArgumentNullException.ThrowIfNull(runtime);
+            if (!ReferenceEquals(runtime.Page, Page))
+                throw new InvalidOperationException("The execution adapter must preserve the active PageFSM instance.");
+            if (!runtime.IsManifestBound)
+                throw new InvalidOperationException("Only a validated manifest-bound Experience runtime can be activated.");
+
+            Volatile.Write(ref _executionRuntime, runtime);
         }
 
         public void RequestEnter() => Page.RequestEnter();
@@ -58,7 +83,7 @@ namespace TheSingularityWorkshop.Services
         public void SignalGravityReleased() => Page.SignalGravityReleased();
         public void SignalLivingGuiFallen() => Page.SignalLivingGuiFallen();
         public void SignalNavigationReady() => Page.SignalNavigationReady();
-        public void Step() => Page.Update();
+        public void Step() => ExecutionRuntime.Tick();
         public void Shutdown() => Page.Shutdown();
 
         private async Task RunHeartbeatAsync(CancellationToken cancellationToken)
@@ -66,7 +91,7 @@ namespace TheSingularityWorkshop.Services
             try
             {
                 while (await _heartbeat.WaitForNextTickAsync(cancellationToken))
-                    Page.Update();
+                    ExecutionRuntime.Tick();
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
