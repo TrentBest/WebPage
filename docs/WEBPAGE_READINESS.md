@@ -87,10 +87,10 @@ Tracking: [living GUI coverage ledger](LIVING_GUI_COVERAGE.md), [architecture au
 
 ## Immediate engineering sequence
 
-1. **Define the host contract** for startup, FSM_API scheduling, lifecycle ownership, and observable state. Check for an existing reusable runtime in the consuming packages before designing a WebPage-only abstraction.
-2. **Connect the manifest-selected assembly to the contract** with explicit failure behavior; composition success must not silently masquerade as execution success.
-3. **Bridge the browser presentation to authoritative state** and expose a small runtime-backed evidence view with manifest/version, selected Experience, composition/execution status, active lifecycle state, population/phase, and source/test links. The immutable `FSM.Observation` snapshot API and manifest/composition/execution evidence view are implemented and browser-tested. The remaining blocker is actual lifecycle ownership transfer and behavior-parity proof.
-4. **Add regression proof** for startup → Moniker → Living GUI → population/reproduction/gravity/navigation, retaining the current implementation until behavioral parity is demonstrated.
-5. **Run the full CI/browser checks**, review responsive layout, then reconcile docs and release workflow safeguards.
+1. [x] **Define the host seam.** `IExperienceExecutionRuntime` now exposes lifecycle actions, ticking, owner identity, and immutable observation; the current implementation remains a clearly named compatibility adapter.
+2. [x] **Bind the selected Experience.** The manifest-selected assembly is validated for required MicroBundle IDs and the adapter is activated with the manifest; failed candidate composition/binding must leave the prior active runtime intact.
+3. [x] **Expose evidence in the living GUI.** The on-demand observation panel reports manifest identity, composition, selected Experience, adapter ownership/binding, lifecycle state, population/phase, and source/test links. Browser smoke verifies opening, refresh, closing, and mobile fit.
+4. **Transfer lifecycle ownership and prove parity.** Replace the compatibility adapter's delegated `PageFSM` tick with an Experience-owned runtime contract and regression-test startup → Moniker → Living GUI → population/reproduction/gravity/navigation before removing the transitional path.
+5. **Finish visitor and release review.** Complete desktop/tablet/mobile visual review, subject-specific living-documentation evidence audits, branch hygiene, and release-workflow safeguards. Run final CI on the final code candidate.
 
 Do not remove the transitional runtime before its replacement passes parity tests. Do not claim the shared SVG is live telemetry. Do not publish or deploy without explicit authorization.
