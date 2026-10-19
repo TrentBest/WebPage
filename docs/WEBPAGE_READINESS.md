@@ -29,7 +29,7 @@ Why it is **not** higher yet:
 
 **Confidence:** high for the cited CI outcome and source facts; medium-low for the percentage because the execution bridge remains a substantial engineering gate. The number must rise through implementation and verification, not by relabeling open gates.
 
-Progress scale: 0% = no release evidence; 100% = release gates verified, final-code CI green, visitor experience reviewed, and explicit human authorization obtained for publication/deployment. Readiness does not itself authorize publication.
+Progress scale: 0% = no release evidence; 100% = technical release gates verified, final-code CI green, and visitor experience reviewed. Readiness does not itself authorize publication or deployment; explicit human approval remains a separate required release action.
 
 ## Readiness gates
 
