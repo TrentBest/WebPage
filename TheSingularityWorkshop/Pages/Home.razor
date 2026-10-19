@@ -12,47 +12,7 @@
 <PageTitle>The Singularity Workshop</PageTitle>
 
 @BuildRootGui()
-
-<button type="button"
-        class="runtime-observation-toggle"
-        aria-expanded="@_runtimeDiagnosticsOpen.ToString().ToLowerInvariant()"
-        aria-controls="runtime-observation-panel"
-        @onclick="ToggleRuntimeObservation">
-    @(_runtimeDiagnosticsOpen ? "CLOSE RUNTIME OBSERVATION" : "RUNTIME OBSERVATION")
-</button>
-@if (_runtimeDiagnosticsOpen && _runtimeObservationSnapshot is { } observation)
-{
-    <aside id="runtime-observation-panel"
-           class="runtime-observation-panel"
-           aria-label="Live runtime observation snapshot">
-        <h2>RUNTIME OBSERVATION</h2>
-        <p>Point-in-time snapshot from the active PageFSM; refresh to sample again.</p>
-        <div class="runtime-observation-grid">
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Page state</span><span class="runtime-observation-value">@observation.PageState</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Living GUI state</span><span class="runtime-observation-value">@observation.LivingGuiState</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Active phase</span><span class="runtime-observation-value">@observation.LivingGuiActivePhase</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Total ticks</span><span class="runtime-observation-value">@observation.TotalTicks</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">State ticks</span><span class="runtime-observation-value">@observation.StateTicks</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Population</span><span class="runtime-observation-value">@observation.PopulationCount</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Available slots</span><span class="runtime-observation-value">@observation.AvailablePopulationSlots</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Page FSM valid</span><span class="runtime-observation-value">@FormatObservationFlag(observation.PageFsmIsValid)</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Living GUI valid</span><span class="runtime-observation-value">@FormatObservationFlag(observation.LivingGuiIsValid)</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Living GUI frozen</span><span class="runtime-observation-value">@FormatObservationFlag(observation.LivingGuiFrozen)</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Entry requested</span><span class="runtime-observation-value">@FormatObservationFlag(observation.EnterRequested)</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">GUI populated</span><span class="runtime-observation-value">@FormatObservationFlag(observation.LivingGuiPopulated)</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Moniker ready</span><span class="runtime-observation-value">@FormatObservationFlag(observation.MonikerReady)</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Gravity released</span><span class="runtime-observation-value">@FormatObservationFlag(observation.GravityReleased)</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">GUI fallen</span><span class="runtime-observation-value">@FormatObservationFlag(observation.LivingGuiFallen)</span></div>
-            <div class="runtime-observation-row"><span class="runtime-observation-label">Navigation ready</span><span class="runtime-observation-value">@FormatObservationFlag(observation.NavigationReady)</span></div>
-        </div>
-        <div class="runtime-observation-actions">
-            <button type="button" @onclick="RefreshRuntimeObservation">REFRESH SNAPSHOT</button>
-            <span>Sample @_runtimeObservationRefresh</span>
-        </div>
-        <p class="runtime-observation-source">Observation only — does not imply that the manifest-selected RuntimeAssembly owns lifecycle execution.</p>
-    </aside>
-}
-
+<TheSingularityWorkshop.Components.RuntimeObservationPanel FSM="FSM" />
 
 <style>
 .manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker #the{color:#00a8ff}.manifest-moniker #singularity{color:#ff2cff}.manifest-moniker #workshop{color:#ff7a00}.manifest-moniker #moniker-composition{display:flex;flex-direction:column;align-items:center;gap:.15em}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
@@ -170,29 +130,11 @@
 </style>
 
 @code {
-    private bool _runtimeDiagnosticsOpen;
-    private int _runtimeObservationRefresh;
-    private PageFSM.RuntimeObservation? _runtimeObservationSnapshot;
     private bool firstRender;
     private bool _entryRequested;
     private bool _explicitHubRouteRequested;
     private string _selectedHubTab = "MONIKER";
     private string? _selectedDemonstrationId;
-
-    private static string FormatObservationFlag(bool value) => value ? "YES" : "NO";
-
-    private void ToggleRuntimeObservation()
-    {
-        _runtimeDiagnosticsOpen = !_runtimeDiagnosticsOpen;
-        if (_runtimeDiagnosticsOpen)
-            _runtimeObservationSnapshot = FSM.Observation;
-    }
-
-    private void RefreshRuntimeObservation()
-    {
-        _runtimeObservationSnapshot = FSM.Observation;
-        _runtimeObservationRefresh++;
-    }
 
 
     private RenderFragment BuildRootGui()
