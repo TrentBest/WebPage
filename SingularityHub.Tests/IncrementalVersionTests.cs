@@ -511,4 +511,17 @@ public sealed class IncrementalVersionTests
         Assert.Contains("DefaultManifestPath", service);
     }
 
+    [ArchitectureTest(0, 0, 209)] [Fact(DisplayName = "V0.0.209 — Remote_Experience_Manifest_Read_Is_Size_Bounded")]
+    public void V0_0_209RemoteExperienceManifestReadIsSizeBounded()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var service = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs"));
+        var docs = File.ReadAllText(Path.Combine(root, "docs", "AZURE_BLOB_EXPERIENCE_DELIVERY.md"));
+
+        Assert.Contains("MaxManifestBytes = 1024 * 1024", service);
+        Assert.Contains("HttpCompletionOption.ResponseHeadersRead", service);
+        Assert.Contains("content.Length + bytesRead > MaxManifestBytes", service);
+        Assert.Contains("1 MiB", docs);
+    }
+
 }
