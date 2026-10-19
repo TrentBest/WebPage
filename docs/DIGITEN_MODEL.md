@@ -1,5 +1,10 @@
 # Digiten data model — first executable contract
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 A **Digiten** is a persistent entity in a Digiverse. It has stable identity, mutable state, relationships to shared world records, needs, activity, and a life course. It may be a resident, visitor, student, worker, job seeker, caregiver, retiree, or another kind of participant.

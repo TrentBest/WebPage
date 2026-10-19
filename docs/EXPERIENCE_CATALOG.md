@@ -1,5 +1,10 @@
 # Experience Catalog — Events, Markets, and VR Spellcraft
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status: composition direction, not a claim that each Experience is implemented.** This document extends the Experience theory with concrete candidate environments. The Experience remains an environment comprised of MicroBundles; it is not synonymous with a route, Blazor page, scene, or hard-coded page component.
 
 ## The organizing rule

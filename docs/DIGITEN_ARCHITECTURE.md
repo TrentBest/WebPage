@@ -1,5 +1,10 @@
 # Digiten Architecture
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 This document defines the Digiten as a first-class architectural primitive of Singularity World.
 
 A Digiten is not a sprite, an NPC script, an FSM, or a neural network. A Digiten is a persistent inhabitant of the universe. Its visible body is a manifestation of persistent state; its goals determine what it is trying to accomplish; its policy determines how it tends to choose among available possibilities; and world capabilities determine what it is actually permitted and able to do.
