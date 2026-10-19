@@ -15,6 +15,13 @@
         <h2>RUNTIME OBSERVATION</h2>
         <p>Point-in-time snapshot from the active PageFSM; refresh to sample again.</p>
         <div class="runtime-observation-grid">
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Host manifest</span><span class="runtime-observation-value">@(Experience.Manifest?.ManifestId ?? "not loaded")</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Manifest version</span><span class="runtime-observation-value">@(Experience.Manifest?.Version ?? "not loaded")</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Startup Experience</span><span class="runtime-observation-value">@(Experience.CurrentManifestExperience?.Name ?? "none")</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Selected primary Experience</span><span class="runtime-observation-value">@(Experience.PrimaryManifestExperience?.Name ?? "none")</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Composition</span><span class="runtime-observation-value">@(Experience.RuntimeAssembly is null ? "NOT COMPOSED" : $"ASSEMBLED · runtime {Experience.RuntimeAssembly.RuntimeId} · {Experience.RuntimeAssembly.Bundles.Count} bundles")</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Execution owner</span><span class="runtime-observation-value">WebPage compatibility PageFSM</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Manifest lifecycle binding</span><span class="runtime-observation-value">NOT BOUND</span></div>
             <div class="runtime-observation-row"><span class="runtime-observation-label">Page state</span><span class="runtime-observation-value">@observation.PageState</span></div>
             <div class="runtime-observation-row"><span class="runtime-observation-label">Living GUI state</span><span class="runtime-observation-value">@observation.LivingGuiState</span></div>
             <div class="runtime-observation-row"><span class="runtime-observation-label">Active phase</span><span class="runtime-observation-value">@observation.LivingGuiActivePhase</span></div>
@@ -36,13 +43,22 @@
             <button type="button" @onclick="RefreshRuntimeObservation">REFRESH SNAPSHOT</button>
             <span>Sample @_runtimeObservationRefresh</span>
         </div>
-        <p class="runtime-observation-source">Observation only — does not imply that the manifest-selected RuntimeAssembly owns lifecycle execution.</p>
+        <div class="runtime-observation-links" aria-label="Runtime observation evidence">
+            <a href="https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Services/PageFSM.cs" target="_blank" rel="noopener noreferrer">PageFSM source</a>
+            <a href="https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Services/WorkshopExperienceService.cs" target="_blank" rel="noopener noreferrer">Host composition source</a>
+            <a href="https://github.com/TrentBest/WebPage/blob/development/SingularityHub.Tests/LivingGuiRuntimeTests.cs" target="_blank" rel="noopener noreferrer">Runtime tests</a>
+            <a href="https://github.com/TrentBest/WebPage/blob/development/tests/browser-smoke.mjs" target="_blank" rel="noopener noreferrer">Browser journey test</a>
+        </div>
+        <p class="runtime-observation-source">Observation only — composition is not execution. The manifest-selected RuntimeAssembly is assembled, but it does not own the current PageFSM lifecycle.</p>
     </aside>
 }
 
 @code {
     [Parameter, EditorRequired]
     public FSMManagerService FSM { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public WorkshopExperienceService Experience { get; set; } = default!;
 
     private bool _runtimeDiagnosticsOpen;
     private int _runtimeObservationRefresh;

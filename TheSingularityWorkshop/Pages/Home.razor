@@ -12,7 +12,7 @@
 <PageTitle>The Singularity Workshop</PageTitle>
 
 @BuildRootGui()
-<TheSingularityWorkshop.Components.RuntimeObservationPanel FSM="FSM" />
+<TheSingularityWorkshop.Components.RuntimeObservationPanel FSM="FSM" Experience="Experience" />
 
 <style>
 .manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker #the{color:#00a8ff}.manifest-moniker #singularity{color:#ff2cff}.manifest-moniker #workshop{color:#ff7a00}.manifest-moniker #moniker-composition{display:flex;flex-direction:column;align-items:center;gap:.15em}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
@@ -124,6 +124,9 @@
 .runtime-observation-actions{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.8rem}
 .runtime-observation-actions button{padding:.5rem .65rem;border:1px solid rgba(255,44,255,.4);background:transparent;color:#fff;font:inherit;cursor:pointer}
 .runtime-observation-source{margin-top:.8rem!important;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.1);font-size:.65rem}
+.runtime-observation-links{display:flex;flex-wrap:wrap;gap:.5rem .8rem;margin-top:.8rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.1)}
+.runtime-observation-links a{color:#70eaff;text-decoration:underline;text-underline-offset:2px;font-size:.65rem}
+.runtime-observation-links a:focus-visible{outline:2px solid #ffd34d;outline-offset:3px}
 @@media(prefers-reduced-motion:reduce){.runtime-observation-toggle{transition:none}}
 
 
