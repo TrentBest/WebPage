@@ -89,9 +89,9 @@ The animated lens is an **architecture illustration, not runtime telemetry**. A 
 | [`docs/integrations/SINGULARITY_CITY_LIVING_INFRASTRUCTURE.md`](integrations/SINGULARITY_CITY_LIVING_INFRASTRUCTURE.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/integrations/SINGULARITY_CITY_RECORDING_STUDIOS.md`](integrations/SINGULARITY_CITY_RECORDING_STUDIOS.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/integrations/SINGULARITY_CITY_SOCCER_ARENA.md`](integrations/SINGULARITY_CITY_SOCCER_ARENA.md) | Embedded | Shared lens present; subject-specific view audit remains
-| [`docs/integrations/SINGULARITY_LABS_ELECTRICITY_HANDOFF.md`](integrations/SINGULARITY_LABS_ELECTRICITY_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/integrations/SINGULARITY_STREET_EXPERIENCE.md`](integrations/SINGULARITY_STREET_EXPERIENCE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/integrations/SINGULARITY_STUDIOS_SFX_WEBPAGELLM.md`](integrations/SINGULARITY_STUDIOS_SFX_WEBPAGELLM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/integrations/SINGULARITY_LABS_ELECTRICITY_HANDOFF.md`](integrations/SINGULARITY_LABS_ELECTRICITY_HANDOFF.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/integrations/SINGULARITY_STREET_EXPERIENCE.md`](integrations/SINGULARITY_STREET_EXPERIENCE.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/integrations/SINGULARITY_STUDIOS_SFX_WEBPAGELLM.md`](integrations/SINGULARITY_STUDIOS_SFX_WEBPAGELLM.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/integrations/SINGULARITY_STUDIOS_WEBPAGELLM_HANDOFF.md`](integrations/SINGULARITY_STUDIOS_WEBPAGELLM_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/integrations/SOCCER_ARENA_ECONOMY.md`](integrations/SOCCER_ARENA_ECONOMY.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/integrations/SOCCER_ARENA_WEBPAGELLM_HANDOFF.md`](integrations/SOCCER_ARENA_WEBPAGELLM_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |

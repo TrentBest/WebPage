@@ -1,5 +1,10 @@
 # Singularity Studios — WebPageLLM Integration Brief
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Audience:** WebPageLLM and anyone shaping the public Workshop/WebPage experience  
 **Status:** product direction and integration contract; not a claim that the studio or acoustic simulation is implemented  
 **Source branch:** `development`  

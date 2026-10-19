@@ -1,5 +1,10 @@
 # Singularity Street — Neighborhood Experience Proposal
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status:** proposed first placement and experience brief; not a claim that the neighborhood or interactive train system already exists.  
 **Owner:** WebPage experience composition, with Physics/Gestures/FSM integration only through their owned contracts.  
 **Destination domain:** Singularity City, not the Workshop.

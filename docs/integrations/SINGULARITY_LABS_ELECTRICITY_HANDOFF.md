@@ -1,5 +1,10 @@
 # Singularity Labs: Scientific and Industrial Experience Handoff
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 This is a staged experience handoff for the WebPageLLM. **Singularity Labs** is the Workshop's scientific and industrial experience layer: visitors can experiment, observe cause and effect, learn the underlying model, and follow that model outward into Singularity City's utilities, factories, logistics, and delivered products. Electricity is one planned vertical slice, not the full remit.
