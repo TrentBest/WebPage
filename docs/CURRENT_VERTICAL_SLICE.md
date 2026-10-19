@@ -45,9 +45,15 @@ present startup Moniker
    ↓
 activate primary Experience
    ↓
-RuntimeAssembly is handed to the host
+resolve one registered IExperience from the primary root IDs
    ↓
-**Current gap:** browser manifestation still consumes the transitional WebPage PageFSM/LivingGuiFsm runtime
+validate required MicroBundles against RuntimeAssembly
+   ↓
+bind PageFsmExecutionRuntime to the existing PageFSM instance
+   ↓
+heartbeat, lifecycle commands, observations, Home, and Living GUI route through the adapter
+   ↓
+**Current gap:** the adapter delegates to PageFSM; RuntimeAssembly does not itself execute the package-owned lifecycle
 ~~~
 
 The critical architectural point is:
@@ -60,7 +66,7 @@ The host must not confuse the two by requesting the same dependency twice.
 
 The current primary root is 2102 — LivingGuiExperienceMicroBundle. The startup root is 2101 — MonikerExperienceMicroBundle, which declares 2110 — MonikerMicroBundle and 2111 — MonikerSwayBehaviorMicroBundle as separate dependencies.
 
-The browser reads the canonical Moniker node and maps the selected presentation-class hint to CSS; the sway behavior is selected by the manifest and resolved by FSM_COS.
+The browser reads the canonical Moniker node and maps the selected presentation-class hint to CSS; the sway behavior is selected by the manifest and resolved by FSM_COS. `WorkshopExperienceService` also resolves the primary `IExperience` from declared bundle IDs and binds a validated `PageFsmExecutionRuntime` to the already-running page FSM.
 
 The manifest names 2102. FSM_COS discovers 2110 through the MicroBundle dependency contract.
 
@@ -71,6 +77,8 @@ WebPage owns:
 - fetching/parsing the host manifest;
 - providing the WebPage composition catalog;
 - consuming the RuntimeAssembly;
+- selecting a unique registered `IExperience` by primary MicroBundle IDs;
+- host scheduling/lifecycle orchestration through `IExperienceExecutionRuntime`;
 - browser presentation;
 - navigation/chrome;
 - WebPage-only Deep Dive presentation.
@@ -140,11 +148,13 @@ The active proof for this slice must establish:
 | REPOSITORY_MAP.md | Source ownership and dependency map |
 | WORKSHOP_RUNTIME_ARCHITECTURE.md | Runtime boundary |
 | FSM_COS_USAGE.md | Operational composition guide |
-| TheSingularityWorkshop/Services/WorkshopExperienceService.cs | Manifest loading and primary composition |
+| TheSingularityWorkshop/Services/WorkshopExperienceService.cs | Manifest loading, primary composition, Experience resolution, and adapter binding |
+| TheSingularityWorkshop/Services/ExperienceExecutionRuntime.cs | Host execution seam; currently delegates to preserved PageFSM |
 | TheSingularityWorkshop/Workshop/Composition/WorkshopCompositionCatalog.cs | FSM_COS catalog |
 | TheSingularityWorkshop/Workshop/MicroBundles/LivingGuiExperienceMicroBundle.cs | Primary root + Moniker dependency |
 | TheSingularityWorkshop/Workshop/MicroBundles/MonikerMicroBundle.cs | Canonical startup capability |
-| TheSingularityWorkshop/Pages/Home.razor | Browser manifestation; currently bridges to transitional runtime |
+| TheSingularityWorkshop/Pages/Home.razor | Browser manifestation reading lifecycle state through the active adapter |
+| TheSingularityWorkshop/Pages/LivingGui.razor | Living GUI manifestation reading context/state through the active adapter |
 | TheSingularityWorkshop/Layout/MainLayout.razor | Browser chrome |
 | SingularityHub.Tests/WebPageHostManifestTests.cs | Manifest/composition contract tests |
 | SingularityHub.Tests/IncrementalVersionTests.cs | Incremental proof ledger |

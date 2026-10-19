@@ -11,8 +11,9 @@ Use these source links to distinguish implemented behavior from the target archi
 
 - **Declared request:** [`webpage-host.manifest.json`](../TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json) — declares the startup Moniker, primary Living GUI Experience, and capabilities.
 - **Composition boundary:** [`WorkshopExperienceService.cs`](../TheSingularityWorkshop/Services/WorkshopExperienceService.cs) — requests FSM_COS composition and retains the resulting `RuntimeAssembly`. This is evidence of composition, not proof of end-to-end execution by that assembly.
-- **Visible host:** [`Home.razor`](../TheSingularityWorkshop/Pages/Home.razor) — constructs the browser-facing GUI and currently coordinates both the composition service and transitional FSM service.
-- **Actual progression:** [`FSMManagerService.cs`](../TheSingularityWorkshop/Services/FSMManagerService.cs) and [`PageFSM.cs`](../TheSingularityWorkshop/Services/PageFSM.cs) — the current page lifecycle advances on a 33 ms heartbeat using FSM_API.
+- **Host execution seam:** [`ExperienceExecutionRuntime.cs`](../TheSingularityWorkshop/Services/ExperienceExecutionRuntime.cs) — defines `IExperienceExecutionRuntime` and the manifest-bound `PageFsmExecutionRuntime`, validates required bundle closure, and routes host ticks, lifecycle commands, and observations. It currently delegates to the preserved PageFSM implementation.
+- **Visible host:** [`Home.razor`](../TheSingularityWorkshop/Pages/Home.razor) and [`LivingGui.razor`](../TheSingularityWorkshop/Pages/LivingGui.razor) — browser state/context reads go through the active execution adapter.
+- **Actual progression:** [`FSMManagerService.cs`](../TheSingularityWorkshop/Services/FSMManagerService.cs) and [`PageFSM.cs`](../TheSingularityWorkshop/Services/PageFSM.cs) — the 33 ms heartbeat calls `ExecutionRuntime.Tick()`; the current adapter forwards to `PageFSM.Update()`.
 - **Living population:** [`LivingGuiFsm.cs`](../TheSingularityWorkshop/Services/LivingGuiFsm.cs) — manages organism FSMs and population updates.
 - **Behavioral proof:** [`LivingGuiRuntimeTests.cs`](../SingularityHub.Tests/LivingGuiRuntimeTests.cs) and [`LivingGuiReproductionTests.cs`](../SingularityHub.Tests/LivingGuiReproductionTests.cs) — exercise lifecycle progression, independent organism phases, growth, reproduction, and inherited position.
 
@@ -23,11 +24,12 @@ Use these source links to distinguish implemented behavior from the target archi
 | Manifest input | Implemented | A concrete versioned host request exists |
 | FSM_COS composition | Implemented | A `RuntimeAssembly` is produced and exposed |
 | Transitional page FSM / Living GUI runtime | Implemented | Current behavior is driven by the FSM_API-backed host path |
-| Single canonical path from composed assembly to observed browser behavior | **Not yet proven** | Composition and execution still have distinct paths; this is a migration/release gate |
+| Manifest-selected host adapter | Implemented, transitional | A unique registered `IExperience` is resolved from primary bundle IDs, required bundle closure is checked, and the adapter routes tick/command/observation calls while preserving the existing PageFSM instance |
+| Package-owned lifecycle through RuntimeAssembly | **Not yet implemented** | The host adapter still delegates to PageFSM; package-owned behavior parity remains a release gate |
 | Shared living-GUI SVG | Illustrative | It explains the evidence loop; it does not read runtime state |
-| Runtime-backed inspection panel | Proposed | Should bind to real service/runtime values and link to their tests; do not imply it exists yet |
+| Runtime-backed inspection panel | Implemented and browser-tested | The on-demand panel reads adapter/manifest values and links to source/tests; it distinguishes composition from execution |
 
-A useful next visual is not another decorative diagram. It is a small evidence panel that reports real values from the current host: manifest identity/version, selected primary Experience, composition result, active page-FSM state, Living GUI population/phase, and a test/source trail. Keep each value visibly labelled as runtime, source-derived, test-derived, or proposed.
+The on-demand [RuntimeObservationPanel](../TheSingularityWorkshop/Components/RuntimeObservationPanel.razor) already reports manifest identity/version, the selected primary Experience contract, composition result, execution owner/binding, active page-FSM state, Living GUI population/phase, and source/test links. The next proof is moving lifecycle implementation into the canonical Experience runtime while preserving browser-visible behavior.
 
 
 ## 1. WebPage is a proving ground, not the Workshop
