@@ -536,10 +536,10 @@ public sealed class IncrementalVersionTests
         Assert.Contains("InitializeAsync(bool returningVisitor = false, CancellationToken cancellationToken = default)", service);
         Assert.Contains("SwitchManifestAsync(string manifestPath, CancellationToken cancellationToken = default)", service);
         Assert.Contains("ReadManifestJsonAsync(manifestUri, cancellationToken)", service);
-        Assert.Contains("ResponseHeadersRead,\n            cancellationToken", service);
-        Assert.Contains("ReadAsStreamAsync(cancellationToken)", service);
-        Assert.Contains("buffer.AsMemory(0, buffer.Length), cancellationToken", service);
-        Assert.Contains("buffer.AsMemory(0, bytesRead), cancellationToken", service);
+        Assert.Contains("ResponseHeadersRead,\n            fetchToken", service);
+        Assert.Contains("ReadAsStreamAsync(fetchToken)", service);
+        Assert.Contains("buffer.AsMemory(0, buffer.Length), fetchToken", service);
+        Assert.Contains("buffer.AsMemory(0, bytesRead), fetchToken", service);
     }
 
     [ArchitectureTest(0, 0, 211)] [Fact(DisplayName = "V0.0.211 — Experience_Manifest_Requires_JSON_Content_Type")]
@@ -640,4 +640,19 @@ public sealed class IncrementalVersionTests
         Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \"application/json\")", composition);
     }
 
+
+    [ArchitectureTest(0, 0, 219)] [Fact(DisplayName = "V0.0.219 — Manifest_Cancellation_Proof_Tracks_The_Bounded_Fetch_Token")]
+    public void V0_0_219ManifestCancellationProofTracksTheBoundedFetchToken()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var service = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs"));
+        var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WebPageHostManifestTests.cs"));
+
+        Assert.Contains("CreateLinkedTokenSource(cancellationToken)", service);
+        Assert.Contains("timeout.CancelAfter(_manifestFetchTimeout)", service);
+        Assert.Contains("ResponseHeadersRead,\\n            fetchToken", service);
+        Assert.Contains("ReadAsStreamAsync(fetchToken)", service);
+        Assert.Contains("ManifestSwitchPropagatesCancellationToHttpRequest", tests);
+        Assert.Contains("ManifestSwitchTimesOutWhenManifestFetchExceedsConfiguredLimit", tests);
+    }
 }
