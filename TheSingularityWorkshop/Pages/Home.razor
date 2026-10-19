@@ -146,7 +146,7 @@
         builder.AddAttribute(2, "class", "runtime-observation-toggle");
         builder.AddAttribute(3, "aria-expanded", _runtimeDiagnosticsOpen.ToString().ToLowerInvariant());
         builder.AddAttribute(4, "aria-controls", "runtime-observation-panel");
-        builder.AddAttribute(5, "onclick", EventCallback.Factory.Create(this, () => _runtimeDiagnosticsOpen = !_runtimeDiagnosticsOpen));
+        builder.AddAttribute(5, "onclick", EventCallback.Factory.Create(this, ToggleRuntimeObservation));
         builder.AddContent(6, _runtimeDiagnosticsOpen ? "CLOSE RUNTIME OBSERVATION" : "RUNTIME OBSERVATION");
         builder.CloseElement();
 
@@ -212,7 +212,17 @@
 
     private static string FormatObservationFlag(bool value) => value ? "YES" : "NO";
 
-    private void RefreshRuntimeObservation() => _runtimeObservationRefresh++;
+    private void ToggleRuntimeObservation()
+    {
+        _runtimeDiagnosticsOpen = !_runtimeDiagnosticsOpen;
+        StateHasChanged();
+    }
+
+    private void RefreshRuntimeObservation()
+    {
+        _runtimeObservationRefresh++;
+        StateHasChanged();
+    }
 
     private RenderFragment BuildRootGui()
     {
