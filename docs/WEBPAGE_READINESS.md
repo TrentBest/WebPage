@@ -9,8 +9,8 @@ This is the active release ledger for the browser host. A green build is necessa
 ## Current baseline
 
 - **Integration branch:** `development`.
-- **Latest audited code candidate:** [`8ec877b`](https://github.com/TrentBest/WebPage/commit/8ec877bc5b1288882976e252dd771ad5587750f6) on `development`.
-- **Latest successful code-candidate .NET CI:** [run 39195465334](https://github.com/TrentBest/WebPage/actions/runs/39195465334) — **success** on code candidate `8ec877b`. Both jobs passed: WebPage restore/build and full Playwright browser journey, SingularityHub and Experience test suites, manifest-bound adapter guards, Renderer source smoke, and city-rendering proof screenshot.
+- **Latest audited code candidate:** [`9d65f67`](https://github.com/TrentBest/WebPage/commit/9d65f67c9c59355becc907869642778cbcc1b219) on `development`.
+- **Latest successful code-candidate .NET CI:** [run 4100 / 39278781274](https://github.com/TrentBest/WebPage/actions/runs/39278781274) — **success** on code candidate `9d65f67`. Both jobs completed successfully: WebPage restore/build and Playwright browser journey, SingularityHub and Experience test suites, manifest-bound adapter guards, Renderer source smoke, and city-rendering proof screenshot. The earlier run 39195465334 remains historical evidence for `8ec877b`, not the latest candidate.
 - **Azure Static Web Apps:** the previously inspected run [39192108528](https://github.com/TrentBest/WebPage/actions/runs/39192108528) was **skipped**. No deployment is claimed.
 - **Documentation rollout:** the shared lens is embedded in all 88 indexed Markdown documents under `docs/`; this is not the same as completing each subject-specific visual/evidence audit. See [coverage ledger](LIVING_GUI_COVERAGE.md).
 - **Branch hygiene:** `development`, `master`, and an extra `fix/restore-founder-entry-sequence` branch currently exist. The extra branch is a release-hygiene item; it has not been deleted here.
@@ -18,7 +18,7 @@ This is the active release ledger for the browser host. A green build is necessa
 
 ## Release readiness
 
-**Estimated release readiness: 72%.** This is an engineering estimate, not a test pass rate. The on-demand `RuntimeObservationPanel` displays an immutable snapshot through the active execution adapter alongside manifest identity/version, selected startup and primary Experiences, composition result, execution-owner disclosure, lifecycle-binding status, and direct source/test links. The host presentation now reads through `FSM.ExecutionRuntime`; the adapter rejects assemblies missing required Experience bundles, and regression tests verify adapter tick/observation routing. The full Playwright journey and both CI jobs passed on [code candidate `8ec877b`](https://github.com/TrentBest/WebPage/commit/8ec877bc5b1288882976e252dd771ad5587750f6) in [run 39195465334](https://github.com/TrentBest/WebPage/actions/runs/39195465334). This improves the host seam and evidence, but does not transfer lifecycle execution ownership to an Experience-owned runtime.
+**Estimated release readiness: 72%.** This is an engineering estimate, not a test pass rate. The on-demand `RuntimeObservationPanel` displays an immutable snapshot through the active execution adapter alongside manifest identity/version, selected startup and primary Experiences, composition result, execution-owner disclosure, lifecycle-binding status, and direct source/test links. The host presentation now reads through `FSM.ExecutionRuntime`; the adapter rejects assemblies missing required Experience bundles, and regression tests verify adapter tick/observation routing. The full Playwright journey and both CI jobs passed on the current [code candidate `9d65f67`](https://github.com/TrentBest/WebPage/commit/9d65f67c9c59355becc907869642778cbcc1b219) in [run 4100 / 39278781274](https://github.com/TrentBest/WebPage/actions/runs/39278781274). This improves the host seam and evidence, but does not transfer lifecycle execution ownership to an Experience-owned runtime.
 
 Why it is **not** higher yet:
 - The manifest-selected `RuntimeAssembly` proves composition and dependency closure, but does **not** own or activate the primary Experience lifecycle.
@@ -75,8 +75,9 @@ Tracking: [living GUI coverage ledger](LIVING_GUI_COVERAGE.md), [architecture au
 
 ### CI and release safeguards
 
-- [x] Latest successful code-candidate .NET CI run is successful on code candidate `8ec877b`: [run 39195465334](https://github.com/TrentBest/WebPage/actions/runs/39195465334).
-- [x] Test job and Workshop repository-source integration passed on that candidate, including browser journey smoke, execution-adapter binding/tick tests, Living GUI tests, Experience tests, and Renderer source smoke.
+- [x] Latest successful code-candidate .NET CI run is successful on code candidate `9d65f67`: [run 4100 / 39278781274](https://github.com/TrentBest/WebPage/actions/runs/39278781274).
+- [x] Test job and Workshop repository-source integration passed on the current candidate, including browser journey smoke, execution-adapter binding/tick tests, Living GUI tests, Experience tests, Renderer source smoke, and city-rendering proof screenshot.
+- [x] Earlier successful code-candidate run 39195465334 remains historical evidence for `8ec877b`; it is not used as the current baseline.
 - [x] Previously inspected Azure workflow outcome was skipped, not deployed; no deployment is claimed.
 - [x] Verify the immutable runtime-observation API on commit `4f56ba5`: [CI run 39185455518](https://github.com/TrentBest/WebPage/actions/runs/39185455518) passed both jobs.
 - [x] Verify the initial visitor-visible runtime-observation component on commit `4f3fd79`: [CI run 39192108299](https://github.com/TrentBest/WebPage/actions/runs/39192108299) passed both jobs.
