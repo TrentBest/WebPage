@@ -71,9 +71,9 @@ The animated lens is an **architecture illustration, not runtime telemetry**. A 
 | [`docs/coordination/PhysicsCastlesLLM.md`](coordination/PhysicsCastlesLLM.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/coordination/PhysicsLLM.md`](coordination/PhysicsLLM.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/coordination/RendererLLM.md`](coordination/RendererLLM.md) | Embedded | Shared lens present; subject-specific view audit remains
-| [`docs/coordination/VisualizeLLM.md`](coordination/VisualizeLLM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/integrations/CASTLE_SIEGE_PHYSICS_HANDOFF.md`](integrations/CASTLE_SIEGE_PHYSICS_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/integrations/GESTURES_MOVEMENT_COURSE_WEBPAGELLM_HANDOFF.md`](integrations/GESTURES_MOVEMENT_COURSE_WEBPAGELLM_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/coordination/VisualizeLLM.md`](coordination/VisualizeLLM.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/integrations/CASTLE_SIEGE_PHYSICS_HANDOFF.md`](integrations/CASTLE_SIEGE_PHYSICS_HANDOFF.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/integrations/GESTURES_MOVEMENT_COURSE_WEBPAGELLM_HANDOFF.md`](integrations/GESTURES_MOVEMENT_COURSE_WEBPAGELLM_HANDOFF.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/integrations/GESTURES_MOVEMENT_LAB.md`](integrations/GESTURES_MOVEMENT_LAB.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md`](integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/integrations/PHYSICS_LIVING_WATER_WORLD_HANDOFF.md`](integrations/PHYSICS_LIVING_WATER_WORLD_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |

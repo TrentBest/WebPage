@@ -1,5 +1,10 @@
 # Castle Siege Experience: Physics-to-WebPage Integration Handoff
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 Build a physics-led castle siege experience in WebPage, beginning with a readable, grounded scene: **the commander stands just behind and to one side of a catapult, looking toward a castle**. The castle is the target and experimental apparatus—not merely a static backdrop for a game animation.

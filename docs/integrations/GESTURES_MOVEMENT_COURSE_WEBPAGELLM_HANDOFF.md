@@ -1,5 +1,10 @@
 # Gestures Movement Course — WebPageLLM Handoff
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Audience:** WebPageLLM and anyone integrating a Workshop capability into the browser experience  
 **Status:** early integration handoff; course geometry and deterministic outcome evaluation are implemented on the Gestures working branch, with CI green and public API review still open in PR #10  
 **Source repository:** [TheSingularityWorkshop.Gestures](https://github.com/TrentBest/TheSingularityWorkshop.Gestures)  
