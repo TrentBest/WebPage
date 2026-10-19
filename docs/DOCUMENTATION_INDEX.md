@@ -106,6 +106,9 @@ If two documents disagree, reconcile them. Do not preserve contradictory archite
 
 ## Living GUI coverage
 
+- [Living GUI Coverage](LIVING_GUI_COVERAGE.md) — per-document rollout ledger showing which guides have the shared lens and which still need subject-specific visual/evidence review.
+
+
 - [Living GUI documentation lens](assets/living-gui-documentation-lens.svg) — shared visual grammar for tracing a claim from question through theory and implementation to visible manifestation and proof. This is an animated architecture illustration, not runtime telemetry.
 - [Diegetic WYSIWYG and Living Documentation](DIEGETIC_WYSIWYG_AND_LIVING_DOCUMENTATION.md) — subject-specific standard for GUI.SVG, source-backed views, provenance, authoring, preview, and evidence.
 - [GUI.SVG connected-points sample](../TheSingularityWorkshop/wwwroot/Visualize/07-gui-svg-connected-points.svg) — a real GUI.SVG sample to compare with the illustrative lens.
