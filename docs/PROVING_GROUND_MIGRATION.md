@@ -1,5 +1,10 @@
 # WebPage as the FSM_COS Proving Ground
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 > **Status:** Direction — this document defines the migration contract. It is not a claim that every legacy implementation has already been removed.
 
 ## 01 — Why this boundary exists

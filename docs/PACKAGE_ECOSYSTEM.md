@@ -1,5 +1,10 @@
 # Workshop Package Ecosystem
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 WebPage is the browser proving ground for The Singularity Workshop. Its job is to **demonstrate the ecosystem**, not recreate it.
 
 The most useful way to read this repository is to ask, for every capability:

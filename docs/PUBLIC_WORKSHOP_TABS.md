@@ -1,5 +1,10 @@
 # Public Workshop Tabs
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Current manifest activation
 
 The public host manifest currently exposes **AnyApp as the one and only hub destination**. The host manifest is intentionally narrow while the architecture is being made public and verifiable.

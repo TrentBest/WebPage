@@ -1,5 +1,10 @@
 # VBIMB — Virtual Building Information Model Builder
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 VBIMB is the Workshop's path from intent to a coherent, inspectable building plan. It is not a static floor-plan picture. A plan is structured data: rooms, walls, openings, fixtures, circulation, and the relationships that make the geometry meaningful.
