@@ -4,6 +4,7 @@ using TheSingularityWorkshop.Infrastructure.Hub;
 using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
 using TheSingularityWorkshop.FSM_COS;
 using TheSingularityWorkshop.Workshop.Composition;
+using TheSingularityWorkshop.Workshop.Experiences;
 using TheSingularityWorkshop.Workshop.MicroBundles;
 using Xunit;
 
@@ -382,6 +383,56 @@ public sealed class WebPageHostManifestTests
             () => WebPageHostManifestParser.Parse(json));
 
         Assert.Contains("SAME-PROOF", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void ManifestBoundExecutionAdapterRejectsRuntimeMissingRequiredExperienceBundle()
+    {
+        using var page = new PageFSM();
+        var assembly = new FsmCos(new WorkshopCompositionCatalog()).Execute(
+            new RuntimeManifest(990, new[] { new MicroBundleManifestEntry(2101, "1.0.0") }));
+
+        try
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                new PageFsmExecutionRuntime(page, new LivingGuiExperience(), assembly));
+        }
+        finally
+        {
+            foreach (var disposable in assembly.Bundles.OfType<IDisposable>())
+                disposable.Dispose();
+        }
+    }
+
+    [Fact]
+    public void ManifestBoundExecutionAdapterTicksAndObservesTheSamePageRuntime()
+    {
+        using var page = new PageFSM();
+        var assembly = new FsmCos(new WorkshopCompositionCatalog()).Execute(
+            new RuntimeManifest(991, new[] { new MicroBundleManifestEntry(2102, "1.0.0") }));
+        var adapter = new PageFsmExecutionRuntime(page, new LivingGuiExperience(), assembly);
+
+        try
+        {
+            Assert.True(adapter.IsManifestBound);
+            Assert.Same(page, adapter.Page);
+            Assert.Same(page.Context, adapter.Context);
+            var ticksBefore = page.Context.TotalTicks;
+
+            adapter.RequestEnter();
+            adapter.Tick();
+            var observation = adapter.Observe();
+
+            Assert.True(page.Context.EnterRequested);
+            Assert.Equal(ticksBefore + 1, observation.TotalTicks);
+            Assert.Equal(page.CurrentState, observation.PageState);
+            Assert.Equal(assembly.RuntimeId, adapter.RuntimeAssembly!.RuntimeId);
+        }
+        finally
+        {
+            foreach (var disposable in assembly.Bundles.OfType<IDisposable>())
+                disposable.Dispose();
+        }
     }
 
     private sealed class ManifestHandler(IReadOnlyDictionary<string, string> manifests) : HttpMessageHandler
