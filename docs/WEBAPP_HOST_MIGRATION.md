@@ -1,5 +1,10 @@
 # WebPage as a Manifest-Defined WebApp
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 > **Architectural invariant:** WebPage should ultimately be a WebApp—AnyApp's web manifestation—not a compiled website whose identity and behaviors are fixed in Razor pages. The compiled host supplies stable runtime machinery; manifests, Experiences, and MicroBundles define what the running application is.
 
 ## The correction

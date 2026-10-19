@@ -1,5 +1,10 @@
 # WebPage Usage
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 WebPage is a .NET 8 browser host and proving ground for The Singularity Workshop. It demonstrates how published Workshop capabilities are composed and manifested without moving their ownership into the host.
