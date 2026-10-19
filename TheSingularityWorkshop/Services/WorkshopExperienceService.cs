@@ -14,6 +14,7 @@ public sealed class WorkshopExperienceService : IDisposable
     private const string DefaultManifestPath = "Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json";
 
     private readonly HttpClient _httpClient;
+    private readonly ExperienceArtifactUriResolver _artifactUriResolver;
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
     private readonly HubRuntime _hubRuntime;
     private readonly FSMManagerService _executionHost;
@@ -74,12 +75,14 @@ public sealed class WorkshopExperienceService : IDisposable
         HttpClient httpClient,
         HubRuntime hubRuntime,
         FSMManagerService executionHost,
-        WorkshopExperienceCatalog experienceCatalog)
+        WorkshopExperienceCatalog experienceCatalog,
+        Uri? experienceArtifactBaseUri = null)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _hubRuntime = hubRuntime ?? throw new ArgumentNullException(nameof(hubRuntime));
         _executionHost = executionHost ?? throw new ArgumentNullException(nameof(executionHost));
         _experienceCatalog = experienceCatalog ?? throw new ArgumentNullException(nameof(experienceCatalog));
+        _artifactUriResolver = new ExperienceArtifactUriResolver(experienceArtifactBaseUri);
     }
 
     public async Task InitializeAsync(bool returningVisitor = false)
@@ -95,8 +98,10 @@ public sealed class WorkshopExperienceService : IDisposable
 
     /// <summary>
     /// Loads and composes a candidate host manifest, then atomically activates it.
-    /// The source must be a same-origin relative asset path. Executable MicroBundle
-    /// artifacts must be resolved by the trusted repository/provider boundary, not URLs.
+    /// Manifest paths are relative and traversal-free. By default they resolve against
+    /// the HttpClient base address; an explicitly configured HTTPS artifact base URI can
+    /// point at a public static host such as Azure Blob Storage. Executable MicroBundles
+    /// remain resolved by the trusted repository/provider boundary, not URLs.
     /// </summary>
     public async Task SwitchManifestAsync(string manifestPath)
     {
@@ -111,7 +116,8 @@ public sealed class WorkshopExperienceService : IDisposable
 
         try
         {
-            var manifestJson = await _httpClient.GetStringAsync(manifestPath);
+            var manifestUri = _artifactUriResolver.Resolve(manifestPath);
+            var manifestJson = await _httpClient.GetStringAsync(manifestUri);
             var candidateManifest = WebPageHostManifestParser.Parse(manifestJson);
 
             if (candidateManifest.Startup is not { Count: > 0 })
