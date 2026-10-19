@@ -1,5 +1,10 @@
 # Ecosystem Dependency Matrix
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 This document records the dependency boundary used while the Workshop moves from package-coupled hosts toward manifest-selected, repository-backed MicroBundles.
 
 ## Current published package baseline
