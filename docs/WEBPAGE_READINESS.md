@@ -9,9 +9,9 @@ This is the active release ledger for the browser host. A green build is necessa
 ## Current baseline
 
 - **Integration branch:** `development`.
-- **Latest audited code candidate:** [`b89cc8a`](https://github.com/TrentBest/WebPage/commit/b89cc8aa10e53711a07abfc41f106ac8deed276a) on `development` (documentation-only changes since the previously audited runtime candidate).
-- **Latest successful .NET CI on the current candidate:** [run 4103 / 39286432177](https://github.com/TrentBest/WebPage/actions/runs/39286432177) — **success** on `b89cc8a`. Both the test job and Workshop repository-source integration job completed successfully. The earlier run 4100 / 39278781274 remains successful evidence for runtime candidate `9d65f67`, not the current HEAD.
-- **Azure Static Web Apps:** run [1132 / 39286432512](https://github.com/TrentBest/WebPage/actions/runs/39286432512) was **skipped**. Both deployment-related jobs were skipped; no deployment is claimed.
+- **Latest audited code candidate:** [`a171c2d`](https://github.com/TrentBest/WebPage/commit/a171c2d37474e97409adae24b2c7f8e8ba4da237) on `development` (documentation-only changes since the previously audited runtime candidate).
+- **Latest successful .NET CI on the current candidate:** [run 4104 / 39309999095](https://github.com/TrentBest/WebPage/actions/runs/39309999095) — **success** on `a171c2d`. Both the test job and Workshop repository-source integration job completed successfully. The earlier run 4100 / 39278781274 remains successful evidence for runtime candidate `9d65f67`, not the current HEAD.
+- **Azure Static Web Apps:** run [1133 / 39309999012](https://github.com/TrentBest/WebPage/actions/runs/39309999012) was **skipped**. Both deployment-related jobs were skipped; no deployment is claimed. Run 1132 / 39286432512 is the prior skipped run.
 - **Documentation rollout:** the shared lens is embedded in all 88 indexed Markdown documents under `docs/`; this is not the same as completing each subject-specific visual/evidence audit. See [coverage ledger](LIVING_GUI_COVERAGE.md).
 - **Branch hygiene:** `development`, `master`, and an extra `fix/restore-founder-entry-sequence` branch currently exist. The extra branch is a release-hygiene item; it has not been deleted here.
 - No package publication, release creation, or deployment has been performed.
@@ -24,7 +24,6 @@ Why it is **not** higher yet:
 - The manifest-selected `RuntimeAssembly` proves composition and dependency closure, but does **not** own or activate the primary Experience lifecycle.
 - The current 33 ms WebPage heartbeat still advances the compatibility `PageFSM → LivingGuiFsm → PageStateContext` path.
 - No end-to-end test yet proves that the manifest-selected primary Experience owns the visitor-visible lifecycle and that the browser renders observations from that owner.
-- The manifest-selected runtime still does not own or activate the primary Experience lifecycle; the panel now reports this boundary explicitly rather than concealing it.
 - Actual desktop/tablet/mobile visitor review and final release safeguards remain outstanding.
 
 **Confidence:** high for the cited CI outcome and source facts; medium-low for the percentage because the execution bridge remains a substantial engineering gate. The number must rise through implementation and verification, not by relabeling open gates.
@@ -76,7 +75,7 @@ Tracking: [living GUI coverage ledger](LIVING_GUI_COVERAGE.md), [architecture au
 ### CI and release safeguards
 
 - [x] Runtime candidate `9d65f67` passed both .NET CI jobs, including the browser journey, execution-adapter binding/tick tests, Living GUI tests, Experience tests, Renderer source smoke, and city-rendering proof screenshot: [run 4100 / 39278781274](https://github.com/TrentBest/WebPage/actions/runs/39278781274).
-- [x] Current documentation-only HEAD `b89cc8a` passed both .NET workflow jobs: [run 4103 / 39286432177](https://github.com/TrentBest/WebPage/actions/runs/39286432177).
+- [x] Documentation-only HEAD `a171c2d` passed both .NET workflow jobs: [run 4104 / 39309999095](https://github.com/TrentBest/WebPage/actions/runs/39309999095). The prior documentation-only HEAD `b89cc8a` also passed both jobs in [run 4103 / 39286432177](https://github.com/TrentBest/WebPage/actions/runs/39286432177).
 - [x] Earlier successful code-candidate run 39195465334 remains historical evidence for `8ec877b`; it is not used as the current baseline.
 - [x] Previously inspected Azure workflow outcome was skipped, not deployed; no deployment is claimed.
 - [x] Verify the immutable runtime-observation API on commit `4f56ba5`: [CI run 39185455518](https://github.com/TrentBest/WebPage/actions/runs/39185455518) passed both jobs.
