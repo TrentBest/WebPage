@@ -541,4 +541,16 @@ public sealed class IncrementalVersionTests
         Assert.Contains("buffer.AsMemory(0, buffer.Length), cancellationToken", service);
         Assert.Contains("buffer.AsMemory(0, bytesRead), cancellationToken", service);
     }
+
+    [ArchitectureTest(0, 0, 211)] [Fact(DisplayName = "V0.0.211 — Experience_Manifest_Requires_JSON_Content_Type")]
+    public void V0_0_211ExperienceManifestRequiresJsonContentType()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var service = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs"));
+
+        Assert.Contains("var mediaType = response.Content.Headers.ContentType?.MediaType;", service);
+        Assert.Contains("string.Equals(mediaType, \"application/json\", StringComparison.OrdinalIgnoreCase)", service);
+        Assert.Contains("mediaType.EndsWith(\"+json\", StringComparison.OrdinalIgnoreCase)", service);
+        Assert.Contains("Experience manifest must use a JSON content type", service);
+    }
 }
