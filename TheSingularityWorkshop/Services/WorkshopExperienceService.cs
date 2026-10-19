@@ -19,6 +19,7 @@ public sealed class WorkshopExperienceService : IDisposable
     private readonly HubRuntime _hubRuntime;
     private readonly FSMManagerService _executionHost;
     private readonly WorkshopExperienceCatalog _experienceCatalog;
+    private readonly string _initialManifestPath;
     private ulong _runtimeGeneration;
     private bool _disposed;
 
@@ -76,13 +77,19 @@ public sealed class WorkshopExperienceService : IDisposable
         HubRuntime hubRuntime,
         FSMManagerService executionHost,
         WorkshopExperienceCatalog experienceCatalog,
-        Uri? experienceArtifactBaseUri = null)
+        Uri? experienceArtifactBaseUri = null,
+        string? initialManifestPath = null)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _hubRuntime = hubRuntime ?? throw new ArgumentNullException(nameof(hubRuntime));
         _executionHost = executionHost ?? throw new ArgumentNullException(nameof(executionHost));
         _experienceCatalog = experienceCatalog ?? throw new ArgumentNullException(nameof(experienceCatalog));
         _artifactUriResolver = new ExperienceArtifactUriResolver(experienceArtifactBaseUri);
+        _initialManifestPath = string.IsNullOrWhiteSpace(initialManifestPath)
+            ? DefaultManifestPath
+            : initialManifestPath;
+        ValidateManifestPath(_initialManifestPath);
+        ActiveManifestPath = _initialManifestPath;
     }
 
     public async Task InitializeAsync(bool returningVisitor = false)
@@ -93,7 +100,7 @@ public sealed class WorkshopExperienceService : IDisposable
 
         IsFirstVisit = !returningVisitor;
         SetState("ManifestLoading");
-        await SwitchManifestAsync(DefaultManifestPath);
+        await SwitchManifestAsync(_initialManifestPath);
     }
 
     /// <summary>
