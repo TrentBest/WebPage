@@ -14,8 +14,10 @@ public sealed class WorkshopExperienceService : IDisposable
 {
     private const string DefaultManifestPath = "Workshop/Forge/StreamingAssets/Experiences/webpage-host.manifest.json";
     private const long MaxManifestBytes = 1024 * 1024;
+    private const int DefaultManifestFetchTimeoutSeconds = 15;
 
     private readonly HttpClient _httpClient;
+    private readonly TimeSpan _manifestFetchTimeout;
     private readonly ExperienceArtifactUriResolver _artifactUriResolver;
     private readonly IFsmCos _compositionSystem = new FsmCos(new WorkshopCompositionCatalog());
     private readonly HubRuntime _hubRuntime;
@@ -80,9 +82,13 @@ public sealed class WorkshopExperienceService : IDisposable
         FSMManagerService executionHost,
         WorkshopExperienceCatalog experienceCatalog,
         Uri? experienceArtifactBaseUri = null,
-        string? initialManifestPath = null)
+        string? initialManifestPath = null,
+        TimeSpan? manifestFetchTimeout = null)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        if (manifestFetchTimeout is { } configuredTimeout && configuredTimeout <= TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(manifestFetchTimeout), "Manifest fetch timeout must be positive.");
+        _manifestFetchTimeout = manifestFetchTimeout ?? TimeSpan.FromSeconds(DefaultManifestFetchTimeoutSeconds);
         _hubRuntime = hubRuntime ?? throw new ArgumentNullException(nameof(hubRuntime));
         _executionHost = executionHost ?? throw new ArgumentNullException(nameof(executionHost));
         _experienceCatalog = experienceCatalog ?? throw new ArgumentNullException(nameof(experienceCatalog));
@@ -363,10 +369,14 @@ public sealed class WorkshopExperienceService : IDisposable
 
     private async Task<string> ReadManifestJsonAsync(Uri manifestUri, CancellationToken cancellationToken)
     {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(_manifestFetchTimeout);
+        var fetchToken = timeout.Token;
+
         using var response = await _httpClient.GetAsync(
             manifestUri,
             HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
+            fetchToken);
         response.EnsureSuccessStatusCode();
 
         var mediaType = response.Content.Headers.ContentType?.MediaType;
@@ -381,16 +391,16 @@ public sealed class WorkshopExperienceService : IDisposable
         if (response.Content.Headers.ContentLength is > MaxManifestBytes)
             throw new InvalidDataException($"Experience manifest exceeds the {MaxManifestBytes}-byte limit.");
 
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        await using var stream = await response.Content.ReadAsStreamAsync(fetchToken);
         using var content = new MemoryStream();
         var buffer = new byte[81920];
         int bytesRead;
-        while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken)) > 0)
+        while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), fetchToken)) > 0)
         {
             if (content.Length + bytesRead > MaxManifestBytes)
                 throw new InvalidDataException($"Experience manifest exceeds the {MaxManifestBytes}-byte limit.");
 
-            await content.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
+            await content.WriteAsync(buffer.AsMemory(0, bytesRead), fetchToken);
         }
 
         return Encoding.UTF8.GetString(content.ToArray());

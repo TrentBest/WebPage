@@ -404,6 +404,28 @@ public sealed class WebPageHostManifestTests
     }
 
     [Fact]
+    public async Task ManifestSwitchTimesOutWhenManifestFetchExceedsConfiguredLimit()
+    {
+        using var handler = new CancellationManifestHandler();
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("https://localhost/") };
+        var hubKernel = new HubKernel();
+        using var executionHost = new FSMManagerService(hubKernel);
+        using var service = new WorkshopExperienceService(
+            client,
+            new HubRuntime(hubKernel),
+            executionHost,
+            new WorkshopExperienceCatalog(),
+            manifestFetchTimeout: TimeSpan.FromMilliseconds(100));
+
+        var switching = service.SwitchManifestAsync("manifest.json");
+        await handler.RequestStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => switching);
+        Assert.Null(service.Manifest);
+        Assert.Contains("canceled", service.LastManifestError, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task ManifestSwitchRejectsExternalAndTraversalPathsBeforeFetching()
     {
         using var client = new HttpClient(new ManifestHandler(new Dictionary<string, string>()))

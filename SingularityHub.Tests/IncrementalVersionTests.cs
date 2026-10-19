@@ -611,4 +611,19 @@ public sealed class IncrementalVersionTests
         Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \\"application/json\\")", moniker);
         Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \\"application/json\\")", composition);
     }
+
+
+    [ArchitectureTest(0, 0, 217)] [Fact(DisplayName = "V0.0.217 — Experience_Manifest_Fetch_Has_An_Explicit_Timeout")]
+    public void V0_0_217ExperienceManifestFetchHasAnExplicitTimeout()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var service = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WorkshopExperienceService.cs"));
+        var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WebPageHostManifestTests.cs"));
+        var docs = File.ReadAllText(Path.Combine(root, "docs", "AZURE_BLOB_EXPERIENCE_DELIVERY.md"));
+
+        Assert.Contains("DefaultManifestFetchTimeoutSeconds = 15", service);
+        Assert.Contains("timeout.CancelAfter(_manifestFetchTimeout)", service);
+        Assert.Contains("ManifestSwitchTimesOutWhenManifestFetchExceedsConfiguredLimit", tests);
+        Assert.Contains("15-second default fetch timeout", docs);
+    }
 }
