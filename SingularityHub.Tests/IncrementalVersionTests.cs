@@ -572,7 +572,7 @@ public sealed class IncrementalVersionTests
         var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
         var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WebPageHostManifestTests.cs"));
 
-        Assert.Contains('var json = $"""', tests);
+        Assert.Contains("var json = $$\"\"\"", tests);
         Assert.Contains("\"version\": \"{{version}}\"", tests);
     }
 
