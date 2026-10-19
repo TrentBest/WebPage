@@ -59,18 +59,18 @@ The animated lens is an **architecture illustration, not runtime telemetry**. A 
 | [`docs/WEBPAGE_READINESS.md`](WEBPAGE_READINESS.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/WEBPAGE_SOUND_AND_AMBIENCE.md`](WEBPAGE_SOUND_AND_AMBIENCE.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/WORKING_TASKS.md`](WORKING_TASKS.md) | Embedded | Shared lens present; subject-specific view audit remains |
-| [`docs/WORKSHOP_CITY_AND_SOFTWARE_VISION.md`](WORKSHOP_CITY_AND_SOFTWARE_VISION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WORKSHOP_FLOORPLAN_EXPERIENCE.md`](WORKSHOP_FLOORPLAN_EXPERIENCE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WORKSHOP_HANDOFF.md`](WORKSHOP_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WORKSHOP_OPENING_EXPERIENCE.md`](WORKSHOP_OPENING_EXPERIENCE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WORKSHOP_PRESENTATION_CONTRACT.md`](WORKSHOP_PRESENTATION_CONTRACT.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WORKSHOP_RUNTIME_ARCHITECTURE.md`](WORKSHOP_RUNTIME_ARCHITECTURE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WORLD_COMPOSITION_AND_HUMAN_AGENCY.md`](WORLD_COMPOSITION_AND_HUMAN_AGENCY.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WebPageLLM.md`](WebPageLLM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/coordination/MicroBundleRepositoryLLM.md`](coordination/MicroBundleRepositoryLLM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/coordination/PhysicsCastlesLLM.md`](coordination/PhysicsCastlesLLM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/coordination/PhysicsLLM.md`](coordination/PhysicsLLM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/coordination/RendererLLM.md`](coordination/RendererLLM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/WORKSHOP_CITY_AND_SOFTWARE_VISION.md`](WORKSHOP_CITY_AND_SOFTWARE_VISION.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/WORKSHOP_FLOORPLAN_EXPERIENCE.md`](WORKSHOP_FLOORPLAN_EXPERIENCE.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/WORKSHOP_HANDOFF.md`](WORKSHOP_HANDOFF.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/WORKSHOP_OPENING_EXPERIENCE.md`](WORKSHOP_OPENING_EXPERIENCE.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/WORKSHOP_PRESENTATION_CONTRACT.md`](WORKSHOP_PRESENTATION_CONTRACT.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/WORKSHOP_RUNTIME_ARCHITECTURE.md`](WORKSHOP_RUNTIME_ARCHITECTURE.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/WORLD_COMPOSITION_AND_HUMAN_AGENCY.md`](WORLD_COMPOSITION_AND_HUMAN_AGENCY.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/WebPageLLM.md`](WebPageLLM.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/coordination/MicroBundleRepositoryLLM.md`](coordination/MicroBundleRepositoryLLM.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/coordination/PhysicsCastlesLLM.md`](coordination/PhysicsCastlesLLM.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/coordination/PhysicsLLM.md`](coordination/PhysicsLLM.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/coordination/RendererLLM.md`](coordination/RendererLLM.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/coordination/VisualizeLLM.md`](coordination/VisualizeLLM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/integrations/CASTLE_SIEGE_PHYSICS_HANDOFF.md`](integrations/CASTLE_SIEGE_PHYSICS_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/integrations/GESTURES_MOVEMENT_COURSE_WEBPAGELLM_HANDOFF.md`](integrations/GESTURES_MOVEMENT_COURSE_WEBPAGELLM_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
