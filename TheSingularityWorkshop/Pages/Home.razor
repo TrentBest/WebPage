@@ -175,7 +175,10 @@
     private bool firstRender;
     private bool _entryRequested;
     private bool _explicitHubRouteRequested;
-    private string _select    private static string FormatObservationFlag(bool value) => value ? "YES" : "NO";
+    private string _selectedHubTab = "MONIKER";
+    private string? _selectedDemonstrationId;
+
+    private static string FormatObservationFlag(bool value) => value ? "YES" : "NO";
 
     private void ToggleRuntimeObservation()
     {
@@ -190,9 +193,6 @@
         _runtimeObservationRefresh++;
     }
 
-     _runtimeObservationRefresh++;
-        StateHasChanged();
-    }
 
     private RenderFragment BuildRootGui()
     {
