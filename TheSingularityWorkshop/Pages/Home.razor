@@ -27,24 +27,24 @@
            aria-label="Live runtime observation snapshot">
         <h2>RUNTIME OBSERVATION</h2>
         <p>Point-in-time snapshot from the active PageFSM; refresh to sample again.</p>
-        <dl class="runtime-observation-grid">
-            <dt>Page state</dt><dd>@observation.PageState</dd>
-            <dt>Living GUI state</dt><dd>@observation.LivingGuiState</dd>
-            <dt>Active phase</dt><dd>@observation.LivingGuiActivePhase</dd>
-            <dt>Total ticks</dt><dd>@observation.TotalTicks</dd>
-            <dt>State ticks</dt><dd>@observation.StateTicks</dd>
-            <dt>Population</dt><dd>@observation.PopulationCount</dd>
-            <dt>Available slots</dt><dd>@observation.AvailablePopulationSlots</dd>
-            <dt>Page FSM valid</dt><dd>@FormatObservationFlag(observation.PageFsmIsValid)</dd>
-            <dt>Living GUI valid</dt><dd>@FormatObservationFlag(observation.LivingGuiIsValid)</dd>
-            <dt>Living GUI frozen</dt><dd>@FormatObservationFlag(observation.LivingGuiFrozen)</dd>
-            <dt>Entry requested</dt><dd>@FormatObservationFlag(observation.EnterRequested)</dd>
-            <dt>GUI populated</dt><dd>@FormatObservationFlag(observation.LivingGuiPopulated)</dd>
-            <dt>Moniker ready</dt><dd>@FormatObservationFlag(observation.MonikerReady)</dd>
-            <dt>Gravity released</dt><dd>@FormatObservationFlag(observation.GravityReleased)</dd>
-            <dt>GUI fallen</dt><dd>@FormatObservationFlag(observation.LivingGuiFallen)</dd>
-            <dt>Navigation ready</dt><dd>@FormatObservationFlag(observation.NavigationReady)</dd>
-        </dl>
+        <div class="runtime-observation-grid">
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Page state</span><span class="runtime-observation-value">@observation.PageState</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Living GUI state</span><span class="runtime-observation-value">@observation.LivingGuiState</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Active phase</span><span class="runtime-observation-value">@observation.LivingGuiActivePhase</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Total ticks</span><span class="runtime-observation-value">@observation.TotalTicks</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">State ticks</span><span class="runtime-observation-value">@observation.StateTicks</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Population</span><span class="runtime-observation-value">@observation.PopulationCount</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Available slots</span><span class="runtime-observation-value">@observation.AvailablePopulationSlots</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Page FSM valid</span><span class="runtime-observation-value">@FormatObservationFlag(observation.PageFsmIsValid)</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Living GUI valid</span><span class="runtime-observation-value">@FormatObservationFlag(observation.LivingGuiIsValid)</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Living GUI frozen</span><span class="runtime-observation-value">@FormatObservationFlag(observation.LivingGuiFrozen)</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Entry requested</span><span class="runtime-observation-value">@FormatObservationFlag(observation.EnterRequested)</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">GUI populated</span><span class="runtime-observation-value">@FormatObservationFlag(observation.LivingGuiPopulated)</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Moniker ready</span><span class="runtime-observation-value">@FormatObservationFlag(observation.MonikerReady)</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Gravity released</span><span class="runtime-observation-value">@FormatObservationFlag(observation.GravityReleased)</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">GUI fallen</span><span class="runtime-observation-value">@FormatObservationFlag(observation.LivingGuiFallen)</span></div>
+            <div class="runtime-observation-row"><span class="runtime-observation-label">Navigation ready</span><span class="runtime-observation-value">@FormatObservationFlag(observation.NavigationReady)</span></div>
+        </div>
         <div class="runtime-observation-actions">
             <button type="button" @onclick="RefreshRuntimeObservation">REFRESH SNAPSHOT</button>
             <span>Sample @_runtimeObservationRefresh</span>
@@ -157,9 +157,10 @@
 .runtime-observation-panel{position:fixed;right:1rem;bottom:4.3rem;z-index:60;width:min(27rem,calc(100vw - 2rem));max-height:min(72vh,38rem);overflow:auto;box-sizing:border-box;padding:1rem;border:1px solid rgba(0,234,255,.4);background:rgba(2,7,17,.97);color:#e8f4f8;box-shadow:0 15px 60px rgba(0,0,0,.55);font: .75rem/1.5 Consolas,'Courier New',monospace;backdrop-filter:blur(14px)}
 .runtime-observation-panel h2{margin:0 0 .35rem;font-size:.9rem;letter-spacing:.08em}
 .runtime-observation-panel p{margin:.3rem 0;color:#9bb5c2}
-.runtime-observation-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.35rem .8rem;margin-top:.8rem}
-.runtime-observation-grid dt{color:#9bb5c2;overflow-wrap:anywhere}
-.runtime-observation-grid dd{margin:0;color:#fff;text-align:right;overflow-wrap:anywhere}
+.runtime-observation-grid{display:flex;flex-direction:column;gap:.35rem;margin-top:.8rem}
+.runtime-observation-row{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;min-width:0}
+.runtime-observation-label{flex:1 1 auto;min-width:0;color:#9bb5c2;overflow-wrap:anywhere}
+.runtime-observation-value{flex:0 1 auto;max-width:58%;margin:0;color:#fff;text-align:right;overflow-wrap:anywhere}
 .runtime-observation-actions{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.8rem}
 .runtime-observation-actions button{padding:.5rem .65rem;border:1px solid rgba(255,44,255,.4);background:transparent;color:#fff;font:inherit;cursor:pointer}
 .runtime-observation-source{margin-top:.8rem!important;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.1);font-size:.65rem}
