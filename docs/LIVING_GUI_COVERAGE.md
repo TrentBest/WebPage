@@ -33,32 +33,32 @@ The animated lens is an **architecture illustration, not runtime telemetry**. A 
 | [`docs/HOST_BOUNDARY_MIGRATION.md`](HOST_BOUNDARY_MIGRATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/LEARNING_PATH.md`](LEARNING_PATH.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/MICROBUNDLE_ARBITRATION_MAP.md`](MICROBUNDLE_ARBITRATION_MAP.md) | Embedded | Shared lens present; subject-specific view audit remains |
-| [`docs/OPERATION_SITH_BRANCH_DISPOSITION.md`](OPERATION_SITH_BRANCH_DISPOSITION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/OPERATION_SITH_BRANCH_DISPOSITION.md`](OPERATION_SITH_BRANCH_DISPOSITION.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/PACKAGE_ECOSYSTEM.md`](PACKAGE_ECOSYSTEM.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/PLAN_VIEW_VBIMB.md`](PLAN_VIEW_VBIMB.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/PROVING_GROUND_MIGRATION.md`](PROVING_GROUND_MIGRATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/PUBLIC_WORKSHOP_TABS.md`](PUBLIC_WORKSHOP_TABS.md) | Embedded | Shared lens present; subject-specific view audit remains |
-| [`docs/REPOSITORY_MAP.md`](REPOSITORY_MAP.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/SINGULARITY_CITY_EXPERIENCE.md`](SINGULARITY_CITY_EXPERIENCE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/SINGULARITY_CITY_LIVING_WORLD.md`](SINGULARITY_CITY_LIVING_WORLD.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/SINGULARITY_CITY_MICROBUNDLE_COMPOSITION.md`](SINGULARITY_CITY_MICROBUNDLE_COMPOSITION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/SINGULARITY_CITY_SIMULATION.md`](SINGULARITY_CITY_SIMULATION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/SINGULARITY_CITY_ZOOMABLE_WORLD_AND_EXPERIENCES.md`](SINGULARITY_CITY_ZOOMABLE_WORLD_AND_EXPERIENCES.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/SINGULARITY_LABORATORY_STATIONS.md`](SINGULARITY_LABORATORY_STATIONS.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/SINGULARITY_STUDIOS_PRODUCTION_MODEL.md`](SINGULARITY_STUDIOS_PRODUCTION_MODEL.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/SINGULARITY_UNIVERSE.md`](SINGULARITY_UNIVERSE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/TABLETOP_CONTENT_BOUNDARY.md`](TABLETOP_CONTENT_BOUNDARY.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/TESTING.md`](TESTING.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/REPOSITORY_MAP.md`](REPOSITORY_MAP.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/SINGULARITY_CITY_EXPERIENCE.md`](SINGULARITY_CITY_EXPERIENCE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/SINGULARITY_CITY_LIVING_WORLD.md`](SINGULARITY_CITY_LIVING_WORLD.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/SINGULARITY_CITY_MICROBUNDLE_COMPOSITION.md`](SINGULARITY_CITY_MICROBUNDLE_COMPOSITION.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/SINGULARITY_CITY_SIMULATION.md`](SINGULARITY_CITY_SIMULATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/SINGULARITY_CITY_ZOOMABLE_WORLD_AND_EXPERIENCES.md`](SINGULARITY_CITY_ZOOMABLE_WORLD_AND_EXPERIENCES.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/SINGULARITY_LABORATORY_STATIONS.md`](SINGULARITY_LABORATORY_STATIONS.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/SINGULARITY_STUDIOS_PRODUCTION_MODEL.md`](SINGULARITY_STUDIOS_PRODUCTION_MODEL.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/SINGULARITY_UNIVERSE.md`](SINGULARITY_UNIVERSE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/TABLETOP_CONTENT_BOUNDARY.md`](TABLETOP_CONTENT_BOUNDARY.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/TESTING.md`](TESTING.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/THEORY.md`](THEORY.md) | Embedded | Shared lens present; subject-specific view audit remains |
-| [`docs/USAGE.md`](USAGE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/USER_IDENTITY_AND_DATA_ARCHITECTURE.md`](USER_IDENTITY_AND_DATA_ARCHITECTURE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WANDERER_ARCHITECTURE.md`](WANDERER_ARCHITECTURE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WEBAPP_HOST_MIGRATION.md`](WEBAPP_HOST_MIGRATION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WEBAPP_SHOWCASE_ORCHESTRATION.md`](WEBAPP_SHOWCASE_ORCHESTRATION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WEBPAGE_EXPERIENCE_ARCHITECTURE.md`](WEBPAGE_EXPERIENCE_ARCHITECTURE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/USAGE.md`](USAGE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/USER_IDENTITY_AND_DATA_ARCHITECTURE.md`](USER_IDENTITY_AND_DATA_ARCHITECTURE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/WANDERER_ARCHITECTURE.md`](WANDERER_ARCHITECTURE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/WEBAPP_HOST_MIGRATION.md`](WEBAPP_HOST_MIGRATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/WEBAPP_SHOWCASE_ORCHESTRATION.md`](WEBAPP_SHOWCASE_ORCHESTRATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/WEBPAGE_EXPERIENCE_ARCHITECTURE.md`](WEBPAGE_EXPERIENCE_ARCHITECTURE.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/WEBPAGE_READINESS.md`](WEBPAGE_READINESS.md) | Embedded | Shared lens present; subject-specific view audit remains |
-| [`docs/WEBPAGE_SOUND_AND_AMBIENCE.md`](WEBPAGE_SOUND_AND_AMBIENCE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/WORKING_TASKS.md`](WORKING_TASKS.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/WEBPAGE_SOUND_AND_AMBIENCE.md`](WEBPAGE_SOUND_AND_AMBIENCE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/WORKING_TASKS.md`](WORKING_TASKS.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/WORKSHOP_CITY_AND_SOFTWARE_VISION.md`](WORKSHOP_CITY_AND_SOFTWARE_VISION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/WORKSHOP_FLOORPLAN_EXPERIENCE.md`](WORKSHOP_FLOORPLAN_EXPERIENCE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/WORKSHOP_HANDOFF.md`](WORKSHOP_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
