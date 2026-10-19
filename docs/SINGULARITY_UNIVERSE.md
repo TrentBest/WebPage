@@ -1,5 +1,10 @@
 # Singularity Universe
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 This document formalizes the persistent-world model behind the Workshop.
 
 The Workshop is no longer conceived as a webpage containing a collection of demonstrations. It is a place inside a persistent universe. Experiences are environments encountered within that universe, and MicroBundles are the focused units from which those environments are composed.

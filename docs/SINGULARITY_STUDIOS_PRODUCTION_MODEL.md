@@ -1,5 +1,10 @@
 # Singularity Studios — Reusable Production Worlds
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status:** product and data architecture direction; this is not a claim that a film-production toolchain already exists.  
 **Owner:** WebPage integration/presentation; domain contracts belong in their owning Workshop packages.  
 **Branch:** `development`. Do not publish or deploy from this brief.
