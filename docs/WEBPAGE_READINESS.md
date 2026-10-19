@@ -10,7 +10,7 @@ This is the active release ledger for the browser host. A green build is necessa
 
 - **Integration branch:** `development`.
 - **Latest audited code candidate:** [`8ec877b`](https://github.com/TrentBest/WebPage/commit/8ec877bc5b1288882976e252dd771ad5587750f6) on `development`.
-- **Latest .NET CI:** [run 39195465334](https://github.com/TrentBest/WebPage/actions/runs/39195465334) — **success** on code candidate `8ec877b`. Both jobs passed: WebPage restore/build and full Playwright browser journey, SingularityHub and Experience test suites, manifest-bound adapter guards, Renderer source smoke, and city-rendering proof screenshot.
+- **Latest successful code-candidate .NET CI:** [run 39195465334](https://github.com/TrentBest/WebPage/actions/runs/39195465334) — **success** on code candidate `8ec877b`. Both jobs passed: WebPage restore/build and full Playwright browser journey, SingularityHub and Experience test suites, manifest-bound adapter guards, Renderer source smoke, and city-rendering proof screenshot.
 - **Azure Static Web Apps:** the previously inspected run [39192108528](https://github.com/TrentBest/WebPage/actions/runs/39192108528) was **skipped**. No deployment is claimed.
 - **Documentation rollout:** the shared lens is embedded in all 88 indexed Markdown documents under `docs/`; this is not the same as completing each subject-specific visual/evidence audit. See [coverage ledger](LIVING_GUI_COVERAGE.md).
 - **Branch hygiene:** `development`, `master`, and an extra `fix/restore-founder-entry-sequence` branch currently exist. The extra branch is a release-hygiene item; it has not been deleted here.
@@ -75,7 +75,7 @@ Tracking: [living GUI coverage ledger](LIVING_GUI_COVERAGE.md), [architecture au
 
 ### CI and release safeguards
 
-- [x] Latest observed .NET CI run is successful on code candidate `8ec877b`: [run 39195465334](https://github.com/TrentBest/WebPage/actions/runs/39195465334).
+- [x] Latest successful code-candidate .NET CI run is successful on code candidate `8ec877b`: [run 39195465334](https://github.com/TrentBest/WebPage/actions/runs/39195465334).
 - [x] Test job and Workshop repository-source integration passed on that candidate, including browser journey smoke, execution-adapter binding/tick tests, Living GUI tests, Experience tests, and Renderer source smoke.
 - [x] Previously inspected Azure workflow outcome was skipped, not deployed; no deployment is claimed.
 - [x] Verify the immutable runtime-observation API on commit `4f56ba5`: [CI run 39185455518](https://github.com/TrentBest/WebPage/actions/runs/39185455518) passed both jobs.
