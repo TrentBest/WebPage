@@ -1,5 +1,10 @@
 # WebApp Showcase Orchestration and Living Documentation
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Audience:** WebPageLLM and maintainers of the Workshop host  
 **Branch:** `development`  
 **Status:** architecture and integration contract; it does not claim the full runtime-redefinition proof is already complete.

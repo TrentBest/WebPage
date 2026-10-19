@@ -1,5 +1,10 @@
 # WebPage Soundscape and Sensory Manifest
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 Give the Workshop an audible identity without turning sound into hard-coded page behavior. WebPage is the browser-hosted manifestation of WebApp; WebApp should host an AnyApp-style experience definition. Sound, speech, visual animation, and interaction are sensory manifestations of experience semantics, not unrelated UI callbacks.
