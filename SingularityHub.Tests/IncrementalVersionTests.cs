@@ -595,7 +595,7 @@ public sealed class IncrementalVersionTests
         var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WebPageHostManifestTests.cs"));
 
         Assert.Contains("ManifestSwitchPropagatesCancellationToHttpRequest", tests);
-        Assert.Contains("SwitchManifestAsync(\\"manifest.json\\", cancellation.Token)", tests);
+        Assert.Contains("SwitchManifestAsync(\"manifest.json\", cancellation.Token)", tests);
         Assert.Contains("Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken)", tests);
         Assert.Contains("ThrowsAnyAsync<OperationCanceledException>", tests);
     }
