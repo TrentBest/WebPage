@@ -63,6 +63,26 @@ public sealed class WebPageHostManifestTests
         Assert.True(manifest.DeepDive.Telemetry);
     }
 
+    [Theory]
+    [InlineData("2.0.0")]
+    [InlineData("not-a-version")]
+    public void ManifestParserRejectsUnsupportedSchemaVersions(string version)
+    {
+        var json = $"""
+        {
+          "manifestId": "webpage-host",
+          "version": "{{version}}",
+          "startup": [{ "name": "Moniker", "kind": "Moniker", "microBundles": [], "presentationSeconds": 0 }],
+          "hub": [],
+          "running": [{ "name": "Primary", "kind": "Primary", "microBundles": [], "presentationSeconds": 0 }],
+          "deepDive": { "experience": "Primary", "restartFromManifest": true, "telemetry": false }
+        }
+        """;
+
+        var exception = Assert.Throws<InvalidOperationException>(() => WebPageHostManifestParser.Parse(json));
+        Assert.Contains("Supported major version is 1", exception.Message);
+    }
+
     [Fact]
     public void PublicHostAssetsExposeManifestDrivenWorkshopDestinationsAndClientRoutes()
     {
