@@ -62,7 +62,7 @@ try {
   await observationPanel.getByText("Observation only — composition is not execution. The manifest-selected RuntimeAssembly is assembled, while the bound host adapter currently delegates lifecycle ticks to the preserved PageFSM implementation.", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Sample 0", { exact: true }).waitFor({ state: "visible" });
   const totalTicksRow = observationPanel.locator(".runtime-observation-row")
-    .filter({ has: observationPanel.getByText("Total ticks", { exact: true }) });
+    .filter({ hasText: "Total ticks" });
   const ticksBeforeRefresh = Number(await totalTicksRow.locator(".runtime-observation-value").innerText());
   await page.waitForTimeout(120);
   await observationPanel.getByRole("button", { name: "REFRESH SNAPSHOT", exact: true }).click();
