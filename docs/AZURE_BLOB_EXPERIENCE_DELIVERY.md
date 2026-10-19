@@ -83,6 +83,12 @@ Each SVG or visual document must label its evidence class:
 
 For generated SVG, keep a reproducible generator and source fixture in the repository. Record the generator/input version and test the output's key semantic elements. Do not use a static diagram to imply that Azure retrieval, city persistence, simulation, or RuntimeAssembly integration is already live.
 
+## Implemented source seam
+
+`WorkshopExperienceService` now accepts an optional `experienceArtifactBaseUri`. When omitted, the existing relative manifest path continues to resolve through the application's configured `HttpClient` base address. When supplied, the base must be an absolute HTTPS URI with no embedded credentials, query, or fragment; relative manifest paths are resolved under that base. The resolver rejects absolute URLs, traversal segments, encoded path segments, backslashes, empty path segments, queries, and fragments.
+
+This is the first source seam, not proof of a deployed Azure integration. The host still needs a real configured Blob endpoint, container access/CORS settings, and a successful browser test against an actual versioned Experience manifest. It resolves manifest JSON only; MicroBundle execution remains restricted to the registered in-process catalog.
+
 ## Current implementation checkpoint
 
 The WebPage host already has manifest-driven composition and package-version boundaries, and its repository includes Singularity City composition documentation plus generated SVG plan examples. The documented City contract explicitly distinguishes architecture direction from currently composed roots.
