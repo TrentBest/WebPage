@@ -12,6 +12,7 @@
 <PageTitle>The Singularity Workshop</PageTitle>
 
 @BuildRootGui()
+@BuildRuntimeObservationPanel()
 
 <style>
 .manifest-moniker{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15em;background:radial-gradient(circle at 50% 42%,rgba(0,234,255,.09),transparent 35%),#020711;color:#fff;font:900 clamp(2.8rem,9vw,8rem)/.86 Consolas,'Courier New',monospace;letter-spacing:.07em;text-align:center;text-shadow:0 0 24px rgba(0,234,255,.22);animation:manifestMonikerBreath 3.8s ease-in-out infinite}.manifest-moniker #the{color:#00a8ff}.manifest-moniker #singularity{color:#ff2cff}.manifest-moniker #workshop{color:#ff7a00}.manifest-moniker #moniker-composition{display:flex;flex-direction:column;align-items:center;gap:.15em}.manifest-moniker small{margin-top:1.2rem;font-size:clamp(.55rem,1vw,.8rem);letter-spacing:.18em;color:#617784}@@keyframes manifestMonikerBreath{0%,100%{transform:scale(.985)}50%{transform:scale(1.015)}}
@@ -232,7 +233,6 @@
             .Style("font-family","Consolas,'Courier New',monospace").Child(builder =>
             {
                 builder.AddContent(0, BuildExperienceContent());
-                builder.AddContent(1, BuildRuntimeObservationPanel());
             }).Build();
     }
 

@@ -42,6 +42,7 @@ try {
   const observationToggle = page.getByRole("button", { name: "RUNTIME OBSERVATION", exact: true });
   await observationToggle.waitFor({ state: "visible" });
   await observationToggle.click();
+  await page.getByRole("button", { name: "CLOSE RUNTIME OBSERVATION", exact: true }).waitFor({ state: "visible" });
   const observationPanel = page.getByRole("complementary", { name: "Live runtime observation snapshot" });
   await observationPanel.waitFor({ state: "visible" });
   await observationPanel.getByText("Page state", { exact: true }).waitFor({ state: "visible" });
