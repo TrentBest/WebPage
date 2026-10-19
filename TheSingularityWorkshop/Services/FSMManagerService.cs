@@ -24,12 +24,12 @@ namespace TheSingularityWorkshop.Services
 
         public PageFSM Page { get; }
         public IExperienceExecutionRuntime ExecutionRuntime => Volatile.Read(ref _executionRuntime);
-        public PageStateContext Context => Page.Context;
-        public string CurrentState => Page.CurrentState;
-        public string LivingGuiState => Page.LivingGuiState;
-        public string LivingGuiActivePhase => Page.LivingGuiActivePhase;
-        public bool LivingGuiIsValid => Page.LivingGuiIsValid;
-        public TimeSpan MonikerPresentationDuration => Page.MonikerPresentationDuration;
+        public PageStateContext Context => ExecutionRuntime.Context;
+        public string CurrentState => ExecutionRuntime.CurrentState;
+        public string LivingGuiState => ExecutionRuntime.LivingGuiState;
+        public string LivingGuiActivePhase => ExecutionRuntime.LivingGuiActivePhase;
+        public bool LivingGuiIsValid => ExecutionRuntime.LivingGuiIsValid;
+        public TimeSpan MonikerPresentationDuration => ExecutionRuntime.MonikerPresentationDuration;
         /// <summary>Point-in-time observation of the canonical page/Living GUI runtime.</summary>
         public PageFSM.RuntimeObservation Observation => ExecutionRuntime.Observe();
 
@@ -77,14 +77,14 @@ namespace TheSingularityWorkshop.Services
             Volatile.Write(ref _executionRuntime, runtime);
         }
 
-        public void RequestEnter() => Page.RequestEnter();
-        public void SignalLivingGuiPopulated() => Page.SignalLivingGuiPopulated();
-        public void SignalMonikerReady() => Page.SignalMonikerReady();
-        public void SignalGravityReleased() => Page.SignalGravityReleased();
-        public void SignalLivingGuiFallen() => Page.SignalLivingGuiFallen();
-        public void SignalNavigationReady() => Page.SignalNavigationReady();
+        public void RequestEnter() => ExecutionRuntime.RequestEnter();
+        public void SignalLivingGuiPopulated() => ExecutionRuntime.SignalLivingGuiPopulated();
+        public void SignalMonikerReady() => ExecutionRuntime.SignalMonikerReady();
+        public void SignalGravityReleased() => ExecutionRuntime.SignalGravityReleased();
+        public void SignalLivingGuiFallen() => ExecutionRuntime.SignalLivingGuiFallen();
+        public void SignalNavigationReady() => ExecutionRuntime.SignalNavigationReady();
         public void Step() => ExecutionRuntime.Tick();
-        public void Shutdown() => Page.Shutdown();
+        public void Shutdown() => ExecutionRuntime.Shutdown();
 
         private async Task RunHeartbeatAsync(CancellationToken cancellationToken)
         {

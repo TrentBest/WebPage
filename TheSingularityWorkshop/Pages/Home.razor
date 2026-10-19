@@ -216,9 +216,9 @@
             return;
         }
 
-        if (FSM.CurrentState is PageFSM.FirstContactFirstLabel or PageFSM.FirstContactTransition or PageFSM.FirstContactSecondLabel)
+        if (FSM.ExecutionRuntime.CurrentState is PageFSM.FirstContactFirstLabel or PageFSM.FirstContactTransition or PageFSM.FirstContactSecondLabel)
         {
-            var state = FSM.CurrentState;
+            var state = FSM.ExecutionRuntime.CurrentState;
             builder.OpenComponent<TheSingularityWorkshop.Components.FirstContactView>(0);
             builder.AddAttribute(1, "State", state switch
             {
@@ -232,7 +232,7 @@
             return;
         }
 
-        if (FSM.CurrentState == PageFSM.Gateway)
+        if (FSM.ExecutionRuntime.CurrentState == PageFSM.Gateway)
         {
             builder.OpenComponent<TheSingularityWorkshop.Components.FirstContactView>(0);
             builder.AddAttribute(1, "State", "Gateway");
@@ -241,7 +241,7 @@
             return;
         }
 
-        if (FSM.CurrentState is PageFSM.GatewayExit
+        if (FSM.ExecutionRuntime.CurrentState is PageFSM.GatewayExit
             or PageFSM.LivingGuiIgnition
             or PageFSM.LivingGuiPopulating
             or PageFSM.MonikerReveal
@@ -263,7 +263,7 @@
             builder.OpenComponent<LivingGui>(4);
             builder.CloseComponent();
 
-            if (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)
+            if (FSM.ExecutionRuntime.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)
             {
                 builder.OpenElement(11, "div");
                 builder.AddAttribute(12, "class", "workshop-hub-overlay");
@@ -735,7 +735,7 @@
     {
         ApplyRequestedHubTab();
         Navigation.LocationChanged += HandleLocationChanged;
-        _lastRenderedPageState = FSM.CurrentState;
+        _lastRenderedPageState = FSM.ExecutionRuntime.CurrentState;
         Experience.StateChanged += ExperienceChanged;
         FSM.StateChanged += PageStateChanged;
     }
@@ -751,8 +751,8 @@
         // journey when browser navigation reloads the root route after entry.
         _entryRequested = _explicitHubRouteRequested
             || returningVisitor
-            || FSM.Context.EnterRequested
-            || FSM.CurrentState is PageFSM.GatewayExit
+            || FSM.ExecutionRuntime.Context.EnterRequested
+            || FSM.ExecutionRuntime.CurrentState is PageFSM.GatewayExit
                 or PageFSM.LivingGuiIgnition
                 or PageFSM.LivingGuiPopulating
                 or PageFSM.MonikerReveal
@@ -802,7 +802,7 @@
     {
         // PageFSM reports every heartbeat as well as transitions. Re-render this
         // parent only when the state used by BuildExperienceContent actually changes.
-        var currentState = FSM.CurrentState;
+        var currentState = FSM.ExecutionRuntime.CurrentState;
         if (string.Equals(currentState, _lastRenderedPageState, StringComparison.Ordinal))
             return;
 

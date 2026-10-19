@@ -47,6 +47,8 @@ try {
   await observationPanel.getByText("Page state", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Host manifest", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Selected primary Experience", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Resolved Experience contract", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("LIVING GUI · 3002", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Composition", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText(/ASSEMBLED · runtime \d+ · \d+ bundles/).waitFor({ state: "visible" });
   await observationPanel.getByText("Execution owner", { exact: true }).waitFor({ state: "visible" });

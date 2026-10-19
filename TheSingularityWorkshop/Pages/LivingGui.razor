@@ -9,11 +9,11 @@
 <PageTitle>Living GUI</PageTitle>
 
 <div class="living-experience-panel" aria-label="Living GUI experience">
-    @if (FSM.Context.MonikerReady)
+    @if (FSM.ExecutionRuntime.Context.MonikerReady)
     {
-        <FirstContactView State="@FirstContactState" Ticks="FSM.Context.MonikerPresentationStartTick" MonikerComposition="@Experience.MonikerComposition" MonikerBehaviorClass="@Experience.MonikerBehaviorClass" />
+        <FirstContactView State="@FirstContactState" Ticks="FSM.ExecutionRuntime.Context.MonikerPresentationStartTick" MonikerComposition="@Experience.MonikerComposition" MonikerBehaviorClass="@Experience.MonikerBehaviorClass" />
     }
-    @foreach (var actor in FSM.Context.LivingNodes)
+    @foreach (var actor in FSM.ExecutionRuntime.Context.LivingNodes)
     {
         <label class="living-actor @(actor.IsRoot ? "living-actor-root" : "") @(GravityActive ? "living-actor-gravity" : "")"
                style="@ActorStyle(actor)"
@@ -115,7 +115,7 @@
 </style>
 
 @code {
-    private bool GravityActive => FSM.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
+    private bool GravityActive => FSM.ExecutionRuntime.CurrentState is PageFSM.Gravity or PageFSM.LivingGuiDissipating or PageFSM.NavigationArrival or PageFSM.Running;
 
     // The moniker remains the persistent landing surface. When the page FSM reaches
     // navigation arrival, MainLayout manifests the Workshop chrome alongside it.

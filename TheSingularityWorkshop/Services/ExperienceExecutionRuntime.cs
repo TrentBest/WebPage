@@ -11,10 +11,23 @@ namespace TheSingularityWorkshop.Services;
 public interface IExperienceExecutionRuntime
 {
     PageFSM Page { get; }
+    PageStateContext Context { get; }
     IExperience? Experience { get; }
     RuntimeAssembly? RuntimeAssembly { get; }
     bool IsManifestBound { get; }
     string ExecutionOwner { get; }
+    string CurrentState { get; }
+    string LivingGuiState { get; }
+    string LivingGuiActivePhase { get; }
+    bool LivingGuiIsValid { get; }
+    TimeSpan MonikerPresentationDuration { get; }
+    void RequestEnter();
+    void SignalLivingGuiPopulated();
+    void SignalMonikerReady();
+    void SignalGravityReleased();
+    void SignalLivingGuiFallen();
+    void SignalNavigationReady();
+    void Shutdown();
     void Tick();
     PageFSM.RuntimeObservation Observe();
 }
@@ -27,6 +40,7 @@ public interface IExperienceExecutionRuntime
 public sealed class PageFsmExecutionRuntime : IExperienceExecutionRuntime
 {
     public PageFSM Page { get; }
+    public PageStateContext Context => Page.Context;
     public IExperience? Experience { get; }
     public RuntimeAssembly? RuntimeAssembly { get; }
     public bool IsManifestBound => Experience is not null && RuntimeAssembly is not null;
@@ -60,6 +74,19 @@ public sealed class PageFsmExecutionRuntime : IExperienceExecutionRuntime
         }
     }
 
+    public string CurrentState => Page.CurrentState;
+    public string LivingGuiState => Page.LivingGuiState;
+    public string LivingGuiActivePhase => Page.LivingGuiActivePhase;
+    public bool LivingGuiIsValid => Page.LivingGuiIsValid;
+    public TimeSpan MonikerPresentationDuration => Page.MonikerPresentationDuration;
+
+    public void RequestEnter() => Page.RequestEnter();
+    public void SignalLivingGuiPopulated() => Page.SignalLivingGuiPopulated();
+    public void SignalMonikerReady() => Page.SignalMonikerReady();
+    public void SignalGravityReleased() => Page.SignalGravityReleased();
+    public void SignalLivingGuiFallen() => Page.SignalLivingGuiFallen();
+    public void SignalNavigationReady() => Page.SignalNavigationReady();
+    public void Shutdown() => Page.Shutdown();
     public void Tick() => Page.Update();
 
     public PageFSM.RuntimeObservation Observe() => Page.ObserveRuntime();

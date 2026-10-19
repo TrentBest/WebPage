@@ -287,6 +287,8 @@ public sealed class WebPageHostManifestTests
         Assert.Equal(3002UL, service.SelectedExperience!.Id);
         Assert.True(firstExecutionRuntime.IsManifestBound);
         Assert.Same(originalPage, firstExecutionRuntime.Page);
+        Assert.Same(originalPage.Context, firstExecutionRuntime.Context);
+        Assert.Equal(originalPage.CurrentState, firstExecutionRuntime.CurrentState);
         Assert.Equal(firstAssembly!.RuntimeId, firstExecutionRuntime.RuntimeAssembly!.RuntimeId);
         Assert.Equal("showcase-a", service.Manifest!.ManifestId);
         Assert.Equal("/a", Assert.Single(service.Manifest.Hub).Route);
