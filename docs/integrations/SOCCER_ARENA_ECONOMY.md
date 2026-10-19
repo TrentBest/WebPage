@@ -1,5 +1,10 @@
 # Soccer Arena Economy — Singularity City
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Audience:** WebPageLLM, Singularity City, venue, commerce, and MicroBundleDomain integration work  
 **Status:** design contract; ticketing, payment, inventory, and settlement are not claimed to be implemented  
 **Scope:** admission, concessions, merchandise, memorabilia, and vendor commerce  

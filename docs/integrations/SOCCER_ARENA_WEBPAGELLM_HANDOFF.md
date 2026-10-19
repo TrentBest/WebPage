@@ -1,5 +1,10 @@
 # Soccer Arena — WebPageLLM Integration Brief
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Audience:** WebPageLLM and the WebPage / Singularity City experience team  
 **Status:** integration direction plus a deterministic domain fixture on a separate review branch; not a playable soccer simulation  
 **Do not merge, publish, or deploy from this brief without the owner's explicit approval.**
