@@ -553,4 +553,17 @@ public sealed class IncrementalVersionTests
         Assert.Contains("mediaType.EndsWith(\"+json\", StringComparison.OrdinalIgnoreCase)", service);
         Assert.Contains("Experience manifest must use a JSON content type", service);
     }
+
+    [ArchitectureTest(0, 0, 212)] [Fact(DisplayName = "V0.0.212 — Host_Manifest_Rejects_Unsupported_Schema_Versions")]
+    public void V0_0_212HostManifestRejectsUnsupportedSchemaVersions()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var parser = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Services", "WebPageHostManifest.cs"));
+        var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WebPageHostManifestTests.cs"));
+
+        Assert.Contains("Version.TryParse(manifest.Version, out var schemaVersion)", parser);
+        Assert.Contains("schemaVersion.Major != 1", parser);
+        Assert.Contains("ManifestParserRejectsUnsupportedSchemaVersions", tests);
+        Assert.Contains("[InlineData(\"2.0.0\")]", tests);
+    }
 }
