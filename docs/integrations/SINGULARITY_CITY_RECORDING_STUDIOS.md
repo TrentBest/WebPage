@@ -1,5 +1,10 @@
 # Singularity City Recording Studios — Vision and Ownership
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 Make recording and music creation a first-class, reusable Experience in Singularity City and The Singularity Workshop. The first visible destination should be the Workshop's own recording studio; the architecture must also let independent creators establish distinct studio spaces without requiring the Workshop to own, approve, or economically operate every one.

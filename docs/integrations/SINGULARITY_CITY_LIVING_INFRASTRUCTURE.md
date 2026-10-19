@@ -1,5 +1,10 @@
 # Singularity City — Living Infrastructure Architecture
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status:** architecture contract and implementation sequence. This document describes the next integration seams; it does not claim that every listed system is implemented.
 
 ## The city is the showcase

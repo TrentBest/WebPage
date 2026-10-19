@@ -1,5 +1,10 @@
 # Singularity City — Soccer Arena Integration
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status:** integration plan; the Soccer MicroBundle contract has not yet been verified on the public development branches inspected on 2026-10-15. This document does not claim that a match is running.
 
 ## Intended experience
