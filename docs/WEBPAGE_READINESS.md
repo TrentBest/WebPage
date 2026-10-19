@@ -9,9 +9,9 @@ This is the active release ledger for the browser host. A green build is necessa
 ## Current baseline
 
 - **Integration branch:** `development`.
-- **Current audited commit:** [`41add99`](https://github.com/TrentBest/WebPage/commit/41add99fae4f0b2f4476a09ff6c8a2c21e7f60f5).
-- **Latest .NET CI:** [run 39183749004](https://github.com/TrentBest/WebPage/actions/runs/39183749004) — **success** on that exact commit. The Workshop repository-source integration job completed successfully, including dependency checkouts, .NET setup, WebPage restore/build, Renderer source smoke test, and city-rendering proof screenshot.
-- **Azure Static Web Apps:** [run 39183749042](https://github.com/TrentBest/WebPage/actions/runs/39183749042) — **skipped**. No deployment is claimed.
+- **Latest audited commit:** [`009977c`](https://github.com/TrentBest/WebPage/commit/009977c5001f0b23d2adde431bed04d324e3b3d9) on `development`.
+- **Latest .NET CI:** [run 39184215967](https://github.com/TrentBest/WebPage/actions/runs/39184215967) — **success** on that exact commit. Both the test job and Workshop repository-source integration job passed, including WebPage restore/build, browser journey smoke coverage, SingularityHub and Living GUI tests, Renderer source smoke test, and city-rendering proof screenshot.
+- **Azure Static Web Apps:** the previously inspected run [39183749042](https://github.com/TrentBest/WebPage/actions/runs/39183749042) was **skipped**. No deployment is claimed.
 - **Documentation rollout:** the shared lens is embedded in all 88 indexed Markdown documents under `docs/`; this is not the same as completing each subject-specific visual/evidence audit. See [coverage ledger](LIVING_GUI_COVERAGE.md).
 - **Branch hygiene:** `development`, `master`, and an extra `fix/restore-founder-entry-sequence` branch currently exist. The extra branch is a release-hygiene item; it has not been deleted here.
 - No package publication, release creation, or deployment has been performed.
@@ -54,7 +54,7 @@ Evidence: `SingularityHub.Tests/WebPageHostManifestTests.cs`, `TheSingularityWor
 
 Evidence: [functionality preservation ledger](FUNCTIONALITY_PRESERVATION.md), [current vertical slice](CURRENT_VERTICAL_SLICE.md), `WorkshopExperienceService.cs`, `FSMManagerService.cs`, `PageFSM.cs`, and `LivingGuiExperienceMicroBundle.cs`.
 
-The current `LivingGuiExperienceMicroBundle` is a composition capability: `Load` validates context and `Arbitrate` returns false; it does not expose simulation state, lifecycle transitions, or a tick/observation API. `FSMManagerService` owns a 33 ms `PeriodicTimer` and calls `Page.Update()`. Therefore composition is real, but execution ownership has not yet moved. FSM_COS assigns Experience startup, scheduling, and host lifecycle to the host; do not add these responsibilities to the composition kernel or pretend a docs-only change closes the gap.
+The current `LivingGuiExperienceMicroBundle` is a composition capability: `Load` validates context and `Arbitrate` returns false; it does not expose simulation state, lifecycle transitions, or a tick/observation API. `WorkshopExperienceService.SwitchManifestAsync` composes and activates `RuntimeAssembly`, records the manifest-selected startup/primary entries, and sets its presentation state to `Moniker`; that is composition activation, not primary lifecycle execution. `FSMManagerService` still owns a 33 ms `PeriodicTimer` and calls `Page.Update()`. Therefore composition is real, but execution ownership has not yet moved. FSM_COS assigns Experience startup, scheduling, and host lifecycle to the host; do not add these responsibilities to the composition kernel or pretend a docs-only change closes the gap.
 
 ### Visitor experience and living documentation
 
@@ -69,9 +69,9 @@ Tracking: [living GUI coverage ledger](LIVING_GUI_COVERAGE.md), [architecture au
 
 ### CI and release safeguards
 
-- [x] Latest observed .NET CI run is successful on audited commit `41add99`.
-- [x] Workshop repository-source integration and Renderer source smoke test completed successfully in that run.
-- [x] Azure workflow outcome reviewed; it was skipped, not deployed.
+- [x] Latest observed .NET CI run is successful on commit `009977c`.
+- [x] Test job and Workshop repository-source integration passed on that commit, including browser journey smoke, Living GUI tests, and Renderer source smoke.
+- [x] Previously inspected Azure workflow outcome was skipped, not deployed; no deployment is claimed.
 - [ ] After the next code change, verify the new commit's .NET tests and relevant browser smoke test.
 - [ ] Reconcile branch hygiene with the repository's master/development-only policy; an extra fix branch currently exists.
 - [ ] Confirm release versioning, package/workflow gates, and public-facing documentation on the final candidate.
