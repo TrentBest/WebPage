@@ -33,12 +33,14 @@ internal class Program
         Uri? experienceArtifactBaseUri = string.IsNullOrWhiteSpace(experienceArtifactBaseUriValue)
             ? null
             : new Uri(experienceArtifactBaseUriValue, UriKind.Absolute);
+        var experienceArtifactManifestPath = builder.Configuration["ExperienceArtifacts:ManifestPath"];
         builder.Services.AddScoped(sp => new WorkshopExperienceService(
             sp.GetRequiredService<HttpClient>(),
             sp.GetRequiredService<HubRuntime>(),
             sp.GetRequiredService<FSMManagerService>(),
             sp.GetRequiredService<WorkshopExperienceCatalog>(),
-            experienceArtifactBaseUri));
+            experienceArtifactBaseUri,
+            experienceArtifactManifestPath));
         builder.Services.AddSingleton<WorkshopExperienceCatalog>();
         builder.Services.AddSingleton<WorkshopCompositionCatalog>();
         builder.Services.AddSingleton<WorkshopDeepDiveCatalog>();
