@@ -94,7 +94,7 @@ public sealed class WorkshopExperienceService : IDisposable
         ActiveManifestPath = _initialManifestPath;
     }
 
-    public async Task InitializeAsync(bool returningVisitor = false)
+    public async Task InitializeAsync(bool returningVisitor = false, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
         if (IsInitialized)
@@ -102,7 +102,7 @@ public sealed class WorkshopExperienceService : IDisposable
 
         IsFirstVisit = !returningVisitor;
         SetState("ManifestLoading");
-        await SwitchManifestAsync(_initialManifestPath);
+        await SwitchManifestAsync(_initialManifestPath, cancellationToken);
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class WorkshopExperienceService : IDisposable
     /// point at a public static host such as Azure Blob Storage. Executable MicroBundles
     /// remain resolved by the trusted repository/provider boundary, not URLs.
     /// </summary>
-    public async Task SwitchManifestAsync(string manifestPath)
+    public async Task SwitchManifestAsync(string manifestPath, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
         ValidateManifestPath(manifestPath);
@@ -126,7 +126,7 @@ public sealed class WorkshopExperienceService : IDisposable
         try
         {
             var manifestUri = _artifactUriResolver.Resolve(manifestPath);
-            var manifestJson = await ReadManifestJsonAsync(manifestUri);
+            var manifestJson = await ReadManifestJsonAsync(manifestUri, cancellationToken);
             var candidateManifest = WebPageHostManifestParser.Parse(manifestJson);
 
             if (candidateManifest.Startup is not { Count: > 0 })
@@ -340,12 +340,12 @@ public sealed class WorkshopExperienceService : IDisposable
     }
 
     /// <summary>Reloads and recomposes the currently active manifest from its configured source.</summary>
-    public async Task RestartFromManifestAsync(bool deepDive)
+    public async Task RestartFromManifestAsync(bool deepDive, CancellationToken cancellationToken = default)
     {
         if (Manifest is null)
             throw new InvalidOperationException("The Workshop manifest must be composed before restarting.");
 
-        await SwitchManifestAsync(ActiveManifestPath);
+        await SwitchManifestAsync(ActiveManifestPath, cancellationToken);
         IsDeepDive = deepDive;
     }
 
@@ -361,26 +361,27 @@ public sealed class WorkshopExperienceService : IDisposable
         StateChanged?.Invoke();
     }
 
-    private async Task<string> ReadManifestJsonAsync(Uri manifestUri)
+    private async Task<string> ReadManifestJsonAsync(Uri manifestUri, CancellationToken cancellationToken)
     {
         using var response = await _httpClient.GetAsync(
             manifestUri,
-            HttpCompletionOption.ResponseHeadersRead);
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
         response.EnsureSuccessStatusCode();
 
         if (response.Content.Headers.ContentLength is > MaxManifestBytes)
             throw new InvalidDataException($"Experience manifest exceeds the {MaxManifestBytes}-byte limit.");
 
-        await using var stream = await response.Content.ReadAsStreamAsync();
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         using var content = new MemoryStream();
         var buffer = new byte[81920];
         int bytesRead;
-        while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length))) > 0)
+        while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken)) > 0)
         {
             if (content.Length + bytesRead > MaxManifestBytes)
                 throw new InvalidDataException($"Experience manifest exceeds the {MaxManifestBytes}-byte limit.");
 
-            await content.WriteAsync(buffer.AsMemory(0, bytesRead));
+            await content.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
         }
 
         return Encoding.UTF8.GetString(content.ToArray());
