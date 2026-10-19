@@ -77,9 +77,9 @@ The animated lens is an **architecture illustration, not runtime telemetry**. A 
 | [`docs/integrations/GESTURES_MOVEMENT_LAB.md`](integrations/GESTURES_MOVEMENT_LAB.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md`](integrations/GESTURES_RENDERER_WEBPAGELLM_HANDOFF.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/integrations/PHYSICS_LIVING_WATER_WORLD_HANDOFF.md`](integrations/PHYSICS_LIVING_WATER_WORLD_HANDOFF.md) | Embedded | Shared lens present; subject-specific view audit remains
-| [`docs/integrations/PHYSICS_REPLAY_WEBPAGELLM_HANDOFF.md`](integrations/PHYSICS_REPLAY_WEBPAGELLM_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/integrations/PHYSICS_REPLAY_WEBPAGELLM_NEXT_STEPS.md`](integrations/PHYSICS_REPLAY_WEBPAGELLM_NEXT_STEPS.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/integrations/PROTOCOLAI_TERMINAL_WEBPAGELLM_HANDOFF.md`](integrations/PROTOCOLAI_TERMINAL_WEBPAGELLM_HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/integrations/PHYSICS_REPLAY_WEBPAGELLM_HANDOFF.md`](integrations/PHYSICS_REPLAY_WEBPAGELLM_HANDOFF.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/integrations/PHYSICS_REPLAY_WEBPAGELLM_NEXT_STEPS.md`](integrations/PHYSICS_REPLAY_WEBPAGELLM_NEXT_STEPS.md) | Embedded | Shared lens present; subject-specific view audit remains
+| [`docs/integrations/PROTOCOLAI_TERMINAL_WEBPAGELLM_HANDOFF.md`](integrations/PROTOCOLAI_TERMINAL_WEBPAGELLM_HANDOFF.md) | Embedded | Shared lens present; subject-specific view audit remains
 | [`docs/integrations/RECORDING_STUDIO_WEBPAGELLM_NEXT_STEPS.md`](integrations/RECORDING_STUDIO_WEBPAGELLM_NEXT_STEPS.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/integrations/RendererLLM.md`](integrations/RendererLLM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/integrations/SINGULARITY_CITY_ACOUSTIC_STUDIO_LAB.md`](integrations/SINGULARITY_CITY_ACOUSTIC_STUDIO_LAB.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |

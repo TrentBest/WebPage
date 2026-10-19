@@ -1,5 +1,10 @@
 # Physics Replay / Shareable Moments — WebPageLLM Integration Brief
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Audience:** WebPageLLM and anyone implementing the Workshop's public-facing experience  
 **Status:** Physics has tested model-level replay and fork-aware route coordination. WebPage now contains a local illustrative `/replay-lab` experience with scrubbing, playback of fixture data, event markers, Physics evidence links, and explicit unavailable states. It is not connected to Physics checkpoints or a reconstructed physical world; browser verification remains outstanding.  
 **Source branch:** `development` in both repositories  

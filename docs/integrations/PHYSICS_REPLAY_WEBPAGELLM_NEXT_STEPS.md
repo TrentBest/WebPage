@@ -1,5 +1,10 @@
 # WebPageLLM Addendum — Physics Replay Lab: Current State and Immediate Intent
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Audience:** WebPageLLM implementing the Workshop browser experience  
 **Applies to:** `TrentBest/WebPage`, branch `development`  
 **Companion brief:** [Physics Replay / Shareable Moments — WebPageLLM Integration Brief](./PHYSICS_REPLAY_WEBPAGELLM_HANDOFF.md)  

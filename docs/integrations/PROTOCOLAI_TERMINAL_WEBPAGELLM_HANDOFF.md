@@ -1,5 +1,10 @@
 # ProtocolAi Terminal — WebPageLLM Handoff
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Branch:** `development`  
 **Purpose:** Keep the browser terminal tiny while rebuilding the manual LLM exchange and the safe path from returned text to intent actuation.
 
