@@ -342,6 +342,47 @@ public sealed class WebPageHostManifestTests
         Assert.NotNull(service.LastManifestError);
     }
 
+    [Theory]
+    [InlineData("text/html", false)]
+    [InlineData("application/vnd.example+json", true)]
+    public async Task ManifestSwitchValidatesJsonContentType(string contentType, bool accepted)
+    {
+        const string manifestJson = """
+        {
+          "manifestId": "content-type-test",
+          "version": "1.0.0",
+          "startup": [{ "name": "MONIKER", "kind": "Moniker", "microBundles": [], "presentationSeconds": 0 }],
+          "hub": [],
+          "running": [{ "name": "LIVING GUI", "kind": "Primary", "microBundles": [{ "bundleId": 2102, "version": "1.0.0" }], "presentationSeconds": 0 }],
+          "deepDive": { "experience": "LIVING GUI", "restartFromManifest": true, "telemetry": false }
+        }
+        """;
+
+        using var client = new HttpClient(new ManifestHandler(
+            new Dictionary<string, string> { ["manifest.json"] = manifestJson },
+            contentType))
+        {
+            BaseAddress = new Uri("https://localhost/")
+        };
+        var hubKernel = new HubKernel();
+        using var executionHost = new FSMManagerService(hubKernel);
+        using var service = new WorkshopExperienceService(
+            client, new HubRuntime(hubKernel), executionHost, new WorkshopExperienceCatalog());
+
+        if (accepted)
+        {
+            await service.SwitchManifestAsync("manifest.json");
+            Assert.Equal("content-type-test", service.Manifest!.ManifestId);
+        }
+        else
+        {
+            await Assert.ThrowsAsync<InvalidDataException>(
+                () => service.SwitchManifestAsync("manifest.json"));
+            Assert.Null(service.Manifest);
+            Assert.Contains("must use a JSON content type", service.LastManifestError);
+        }
+    }
+
     [Fact]
     public async Task ManifestSwitchRejectsExternalAndTraversalPathsBeforeFetching()
     {
@@ -457,7 +498,7 @@ public sealed class WebPageHostManifestTests
         }
     }
 
-    private sealed class ManifestHandler(IReadOnlyDictionary<string, string> manifests) : HttpMessageHandler
+    private sealed class ManifestHandler(IReadOnlyDictionary<string, string> manifests, string contentType = "application/json") : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
@@ -469,7 +510,7 @@ public sealed class WebPageHostManifestTests
 
             return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
             {
-                Content = new StringContent(content, System.Text.Encoding.UTF8, "application/json")
+                Content = new StringContent(content, System.Text.Encoding.UTF8, contentType)
             });
         }
     }
