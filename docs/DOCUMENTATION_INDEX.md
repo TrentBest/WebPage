@@ -102,3 +102,12 @@ When code changes ownership or behavior, update the smallest authoritative set o
 If two documents disagree, reconcile them. Do not preserve contradictory architecture because both documents are old.
 
 *The documentation should let the machine explain itself.*
+
+
+## Living GUI coverage
+
+- [Living GUI documentation lens](assets/living-gui-documentation-lens.svg) — shared visual grammar for tracing a claim from question through theory and implementation to visible manifestation and proof. This is an animated architecture illustration, not runtime telemetry.
+- [Diegetic WYSIWYG and Living Documentation](DIEGETIC_WYSIWYG_AND_LIVING_DOCUMENTATION.md) — subject-specific standard for GUI.SVG, source-backed views, provenance, authoring, preview, and evidence.
+- [GUI.SVG connected-points sample](../TheSingularityWorkshop/wwwroot/Visualize/07-gui-svg-connected-points.svg) — a real GUI.SVG sample to compare with the illustrative lens.
+
+The shared lens is the common entry point; each guide remains responsible for a subject-specific view and for clearly distinguishing current behavior from illustrations and proposals.

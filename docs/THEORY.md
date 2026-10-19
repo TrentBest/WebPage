@@ -1,5 +1,10 @@
 # WebPage Theory
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Living GUI lens.** Trace this page’s claims to the responsible source, a visible manifestation where one exists, and executable evidence. This animated loop is an orientation illustration—not live runtime telemetry. The page must label implemented, illustrated, proposed, and unverified claims honestly.
+
+
 ## 1. WebPage is a proving ground, not the Workshop
 
 A proving ground exists to make an architectural idea observable. WebPage should be rich enough to demonstrate the ecosystem, but disciplined enough that reusable behavior migrates downward into the package that owns it.

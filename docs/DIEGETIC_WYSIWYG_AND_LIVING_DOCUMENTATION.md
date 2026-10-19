@@ -122,3 +122,10 @@ The City Lab integration remains a separate next seam: a stable, revisioned worl
 5. Keep correctness tests deterministic and separate opt-in performance benchmarks from CI.
 
 **North star:** the reader should not merely be told how the Workshop works. They should be able to inspect the model, witness the behavior, trace the evidence, and use the same underlying representation to create something new.
+
+
+## The every-document requirement
+
+Every document in `docs/` embeds the shared [Living GUI documentation lens](assets/living-gui-documentation-lens.svg) as a consistent navigation cue. That shared illustration does **not** satisfy the subject-specific requirement by itself. Each page must connect its subject to the most useful available living view, deterministic fixture, source file, browser experience, or test. When no such view exists, say so explicitly and record the missing proof as work—not as an implied feature.
+
+The document’s visual should answer: **What am I looking at? What source or fixture drives it? What can I interact with or verify? What does it not prove?** For genuinely live views, expose provenance and refresh/runtime boundaries. For static SVGs and diagrams, label them illustrative. For future designs, label them proposed. A looping animation alone is not evidence that application state is changing.

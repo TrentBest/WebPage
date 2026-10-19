@@ -272,3 +272,17 @@ That document should answer:
 - what WebPage does after handoff.
 
 This is the operational companion to the deeper FSM_COS theory.
+
+
+## Living GUI in every document
+
+Every Markdown document under `docs/` must embed the shared [Living GUI documentation lens](assets/living-gui-documentation-lens.svg) (use the absolute raw URL from nested folders). This common animated lens is a navigation pattern, **not** a substitute for a subject-specific living view. Each document must also provide, link, or explicitly mark as unavailable the most relevant view of the subject it describes.
+
+For each subject-specific visual, record its evidence class:
+
+- **Live/source-backed:** generated from current runtime state, current source, or a deterministic fixture/test.
+- **Observed:** a captured screenshot, trace, or result tied to a named run/environment.
+- **Illustrative:** explains a contract or relationship but is not runtime output.
+- **Proposed:** depicts future work and must not be phrased as implemented behavior.
+
+Use GUI.SVG or a real host view when it adds evidence; never relabel static SVG animation as live runtime data. Link visuals to their source/fixture/test where possible, provide descriptive alt text, and honor reduced-motion preferences. Every theory document should include a subject-specific diagram or visual model; every operational/integration guide should point to a runnable demonstration, deterministic fixture, test, or explicitly stated missing proof. If none exists, state that gap rather than fabricating a living view.

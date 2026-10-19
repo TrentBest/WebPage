@@ -9,6 +9,11 @@
 
 ![The WebPage opening journey: gateway, moniker, and manifest-driven hub](docs/assets/webpage-opening-journey.svg)
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Living GUI lens.** Trace this page’s claims to the responsible source, a visible manifestation where one exists, and executable evidence. This animated loop is an orientation illustration—not live runtime telemetry. The page must label implemented, illustrated, proposed, and unverified claims honestly.
+
+
 > **The page opens the door. The Experience gives you somewhere to stand. The machinery lets you look underneath it.**
 
 WebPage is the browser host, public learning surface, and proving ground for [The Singularity Workshop](https://github.com/TrentBest). It lets people witness Workshop behavior in a browser, then follow the evidence into the code and theory.

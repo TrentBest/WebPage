@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+<title id="title">Living GUI documentation lens</title>
+<desc id="desc">An animated evidence loop: question, model, implementation, running view, and proof return to the question. This is an architecture illustration, not live runtime telemetry.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10172b"/><stop offset="1" stop-color="#1c2941"/></linearGradient>
+  <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#49d9c7"/><stop offset=".5" stop-color="#a5f3fc"/><stop offset="1" stop-color="#c4b5fd"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <style>
+    .label{font:700 19px system-ui,sans-serif;fill:#f8fafc}.sub{font:14px system-ui,sans-serif;fill:#cbd5e1}.small{font:12px system-ui,sans-serif;fill:#94a3b8}.node{fill:#17243a;stroke:#60758f;stroke-width:1.5}.active{fill:#163b45;stroke:#49d9c7;stroke-width:2}.path{fill:none;stroke:#49617a;stroke-width:3;stroke-linecap:round}.pulse{fill:none;stroke:url(#beam);stroke-width:4;stroke-linecap:round;stroke-dasharray:16 480;animation:travel 7s linear infinite;filter:url(#glow)}.dot{fill:#6ee7d8;filter:url(#glow);animation:breathe 2.4s ease-in-out infinite alternate}
+    @keyframes travel{to{stroke-dashoffset:-496}}@keyframes breathe{to{opacity:.35;r:5}}
+    @media(prefers-reduced-motion:reduce){.pulse,.dot{animation:none}}
+  </style>
+</defs>
+<rect width="1200" height="360" rx="24" fill="url(#bg)"/>
+<path d="M38 58H1162" stroke="#35445b" stroke-width="1"/>
+<text x="48" y="38" class="small" letter-spacing="3">THE SINGULARITY WORKSHOP · LIVING DOCUMENTATION</text>
+<text x="48" y="94" class="label" font-size="26">A claim should lead to a view. A view should lead to proof.</text>
+<text x="48" y="119" class="sub">Use this lens to connect the explanation on this page to its implementation and evidence.</text>
+<path class="path" d="M142 210H1058Q1090 210 1090 242V258Q1090 278 1065 278H142Q112 278 112 248V242Q112 210 142 210"/>
+<path class="pulse" d="M142 210H1058Q1090 210 1090 242V258Q1090 278 1065 278H142Q112 278 112 248V242Q112 210 142 210"/>
+<g transform="translate(120 178)"><rect class="node" width="180" height="66" rx="13"/><circle class="dot" cx="18" cy="18" r="6"/><text x="90" y="29" class="label" text-anchor="middle">Question</text><text x="90" y="49" class="sub" text-anchor="middle">What should be true?</text></g>
+<g transform="translate(340 178)"><rect class="node" width="180" height="66" rx="13"/><circle cx="18" cy="18" r="6" fill="#a5b4fc"/><text x="90" y="29" class="label" text-anchor="middle">Model</text><text x="90" y="49" class="sub" text-anchor="middle">Theory &amp; contracts</text></g>
+<g transform="translate(560 178)"><rect class="node active" width="180" height="66" rx="13"/><circle cx="18" cy="18" r="6" fill="#49d9c7"/><text x="90" y="29" class="label" text-anchor="middle">Implementation</text><text x="90" y="49" class="sub" text-anchor="middle">Real source &amp; owners</text></g>
+<g transform="translate(780 178)"><rect class="node" width="180" height="66" rx="13"/><circle cx="18" cy="18" r="6" fill="#c4b5fd"/><text x="90" y="29" class="label" text-anchor="middle">Living GUI</text><text x="90" y="49" class="sub" text-anchor="middle">Visible manifestation</text></g>
+<g transform="translate(1000 178)"><rect class="node" width="130" height="66" rx="13"/><circle cx="16" cy="18" r="6" fill="#fbbf24"/><text x="65" y="29" class="label" text-anchor="middle">Proof</text><text x="65" y="49" class="sub" text-anchor="middle">Tests / traces</text></g>
+<text x="48" y="320" class="sub">Evidence status matters: implemented · illustrated · proposed · unverified</text>
+<text x="1150" y="320" class="small" text-anchor="end">Illustrative loop — not live telemetry</text>
+</svg>

@@ -1,5 +1,10 @@
 # WebPage Readiness Checklist
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Living GUI lens.** Trace this page’s claims to the responsible source, a visible manifestation where one exists, and executable evidence. This animated loop is an orientation illustration—not live runtime telemetry. The page must label implemented, illustrated, proposed, and unverified claims honestly.
+
+
 This is the active readiness ledger for the browser host. It distinguishes verified repository/CI evidence from work that remains incomplete. Do not treat a successful build as proof that every architectural migration is complete.
 
 ## Current baseline
@@ -70,3 +75,14 @@ Close the gap between **composition** and **execution**. The manifest and FSM_CO
 - `TheSingularityWorkshop/Services/FSMManagerService.cs` owns a 33 ms `PeriodicTimer` heartbeat and calls `Page.Update()`; `PageFSM.Tick` advances `LivingGuiFsm.Update()` while populating and separately updates the gravity process group. This is direct source evidence that the current execution owner is still the WebPage compatibility runtime, even though the manifest-selected bundle has been composed.
 - `WorkshopExperienceService.RuntimeAssembly` proves composition and dependency closure, not a runnable Living GUI Experience. A WebPage-only rewrite cannot safely transfer execution to an API that the composed bundle does not expose. The next implementation gate is an explicit WebPage host bridge for Experience startup, scheduling, and state observation, unless a separately owned reusable Experience runtime is found and verified. FSM_COS's own `RUNTIME_ASSEMBLY.md` and `RUNTIME_BOUNDARY.md` explicitly assign these host responsibilities outside the composition kernel. Keep the current behavior path until the bridge and browser handoff regression test prove parity.
 
+
+
+## Living documentation rollout
+
+- [x] Establish a shared animated evidence-loop visual and a standard for evidence labels.
+- [x] Add the shared lens and explicit subject-specific-view requirement to the documentation standard and index.
+- [ ] Embed the shared lens in every remaining Markdown document under `docs/`.
+- [ ] Inventory every guide/theory/integration page for a subject-specific visual, source/fixture link, and accurate evidence class.
+- [ ] Add validation so new or edited documents cannot silently omit their living view or evidence statement.
+
+This is a documentation rollout, not proof of the composition-to-execution migration. Release readiness remains **60%** until implementation and browser handoff gates change with evidence.
