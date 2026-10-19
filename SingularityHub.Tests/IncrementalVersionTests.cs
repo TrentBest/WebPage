@@ -608,8 +608,8 @@ public sealed class IncrementalVersionTests
         var moniker = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "MonikerExperienceTests.cs"));
         var composition = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WorkshopCompositionTests.cs"));
 
-        Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \\"application/json\\")", moniker);
-        Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \\"application/json\\")", composition);
+        Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \"application/json\")", moniker);
+        Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \"application/json\")", composition);
     }
 
 
@@ -626,4 +626,18 @@ public sealed class IncrementalVersionTests
         Assert.Contains("ManifestSwitchTimesOutWhenManifestFetchExceedsConfiguredLimit", tests);
         Assert.Contains("15-second default fetch timeout", docs);
     }
+
+    [ArchitectureTest(0, 0, 218)] [Fact(DisplayName = "V0.0.218 — JSON_Content_Type_Architecture_Proof_Compiles_And_Matches_Fixtures")]
+    public void V0_0_218JsonContentTypeArchitectureProofMatchesFixtures()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "IncrementalVersionTests.cs"));
+        var moniker = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "MonikerExperienceTests.cs"));
+        var composition = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WorkshopCompositionTests.cs"));
+
+        Assert.Contains("V0_0_216JsonContentTypeTestFixturesDeclareApplicationJson", tests);
+        Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \"application/json\")", moniker);
+        Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \"application/json\")", composition);
+    }
+
 }
