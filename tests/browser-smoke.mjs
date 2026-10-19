@@ -66,6 +66,16 @@ try {
     throw new Error(`Runtime observation panel should remain compact; width was ${observationPanelWidth}px.`);
   }
   await page.screenshot({ path: `${outputDir}/03-runtime-observation.png`, fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobilePanelBounds = await observationPanel.evaluate(el => {
+    const rect = el.getBoundingClientRect();
+    return { x: rect.x, right: rect.right, width: rect.width, viewportWidth: window.innerWidth };
+  });
+  if (mobilePanelBounds.x < 0 || mobilePanelBounds.right > mobilePanelBounds.viewportWidth || mobilePanelBounds.width > mobilePanelBounds.viewportWidth - 24) {
+    throw new Error("Runtime observation panel must fit a 390px mobile viewport: " + JSON.stringify(mobilePanelBounds));
+  }
+  await page.screenshot({ path: `${outputDir}/03-runtime-observation-mobile.png`, fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByRole("button", { name: "CLOSE RUNTIME OBSERVATION", exact: true }).click();
   await observationPanel.waitFor({ state: "hidden" });
   if (await page.locator(".manifest-hub-tabs").count() !== 0) {
