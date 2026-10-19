@@ -490,7 +490,9 @@ public sealed class IncrementalVersionTests
         Assert.Contains("UriSchemeHttps", resolver);
         Assert.Contains("experienceArtifactBaseUri", service);
         Assert.Contains("ExperienceArtifacts:BaseUri", program);
-        Assert.Contains("GetStringAsync(manifestUri)", service);
+        Assert.Contains("ReadManifestJsonAsync(manifestUri)", service);
+        Assert.Contains("GetAsync(", service);
+        Assert.Contains("ResponseHeadersRead", service);
         Assert.Contains("RejectsUnsafeManifestPaths", tests);
         Assert.Contains("This is the first source seam", docs);
     }
