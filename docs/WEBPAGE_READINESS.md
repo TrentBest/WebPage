@@ -5,9 +5,21 @@ This is the active readiness ledger for the browser host. It distinguishes verif
 ## Current baseline
 
 - Branch: `development` (integration branch).
-- Latest completed successful .NET CI validation: [run 39179278861](https://github.com/TrentBest/WebPage/actions/runs/39179278861) — **success**, commit `879a62a0191a53a608b678c41ad4c8dab723bf10`. Browser-host restore/build, browser-journey smoke test, solution build, SingularityHub tests, LivingGui Experience tests, Pong Experience tests, Codecov upload, and Workshop repository-source integration all completed successfully. Earlier successful baseline: [run 39178605389](https://github.com/TrentBest/WebPage/actions/runs/39178605389).
+- Latest completed successful .NET CI validation: [run 39179278861](https://github.com/TrentBest/WebPage/actions/runs/39179278861) — **success**, commit `879a62a0191a53a608b678c41ad4c8dab723bf10`. Browser-host restore/build, browser-journey smoke test, solution build, SingularityHub tests, LivingGui Experience tests, Pong Experience tests, Codecov upload, and Workshop repository-source integration all completed successfully. The checklist-only follow-up commit `131d9abe4d1e15a20db8e66d1e40d104b07d7de9` is currently validating in [run 39179783300](https://github.com/TrentBest/WebPage/actions/runs/39179783300): host restore/build passed, browser-journey smoke is in progress, and repository-source integration passed. Earlier successful baseline: [run 39178605389](https://github.com/TrentBest/WebPage/actions/runs/39178605389).
 - Azure Static Web Apps workflow [run 39179189929](https://github.com/TrentBest/WebPage/actions/runs/39179189929) — **skipped**. This is not evidence of a deployment.
 - No package publication or deployment is authorized by this checklist.
+
+## Release completion estimate
+
+**Estimated release readiness: 60%** — an engineering judgment, not a test pass rate or an automated metric. This is a baseline estimate as of 2026-10-19 and should move only when evidence changes.
+
+Why 60%:
+- **Validated foundation:** manifest loading and composition, dependency-closure tests, the existing FSM_API-driven page/Living GUI behavior, browser smoke coverage, and cross-repository source integration are present.
+- **Major release gate still open:** the browser's manifest-selected `RuntimeAssembly` is not yet proven to own or activate the primary Experience lifecycle. The current 33 ms WebPage heartbeat still advances the compatibility `PageFSM → LivingGuiFsm` path.
+- **Remaining release proof:** implement and test the host-side execution/observation bridge without losing behavior; verify the full visitor journey and responsive layout; reconcile public docs/visuals; confirm final CI and release safeguards.
+- **Confidence:** medium-low for the percentage itself because the host bridge is a substantial architectural gate whose true scope will become clearer during implementation. The listed source/test evidence is higher-confidence than the numeric estimate.
+
+Progress scale: 0% = no release evidence; 100% = all release gates evidenced, CI green for the final code, and explicit human approval obtained for any publication/deployment. CI success alone cannot move the estimate past the execution-ownership gate.
 
 ## Readiness gates
 
