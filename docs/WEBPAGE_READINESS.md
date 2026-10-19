@@ -5,9 +5,8 @@ This is the active readiness ledger for the browser host. It distinguishes verif
 ## Current baseline
 
 - Branch: `development` (integration branch).
-- Latest completed successful .NET CI baseline: [run 39178605389](https://github.com/TrentBest/WebPage/actions/runs/39178605389) — **success**, commit `f4e4fc2164e3f8936400ccc73100a471b39ebe79`. The browser-host build, browser-journey smoke test, solution build, SingularityHub tests, LivingGui Experience tests, Pong Experience tests, coverage upload, and Workshop repository-source integration all completed successfully. Earlier successful baseline: [run 39148410137](https://github.com/TrentBest/WebPage/actions/runs/39148410137).
-- Current validation for checklist commit [`a20e21d`](https://github.com/TrentBest/WebPage/commit/a20e21d3b12d438c33c5550d3ac1c7232e8d23b2) is **in progress** in [.NET run 39179189789](https://github.com/TrentBest/WebPage/actions/runs/39179189789). At the latest check, restore completed and browser-host restore/build was running; the Workshop source-integration restore was also running. No conclusion is available yet.
-- Azure Static Web Apps workflow for this same commit: [run 39179189929](https://github.com/TrentBest/WebPage/actions/runs/39179189929) — **skipped**. This is not evidence of a deployment.
+- Latest completed successful .NET CI validation: [run 39179278861](https://github.com/TrentBest/WebPage/actions/runs/39179278861) — **success**, commit `879a62a0191a53a608b678c41ad4c8dab723bf10`. Browser-host restore/build, browser-journey smoke test, solution build, SingularityHub tests, LivingGui Experience tests, Pong Experience tests, Codecov upload, and Workshop repository-source integration all completed successfully. Earlier successful baseline: [run 39178605389](https://github.com/TrentBest/WebPage/actions/runs/39178605389).
+- Azure Static Web Apps workflow [run 39179189929](https://github.com/TrentBest/WebPage/actions/runs/39179189929) — **skipped**. This is not evidence of a deployment.
 - No package publication or deployment is authorized by this checklist.
 
 ## Readiness gates
