@@ -583,9 +583,9 @@ public sealed class IncrementalVersionTests
         var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WebPageHostManifestTests.cs"));
 
         Assert.Contains("ManifestSwitchValidatesJsonContentType", tests);
-        Assert.Contains("[InlineData(\\"text/html\\", false)]", tests);
-        Assert.Contains("[InlineData(\\"application/vnd.example+json\\", true)]", tests);
-        Assert.Contains("await service.SwitchManifestAsync(\\"manifest.json\\")", tests);
+        Assert.Contains("[InlineData(\"text/html\", false)]", tests);
+        Assert.Contains("[InlineData(\"application/vnd.example+json\", true)]", tests);
+        Assert.Contains("await service.SwitchManifestAsync(\"manifest.json\")", tests);
     }
 
 }
