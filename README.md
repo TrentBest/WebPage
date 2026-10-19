@@ -129,7 +129,6 @@ Choose the guide that answers your question; the README stays an orientation and
 - [**Package Ecosystem**](docs/PACKAGE_ECOSYSTEM.md) — package ownership and why each external dependency is present.
 - [**Usage**](docs/USAGE.md) — local setup and the host's runtime shape.
 - [**Brave1 Public Demonstration**](docs/BRAVE1_PUBLIC_DEMONSTRATION.md) — the public MVP story, claim boundaries, and pre-submission checks.
-- [**Singularity City Composition Contract**](docs/SINGULARITY_CITY_MICROBUNDLE_COMPOSITION.md)
 - [**Azure Blob Experience Delivery**](docs/AZURE_BLOB_EXPERIENCE_DELIVERY.md) — versioned artifact delivery, browser security, SVG evidence classes, and the unverified cloud-integration gate.
 - [**Singularity City Composition Contract**](docs/SINGULARITY_CITY_MICROBUNDLE_COMPOSITION.md) — how city capabilities become a manifest-composed Experience in the single WebPage host.
 - [**Zoomable City World**](docs/SINGULARITY_CITY_ZOOMABLE_WORLD_AND_EXPERIENCES.md) — shared city-to-room navigation, vehicles, Digitens, and renderer boundaries.
