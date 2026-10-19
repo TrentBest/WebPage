@@ -40,7 +40,9 @@ public sealed class MonikerExperienceTests
     [Fact(DisplayName = "Primary Experience resolves the canonical Moniker dependency without advancing host lifecycle")]
     public async Task PrimaryExperienceResolvesCanonicalMonikerDependencyWithoutAdvancingHostLifecycle()
     {
-        using var service = CreateService();
+        var hubKernel = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        using var executionHost = new FSMManagerService(hubKernel);
+        using var service = CreateService(executionHost, hubKernel);
 
         await service.InitializeAsync();
 
@@ -58,7 +60,9 @@ public sealed class MonikerExperienceTests
     [Fact(DisplayName = "The primary Experience remains composed while PageFSM owns startup presentation")]
     public async Task PrimaryExperienceRemainsComposedWhilePageFsmOwnsStartupPresentation()
     {
-        using var service = CreateService();
+        var hubKernel = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        using var executionHost = new FSMManagerService(hubKernel);
+        using var service = CreateService(executionHost, hubKernel);
 
         await service.InitializeAsync();
         service.RequestEntry();
@@ -79,14 +83,18 @@ public sealed class MonikerExperienceTests
             out _));
     }
 
-    private static WorkshopExperienceService CreateService()
+    private static WorkshopExperienceService CreateService(
+        FSMManagerService executionHost,
+        TheSingularityWorkshop.SingularityHub.SingularityHub hubKernel)
     {
         var client = new HttpClient(new ManifestHandler())
         {
             BaseAddress = new Uri("https://webpage.test/")
         };
 
-        return new WorkshopExperienceService(client, new HubRuntime(new TheSingularityWorkshop.SingularityHub.SingularityHub()));
+        return new WorkshopExperienceService(
+            client, new HubRuntime(hubKernel), executionHost,
+            new TheSingularityWorkshop.Workshop.Composition.WorkshopExperienceCatalog());
     }
 
     private sealed class ManifestHandler : HttpMessageHandler
