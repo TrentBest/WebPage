@@ -1,5 +1,10 @@
 # Singularity City Hidden Martial-Arts Dojos — WebPageLLM Handoff
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Intent
 
 Give Singularity City a network of small, distinctive martial-arts dojos tucked into the city fabric. They should reward exploration: a visitor might discover a training room behind a market, above a transit concourse, in a converted service level, on a quiet roof, inside a residential courtyard, or at the edge of an industrial district. Some entrances are discreet; the places themselves should still be legible and welcoming once discovered.

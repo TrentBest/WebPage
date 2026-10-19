@@ -1,5 +1,10 @@
 # Singularity City Dojos, Venues, and Gestures Integration Handoff
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 Define a coherent path for martial-arts dojos and training venues inside Singularity City, coordinated with the Gestures work and the existing arena/venue and Economy design handoffs. This is a design contract for the WebPage experience, not a claim that a dojo simulator or combat model already exists.

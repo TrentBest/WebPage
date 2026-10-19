@@ -1,5 +1,10 @@
 # Singularity City — Aerial Traffic Model
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Status:** deterministic route model, GUI snapshot renderer, and city-map host loop are implemented. The loop advances snapshots once per second while the City map is open; it is a presentation-time prototype, not yet an FSM_API-owned simulation clock.
 
 ## Purpose
