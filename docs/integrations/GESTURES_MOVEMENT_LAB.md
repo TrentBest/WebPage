@@ -1,5 +1,10 @@
 # Gestures Movement Lab — WebPage proving ground
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 The Movement Lab is a small, lazy-by-navigation browser view for inspecting the authored hurdle-course geometry described in the Gestures WebPageLLM handoff. It makes the element order, stable IDs, axis-aligned center/full-extents bounds, and unit label visible.

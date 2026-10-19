@@ -1,5 +1,10 @@
 # Gestures / Renderer — WebPageLLM Integration Brief
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Audience:** WebPageLLM and anyone implementing the Workshop's public-facing experience  
 **Status:** integration plan; no Gestures-to-Renderer runtime adapter or browser demonstration is claimed complete  
 **Source:** Gestures PR #10, branch `work/planar-ik-reference`; Renderer `master`; WebPage `development`  
