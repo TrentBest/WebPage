@@ -449,4 +449,23 @@ public sealed class IncrementalVersionTests
         Assert.Contains("metadata discovery", demonstrations);
     }
 
+
+    [ArchitectureTest(0, 0, 206)] [Fact(DisplayName = "V0.0.206 — Azure_Blob_Experience_Delivery_And_Browser_Security_Are_Documented")]
+    public void V0_0_206AzureBlobExperienceDeliveryAndBrowserSecurityAreDocumented()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var docsPath = Path.Combine(root, "docs", "AZURE_BLOB_EXPERIENCE_DELIVERY.md");
+        var readmePath = Path.Combine(root, "README.md");
+
+        Assert.True(File.Exists(docsPath), "The Azure Blob Experience delivery contract must exist.");
+        var docs = File.ReadAllText(docsPath);
+        var readme = File.ReadAllText(readmePath);
+
+        Assert.Contains("FSM_COS", docs);
+        Assert.Contains("Never ship an Azure account key", docs);
+        Assert.Contains("not proven as the active source", docs);
+        Assert.Contains("Release gate for a public Singularity City showcase", docs);
+        Assert.Contains("docs/AZURE_BLOB_EXPERIENCE_DELIVERY.md", readme);
+    }
+
 }
