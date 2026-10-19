@@ -384,6 +384,26 @@ public sealed class WebPageHostManifestTests
     }
 
     [Fact]
+    public async Task ManifestSwitchPropagatesCancellationToHttpRequest()
+    {
+        using var handler = new CancellationManifestHandler();
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("https://localhost/") };
+        var hubKernel = new HubKernel();
+        using var executionHost = new FSMManagerService(hubKernel);
+        using var service = new WorkshopExperienceService(
+            client, new HubRuntime(hubKernel), executionHost, new WorkshopExperienceCatalog());
+        using var cancellation = new CancellationTokenSource();
+
+        var switching = service.SwitchManifestAsync("manifest.json", cancellation.Token);
+        await handler.RequestStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        cancellation.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => switching);
+        Assert.Null(service.Manifest);
+        Assert.NotNull(service.LastManifestError);
+    }
+
+    [Fact]
     public async Task ManifestSwitchRejectsExternalAndTraversalPathsBeforeFetching()
     {
         using var client = new HttpClient(new ManifestHandler(new Dictionary<string, string>()))
@@ -495,6 +515,21 @@ public sealed class WebPageHostManifestTests
         {
             foreach (var disposable in assembly.Bundles.OfType<IDisposable>())
                 disposable.Dispose();
+        }
+    }
+
+    private sealed class CancellationManifestHandler : HttpMessageHandler
+    {
+        public TaskCompletionSource<bool> RequestStarted { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            RequestStarted.TrySetResult(true);
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
         }
     }
 
