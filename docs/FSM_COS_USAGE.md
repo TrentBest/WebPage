@@ -1,5 +1,10 @@
 # WebPage — FSM_COS Usage
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 > **This document explains how WebPage uses FSM_COS. It does not redefine FSM_COS.**
 
 WebPage is the browser proving ground. Its job is to use the reusable composition machinery in a real application, make the result observable, and turn successful experiments into operational knowledge for developers.
