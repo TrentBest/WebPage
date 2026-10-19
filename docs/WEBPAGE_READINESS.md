@@ -5,7 +5,7 @@ This is the active readiness ledger for the browser host. It distinguishes verif
 ## Current baseline
 
 - Branch: `development` (integration branch).
-- Latest observed .NET CI run: [run 39148410137](https://github.com/TrentBest/WebPage/actions/runs/39148410137) — **success**, updated 2026-10-18 17:15 UTC, commit `ae302eef5b36f8412b71227e513b4d021ca77e01`.
+- Latest observed .NET CI run: [run 39178605389](https://github.com/TrentBest/WebPage/actions/runs/39178605389) — **success**, commit `f4e4fc2164e3f8936400ccc73100a471b39ebe79`. The browser-host build, browser-journey smoke test, solution build, SingularityHub tests, LivingGui Experience tests, Pong Experience tests, coverage upload, and Workshop repository-source integration all completed successfully. Earlier successful baseline: [run 39148410137](https://github.com/TrentBest/WebPage/actions/runs/39148410137).
 - Latest observed Azure Static Web Apps workflow: [run 39148410141](https://github.com/TrentBest/WebPage/actions/runs/39148410141) — **skipped**. This is not evidence of a deployment.
 - No package publication or deployment is authorized by this checklist.
 
@@ -18,7 +18,7 @@ This is the active readiness ledger for the browser host. It distinguishes verif
 - [x] Primary root 2102 declares the canonical Moniker dependency 2110.
 - [x] FSM_COS composition proof asserts dependency closure for 2102 → 2110.
 - [x] Composition catalog creates isolated bundle instances for separate compositions.
-- [ ] Add/confirm an end-to-end test proving the actual browser's startup-to-primary transition is driven by the manifest-selected `RuntimeAssembly`, not only by the transitional page runtime.
+- [ ] Add/confirm an end-to-end test proving the actual browser's startup-to-primary transition is driven by the manifest-selected `RuntimeAssembly`, not only by the transitional page runtime. The latest browser smoke test passes, but that is not yet proof that the primary lifecycle is owned by `RuntimeAssembly`.
 
 Evidence: `SingularityHub.Tests/WebPageHostManifestTests.cs`, `TheSingularityWorkshop/Services/WorkshopExperienceService.cs`, and `TheSingularityWorkshop/Workshop/Composition/WorkshopCompositionCatalog.cs`.
 
@@ -42,7 +42,7 @@ Evidence: `docs/FUNCTIONALITY_PRESERVATION.md` and `docs/CURRENT_VERTICAL_SLICE.
 
 ### CI and release safeguards
 
-- [x] Latest observed .NET CI run is successful (link above).
+- [x] Latest observed .NET CI run is successful (link above), including browser journey smoke and cross-repository source integration.
 - [ ] After the next code change, verify the new commit's .NET tests and relevant browser smoke test.
 - [ ] Review all workflow outcomes; a skipped deploy workflow must remain described as skipped, not deployed.
 - [ ] Confirm `master` remains untouched and only `master` / `development` branches exist.
@@ -50,4 +50,4 @@ Evidence: `docs/FUNCTIONALITY_PRESERVATION.md` and `docs/CURRENT_VERTICAL_SLICE.
 
 ## Immediate next engineering task
 
-Close the gap between **composition** and **execution**. The manifest and FSM_COS can produce a `RuntimeAssembly`, but the preservation ledger currently records the browser as still using `FSMManagerService → PageFSM → LivingGuiFsm → PageStateContext`. First identify a canonical runtime owner and its state-observation contract, then add executable proof for the browser handoff. Do not delete the transitional path or simulate a successful migration with documentation alone.
+Close the gap between **composition** and **execution**. The manifest and FSM_COS can produce a `RuntimeAssembly`, but the preservation ledger currently records the browser as still using `FSMManagerService → PageFSM → LivingGuiFsm → PageStateContext`. The `WebPageCosRuntime` search hit is from an indexed historical commit, not a file currently retrievable on `development`; it is not evidence of a usable primary-Experience runtime contract. The current `IdleExperienceHost.razor` also still injects `FSMManagerService`, so it does not establish the missing ownership boundary. First identify a canonical runtime owner and its state-observation contract, then add executable proof for the browser handoff. Do not delete the transitional path or simulate a successful migration with documentation alone.
