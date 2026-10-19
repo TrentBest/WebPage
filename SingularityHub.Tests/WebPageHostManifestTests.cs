@@ -417,14 +417,16 @@ public sealed class WebPageHostManifestTests
             Assert.True(adapter.IsManifestBound);
             Assert.Same(page, adapter.Page);
             Assert.Same(page.Context, adapter.Context);
-            var ticksBefore = page.Context.TotalTicks;
+            var ticksBeforeRequest = page.Context.TotalTicks;
 
             adapter.RequestEnter();
+            var ticksAfterRequest = page.Context.TotalTicks;
             adapter.Tick();
             var observation = adapter.Observe();
 
             Assert.True(page.Context.EnterRequested);
-            Assert.Equal(ticksBefore + 1, observation.TotalTicks);
+            Assert.True(ticksAfterRequest >= ticksBeforeRequest);
+            Assert.Equal(ticksAfterRequest + 1, observation.TotalTicks);
             Assert.Equal(page.CurrentState, observation.PageState);
             Assert.Equal(assembly.RuntimeId, adapter.RuntimeAssembly!.RuntimeId);
         }

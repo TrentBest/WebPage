@@ -199,7 +199,7 @@ public sealed class IncrementalVersionTests
         var firstContact = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Components", "FirstContactView.razor"));
 
         Assert.Contains("FirstContactView", home);
-        Assert.Contains("FSM.CurrentState == PageFSM.Gateway", home);
+        Assert.Contains("FSM.ExecutionRuntime.CurrentState == PageFSM.Gateway", home);
         Assert.Contains("FSM.RequestEnter();", home);
         Assert.Contains("or PageFSM.Running)", home);
         Assert.Contains("PageFSM.NavigationArrival", layout);
@@ -251,7 +251,7 @@ public sealed class IncrementalVersionTests
         var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
         var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
 
-        Assert.Contains("FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running", home);
+        Assert.Contains("FSM.ExecutionRuntime.CurrentState is PageFSM.NavigationArrival or PageFSM.Running", home);
         Assert.Contains("Keep one LivingGui instance at one stable render-tree location", home);
         Assert.Contains("BuildManifestHub(builder);", home);
         Assert.DoesNotContain("WORKSHOP HUB ARRIVING", home);
@@ -304,7 +304,7 @@ public sealed class IncrementalVersionTests
         var root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
         var home = File.ReadAllText(Path.Combine(root, "TheSingularityWorkshop", "Pages", "Home.razor"));
 
-        var arrivalStart = home.IndexOf("if (FSM.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)", StringComparison.Ordinal);
+        var arrivalStart = home.IndexOf("if (FSM.ExecutionRuntime.CurrentState is PageFSM.NavigationArrival or PageFSM.Running)", StringComparison.Ordinal);
         var arrivalEnd = home.IndexOf("private async Task EnterWorkshop()", StringComparison.Ordinal);
         Assert.True(arrivalStart >= 0 && arrivalEnd > arrivalStart);
         var arrival = home.Substring(arrivalStart, arrivalEnd - arrivalStart);
