@@ -60,6 +60,47 @@ namespace TheSingularityWorkshop.Services
         public event Action<string>? StateChanged;
         public event Action? LivingGuiChanged;
 
+        /// <summary>
+        /// Immutable point-in-time view of the authoritative PageFSM/Living GUI runtime.
+        /// This is observation only; it does not transfer lifecycle or scheduling ownership.
+        /// </summary>
+        public sealed record RuntimeObservation(
+            string PageState,
+            string LivingGuiState,
+            string LivingGuiActivePhase,
+            bool PageFsmIsValid,
+            bool LivingGuiIsValid,
+            long TotalTicks,
+            long StateTicks,
+            int PopulationCount,
+            int AvailablePopulationSlots,
+            bool LivingGuiFrozen,
+            bool EnterRequested,
+            bool LivingGuiPopulated,
+            bool MonikerReady,
+            bool GravityReleased,
+            bool LivingGuiFallen,
+            bool NavigationReady);
+
+        /// <summary>Captures runtime state without exposing mutable context collections.</summary>
+        public RuntimeObservation ObserveRuntime() => new(
+            CurrentState,
+            LivingGuiState,
+            LivingGuiActivePhase,
+            IsValid,
+            LivingGuiIsValid,
+            Context.TotalTicks,
+            Context.StateTicks,
+            Context.LivingNodes.Count,
+            Context.AvailablePopulationSlots,
+            Context.LivingGuiFrozen,
+            Context.EnterRequested,
+            Context.LivingGuiPopulated,
+            Context.MonikerReady,
+            Context.GravityReleased,
+            Context.LivingGuiFallen,
+            Context.NavigationReady);
+
         public sealed class Behavior
         {
             public Action<PageStateContext>? OnInitialization { get; init; }

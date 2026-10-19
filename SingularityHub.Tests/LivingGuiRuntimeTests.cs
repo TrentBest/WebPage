@@ -17,6 +17,30 @@ public sealed class LivingGuiRuntimeTests
     }
 
     [Fact]
+    public void RuntimeObservationIsAnImmutablePointInTimeSnapshot()
+    {
+        using var fsm = new PageFSM();
+
+        var initial = fsm.ObserveRuntime();
+        Assert.Equal(fsm.CurrentState, initial.PageState);
+        Assert.Equal(fsm.LivingGuiState, initial.LivingGuiState);
+        Assert.True(initial.PageFsmIsValid);
+        Assert.True(initial.LivingGuiIsValid);
+        Assert.Equal(fsm.Context.LivingNodes.Count, initial.PopulationCount);
+        Assert.Equal(fsm.Context.TotalTicks, initial.TotalTicks);
+
+        EnterFromGateway(fsm);
+        fsm.Update();
+        var advanced = fsm.ObserveRuntime();
+
+        Assert.True(advanced.TotalTicks > initial.TotalTicks);
+        Assert.Equal(fsm.CurrentState, advanced.PageState);
+        Assert.Equal(fsm.Context.LivingNodes.Count, advanced.PopulationCount);
+        // A prior observation remains a snapshot rather than a live mutable view.
+        Assert.Equal(0, initial.PopulationCount);
+    }
+
+    [Fact]
     public void LivingGuiCreatesRootAndThenIndependentChildren()
     {
         using var fsm = new PageFSM();

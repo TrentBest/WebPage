@@ -26,6 +26,8 @@ namespace TheSingularityWorkshop.Services
         public string LivingGuiActivePhase => Page.LivingGuiActivePhase;
         public bool LivingGuiIsValid => Page.LivingGuiIsValid;
         public TimeSpan MonikerPresentationDuration => Page.MonikerPresentationDuration;
+        /// <summary>Point-in-time observation of the canonical page/Living GUI runtime.</summary>
+        public PageFSM.RuntimeObservation Observation => Page.ObserveRuntime();
 
         public event Action<string>? StateChanged
         {
