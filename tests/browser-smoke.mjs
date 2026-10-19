@@ -36,6 +36,28 @@ try {
 
   const hub = page.locator(".manifest-hub");
   await hub.waitFor({ state: "visible", timeout: 240_000 });
+  // Exercise the opt-in runtime observation surface against the running Blazor host.
+  // This proves the real UI exposes the snapshot fields and refreshes on demand without
+  // subscribing the whole page to every 33 ms heartbeat.
+  const observationToggle = page.getByRole("button", { name: "RUNTIME OBSERVATION", exact: true });
+  await observationToggle.waitFor({ state: "visible" });
+  await observationToggle.click();
+  const observationPanel = page.getByRole("complementary", { name: "Live runtime observation snapshot" });
+  await observationPanel.waitFor({ state: "visible" });
+  await observationPanel.getByText("Page state", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Living GUI state", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Population", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Observation only — does not imply that the manifest-selected RuntimeAssembly owns lifecycle execution.", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Sample 0", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByRole("button", { name: "REFRESH SNAPSHOT", exact: true }).click();
+  await observationPanel.getByText("Sample 1", { exact: true }).waitFor({ state: "visible" });
+  const observationPanelWidth = await observationPanel.evaluate(el => el.getBoundingClientRect().width);
+  if (observationPanelWidth > 450) {
+    throw new Error(`Runtime observation panel should remain compact; width was ${observationPanelWidth}px.`);
+  }
+  await page.screenshot({ path: `${outputDir}/03-runtime-observation.png`, fullPage: true });
+  await page.getByRole("button", { name: "CLOSE RUNTIME OBSERVATION", exact: true }).click();
+  await observationPanel.waitFor({ state: "hidden" });
   if (await page.locator(".manifest-hub-tabs").count() !== 0) {
     throw new Error("The primary canvas must not add a second tab strip; navigation belongs to the left rail.");
   }
