@@ -5,7 +5,8 @@ This is the active readiness ledger for the browser host. It distinguishes verif
 ## Current baseline
 
 - Branch: `development` (integration branch).
-- Latest observed .NET CI run: [run 39178605389](https://github.com/TrentBest/WebPage/actions/runs/39178605389) — **success**, commit `f4e4fc2164e3f8936400ccc73100a471b39ebe79`. The browser-host build, browser-journey smoke test, solution build, SingularityHub tests, LivingGui Experience tests, Pong Experience tests, coverage upload, and Workshop repository-source integration all completed successfully. Earlier successful baseline: [run 39148410137](https://github.com/TrentBest/WebPage/actions/runs/39148410137).
+- Latest completed successful .NET CI baseline: [run 39178605389](https://github.com/TrentBest/WebPage/actions/runs/39178605389) — **success**, commit `f4e4fc2164e3f8936400ccc73100a471b39ebe79`. The browser-host build, browser-journey smoke test, solution build, SingularityHub tests, LivingGui Experience tests, Pong Experience tests, coverage upload, and Workshop repository-source integration all completed successfully. Earlier successful baseline: [run 39148410137](https://github.com/TrentBest/WebPage/actions/runs/39148410137).
+- Current validation for checklist commit [`7b2e5ad`](https://github.com/TrentBest/WebPage/actions/runs/39179017162) is **in progress**. Browser-host restore/build passed; browser-journey smoke test and Workshop source-integration build are running. No conclusion is available yet.
 - Latest observed Azure Static Web Apps workflow: [run 39148410141](https://github.com/TrentBest/WebPage/actions/runs/39148410141) — **skipped**. This is not evidence of a deployment.
 - No package publication or deployment is authorized by this checklist.
 
