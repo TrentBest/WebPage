@@ -576,4 +576,16 @@ public sealed class IncrementalVersionTests
         Assert.Contains("\"version\": \"{{version}}\"", tests);
     }
 
+    [ArchitectureTest(0, 0, 214)] [Fact(DisplayName = "V0.0.214 — Experience_Manifest_JSON_Content_Type_Is_Behaviorally_Validated")]
+    public void V0_0_214ExperienceManifestJsonContentTypeIsBehaviorallyValidated()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WebPageHostManifestTests.cs"));
+
+        Assert.Contains("ManifestSwitchValidatesJsonContentType", tests);
+        Assert.Contains("[InlineData(\\"text/html\\", false)]", tests);
+        Assert.Contains("[InlineData(\\"application/vnd.example+json\\", true)]", tests);
+        Assert.Contains("await service.SwitchManifestAsync(\\"manifest.json\\")", tests);
+    }
+
 }
