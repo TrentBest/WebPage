@@ -1,5 +1,10 @@
 # Brave1 Technical Submission — Modular Runtime Composition
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 > **Status:** submission draft for review. This document describes a working software prototype and its current limitations; it does not claim operational deployment, combat validation, or production readiness.
 
 ## Short pitch

@@ -1,5 +1,10 @@
 # Brave1 Public Demonstration — MVP Readiness
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 ## Purpose
 
 This is the minimum public-facing demonstration intended to accompany a Brave1 intake submission. The goal is not to present the entire Workshop vision as completed. The goal is to give a reviewer a credible, understandable entry point into the technology and direct evidence they can inspect.

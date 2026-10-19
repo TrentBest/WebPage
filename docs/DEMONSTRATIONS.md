@@ -1,5 +1,10 @@
 # Demonstrations — discovery, evidence, and extension
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 The Demonstrations gallery is a WebPage-hosted Experience, not a separate demo site. Its descriptive entries are loaded from the host manifest and resolved through `DemonstrationRegistry`; the existing Home presentation renders the gallery and its detail view inside the current Workshop host.
 
 **Product placement direction:** these entries should become discoverable stations in the Singularity Laboratory, not a competing destination system. The current registry is metadata discovery; it is not yet the Laboratory's spatial station catalogue or a universal executable Experience loader. Preserve its launch modes and evidence, and connect each station to actual MicroBundle composition only when the runtime contract exists. See [Singularity Laboratory Stations](SINGULARITY_LABORATORY_STATIONS.md).
