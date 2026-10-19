@@ -44,7 +44,7 @@ public sealed class ExperienceArtifactUriResolver
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         if (path.StartsWith("/", StringComparison.Ordinal) ||
             path.Contains("://", StringComparison.Ordinal) ||
-            path.Contains('\\\\') ||
+            path.Contains('\\') ||
             path.Contains('?') ||
             path.Contains('#') ||
             path.Contains('%') ||
