@@ -1,5 +1,10 @@
 # WebPageLLM Implementation Handoff — Recording Studio Vertical Slice
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Target repository:** [TrentBest/WebPage](https://github.com/TrentBest/WebPage)  
 **Integration line:** `development` (this handoff branch is based on `development`)  
 **Vision document:** [Singularity City Recording Studios](SINGULARITY_CITY_RECORDING_STUDIOS.md)  
