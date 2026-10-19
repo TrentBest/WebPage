@@ -6,7 +6,9 @@ namespace TheSingularityWorkshop.Workshop.MicroBundles;
 /// <summary>
 /// Composition capability for the Living GUI Experience.
 /// FSM_COS must load the Workshop Moniker before this Experience capability can install.
-/// The actual living organism is then scheduled by the host's FSM_API process groups.
+/// This bundle currently declares composition and provider access only; it does not own
+/// or schedule the living-organism lifecycle. The host's compatibility PageFSM path
+/// still advances that lifecycle until an Experience-owned execution contract exists.
 /// </summary>
 public sealed class LivingGuiExperienceMicroBundle :
     TheSingularityWorkshop.MicroBundleDomain.IMicroBundle,
