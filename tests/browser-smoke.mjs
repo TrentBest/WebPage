@@ -57,7 +57,7 @@ try {
   await observationPanel.getByRole("link", { name: "Browser journey test", exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Living GUI state", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Population", { exact: true }).waitFor({ state: "visible" });
-  await observationPanel.getByText("Observation only — does not imply that the manifest-selected RuntimeAssembly owns lifecycle execution.", { exact: true }).waitFor({ state: "visible" });
+  await observationPanel.getByText("Observation only — composition is not execution. The manifest-selected RuntimeAssembly is assembled, but it does not own the current PageFSM lifecycle.", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Sample 0", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByRole("button", { name: "REFRESH SNAPSHOT", exact: true }).click();
   await observationPanel.getByText("Sample 1", { exact: true }).waitFor({ state: "visible" });
