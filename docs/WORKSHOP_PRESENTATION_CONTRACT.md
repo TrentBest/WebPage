@@ -1,5 +1,10 @@
 # Workshop Presentation Contract
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 This document is the presentation contract for the current manifest-driven WebPage opening.
 
 The browser is the manifestation. FSM_API and FSM_COS remain the runtime authorities.

@@ -1,5 +1,10 @@
 # WebPageLLM — Runtime Host Refactor
 
+![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
+
+> **Evidence class:** architecture illustration, not live runtime telemetry. Follow the subject-specific source, view, fixture, or test below; if none exists, record that gap rather than implying it is implemented.
+
+
 **Branch:** `development`  
 **Status:** host-manifest switching/reset is implemented as an initial slice. The explicit entry scene and illustrative Replay Lab are present on `development`; the Forge return path is implemented, and the browser smoke now preserves the existing first-contact/gateway FSM for both the Forge return and a later direct Welcome navigation; the latest browser-smoke correction now advances through the navigation FSM's progressive destination stages instead of assuming later links are exposed after a fresh session load; CI is pending. Repository-backed Experience artifact loading and Experience-manifest switching remain unimplemented.
 
