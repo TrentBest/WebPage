@@ -10,34 +10,34 @@ The animated lens is an **architecture illustration, not runtime telemetry**. A 
 
 | Document | Shared lens | Next action |
 |---|---|---|
-| [`docs/ARCHITECTURE_AUDIT.md`](ARCHITECTURE_AUDIT.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/BRAVE1_PUBLIC_DEMONSTRATION.md`](BRAVE1_PUBLIC_DEMONSTRATION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/BRAVE1_SUBMISSION.md`](BRAVE1_SUBMISSION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/CURRENT_VERTICAL_SLICE.md`](CURRENT_VERTICAL_SLICE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/DEEP_DIVE_PROVIDER_ARCHITECTURE.md`](DEEP_DIVE_PROVIDER_ARCHITECTURE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/DEMONSTRATIONS.md`](DEMONSTRATIONS.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/DEPENDENCY_WORKFLOW.md`](DEPENDENCY_WORKFLOW.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/DEVELOPMENT_STATUS.md`](DEVELOPMENT_STATUS.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/ARCHITECTURE_AUDIT.md`](ARCHITECTURE_AUDIT.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/BRAVE1_PUBLIC_DEMONSTRATION.md`](BRAVE1_PUBLIC_DEMONSTRATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/BRAVE1_SUBMISSION.md`](BRAVE1_SUBMISSION.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/CURRENT_VERTICAL_SLICE.md`](CURRENT_VERTICAL_SLICE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/DEEP_DIVE_PROVIDER_ARCHITECTURE.md`](DEEP_DIVE_PROVIDER_ARCHITECTURE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/DEMONSTRATIONS.md`](DEMONSTRATIONS.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/DEPENDENCY_WORKFLOW.md`](DEPENDENCY_WORKFLOW.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/DEVELOPMENT_STATUS.md`](DEVELOPMENT_STATUS.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/DIEGETIC_WYSIWYG_AND_LIVING_DOCUMENTATION.md`](DIEGETIC_WYSIWYG_AND_LIVING_DOCUMENTATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
-| [`docs/DIGITEN_ARCHITECTURE.md`](DIGITEN_ARCHITECTURE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/DIGITEN_MODEL.md`](DIGITEN_MODEL.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/DIGITEN_ARCHITECTURE.md`](DIGITEN_ARCHITECTURE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/DIGITEN_MODEL.md`](DIGITEN_MODEL.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/DOCUMENTATION_INDEX.md`](DOCUMENTATION_INDEX.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/DOCUMENTATION_STANDARD.md`](DOCUMENTATION_STANDARD.md) | Embedded | Shared lens present; subject-specific view audit remains |
-| [`docs/ECOSYSTEM_DEPENDENCY_MATRIX.md`](ECOSYSTEM_DEPENDENCY_MATRIX.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/EXPERIENCE_CATALOG.md`](EXPERIENCE_CATALOG.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/EXPERIENCE_EXTRACTION_MAP.md`](EXPERIENCE_EXTRACTION_MAP.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/EXPERIENCE_THEORY.md`](EXPERIENCE_THEORY.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/FSM_COS_USAGE.md`](FSM_COS_USAGE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/HANDOFF.md`](HANDOFF.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/HOST_BOUNDARY_MIGRATION.md`](HOST_BOUNDARY_MIGRATION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/LEARNING_PATH.md`](LEARNING_PATH.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/MICROBUNDLE_ARBITRATION_MAP.md`](MICROBUNDLE_ARBITRATION_MAP.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/ECOSYSTEM_DEPENDENCY_MATRIX.md`](ECOSYSTEM_DEPENDENCY_MATRIX.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/EXPERIENCE_CATALOG.md`](EXPERIENCE_CATALOG.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/EXPERIENCE_EXTRACTION_MAP.md`](EXPERIENCE_EXTRACTION_MAP.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/EXPERIENCE_THEORY.md`](EXPERIENCE_THEORY.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/FSM_COS_USAGE.md`](FSM_COS_USAGE.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/FUNCTIONALITY_PRESERVATION.md`](FUNCTIONALITY_PRESERVATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/HANDOFF.md`](HANDOFF.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/HOST_BOUNDARY_MIGRATION.md`](HOST_BOUNDARY_MIGRATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/LEARNING_PATH.md`](LEARNING_PATH.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/MICROBUNDLE_ARBITRATION_MAP.md`](MICROBUNDLE_ARBITRATION_MAP.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/OPERATION_SITH_BRANCH_DISPOSITION.md`](OPERATION_SITH_BRANCH_DISPOSITION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/PACKAGE_ECOSYSTEM.md`](PACKAGE_ECOSYSTEM.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/PLAN_VIEW_VBIMB.md`](PLAN_VIEW_VBIMB.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/PROVING_GROUND_MIGRATION.md`](PROVING_GROUND_MIGRATION.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
-| [`docs/PUBLIC_WORKSHOP_TABS.md`](PUBLIC_WORKSHOP_TABS.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
+| [`docs/PACKAGE_ECOSYSTEM.md`](PACKAGE_ECOSYSTEM.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/PLAN_VIEW_VBIMB.md`](PLAN_VIEW_VBIMB.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/PROVING_GROUND_MIGRATION.md`](PROVING_GROUND_MIGRATION.md) | Embedded | Shared lens present; subject-specific view audit remains |
+| [`docs/PUBLIC_WORKSHOP_TABS.md`](PUBLIC_WORKSHOP_TABS.md) | Embedded | Shared lens present; subject-specific view audit remains |
 | [`docs/REPOSITORY_MAP.md`](REPOSITORY_MAP.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/SINGULARITY_CITY_EXPERIENCE.md`](SINGULARITY_CITY_EXPERIENCE.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
 | [`docs/SINGULARITY_CITY_LIVING_WORLD.md`](SINGULARITY_CITY_LIVING_WORLD.md) | Pending | Add shared lens; audit subject-specific view and evidence labels |
