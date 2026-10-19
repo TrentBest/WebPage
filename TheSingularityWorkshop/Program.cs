@@ -27,7 +27,18 @@ internal class Program
         builder.Services.AddScoped<FSMManagerService>();
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<BlazorFSMIntegration>();
-        builder.Services.AddScoped<WorkshopExperienceService>();
+        // Optional public, read-only artifact origin. Configure only a base URI here;
+        // never place storage account keys or write-capable SAS tokens in browser config.
+        var experienceArtifactBaseUriValue = builder.Configuration["ExperienceArtifacts:BaseUri"];
+        Uri? experienceArtifactBaseUri = string.IsNullOrWhiteSpace(experienceArtifactBaseUriValue)
+            ? null
+            : new Uri(experienceArtifactBaseUriValue, UriKind.Absolute);
+        builder.Services.AddScoped(sp => new WorkshopExperienceService(
+            sp.GetRequiredService<HttpClient>(),
+            sp.GetRequiredService<HubRuntime>(),
+            sp.GetRequiredService<FSMManagerService>(),
+            sp.GetRequiredService<WorkshopExperienceCatalog>(),
+            experienceArtifactBaseUri));
         builder.Services.AddSingleton<WorkshopExperienceCatalog>();
         builder.Services.AddSingleton<WorkshopCompositionCatalog>();
         builder.Services.AddSingleton<WorkshopDeepDiveCatalog>();
