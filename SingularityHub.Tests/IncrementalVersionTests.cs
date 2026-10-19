@@ -566,4 +566,14 @@ public sealed class IncrementalVersionTests
         Assert.Contains("ManifestParserRejectsUnsupportedSchemaVersions", tests);
         Assert.Contains("[InlineData(\"2.0.0\")]", tests);
     }
+    [ArchitectureTest(0, 0, 213)] [Fact(DisplayName = "V0.0.213 — Schema_Version_Test_Fixture_Uses_Valid_Raw_String_Interpolation")]
+    public void V0_0_213SchemaVersionTestFixtureUsesValidRawStringInterpolation()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var tests = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WebPageHostManifestTests.cs"));
+
+        Assert.Contains('var json = $"""', tests);
+        Assert.Contains('"version": "{{version}}"', tests);
+    }
+
 }
