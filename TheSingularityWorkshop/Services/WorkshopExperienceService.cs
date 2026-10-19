@@ -369,6 +369,15 @@ public sealed class WorkshopExperienceService : IDisposable
             cancellationToken);
         response.EnsureSuccessStatusCode();
 
+        var mediaType = response.Content.Headers.ContentType?.MediaType;
+        if (mediaType is null ||
+            (!string.Equals(mediaType, "application/json", StringComparison.OrdinalIgnoreCase) &&
+             !mediaType.EndsWith("+json", StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidDataException(
+                $"Experience manifest must use a JSON content type; received '{mediaType ?? "missing"}'.");
+        }
+
         if (response.Content.Headers.ContentLength is > MaxManifestBytes)
             throw new InvalidDataException($"Experience manifest exceeds the {MaxManifestBytes}-byte limit.");
 
