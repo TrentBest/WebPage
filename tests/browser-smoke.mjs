@@ -44,16 +44,6 @@ try {
   await observationToggle.click();
   await page.getByRole("button", { name: "CLOSE RUNTIME OBSERVATION", exact: true }).waitFor({ state: "visible" });
   const observationPanel = page.getByRole("complementary", { name: "Live runtime observation snapshot" });
-  console.log("Runtime observation visibility diagnostic:", JSON.stringify(await page.locator("#runtime-observation-panel").evaluate(el => {
-    const chain = [];
-    for (let node = el; node; node = node.parentElement) {
-      const style = getComputedStyle(node);
-      const rect = node.getBoundingClientRect();
-      chain.push({ tag: node.tagName, id: node.id, className: typeof node.className === "string" ? node.className : "", display: style.display, visibility: style.visibility, opacity: style.opacity, width: rect.width, height: rect.height });
-    }
-    return { expanded: document.querySelector(".runtime-observation-toggle")?.getAttribute("aria-expanded"), chain };
-  })));
-  await observationPanel.waitFor({ state: "visible" });
   await observationPanel.getByText("Page state", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Living GUI state", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Population", { exact: true }).waitFor({ state: "visible" });
