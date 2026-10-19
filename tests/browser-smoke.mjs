@@ -44,15 +44,13 @@ try {
   await observationToggle.click();
   await page.getByRole("button", { name: "CLOSE RUNTIME OBSERVATION", exact: true }).waitFor({ state: "visible" });
   const observationPanel = page.getByRole("complementary", { name: "Live runtime observation snapshot" });
-  console.log("Runtime observation visibility diagnostic:", JSON.stringify(await page.locator("#runtime-observation-panel").evaluate(el => {
-    const chain = [];
-    for (let node = el; node; node = node.parentElement) {
-      const style = getComputedStyle(node);
-      const rect = node.getBoundingClientRect();
-      chain.push({ tag: node.tagName, id: node.id, className: typeof node.className === "string" ? node.className : "", display: style.display, visibility: style.visibility, opacity: style.opacity, width: rect.width, height: rect.height });
-    }
-    return { expanded: document.querySelector(".runtime-observation-toggle")?.getAttribute("aria-expanded"), chain };
-  })));
+  console.log("Runtime observation visibility diagnostic:", JSON.stringify(await page.evaluate(() => ({
+    toggles: [...document.querySelectorAll(".runtime-observation-toggle")].map(el => ({ text: el.textContent?.trim(), expanded: el.getAttribute("aria-expanded"), visible: !!el.getClientRects().length })),
+    panels: [...document.querySelectorAll("#runtime-observation-panel")].map(el => ({
+      style: { display: getComputedStyle(el).display, visibility: getComputedStyle(el).visibility, opacity: getComputedStyle(el).opacity, rect: (() => { const r = el.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; })() },
+      content: [...el.querySelectorAll("dl,dt,dd,button,span")].map(node => { const c = getComputedStyle(node); const r = node.getBoundingClientRect(); return { tag: node.tagName, text: node.textContent?.trim(), display: c.display, visibility: c.visibility, opacity: c.opacity, rect: { x: r.x, y: r.y, width: r.width, height: r.height } }; })
+    }))
+  }))));
   await observationPanel.getByText("Page state", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Living GUI state", { exact: true }).waitFor({ state: "visible" });
   await observationPanel.getByText("Population", { exact: true }).waitFor({ state: "visible" });
