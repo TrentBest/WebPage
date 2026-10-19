@@ -9,8 +9,8 @@ This is the active release ledger for the browser host. A green build is necessa
 ## Current baseline
 
 - **Integration branch:** `development`.
-- **Latest audited commit:** [`009977c`](https://github.com/TrentBest/WebPage/commit/009977c5001f0b23d2adde431bed04d324e3b3d9) on `development`.
-- **Latest .NET CI:** [run 39184215967](https://github.com/TrentBest/WebPage/actions/runs/39184215967) — **success** on that exact commit. Both the test job and Workshop repository-source integration job passed, including WebPage restore/build, browser journey smoke coverage, SingularityHub and Living GUI tests, Renderer source smoke test, and city-rendering proof screenshot.
+- **Latest audited commit:** [`4f56ba5`](https://github.com/TrentBest/WebPage/commit/4f56ba5312bb516e239324fb2c8a65344211684a) on `development`.
+- **Latest .NET CI:** [run 39185455518](https://github.com/TrentBest/WebPage/actions/runs/39185455518) — **success** on that exact commit. Both the test job and Workshop repository-source integration job passed, including WebPage restore/build, the browser journey smoke test, SingularityHub and Living GUI tests, Renderer source smoke test, and city-rendering proof screenshot.
 - **Azure Static Web Apps:** the previously inspected run [39183749042](https://github.com/TrentBest/WebPage/actions/runs/39183749042) was **skipped**. No deployment is claimed.
 - **Documentation rollout:** the shared lens is embedded in all 88 indexed Markdown documents under `docs/`; this is not the same as completing each subject-specific visual/evidence audit. See [coverage ledger](LIVING_GUI_COVERAGE.md).
 - **Branch hygiene:** `development`, `master`, and an extra `fix/restore-founder-entry-sequence` branch currently exist. The extra branch is a release-hygiene item; it has not been deleted here.
@@ -18,7 +18,7 @@ This is the active release ledger for the browser host. A green build is necessa
 
 ## Release readiness
 
-**Estimated release readiness: 65%.** This is an engineering estimate, not a test pass rate. It has moved from 60% because the latest audited commit now has a completed green .NET CI run, the source-integration/Renderer smoke evidence is confirmed, and the architecture/theory pages have a source-backed evidence map. Documentation coverage is also no longer waiting for the shared lens rollout.
+**Estimated release readiness: 65%.** This is an engineering estimate, not a test pass rate. It remains at 65%: the latest code commit now has a completed green .NET CI run, including the browser-host journey and Workshop source-integration/Renderer smoke evidence. The new immutable `PageFSM.RuntimeObservation` snapshot API is covered by a regression test and exposes authoritative point-in-time lifecycle signals, but it is not yet surfaced as a visitor-facing living diagnostic view and does not transfer lifecycle execution ownership to the manifest-selected runtime.
 
 Why it is **not** higher yet:
 - The manifest-selected `RuntimeAssembly` proves composition and dependency closure, but does **not** own or activate the primary Experience lifecycle.
@@ -72,7 +72,7 @@ Tracking: [living GUI coverage ledger](LIVING_GUI_COVERAGE.md), [architecture au
 - [x] Latest observed .NET CI run is successful on commit `009977c`.
 - [x] Test job and Workshop repository-source integration passed on that commit, including browser journey smoke, Living GUI tests, and Renderer source smoke.
 - [x] Previously inspected Azure workflow outcome was skipped, not deployed; no deployment is claimed.
-- [ ] After the next code change, verify the new commit's .NET tests and relevant browser smoke test.
+- [x] Verify the new runtime-observation API on commit `4f56ba5`: [CI run 39185455518](https://github.com/TrentBest/WebPage/actions/runs/39185455518) passed both jobs, including the browser-host journey, Living GUI tests, and Renderer source smoke.
 - [ ] Reconcile branch hygiene with the repository's master/development-only policy; an extra fix branch currently exists.
 - [ ] Confirm release versioning, package/workflow gates, and public-facing documentation on the final candidate.
 - [ ] Explicit human approval before publishing packages, creating a release, or deploying.
@@ -81,7 +81,7 @@ Tracking: [living GUI coverage ledger](LIVING_GUI_COVERAGE.md), [architecture au
 
 1. **Define the host contract** for startup, FSM_API scheduling, lifecycle ownership, and observable state. Check for an existing reusable runtime in the consuming packages before designing a WebPage-only abstraction.
 2. **Connect the manifest-selected assembly to the contract** with explicit failure behavior; composition success must not silently masquerade as execution success.
-3. **Bridge the browser presentation to authoritative state** and expose a small runtime-backed evidence view with manifest/version, selected Experience, composition/execution status, active lifecycle state, population/phase, and source/test links.
+3. **Bridge the browser presentation to authoritative state** and expose a small runtime-backed evidence view with manifest/version, selected Experience, composition/execution status, active lifecycle state, population/phase, and source/test links. The immutable `FSM.Observation` snapshot API now exists and is regression-tested; the visible evidence view remains open.
 4. **Add regression proof** for startup → Moniker → Living GUI → population/reproduction/gravity/navigation, retaining the current implementation until behavioral parity is demonstrated.
 5. **Run the full CI/browser checks**, review responsive layout, then reconcile docs and release workflow safeguards.
 
