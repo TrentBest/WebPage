@@ -490,7 +490,7 @@ public sealed class IncrementalVersionTests
         Assert.Contains("UriSchemeHttps", resolver);
         Assert.Contains("experienceArtifactBaseUri", service);
         Assert.Contains("ExperienceArtifacts:BaseUri", program);
-        Assert.Contains("ReadManifestJsonAsync(manifestUri)", service);
+        Assert.Contains("ReadManifestJsonAsync(manifestUri, cancellationToken)", service);
         Assert.Contains("GetAsync(", service);
         Assert.Contains("ResponseHeadersRead", service);
         Assert.Contains("RejectsUnsafeManifestPaths", tests);
@@ -508,7 +508,7 @@ public sealed class IncrementalVersionTests
 
         Assert.Contains("ExperienceArtifacts:ManifestPath", program);
         Assert.Contains("initialManifestPath", service);
-        Assert.Contains("SwitchManifestAsync(_initialManifestPath)", service);
+        Assert.Contains("SwitchManifestAsync(_initialManifestPath, cancellationToken)", service);
         Assert.Contains("ExperienceArtifacts:ManifestPath", docs);
         Assert.Contains("DefaultManifestPath", service);
     }
@@ -600,4 +600,15 @@ public sealed class IncrementalVersionTests
         Assert.Contains("ThrowsAnyAsync<OperationCanceledException>", tests);
     }
 
+
+    [ArchitectureTest(0, 0, 216)] [Fact(DisplayName = "V0.0.216 — JSON_Content_Type_Test_Fixtures_Declare_Application_Json")]
+    public void V0_0_216JsonContentTypeTestFixturesDeclareApplicationJson()
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var moniker = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "MonikerExperienceTests.cs"));
+        var composition = File.ReadAllText(Path.Combine(root, "SingularityHub.Tests", "WorkshopCompositionTests.cs"));
+
+        Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \\"application/json\\")", moniker);
+        Assert.Contains("new StringContent(manifest, System.Text.Encoding.UTF8, \\"application/json\\")", composition);
+    }
 }
