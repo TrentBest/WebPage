@@ -111,21 +111,119 @@
 @@media(max-width:600px){.entry-monolith-btn{width:92%;height:38vh;min-height:190px}.entry-warning{width:96%;padding:.7rem}.entry-warning-header{letter-spacing:.04em}}
 @@media(prefers-reduced-motion:reduce){.entry-monolith-btn{transition:none}}
 
+.runtime-observation-toggle{position:fixed;right:1rem;bottom:1rem;z-index:60;padding:.7rem .9rem;border:1px solid rgba(0,234,255,.55);border-radius:.25rem;background:rgba(2,7,17,.94);color:#c9faff;font:800 .65rem Consolas,'Courier New',monospace;letter-spacing:.08em;cursor:pointer;box-shadow:0 0 20px rgba(0,234,255,.08)}
+.runtime-observation-toggle:hover,.runtime-observation-toggle:focus-visible{border-color:#ff2cff;color:#fff;outline-offset:3px}
+.runtime-observation-panel{position:fixed;right:1rem;bottom:4.3rem;z-index:60;width:min(27rem,calc(100vw - 2rem));max-height:min(72vh,38rem);overflow:auto;box-sizing:border-box;padding:1rem;border:1px solid rgba(0,234,255,.4);background:rgba(2,7,17,.97);color:#e8f4f8;box-shadow:0 15px 60px rgba(0,0,0,.55);font: .75rem/1.5 Consolas,'Courier New',monospace;backdrop-filter:blur(14px)}
+.runtime-observation-panel h2{margin:0 0 .35rem;font-size:.9rem;letter-spacing:.08em}
+.runtime-observation-panel p{margin:.3rem 0;color:#9bb5c2}
+.runtime-observation-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.35rem .8rem;margin-top:.8rem}
+.runtime-observation-grid dt{color:#9bb5c2;overflow-wrap:anywhere}
+.runtime-observation-grid dd{margin:0;color:#fff;text-align:right;overflow-wrap:anywhere}
+.runtime-observation-actions{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.8rem}
+.runtime-observation-actions button{padding:.5rem .65rem;border:1px solid rgba(255,44,255,.4);background:transparent;color:#fff;font:inherit;cursor:pointer}
+.runtime-observation-source{margin-top:.8rem!important;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.1);font-size:.65rem}
+@media(prefers-reduced-motion:reduce){.runtime-observation-toggle{transition:none}}
+
+
 </style>
 
 @code {
+    private bool _runtimeDiagnosticsOpen;
+    private int _runtimeObservationRefresh;
     private bool firstRender;
     private bool _entryRequested;
     private bool _explicitHubRouteRequested;
     private string _selectedHubTab = "MONIKER";
     private string? _selectedDemonstrationId;
 
+    private RenderFragment BuildRuntimeObservationPanel() => builder =>
+    {
+        // This panel reads the canonical FSM observation snapshot. It is deliberately
+        // user-refreshable rather than subscribing to every heartbeat/population tick.
+        var observation = FSM.Observation;
+        builder.OpenElement(0, "button");
+        builder.AddAttribute(1, "type", "button");
+        builder.AddAttribute(2, "class", "runtime-observation-toggle");
+        builder.AddAttribute(3, "aria-expanded", _runtimeDiagnosticsOpen.ToString().ToLowerInvariant());
+        builder.AddAttribute(4, "aria-controls", "runtime-observation-panel");
+        builder.AddAttribute(5, "onclick", EventCallback.Factory.Create(this, () => _runtimeDiagnosticsOpen = !_runtimeDiagnosticsOpen));
+        builder.AddContent(6, _runtimeDiagnosticsOpen ? "CLOSE RUNTIME OBSERVATION" : "RUNTIME OBSERVATION");
+        builder.CloseElement();
+
+        if (!_runtimeDiagnosticsOpen)
+            return;
+
+        builder.OpenElement(7, "aside");
+        builder.AddAttribute(8, "id", "runtime-observation-panel");
+        builder.AddAttribute(9, "class", "runtime-observation-panel");
+        builder.AddAttribute(10, "aria-label", "Live runtime observation snapshot");
+        builder.OpenElement(11, "h2");
+        builder.AddContent(12, "RUNTIME OBSERVATION");
+        builder.CloseElement();
+        builder.OpenElement(13, "p");
+        builder.AddContent(14, "Point-in-time snapshot from the active PageFSM; refresh to sample again.");
+        builder.CloseElement();
+        builder.OpenElement(15, "dl");
+        builder.AddAttribute(16, "class", "runtime-observation-grid");
+        AddObservationRow(builder, 17, "Page state", observation.PageState);
+        AddObservationRow(builder, 20, "Living GUI state", observation.LivingGuiState);
+        AddObservationRow(builder, 23, "Active phase", observation.LivingGuiActivePhase);
+        AddObservationRow(builder, 26, "Total ticks", observation.TotalTicks.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        AddObservationRow(builder, 29, "State ticks", observation.StateTicks.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        AddObservationRow(builder, 32, "Population", observation.PopulationCount.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        AddObservationRow(builder, 35, "Available slots", observation.AvailablePopulationSlots.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        AddObservationRow(builder, 38, "Page FSM valid", FormatObservationFlag(observation.PageFsmIsValid));
+        AddObservationRow(builder, 41, "Living GUI valid", FormatObservationFlag(observation.LivingGuiIsValid));
+        AddObservationRow(builder, 44, "Living GUI frozen", FormatObservationFlag(observation.LivingGuiFrozen));
+        AddObservationRow(builder, 47, "Entry requested", FormatObservationFlag(observation.EnterRequested));
+        AddObservationRow(builder, 50, "GUI populated", FormatObservationFlag(observation.LivingGuiPopulated));
+        AddObservationRow(builder, 53, "Moniker ready", FormatObservationFlag(observation.MonikerReady));
+        AddObservationRow(builder, 56, "Gravity released", FormatObservationFlag(observation.GravityReleased));
+        AddObservationRow(builder, 59, "GUI fallen", FormatObservationFlag(observation.LivingGuiFallen));
+        AddObservationRow(builder, 62, "Navigation ready", FormatObservationFlag(observation.NavigationReady));
+        builder.CloseElement();
+        builder.OpenElement(65, "div");
+        builder.AddAttribute(66, "class", "runtime-observation-actions");
+        builder.OpenElement(67, "button");
+        builder.AddAttribute(68, "type", "button");
+        builder.AddAttribute(69, "onclick", EventCallback.Factory.Create(this, RefreshRuntimeObservation));
+        builder.AddContent(70, "REFRESH SNAPSHOT");
+        builder.CloseElement();
+        builder.OpenElement(71, "span");
+        builder.AddContent(72, $"Sample {_runtimeObservationRefresh}");
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.OpenElement(73, "p");
+        builder.AddAttribute(74, "class", "runtime-observation-source");
+        builder.AddContent(75, "Observation only — does not imply that the manifest-selected RuntimeAssembly owns lifecycle execution.");
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private static void AddObservationRow(RenderTreeBuilder builder, int sequence, string label, string value)
+    {
+        builder.OpenElement(sequence, "dt");
+        builder.AddContent(sequence + 1, label);
+        builder.CloseElement();
+        builder.OpenElement(sequence + 2, "dd");
+        builder.AddContent(sequence + 3, value);
+        builder.CloseElement();
+    }
+
+    private static string FormatObservationFlag(bool value) => value ? "YES" : "NO";
+
+    private void RefreshRuntimeObservation() => _runtimeObservationRefresh++;
+
     private RenderFragment BuildRootGui()
     {
         return WorkshopGui.Panel(this)
             .Class("workshop-root").Style("position","absolute").Style("inset","0").Style("width","100%").Style("height","100%")
             .Style("min-height","0").Style("overflow","hidden").Style("background","#020711").Style("color","#fff")
-            .Style("font-family","Consolas,'Courier New',monospace").Child(BuildExperienceContent()).Build();
+            .Style("font-family","Consolas,'Courier New',monospace").Child(builder =>
+            {
+                builder.AddContent(0, BuildExperienceContent());
+                builder.AddContent(1, BuildRuntimeObservationPanel());
+            }).Build();
     }
 
     private RenderFragment BuildExperienceContent() => builder =>
