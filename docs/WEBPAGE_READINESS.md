@@ -89,7 +89,7 @@ Tracking: [living GUI coverage ledger](LIVING_GUI_COVERAGE.md), [architecture au
 
 1. [x] **Define the host seam.** `IExperienceExecutionRuntime` now exposes lifecycle actions, ticking, owner identity, and immutable observation; the current implementation remains a clearly named compatibility adapter.
 2. [x] **Bind the selected Experience.** The manifest-selected assembly is validated for required MicroBundle IDs and the adapter is activated with the manifest; failed candidate composition/binding must leave the prior active runtime intact.
-3. [x] **Expose evidence in the living GUI.** The on-demand observation panel reports manifest identity, composition, selected Experience, adapter ownership/binding, lifecycle state, population/phase, and source/test links. Browser smoke verifies opening, refresh, closing, and mobile fit.
+3. [x] **Expose evidence in the living GUI.** The on-demand observation panel reports manifest identity, composition, selected Experience, adapter ownership/binding, lifecycle state, population/phase, and source/test links. Automated browser smoke verifies opening, refresh, and closing; its mobile-fit assertion is not a substitute for the outstanding desktop/tablet/mobile visual review.
 4. **Transfer lifecycle ownership and prove parity.** Replace the compatibility adapter's delegated `PageFSM` tick with an Experience-owned runtime contract and regression-test startup → Moniker → Living GUI → population/reproduction/gravity/navigation before removing the transitional path.
 5. **Finish visitor and release review.** Complete desktop/tablet/mobile visual review, subject-specific living-documentation evidence audits, branch hygiene, and release-workflow safeguards. Run final CI on the final code candidate.
 
