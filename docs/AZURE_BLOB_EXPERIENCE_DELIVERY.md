@@ -85,12 +85,12 @@ For generated SVG, keep a reproducible generator and source fixture in the repos
 
 ## Implemented source seam
 
-The browser host reads the optional public base URI from `ExperienceArtifacts:BaseUri` in standard .NET configuration (for example, `https://example.blob.core.windows.net/public-experiences/`). Leaving the setting absent preserves the local same-origin behavior. Because this configuration is delivered to the browser, it must contain only a public endpoint—not account keys, write-capable SAS tokens, or other secrets.
+The browser host reads the optional public base URI from `ExperienceArtifacts:BaseUri` in standard .NET configuration (for example, `https://example.blob.core.windows.net/public-experiences/`) and the optional relative startup manifest path from `ExperienceArtifacts:ManifestPath` (for example, `experiences/singularity-city/1.0.0/manifest.json`). The base URI chooses the origin/prefix; the manifest path chooses the artifact beneath it. Leaving either setting absent preserves the existing local default path behavior. Because this configuration is delivered to the browser, it must contain only a public endpoint—not account keys, write-capable SAS tokens, or other secrets.
 
 
 `WorkshopExperienceService` now accepts an optional `experienceArtifactBaseUri`. When omitted, the existing relative manifest path continues to resolve through the application's configured `HttpClient` base address. When supplied, the base must be an absolute HTTPS URI with no embedded credentials, query, or fragment; relative manifest paths are resolved under that base. The resolver rejects absolute URLs, traversal segments, encoded path segments, backslashes, empty path segments, queries, and fragments.
 
-This is the first source seam, not proof of a deployed Azure integration. The host still needs a real configured Blob endpoint, container access/CORS settings, and a successful browser test against an actual versioned Experience manifest. It resolves manifest JSON only; MicroBundle execution remains restricted to the registered in-process catalog.
+This is the first source seam, not proof of a deployed Azure integration. The host still needs a real configured Blob endpoint, both `ExperienceArtifacts:BaseUri` and `ExperienceArtifacts:ManifestPath` configured for that artifact, container access/CORS settings, and a successful browser test against an actual versioned Experience manifest. It resolves manifest JSON only; MicroBundle execution remains restricted to the registered in-process catalog.
 
 ## Current implementation checkpoint
 
