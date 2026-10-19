@@ -36,10 +36,13 @@ public sealed class FirstContactPlantTests
         """;
 
         using var httpClient = new HttpClient(new ManifestHandler(manifestJson)) { BaseAddress = new Uri("https://test.local/") };
+        var hubKernel = new TheSingularityWorkshop.SingularityHub.SingularityHub();
+        using var executionHost = new FSMManagerService(hubKernel);
         using var experience = new WorkshopExperienceService(
             httpClient,
-            new TheSingularityWorkshop.Infrastructure.Hub.HubRuntime(
-                new TheSingularityWorkshop.SingularityHub.SingularityHub()));
+            new TheSingularityWorkshop.Infrastructure.Hub.HubRuntime(hubKernel),
+            executionHost,
+            new TheSingularityWorkshop.Workshop.Composition.WorkshopExperienceCatalog());
 
         await experience.InitializeAsync();
 
