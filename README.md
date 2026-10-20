@@ -16,6 +16,8 @@
 
 > **The page opens the door. The Experience gives you somewhere to stand. The machinery lets you look underneath it.**
 
+**[Gallery](docs/GALLERY.md)** — Singularity Universe, Singularity City, and their deeper implementation guides
+
 WebPage is the browser host, public learning surface, and proving ground for [The Singularity Workshop](https://github.com/TrentBest). It lets people witness Workshop behavior in a browser, then follow the evidence into the code and theory.
 
 ```mermaid
