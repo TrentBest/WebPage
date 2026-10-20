@@ -2,7 +2,11 @@
 
 **WebPage is the public browser host and proving ground. The Experience is the place to stand; the Gallery is the map into its implementation.**
 
-This gallery intentionally links visible Experiences to focused documents. It should eventually show screenshots or SVGs captured from the actual WebPage experience where useful, while keeping architecture diagrams labeled as explanatory rather than live runtime output.
+This gallery intentionally links visible Experiences to focused documents. The current opening image is the actual checked-in WebPage orientation SVG; it is not a live capture of Singularity City. Add City visuals when they can be captured from the real browser Experience or generated from its authoritative scene data.
+
+![WebPage opening journey](assets/webpage-opening-journey.svg)
+
+![Living GUI documentation lens](assets/living-gui-documentation-lens.svg)
 
 ## 01 — Singularity Universe
 
