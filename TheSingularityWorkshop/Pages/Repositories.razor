@@ -1,0 +1,89 @@
+@page "/repositories"
+<PageTitle>Repositories // The Singularity Workshop</PageTitle>
+
+<section class="catalog">
+    <header class="catalog__header">
+        <p class="catalog__eyebrow">THE WORKSHOP // SOURCE MAP</p>
+        <h1>Repositories</h1>
+        <p>The source of truth for each Workshop capability. Start with the repository that owns the behavior, then follow its package and documentation links.</p>
+    </header>
+
+    <div class="catalog__grid">
+        <article class="catalog__card">
+            <span class="catalog__kind">CORE RUNTIME</span>
+            <h2>FSM_API</h2>
+            <p>Engine-agnostic finite-state-machine runtime and state behavior.</p>
+            <a href="https://github.com/TrentBest/FSM_API">Source repository ↗</a>
+            <a href="https://www.nuget.org/packages/TheSingularityWorkshop.FSM_API">NuGet package ↗</a>
+        </article>
+        <article class="catalog__card">
+            <span class="catalog__kind">COMPOSITION</span>
+            <h2>FSM_COS</h2>
+            <p>Composition and runtime assembly across reusable Workshop capabilities.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS">Source repository ↗</a>
+        </article>
+        <article class="catalog__card">
+            <span class="catalog__kind">SERIALIZATION</span>
+            <h2>FSM_Serialization</h2>
+            <p>Serialization and representation boundaries for Workshop data.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization">Source repository ↗</a>
+        </article>
+        <article class="catalog__card">
+            <span class="catalog__kind">AI INTEROPERABILITY</span>
+            <h2>ProtocolAi</h2>
+            <p>Integer-backed protocol vocabularies and deterministic payloads.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.ProtocolAi">Source repository ↗</a>
+            <a href="https://www.nuget.org/packages/TheSingularityWorkshop.ProtocolAi">NuGet package ↗</a>
+        </article>
+        <article class="catalog__card">
+            <span class="catalog__kind">AI STRUCTURE</span>
+            <h2>GrammarAi</h2>
+            <p>Integer-backed grammar definitions that connect protocol symbols.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.GrammarAi">Source repository ↗</a>
+            <a href="https://www.nuget.org/packages/TheSingularityWorkshop.GrammarAi">NuGet package ↗</a>
+        </article>
+        <article class="catalog__card">
+            <span class="catalog__kind">AI TRANSPORT</span>
+            <h2>HeadlessAi</h2>
+            <p>Headless provider adapters with explicit host-owned security and execution policy.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.HeadlessAi">Source repository ↗</a>
+            <a href="https://www.nuget.org/packages/TheSingularityWorkshop.HeadlessAi">NuGet package ↗</a>
+        </article>
+        <article class="catalog__card">
+            <span class="catalog__kind">VISUALIZATION</span>
+            <h2>Visualize</h2>
+            <p>Visual-world and visualization tooling used to explain and demonstrate Workshop systems.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.Visualize">Source repository ↗</a>
+        </article>
+        <article class="catalog__card">
+            <span class="catalog__kind">SVG INTERFACE</span>
+            <h2>GUI</h2>
+            <p>GUI tooling and SVG manifestations for living, inspectable documentation.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.GUI">Source repository ↗</a>
+        </article>
+        <article class="catalog__card">
+            <span class="catalog__kind">WEB HOST</span>
+            <h2>WebPage</h2>
+            <p>This browser-facing Workshop host and its living proving ground.</p>
+            <a href="https://github.com/TrentBest/WebPage">Source repository ↗</a>
+        </article>
+        <article class="catalog__card">
+            <span class="catalog__kind">CAPABILITY LIBRARY</span>
+            <h2>Experiences</h2>
+            <p>Existing MicroBundles and reusable Experiences. Reuse these before inventing another implementation.</p>
+            <a href="https://github.com/TrentBest/WebPage/tree/development/Experiences">Experiences source tree ↗</a>
+        </article>
+    </div>
+
+    <p class="catalog__note">This is the curated starting map, not an assertion that every Workshop repository is listed. The catalog should grow from verified repository metadata rather than manually guessed links.</p>
+    <nav class="catalog__crosslinks" aria-label="Related catalogs">
+        <a href="/packages">Browse NuGet packages →</a>
+        <a href="/">Return to the Workshop →</a>
+    </nav>
+</section>
+
+<style>
+.catalog{max-width:1200px;margin:0 auto;padding:clamp(1rem,4vw,3rem);color:#e7f2fb;background:radial-gradient(ellipse at 50% 0,rgba(0,234,255,.07),transparent 45%),#030812;min-height:100%}
+.catalog__header{max-width:780px;margin:0 auto 2rem}.catalog__eyebrow,.catalog__kind{font:700 .7rem Consolas,monospace;letter-spacing:.16em;color:#00eaff}.catalog__header h1{font-size:clamp(2.5rem,7vw,5rem);line-height:1;margin:.5rem 0 1rem;color:white}.catalog__header p:last-child{line-height:1.7;color:#a6bacb}
+.catalog__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:1rem}.catalog__card{display:flex;flex-direction:column;align-items:flex-start;gap:.65rem;padding:1.25rem;background:rgba(5,15,29,.92);border:1px solid rgba(0,234,255,.2);min-height:205px}.catalog__card h2{font-size:1.45rem;color:white;margin:0}.catalog__card p{color:#a6bacb;line-height:1.6;margin:0 0 .4rem;flex:1}.catalog a{color:#69dfff;text-underline-offset:.2em}.catalog a:hover{color:#ff8df5}.catalog__note{margin:1.5rem 0;color:#9db0c2;font-size:.9rem;line-height:1.6}.catalog__crosslinks{display:flex;flex-wrap:wrap;gap:1.2rem;border-top:1px solid rgba(0,234,255,.2);padding-top:1.2rem}
+</style>
