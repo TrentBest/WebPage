@@ -139,6 +139,8 @@ Choose the guide that answers your question; the README stays an orientation and
 - [**Singularity Studios / Sound & Acoustics**](docs/integrations/SINGULARITY_STUDIOS_SFX_WEBPAGELLM.md) — creator-studio integration brief, audio provenance, and evidence-backed physical acoustics.
 - [**Visualize Stress Campaign**](docs/integrations/VisualizeLLM.md) — geometry-to-GPU workload, visualization invariants and Visualize LLM handoff.
 - [**Documentation Index**](docs/DOCUMENTATION_INDEX.md) — the broader guide catalogue.
+- [**Repository Catalog**](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Pages/Repositories.razor) — source repositories grouped by capability.
+- [**NuGet Package Catalog**](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Pages/Packages.razor) — package links and explicit release-status boundaries.
 - [**Documentation Standard**](docs/DOCUMENTATION_STANDARD.md) — how WebPage applies the shared Workshop documentation rules.
 
 Canonical external documentation: [FSM_COS](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS), [FSM_API](https://github.com/TrentBest/FSM_API), and [MicroBundleDomain](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain).
