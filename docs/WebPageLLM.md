@@ -113,3 +113,15 @@ Separately, `Workshop.MicroBundles.MicroBundle` is a Hub-level lifecycle shell i
 **Next proof:** instrument the callback and failure diagnostics to record browser page errors, whether the JS interop completed, and the actual PageFSM state after the click. Verify a persistence/interoperability error cannot strand entry before the FSM request, without bypassing the entry FSM. Add a focused regression proof for direct Economy entry, then update the status here only after CI passes. Do not relax the iframe assertion or extend its timeout as a substitute for fixing lifecycle behavior.
 
 **Boundary:** WebPage owns the browser gateway/navigation adapter; Economy owns reusable simulated currency and casino domain behavior. Stay on `development`; no master changes, publish, or deploy.
+
+
+## 2026-10-23 checkpoint — Physics evidence and integration boundaries reconciled
+
+- Updated [Singularity Laboratory Stations](SINGULARITY_LABORATORY_STATIONS.md) against Physics development through 2026-10-23. Added bounded `SeededPointSet2d` and `MandelbrotEscapeTime2d` sources, tests, and exporter links. Their Physics Build and Tests workflows passed on the reviewed PR heads; neither capability is represented as a physical solver or a wired browser station.
+- Updated the [Castle Siege Physics handoff](integrations/CASTLE_SIEGE_PHYSICS_HANDOFF.md). Physics issue [#23](https://github.com/TrentBest/TheSingularityWorkshop.Physics/issues/23) remains open; existing projectile/intersection/impact primitives are not yet a validated Castle Siege run/adapter. The Experience-owned Y-up/metre convention still requires a tested mapping to Physics' declared frame.
+- Updated the [Replay / Shareable Moments handoff](integrations/PHYSICS_REPLAY_WEBPAGELLM_HANDOFF.md). The browser-smoke source checks the manifest-driven Replay Lab card and iframe heading, but no exact-head WebPage CI result was confirmed in this review. The fixture remains illustrative; Physics world reconstruction and portable Moments remain unavailable.
+- Appended the authorized dated WebPageLLM response to Physics root `PhysicsCastlesLLM.md` only. No other Physics file was changed.
+
+**Current gate:** repository-backed Experience activation still depends on WebPage #100, Experiences #19, MicroBundleDomain #17, MicroBundleRepository #22/#24, and FSM_COS #11. Do not add a parallel manifest/closure resolver or duplicate the Experience-owned Castle Siege scene data. No merge, publication, release, or deployment was performed.
+
+**CI status:** the exact current WebPage development head has not been verified by a confirmed workflow result after these documentation commits. Treat the source-level browser smoke as coverage, not as a passing execution.
