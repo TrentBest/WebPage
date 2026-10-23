@@ -107,3 +107,12 @@ Do not assume that reversing time is implemented by running updates backward. Ge
 5. Report exact files changed, test evidence, and the local click path. Leave release/deploy actions untouched.
 
 This is an integration handoff, not permission to publish or deploy. The goal is to bring the work into view early enough for human eyes and a real browser to validate it while the underlying reconstruction capability is built.
+
+
+## 2026-10-23 verification note — browser fixture versus Physics reconstruction
+
+The current `tests/browser-smoke.mjs` source includes a manifest-driven route check: it expects exactly one “Physics Replay Lab — Shareable Moments Prototype” demonstration card, opens its explanation, and verifies the embedded Replay Lab heading. `TheSingularityWorkshop/Pages/ReplayLab.razor` continues to label its timeline as demo data and links to Physics' executor and route-replay tests.
+
+This confirms that browser-smoke coverage exists in source; it does **not** prove that the latest `development` head's workflow ran successfully, nor that the page reconstructs a Physics world. No exact-head WebPage CI result was available in this review. Keep browser runtime verification pending until the current workflow result is checked, and keep physical replay unavailable until Physics provides a concrete world/solver adapter with independently verifiable reconstruction output.
+
+Physics' model-level executor and fork-aware route coordination remain useful prerequisites, but neither the local fixture nor a generated SVG is a replay of a coupled physical world. Shareable Moments, portable checkpoint/event payloads, and world reconstruction remain unimplemented at this boundary.
