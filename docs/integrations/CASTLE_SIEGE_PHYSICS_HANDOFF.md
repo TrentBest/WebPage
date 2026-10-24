@@ -111,10 +111,10 @@ The Experience's authored coordinate convention is right-handed Y-up with metre-
 
 - `TheSingularityWorkshop/Workshop/Spatial/SpatialPlaceCatalog.cs` registers city place `city.castle-siege` with scene ID `castle-siege`.
 - `SpatialWorkshopScene.cs` adds the destination as a clickable spatial place; `Explore.razor` routes that scene through the existing spatial composition path.
-- `TheSingularityWorkshop/Gui/SpatialCastleSiegeGuiBuilder.cs` presents the commander-shoulder composition with authored castle/siege-engine silhouettes, selectable **presentation-only** left/center/right zones, and a working scene-label toggle.
+- `TheSingularityWorkshop/Gui/SpatialCastleSiegeGuiBuilder.cs` presents the commander-shoulder composition with authored castle/siege-engine silhouettes, selectable **presentation-only** left/center/right zones, a working scene-label toggle, and explicit experiment-setup, baseline/variant, and measurement-status cards.
 - `SingularityHub.Tests/SpatialCastleSiegeRegistrationTests.cs` checks the stable destination and that the default scene can be constructed with its existing catalog/overlap validation.
 
-The highlighted zones are not Experience semantic IDs and are not collision geometry. The page explicitly says `ILLUSTRATIVE FIXTURE — NOT PHYSICS-BACKED` and does not compute or display a trajectory, hit/miss, impact, damage, or replay result. This scaffold is deliberately useful before the Physics adapter exists without claiming to load the Experience-owned Castle Siege artifact.
+The highlighted zones are not Experience semantic IDs and are not collision geometry. The baseline/variant and measurement cards are status placeholders, not runnable experiment controls. The page explicitly says `ILLUSTRATIVE FIXTURE — NOT PHYSICS-BACKED` and does not compute or display a trajectory, hit/miss, impact, damage, or replay result. This scaffold is deliberately useful before the Physics adapter exists without claiming to load the Experience-owned Castle Siege artifact.
 
 **Verification limit:** the .NET Tests workflow is configured for pushes to `development`, but no confirmed workflow result/status was available for the latest commits during this review. Do not treat the implementation as CI-verified yet.
 
