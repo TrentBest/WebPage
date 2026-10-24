@@ -140,7 +140,7 @@
     private CancellationTokenSource? softwareOfficeCinematicCts;
     private SpatialAECRemoteOfficeLobbyGuiBuilder.Stage AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Arrival;
     private string? selectedTransitDestinationId;
-    private string castleSiegeTargetWall = "gate";
+    private string castleSiegeTargetWall = "center";
     private bool castleSiegeLabelsVisible = true;
     private bool transitTrainVisible;
     private bool transitMicroGameActive;
@@ -2096,7 +2096,7 @@
 
     private void SelectCastleSiegeTargetWall(string targetWall)
     {
-        if (targetWall is not ("west" or "gate" or "east")) return;
+        if (targetWall is not ("left" or "center" or "right")) return;
         castleSiegeTargetWall = targetWall;
     }
 
