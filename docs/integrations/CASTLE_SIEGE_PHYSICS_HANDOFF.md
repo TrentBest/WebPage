@@ -104,3 +104,18 @@ The Experience's authored coordinate convention is right-handed Y-up with metre-
 **Current gate:** WebPage can own the commander-view composition, scene labels, accessibility, and experiment presentation. It must not show a Physics-derived trajectory, hit, impact, damage, or structural failure until the selected Physics run record supplies those outputs. Repository-backed loading of the pinned Experience is also blocked by [WebPage #100](https://github.com/TrentBest/WebPage/issues/100), [Experiences #19](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/issues/19), [MicroBundleDomain #17](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain/issues/17), [MicroBundleRepository #22](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleRepository/issues/22) and [#24](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleRepository/issues/24), and [FSM_COS #11](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/issues/11). Do not bypass that boundary by copying Experience data into a parallel host-owned schema.
 
 **Next step:** resolve the immutable Experience artifact/closure contract, then consume the authored Castle Siege data through the supported host path. In parallel, Physics should deliver the deterministic projectile run record and target-intersection validation requested by issue #23. No release, publication, merge, or deployment is implied by this checkpoint.
+
+## 2026-10-24 — Authored spatial scaffold implemented on development
+
+**Status:** navigable presentation fixture exists; no canonical Experience geometry or Physics solver adapter is connected.
+
+- `TheSingularityWorkshop/Workshop/Spatial/SpatialPlaceCatalog.cs` registers city place `city.castle-siege` with scene ID `castle-siege`.
+- `SpatialWorkshopScene.cs` adds the destination as a clickable spatial place; `Explore.razor` routes that scene through the existing spatial composition path.
+- `TheSingularityWorkshop/Gui/SpatialCastleSiegeGuiBuilder.cs` presents the commander-shoulder composition with authored castle/siege-engine silhouettes, selectable **presentation-only** left/center/right zones, and a working scene-label toggle.
+- `SingularityHub.Tests/SpatialCastleSiegeRegistrationTests.cs` checks the stable destination and that the default scene can be constructed with its existing catalog/overlap validation.
+
+The highlighted zones are not Experience semantic IDs and are not collision geometry. The page explicitly says `ILLUSTRATIVE FIXTURE — NOT PHYSICS-BACKED` and does not compute or display a trajectory, hit/miss, impact, damage, or replay result. This scaffold is deliberately useful before the Physics adapter exists without claiming to load the Experience-owned Castle Siege artifact.
+
+**Verification limit:** the .NET Tests workflow is configured for pushes to `development`, but no confirmed workflow result/status was available for the latest commits during this review. Do not treat the implementation as CI-verified yet.
+
+**Next gate:** consume the canonical Experience-owned geometry only after the immutable artifact/closure path is resolved, then map its coordinates to Physics through a tested adapter. Physics issue [#23](https://github.com/TrentBest/TheSingularityWorkshop.Physics/issues/23) remains open.
