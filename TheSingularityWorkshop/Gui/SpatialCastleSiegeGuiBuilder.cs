@@ -136,7 +136,7 @@ public static class SpatialCastleSiegeGuiBuilder
                 .Style("letter-spacing", ".06em")
                 .Style("cursor", "pointer")
                 .Style("touch-action", "manipulation")
-                .Style("class", "castle-siege-button")
+                .Attribute("class", "castle-siege-button")
                 .OnClick(() => selectTarget(target.Id)));
         }
 
@@ -153,7 +153,7 @@ public static class SpatialCastleSiegeGuiBuilder
             .Style("letter-spacing", ".06em")
             .Style("cursor", "pointer")
             .Style("touch-action", "manipulation")
-            .Style("class", "castle-siege-button")
+            .Attribute("class", "castle-siege-button")
             .OnClick(toggleLabels));
 
         root.Content(controls);
