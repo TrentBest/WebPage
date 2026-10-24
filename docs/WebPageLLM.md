@@ -125,3 +125,17 @@ Separately, `Workshop.MicroBundles.MicroBundle` is a Hub-level lifecycle shell i
 **Current gate:** repository-backed Experience activation still depends on WebPage #100, Experiences #19, MicroBundleDomain #17, MicroBundleRepository #22/#24, and FSM_COS #11. Do not add a parallel manifest/closure resolver or duplicate the Experience-owned Castle Siege scene data. No merge, publication, release, or deployment was performed.
 
 **CI status:** the exact current WebPage development head has not been verified by a confirmed workflow result after these documentation commits. Treat the source-level browser smoke as coverage, not as a passing execution.
+
+## 2026-10-24 — Castle Siege authored destination scaffold
+
+Implemented the minimal WebPage-side spatial destination scaffold on `development`:
+
+- [Spatial destination catalog](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Workshop/Spatial/SpatialPlaceCatalog.cs) now declares `city.castle-siege` / `castle-siege`.
+- [Spatial scene](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Workshop/Spatial/SpatialWorkshopScene.cs) makes it reachable from the existing Explore world.
+- [Castle Siege presentation builder](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Gui/SpatialCastleSiegeGuiBuilder.cs) shows the commander-shoulder fixture and provides functional presentation-zone selection and label toggling.
+- [Explore routing](https://github.com/TrentBest/WebPage/blob/development/TheSingularityWorkshop/Pages/Explore.razor) uses the existing scene router; no parallel route system was added.
+- [Registration tests](https://github.com/TrentBest/WebPage/blob/development/SingularityHub.Tests/SpatialCastleSiegeRegistrationTests.cs) cover the destination identity and default-scene construction.
+
+The visual castle and siege engine are an illustrative WebPage fixture only. The left/center/right highlight zones are presentation state, not canonical Experience IDs or Physics target geometry. No trajectory, target hit/miss, impact, damage, or authoritative replay is computed. The Experience-owned Castle Siege artifact is not yet loaded because the immutable artifact/dependency-closure contract remains unresolved.
+
+The latest WebPage commits are [builder](https://github.com/TrentBest/WebPage/commit/b4befdbb07800cf6e60d428432519c243de68a48), [Explore route](https://github.com/TrentBest/WebPage/commit/91bf62548d2cae0d0ad2caace39056a5caddc790), and [destination maturity wording](https://github.com/TrentBest/WebPage/commit/f1fa87482fc662bcdaf7daf2c47958d6d10619bc). The .NET Tests workflow has a `development` push trigger, but no confirmed exact-head result was surfaced; CI remains unverified.
