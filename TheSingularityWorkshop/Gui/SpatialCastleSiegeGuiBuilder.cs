@@ -38,10 +38,10 @@ public static class SpatialCastleSiegeGuiBuilder
             .Style("position", "fixed")
             .Style("inset", "0")
             .Style("display", "grid")
-            .Style("grid-template-rows", "auto minmax(0, 1fr) auto auto")
+            .Style("grid-template-rows", "auto minmax(0, 1fr) auto auto auto")
             .Style("gap", ".65rem")
             .Style("padding", "clamp(.6rem, 1.5vw, 1.2rem)")
-            .Style("overflow", "hidden")
+            .Style("overflow", "auto")
             .Style("box-sizing", "border-box")
             .Style("background", "radial-gradient(ellipse at 52% 28%, #14303d 0%, #06111d 58%, #02060c 100%)")
             .Style("color", White)
@@ -157,6 +157,7 @@ public static class SpatialCastleSiegeGuiBuilder
             .OnClick(toggleLabels));
 
         root.Content(controls);
+        root.Content(ExperimentStatus(receiver));
 
         root.Content(WorkshopGui.Panel(receiver)
             .Attribute("role", "status")
@@ -182,6 +183,61 @@ public static class SpatialCastleSiegeGuiBuilder
 
         return root;
     }
+
+    private static ElementBuilder ExperimentStatus(object receiver)
+    {
+        var panel = WorkshopGui.Panel(receiver)
+            .Attribute("aria-label", "Physics experiment and comparison status")
+            .Style("display", "grid")
+            .Style("grid-template-columns", "repeat(auto-fit, minmax(210px, 1fr))")
+            .Style("gap", ".5rem");
+
+        panel.Content(StatusCard(
+            receiver,
+            "EXPERIMENT SETUP",
+            "AWAITING PHYSICS CONTRACT",
+            "Launch state, units, coordinate frame, and timestep are not bound to a solver. No experiment inputs are being simulated."));
+
+        panel.Content(StatusCard(
+            receiver,
+            "BASELINE / VARIANT",
+            "NOT RUN",
+            "Comparison requires separate, immutable Physics run identities and a declared supported parameter change."));
+
+        panel.Content(StatusCard(
+            receiver,
+            "MODEL MEASUREMENTS",
+            "UNAVAILABLE",
+            "Trajectory samples, hit/miss, impact diagnostics, and damage stay unavailable until supplied by the authoritative run record."));
+
+        return panel;
+    }
+
+    private static ElementBuilder StatusCard(object receiver, string title, string value, string detail)
+        => WorkshopGui.Panel(receiver)
+            .Style("min-width", "0")
+            .Style("padding", ".6rem .7rem")
+            .Style("border", "1px solid rgba(147,169,180,.2)")
+            .Style("background", "rgba(2,8,14,.7)")
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("color", Cyan)
+                .Style("font-size", ".56rem")
+                .Style("font-weight", "800")
+                .Style("letter-spacing", ".13em")
+                .Text(title))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".35rem")
+                .Style("color", Gold)
+                .Style("font-size", ".67rem")
+                .Style("font-weight", "800")
+                .Text(value))
+            .Content(WorkshopGui.Element(receiver, "div")
+                .Style("margin-top", ".35rem")
+                .Style("color", Muted)
+                .Style("font-family", "system-ui, sans-serif")
+                .Style("font-size", ".7rem")
+                .Style("line-height", "1.4")
+                .Text(detail));
 
     private static ElementBuilder Scene(object receiver, string selectedTarget, bool labelsVisible)
     {
