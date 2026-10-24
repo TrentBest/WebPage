@@ -140,6 +140,8 @@
     private CancellationTokenSource? softwareOfficeCinematicCts;
     private SpatialAECRemoteOfficeLobbyGuiBuilder.Stage AECOfficeStage = SpatialAECRemoteOfficeLobbyGuiBuilder.Stage.Arrival;
     private string? selectedTransitDestinationId;
+    private string castleSiegeTargetWall = "gate";
+    private bool castleSiegeLabelsVisible = true;
     private bool transitTrainVisible;
     private bool transitMicroGameActive;
     private int transitMicroGameScore;
@@ -446,6 +448,9 @@
                 SelectMansionFeature,
                 selectedMansionFeatureId)
                 .Content(MansionMayorOverlay());
+
+        if (insideRoomId == "castle-siege")
+            return SpatialCastleSiegeGuiBuilder.Build(this, Experience.User.DisplayName, castleSiegeTargetWall, castleSiegeLabelsVisible, SelectCastleSiegeTargetWall, ToggleCastleSiegeLabels, ExitRoom);
 
         if (insideRoomId is not null)
         {
@@ -2088,6 +2093,15 @@
         else
             ShowWorkshopMap();
     }
+
+    private void SelectCastleSiegeTargetWall(string targetWall)
+    {
+        if (targetWall is not ("west" or "gate" or "east")) return;
+        castleSiegeTargetWall = targetWall;
+    }
+
+    private void ToggleCastleSiegeLabels()
+        => castleSiegeLabelsVisible = !castleSiegeLabelsVisible;
 
     private void ExitRoom()
     {
