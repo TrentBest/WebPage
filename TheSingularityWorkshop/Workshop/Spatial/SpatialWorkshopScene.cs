@@ -41,7 +41,9 @@ public sealed class SpatialWorkshopScene
                 Building("acoustic-studio-lab", "acoustic-studio-lab", new SpatialBounds(52, 51, 3, 2)),
                 Building("singularity-lab", "singularity-lab", new SpatialBounds(21, 57.5, 2, 1)),
                 new SpatialInteractable("aec-remote-office", "AEC Remote Office", new SpatialBounds(38, 76, 13, 8), new SpatialBounds(43, 85, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "aec-remote-office"),
-                new SpatialInteractable("singularity-software-office", "Singularity Software Inc.", new SpatialBounds(44, 15, 18, 10), new SpatialBounds(51, 27, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "singularity-software-office")            ],
+                new SpatialInteractable("singularity-software-office", "Singularity Software Inc.", new SpatialBounds(44, 15, 18, 10), new SpatialBounds(51, 27, 3, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "singularity-software-office"),
+                new SpatialInteractable("castle-siege", "Castle Siege", new SpatialBounds(66, 31, 12, 8), new SpatialBounds(69, 40, 4, 2), new SpatialRectangularHitRegion(0, 0, 1, 1), "castle-siege")
+            ],
             SpatialViewSettings.CreateDefault(),
             new SpatialConstructionSite(
                 "workshop-expansion",
