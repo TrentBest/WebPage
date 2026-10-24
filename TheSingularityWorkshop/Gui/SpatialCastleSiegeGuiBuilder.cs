@@ -14,9 +14,9 @@ public static class SpatialCastleSiegeGuiBuilder
 
     private static readonly (string Id, string Label)[] TargetSections =
     [
-        ("west", "WEST WALL"),
-        ("gate", "GATE SECTION"),
-        ("east", "EAST WALL")
+        ("left", "LEFT ZONE"),
+        ("center", "CENTER ZONE"),
+        ("right", "RIGHT ZONE")
     ];
 
     /// <summary>Builds the commander-view scene and its presentation-only controls.</summary>
@@ -117,7 +117,7 @@ public static class SpatialCastleSiegeGuiBuilder
             .Style("font-size", ".62rem")
             .Style("letter-spacing", ".12em")
             .Style("margin-right", ".25rem")
-            .Text("HIGHLIGHT TARGET REGION"));
+            .Text("HIGHLIGHT ILLUSTRATIVE ZONE"));
 
         foreach (var target in TargetSections)
         {
@@ -178,7 +178,7 @@ public static class SpatialCastleSiegeGuiBuilder
                 .Style("color", "#c5d1d7")
                 .Style("font-size", ".76rem")
                 .Style("line-height", "1.45")
-                .Text("Authored scene only. No trajectory, hit/miss, impact, or damage result is computed. The experiment remains gated on the validated Physics contract tracked by issue #23.")));
+                .Text("Authored scene only. No trajectory, hit/miss, impact, or damage result is computed. The highlighted zone is presentation-only, not Experience-owned target geometry. Physics-backed trajectory, hit/miss, impact, and damage remain gated on the validated contract tracked by issue #23.")));
 
         return root;
     }
@@ -217,7 +217,7 @@ public static class SpatialCastleSiegeGuiBuilder
         var svg = WorkshopGui.Element(receiver, "svg")
             .Attribute("viewBox", "0 0 1200 600")
             .Attribute("role", "img")
-            .Attribute("aria-label", "Authored commander-view composition: a siege engine in the foreground and a castle wall target beyond it. No projectile trajectory or impact is simulated.")
+            .Attribute("aria-label", "Illustrative commander-view fixture with a siege engine and castle silhouette. The highlighted zone is not canonical Experience geometry; no projectile trajectory or impact is simulated.")
             .Style("display", "block")
             .Style("width", "100%")
             .Style("height", "100%")
@@ -237,9 +237,9 @@ public static class SpatialCastleSiegeGuiBuilder
 
         var sections = new[]
         {
-            (Id: "west", X: 590, Width: 120),
-            (Id: "gate", X: 710, Width: 130),
-            (Id: "east", X: 840, Width: 120)
+            (Id: "left", X: 590, Width: 120),
+            (Id: "center", X: 710, Width: 130),
+            (Id: "right", X: 840, Width: 120)
         };
 
         foreach (var section in sections)
@@ -270,7 +270,7 @@ public static class SpatialCastleSiegeGuiBuilder
         svg.Child(SvgPath(receiver, "M745 375 L745 300 Q775 268 805 300 L805 375 Z", "#08131d", "#a2b1b8", "2"));
         svg.Child(SvgLine(receiver, "775", "240", "775", "375", "#a2b1b8", "2", ".5"));
 
-        var targetX = selectedTarget switch { "west" => 650, "east" => 900, _ => 775 };
+        var targetX = selectedTarget switch { "left" => 650, "right" => 900, _ => 775 };
         svg.Child(SvgCircle(receiver, targetX.ToString(System.Globalization.CultureInfo.InvariantCulture), "305", "15", "none", Gold, "3"));
         svg.Child(SvgLine(receiver, (targetX - 24).ToString(System.Globalization.CultureInfo.InvariantCulture), "305", (targetX + 24).ToString(System.Globalization.CultureInfo.InvariantCulture), "305", Gold, "2", ".9"));
         svg.Child(SvgLine(receiver, targetX.ToString(System.Globalization.CultureInfo.InvariantCulture), "281", targetX.ToString(System.Globalization.CultureInfo.InvariantCulture), "329", Gold, "2", ".9"));
@@ -294,7 +294,7 @@ public static class SpatialCastleSiegeGuiBuilder
         if (labelsVisible)
         {
             svg.Child(SvgText(receiver, "35", "50", "SINGULARITY CITY // CASTLE SIEGE", Cyan, "18", "800", ".14em"));
-            svg.Child(SvgText(receiver, "35", "78", $"TARGET REGION: {selectedTarget.ToUpperInvariant()}", Gold, "17", "800", ".1em"));
+            svg.Child(SvgText(receiver, "35", "78", $"ILLUSTRATIVE ZONE: {selectedTarget.ToUpperInvariant()}", Gold, "17", "800", ".1em"));
             svg.Child(SvgText(receiver, "640", "205", "CASTLE WALL / AUTHORED TARGET", White, "15", "700", ".08em"));
             svg.Child(SvgText(receiver, "105", "430", "SIEGE ENGINE PROP", White, "15", "700", ".08em"));
             svg.Child(SvgText(receiver, "1010", "420", "COMMANDER", Muted, "13", "700", ".1em"));
