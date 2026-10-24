@@ -462,6 +462,14 @@ try {
   const stageDataLink = page.getByRole("link", { name: /inspect \/ download the versioned stage data/i });
   await stageDataLink.waitFor({ state: "visible", timeout: 10_000 });
   await page.locator(".studios-audio audio[controls]").waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByText("ANALYTICAL PATH METADATA ONLY", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.getByRole("heading", { name: "First-order room reflection", exact: true }).waitFor({ state: "visible", timeout: 10_000 });
+  const roomRunLink = page.getByRole("link", { name: "SERIALIZED ROOM RUN", exact: true });
+  await roomRunLink.waitFor({ state: "visible", timeout: 10_000 });
+  if (!(await roomRunLink.getAttribute("href"))?.includes("first-order-room-reflection.run.json")) {
+    throw new Error("The first-order room-reflection section must link to its Physics-owned serialized run record.");
+  }
+  await page.locator('img[alt*="Generated room plan showing the source"]').waitFor({ state: "visible", timeout: 10_000 });
   const stageDataResponse = await page.request.get(`${baseUrl}/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage.json`);
   if (!stageDataResponse.ok()) {
     throw new Error(`Singularity Studios stage data must be served by the WebPage host; HTTP ${stageDataResponse.status()}.`);
