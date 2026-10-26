@@ -176,3 +176,27 @@ The goal is not to draw a giant studio. The goal is to make a production reusabl
 Gestures has added the proposed [Extremus deterministic crowd-baking contract](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/EXTREMUS_CROWD_BAKING.md). This is a design contract, not an implemented impostor renderer. The first intended fixture is two reproducible starport population patches generated from distinct seeds and actual source-catalogue capabilities.
 
 For WebPage, treat any first SVG/GUI.SVG view as a CPU-generated inspection artifact with explicit seed, profile, source IDs, count, and provenance. Keep the stage/world identity authoritative outside Renderer; do not introduce a parallel crowd schema just for the browser. Please coordinate the shared fixture shape and coordinate frame with Gestures, Renderer, Visualize, and Physics before presenting it as a runtime-linked studio crowd. The same versioned fixture should eventually be consumable by AnyApp.
+
+
+## 2026-10-26 — Extremus crowd-bake consumer checkpoint
+
+**Status:** shared-fixture coordination is actionable; the Extremus bake itself remains design-only. This is not a claim that WebPage or AnyApp has a runtime-linked crowd.
+
+The current [Gestures crowd-baking contract](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/EXTREMUS_CROWD_BAKING.md) calls for a manifest that identifies the schema and bake-algorithm versions, source-catalogue and population-profile IDs/versions, stable region ID and coordinate frame/units, seed and deterministic algorithm, region/content revisions, generated identity plus activity/phase mapping where supported, and output asset IDs/hashes/generator version. Its first intended fixture is two starport population patches from the same source vocabulary/profile family but different stable seeds. I found no WebPage or AnyApp consumer implementation for this bake in the searched source; the contract does not yet establish an executable cross-host artifact.
+
+### Ownership and consumer boundary
+
+- **Gestures / content providers:** own the reusable source/profile vocabulary and deterministic bake semantics; domain content providers own person/faction/equipment identity and domain-specific activities.
+- **Physics:** supplies authoritative region, exclusion, flow, and world-revision inputs where implemented. A baked placement is not collision avoidance or a physical simulation.
+- **Renderer:** owns the neutral representation descriptor, observer suitability, freshness/version policy, promotion/demotion continuity, and frame selection. See [Renderer issue #17](https://github.com/TrentBest/TheSingularityWorkshop.Renderer/issues/17).
+- **Visualize:** realizes only representation/resource descriptions its current backend actually supports. See [Visualize issue #18](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/issues/18). Do not describe a CPU/SVG snapshot as impostor rendering or GPU output.
+- **WebPage and AnyApp:** must consume the same versioned fixture and expose its seed, profile, source IDs, generated count, and provenance. Do not invent a WebPage-only crowd schema or add per-frame randomness.
+
+### Adjacent CI evidence — 2026-10-26
+
+- [Visualize workflow run #40261788410](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/actions/runs/40261788410) passed build/test, the dedicated Drone Construction frame proof, and GUI.SVG package proof; `publish_nuget` was skipped. The uploaded drone artifact is a **three-agent CPU/SVG proof**, not an Extremus bake, 100k-agent rendering, or a GPU-performance result.
+- [Experiences workflow run #40261791798](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/actions/runs/40261791798) passed the source-integration, Castle Siege, Drone Construction, showcase, and quadrotor benchmark jobs; package publication was skipped. These results do not implement or validate the Extremus crowd contract.
+
+**Next gate:** Gestures must supply executable canonical bake records, deterministic/order-independence/seed-divergence tests, and a CI-generated manifest/snapshot. Renderer and Visualize then review the neutral representation descriptor against implemented contracts. WebPage and AnyApp can consume that same versioned artifact after the shared provider/dependency-closure path is available. Until then, any SVG remains a CPU-generated inspection view.
+
+No other repository was edited by this checkpoint. No merge, package publication, release, or deployment was performed.
