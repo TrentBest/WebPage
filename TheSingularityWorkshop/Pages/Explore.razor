@@ -134,7 +134,7 @@
     private string? selectedLeaderboardEntry;
     private string? insideRoomId;
     [SupplyParameterFromQuery(Name = "room")]
-    private string? RequestedRoom { get; set; }
+    public string? RequestedRoom { get; set; }
     private bool behaviorBuilderVisible;
     private bool fsmForgeVisited;
     private CancellationTokenSource? softwareOfficeCinematicCts;
