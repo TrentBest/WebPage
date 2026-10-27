@@ -202,6 +202,24 @@
     private FsmForgeMicroBundle Forge => Experience.Forge;
     private bool FsmScaffoldReady => fsmForgeVisited && Forge.Events.Count > 0;
 
+    protected override void OnParametersSet()
+    {
+        ApplyRequestedRoom();
+    }
+
+    private void ApplyRequestedRoom()
+    {
+        if (RequestedRoom is not ("engineering" or "forge"))
+            return;
+
+        // Query parameters can change while Blazor reuses this Explore component.
+        // Apply the destination at parameter-set time, not only on first render.
+        gardenMode = false;
+        insideRoomId = RequestedRoom == "forge" ? "forge" : "engineering";
+        if (insideRoomId == "forge")
+            fsmForgeVisited = true;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender && !gardenVisitResolved)
@@ -220,16 +238,9 @@
                 gardenVisitResolved = true;
             }
 
-            if (gardenVisitResolved && RequestedRoom is "engineering" or "forge")
-            {
-                // An explicit room deep link is a deliberate destination request.
-                // It must override the first-visit garden, otherwise Home's Forge
-                // entry is silently swallowed when Explore storage says "not visited".
-                gardenMode = false;
-                insideRoomId = RequestedRoom == "forge" ? "forge" : "engineering";
-                await InvokeAsync(StateHasChanged);
-            }
-
+            // Storage resolution can overwrite parameter-derived state on the first
+            // render, so reapply an explicit room request after the JS visit check.
+            ApplyRequestedRoom();
             await InvokeAsync(StateHasChanged);
             return;
         }
