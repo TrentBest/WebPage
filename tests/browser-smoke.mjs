@@ -103,9 +103,11 @@ try {
   await page.screenshot({ path: `${outputDir}/03-hub-moniker.png`, fullPage: true });
 
   const initialLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  const expectedLinks = ["Welcome", "About Us"];
-  if (initialLinks.length !== expectedLinks.length || expectedLinks.some((label, i) => initialLinks[i] !== label)) {
-    throw new Error(`The first hub view must expose only the Welcome and About Us routes; found: ${initialLinks.join(", ")}.`);
+  const expectedInitialLinks = ["Welcome", "Repositories", "NuGet Packages", "About Us"];
+  if (initialLinks.length !== expectedInitialLinks.length ||
+      expectedInitialLinks.some((label, i) => initialLinks[i] !== label)) {
+    throw new Error(
+      `Navigation stage zero should expose Welcome and the repository/package/About utilities, not later Experience destinations; found: ${initialLinks.join(", ")}.`);
   }
 
   await page.getByRole("link", { name: "Welcome", exact: true }).click();
@@ -220,8 +222,11 @@ try {
   await page.getByRole("button", { name: /expand workshop navigation/i }).click();
   await page.getByRole("link", { name: "About Us", exact: true }).waitFor({ state: "visible" });
   const expandedLinks = (await page.locator(".workshop-nav-links a").allTextContents()).map(label => label.trim());
-  if (expandedLinks.length !== 2 || expandedLinks[0] !== "Welcome" || expandedLinks[1] !== "About Us") {
-    throw new Error("The first hub view should expose only Welcome and the always-available About Us route; found: " + expandedLinks.join(", ") + ".");
+  if (expandedLinks.length !== expectedInitialLinks.length ||
+      expectedInitialLinks.some((label, i) => expandedLinks[i] !== label)) {
+    throw new Error(
+      "Navigation stage zero should expose Welcome and the repository/package/About utilities, not later Experience destinations; found: " +
+      expandedLinks.join(", ") + ".");
   }
   await page.screenshot({ path: outputDir + "/03-welcome.png", fullPage: true });
 
