@@ -45,9 +45,24 @@ public sealed class ContractSurfaceTests
     }
 
     [ArchitectureTest(0, 1, 4)]
-    [Fact(DisplayName = "0.01.004 — Hub_Contract_Composes_Execution_Indirection")]
+    [Fact(DisplayName = "0.01.004 — Hub_ExecutionProvider_Remains_Separate_From_Hub_Lifecycle")]
     public void Hub_Contract_Composes_Execution_Indirection()
-        => Assert.Contains(typeof(IExecutionProvider), typeof(IExecutionProvider).Assembly.GetTypes());
+    {
+        var hubContract = typeof(ISingularityHub);
+        var hubImplementation = typeof(TheSingularityWorkshop.SingularityHub.SingularityHub);
+
+        Assert.DoesNotContain(typeof(IExecutionProvider), hubContract.GetInterfaces());
+        Assert.DoesNotContain(typeof(IExecutionProvider), hubImplementation.GetInterfaces());
+
+        var execute = Assert.Single(typeof(IExecutionProvider).GetMethods());
+        Assert.Equal(typeof(CompletionToken), execute.ReturnType);
+        Assert.Equal(typeof(WorkDescriptor), Assert.Single(execute.GetParameters()).ParameterType);
+        Assert.DoesNotContain(
+            hubContract.GetMethods(),
+            method => method.GetParameters().Any(parameter =>
+                parameter.ParameterType == typeof(WorkDescriptor) ||
+                parameter.ParameterType == typeof(CompletionToken)));
+    }
 
     [ArchitectureTest(0, 1, 5)]
     [Fact(DisplayName = "0.01.005 — ProcessGroup_Contract_Exposes_State_Not_Mechanics")]
