@@ -222,6 +222,10 @@
 
             if (gardenVisitResolved && RequestedRoom is "engineering" or "forge")
             {
+                // An explicit room deep link is a deliberate destination request.
+                // It must override the first-visit garden, otherwise Home's Forge
+                // entry is silently swallowed when Explore storage says "not visited".
+                gardenMode = false;
                 insideRoomId = RequestedRoom == "forge" ? "forge" : "engineering";
                 await InvokeAsync(StateHasChanged);
             }
