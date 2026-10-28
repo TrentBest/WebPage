@@ -106,3 +106,9 @@ Economy integration is a later optional capability. Studio creation, experimenta
 5. A concise handoff back to the coordinating agent explaining what exists now and what the next concrete increment should be.
 
 Do not merge, publish NuGet packages, deploy Azure, or promote branches. Keep the PR draft until its actual behavior and evidence have been reviewed.
+
+## 2026-10-28 correction — free-field baseline is in Physics development
+
+The `Physics PR #21` dependency note above is stale. [PR #21](https://github.com/TrentBest/TheSingularityWorkshop.Physics/pull/21) was closed unmerged on 2026-10-16 after `FreeFieldAcoustics`, its tests, documentation, and package tags were ported directly to Physics `development`. The current [source](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/Physics/Acoustics/FreeFieldAcoustics.cs), [versioned observation record](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-observation.run.json), and [SVG](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-observation.svg) are available on that branch; the Physics workflow validates the generated record and SVG.
+
+The integration blocker is now **WebPage adapter and dependency-path work**, not an unmerged PR. Keep the current studio fixture clearly labelled until a tested adapter consumes the Physics output. Do not invent or assume a published NuGet version; no release or publication is authorized by this checkpoint.
