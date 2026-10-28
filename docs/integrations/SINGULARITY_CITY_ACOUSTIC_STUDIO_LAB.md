@@ -24,3 +24,9 @@ The current fixture does not model room reflections, materials, occlusion, wavef
 ## Next increment
 
 After the Physics API is available through the repository's normal dependency/source workflow, add a narrow adapter that maps selected source/listener identities and metre-based positions to the real Physics observation. Preserve units and provenance in the UI, test the mapping, and remove fixture values only when the adapter produces verified observations. Keep room simulation, capture/playback, creator-owned studios, and optional Economy integration as separate increments.
+
+## 2026-10-28 correction — Physics free-field baseline is on development
+
+The earlier statement that Physics PR #21 is a draft, unmerged baseline is stale. [PR #21](https://github.com/TrentBest/TheSingularityWorkshop.Physics/pull/21) was **closed unmerged on 2026-10-16 as part of Operation Sith after its FreeFieldAcoustics source, tests, documentation, and package tags were ported directly to Physics `development`**. The current [FreeFieldAcoustics implementation](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/Physics/Acoustics/FreeFieldAcoustics.cs), [versioned acoustic-observation record](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/acoustic-observation.run.json), and Physics Build and Tests workflow are the source of truth.
+
+This does **not** mean the WebPage Acoustic Studio Lab is integrated: the current lab still shows authored fixture values, and its Physics adapter is not connected. WebPage should use the current source/dependency workflow to build a narrow adapter and verify provenance; it must not wait on the closed PR or relabel fixture values as solver output. No package publication or release is implied.
