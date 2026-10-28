@@ -263,8 +263,8 @@ jobs:
         working-directory: WebPage
         run: |
           output="$RUNNER_TEMP/singularity-studios-stage-plan.svg"
-          dotnet restore samples/SingularityStudiosPlan/SingularityStudiosPlan.csproj
-          dotnet run --project samples/SingularityStudiosPlan/SingularityStudiosPlan.csproj --configuration Release --no-restore -- "$output"
+          dotnet restore samples/SingularityStudiosPlan/SingularityStudiosPlan.csproj -p:WorkshopUseRepositorySources=true -p:WorkshopSourceRoot="$GITHUB_WORKSPACE/"
+          dotnet run --project samples/SingularityStudiosPlan/SingularityStudiosPlan.csproj --configuration Release --no-restore -p:WorkshopUseRepositorySources=true -p:WorkshopSourceRoot="$GITHUB_WORKSPACE/" -- "$output"
           test -s "$output"
           if ! cmp -s "$output" TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage-plan.svg; then
             echo "The committed Singularity Studios plan differs from the current Renderer → Visualize → GUI.SVG output."
