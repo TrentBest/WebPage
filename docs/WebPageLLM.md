@@ -185,3 +185,29 @@ The existing [contract tests](https://github.com/TrentBest/WebPage/blob/developm
 FSM_REST's [current source transport](https://github.com/TrentBest/TheSingularityWorkshop.FSM_REST/blob/development/src/FSM_REST/HttpClientRestTransport.cs) accepts a host-owned `HttpClient`; its [consumer guide](https://github.com/TrentBest/TheSingularityWorkshop.FSM_REST/blob/development/docs/CONSUMING.md) documents `RestRequestFactory`, `IRestTransport`, and `RestOperationExecutor`. The source project declares `0.1.0-alpha.5`, but WebPage has no FSM_REST package/project reference and a compatible published NuGet package was not verified in this review. The current source transport also does not expose the requested fluent `HttpClientBuilder`. **Do not add a speculative dependency or a local wrapper:** coordinate that API/package gate with FSM_REST's owner, then integrate only the confirmed REST call sites. Binary/streaming and platform-auth flows must not be forced through a text-only REST response contract.
 
 **Checkpoint (2026-10-27):** source mapping and the Hub/provider separation regression are in WebPage development. MicroBundleRepository's publication/artifact endpoints now exist and the current development build/test and package workflows passed, but WebPage's runtime consumer remains unwired; Experience identity/content closure and repository size/security gates remain open. Foundry's coordinator exists and passed its own CI, but no stable WebPage-facing adapter connects it to `RuntimeAssembly` or the legacy PageFSM lifecycle. FSM_REST adoption remains gated on a confirmed public package version and the builder/transport contract. Recheck the current WebPage browser workflow before claiming the latest route fixes are green. No merge, publication, release, or deployment was performed.
+
+
+## 2026-10-28 — Cross-host UserIO capability requirements
+
+**Requesting owner:** [Experiences issue #27 — manifest-declared UserIO requirements and host-compatible MicroBundle resolution](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/issues/27). This is an explicit cross-host request for one Experience to run through AnyApp and WebApp without rewriting its domain logic.
+
+### Source-grounded contract status
+
+- The current Experience manifest's `Bundles` / `ExperienceBundleRequest` entries identify concrete bundle roots and can carry immutable artifact identity/configuration references. `Intent` is a single `SemanticIntent` (`Name` plus optional `ProtocolId`), not a capability collection.
+- FSM_UserIO currently provides the semantic-intent contract; no concrete UserIO provider MicroBundle or capability resolver was confirmed in the reviewed source.
+- MicroBundleDomain's `MicroBundleDescriptor` lists generic `MicroBundleProvider` identifiers and dependencies. It is deliberately ontology-agnostic and does not negotiate host providers.
+- MicroBundleRepository's immutable artifact identity is a concrete content address, not a semantic capability address. A publication pointer transports the Experience manifest; it does not resolve its semantic UserIO requirements.
+- WebPage's `OntologySignature`, Hub capability IDs, and `ExperienceManifest.RequiredCapabilities` belong to the existing WebPage Hub/ontology boundary. They must not be silently reused as the FSM_UserIO / AnyApp manifest contract.
+
+### Ownership and WebPage decision
+
+- **Experiences** owns reusable Experience semantics and the versioned manifest requirement vocabulary.
+- **FSM_UserIO** owns host-neutral semantic request/response contracts; a semantic request is not authorization to execute a domain transition.
+- **AnyApp and WebPage/WebApp** own host-side provider resolution and platform adapters. Resolve a semantic requirement to explicit, versioned MicroBundle/artifact identities before composition; do not put WPF, DOM, keyboard, mouse, or touch assumptions into the Experience.
+- **MicroBundleDomain** owns generic descriptor/provider/dependency contracts, not a Workshop-specific capability ontology.
+- **FSM_COS** composes the resolved bundle request and dependency closure.
+- **Foundry** owns runtime workflow execution across AnyApp, WebApp, The, and WebPage. A UserIO adapter must not become a second execution scheduler.
+
+**Current disposition: blocked for consumer implementation; actionable as contract coordination.** The first implementation gate belongs with the Experience publication contract: define stable semantic capability IDs and their versioning, then have each host resolve them to existing immutable artifact identities. Add failure-before-activation tests and preserve the previously active Experience when resolution, verification, or composition fails. Only after the shared semantic request/response and Foundry lifecycle seams are identified should browser/WPF adapters be added.
+
+WebPage will not overload `SemanticIntent`, reinterpret `OntologyAddress`, reuse Hub ontology IDs as UserIO requirements, or invent a second browser-only capability schema. No WebPage UserIO provider or runtime integration is claimed by this checkpoint.
