@@ -135,3 +135,22 @@ This is a concrete request to the Singularity Studios / SFX owner, coordinated w
 **Art direction:** a short forged-metal resonance, low warm room tone, restrained ember/air texture, and a brief transition swell. It should evoke an inhabited engineering stronghold, not a loud fantasy trailer.
 
 Please answer with current source evidence and a minimal asset contract. A conceptual cue, external reference recording, or physics metadata must retain its truthful label. No package publish, deployment, or master promotion is requested.
+
+## 2026-10-28 — Physics first-order reflection evidence checkpoint
+
+Physics now has a source-derived, versioned [first-order room-reflection run record](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/first-order-room-reflection.run.json), its [experiment explanation](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/first-order-room-reflection.md), and an [SVG generated from that record](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/docs/experiments/first-order-room-reflection.svg). The record is explicitly `computed-from-physics-model`: a 10 m cubic room, one source, one listener, a direct path, and one maximum-X-wall reflection. It records path lengths, propagation delays, and separate per-path level estimates.
+
+The [Physics Build and Tests workflow](https://github.com/TrentBest/TheSingularityWorkshop.Physics/actions/runs/40737290307) passed on 2026-10-28. Its current workflow regenerates the reflection record from the C# model, compares it with the checked-in JSON, renders a fresh SVG, and compares the SVG byte-for-byte with the committed artifact. This is repeatability evidence for the **path metadata and illustration**, not proof of an audible room response.
+
+### Evidence classes must stay separate
+
+- **Authored/reference audio:** a creator-selected or licensed recording with its own asset identity, source, and licence. It is not Physics output.
+- **Computed path metadata:** the run record and SVG above. The model explicitly does not combine the direct/reflected levels into one listener level and has no waveform, phase/interference, frequency-dependent absorption, occlusion, or multiple reflections.
+- **Measured audio/results:** require an identified recording/measurement source and provenance; none is supplied by this run record.
+- **Synthesized audio:** requires a versioned excitation/signal contract, sample rate, channel/amplitude conventions, deterministic transformation, and tests. The reflection metadata is not a waveform and must not be played or labelled as one.
+
+### WebPage / Experiences integration status
+
+The [WebPage Acoustic Studio Lab](https://github.com/TrentBest/WebPage/blob/development/docs/integrations/SINGULARITY_CITY_ACOUSTIC_STUDIO_LAB.md) remains an illustrative fixture; it has no Physics adapter connected. Experiences' [Sound MicroBundle contract mapping](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/blob/development/experiences/Sound/MICROBUNDLE_CONTRACT_MAPPING.md) remains design-only: no executable Sound provider/schema/test path is established. WebPage should consume a versioned Physics result through an agreed adapter and should not duplicate room calculations or synthesize audio from path metadata.
+
+**Next gate:** Physics and the owning consumers must agree on the canonical externally consumed record identity (see the append-only clarification in [PhysicsCastlesLLM.md](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/PhysicsCastlesLLM.md)); only then should a separate signal-generation/room-response contract be introduced. No audio playback, synthesis, measurement, package publication, release, or deployment is claimed by this checkpoint.
