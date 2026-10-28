@@ -69,3 +69,9 @@ These stages are not currently implemented by PR #15.
 ## Evidence boundary
 
 The present solver is a flat-bed, positive-depth, closed-basin shallow-water model. It is not full 3D fluid dynamics and does not yet provide terrain, wet/dry shorelines, buildings, obstacles, boat coupling, breaking waves, spray, or an interactive browser scene. This brief specifies how to integrate the real model as it matures; it does not claim those features exist.
+
+## 2026-10-28 correction — Physics wave and basin code is on development
+
+The status above describing PRs #14 and #15 as draft/unmerged is stale. Both PRs were [closed unmerged](https://github.com/TrentBest/TheSingularityWorkshop.Physics/pull/14) [#15](https://github.com/TrentBest/TheSingularityWorkshop.Physics/pull/15) on 2026-10-16 after their source, tests, and scope documentation were ported directly to Physics `development`. The current source includes [`LinearWaveBasin1D`](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/Physics/Fluid/LinearWaveBasin1D.cs) and [`ShallowWaterBasin2D`](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/Physics/Fluid/ShallowWaterBasin2D.cs); the [Physics Build and Tests run #40740328379](https://github.com/TrentBest/TheSingularityWorkshop.Physics/actions/runs/40740328379) passed on 2026-10-28.
+
+The existing limitation still applies: these are a 1D linear reference and a bounded flat-bed 2D shallow-water model, not general 3D fluid dynamics. WebPage's Living Water World remains an integration candidate, not an implemented browser scene. Use current development source only through the approved source/dependency workflow; do not invent a NuGet version or treat closed draft PRs as pending dependencies.
