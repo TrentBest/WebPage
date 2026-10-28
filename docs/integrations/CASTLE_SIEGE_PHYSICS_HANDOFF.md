@@ -137,3 +137,13 @@ WebPage is also adding a source-integration check that regenerates the Singulari
 
 No other repository handoff was edited. No merge, package publication, release, or deployment is implied.
 
+
+## 2026-10-28 follow-up — distinguish Physics trajectory record types
+
+**Correction to the checkpoint immediately above:** it compared Experiences' trajectory adapter with Physics' `ProjectileExperimentRunRecord`, but the checked-in `docs/experiments/projectile-trajectory.run.json` is the `ProjectileTrajectoryRunRecord` shape. The latter declares `units.elapsedTime` and `definition.coordinateFrame`, and the current `ProjectileTrajectoryEvidenceAdapter` requires those same fields. The adapter's test fixture matches this trajectory record shape. The checked-in trajectory fixture is therefore not mismatched with the adapter.
+
+The real contract hazard is that Physics also has a distinct `ProjectileExperimentRunRecord` with root `coordinateConvention`, `units.time` / `units.speed`, and a different definition shape, while both record types currently use the same model ID/version and record schema version. WebPage appended this distinction to the authorized root [PhysicsCastlesLLM.md](https://github.com/TrentBest/TheSingularityWorkshop.Physics/blob/development/PhysicsCastlesLLM.md) in [commit `1f152f1`](https://github.com/TrentBest/TheSingularityWorkshop.Physics/commit/1f152f1b8f76dbf4a79afd5252b9b7ad39676544).
+
+**Owner action:** Physics should designate the canonical record for Castle Siege or give the two JSON contracts distinct model/schema identities and explicit consumers. Experiences owns its adapter and should validate it against the chosen Physics-produced record—not a separately hand-authored lookalike. WebPage will not add a third parser or silently normalize the two shapes.
+
+This clarification does not activate the scene. WebPage still does not load the immutable Experience artifact or display a computed target-intersection result; Physics issue [#23](https://github.com/TrentBest/TheSingularityWorkshop.Physics/issues/23) and the immutable Experience/dependency-closure gates remain open. No merge, publication, release, or deployment is implied.
