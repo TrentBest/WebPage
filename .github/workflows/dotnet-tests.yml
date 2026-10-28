@@ -70,6 +70,11 @@ jobs:
           dotnet run --project TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-build --no-launch-profile --urls http://127.0.0.1:5260 > /tmp/webpage-host.log 2>&1 &
           host_pid=$!
           cleanup() {
+            local status=$?
+            if [ "$status" -ne 0 ]; then
+              echo "WebPage host log after failed browser smoke:"
+              cat /tmp/webpage-host.log || true
+            fi
             kill "$host_pid" 2>/dev/null || true
             wait "$host_pid" 2>/dev/null || true
           }
