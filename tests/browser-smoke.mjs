@@ -193,9 +193,24 @@ try {
   await page.getByRole("button", { name: "Close the Laboratory station", exact: true }).click();
   await page.getByRole("button", { name: "Forge: construct MicroBundles and Experiences", exact: true }).hover();
   await page.getByRole("button", { name: "ENTER THE FORGE ↗", exact: true }).click();
+  try {
+    await page.waitForURL(url => {
+      const current = new URL(url);
+      return current.pathname === "/explore" && current.searchParams.get("room") === "forge";
+    }, { timeout: 15_000 });
+  } catch {
+    throw new Error(`Forge action did not reach /explore?room=forge; current URL: ${page.url()}`);
+  }
   // Assert the actual diegetic FSM assembly floor, not obsolete labels from an unimplemented
-  // authoring/preview screen. The current Forge exposes its structure-only contract explicitly.
-  await page.getByText("FSM FORGE", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  // authoring/preview screen. Include a screenshot and visible DOM excerpt if routing succeeds
+  // but the room does not render, so a future failure identifies the broken boundary.
+  try {
+    await page.getByText("FSM FORGE", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+  } catch {
+    const visibleText = await page.locator("body").innerText().catch(() => "<body text unavailable>");
+    await page.screenshot({ path: `${outputDir}/04-forge-failure.png`, fullPage: true }).catch(() => {});
+    throw new Error(`Forge route reached ${page.url()} but its title was not visible. Body excerpt: ${visibleText.slice(0, 2500)}. Browser errors: ${browserErrors.join(" | ") || "<none captured>"}`);
+  }
   await page.getByText("BLACKSMITH FLOOR // FSM ASSEMBLY", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByText("WELCOME TO THE FSM FORGE", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByRole("button", { name: "UNDERSTOOD — ENTER THE FORGE", exact: true }).click({ force: true });
