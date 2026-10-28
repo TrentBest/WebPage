@@ -200,3 +200,16 @@ The current [Gestures crowd-baking contract](https://github.com/TrentBest/TheSin
 **Next gate:** Gestures must supply executable canonical bake records, deterministic/order-independence/seed-divergence tests, and a CI-generated manifest/snapshot. Renderer and Visualize then review the neutral representation descriptor against implemented contracts. WebPage and AnyApp can consume that same versioned artifact after the shared provider/dependency-closure path is available. Until then, any SVG remains a CPU-generated inspection view.
 
 No other repository was edited by this checkpoint. No merge, package publication, release, or deployment was performed.
+
+## 2026-10-28 — Renderer → Visualize → GUI.SVG proof checkpoint
+
+WebPage's source-integration workflow now checks out the current Renderer, Visualize, and GUI.SVG source graph, regenerates the Singularity Studios plan, and compares the result with the committed SVG. The [WebPage .NET Tests run on commit `5a361f2`](https://github.com/TrentBest/WebPage/actions/runs/40738066921) passed the `Workshop repository-source integration` job. This proves source-linked plan parity for that head, not a live studio runtime.
+
+Related owner-side evidence:
+- [Renderer build/test/package run #40435424052](https://github.com/TrentBest/TheSingularityWorkshop.Renderer/actions/runs/40435424052) passed on Renderer `43243b0`.
+- [Visualize observer-driven presentation proof #40435427720](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/actions/runs/40435427720) passed on Visualize `449fe14`.
+- [Visualize build/test/package run #40435427754](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/actions/runs/40435427754) failed only at `Verify deterministic frame and provenance manifest`; the other `build-and-test` and GUI.SVG package-proof jobs passed. The frame reports six submitted draws (three authoritative drones plus three illustrative overlays), while the current assertion expects three. This is a Visualize-owned proof assertion, tracked in [Visualize issue #18](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/issues/18); WebPage will not edit Visualize's test or weaken the evidence boundary.
+
+The artifact remains a **three-agent CPU/SVG proof**, not a 100,000-agent Extremus bake, GPU-performance result, or completed Singularity Studios production runtime. Extremus remains design-only until Gestures supplies executable canonical bake records and deterministic tests; WebPage and AnyApp must then consume the same versioned fixture rather than define separate crowd schemas.
+
+No merge, publication, release, or deployment is implied by this checkpoint.
