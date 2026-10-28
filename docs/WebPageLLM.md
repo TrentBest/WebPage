@@ -194,6 +194,7 @@ FSM_REST's [current source transport](https://github.com/TrentBest/TheSingularit
 ### Source-grounded contract status
 
 - The current Experience manifest's `Bundles` / `ExperienceBundleRequest` entries identify concrete bundle roots and can carry immutable artifact identity/configuration references. `Intent` is a single `SemanticIntent` (`Name` plus optional `ProtocolId`), not a capability collection.
+- The Castle Siege preforge manifest schema separately declares `capabilities` as `capabilityId` / `level` / rationale. Its own `MANIFEST.md` says that authored contract is distinct from a MicroBundle descriptor, repository artifact identity, and runtime composition. It is a candidate to align or generalize, not proof that the published runtime manifest already has a canonical UserIO requirement field.
 - FSM_UserIO currently provides `SemanticIntent` and the source-neutral `InteractionCapability(Name, Mode)` contract. `InteractionCapability` is a candidate primitive for declaring semantic needs, but no concrete UserIO provider MicroBundle or requirement-to-versioned-artifact resolver was confirmed in the reviewed source.
 - MicroBundleDomain's `MicroBundleDescriptor` lists generic `MicroBundleProvider` identifiers and dependencies. It is deliberately ontology-agnostic and does not negotiate host providers.
 - MicroBundleRepository's immutable artifact identity is a concrete content address, not a semantic capability address. A publication pointer transports the Experience manifest; it does not resolve its semantic UserIO requirements.
