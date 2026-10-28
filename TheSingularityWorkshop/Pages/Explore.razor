@@ -273,7 +273,10 @@
 
     private ElementBuilder BuildGui()
     {
-        if (!gardenVisitResolved || gardenMode)
+        // An explicit room URL must render that room immediately. Rendering the garden first
+        // and swapping the entire ElementBuilder tree after the storage check can break the
+        // Blazor diff when the same Explore component is reused for /explore?room=forge.
+        if ((!gardenVisitResolved && RequestedRoom is not ("engineering" or "forge")) || gardenMode)
             return SpatialGardenGuiBuilder.Build(this, SpatialGardenManifest.CreateDefault(), Experience.User.DisplayName, EnterGardenDestination, ExitGarden);
 
         if (insideRoomId is "hangout" or "settings")
