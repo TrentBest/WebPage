@@ -53,7 +53,7 @@ public static class SpatialForgeGuiBuilder
             .Style("color", Magenta).Style("font-family", "inherit").Style("font-size", ".48rem")
             .Style("letter-spacing", ".12em").Style("cursor", "pointer").OnClick(exitForge));
 
-        var welcomeState = WelcomeStates.GetOrCreateValue(receiver);
+        var welcomeState = WelcomeStates.GetValue(receiver, static _ => new WelcomeState());
         if (!welcomeState.Dismissed)
             root.Content(Welcome(receiver, () => { welcomeState.Dismissed = true; }));
 
@@ -119,7 +119,7 @@ public static class SpatialForgeGuiBuilder
 
     private static ElementBuilder Workbench(object receiver)
     {
-        var assembly = AssemblyStates.GetOrCreateValue(receiver);
+        var assembly = AssemblyStates.GetValue(receiver, static _ => new ForgeAssemblyState());
         var panel = WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("left", "5%").Style("top", "30%").Style("width", "140vw").Style("height", "43vh")
             .Style("box-sizing", "border-box").Style("z-index", "25").Style("padding", ".8rem")
@@ -167,7 +167,7 @@ public static class SpatialForgeGuiBuilder
 
     private static ElementBuilder StateShelf(object receiver)
     {
-        var assembly = AssemblyStates.GetOrCreateValue(receiver);
+        var assembly = AssemblyStates.GetValue(receiver, static _ => new ForgeAssemblyState());
         return WorkshopGui.Element(receiver, "div")
             .Style("position", "absolute").Style("left", "5%").Style("top", "9%").Style("width", "140vw").Style("height", "12%")
             .Style("z-index", "24").Style("box-sizing", "border-box").Style("padding", ".65rem")
