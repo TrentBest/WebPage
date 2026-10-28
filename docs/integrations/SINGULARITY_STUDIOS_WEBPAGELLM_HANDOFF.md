@@ -213,3 +213,17 @@ Related owner-side evidence:
 The artifact remains a **three-agent CPU/SVG proof**, not a 100,000-agent Extremus bake, GPU-performance result, or completed Singularity Studios production runtime. Extremus remains design-only until Gestures supplies executable canonical bake records and deterministic tests; WebPage and AnyApp must then consume the same versioned fixture rather than define separate crowd schemas.
 
 No merge, publication, release, or deployment is implied by this checkpoint.
+
+## 2026-10-28 follow-up — Extremus CPU bake exists; cross-host artifact remains open
+
+**Correction to the next-gate wording above:** Gestures' current [`EXTREMUS_CROWD_BAKING.md`](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/EXTREMUS_CROWD_BAKING.md) and development source already contain a CPU reference baker (`ExtremusCrowdBaker`), immutable input/output records, an `ExtremusBakeManifest`, deterministic stable IDs/positions/headings/scale/activity/phase, and tests for repeatability, input-order independence, seed diversity, bounds, exclusions, empty populations, and invalid inputs. The current Gestures development head `74a1b2e` passed [Build, test, and package run #39101076840](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/actions/runs/39101076840) on 2026-10-18.
+
+That advances the domain beyond a proposal, but only to **CPU population-instance layout**. Gestures explicitly does not yet provide a pose/animation bake, billboard atlas, impostor renderer, GPU-instancing path, crowd-LOD transition system, collision/clearance solver, or promotion back to live actors. The run is current-head evidence but is not a fresh post-18-October CI result.
+
+### Remaining cross-host gate
+
+WebPage and AnyApp still have no consumer for the canonical bake artifact. Before either host adds code, coordinate with Gestures and MicroBundleDomain/Repository on the versioned interchange schema, stable source-catalogue/profile/provider identities, region coordinate frame and units, seed/algorithm version, generated count/IDs, provenance, artifact hash, and dependency closure. Golden vectors and a CI-generated manifest/SVG should prove cross-language parity. Renderer then owns the neutral representation descriptor and observer/freshness policy; Visualize may realize only the representation resources its current backend supports.
+
+The WebPage/Visualize proof cited above remains a three-agent CPU/SVG proof. It does not consume the Extremus bake, prove a crowd representation transition, or establish 100,000-agent/GPU performance. Do not duplicate the Gestures bake in WebPage or AnyApp while the shared artifact boundary is pending.
+
+No other repository file was changed by this correction. No merge, publication, release, or deployment is implied.
