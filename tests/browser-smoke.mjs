@@ -3,11 +3,15 @@ import { chromium } from "playwright";
 const baseUrl = process.env.WORKSHOP_BASE_URL ?? "http://127.0.0.1:5260";
 const outputDir = process.env.WORKSHOP_SCREENSHOT_DIR ?? "TestResults/Browser";
 const browserErrors = [];
+const browserConsoleErrors = [];
 
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
   page.on("pageerror", error => browserErrors.push(error.message));
+  page.on("console", message => {
+    if (message.type() === "error") browserConsoleErrors.push(message.text());
+  });
   const failedRequests = [];
   page.on("requestfailed", request => failedRequests.push({
     url: request.url(),
@@ -209,7 +213,7 @@ try {
   } catch {
     const visibleText = await page.locator("body").innerText().catch(() => "<body text unavailable>");
     await page.screenshot({ path: `${outputDir}/04-forge-failure.png`, fullPage: true }).catch(() => {});
-    throw new Error(`Forge route reached ${page.url()} but its title was not visible. Body excerpt: ${visibleText.slice(0, 2500)}. Browser errors: ${browserErrors.join(" | ") || "<none captured>"}`);
+    throw new Error(`Forge route reached ${page.url()} but its title was not visible. Body excerpt: ${visibleText.slice(0, 2500)}. Page errors: ${browserErrors.join(" | ") || "<none captured>"}. Console errors: ${browserConsoleErrors.join(" | ") || "<none captured>"}`);
   }
   await page.getByText("BLACKSMITH FLOOR // FSM ASSEMBLY", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByText("WELCOME TO THE FSM FORGE", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
