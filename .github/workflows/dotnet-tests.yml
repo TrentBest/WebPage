@@ -255,6 +255,19 @@ jobs:
         working-directory: WebPage
         run: dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore -m:1 -p:WorkshopUseRepositorySources=true
 
+      - name: Regenerate and verify Singularity Studios stage plan from source
+        working-directory: WebPage
+        run: |
+          output="$RUNNER_TEMP/singularity-studios-stage-plan.svg"
+          dotnet restore samples/SingularityStudiosPlan/SingularityStudiosPlan.csproj
+          dotnet run --project samples/SingularityStudiosPlan/SingularityStudiosPlan.csproj --configuration Release --no-restore -- "$output"
+          test -s "$output"
+          if ! cmp -s "$output" TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage-plan.svg; then
+            echo "The committed Singularity Studios plan differs from the current Renderer → Visualize → GUI.SVG output."
+            diff -u TheSingularityWorkshop/wwwroot/Workshop/Forge/StreamingAssets/Experiences/singularity-studios-stage-plan.svg "$output" || true
+            exit 1
+          fi
+
       - name: Smoke-test live Renderer source integration
         working-directory: WebPage
         timeout-minutes: 5
