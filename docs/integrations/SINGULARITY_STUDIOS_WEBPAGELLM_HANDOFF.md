@@ -173,16 +173,16 @@ The goal is not to draw a giant studio. The goal is to make a production reusabl
 
 ## Extremus crowd representation coordination
 
-Gestures has added the proposed [Extremus deterministic crowd-baking contract](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/EXTREMUS_CROWD_BAKING.md). This is a design contract, not an implemented impostor renderer. The first intended fixture is two reproducible starport population patches generated from distinct seeds and actual source-catalogue capabilities.
+Gestures now has a CPU reference baker, immutable input/output records, and an `ExtremusBakeManifest` in its [deterministic crowd-baking contract](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/EXTREMUS_CROWD_BAKING.md). This is implemented CPU population-instance layout, not an impostor renderer or GPU crowd path. The planned first consumer fixture remains two reproducible starport population patches generated from distinct seeds and declared source-catalogue capabilities.
 
 For WebPage, treat any first SVG/GUI.SVG view as a CPU-generated inspection artifact with explicit seed, profile, source IDs, count, and provenance. Keep the stage/world identity authoritative outside Renderer; do not introduce a parallel crowd schema just for the browser. Please coordinate the shared fixture shape and coordinate frame with Gestures, Renderer, Visualize, and Physics before presenting it as a runtime-linked studio crowd. The same versioned fixture should eventually be consumable by AnyApp.
 
 
 ## 2026-10-26 — Extremus crowd-bake consumer checkpoint
 
-**Status:** shared-fixture coordination is actionable; the Extremus bake itself remains design-only. This is not a claim that WebPage or AnyApp has a runtime-linked crowd.
+**Historical status as of 2026-10-26:** shared-fixture coordination was actionable and the bake was still described as design-only. The 2026-10-28 follow-up below supersedes that implementation status: the Gestures CPU reference bake and deterministic tests now exist, but WebPage and AnyApp still have no runtime-linked crowd consumer.
 
-The current [Gestures crowd-baking contract](https://github.com/TrentBest/TheSingularityWorkshop.Gestures/blob/development/docs/EXTREMUS_CROWD_BAKING.md) calls for a manifest that identifies the schema and bake-algorithm versions, source-catalogue and population-profile IDs/versions, stable region ID and coordinate frame/units, seed and deterministic algorithm, region/content revisions, generated identity plus activity/phase mapping where supported, and output asset IDs/hashes/generator version. Its first intended fixture is two starport population patches from the same source vocabulary/profile family but different stable seeds. I found no WebPage or AnyApp consumer implementation for this bake in the searched source; the contract does not yet establish an executable cross-host artifact.
+At this checkpoint the intended manifest fields were schema and bake-algorithm versions, source-catalogue and population-profile IDs/versions, stable region ID and coordinate frame/units, seed and deterministic algorithm, region/content revisions, generated identity plus activity/phase mapping where supported, and output asset IDs/hashes/generator version. The planned first fixture was two starport population patches from the same source vocabulary/profile family but different stable seeds. The later 2026-10-28 source check confirms the CPU baker and manifest now exist; it still found no WebPage or AnyApp consumer and no agreed immutable cross-host artifact/dependency-closure contract.
 
 ### Ownership and consumer boundary
 
@@ -197,7 +197,7 @@ The current [Gestures crowd-baking contract](https://github.com/TrentBest/TheSin
 - [Visualize workflow run #40261788410](https://github.com/TrentBest/TheSingularityWorkshop.Visualize/actions/runs/40261788410) passed build/test, the dedicated Drone Construction frame proof, and GUI.SVG package proof; `publish_nuget` was skipped. The uploaded drone artifact is a **three-agent CPU/SVG proof**, not an Extremus bake, 100k-agent rendering, or a GPU-performance result.
 - [Experiences workflow run #40261791798](https://github.com/TrentBest/TheSingularityWorkshop.Experiences/actions/runs/40261791798) passed the source-integration, Castle Siege, Drone Construction, showcase, and quadrotor benchmark jobs; package publication was skipped. These results do not implement or validate the Extremus crowd contract.
 
-**Next gate:** Gestures must supply executable canonical bake records, deterministic/order-independence/seed-divergence tests, and a CI-generated manifest/snapshot. Renderer and Visualize then review the neutral representation descriptor against implemented contracts. WebPage and AnyApp can consume that same versioned artifact after the shared provider/dependency-closure path is available. Until then, any SVG remains a CPU-generated inspection view.
+**Next gate at the 2026-10-26 checkpoint:** obtain executable canonical bake records, deterministic/order-independence/seed-divergence tests, and a CI-generated manifest/snapshot. The 2026-10-28 follow-up below confirms those CPU-bake elements now exist. The remaining gate is agreement with MicroBundleDomain/Repository on the versioned immutable interchange identity and dependency closure, then Renderer/Visualize review of the neutral representation descriptor and golden-vector parity. WebPage and AnyApp consumers remain unimplemented; any SVG is still a CPU-generated inspection view.
 
 No other repository was edited by this checkpoint. No merge, package publication, release, or deployment was performed.
 
