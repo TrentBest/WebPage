@@ -194,7 +194,7 @@ FSM_REST's [current source transport](https://github.com/TrentBest/TheSingularit
 ### Source-grounded contract status
 
 - The current Experience manifest's `Bundles` / `ExperienceBundleRequest` entries identify concrete bundle roots and can carry immutable artifact identity/configuration references. `Intent` is a single `SemanticIntent` (`Name` plus optional `ProtocolId`), not a capability collection.
-- FSM_UserIO currently provides the semantic-intent contract; no concrete UserIO provider MicroBundle or capability resolver was confirmed in the reviewed source.
+- FSM_UserIO currently provides `SemanticIntent` and the source-neutral `InteractionCapability(Name, Mode)` contract. `InteractionCapability` is a candidate primitive for declaring semantic needs, but no concrete UserIO provider MicroBundle or requirement-to-versioned-artifact resolver was confirmed in the reviewed source.
 - MicroBundleDomain's `MicroBundleDescriptor` lists generic `MicroBundleProvider` identifiers and dependencies. It is deliberately ontology-agnostic and does not negotiate host providers.
 - MicroBundleRepository's immutable artifact identity is a concrete content address, not a semantic capability address. A publication pointer transports the Experience manifest; it does not resolve its semantic UserIO requirements.
 - WebPage's `OntologySignature`, Hub capability IDs, and `ExperienceManifest.RequiredCapabilities` belong to the existing WebPage Hub/ontology boundary. They must not be silently reused as the FSM_UserIO / AnyApp manifest contract.
