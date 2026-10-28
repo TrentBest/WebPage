@@ -11,7 +11,9 @@
 
 <PageTitle>Explore // The Singularity Workshop</PageTitle>
 
-@BuildGui().Build()
+<div @key="CurrentGuiKey" style="display: contents">
+    @BuildGui().Build()
+</div>
 
 @if (!gardenMode && insideRoomId is null && ExperienceCatalog.Experiences.Count > 0)
 {
@@ -295,6 +297,9 @@
             }
         }
     }
+
+    private string CurrentGuiKey =>
+        insideRoomId ?? (gardenMode || !gardenVisitResolved ? "garden" : "map");
 
     private ElementBuilder BuildGui()
     {
