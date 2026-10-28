@@ -208,15 +208,40 @@
         ApplyRequestedRoom();
     }
 
+    private string? EffectiveRequestedRoom
+    {
+        get
+        {
+            // The browser URL is the authoritative source for a deep link, including
+            // when the router reuses this component and its supplied query parameter
+            // is stale or has not yet been refreshed.
+            var query = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).Query;
+            foreach (var parameter in query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var separator = parameter.IndexOf('=');
+                var rawName = separator < 0 ? parameter : parameter[..separator];
+                var name = Uri.UnescapeDataString(rawName.Replace('+', ' '));
+                if (!string.Equals(name, "room", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var rawValue = separator < 0 ? string.Empty : parameter[(separator + 1)..];
+                return Uri.UnescapeDataString(rawValue.Replace('+', ' '));
+            }
+
+            return RequestedRoom;
+        }
+    }
+
     private void ApplyRequestedRoom()
     {
-        if (RequestedRoom is not ("engineering" or "forge"))
+        var requestedRoom = EffectiveRequestedRoom;
+        if (requestedRoom is not ("engineering" or "forge"))
             return;
 
         // Query parameters can change while Blazor reuses this Explore component.
         // Apply the destination at parameter-set time, not only on first render.
         gardenMode = false;
-        insideRoomId = RequestedRoom == "forge" ? "forge" : "engineering";
+        insideRoomId = requestedRoom == "forge" ? "forge" : "engineering";
         if (insideRoomId == "forge")
             fsmForgeVisited = true;
     }
@@ -276,7 +301,7 @@
         // An explicit room URL must render that room immediately. Rendering the garden first
         // and swapping the entire ElementBuilder tree after the storage check can break the
         // Blazor diff when the same Explore component is reused for /explore?room=forge.
-        if ((!gardenVisitResolved && RequestedRoom is not ("engineering" or "forge")) || gardenMode)
+        if ((!gardenVisitResolved && EffectiveRequestedRoom is not ("engineering" or "forge")) || gardenMode)
             return SpatialGardenGuiBuilder.Build(this, SpatialGardenManifest.CreateDefault(), Experience.User.DisplayName, EnterGardenDestination, ExitGarden);
 
         if (insideRoomId is "hangout" or "settings")
@@ -2104,7 +2129,7 @@
         // Return that visitor to the Home Welcome floorplan; a Forge entered from
         // within the spatial world should instead reopen its own Workshop map overlay.
         var returnToWelcomeFloorplan = string.Equals(
-            RequestedRoom, "forge", StringComparison.OrdinalIgnoreCase);
+            EffectiveRequestedRoom, "forge", StringComparison.OrdinalIgnoreCase);
         ExitRoom();
 
         if (returnToWelcomeFloorplan)
