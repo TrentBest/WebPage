@@ -127,7 +127,11 @@ jobs:
           echo "WebPage host served its landing HTML and Blazor boot manifest."
 
           mkdir -p TestResults/Browser
-          WORKSHOP_BASE_URL=http://127.0.0.1:5260 WORKSHOP_SCREENSHOT_DIR=TestResults/Browser node tests/browser-smoke.mjs
+          if ! WORKSHOP_BASE_URL=http://127.0.0.1:5260 WORKSHOP_SCREENSHOT_DIR=TestResults/Browser node tests/browser-smoke.mjs; then
+            echo "WebPage host log after failed browser smoke:"
+            cat /tmp/webpage-host.log || true
+            exit 1
+          fi
 
       - name: Build
         run: |
