@@ -133,6 +133,7 @@
     private DateTime? mazeStartedAtUtc;
     private string? selectedLeaderboardEntry;
     private string? insideRoomId;
+    [Parameter]
     [SupplyParameterFromQuery(Name = "room")]
     public string? RequestedRoom { get; set; }
     private bool behaviorBuilderVisible;
