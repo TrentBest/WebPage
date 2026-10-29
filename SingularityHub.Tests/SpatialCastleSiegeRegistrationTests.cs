@@ -21,7 +21,9 @@ public sealed class SpatialCastleSiegeRegistrationTests
     public void DefaultSpatialSceneContainsTheRegisteredCastleSiegeInteractable()
     {
         var scene = SpatialWorkshopScene.CreateDefault();
-        var interactable = Assert.Single(scene.Interactables.Where(item => item.ExperienceId == "castle-siege"));
+        var interactable = Assert.Single(
+            scene.Interactables,
+            item => item.ExperienceId == "castle-siege");
 
         Assert.Equal("Castle Siege", interactable.Name);
         Assert.Equal("castle-siege", interactable.Place?.SceneId);
