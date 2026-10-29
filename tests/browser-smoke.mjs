@@ -488,7 +488,7 @@ try {
   await page.locator(".studios-audio audio[controls]").waitFor({ state: "visible", timeout: 10_000 });
   await page.getByText("ANALYTICAL PATH METADATA ONLY", { exact: true }).waitFor({ state: "visible", timeout: 10_000 });
   await page.getByRole("heading", { name: "First-order room reflection", exact: true }).waitFor({ state: "visible", timeout: 10_000 });
-  const roomRunLink = page.getByRole("link", { name: "SERIALIZED ROOM RUN", exact: true });
+  const roomRunLink = page.getByRole("link", { name: /SERIALIZED ROOM RUN RECORD/ });
   await roomRunLink.waitFor({ state: "visible", timeout: 10_000 });
   if (!(await roomRunLink.getAttribute("href"))?.includes("first-order-room-reflection.run.json")) {
     throw new Error("The first-order room-reflection section must link to its Physics-owned serialized run record.");
