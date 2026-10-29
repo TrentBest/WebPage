@@ -63,6 +63,7 @@ jobs:
       # A lightweight HTTP smoke test proves the built host serves its landing page and
       # Blazor WebAssembly boot manifest. It does not claim to verify browser animations.
       - name: Smoke-test WebPage host and browser journey
+        id: browser_smoke
         timeout-minutes: 8
         shell: bash
         run: |
@@ -133,23 +134,29 @@ jobs:
             exit 1
           fi
 
+      # Keep unit/build validation running when the independent browser journey fails;
+      # the workflow still reports the browser smoke failure as a failed run.
       - name: Build
+        if: ${{ success() || steps.browser_smoke.outcome == 'failure' }}
         run: |
           dotnet build SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-restore
           dotnet build Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-restore
 
       - name: Test SingularityHub with TRX, coverage, and hang diagnostics
+        if: ${{ success() || steps.browser_smoke.outcome == 'failure' }}
         timeout-minutes: 6
         run: |
           dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-build --blame-hang --blame-hang-timeout 2m --blame-hang-dump-type mini --collect:"XPlat Code Coverage" --results-directory ./TestResults/SingularityHub --logger "trx;LogFileName=SingularityHub.Tests.trx"
 
       - name: Test LivingGui Experience with TRX and coverage
+        if: ${{ success() || steps.browser_smoke.outcome == 'failure' }}
         timeout-minutes: 5
         run: |
           dotnet test Experiences/LivingGuiExperience.Tests/LivingGuiExperience.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults/LivingGui --logger "trx;LogFileName=LivingGuiExperience.Tests.trx"
 
       - name: Test Pong Experience with TRX and coverage
+        if: ${{ success() || steps.browser_smoke.outcome == 'failure' }}
         timeout-minutes: 5
         run: |
           dotnet test Experiences/PongExperience.Tests/PongExperience.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults/Pong --logger "trx;LogFileName=PongExperience.Tests.trx"
