@@ -285,10 +285,16 @@ public sealed class WebPageHostManifestTests
         }
         """;
 
+        var manifestCompositionFailure = manifestB
+            .Replace("showcase-b", "showcase-composition-failure", StringComparison.Ordinal)
+            .Replace("\\"bundleId\\": 2102, \\"version\\": \\"1.0.0\\"",
+                "\\"bundleId\\": 2102, \\"version\\": \\"9.9.9\\"", StringComparison.Ordinal);
+
         using var client = new HttpClient(new ManifestHandler(new Dictionary<string, string>
         {
             ["manifest-a.json"] = manifestA,
             ["manifest-b.json"] = manifestB,
+            ["composition-failure.json"] = manifestCompositionFailure,
             ["invalid.json"] = "{ invalid json"
         }))
         {
@@ -334,6 +340,14 @@ public sealed class WebPageHostManifestTests
 
         var activeAssembly = service.RuntimeAssembly;
         var activeExecutionRuntime = executionHost.ExecutionRuntime;
+
+        await Assert.ThrowsAnyAsync<Exception>(
+            () => service.SwitchManifestAsync("composition-failure.json"));
+        Assert.Equal("showcase-b", service.Manifest!.ManifestId);
+        Assert.Same(activeAssembly, service.RuntimeAssembly);
+        Assert.Same(activeExecutionRuntime, executionHost.ExecutionRuntime);
+        Assert.Equal("manifest-b.json", service.ActiveManifestPath);
+
         await Assert.ThrowsAnyAsync<Exception>(() => service.SwitchManifestAsync("invalid.json"));
         Assert.Equal("showcase-b", service.Manifest!.ManifestId);
         Assert.Same(activeAssembly, service.RuntimeAssembly);
