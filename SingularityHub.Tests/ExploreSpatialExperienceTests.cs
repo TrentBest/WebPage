@@ -25,6 +25,7 @@ public sealed class ExploreSpatialExperienceTests
                 "acoustic-studio-lab",
                 "aec-remote-office",
                 "blueprint-library",
+                "castle-siege",
                 "forge",
                 "fsm-bench",
                 "npc-studio",
