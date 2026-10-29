@@ -287,8 +287,9 @@ public sealed class WebPageHostManifestTests
 
         var manifestCompositionFailure = manifestB
             .Replace("showcase-b", "showcase-composition-failure", StringComparison.Ordinal)
-            .Replace("\\"bundleId\\": 2102, \\"version\\": \\"1.0.0\\"",
-                "\\"bundleId\\": 2102, \\"version\\": \\"9.9.9\\"", StringComparison.Ordinal);
+            .Replace("\"bundleId\": 2102, \"version\": \"1.0.0\"",
+
+                "\"bundleId\": 2102, \"version\": \"9.9.9\"", StringComparison.Ordinal);
 
         using var client = new HttpClient(new ManifestHandler(new Dictionary<string, string>
         {
