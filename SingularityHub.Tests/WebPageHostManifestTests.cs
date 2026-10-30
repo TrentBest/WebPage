@@ -63,6 +63,60 @@ public sealed class WebPageHostManifestTests
         Assert.True(manifest.DeepDive.Telemetry);
     }
 
+    [Fact]
+    public void ManifestParserPreservesOptionalImmutableMicroBundleHash()
+    {
+        const string hash = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        const string json = """
+        {
+          "manifestId": "webpage-host",
+          "version": "1.0.0",
+          "startup": [],
+          "hub": [],
+          "running": [
+            { "name": "Primary", "kind": "Primary", "microBundles": [
+              { "bundleId": 2102, "version": "1.0.0", "contentHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+            ], "presentationSeconds": 0 }
+          ],
+          "deepDive": { "experience": "Primary", "restartFromManifest": true, "telemetry": false }
+        }
+        """;
+
+        var manifest = WebPageHostManifestParser.Parse(json);
+        var bundle = Assert.Single(Assert.Single(manifest.Running).MicroBundles!);
+
+        Assert.Equal(hash, bundle.ContentHash);
+#if WORKSHOP_USE_REPOSITORY_SOURCES
+        var runtimeEntry = bundle.ToRuntimeManifestEntry();
+        Assert.True(runtimeEntry.IsPinned);
+        Assert.Equal(hash, runtimeEntry.ContentHash);
+#else
+        Assert.Throws<NotSupportedException>(() => bundle.ToRuntimeManifestEntry());
+#endif
+    }
+
+    [Fact]
+    public void ManifestParserRejectsMalformedImmutableMicroBundleHash()
+    {
+        const string json = """
+        {
+          "manifestId": "webpage-host",
+          "version": "1.0.0",
+          "startup": [],
+          "hub": [],
+          "running": [
+            { "name": "Primary", "kind": "Primary", "microBundles": [
+              { "bundleId": 2102, "version": "1.0.0", "contentHash": "sha256:not-a-hash" }
+            ], "presentationSeconds": 0 }
+          ],
+          "deepDive": { "experience": "Primary", "restartFromManifest": true, "telemetry": false }
+        }
+        """;
+
+        var error = Assert.Throws<InvalidOperationException>(() => WebPageHostManifestParser.Parse(json));
+        Assert.Contains("invalid SHA-256 content hash", error.Message);
+    }
+
     [Theory]
     [InlineData("2.0.0")]
     [InlineData("not-a-version")]
