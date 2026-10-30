@@ -22,9 +22,21 @@ public sealed record WebPageManifestExperience(
     double PresentationSeconds);
 
 /// <summary>One versioned MicroBundle root selected by the WebPage host manifest.</summary>
-public sealed record WebPageManifestBundle(ulong BundleId, string Version)
+public sealed record WebPageManifestBundle(ulong BundleId, string Version, string? ContentHash = null)
 {
-    public MicroBundleManifestEntry ToRuntimeManifestEntry() => new(BundleId, Version);
+    /// <summary>Converts this host selection into the FSM_COS runtime identity.</summary>
+    public MicroBundleManifestEntry ToRuntimeManifestEntry()
+    {
+#if WORKSHOP_USE_REPOSITORY_SOURCES
+        return new MicroBundleManifestEntry(BundleId, Version, ContentHash);
+#else
+        if (ContentHash is not null)
+            throw new NotSupportedException(
+                "Content-pinned host manifest entries require WorkshopUseRepositorySources=true until the updated FSM_COS package is available.");
+
+        return new MicroBundleManifestEntry(BundleId, Version);
+#endif
+    }
 }
 
 /// <summary>One manifest-defined hub destination. The host renders this data; it does not hard-code the catalog.</summary>
@@ -120,6 +132,12 @@ public static class WebPageHostManifestParser
             if (string.IsNullOrWhiteSpace(bundle.Version))
                 throw new InvalidOperationException(
                     $"The WebPage host manifest does not declare a version for MicroBundle {bundle.BundleId}.");
+
+            if (bundle.ContentHash is not null &&
+                (bundle.ContentHash.Length != 64 ||
+                 bundle.ContentHash.Any(character => !Uri.IsHexDigit(character))))
+                throw new InvalidOperationException(
+                    $"The WebPage host manifest declares an invalid SHA-256 content hash for MicroBundle {bundle.BundleId}.");
         }
     }
 }
