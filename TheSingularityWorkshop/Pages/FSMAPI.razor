@@ -96,6 +96,8 @@
 
     protected override void OnInitialized()
     {
+        _group = "Workshop.FSMApiLearning." + Guid.NewGuid().ToString("N");
+        _machine = "Workshop.FSMApiLearningMachine." + Guid.NewGuid().ToString("N");
         FSM_API.Create.CreateFiniteStateMachine(_machine, processRate: -1, processingGroup: _group)
             .State("Forward", null, state => Advance((OscillatorContext)state, +1), null)
             .State("Reverse", null, state => Advance((OscillatorContext)state, -1), null)
@@ -114,8 +116,6 @@
             FSM_API.Interaction.DestroyInstance(_handle);
         }
 
-        _group = "Workshop.FSMApiLearning." + Guid.NewGuid().ToString("N");
-        _machine = "Workshop.FSMApiLearningMachine." + Guid.NewGuid().ToString("N");
         _tick = 0;
         _samples.Clear();
         _context = new OscillatorContext(_step);
@@ -125,6 +125,8 @@
 
     private void Tick()
     {
+        if (_tick >= 12)
+            return;
         FSM_API.Interaction.Update(_group);
         _tick++;
         Capture();
