@@ -20,8 +20,8 @@
                     <input id="step-size" class="form-range" type="range" min="1" max="5" step="1" @bind="_step" @bind:event="oninput" @bind:after="ResetExperiment" />
                     <p class="small text-muted">Prediction: once the value reaches 10, which state should be active?</p>
                     <div class="d-flex flex-wrap gap-2">
-                        <button class="btn btn-primary" @onclick="Tick">Tick once</button>
-                        <button class="btn btn-outline-primary" @onclick="TickSix">Run 6 ticks</button>
+                        <button class="btn btn-primary" @onclick="Tick" disabled="@(_tick >= 12)">Tick once</button>
+                        <button class="btn btn-outline-primary" @onclick="TickSix" disabled="@(_tick >= 12)">Run 6 ticks</button>
                         <button class="btn btn-outline-secondary" @onclick="ResetExperiment">Reset</button>
                     </div>
                     <hr />
@@ -87,8 +87,8 @@
 
 @code {
     private double _step = 3;
-    private readonly string _group = "Workshop.FSMApiLearning." + Guid.NewGuid().ToString("N");
-    private readonly string _machine = "Workshop.FSMApiLearningMachine." + Guid.NewGuid().ToString("N");
+    private string _group = "";
+    private string _machine = "";
     private OscillatorContext _context = default!;
     private FSMHandle _handle = default!;
     private int _tick;
@@ -104,6 +104,8 @@
             FSM_API.Interaction.DestroyInstance(_handle);
         }
 
+        _group = "Workshop.FSMApiLearning." + Guid.NewGuid().ToString("N");
+        _machine = "Workshop.FSMApiLearningMachine." + Guid.NewGuid().ToString("N");
         _tick = 0;
         _samples.Clear();
         _context = new OscillatorContext(_step);
@@ -127,7 +129,7 @@
 
     private void TickSix()
     {
-        for (var i = 0; i < 6; i++)
+        for (var i = 0; i < 6 && _tick < 12; i++)
             Tick();
     }
 
