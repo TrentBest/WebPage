@@ -1,21 +1,166 @@
-﻿@page "/fsm-api"
+@page "/fsm-api"
+@using System.Globalization
+@implements IDisposable
+
 <PageTitle>FSM_API - The Foundation</PageTitle>
 
-<h1>FSM_API: The Foundation</h1>
+<div class="container py-4">
+    <div class="mb-4">
+        <span class="text-uppercase text-info fw-bold">Live WebAssembly exercise</span>
+        <h1>FSM_API: Make a value turn around</h1>
+        <p class="lead">A value moves between 0 and 10. When it reaches a boundary, the finite state machine changes direction. Use the controls, predict the next state, and inspect the trace produced by real FSM_API updates.</p>
+    </div>
 
-<p>
-    The FSM_API is the lightweight, high-performance, and engine-agnostic core technology providing
-    a robust C# framework for defining complex Finite State Machines. It is the core logic
-    engine from which all other components of The Singularity Workshop are built.
-</p>
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <section class="card h-100">
+                <div class="card-body">
+                    <h2 class="h4 card-title">Set the experiment</h2>
+                    <label for="step-size" class="form-label">Step size: @_step</label>
+                    <input id="step-size" class="form-range" type="range" min="1" max="5" step="1" @bind="_step" @bind:event="oninput" @bind:after="ResetExperiment" />
+                    <p class="small text-muted">Prediction: once the value reaches 10, which state should be active?</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-primary" @onclick="Tick">Tick once</button>
+                        <button class="btn btn-outline-primary" @onclick="TickSix">Run 6 ticks</button>
+                        <button class="btn btn-outline-secondary" @onclick="ResetExperiment">Reset</button>
+                    </div>
+                    <hr />
+                    <dl class="row mb-0">
+                        <dt class="col-5">Value</dt><dd class="col-7">@_context.Value.ToString("0.###", CultureInfo.InvariantCulture)</dd>
+                        <dt class="col-5">FSM state</dt><dd class="col-7"><strong>@_handle.CurrentState</strong></dd>
+                        <dt class="col-5">Updates</dt><dd class="col-7">@_tick</dd>
+                    </dl>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-8">
+            <section class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-baseline flex-wrap gap-2">
+                        <h2 class="h4 mb-0">The value moves; the state explains why</h2>
+                        <span class="badge @(_handle.CurrentState == "Forward" ? "bg-info text-dark" : "bg-warning text-dark")">@_handle.CurrentState</span>
+                    </div>
+                    <svg class="w-100 mt-3" viewBox="0 0 640 190" role="img" aria-label="@($"FSM_API value trace, currently {_context.Value:0.###} in state {_handle.CurrentState}")">
+                        <line x1="38" y1="28" x2="620" y2="28" stroke="#8a9aaa" stroke-dasharray="5 5" />
+                        <line x1="38" y1="148" x2="620" y2="148" stroke="#8a9aaa" />
+                        <text x="4" y="32" font-size="13">10</text><text x="15" y="152" font-size="13">0</text>
+                        <polyline points="@TracePoints" fill="none" stroke="#258cf4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                        @foreach (var sample in _samples)
+                        {
+                            <circle cx="@PlotX(sample.Tick)" cy="@PlotY(sample.Value)" r="@(sample.Tick == _tick ? 7 : 4)" fill="@(sample.State == "Forward" ? "#20b9a2" : "#f0ad4e")">
+                                <title>@($"Tick {sample.Tick}: {sample.Value:0.###}, {sample.State}")</title>
+                            </circle>
+                        }
+                    </svg>
+                    <p class="small text-muted mb-0">Each marker comes from the context and state handle after an FSM_API update. Green means Forward; gold means Reverse.</p>
+                </div>
+            </section>
+            <section class="card">
+                <div class="card-body">
+                    <h2 class="h4">Observed trace</h2>
+                    <ol class="list-group list-group-numbered list-group-horizontal flex-wrap">
+                        @foreach (var sample in _samples)
+                        {
+                            <li class="list-group-item d-flex flex-column px-3">
+                                <span class="small text-muted">tick @sample.Tick</span>
+                                <strong>@sample.Value.ToString("0.###", CultureInfo.InvariantCulture)</strong>
+                                <span>@sample.State</span>
+                            </li>
+                        }
+                    </ol>
+                </div>
+            </section>
+        </div>
+    </div>
 
-<h2>Core Concepts</h2>
-<ul>
-    <li>FSM Definition (The Blueprint)</li>
-    <li>FSM Handle (The Live Instance)</li>
-    <li>IStateContext (The Data Bag)</li>
-</ul>
+    <section class="mt-4 p-4 border rounded">
+        <h2 class="h4">Follow the real handoff</h2>
+        <ol>
+            <li><strong>Definition:</strong> two FSM_API states, Forward and Reverse, each apply a bounded step.</li>
+            <li><strong>Transition:</strong> reaching either endpoint switches the live FSM handle to the opposite state.</li>
+            <li><strong>Update:</strong> each button calls <code>FSM_API.Interaction.Update</code> on this exercise’s isolated processing group.</li>
+            <li><strong>Evidence:</strong> the value and state displayed above are read from the same context and handle used by those updates.</li>
+        </ol>
+        <p class="mb-0">This is the WebPage host running FSM_API in .NET WebAssembly. <a href="https://github.com/TrentBest/TheSingularityWorkshop.Learning/blob/main/docs/PROBLEM_TO_PROOF.md">Continue with the problem-to-proof lesson</a> or inspect the <a href="https://github.com/TrentBest/FSM_API">FSM_API source</a>.</p>
+    </section>
+</div>
 
-<p>
-    We'll showcase live FSM instances here to demonstrate the API's features.
-</p>
+@code {
+    private double _step = 3;
+    private readonly string _group = "Workshop.FSMApiLearning." + Guid.NewGuid().ToString("N");
+    private readonly string _machine = "Workshop.FSMApiLearningMachine." + Guid.NewGuid().ToString("N");
+    private OscillatorContext _context = default!;
+    private FSMHandle _handle = default!;
+    private int _tick;
+    private readonly List<TickSample> _samples = [];
+
+    protected override void OnInitialized() => ResetExperiment();
+
+    private void ResetExperiment()
+    {
+        if (_handle is not null)
+        {
+            _context.IsValid = false;
+            FSM_API.Interaction.DestroyInstance(_handle);
+        }
+
+        _tick = 0;
+        _samples.Clear();
+        _context = new OscillatorContext(_step);
+        FSM_API.Create.CreateFiniteStateMachine(_machine, processRate: -1, processingGroup: _group)
+            .State("Forward", null, state => Advance((OscillatorContext)state, +1), null)
+            .State("Reverse", null, state => Advance((OscillatorContext)state, -1), null)
+            .WithInitialState("Forward")
+            .Transition("Forward", "Reverse", state => ((OscillatorContext)state).Value >= 10)
+            .Transition("Reverse", "Forward", state => ((OscillatorContext)state).Value <= 0)
+            .BuildDefinition();
+        _handle = FSM_API.Create.CreateInstance(_machine, _context, _group);
+        Capture();
+    }
+
+    private void Tick()
+    {
+        FSM_API.Interaction.Update(_group);
+        _tick++;
+        Capture();
+    }
+
+    private void TickSix()
+    {
+        for (var i = 0; i < 6; i++)
+            Tick();
+    }
+
+    private void Capture() => _samples.Add(new TickSample(_tick, _context.Value, _handle.CurrentState));
+
+    private string TracePoints => string.Join(" ", _samples.Select(sample =>
+        $"{PlotX(sample.Tick).ToString("0.##", CultureInfo.InvariantCulture)},{PlotY(sample.Value).ToString("0.##", CultureInfo.InvariantCulture)}"));
+
+    private static double PlotX(int tick) => 38 + tick * 44;
+    private static double PlotY(double value) => 148 - value * 12;
+
+    private static void Advance(OscillatorContext context, int direction)
+    {
+        context.Value = Math.Clamp(context.Value + direction * context.Step, 0, 10);
+    }
+
+    public void Dispose()
+    {
+        if (_handle is not null)
+        {
+            _context.IsValid = false;
+            FSM_API.Interaction.DestroyInstance(_handle);
+        }
+    }
+
+    private sealed class OscillatorContext : IStateContext
+    {
+        public OscillatorContext(double step) { Step = step; }
+        public string Name { get; set; } = "webapp-fsm-api-learning";
+        public bool IsValid { get; set; } = true;
+        public double Step { get; }
+        public double Value { get; set; }
+    }
+
+    private sealed record TickSample(int Tick, double Value, string State);
+}
