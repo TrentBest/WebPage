@@ -94,7 +94,17 @@
     private int _tick;
     private readonly List<TickSample> _samples = [];
 
-    protected override void OnInitialized() => ResetExperiment();
+    protected override void OnInitialized()
+    {
+        FSM_API.Create.CreateFiniteStateMachine(_machine, processRate: -1, processingGroup: _group)
+            .State("Forward", null, state => Advance((OscillatorContext)state, +1), null)
+            .State("Reverse", null, state => Advance((OscillatorContext)state, -1), null)
+            .WithInitialState("Forward")
+            .Transition("Forward", "Reverse", state => ((OscillatorContext)state).Value >= 10)
+            .Transition("Reverse", "Forward", state => ((OscillatorContext)state).Value <= 0)
+            .BuildDefinition();
+        ResetExperiment();
+    }
 
     private void ResetExperiment()
     {
@@ -109,13 +119,6 @@
         _tick = 0;
         _samples.Clear();
         _context = new OscillatorContext(_step);
-        FSM_API.Create.CreateFiniteStateMachine(_machine, processRate: -1, processingGroup: _group)
-            .State("Forward", null, state => Advance((OscillatorContext)state, +1), null)
-            .State("Reverse", null, state => Advance((OscillatorContext)state, -1), null)
-            .WithInitialState("Forward")
-            .Transition("Forward", "Reverse", state => ((OscillatorContext)state).Value >= 10)
-            .Transition("Reverse", "Forward", state => ((OscillatorContext)state).Value <= 0)
-            .BuildDefinition();
         _handle = FSM_API.Create.CreateInstance(_machine, _context, _group);
         Capture();
     }
