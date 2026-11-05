@@ -47,6 +47,7 @@ internal class Program
         builder.Services.AddScoped<WorkshopWorldClient>();
         builder.Services.AddScoped<IWorkshopStorage, BrowserWorkshopStorage>();
         builder.Services.AddScoped<WorkshopAssetLibrary>();
+        builder.Services.AddScoped<EconomyDiceService>();
 
         // The WebPage hosts the concrete Hub but owns no Hub mechanics.
         // Hub state belongs to one browser session. Scoped lifetimes are required for
