@@ -1,0 +1,17 @@
+{
+  "repository": "TrentBest/WebPage",
+  "policy": "exactly-master-and-development",
+  "required_branches": [
+    "development",
+    "master"
+  ],
+  "actual_branches": [
+    "development",
+    "master"
+  ],
+  "branch_count": 2,
+  "status": "COMPLIANT",
+  "evaluated_at": "2026-11-05T04:27:16Z",
+  "workflow_run": "https://github.com/TrentBest/WebPage/actions/runs/41967883195",
+  "triggering_commit": "eb9003f86db91e15e2490a19c8db61dfbc343e4b"
+}
