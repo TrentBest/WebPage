@@ -1,0 +1,111 @@
+@page "/dice"
+@inject EconomyDiceService DiceService
+
+<PageTitle>Dice Table | The Singularity Workshop</PageTitle>
+
+<main class="dice-lab">
+    <a class="back-link" href="/hub">← RETURN TO THE HUB</a>
+    <header>
+        <p class="eyebrow">THE SINGULARITY WORKSHOP / ECONOMY</p>
+        <h1>Dice <span>Table</span></h1>
+        <p class="intro">An outcome-first experience. Economy resolves every face; this page presents the result and evaluates named rules without changing it.</p>
+    </header>
+
+    @if (!DiceService.IsAvailable)
+    {
+        <section class="notice" role="status">
+            <strong>Source integration required</strong>
+            <p>The Economy dice domain is not bundled into the default package build. Run this experience through the repository-source integration workflow to enable authoritative rolls. No browser-side random fallback is provided.</p>
+        </section>
+    }
+    else
+    {
+        <section class="table-panel" aria-labelledby="rollHeading">
+            <div class="controls">
+                <label>Die shape
+                    <select @bind="FaceCount">
+                        <option value="4">D4</option><option value="6">D6</option>
+                        <option value="8">D8</option><option value="10">D10</option>
+                        <option value="12">D12</option><option value="20">D20</option>
+                    </select>
+                </label>
+                <label>Quantity
+                    <input type="number" min="1" max="100" @bind="Quantity" />
+                </label>
+                <button class="roll-button" type="button" @onclick="Roll">ROLL DICE</button>
+            </div>
+            @if (LastRoll is not null)
+            {
+                <div class="result" aria-live="polite">
+                    <div class="result-heading"><span>RESOLVED FACES</span><small>@LastRoll.RolledAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</small></div>
+                    <div class="dice-faces">
+                        @foreach (var face in LastRoll.Faces)
+                        {
+                            <div class="die-face" aria-label="Resolved face @face">@face</div>
+                        }
+                    </div>
+                    <div class="total"><span>TOTAL</span><strong>@LastRoll.Total</strong></div>
+                    <div class="rule-grid">
+                        <article><small>HIGHEST FACE</small><strong>@LastRoll.Highest</strong></article>
+                        <article><small>DOUBLES</small><strong>@(LastRoll.Doubles is null ? "N/A" : LastRoll.Doubles.Value ? "YES" : "NO")</strong></article>
+                        <article><small>AT LEAST 10</small><strong>@(LastRoll.AtLeastTen == true ? "YES" : "NO")</strong></article>
+                    </div>
+                    <p class="roll-id">ROLL ID · @LastRoll.RollId</p>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">Choose a die and roll to create the first authoritative result.</div>
+            }
+        </section>
+        <section class="history">
+            <div class="history-heading"><h2>Roll history</h2><span>@History.Count results</span></div>
+            @if (History.Count == 0)
+            {
+                <p class="empty-history">No rolls yet.</p>
+            }
+            else
+            {
+                @foreach (var item in History)
+                {
+                    <div class="history-row"><span>@item.RolledAt.ToLocalTime().ToString("HH:mm:ss")</span><span>@item.Faces.Count × D@item.FaceCount</span><strong>@item.Total</strong></div>
+                }
+            }
+        </section>
+    }
+</main>
+
+<style>
+.dice-lab{min-height:100vh;margin:-1rem -1.5rem;padding:clamp(1rem,4vw,4rem);box-sizing:border-box;background:radial-gradient(ellipse at 70% 0,rgba(0,234,255,.12),transparent 40%),#020711;color:#eafaff;font-family:system-ui,sans-serif}
+.dice-lab>header,.dice-lab>section{max-width:1000px;margin-inline:auto}.back-link{color:#8aa7b4;text-decoration:none;font:700 .65rem Consolas,monospace;letter-spacing:.12em}.eyebrow{margin-top:3rem;color:#00eaff;font:700 .65rem Consolas,monospace;letter-spacing:.18em}
+h1{margin:.6rem 0;font-size:clamp(3rem,8vw,6rem);line-height:1;letter-spacing:-.06em}h1 span{color:#ff2cff}.intro{max-width:70ch;color:#a3bbc6;line-height:1.7}
+.table-panel,.history,.notice{margin-top:2rem;padding:clamp(1rem,3vw,2rem);border:1px solid rgba(0,234,255,.2);background:rgba(5,15,29,.85)}
+.controls{display:flex;gap:1rem;align-items:end;flex-wrap:wrap}.controls label{display:grid;gap:.45rem;color:#9db8c5;font-size:.72rem;letter-spacing:.08em}.controls select,.controls input{min-width:6rem;padding:.75rem;background:#081729;border:1px solid #31536a;border-radius:.25rem;color:#eafaff;font:inherit}
+.roll-button{padding:.8rem 1.5rem;border:1px solid #ffd34d;background:rgba(255,211,77,.1);color:#ffd34d;font-weight:800;letter-spacing:.12em;cursor:pointer}.roll-button:hover{background:rgba(255,211,77,.2)}
+.result{margin-top:2rem}.result-heading,.history-heading{display:flex;justify-content:space-between;gap:1rem;align-items:center;color:#00eaff;font:700 .68rem Consolas,monospace;letter-spacing:.12em}.result-heading small{color:#7e9aa8;font-weight:400;letter-spacing:0}
+.dice-faces{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.2rem 0}.die-face{display:grid;place-items:center;width:clamp(3.5rem,8vw,5rem);aspect-ratio:1;border:1px solid rgba(0,234,255,.55);border-radius:.8rem;background:linear-gradient(145deg,#15334b,#07111e);box-shadow:inset 0 0 20px rgba(0,234,255,.08);font-size:1.8rem;font-weight:800;color:#fff}
+.total{display:flex;align-items:baseline;justify-content:space-between;padding:1rem 0;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12)}.total span{color:#ffd34d;font:700 .7rem Consolas,monospace;letter-spacing:.16em}.total strong{font-size:2.5rem}
+.rule-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin-top:1rem}.rule-grid article{padding:1rem;border:1px solid rgba(35,70,91,.8);background:rgba(0,0,0,.15)}.rule-grid small{display:block;color:#7e9aa8;font-size:.6rem;letter-spacing:.1em}.rule-grid strong{display:block;margin-top:.4rem;font-size:1.15rem}
+.roll-id{color:#627f8d;font: .6rem Consolas,monospace;overflow-wrap:anywhere}.empty-state,.empty-history{padding:2rem 0;color:#809ba8;text-align:center}.history-heading h2{margin:0;color:#eafaff;font-size:.9rem}.history-heading span{color:#809ba8}.history-row{display:grid;grid-template-columns:1fr 1fr auto;gap:1rem;padding:.8rem 0;border-bottom:1px solid rgba(255,255,255,.08);color:#9db8c5;font: .75rem Consolas,monospace}.history-row strong{color:#ffd34d}
+.notice{border-color:rgba(255,211,77,.4)}.notice strong{color:#ffd34d}.notice p{color:#a3bbc6;line-height:1.7}
+@media(max-width:560px){.rule-grid{grid-template-columns:1fr}.controls label{flex:1}.roll-button{width:100%}.history-row{grid-template-columns:1fr auto}.history-row span:nth-child(2){display:none}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
+
+@code {
+    private int FaceCount { get; set; } = 6;
+    private int Quantity { get; set; } = 2;
+    private EconomyDiceResult? LastRoll { get; set; }
+    private List<EconomyDiceResult> History { get; } = [];
+
+    private void Roll()
+    {
+        if (FaceCount is not (4 or 6 or 8 or 10 or 12 or 20) || Quantity is < 1 or > 100)
+            return;
+
+        LastRoll = DiceService.Roll(FaceCount, Quantity);
+        History.Insert(0, LastRoll);
+        if (History.Count > 20)
+            History.RemoveAt(History.Count - 1);
+    }
+}
