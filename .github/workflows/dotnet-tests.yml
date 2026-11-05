@@ -234,6 +234,12 @@ jobs:
           repository: TrentBest/TheSingularityWorkshop.GrammarAi
           ref: development
           path: TheSingularityWorkshop.GrammarAi
+      - name: Checkout Economy development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.Economy
+          ref: development
+          path: TheSingularityWorkshop.Economy
 
       - name: Checkout Renderer development
         uses: actions/checkout@v5
