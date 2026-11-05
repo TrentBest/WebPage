@@ -26,6 +26,7 @@
     <PackageReference Include="TheSingularityWorkshop.GUI.Blazor" Version="0.1.0-alpha.8" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
     <PackageReference Include="TheSingularityWorkshop.ProtocolAi" Version="0.1.0-alpha.2" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
     <PackageReference Include="TheSingularityWorkshop.GrammarAi" Version="0.1.0-alpha.2" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
+    <PackageReference Include="TheSingularityWorkshop.Economy" Version="0.1.0-alpha.1" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
 
     <ProjectReference Include="..\..\FSM_API\FSM_API\FSM_API.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.MicroBundleDomain\TheSingularityWorkshop.MicroBundleDomain.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
@@ -33,6 +34,7 @@
     <ProjectReference Include="..\..\TheSingularityWorkshop.GUI\src\Blazor\TheSingularityWorkshop.GUI.Blazor.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.ProtocolAi\TheSingularityWorkshop.ProtocolAi.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.GrammarAi\TheSingularityWorkshop.GrammarAi.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
+    <ProjectReference Include="..\..\TheSingularityWorkshop.Economy\src\TheSingularityWorkshop.Economy\TheSingularityWorkshop.Economy.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.Renderer\TheSingularityWorkshop.Renderer.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.Visualize\TheSingularityWorkshop.Visualize.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.Visualize\integrations\RendererAdapter\TheSingularityWorkshop.Renderer.VisualizeAdapter.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" AdditionalProperties="WorkshopUseRepositorySources=true;WorkshopSourceRoot=$(WorkshopSourceRoot)" />
@@ -61,6 +63,7 @@
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.GUI\src\Blazor\TheSingularityWorkshop.GUI.Blazor.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.GUI on development." />
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.ProtocolAi\TheSingularityWorkshop.ProtocolAi.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.ProtocolAi on development." />
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.GrammarAi\TheSingularityWorkshop.GrammarAi.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.GrammarAi on development." />
+    <Error Condition="!Exists('..\..\TheSingularityWorkshop.Economy\src\TheSingularityWorkshop.Economy\TheSingularityWorkshop.Economy.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.Economy on development." />
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.Renderer\TheSingularityWorkshop.Renderer.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.Renderer on development." />
     <Error Condition="!Exists('..\..\TheSingularityWorkshop.Visualize\TheSingularityWorkshop.Visualize.csproj')" Text="Workshop source mode requires sibling repository TheSingularityWorkshop.Visualize on development." />
   </Target>
