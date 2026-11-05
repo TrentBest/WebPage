@@ -26,7 +26,6 @@
     <PackageReference Include="TheSingularityWorkshop.GUI.Blazor" Version="0.1.0-alpha.8" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
     <PackageReference Include="TheSingularityWorkshop.ProtocolAi" Version="0.1.0-alpha.2" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
     <PackageReference Include="TheSingularityWorkshop.GrammarAi" Version="0.1.0-alpha.2" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
-    <PackageReference Include="TheSingularityWorkshop.Economy" Version="0.1.0-alpha.1" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
 
     <ProjectReference Include="..\..\FSM_API\FSM_API\FSM_API.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
     <ProjectReference Include="..\..\TheSingularityWorkshop.MicroBundleDomain\TheSingularityWorkshop.MicroBundleDomain.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
