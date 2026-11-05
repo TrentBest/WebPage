@@ -11,6 +11,7 @@
 
 ![Living GUI documentation lens: question, model, implementation, visible manifestation, and proof](https://raw.githubusercontent.com/TrentBest/WebPage/development/docs/assets/living-gui-documentation-lens.svg)
 
+[![Sith Policy](assets/sith-policy.svg)](https://github.com/TrentBest/WebPage/actions/workflows/sith-policy.yml)
 > **Living GUI lens.** Trace this page’s claims to the responsible source, a visible manifestation where one exists, and executable evidence. This animated loop is an orientation illustration—not live runtime telemetry. The page must label implemented, illustrated, proposed, and unverified claims honestly.
 
 
