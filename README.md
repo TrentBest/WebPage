@@ -7,6 +7,7 @@
 
 # ✳️ 00 The Singularity Workshop — WebPage
 
+[![Sith Policy](assets/sith-policy.svg)](https://github.com/TrentBest/WebPage/actions/workflows/sith-policy.yml)
 
 This README follows the Workshop's shared [Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/master/DOCUMENTATION_STANDARD.md), while keeping this repository's own purpose and implementation authoritative.
 
@@ -565,7 +566,6 @@ That's the point of a workshop.
   <strong>Because state shouldn't be a mess.</strong>
 </p>
 
-
 ---
 
 ## 🔗 The Singularity Workshop
@@ -588,8 +588,6 @@ This project is part of a deliberately troublesome ecosystem:
   <em>Forging Software for the Singularity.</em><br />
   <a href="https://github.com/TrentBest">GitHub</a> · <a href="https://github.com/TrentBest/WebPage">Workshop</a>
 </p>
-
-
 
 ## WebApp runtime architecture
 
