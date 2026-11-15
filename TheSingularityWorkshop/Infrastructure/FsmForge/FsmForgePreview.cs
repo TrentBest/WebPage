@@ -1,5 +1,5 @@
 using TheSingularityWorkshop.FSM_API;
-using FsmApi = TheSingularityWorkshop.FSM_API.FSM_API;
+using FsmApi = TheSingularityWorkshop.FSM_API.FsmApi;
 namespace TheSingularityWorkshop.Infrastructure.FsmForge;
 public class FsmForgePreviewContext:IStateContext
 {
