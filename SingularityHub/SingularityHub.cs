@@ -2,11 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TheSingularityWorkshop.FSM_API;
-#if WORKSHOP_REPOSITORY_SOURCES
 using fsm_API = FSM_API;
-#else
-using fsm_API = FSM_API;
-#endif
 
 namespace TheSingularityWorkshop.SingularityHub;
 
