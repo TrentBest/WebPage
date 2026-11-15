@@ -9,11 +9,15 @@
     <AssemblyName>SingularityHub</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" />
+    <PackageReference Include="TheSingularityWorkshop.FSM_API" Version="1.0.13" Condition="'$(WorkshopUseRepositorySources)' != 'true'" />
     <PackageReference Include="TheSingularityWorkshop.FSM_COS" Version="0.1.0-alpha.5" />
     <PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SingularityHub.Abstractions\SingularityHub.Abstractions.csproj" />
+    <ProjectReference Include="..\..\FSM_API\FSM_API\FSM_API.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(WorkshopUseRepositorySources)' == 'true'">
+    <DefineConstants>$(DefineConstants);WORKSHOP_REPOSITORY_SOURCES</DefineConstants>
+  </PropertyGroup>
 </Project>
