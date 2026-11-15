@@ -18,6 +18,6 @@
     <ProjectReference Include="..\..\FSM_API\FSM_API\FSM_API.csproj" Condition="'$(WorkshopUseRepositorySources)' == 'true'" />
   </ItemGroup>
   <PropertyGroup Condition="'$(WorkshopUseRepositorySources)' == 'true'">
-    <DefineConstants>$(DefineConstants);WORKSHOP_REPOSITORY_SOURCES</DefineConstants>
+    <DefineConstants>$(DefineConstants);WORKSHOP_USE_REPOSITORY_SOURCES</DefineConstants>
   </PropertyGroup>
 </Project>
