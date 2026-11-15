@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TheSingularityWorkshop.FSM_API;
 using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
-using fsm_API = TheSingularityWorkshop.FSM_API.FsmApi;
+using fsm_API = FSM_API;
 
 namespace TheSingularityWorkshop.Services;
 
