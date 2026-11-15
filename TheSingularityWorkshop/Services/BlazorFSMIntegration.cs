@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using _FSM_API = TheSingularityWorkshop.FSM_API.FsmApi;
+using _FSM_API = FSM_API;
 
 public class BlazorFSMIntegration : IDisposable
 {
