@@ -1,7 +1,7 @@
 using System;
 using TheSingularityWorkshop.FSM_API;
 using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
-using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
+using fsm_API = TheSingularityWorkshop.FSM_API.FsmApi;
 
 namespace TheSingularityWorkshop.Services
 {
