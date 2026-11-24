@@ -23,7 +23,7 @@ public static class SpatialAECPlanExperienceGuiBuilder
         double avatarY,
         Action<int> selectFloor,
         Action<string> approachInteractable,
-        Action<double, double> walkTo,
+        Func<double, double, Task> walkTo,
         Action enterAuthoring,
         Action exit)
     {
@@ -52,7 +52,7 @@ public static class SpatialAECPlanExperienceGuiBuilder
         double avatarX,
         double avatarY,
         Action<string> approachInteractable,
-        Action<double, double> walkTo)
+        Func<double, double, Task> walkTo)
     {
         var svg = WorkshopGui.Element(receiver, "svg")
             .Attribute("viewBox", "0 0 100 100")
@@ -148,9 +148,9 @@ public static class SpatialAECPlanExperienceGuiBuilder
             // WorkshopGui's element builder is intentionally event-oriented; attach the
             // interaction to the semantic group rather than inventing a renderer-level
             // object type.
-            button.OnClick(() =>
+            button.OnClick(async () =>
             {
-                walkTo(interactable.X, interactable.Y);
+                await walkTo(interactable.X, interactable.Y);
                 approachInteractable(interactable.Id);
             });
             svg.Child(button);
@@ -217,7 +217,7 @@ public static class SpatialAECPlanExperienceGuiBuilder
         SpatialAECPlanView view,
         string? selectedInteractableId,
         Action<string> approachInteractable,
-        Action<double, double> walkTo,
+        Func<double, double, Task> walkTo,
         Action enterAuthoring)
     {
         var selected = view.Interactables.FirstOrDefault(x =>
@@ -273,9 +273,9 @@ public static class SpatialAECPlanExperienceGuiBuilder
                 .Style("background", "rgba(0,234,255,.05)")
                 .Style("color", Cyan).Style("font-family", "inherit")
                 .Style("cursor", "pointer")
-                .OnClick(() =>
+                .OnClick(async () =>
                 {
-                    walkTo(selected.X, selected.Y);
+                    await walkTo(selected.X, selected.Y);
                     approachInteractable(selected.Id);
                 }));
         }
