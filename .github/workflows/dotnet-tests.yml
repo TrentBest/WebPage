@@ -204,6 +204,12 @@ jobs:
           repository: TrentBest/TheSingularityWorkshop.MicroBundleDomain
           ref: development
           path: TheSingularityWorkshop.MicroBundleDomain
+      - name: Checkout Physics development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.Physics
+          ref: development
+          path: TheSingularityWorkshop.Physics
       - name: Checkout FSM_COS development
         uses: actions/checkout@v5
         with:
