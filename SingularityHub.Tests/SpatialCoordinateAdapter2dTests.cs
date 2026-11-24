@@ -19,6 +19,25 @@ public sealed class SpatialCoordinateAdapter2dTests
     }
 
     [Fact]
+    public void AecTemplateFloors_DeclareDistinctStableCoordinateFrames()
+    {
+        var buildingType = SpatialAECOntologyCatalog.ListBuildingTypes()
+            .Single(x => x.Id == "aec.scenario.fiction.high-tech-research");
+        var plan = SpatialAECPlanExperienceFactory.Create(buildingType);
+        var firstFloor = plan.GetFloor(1);
+        var secondFloor = plan.GetFloor(2);
+
+        var firstFrame = SpatialCoordinateAdapter2d.CreateFrame(firstFloor);
+        var secondFrame = SpatialCoordinateAdapter2d.CreateFrame(secondFloor);
+        var point = SpatialCoordinateAdapter2d.ToPhysicsPoint(new SpatialPoint(4, 7), firstFloor);
+
+        Assert.NotEqual(firstFloor.CoordinateFrameId, secondFloor.CoordinateFrameId);
+        Assert.Equal(firstFloor.CoordinateFrameId, firstFrame.Id);
+        Assert.Equal(firstFrame, point.Frame);
+        Assert.NotEqual(firstFrame, secondFrame);
+    }
+
+    [Fact]
     public void ToWorkshopPoint_RejectsAnUnexpectedFrame()
     {
         var actual = new CoordinateFrame2d("plan.level-01");
