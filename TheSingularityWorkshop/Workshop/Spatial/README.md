@@ -289,3 +289,14 @@ The project reference is enabled only when `WorkshopUseRepositorySources=true`, 
 **Implemented:** source-mode dependency and explicit point/transform adapter.
 
 **Not yet migrated:** existing Workshop spatial records, AEC plan data, collision/pathfinding, and GUI projection. They remain on their current representations until each migration has regression coverage. A Physics frame identifier is not a unit system; each authored plan/world must document its axes, origin, and units before assigning a stable frame ID.
+
+
+## Authored AEC coordinate-frame identity
+
+Each generated AEC template floor now declares a stable local XY frame identity derived from its building-type catalog ID and floor number:
+
+`aec.template.{building-type-id}.floor.{floor}.xy.v1`
+
+The local origin is the plan's authored origin; X and Y are the plan's horizontal axes as drawn. The identifier prevents points from different template floors being treated as though they share a coordinate frame. The source-mode Physics adapter can construct a `CoordinateFrame2d` directly from this declaration.
+
+**Important boundary:** the current building catalog stores numeric plan units but does not yet declare a physical unit system. The frame ID therefore identifies coordinate space, not meters, feet, or a scale conversion. A placed building instance must receive its own instance-specific frame identity, and a physical unit/axis contract must be established before mapping template coordinates into campus/world coordinates. No implicit transform or unit conversion is performed.
