@@ -277,6 +277,12 @@ jobs:
       - name: Build WebPage from checked-out Workshop source
         working-directory: WebPage
         run: dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore -m:1 -p:WorkshopUseRepositorySources=true
+      - name: Restore source-mode spatial adapter tests
+        working-directory: WebPage
+        run: dotnet restore SingularityHub.Tests/SingularityHub.Tests.csproj -p:WorkshopUseRepositorySources=true
+      - name: Test source-mode Physics coordinate adapter
+        working-directory: WebPage
+        run: dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-restore -p:WorkshopUseRepositorySources=true --filter FullyQualifiedName~SpatialCoordinateAdapter2dTests
 
       - name: Regenerate and verify Singularity Studios stage plan from source
         working-directory: WebPage
