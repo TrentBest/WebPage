@@ -300,3 +300,14 @@ Each generated AEC template floor now declares a stable local XY frame identity 
 The local origin is the plan's authored origin; X and Y are the plan's horizontal axes as drawn. The identifier prevents points from different template floors being treated as though they share a coordinate frame. The source-mode Physics adapter can construct a `CoordinateFrame2d` directly from this declaration.
 
 **Important boundary:** the current building catalog stores numeric plan units but does not yet declare a physical unit system. The frame ID therefore identifies coordinate space, not meters, feet, or a scale conversion. A placed building instance must receive its own instance-specific frame identity, and a physical unit/axis contract must be established before mapping template coordinates into campus/world coordinates. No implicit transform or unit conversion is performed.
+
+
+## AEC plan visitor movement
+
+The AEC plan visitor now moves through an eased, frame-local animation before an interactable's capability is revealed. A new click supersedes the prior movement, and changing floors invalidates any in-flight movement. The renderer awaits the walk before invoking the semantic approach action, so selecting a marker no longer reveals its inspector immediately while the avatar remains at the starting point.
+
+This is an interaction improvement, not yet a complete navigation/collision migration. The visitor currently follows a direct segment in the authored plan's local XY coordinates. Room rectangles are semantic program regions, not collision walls; no physical clearance, door topology, or obstacle-avoiding route is claimed. The existing Workshop pathfinder operates in a separate world coordinate convention and is not silently reused for AEC plan coordinates. Physics frame-tagged points and explicit transforms remain the intended foundation before cross-frame routing is introduced.
+
+**Implemented:** stable template-floor frame identity; eased visitor movement within the selected floor; stale movement invalidation on a new destination or floor change; capability reveal after arrival.
+
+**Still required:** explicit unit/axis metadata; placed-building instance frames and transforms; authored wall/opening topology; collision-aware floor routing; and regression tests for obstacle avoidance and viewport/zoom invariance.
