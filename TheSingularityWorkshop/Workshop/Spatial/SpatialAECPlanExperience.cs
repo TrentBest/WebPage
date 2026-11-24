@@ -33,7 +33,14 @@ public sealed record SpatialAECPlanView(
     double Width,
     double Depth,
     IReadOnlyList<SpatialAECPlanRoom> Rooms,
-    IReadOnlyList<SpatialAECPlanInteractable> Interactables);
+    IReadOnlyList<SpatialAECPlanInteractable> Interactables)
+{
+    /// <summary>
+    /// Stable identity for this authored template floor's local XY coordinate frame.
+    /// This is not a physical unit declaration or a placed building-instance identity.
+    /// </summary>
+    public string CoordinateFrameId { get; init; } = $"aec.template.floor.{Floor}.xy.v1";
+}
 
 /// <summary>
 /// The default walkable experience for a selected building type.
@@ -175,6 +182,9 @@ public static class SpatialAECPlanExperienceFactory
             width,
             depth,
             rooms,
-            interactables);
+            interactables)
+        {
+            CoordinateFrameId = $"aec.template.{buildingType.Id}.floor.{floor}.xy.v1"
+        };
     }
 }
