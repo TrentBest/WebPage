@@ -278,3 +278,14 @@ The city and solar-system presentations remain **UNDER CONSTRUCTION**. Their cur
   <em>If a picture is worth a thousand words, what is a living picture worth?</em><br />
   <a href="https://github.com/TrentBest">GitHub</a> · <a href="https://www.patreon.com/TheSingularityWorkshop">Support the Workshop</a>
 </p>
+## Physics-owned coordinate contract (source integration)
+
+The Workshop host and Physics repository both target **.NET 10**. The Physics core project has no package references; its spatial primitives are implemented in the core assembly. This makes a source-project reference compatible with the current WebPage target without introducing a new runtime package dependency.
+
+`SpatialCoordinateAdapter2d` is the first narrow integration seam. It deliberately requires the caller to provide a `CoordinateFrame2d` when wrapping existing `SpatialPoint` data, and it requires an expected frame when converting back. It does not assign units, axis conventions, or coordinate-frame identity on behalf of the caller. Explicit `RigidTransform2d` instances are the only supported conversion between distinct frames.
+
+The project reference is enabled only when `WorkshopUseRepositorySources=true`, matching the repository's existing source-integration mode. The default NuGet build remains unchanged: this work does **not** publish or assume the availability of a new Physics package.
+
+**Implemented:** source-mode dependency and explicit point/transform adapter.
+
+**Not yet migrated:** existing Workshop spatial records, AEC plan data, collision/pathfinding, and GUI projection. They remain on their current representations until each migration has regression coverage. A Physics frame identifier is not a unit system; each authored plan/world must document its axes, origin, and units before assigning a stable frame ID.
