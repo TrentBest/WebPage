@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TheSingularityWorkshop.FSM_API;
-using fsm_API = FSM_API;
 
 namespace TheSingularityWorkshop.SingularityHub;
 
@@ -21,7 +20,7 @@ public sealed class SingularityHub : ISingularityHub
     private readonly Action<string> _update;
 
     /// <summary>Creates a Hub using the FSM API update sink.</summary>
-    public SingularityHub() : this(fsm_API.Interaction.Update) { }
+    public SingularityHub() : this(FsmApi.Interaction.Update) { }
     /// <summary>Creates a Hub using the supplied process-group update sink.</summary>
     public SingularityHub(Action<string> update)
     {
