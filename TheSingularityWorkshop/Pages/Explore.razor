@@ -72,6 +72,7 @@
     private string? AECPlanInteractableId;
     private double AECPlanAvatarX = 3;
     private double AECPlanAvatarY = 3;
+    private int AECPlanMovementVersion;
     private readonly SpatialSingularityLabModel SingularityLab = new();
     private readonly SpatialLaboratoryAccessModel LaboratoryAccess = new();
     private readonly SpatialLaboratoryTrafficModel LaboratoryTraffic = new();
@@ -1893,19 +1894,46 @@
     private void SelectAECPlanFloor(int floor)
     {
         if (AECPlanExperience is null) return;
+        AECPlanMovementVersion++;
         AECPlanFloor = Math.Clamp(floor, 1, AECPlanExperience.Floors.Count);
         AECPlanInteractableId = null;
         AECPlanAvatarX = 3;
         AECPlanAvatarY = 3;
     }
 
-    private void WalkAECPlanTo(double x, double y)
+    private async Task WalkAECPlanTo(double x, double y)
     {
-        if (AECPlanExperience is null) return;
+        if (AECPlanExperience is null || insideRoomId != "aec-plan") return;
 
-        var view = AECPlanExperience.GetFloor(AECPlanFloor);
-        AECPlanAvatarX = Math.Clamp(x, 0, view.Width);
-        AECPlanAvatarY = Math.Clamp(y, 0, view.Depth);
+        var experience = AECPlanExperience;
+        var floor = AECPlanFloor;
+        var view = experience.GetFloor(floor);
+        var frameId = view.CoordinateFrameId;
+        var startX = AECPlanAvatarX;
+        var startY = AECPlanAvatarY;
+        var targetX = Math.Clamp(x, 0, view.Width);
+        var targetY = Math.Clamp(y, 0, view.Depth);
+        var movementVersion = ++AECPlanMovementVersion;
+
+        // AEC template coordinates remain in their declared floor frame. Animate
+        // inside that frame; changing floors or starting a newer walk invalidates
+        // the in-flight movement rather than mixing coordinate spaces.
+        const int frames = 12;
+        for (var frame = 1; frame <= frames; frame++)
+        {
+            if (movementVersion != AECPlanMovementVersion ||
+                !ReferenceEquals(AECPlanExperience, experience) ||
+                AECPlanFloor != floor ||
+                !string.Equals(AECPlanExperience.GetFloor(AECPlanFloor).CoordinateFrameId, frameId, StringComparison.Ordinal))
+                return;
+
+            var t = frame / (double)frames;
+            var eased = t * t * (3d - 2d * t);
+            AECPlanAvatarX = startX + (targetX - startX) * eased;
+            AECPlanAvatarY = startY + (targetY - startY) * eased;
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(16);
+        }
     }
 
     private void ApproachAECPlanInteractable(string interactableId)
