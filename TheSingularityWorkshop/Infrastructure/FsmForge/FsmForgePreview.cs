@@ -1,5 +1,5 @@
 using TheSingularityWorkshop.FSM_API;
-using FsmApi = FsmApiCompat;
+
 namespace TheSingularityWorkshop.Infrastructure.FsmForge;
 public class FsmForgePreviewContext:IStateContext
 {
@@ -31,7 +31,7 @@ public sealed class FsmForgePreview
         var suffix=Interlocked.Increment(ref _definitionSequence);
         var name=$"WorkshopForgePreview_{suffix}";
         _context=new FsmForgeLogicContext(); _events.Clear(); Definition=definition;
-        var builder=FsmApi.Create.CreateFiniteStateMachine(name,processRate:-1,processingGroup:"ForgePreview");
+        var builder=FsmApiCompat.Create.CreateFiniteStateMachine(name,processRate:-1,processingGroup:"ForgePreview");
         foreach(var state in definition.States)
         {
             builder.State(state.Name,
@@ -43,7 +43,7 @@ public sealed class FsmForgePreview
         foreach(var transition in definition.Transitions)
             builder.Transition(transition.FromState,transition.ToState,ctx=>transition.Condition.Evaluate((FsmForgePreviewContext)ctx));
         builder.BuildDefinition();
-        _handle=FsmApi.Create.CreateInstance(name,_context,"ForgePreview");
+        _handle=FsmApiCompat.Create.CreateInstance(name,_context,"ForgePreview");
     }
     public void AttachBundle(TheSingularityWorkshop.MicroBundleDomain.IMicroBundle bundle)=>_context?.AttachBundle(bundle);
     public void SetSignal(string signal,bool enabled=true)
@@ -51,7 +51,7 @@ public sealed class FsmForgePreview
         ArgumentException.ThrowIfNullOrWhiteSpace(signal);
         if(enabled)_context?.Signals.Add(signal);else _context?.Signals.Remove(signal);
     }
-    public void Tick(){if(_handle is null)return;FsmApi.Interaction.Update("ForgePreview");}
+    public void Tick(){if(_handle is null)return;FsmApiCompat.Interaction.Update("ForgePreview");}
     public void Stop(){if(_context is not null)_context.IsValid=false;_handle=null;_context=null;Definition=null;}
     private static FsmForgeDefinition CreateDefaultDefinition()
     {
