@@ -27,9 +27,9 @@ public sealed class PlantGrowthMicroBundle : IDisposable
 
     public PlantGrowthMicroBundle()
     {
-        FSM_API.FSM_API.Create.CreateProcessingGroup(_processingGroup);
+        FsmApiCompat.Create.CreateProcessingGroup(_processingGroup);
 
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_vineDefinitionName, -1, _processingGroup)
+        FsmApiCompat.Create.CreateFiniteStateMachine(_vineDefinitionName, -1, _processingGroup)
             .State("Waiting", null, UpdateVineWaiting, null)
             .State("Growing", null, UpdateVineGrowing, null)
             .State("Blooming", null, UpdateVineBlooming, null)
@@ -40,7 +40,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
             .WithInitialState("Waiting")
             .BuildDefinition();
 
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_definitionName, -1, _processingGroup)
+        FsmApiCompat.Create.CreateFiniteStateMachine(_definitionName, -1, _processingGroup)
             .State("Rooting", null, UpdateRooting, null)
             .State("Growing", null, UpdateGrowing, null)
             .State("Blooming", null, UpdateBlooming, null)
@@ -54,10 +54,10 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         foreach (var vine in _context.Vines)
         {
             var vineContext = new VineContext(vine);
-            _vineFsms.Add(FSM_API.FSM_API.Create.CreateInstance(_vineDefinitionName, vineContext, _processingGroup));
+            _vineFsms.Add(FsmApiCompat.Create.CreateInstance(_vineDefinitionName, vineContext, _processingGroup));
         }
 
-        _fsm = FSM_API.FSM_API.Create.CreateInstance(_definitionName, _context, _processingGroup);
+        _fsm = FsmApiCompat.Create.CreateInstance(_definitionName, _context, _processingGroup);
     }
 
     public static IReadOnlyList<HubPanelGeometry> FinalHubGeometry => HubGeometry.Panels;
@@ -75,7 +75,7 @@ public sealed class PlantGrowthMicroBundle : IDisposable
         if (_disposed || !_context.Started) return;
 
         var before = _fsm.CurrentState;
-        FSM_API.FSM_API.Interaction.Update(_processingGroup);
+        FsmApiCompat.Interaction.Update(_processingGroup);
         SyncPanelsFromVines();
 
         if (before != _fsm.CurrentState)
@@ -145,8 +145,8 @@ public sealed class PlantGrowthMicroBundle : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_definitionName, _processingGroup);
-        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_vineDefinitionName, _processingGroup);
+        FsmApiCompat.Interaction.DestroyFiniteStateMachine(_definitionName, _processingGroup);
+        FsmApiCompat.Interaction.DestroyFiniteStateMachine(_vineDefinitionName, _processingGroup);
         _disposed = true;
     }
 
