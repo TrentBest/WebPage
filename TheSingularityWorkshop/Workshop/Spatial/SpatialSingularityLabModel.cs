@@ -1,4 +1,4 @@
-using fsm_API = FSM_API;
+using fsm_API = FsmApiCompat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
