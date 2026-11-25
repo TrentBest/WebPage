@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TheSingularityWorkshop.FSM_API;
 using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
-using fsm_API = FsmApiCompat;
 
 namespace TheSingularityWorkshop.Services;
 
@@ -38,15 +37,15 @@ public sealed class LivingGuiFsm : IDisposable
         _context = context;
         _processingGroup = $"LivingGui:{Guid.NewGuid():N}";
 
-        fsm_API.Create.CreateProcessingGroup(_processingGroup);
+        FsmApiCompat.Create.CreateProcessingGroup(_processingGroup);
         _hub.RegisterProcessGroup(_processingGroup, parentProcessingGroup);
 
-        fsm_API.Create.CreateFiniteStateMachine("LivingGuiFSM", -1, _processingGroup)
+        FsmApiCompat.Create.CreateFiniteStateMachine("LivingGuiFSM", -1, _processingGroup)
             .State(LifecycleState, onEnter: null, onUpdate: null, onExit: null)
             .WithInitialState(LifecycleState)
             .BuildDefinition();
 
-        fsm_API.Create.CreateInstance("LivingGuiFSM", context, _processingGroup);
+        FsmApiCompat.Create.CreateInstance("LivingGuiFSM", context, _processingGroup);
 
         // Allocate the full organism/FSM population once. Reproduction later only
         // activates an already-existing slot; it never news another FSM instance or processing group.
@@ -149,10 +148,10 @@ public sealed class LivingGuiFsm : IDisposable
         _attachedNodes.Clear();
         _organismPool.Clear();
 
-        fsm_API.Interaction.DestroyFiniteStateMachine(
+        FsmApiCompat.Interaction.DestroyFiniteStateMachine(
             LivingGuiOrganismFsm.DefinitionNameForGroup(_processingGroup),
             _processingGroup);
-        fsm_API.Interaction.DestroyFiniteStateMachine("LivingGuiFSM", _processingGroup);
+        FsmApiCompat.Interaction.DestroyFiniteStateMachine("LivingGuiFSM", _processingGroup);
         _disposed = true;
     }
 }
