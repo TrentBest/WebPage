@@ -1,7 +1,7 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using TheSingularityWorkshop.FSM_API
-@using FsmApi = FsmApiCompat
+
 @using TheSingularityWorkshop.Gui
 @implements IDisposable
 
@@ -52,7 +52,7 @@
     {
         // The Welcome lab owns a dedicated processing group; no visitor's ticks
         // may advance another visitor's machine.
-        FsmApi.Create.CreateProcessingGroup(_processingGroup);
+        FsmApiCompat.Create.CreateProcessingGroup(_processingGroup);
         ComposeMachine();
     }
 
@@ -69,7 +69,7 @@
         _events.Clear();
         _machineName = $"WelcomeLabMachine_{_labId}_{Guid.NewGuid():N}";
 
-        var machine = FsmApi.Create.CreateFiniteStateMachine(
+        var machine = FsmApiCompat.Create.CreateFiniteStateMachine(
             _machineName,
             processRate: -1,
             processingGroup: _processingGroup);
@@ -89,11 +89,11 @@
         machine.Transition(states[1], states[2], ctx => ((WelcomeLabContext)ctx).UpdateCount >= 2);
         machine.BuildDefinition();
 
-        _handle = FsmApi.Create.CreateInstance(_machineName, _context, _processingGroup);
+        _handle = FsmApiCompat.Create.CreateInstance(_machineName, _context, _processingGroup);
 
         // Enter Ready during composition so the first visitor signal is evaluated
         // as a signal, rather than being consumed by the FSM's initial lifecycle step.
-        FsmApi.Interaction.Update(_processingGroup);
+        FsmApiCompat.Interaction.Update(_processingGroup);
     }
 
     private void Begin()
@@ -107,7 +107,7 @@
         // while the machine is still Ready. Advance the dedicated group once to
         // evaluate StartRequested and select Running, then leave the deferred
         // OnEnter and all later updates to the visitor's TICK RUNTIME control.
-        FsmApi.Interaction.Update(_processingGroup);
+        FsmApiCompat.Interaction.Update(_processingGroup);
         StateHasChanged();
     }
 
@@ -119,7 +119,7 @@
         if (!IsRunning || !CanTick)
             return;
 
-        FsmApi.Interaction.Update(_processingGroup);
+        FsmApiCompat.Interaction.Update(_processingGroup);
         StateHasChanged();
     }
 
@@ -139,7 +139,7 @@
             _context.IsValid = false;
 
         if (!string.IsNullOrWhiteSpace(_machineName))
-            FsmApi.Interaction.DestroyFiniteStateMachine(_machineName, _processingGroup);
+            FsmApiCompat.Interaction.DestroyFiniteStateMachine(_machineName, _processingGroup);
 
         _handle = null;
         _context = null;
