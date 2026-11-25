@@ -1,4 +1,4 @@
-using fsm_API = FsmApiCompat;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,9 +30,9 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
     public SpatialAECIntentModel()
     {
         _processingGroup = $"SpatialAECIntent:{Guid.NewGuid():N}";
-        fsm_API.Create.CreateProcessingGroup(_processingGroup);
+        FsmApiCompat.Create.CreateProcessingGroup(_processingGroup);
 
-        var builder = fsm_API.Create.CreateFiniteStateMachine(
+        var builder = FsmApiCompat.Create.CreateFiniteStateMachine(
             "SpatialAECIntent",
             processRate: -1,
             processingGroup: _processingGroup);
@@ -69,7 +69,7 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
 
         builder.BuildDefinition();
 
-        _handle = fsm_API.Create.CreateInstance(
+        _handle = FsmApiCompat.Create.CreateInstance(
             "SpatialAECIntent",
             this,
             _processingGroup);
@@ -267,7 +267,7 @@ public sealed class SpatialAECIntentModel : IStateContext, IDisposable
         if (_disposed)
             return;
 
-        fsm_API.Interaction.DestroyFiniteStateMachine(
+        FsmApiCompat.Interaction.DestroyFiniteStateMachine(
             "SpatialAECIntent",
             _processingGroup);
 
