@@ -20,7 +20,7 @@ public sealed class SingularityHub : ISingularityHub
     private readonly Action<string> _update;
 
     /// <summary>Creates a Hub using the FSM API update sink.</summary>
-    public SingularityHub() : this(FsmApi.Interaction.Update) { }
+    public SingularityHub() : this(FsmApiCompat.Interaction.Update) { }
     /// <summary>Creates a Hub using the supplied process-group update sink.</summary>
     public SingularityHub(Action<string> update)
     {
