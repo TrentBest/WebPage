@@ -100,6 +100,6 @@ The earlier source-vs-package FSM_API compatibility blocker is resolved on `deve
 - [Build and source-integration proof](https://github.com/TrentBest/WebPage/actions/runs/45558427853) on [`957fec2`](https://github.com/TrentBest/WebPage/commit/957fec260575c973480d6d54f9dcc5dbb71f0e8d).
 - [Follow-up .NET 10 smoke-check proof](https://github.com/TrentBest/WebPage/actions/runs/45570618182) on [`02a1c66`](https://github.com/TrentBest/WebPage/commit/02a1c66aed51fc42c8e40ba24cf59025d11ab09f).
 
-The browser smoke check now verifies the .NET 10 WebAssembly bootstrap script at `/_framework/blazor.webassembly.js`; it does not expect the removed `blazor.boot.json` manifest. The README's .NET SDK and bootstrap descriptions are being aligned with the .NET 10 project target.
+The browser smoke check now verifies the .NET 10 WebAssembly bootstrap script at `/_framework/blazor.webassembly.js`; it does not expect the removed `blazor.boot.json` manifest. The README now reflects the .NET 10 project target, SDK requirement and bootstrap asset, and links to the successful browser-proof run.
 
 No NuGet publication, no `master` changes, and no deletion of existing behavior are part of this work without explicit approval.
