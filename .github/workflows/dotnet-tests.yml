@@ -62,6 +62,15 @@ jobs:
 
       # A lightweight HTTP smoke test proves the built host serves its landing page and
       # Blazor WebAssembly boot manifest. It does not claim to verify browser animations.
+      - name: Inspect generated Blazor WebAssembly assets
+        run: |
+          echo "Project wwwroot framework assets:"
+          find TheSingularityWorkshop/wwwroot/_framework -maxdepth 1 -type f -printf '%f (%s bytes)\\n' 2>/dev/null | sort || true
+          echo "Build-output framework assets:"
+          find TheSingularityWorkshop/bin/Release/net10.0/wwwroot/_framework -maxdepth 1 -type f -printf '%f (%s bytes)\\n' 2>/dev/null | sort || true
+          echo "Generated boot manifests and static-web-assets metadata:"
+          find TheSingularityWorkshop/obj/Release/net10.0 TheSingularityWorkshop/bin/Release/net10.0 -type f \\n            \\( -name 'blazor.boot.json' -o -name 'blazor.webassembly.js' -o -name 'staticwebassets.runtime.json' \\) \\n            -printf '%p\\n' 2>/dev/null | sort || true
+
       - name: Smoke-test WebPage host and browser journey
         id: browser_smoke
         timeout-minutes: 8
