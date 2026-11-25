@@ -9,9 +9,9 @@ internal class LazySleepingDog : IStateContext, ISimpleAgent
     public LazySleepingDog(int position)
     {
         this.Position = position;
-        if (!FSM_API.Interaction.Exists("LazyDogFSM", "Update"))
+        if (!FsmApiCompat.Interaction.Exists("LazyDogFSM", "Update"))
         {
-            FSM_API.Create.CreateFiniteStateMachine("LazyDogFSM", -1, "Update")
+            FsmApiCompat.Create.CreateFiniteStateMachine("LazyDogFSM", -1, "Update")
                 .State("Sleeping", OnEnterSleeping, OnUpdateSleeping, OnExitSleeping)
                 .State("Awake", OnEnterAwake, OnUpdateAwake, OnExitAwake)
                 .State("Chasing", OnEnterChasing, OnUpdateChasing, OnExitChasing)
@@ -21,7 +21,7 @@ internal class LazySleepingDog : IStateContext, ISimpleAgent
                 .Transition("Chasing", "Mangling", IsMangling)
                 .BuildDefinition();
         }
-        State = FSM_API.Create.CreateInstance("LazyDogFSM", this, "Update");
+        State = FsmApiCompat.Create.CreateInstance("LazyDogFSM", this, "Update");
         IsValid = true;
     }
 
