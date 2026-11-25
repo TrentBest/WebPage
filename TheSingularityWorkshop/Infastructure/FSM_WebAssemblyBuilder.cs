@@ -75,7 +75,7 @@ public class FSM_WebAssemblyBuilder
     {
         try
         {
-            FSM_API.Error.OnInternalApiError += (errorMessage, exception) => {
+            FsmApiCompat.Error.OnInternalApiError += (errorMessage, exception) => {
                 // Log to console, file, or your game's debug window
                 Console.WriteLine($"[FSM Error]: {errorMessage}");
 
