@@ -4,8 +4,6 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 
-using fsm_API = FsmApiCompat;
-
 namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
 {
     public class AdvancedDemoContext : IStateContext
@@ -30,15 +28,15 @@ namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
 
         public AdvancedDemoContext()
         {
-            fsm_API.Internal.ResetAPI(true);
+            FsmApiCompat.Internal.ResetAPI(true);
 
-            if (!fsm_API.Interaction.Exists("AdvancedDemoFSM", "Update"))
+            if (!FsmApiCompat.Interaction.Exists("AdvancedDemoFSM", "Update"))
             {
-                fsm_API.Create.CreateProcessingGroup("Environment");
-                fsm_API.Create.CreateProcessingGroup("Foxes");
-                fsm_API.Create.CreateProcessingGroup("Dogs");
+                FsmApiCompat.Create.CreateProcessingGroup("Environment");
+                FsmApiCompat.Create.CreateProcessingGroup("Foxes");
+                FsmApiCompat.Create.CreateProcessingGroup("Dogs");
 
-                fsm_API.Create.CreateFiniteStateMachine("AdvancedDemoFSM", -1, "Update")
+                FsmApiCompat.Create.CreateFiniteStateMachine("AdvancedDemoFSM", -1, "Update")
                     .State("Executing", OnEnterExecuting, OnUpdateExecuting, OnExitExecuting)
                     .State("Shutdown", OnEnterShutdown, null, null)
                     .Transition("Executing", "Shutdown", ShouldShutDown)
@@ -47,7 +45,7 @@ namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
 
             environment = new AdvancedDemoEnvironment();
             // FIX: Assign FSMHandle to the new State property
-            State = fsm_API.Create.CreateInstance("AdvancedDemoFSM", this, "Update");
+            State = FsmApiCompat.Create.CreateInstance("AdvancedDemoFSM", this, "Update");
             IsValid = true;
         }
 
@@ -92,9 +90,9 @@ namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
 
         private void OnUpdateExecuting(IStateContext context)
         {
-            fsm_API.Interaction.Update("Environment");
-            fsm_API.Interaction.Update("Dogs");
-            fsm_API.Interaction.Update("Foxes");
+            FsmApiCompat.Interaction.Update("Environment");
+            FsmApiCompat.Interaction.Update("Dogs");
+            FsmApiCompat.Interaction.Update("Foxes");
 
             if(context is AdvancedDemoContext adc)
             {
@@ -155,13 +153,13 @@ namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
             if (context is AdvancedDemoContext adc)
             {
                 // Cleanup logic (unchanged)
-                fsm_API.Interaction.DestroyFiniteStateMachine("AdvancedDemoFSM", "Update");
-                fsm_API.Interaction.DestroyFiniteStateMachine("AdvancedDemoEnvironmentFSM", "Environment");
-                fsm_API.Interaction.DestroyFiniteStateMachine("AdvancedDogFSM", "Dogs");
-                fsm_API.Interaction.DestroyFiniteStateMachine("AdvancedFoxFSM", "Foxes");
-                fsm_API.Interaction.RemoveProcessingGroup("Environment");
-                fsm_API.Interaction.RemoveProcessingGroup("Foxes");
-                fsm_API.Interaction.RemoveProcessingGroup("Dogs");
+                FsmApiCompat.Interaction.DestroyFiniteStateMachine("AdvancedDemoFSM", "Update");
+                FsmApiCompat.Interaction.DestroyFiniteStateMachine("AdvancedDemoEnvironmentFSM", "Environment");
+                FsmApiCompat.Interaction.DestroyFiniteStateMachine("AdvancedDogFSM", "Dogs");
+                FsmApiCompat.Interaction.DestroyFiniteStateMachine("AdvancedFoxFSM", "Foxes");
+                FsmApiCompat.Interaction.RemoveProcessingGroup("Environment");
+                FsmApiCompat.Interaction.RemoveProcessingGroup("Foxes");
+                FsmApiCompat.Interaction.RemoveProcessingGroup("Dogs");
                 adc.IsValid = false;
             }
         }
