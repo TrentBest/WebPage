@@ -64,12 +64,20 @@ jobs:
       # Blazor WebAssembly boot manifest. It does not claim to verify browser animations.
       - name: Inspect generated Blazor WebAssembly assets
         run: |
-          echo "Project wwwroot framework assets:"
-          find TheSingularityWorkshop/wwwroot/_framework -maxdepth 1 -type f -printf '%f (%s bytes)\\n' 2>/dev/null | sort || true
-          echo "Build-output framework assets:"
-          find TheSingularityWorkshop/bin/Release/net10.0/wwwroot/_framework -maxdepth 1 -type f -printf '%f (%s bytes)\\n' 2>/dev/null | sort || true
-          echo "Generated boot manifests and static-web-assets metadata:"
-          find TheSingularityWorkshop/obj/Release/net10.0 TheSingularityWorkshop/bin/Release/net10.0 -type f \\n            \\( -name 'blazor.boot.json' -o -name 'blazor.webassembly.js' -o -name 'staticwebassets.runtime.json' \\) \\n            -printf '%p\\n' 2>/dev/null | sort || true
+          for root in TheSingularityWorkshop/wwwroot TheSingularityWorkshop/bin/Release/net10.0/wwwroot; do
+            echo "Assets under $root:"
+            if [ -d "$root" ]; then
+              find "$root" -maxdepth 2 -type f | sort | head -80
+            else
+              echo "(directory does not exist)"
+            fi
+          done
+          echo "Generated boot manifests:"
+          find TheSingularityWorkshop/obj/Release/net10.0 TheSingularityWorkshop/bin/Release/net10.0 -type f -name blazor.boot.json -print 2>/dev/null || true
+          echo "Generated WebAssembly bootstrap scripts:"
+          find TheSingularityWorkshop/obj/Release/net10.0 TheSingularityWorkshop/bin/Release/net10.0 -type f -name blazor.webassembly.js -print 2>/dev/null || true
+          echo "Static-web-assets metadata:"
+          find TheSingularityWorkshop/obj/Release/net10.0 TheSingularityWorkshop/bin/Release/net10.0 -type f -name staticwebassets.runtime.json -print 2>/dev/null || true
 
       - name: Smoke-test WebPage host and browser journey
         id: browser_smoke
