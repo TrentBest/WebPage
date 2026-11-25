@@ -277,10 +277,10 @@
 
     private void BuildFsm()
     {
-        if (!FSM_API.Interaction.Exists(DefinitionName, ProcessingGroup))
+        if (!FsmApiCompat.Interaction.Exists(DefinitionName, ProcessingGroup))
         {
-            FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
-            FSM_API.Create.CreateFiniteStateMachine(DefinitionName, -1, ProcessingGroup)
+            FsmApiCompat.Create.CreateProcessingGroup(ProcessingGroup);
+            FsmApiCompat.Create.CreateFiniteStateMachine(DefinitionName, -1, ProcessingGroup)
                 .State("Dormant", null, OnDormant, null)
                 .State("Manifesting", OnManifesting, OnManifestingUpdate, null)
                 .State("Playing", OnEnterPlaying, OnPlaying, null)
@@ -291,7 +291,7 @@
                 .BuildDefinition();
         }
 
-        _fsm = FSM_API.Create.CreateInstance(DefinitionName, _context, ProcessingGroup);
+        _fsm = FsmApiCompat.Create.CreateInstance(DefinitionName, _context, ProcessingGroup);
     }
 
     private void Tick(object? sender, ElapsedEventArgs e)
@@ -305,7 +305,7 @@
             _context.ManifestRequested = true;
         }
 
-        FSM_API.Interaction.Update(ProcessingGroup);
+        FsmApiCompat.Interaction.Update(ProcessingGroup);
         _ticks = _context.Ticks;
         _state = _fsm?.CurrentState ?? "DORMANT";
         _ = InvokeAsync(StateHasChanged);
