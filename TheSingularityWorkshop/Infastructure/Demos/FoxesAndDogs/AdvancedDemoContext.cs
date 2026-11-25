@@ -4,7 +4,7 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 
-using  fsm_API = FSM_API;
+using fsm_API = FsmApiCompat;
 
 namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
 {
