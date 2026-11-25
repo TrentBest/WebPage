@@ -62,23 +62,6 @@ jobs:
 
       # A lightweight HTTP smoke test proves the built host serves its landing page and
       # Blazor WebAssembly boot manifest. It does not claim to verify browser animations.
-      - name: Inspect generated Blazor WebAssembly assets
-        run: |
-          for root in TheSingularityWorkshop/wwwroot TheSingularityWorkshop/bin/Release/net10.0/wwwroot; do
-            echo "Assets under $root:"
-            if [ -d "$root" ]; then
-              find "$root" -maxdepth 2 -type f | sort | head -80
-            else
-              echo "(directory does not exist)"
-            fi
-          done
-          echo "Generated boot manifests:"
-          find TheSingularityWorkshop/obj/Release/net10.0 TheSingularityWorkshop/bin/Release/net10.0 -type f -name blazor.boot.json -print 2>/dev/null || true
-          echo "Generated WebAssembly bootstrap scripts:"
-          find TheSingularityWorkshop/obj/Release/net10.0 TheSingularityWorkshop/bin/Release/net10.0 -type f -name blazor.webassembly.js -print 2>/dev/null || true
-          echo "Static-web-assets metadata:"
-          find TheSingularityWorkshop/obj/Release/net10.0 TheSingularityWorkshop/bin/Release/net10.0 -type f -name staticwebassets.runtime.json -print 2>/dev/null || true
-
       - name: Smoke-test WebPage host and browser journey
         id: browser_smoke
         timeout-minutes: 8
@@ -125,8 +108,10 @@ jobs:
           }
 
           grep -q '<title>The Singularity Workshop</title>' /tmp/webpage-index.html
-          fetch_asset /_framework/blazor.boot.json /tmp/webpage-blazor.boot.json
-          grep -q '"resources"' /tmp/webpage-blazor.boot.json
+          # .NET 10 inlines the former blazor.boot.json configuration into dotnet.js.
+          # Verify the actual WebAssembly bootstrap asset instead of a removed endpoint.
+          fetch_asset /_framework/blazor.webassembly.js /tmp/webpage-blazor.webassembly.js
+          test -s /tmp/webpage-blazor.webassembly.js
           fetch_asset /experiences/soldier-field/index.html /tmp/soldier-field.html
           grep -q 'Soldier Field — Event Horizon Scaling Lab' /tmp/soldier-field.html
           fetch_asset /experiences/soldier-field/soldier-part-records.json /tmp/soldier-part-records.json
@@ -149,7 +134,7 @@ jobs:
           echo "WebPage host served the Soldier Field lab, semantic part records, cut-sheet module, research catalog/schema, trial schema, and persistent simulation state."
           WORKSHOP_BASE_URL=http://127.0.0.1:5260 node tests/soldier-field-smoke.mjs
 
-          echo "WebPage host served its landing HTML and Blazor boot manifest."
+          echo "WebPage host served its landing HTML and .NET 10 Blazor WebAssembly bootstrap script."
 
           mkdir -p TestResults/Browser
           if ! WORKSHOP_BASE_URL=http://127.0.0.1:5260 WORKSHOP_SCREENSHOT_DIR=TestResults/Browser node tests/browser-smoke.mjs; then
