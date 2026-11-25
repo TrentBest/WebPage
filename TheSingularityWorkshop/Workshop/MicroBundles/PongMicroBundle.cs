@@ -31,13 +31,13 @@ public sealed class PongMicroBundle : IDisposable
         _lifecycle = new MicroBundle(BundleId, "PONG", new WebMicroBundleProvider());
         _gameContext = new PongStateContext();
 
-        FSM_API.FSM_API.Create.CreateProcessingGroup(_gameProcessingGroup);
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_gameContext.FsmName, -1, _gameProcessingGroup)
+        FsmApiCompat.Create.CreateProcessingGroup(_gameProcessingGroup);
+        FsmApiCompat.Create.CreateFiniteStateMachine(_gameContext.FsmName, -1, _gameProcessingGroup)
             .State(GameStateName, onEnter: null, onUpdate: _ => _gameContext.Advance(), onExit: null)
             .WithInitialState(GameStateName)
             .BuildDefinition();
 
-        _gameHandle = FSM_API.FSM_API.Create.CreateInstance(
+        _gameHandle = FsmApiCompat.Create.CreateInstance(
             _gameContext.FsmName,
             _gameContext,
             _gameProcessingGroup);
@@ -66,7 +66,7 @@ public sealed class PongMicroBundle : IDisposable
         if (_disposed) return;
 
         _lifecycle.Update();
-        FSM_API.FSM_API.Interaction.Update(_gameProcessingGroup);
+        FsmApiCompat.Interaction.Update(_gameProcessingGroup);
     }
 
     public void Invalidate() => _lifecycle.Invalidate();
@@ -76,7 +76,7 @@ public sealed class PongMicroBundle : IDisposable
         if (_disposed) return;
 
         _lifecycle.Dispose();
-        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_gameContext.FsmName, _gameProcessingGroup);
+        FsmApiCompat.Interaction.DestroyFiniteStateMachine(_gameContext.FsmName, _gameProcessingGroup);
         _disposed = true;
     }
 
