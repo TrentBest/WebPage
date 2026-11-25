@@ -215,7 +215,7 @@
         if (DemoContext?.State is FSMHandle state)
         {
             state.TransitionTo("Shutdown");
-            FSM_API.Interaction.Update("Update");
+            FsmApiCompat.Interaction.Update("Update");
         }
         StopSimulationInternal();
     }
@@ -223,7 +223,7 @@
     public void ResetSimulation()
     {
         StopSimulationInternal();
-        FSM_API.Internal.ResetAPI(true);
+        FsmApiCompat.Internal.ResetAPI(true);
         DemoContext = null;
         Agents = new();
         tickCount = 0;
@@ -259,19 +259,19 @@
         try
         {
             // FIX: Direct static member access
-            var allHandles = FSM_API.Internal.GetAllFsmHandles()?.ToArray() ??
+            var allHandles = FsmApiCompat.Internal.GetAllFsmHandles()?.ToArray() ??
                 Array.Empty<FSMHandle>();
-            var groupNames = FSM_API.Internal.GetProcessingGroupNames()?.ToList() ?? new List<string>();
+            var groupNames = FsmApiCompat.Internal.GetProcessingGroupNames()?.ToList() ?? new List<string>();
 
             sb.AppendLine($"- Total FSM Instances (Handles): {allHandles.Length}");
             sb.AppendLine($"- Total Processing Groups: {groupNames.Count}");
             foreach (var groupName in groupNames)
             {
                 // FIX: Corrected method name (GetProcessingGroupTickCount)
-                var tickCount = FSM_API.Internal.GetProcessingGroupTickCount(groupName);
+                var tickCount = FsmApiCompat.Internal.GetProcessingGroupTickCount(groupName);
                 sb.AppendLine($"  - Group: {groupName} (Ticks: {tickCount})");
 
-                var definitions = FSM_API.Internal.GetFsmDefinitionNamesInGroup(groupName)?.ToList() ?? new List<string>();
+                var definitions = FsmApiCompat.Internal.GetFsmDefinitionNamesInGroup(groupName)?.ToList() ?? new List<string>();
                 foreach (var defName in definitions)
                 {
                     var handleCount = allHandles.Count(h => h.Definition.Name == defName);
