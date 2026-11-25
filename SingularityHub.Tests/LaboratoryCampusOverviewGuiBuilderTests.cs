@@ -1,6 +1,7 @@
 #if WORKSHOP_USE_REPOSITORY_SOURCES
 using TheSingularityWorkshop.Gui;
 using TheSingularityWorkshop.SingularityLaboratories.Contracts;
+using DomainLaboratoryInstrument = TheSingularityWorkshop.SingularityLaboratories.Contracts.LaboratoryInstrument;
 using Xunit;
 
 namespace SingularityHub.Tests;
@@ -18,7 +19,7 @@ public sealed class LaboratoryCampusOverviewGuiBuilderTests
             [new LaboratoryRoom("bench-room", "Measurement Bench", "Supervised measurement.")],
             [new LaboratoryApparatus("calorimeter", "Calorimetry Station",
                 "thermal-measurement-apparatus", "bench-room", "Illustrative apparatus.")],
-            [new LaboratoryInstrument("temperature-probe", "Temperature Probe",
+            [new DomainLaboratoryInstrument("temperature-probe", "Temperature Probe",
                 "temperature-sensor", "calorimeter", "1.0.0", "SAMPLE-CAL-001")],
             [new MeasurementChannel("temperature", "Sample Temperature",
                 "temperature-probe", "thermodynamic-temperature", "K",
