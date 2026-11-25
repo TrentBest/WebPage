@@ -28,11 +28,11 @@ public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
             Generation = generation
         };
 
-        FSM_API.FSM_API.Create.CreateProcessingGroup(ProcessingGroup);
+        FsmApiCompat.Create.CreateProcessingGroup(ProcessingGroup);
 
         // Construction establishes Created conceptually. FSM_API enters the
         // configured initial state on the first explicit group update.
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
+        FsmApiCompat.Create.CreateFiniteStateMachine(FsmName, -1, ProcessingGroup)
             .State("Manifesting", onEnter: EnterManifesting, onUpdate: _ => { }, onExit: _ => { })
             .State("Active", onEnter: EnterActive, onUpdate: _ => { }, onExit: _ => { })
             .State("Collapsing", onEnter: EnterCollapsing, onUpdate: _ => { }, onExit: _ => { })
@@ -43,7 +43,7 @@ public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
             .WithInitialState("Manifesting")
             .BuildDefinition();
 
-        _fsm = FSM_API.FSM_API.Create.CreateInstance(FsmName, Context, ProcessingGroup);
+        _fsm = FsmApiCompat.Create.CreateInstance(FsmName, Context, ProcessingGroup);
 
         // The context is deliberately invalid while this constructor is wiring
         // the bundle. Only the completed object becomes runnable by FSM_API.
@@ -95,7 +95,7 @@ public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
         // immediately satisfying its one-tick transition to Active.
         var stateBeforeTick = _fsm.CurrentState;
 
-        FSM_API.FSM_API.Interaction.Update(ProcessingGroup);
+        FsmApiCompat.Interaction.Update(ProcessingGroup);
 
         if (stateBeforeTick != _fsm.CurrentState && !_fsm.HasEnteredCurrentState)
         {
@@ -123,7 +123,7 @@ public sealed class MicroBundle : IMicroBundle, HubBundle, IDisposable
     {
         if (_disposed) return;
 
-        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(FsmName, ProcessingGroup);
+        FsmApiCompat.Interaction.DestroyFiniteStateMachine(FsmName, ProcessingGroup);
         _disposed = true;
     }
 
