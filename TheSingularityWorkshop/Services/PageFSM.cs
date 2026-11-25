@@ -1,7 +1,6 @@
 using System;
 using TheSingularityWorkshop.FSM_API;
 using HubKernel = TheSingularityWorkshop.SingularityHub.SingularityHub;
-using fsm_API = FsmApiCompat;
 
 namespace TheSingularityWorkshop.Services
 {
@@ -127,14 +126,14 @@ namespace TheSingularityWorkshop.Services
             _processingGroup = $"{ProcessingGroup}:{Guid.NewGuid():N}";
             _gravityProcessingGroup = $"Gravity:{Guid.NewGuid():N}";
 
-            fsm_API.Create.CreateProcessingGroup(_processingGroup);
-            fsm_API.Create.CreateProcessingGroup(_gravityProcessingGroup);
+            FsmApiCompat.Create.CreateProcessingGroup(_processingGroup);
+            FsmApiCompat.Create.CreateProcessingGroup(_gravityProcessingGroup);
 
             _hub
                 .RegisterProcessGroup(_processingGroup)
                 .RegisterProcessGroup(_gravityProcessingGroup, _processingGroup);
 
-            fsm_API.Create.CreateFiniteStateMachine("PageFSM", -1, _processingGroup)
+            FsmApiCompat.Create.CreateFiniteStateMachine("PageFSM", -1, _processingGroup)
                 .State(Initializing, Enter(behavior?.OnInitialization), Tick, null)
                 .State(FirstContactFirstLabel, Enter(null), Tick, null)
                 .State(FirstContactTransition, Enter(null), Tick, null)
@@ -198,16 +197,16 @@ namespace TheSingularityWorkshop.Services
                 .Transition(NavigationArrival, Running, c => ((PageStateContext)c).StateTicks >= 1)
                 .BuildDefinition();
 
-            _handle = fsm_API.Create.CreateInstance("PageFSM", Context, _processingGroup);
+            _handle = FsmApiCompat.Create.CreateInstance("PageFSM", Context, _processingGroup);
             _livingGuiRuntime = new LivingGuiFsm(_hub, Context, _processingGroup);
             _livingGuiRuntime.PopulationChanged += HandleLivingGuiChanged;
 
-            fsm_API.Create.CreateFiniteStateMachine("GravityFSM", -1, _gravityProcessingGroup)
+            FsmApiCompat.Create.CreateFiniteStateMachine("GravityFSM", -1, _gravityProcessingGroup)
                 .State("Falling", onEnter: null, onUpdate: _ => Context.AdvanceGravity(), onExit: null)
                 .WithInitialState("Falling")
                 .BuildDefinition();
 
-            fsm_API.Create.CreateInstance("GravityFSM", Context, _gravityProcessingGroup);
+            FsmApiCompat.Create.CreateInstance("GravityFSM", Context, _gravityProcessingGroup);
 
             Update();
         }
@@ -278,8 +277,8 @@ namespace TheSingularityWorkshop.Services
 
             _livingGuiRuntime.PopulationChanged -= HandleLivingGuiChanged;
             _livingGuiRuntime.Dispose();
-            fsm_API.Interaction.DestroyFiniteStateMachine("PageFSM", _processingGroup);
-            fsm_API.Interaction.DestroyFiniteStateMachine("GravityFSM", _gravityProcessingGroup);
+            FsmApiCompat.Interaction.DestroyFiniteStateMachine("PageFSM", _processingGroup);
+            FsmApiCompat.Interaction.DestroyFiniteStateMachine("GravityFSM", _gravityProcessingGroup);
             _disposed = true;
         }
     }
