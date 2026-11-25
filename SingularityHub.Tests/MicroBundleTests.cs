@@ -10,6 +10,8 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class MicroBundleTests : IDisposable
 {
+    private readonly List<MicroBundle> _bundles = new();
+
     public MicroBundleTests() => Reset();
 
     [ArchitectureTest(2, 2, 1)]
@@ -112,6 +114,7 @@ public sealed class MicroBundleTests : IDisposable
     public void ParentAndGeneration_Are_Preserved()
     {
         var bundle = new MicroBundle(1009, "Lineage", new WebMicroBundleProvider(), 77, 4);
+        _bundles.Add(bundle);
         var context = Context(bundle);
         Assert.Equal(77, context.ParentId);
         Assert.Equal(4, context.Generation);
@@ -179,11 +182,20 @@ public sealed class MicroBundleTests : IDisposable
 
     public void Dispose() => Reset();
 
-    private static MicroBundle CreateBundle(int id)
-        => new(id, $"TestElement_{id}", new WebMicroBundleProvider());
+    private MicroBundle CreateBundle(int id)
+    {
+        var bundle = new MicroBundle(id, $"TestElement_{id}", new WebMicroBundleProvider());
+        _bundles.Add(bundle);
+        return bundle;
+    }
 
     private static MicroBundleContext Context(MicroBundle bundle)
         => Assert.IsType<MicroBundleContext>(bundle.Context);
 
-    private static void Reset() => FSM_API.Internal.ResetAPI(true);
+    private void Reset()
+    {
+        foreach (var bundle in _bundles)
+            bundle.Dispose();
+        _bundles.Clear();
+    }
 }
