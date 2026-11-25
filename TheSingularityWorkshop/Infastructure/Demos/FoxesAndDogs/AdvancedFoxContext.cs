@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-using fsm_API = FsmApiCompat;
-
 namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
 {
     // Changed access modifier from internal to public to be used by AdvancedDemoContext
@@ -33,9 +31,9 @@ namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
             this.Environment = environment;
             this.Name = $"Fox[{id}]";
 
-            if (!fsm_API.Interaction.Exists("AdvancedFoxFSM", "Foxes"))
+            if (!FsmApiCompat.Interaction.Exists("AdvancedFoxFSM", "Foxes"))
             {
-                fsm_API.Create.CreateFiniteStateMachine("AdvancedFoxFSM", -1, "Foxes")
+                FsmApiCompat.Create.CreateFiniteStateMachine("AdvancedFoxFSM", -1, "Foxes")
                     .State("Idle", null, OnUpdateIdle, null)
                     .State("Walking", OnEnterWalking, OnUpdateWalking, OnExitWalking)
                     .State("Jumping", OnEnterJumping, OnUpdateJumping, OnExitJumping)
@@ -49,7 +47,7 @@ namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
                     .Transition("Fleeing", "Walking", ShouldStopFleeing)
                     .BuildDefinition();
             }
-            Status = fsm_API.Create.CreateInstance("AdvancedFoxFSM", this, "Foxes");
+            Status = FsmApiCompat.Create.CreateInstance("AdvancedFoxFSM", this, "Foxes");
         }
 
         // --- MOVEMENT HELPERS (Logic copied from original file) ---
