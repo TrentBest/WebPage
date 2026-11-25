@@ -1,7 +1,6 @@
 using System;
 using Xunit;
 using TheSingularityWorkshop.Services;
-using fsm_API = FsmApiCompat;
 
 namespace SingularityHub.Tests;
 
@@ -111,15 +110,15 @@ public sealed class IdleExperienceArchitectureTests
             livingGuiGroup = fsm.LivingGuiProcessingGroup;
             gravityGroup = fsm.GravityProcessingGroup;
 
-            Assert.Equal(1, fsm_API.Internal.GetFSMHandleCountInGroup(pageGroup));
+            Assert.Equal(1, FsmApiCompat.Internal.GetFSMHandleCountInGroup(pageGroup));
             // One manager FSM plus one preallocated FSM_API instance per population slot.
-            Assert.Equal(101, fsm_API.Internal.GetFSMHandleCountInGroup(livingGuiGroup));
-            Assert.Equal(1, fsm_API.Internal.GetFSMHandleCountInGroup(gravityGroup));
+            Assert.Equal(101, FsmApiCompat.Internal.GetFSMHandleCountInGroup(livingGuiGroup));
+            Assert.Equal(1, FsmApiCompat.Internal.GetFSMHandleCountInGroup(gravityGroup));
         }
 
-        Assert.Equal(0, fsm_API.Internal.GetFSMHandleCountInGroup(pageGroup));
-        Assert.Equal(0, fsm_API.Internal.GetFSMHandleCountInGroup(livingGuiGroup));
-        Assert.Equal(0, fsm_API.Internal.GetFSMHandleCountInGroup(gravityGroup));
+        Assert.Equal(0, FsmApiCompat.Internal.GetFSMHandleCountInGroup(pageGroup));
+        Assert.Equal(0, FsmApiCompat.Internal.GetFSMHandleCountInGroup(livingGuiGroup));
+        Assert.Equal(0, FsmApiCompat.Internal.GetFSMHandleCountInGroup(gravityGroup));
     }
 
     [Fact(DisplayName = "Incremental Unit Test 08 — PageFSM Update advances only its owning handle")]
