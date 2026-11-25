@@ -16,10 +16,10 @@ public class FSM_WebAssemblyBuilder
         _context = new BlazorAppFSMContext(args);
 
         // Ensure FSM Definition Exists
-        if (!FSM_API.Interaction.Exists("BlazorAppLifecycle", "Bootstrap"))
+        if (!FsmApiCompat.Interaction.Exists("BlazorAppLifecycle", "Bootstrap"))
         {
-            FSM_API.Create.CreateProcessingGroup("Bootstrap");
-            FSM_API.Create.CreateFiniteStateMachine("BlazorAppLifecycle", -1, "Bootstrap")
+            FsmApiCompat.Create.CreateProcessingGroup("Bootstrap");
+            FsmApiCompat.Create.CreateFiniteStateMachine("BlazorAppLifecycle", -1, "Bootstrap")
                 .State("Initializing", OnEnterInitializing, OnUpdateInitializing, OnExitInitializing)
                 .State("Operating", OnEnterOperating, null, null)
                 .State("Shutdown", null, null, null)
@@ -32,7 +32,7 @@ public class FSM_WebAssemblyBuilder
         }
 
         // Create Instance
-        _fsmHandle = FSM_API.Create.CreateInstance("BlazorAppLifecycle", _context, "Bootstrap");
+        _fsmHandle = FsmApiCompat.Create.CreateInstance("BlazorAppLifecycle", _context, "Bootstrap");
 
         
     }
@@ -49,7 +49,7 @@ public class FSM_WebAssemblyBuilder
         int safetyBreaker = 0;
         while (!_context.IsBuilt && safetyBreaker++ < 100)
         {
-            FSM_API.Interaction.Update("Bootstrap");
+            FsmApiCompat.Interaction.Update("Bootstrap");
         }
 
         if (_context.Host == null)
@@ -64,7 +64,7 @@ public class FSM_WebAssemblyBuilder
         }
 
         // Clean up the Bootstrap FSM
-        FSM_API.Interaction.DestroyInstance(_fsmHandle);
+        FsmApiCompat.Interaction.DestroyInstance(_fsmHandle);
 
         return new FSM_WebAssemblyHost(_context.Host);
     }
