@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using _FSM_API = FSM_API;
+using _FSM_API = FsmApiCompat;
 
 public class BlazorFSMIntegration : IDisposable
 {
