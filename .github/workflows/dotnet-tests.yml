@@ -68,7 +68,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ASPNETCORE_ENVIRONMENT=Development dotnet run --project TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-build --urls http://127.0.0.1:5260 > /tmp/webpage-host.log 2>&1 &
+          ASPNETCORE_ENVIRONMENT=Development dotnet run --project TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --urls http://127.0.0.1:5260 > /tmp/webpage-host.log 2>&1 &
           host_pid=$!
           cleanup() {
             local status=$?
