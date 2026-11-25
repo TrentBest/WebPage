@@ -35,8 +35,8 @@ public sealed class MonikerMicroBundle :
         Context = new MonikerContext(text);
         Descriptor = new MicroBundleDescriptor((ulong)BundleId, "1.0.0");
 
-        FSM_API.FSM_API.Create.CreateProcessingGroup(_processingGroup);
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_fsmName, -1, _processingGroup)
+        FsmApiCompat.Create.CreateProcessingGroup(_processingGroup);
+        FsmApiCompat.Create.CreateFiniteStateMachine(_fsmName, -1, _processingGroup)
             .State("Created", onEnter: EnterCreated, onUpdate: _ => { }, onExit: _ => { })
             .State("Ready", onEnter: EnterReady, onUpdate: _ => { }, onExit: _ => { })
             .State("Presenting", onEnter: EnterPresenting, onUpdate: _ => { }, onExit: _ => { })
@@ -49,8 +49,8 @@ public sealed class MonikerMicroBundle :
             .WithInitialState("Created")
             .BuildDefinition();
 
-        _fsm = FSM_API.FSM_API.Create.CreateInstance(_fsmName, Context, _processingGroup);
-        FSM_API.FSM_API.Interaction.Update(_processingGroup);
+        _fsm = FsmApiCompat.Create.CreateInstance(_fsmName, Context, _processingGroup);
+        FsmApiCompat.Interaction.Update(_processingGroup);
     }
 
     public int Id => BundleId;
@@ -117,7 +117,7 @@ public sealed class MonikerMicroBundle :
     public void Update()
     {
         if (_disposed) return;
-        FSM_API.FSM_API.Interaction.Update(_processingGroup);
+        FsmApiCompat.Interaction.Update(_processingGroup);
     }
 
     void TheSingularityWorkshop.SingularityHub.IMicroBundle.LoadBundle(
@@ -137,8 +137,8 @@ public sealed class MonikerMicroBundle :
     public void Dispose()
     {
         if (_disposed) return;
-        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_fsmName, _processingGroup);
-        FSM_API.FSM_API.Interaction.RemoveProcessingGroup(_processingGroup);
+        FsmApiCompat.Interaction.DestroyFiniteStateMachine(_fsmName, _processingGroup);
+        FsmApiCompat.Interaction.RemoveProcessingGroup(_processingGroup);
         _disposed = true;
     }
 
