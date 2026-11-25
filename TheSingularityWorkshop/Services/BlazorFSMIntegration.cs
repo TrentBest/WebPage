@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using _FSM_API = FsmApiCompat;
-
 public class BlazorFSMIntegration : IDisposable
 {
     private const int UpdateRateMs = 33;
@@ -24,7 +22,7 @@ public class BlazorFSMIntegration : IDisposable
     public BlazorFSMIntegration()
     {
         // PageFSM owns creation of its own processing group.
-        _FSM_API.Create.CreateProcessingGroup("Update");
+        FsmApiCompat.Create.CreateProcessingGroup("Update");
         StartLoop();
     }
 
@@ -46,7 +44,7 @@ public class BlazorFSMIntegration : IDisposable
             while (await _gameLoopTimer.WaitForNextTickAsync(token))
             {
                 foreach (var group in UpdateGroups)
-                    _FSM_API.Interaction.Update(group);
+                    FsmApiCompat.Interaction.Update(group);
 
                 OnStateChanged?.Invoke();
             }
