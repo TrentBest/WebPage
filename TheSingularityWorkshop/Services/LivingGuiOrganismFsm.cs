@@ -1,6 +1,5 @@
 using System;
 using TheSingularityWorkshop.FSM_API;
-using fsm_API = FsmApiCompat;
 
 namespace TheSingularityWorkshop.Services;
 
@@ -37,7 +36,7 @@ public sealed class LivingGuiOrganismFsm : IDisposable
 
         EnsureDefinition(_fsmName, _processingGroup);
 
-        _handle = fsm_API.Create.CreateInstance(_fsmName, _organismContext, _processingGroup);
+        _handle = FsmApiCompat.Create.CreateInstance(_fsmName, _organismContext, _processingGroup);
 
         if (!IsValid)
             throw new InvalidOperationException("Living GUI organism FSM was created with an invalid context or handle.");
@@ -48,10 +47,10 @@ public sealed class LivingGuiOrganismFsm : IDisposable
 
     private static void EnsureDefinition(string fsmName, string processingGroup)
     {
-        if (fsm_API.Interaction.Exists(fsmName, processingGroup))
+        if (FsmApiCompat.Interaction.Exists(fsmName, processingGroup))
             return;
 
-        fsm_API.Create.CreateFiniteStateMachine(fsmName, -1, processingGroup)
+        FsmApiCompat.Create.CreateFiniteStateMachine(fsmName, -1, processingGroup)
             .State(
                 DormantState,
                 onEnter: null,
@@ -127,7 +126,7 @@ public sealed class LivingGuiOrganismFsm : IDisposable
         if (_disposed)
             return;
 
-        fsm_API.Interaction.DestroyInstance(_handle);
+        FsmApiCompat.Interaction.DestroyInstance(_handle);
         _disposed = true;
     }
 
