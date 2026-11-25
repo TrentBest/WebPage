@@ -15,10 +15,10 @@ public class SimpleDemoContext : IStateContext
 
     public SimpleDemoContext()
     {
-        if (!FSM_API.Interaction.Exists("AppFSM", "Main"))
+        if (!FsmApiCompat.Interaction.Exists("AppFSM", "Main"))
         {
-            FSM_API.Create.CreateProcessingGroup("Main");
-            FSM_API.Create.CreateFiniteStateMachine("AppFSM", -1, "Main")
+            FsmApiCompat.Create.CreateProcessingGroup("Main");
+            FsmApiCompat.Create.CreateFiniteStateMachine("AppFSM", -1, "Main")
                 .State("Executing", OnEnterExecuting, OnUpdateExecuting, OnExitExecuting)
                 .State("Shutdown", OnEnterShutdown, null, null)
                 .Transition("Executing", "Shutdown", (ctx) => Console.KeyAvailable
@@ -26,7 +26,7 @@ public class SimpleDemoContext : IStateContext
                 || agents.Any(s => s is QuickBrownFox fox && fox.Position == ((SimpleDemoContext)ctx).WinPosition))
                 .BuildDefinition();
         }
-        FSM_API.Create.CreateInstance("AppFSM", this, "Main");
+        FsmApiCompat.Create.CreateInstance("AppFSM", this, "Main");
         IsValid = true;
     }
 
@@ -35,7 +35,7 @@ public class SimpleDemoContext : IStateContext
         if (context is SimpleDemoContext demo)
         {
             Console.WriteLine("Shutting down the Simple Demo...");
-            foreach (var agent in demo.agents) FSM_API.Interaction.DestroyInstance(agent.State);
+            foreach (var agent in demo.agents) FsmApiCompat.Interaction.DestroyInstance(agent.State);
             demo.IsValid = false;
         }
     }
@@ -86,7 +86,7 @@ public class SimpleDemoContext : IStateContext
                 }
             }
 
-            FSM_API.Interaction.Update("Update");
+            FsmApiCompat.Interaction.Update("Update");
             demo.CurrentFrame++;
         }
     }
