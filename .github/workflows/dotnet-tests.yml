@@ -219,6 +219,12 @@ jobs:
           repository: TrentBest/TheSingularityWorkshop.Physics
           ref: development
           path: TheSingularityWorkshop.Physics
+      - name: Checkout Singularity Laboratories development
+        uses: actions/checkout@v5
+        with:
+          repository: TrentBest/TheSingularityWorkshop.SingularityLaboratories
+          ref: development
+          path: TheSingularityWorkshop.SingularityLaboratories
       - name: Checkout FSM_COS development
         uses: actions/checkout@v5
         with:
@@ -291,7 +297,7 @@ jobs:
         run: dotnet restore SingularityHub.Tests/SingularityHub.Tests.csproj -p:WorkshopUseRepositorySources=true
       - name: Test source-mode Physics coordinate adapter
         working-directory: WebPage
-        run: dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-restore -p:WorkshopUseRepositorySources=true --filter FullyQualifiedName~SpatialCoordinateAdapter2dTests
+        run: dotnet test SingularityHub.Tests/SingularityHub.Tests.csproj --configuration Release --no-restore -p:WorkshopUseRepositorySources=true --filter "FullyQualifiedName~SpatialCoordinateAdapter2dTests|FullyQualifiedName~LaboratoryCampusOverviewGuiBuilderTests"
 
       - name: Regenerate and verify Singularity Studios stage plan from source
         working-directory: WebPage
