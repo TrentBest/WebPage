@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 using TheSingularityWorkshop.Services;
-using fsm_API = TheSingularityWorkshop.FSM_API.FSM_API;
+using fsm_API = FsmApiCompat;
 
 namespace SingularityHub.Tests;
 
