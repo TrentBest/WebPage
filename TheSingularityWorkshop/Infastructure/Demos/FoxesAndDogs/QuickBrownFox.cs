@@ -13,9 +13,9 @@ public class QuickBrownFox : IStateContext, ISimpleAgent
     public QuickBrownFox(int position)
     {
         this.Position = position;
-        if (!FSM_API.Interaction.Exists("QuickBrownFoxFSM", "Update"))
+        if (!FsmApiCompat.Interaction.Exists("QuickBrownFoxFSM", "Update"))
         {
-            FSM_API.Create.CreateFiniteStateMachine("QuickBrownFoxFSM", -1, "Update")
+            FsmApiCompat.Create.CreateFiniteStateMachine("QuickBrownFoxFSM", -1, "Update")
                 .State("Walking", 
                 ctx => (ctx as QuickBrownFox)?.OnEnterWalking(ctx), 
                 ctx => (ctx as QuickBrownFox)?.OnUpdateWalking(ctx),
@@ -37,7 +37,7 @@ public class QuickBrownFox : IStateContext, ISimpleAgent
                 .Transition("Walking", "Fleeing", ShouldFlee)
                 .BuildDefinition();
         }
-        State = FSM_API.Create.CreateInstance("QuickBrownFoxFSM", this, "Update");
+        State = FsmApiCompat.Create.CreateInstance("QuickBrownFoxFSM", this, "Update");
         IsValid = true;
     }
 
