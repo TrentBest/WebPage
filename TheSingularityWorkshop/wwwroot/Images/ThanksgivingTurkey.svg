@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+<title id="title">Happy Thanksgiving — a living harvest celebration</title>
+<desc id="desc">A cheerful, richly colored Thanksgiving scene with a proud animated turkey, a glowing autumn harvest table, pumpkins, corn, apples, falling leaves, twinkling lights and the words Happy and Thanksgiving gently taking turns.</desc>
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0.9" y2="1"><stop stop-color="#24183d"/><stop offset=".48" stop-color="#67314a"/><stop offset="1" stop-color="#bd633d"/></linearGradient>
+  <radialGradient id="sunset"><stop stop-color="#ffd88b" stop-opacity=".55"/><stop offset="1" stop-color="#ffb36b" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#fff0ad"/><stop offset=".55" stop-color="#f7b84e"/><stop offset="1" stop-color="#d97732"/></linearGradient>
+  <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffcf75"/><stop offset=".45" stop-color="#d96b3c"/><stop offset="1" stop-color="#7d3650"/></linearGradient>
+  <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff8c70"/><stop offset="1" stop-color="#b93645"/></linearGradient>
+  <linearGradient id="cream" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff6d9"/><stop offset="1" stop-color="#e9c998"/></linearGradient>
+  <linearGradient id="table" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#985037"/><stop offset="1" stop-color="#512b39"/></linearGradient>
+  <radialGradient id="glow"><stop stop-color="#ffd77d" stop-opacity=".48"/><stop offset="1" stop-color="#ffd77d" stop-opacity="0"/></radialGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#211126" flood-opacity=".38"/></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+  <filter id="shine"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <g id="leaf"><path d="M0 0C-26-34-12-65 24-76C28-40 22-14 0 0Z" fill="#f2a348" stroke="#ffe0a0" stroke-width="2"/><path d="M0 0L16-60M5-22L-9-35M11-42L25-48" fill="none" stroke="#a94e38" stroke-width="2"/></g>
+  <g id="sparkle" stroke="#fff0bb" stroke-width="3" stroke-linecap="round"><path d="M0-12V12M-12 0H12"/></g>
+</defs>
+
+<!-- Autumn evening -->
+<rect width="1200" height="700" rx="34" fill="url(#sky)"/>
+<ellipse cx="600" cy="310" rx="510" ry="350" fill="url(#sunset)"/>
+<circle cx="600" cy="270" r="205" fill="url(#glow)" filter="url(#soft)"/>
+<path d="M0 500Q180 430 360 480T720 465T1200 475V700H0Z" fill="#39253a"/>
+<path d="M0 540Q180 485 360 525T720 510T1200 520" fill="none" stroke="#d98a55" stroke-opacity=".45" stroke-width="3"/>
+
+<!-- Distant autumn trees -->
+<g opacity=".55" fill="#48283e">
+ <path d="M25 510V310h18v200M-15 380Q10 280 75 320Q110 240 155 325Q190 360 150 420H0Z"/>
+ <path d="M1050 515V300h20v215M1000 390Q1000 300 1065 315Q1110 240 1160 330Q1220 350 1185 425H1010Z"/>
+</g>
+<g opacity=".55" fill="#d47a45">
+ <circle cx="55" cy="350" r="55"/><circle cx="115" cy="330" r="46"/><circle cx="1090" cy="340" r="62"/><circle cx="1150" cy="370" r="47"/>
+</g>
+
+<!-- Hanging harvest lights -->
+<path d="M65 112Q300 190 590 112T1135 115" fill="none" stroke="#f4c57a" stroke-width="3" opacity=".65"/>
+<g fill="#ffe7a3" filter="url(#shine)">
+ <circle cx="150" cy="145" r="7"><animate attributeName="opacity" values=".45;1;.45" dur="2.1s" repeatCount="indefinite"/></circle>
+ <circle cx="310" cy="170" r="6"><animate attributeName="opacity" values="1;.35;1" dur="2.7s" repeatCount="indefinite"/></circle>
+ <circle cx="490" cy="150" r="7"><animate attributeName="opacity" values=".4;1;.4" dur="1.9s" repeatCount="indefinite"/></circle>
+ <circle cx="700" cy="143" r="6"><animate attributeName="opacity" values="1;.3;1" dur="2.4s" repeatCount="indefinite"/></circle>
+ <circle cx="890" cy="147" r="7"><animate attributeName="opacity" values=".4;1;.4" dur="2s" repeatCount="indefinite"/></circle>
+ <circle cx="1060" cy="125" r="6"><animate attributeName="opacity" values="1;.4;1" dur="2.5s" repeatCount="indefinite"/></circle>
+</g>
+
+<!-- Seasonal greeting -->
+<g font-family="Georgia,'Times New Roman',serif" text-anchor="middle" filter="url(#shadow)">
+ <g class="greeting greeting-happy">
+  <text x="600" y="125" font-size="82" font-weight="bold" fill="#fff0c5" stroke="#8f4a42" stroke-width="2" paint-order="stroke">Happy</text>
+  <path d="M420 145Q600 170 780 145" fill="none" stroke="#f6c66f" stroke-width="3"/>
+ </g>
+ <g class="greeting greeting-thanks">
+  <text x="600" y="125" font-size="70" font-weight="bold" fill="#fff0c5" stroke="#8f4a42" stroke-width="2" paint-order="stroke">Thanksgiving</text>
+  <path d="M370 145Q600 170 830 145" fill="none" stroke="#f6c66f" stroke-width="3"/>
+ </g>
+</g>
+
+<!-- Falling leaves on drifting paths -->
+<g>
+ <use href="#leaf" transform="translate(210 -40) rotate(-35)"><animateTransform attributeName="transform" type="translate" values="210 -40;175 230;230 540" dur="10s" repeatCount="indefinite"/></use>
+ <use href="#leaf" transform="translate(930 -80) rotate(35) scale(.8)"><animateTransform attributeName="transform" type="translate" values="930 -80;980 180;900 520" dur="12s" repeatCount="indefinite"/></use>
+ <use href="#leaf" transform="translate(420 -60) rotate(65) scale(.65)"><animateTransform attributeName="transform" type="translate" values="420 -60;370 210;450 550" dur="9s" repeatCount="indefinite"/></use>
+ <use href="#leaf" transform="translate(1090 -50) rotate(-15) scale(.7)"><animateTransform attributeName="transform" type="translate" values="1090 -50;1040 250;1100 560" dur="11s" repeatCount="indefinite"/></use>
+ <use href="#leaf" transform="translate(720 -100) rotate(20) scale(.55)"><animateTransform attributeName="transform" type="translate" values="720 -100;760 210;700 520" dur="13s" repeatCount="indefinite"/></use>
+</g>
+
+<!-- Turkey: proud, warm and a little goofy -->
+<g transform="translate(600 410)" filter="url(#shadow)">
+ <!-- fan feathers -->
+ <g class="tail">
+  <path d="M-15 28Q-170 15-205-118Q-94-145-15 5Z" fill="#9d3e42" stroke="#f6ad65" stroke-width="5"/>
+  <path d="M-6 16Q-150-34-155-178Q-51-170 0 3Z" fill="#d56b3f" stroke="#ffd18a" stroke-width="5"/>
+  <path d="M0 6Q-75-90-45-205Q48-174 40 12Z" fill="#e99b49" stroke="#ffe0a2" stroke-width="5"/>
+  <path d="M12 6Q55-112 150-178Q196-95 42 32Z" fill="#b84b46" stroke="#f8bd75" stroke-width="5"/>
+  <path d="M22 16Q145-44 205-100Q230 15 45 55Z" fill="#73394c" stroke="#f3a95d" stroke-width="5"/>
+  <g fill="#ffe0a2" opacity=".65"><path d="M-168-105Q-110-78-48 0" fill="none" stroke="#ffe0a2" stroke-width="5"/><path d="M-116-150Q-55-93 5 8" fill="none" stroke="#ffe0a2" stroke-width="5"/><path d="M-30-180Q-10-75 22 7" fill="none" stroke="#ffe0a2" stroke-width="5"/><path d="M145-145Q90-65 42 22" fill="none" stroke="#ffe0a2" stroke-width="5"/></g>
+  <animateTransform attributeName="transform" type="rotate" values="-2 0 20;2 0 20;-2 0 20" dur="4.5s" repeatCount="indefinite"/>
+ </g>
+ <!-- body -->
+ <ellipse cx="0" cy="75" rx="112" ry="135" fill="url(#feather)" stroke="#f5c17c" stroke-width="5"/>
+ <ellipse cx="-22" cy="95" rx="72" ry="92" fill="#f6d49a" opacity=".92"/>
+ <path d="M-60 42Q-5 15 57 55" fill="none" stroke="#fff0c8" stroke-opacity=".5" stroke-width="6" stroke-linecap="round"/>
+ <!-- wings -->
+ <path d="M-85 65Q-150 20-150 91Q-130 147-69 143" fill="#a94a43" stroke="#f3b46d" stroke-width="5"/>
+ <path d="M83 65Q145 20 150 91Q130 147 68 143" fill="#a94a43" stroke="#f3b46d" stroke-width="5"/>
+ <!-- neck and head -->
+ <path d="M-42 5Q-56-75-30-126Q-6-165 35-129Q57-103 44-49L30 13Z" fill="url(#feather)" stroke="#f6c27b" stroke-width="5"/>
+ <ellipse cx="0" cy="-142" rx="66" ry="61" fill="#c96b48" stroke="#f8c98c" stroke-width="5"/>
+ <!-- feather tuft -->
+ <path d="M-28-194Q-42-232-9-220Q-5-245 19-213Q48-227 35-188" fill="#e7a64f" stroke="#ffe0a2" stroke-width="4"/>
+ <!-- eyes -->
+ <ellipse cx="-24" cy="-151" rx="15" ry="19" fill="#fff8e8"/>
+ <ellipse cx="25" cy="-151" rx="15" ry="19" fill="#fff8e8"/>
+ <g fill="#38283b"><ellipse cx="-20" cy="-148" rx="6" ry="9"/><ellipse cx="29" cy="-148" rx="6" ry="9"/></g>
+ <g fill="#fff"><circle cx="-22" cy="-153" r="3"/><circle cx="27" cy="-153" r="3"/></g>
+ <path d="M-41-176Q-25-186-10-177M10-177Q26-186 42-175" fill="none" stroke="#733b3d" stroke-width="5" stroke-linecap="round"/>
+ <!-- beak -->
+ <path d="M-16-123L18-123L2-94Z" fill="#ffd16b" stroke="#9a573b" stroke-width="3"/>
+ <!-- wattle -->
+ <path d="M19-130Q44-116 28-91Q16-76 12-101Q4-119 19-130Z" fill="url(#red)" stroke="#8e3345" stroke-width="2"/>
+ <!-- smile -->
+ <path d="M-19-86Q0-74 18-87" fill="none" stroke="#713c3d" stroke-width="3" stroke-linecap="round"/>
+ <!-- feet -->
+ <path d="M-45 196L-51 224M44 196L51 224" stroke="#e5a34f" stroke-width="10" stroke-linecap="round"/>
+ <path d="M-78 230L-48 224L-18 234M20 234L50 224L80 230" fill="none" stroke="#e5a34f" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+ <animateTransform attributeName="transform" type="translate" values="600 410;600 399;600 410" dur="3.6s" repeatCount="indefinite"/>
+</g>
+
+<!-- Abundant harvest table -->
+<g filter="url(#shadow)">
+ <path d="M80 555Q600 515 1120 555L1080 635Q600 665 120 635Z" fill="url(#table)" stroke="#e2a36b" stroke-width="5"/>
+ <path d="M125 574Q600 550 1075 574" fill="none" stroke="#f3c48a" stroke-opacity=".5" stroke-width="4"/>
+ <!-- Cornucopia -->
+ <path d="M170 538Q120 505 154 466Q183 432 230 467Q275 499 325 527Q273 561 220 555Q188 552 170 538Z" fill="#c47a3f" stroke="#ffd18a" stroke-width="5"/>
+ <path d="M166 476Q210 503 287 534M178 460Q230 496 303 526M156 495Q205 526 260 548" fill="none" stroke="#f2c47e" stroke-width="4"/>
+ <!-- pumpkin left -->
+ <g transform="translate(360 548)">
+  <path d="M0-44Q-50-72-73-27Q-93 24-38 45Q0 59 37 43Q86 17 64-29Q42-70 0-44Z" fill="#e77938" stroke="#ffbd6e" stroke-width="4"/>
+  <path d="M0-46Q-22-14-15 44M0-46Q22-14 15 44M-52-35Q-25-4-29 43M52-35Q25-4 29 43" fill="none" stroke="#a64b35" stroke-width="4"/>
+  <path d="M-3-49Q-5-70 13-75Q25-65 12-47Z" fill="#66804b"/>
+ </g>
+ <!-- apples -->
+ <g transform="translate(485 548)"><path d="M0-35Q-30-54-44-24Q-60 18-25 38Q-4 49 0 35Q8 48 30 34Q61 8 42-25Q23-52 0-35Z" fill="#c83d46" stroke="#f18c68" stroke-width="3"/><path d="M0-37L4-52" stroke="#6f4937" stroke-width="5"/><path d="M3-48Q20-65 34-51Q20-39 3-48Z" fill="#8caa58"/></g>
+ <g transform="translate(720 548) scale(.8)"><path d="M0-35Q-30-54-44-24Q-60 18-25 38Q-4 49 0 35Q8 48 30 34Q61 8 42-25Q23-52 0-35Z" fill="#d44c3c" stroke="#f5a16c" stroke-width="3"/><path d="M0-37L4-52" stroke="#6f4937" stroke-width="5"/><path d="M3-48Q20-65 34-51Q20-39 3-48Z" fill="#8caa58"/></g>
+ <!-- corn -->
+ <g transform="translate(850 550) rotate(-14)"><rect x="-18" y="-49" width="36" height="96" rx="18" fill="#ffd66e" stroke="#fff0b5" stroke-width="3"/><path d="M-10-37V37M0-43V42M10-35V37" stroke="#c8893d" stroke-width="3"/><path d="M-20 42Q-53 16-37-27Q-12 0-8 43M20 42Q54 12 38-27Q12 0 8 43" fill="#668d52" stroke="#9ec16b" stroke-width="3"/></g>
+ <!-- candle -->
+ <g transform="translate(970 540)">
+  <rect x="-15" y="-33" width="30" height="76" rx="7" fill="url(#cream)"/>
+  <path d="M0-33V-49" stroke="#594044" stroke-width="4"/>
+  <path d="M0-50Q-20-71 0-91Q21-68 0-50Z" fill="url(#gold)" filter="url(#shine)"><animate attributeName="d" values="M0-50Q-20-71 0-91Q21-68 0-50Z;M0-50Q-13-78 0-87Q15-68 0-50Z;M0-50Q-20-71 0-91Q21-68 0-50Z" dur=".8s" repeatCount="indefinite"/></path>
+ </g>
+</g>
+
+<!-- little celebratory glints -->
+<g>
+ <use href="#sparkle" transform="translate(290 290) scale(.8)"><animate attributeName="opacity" values=".2;1;.2" dur="2s" repeatCount="indefinite"/></use>
+ <use href="#sparkle" transform="translate(910 275) scale(.65)"><animate attributeName="opacity" values="1;.2;1" dur="2.4s" repeatCount="indefinite"/></use>
+ <use href="#sparkle" transform="translate(430 390) scale(.45)"><animate attributeName="opacity" values=".15;1;.15" dur="1.8s" repeatCount="indefinite"/></use>
+ <use href="#sparkle" transform="translate(790 390) scale(.5)"><animate attributeName="opacity" values="1;.25;1" dur="2.1s" repeatCount="indefinite"/></use>
+</g>
+
+<text x="600" y="680" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" letter-spacing="5" fill="#f9d9a0">GATHER • GIVE THANKS • SHARE THE GOOD</text>
+
+<style>
+.greeting{animation:messageCycle 9s ease-in-out infinite}
+.greeting-thanks{animation-delay:4.5s;opacity:0}
+@keyframes messageCycle{
+  0%,8%{opacity:0;transform:translateY(10px)}
+  16%,42%{opacity:1;transform:translateY(0)}
+  50%,100%{opacity:0;transform:translateY(-8px)}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation:none!important}
+ .greeting-happy{opacity:1!important;transform:none!important}
+ .greeting-thanks{opacity:0!important}
+}
+</style>
+</svg>
