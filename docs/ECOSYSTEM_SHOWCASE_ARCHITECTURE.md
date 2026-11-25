@@ -93,8 +93,13 @@ The City repository already has place/blueprint data, spatial/civic models, laye
 
 WebPage's current AEC visitor animation is direct movement in a floor-local coordinate frame, not collision-aware routing. The room regions are semantic program regions, not authored walls. Preserve these distinctions until the corresponding topology and proofs exist.
 
-## Verification blocker
+## Verification checkpoint
 
-WebPage workflow run [45345665643](https://github.com/TrentBest/WebPage/actions/runs/45345665643) failed in both standard NuGet and repository-source builds. The source branch of FSM_API now exposes `TheSingularityWorkshop.FSM_API.FsmApi`, while WebPage still calls the prior `FSM_API` static class. The standard package lane pins released FSM_API 1.0.13 and does not expose the newer `FsmApi` name. Establish a deliberate compatibility boundary and prove both modes before treating the AEC work or new integrations as verified.
+The earlier source-vs-package FSM_API compatibility blocker is resolved on `development`. The standard NuGet build and the repository-source integration both pass, including the browser journey:
+
+- [Build and source-integration proof](https://github.com/TrentBest/WebPage/actions/runs/45558427853) on [`957fec2`](https://github.com/TrentBest/WebPage/commit/957fec260575c973480d6d54f9dcc5dbb71f0e8d).
+- [Follow-up .NET 10 smoke-check proof](https://github.com/TrentBest/WebPage/actions/runs/45570618182) on [`02a1c66`](https://github.com/TrentBest/WebPage/commit/02a1c66aed51fc42c8e40ba24cf59025d11ab09f).
+
+The browser smoke check now verifies the .NET 10 WebAssembly bootstrap script at `/_framework/blazor.webassembly.js`; it does not expect the removed `blazor.boot.json` manifest. The README's .NET SDK and bootstrap descriptions are being aligned with the .NET 10 project target.
 
 No NuGet publication, no `master` changes, and no deletion of existing behavior are part of this work without explicit approval.
