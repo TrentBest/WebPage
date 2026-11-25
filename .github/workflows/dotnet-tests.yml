@@ -61,7 +61,7 @@ jobs:
           dotnet build TheSingularityWorkshop/TheSingularityWorkshop.csproj --configuration Release --no-restore
 
       # A lightweight HTTP smoke test proves the built host serves its landing page and
-      # Blazor WebAssembly boot manifest. It does not claim to verify browser animations.
+      # .NET 10 Blazor WebAssembly bootstrap asset. It does not claim to verify browser animations.
       - name: Smoke-test WebPage host and browser journey
         id: browser_smoke
         timeout-minutes: 8
