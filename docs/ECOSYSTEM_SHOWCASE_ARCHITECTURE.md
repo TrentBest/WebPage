@@ -103,3 +103,16 @@ The earlier source-vs-package FSM_API compatibility blocker is resolved on `deve
 The browser smoke check now verifies the .NET 10 WebAssembly bootstrap script at `/_framework/blazor.webassembly.js`; it does not expect the removed `blazor.boot.json` manifest. The README now reflects the .NET 10 project target, SDK requirement and bootstrap asset, and links to the successful browser-proof run.
 
 No NuGet publication, no `master` changes, and no deletion of existing behavior are part of this work without explicit approval.
+
+
+## Cross-repository contract checkpoint — 25 November 2026
+
+The first City and Laboratory vertical slices now have executable evidence on their owner/consumer branches:
+
+- **Singularity City** added JSON Schemas for the existing `singularity-city.catalog.v1` place catalog and the proposed `singularity-city.experience-entry.v1` handoff declaration, plus deterministic contract tests. The Underworks entry fixture resolves to an existing place and district but is not registered as a live destination. City Pages build/deployment and CiAi exact-commit evidence passed: [Pages run](https://github.com/TrentBest/TheSingularityWorkshop.SingularityCity/actions/runs/45700149617) · [CiAi evidence](https://github.com/TrentBest/TheSingularityWorkshop.SingularityCity/actions/runs/45700148709).
+- **WebPage** now has a source-mode `LaboratoryCampusOverviewGuiBuilder` that consumes Laboratory's `LaboratoryCampusOverview` and projects owner-defined campus/workspace/facility/room/apparatus/instrument/measurement-channel metadata into the host GUI tree. Its focused test verifies identity, labels, units and sampling metadata.
+- **WebPage CI** checks out Laboratory `development` and compiles/tests the adapter through the repository-source lane. The standard package lane remains unchanged. [Both CI jobs passed](https://github.com/TrentBest/WebPage/actions/runs/45701016711): standard browser-host tests and Workshop repository-source integration.
+
+These are contract and presentation proofs, not a live hosted lab, live instrument telemetry, trusted authorization, Physics coordinate mapping or runtime City-to-Laboratory handoff. City map coordinates remain presentation coordinates until a complete spatial-frame contract exists. WebPage's legacy spatial laboratory models remain host-side presentation/visitor prototypes; they are not promoted to canonical scientific or security models.
+
+Next slice: consume Laboratory-owned experiment definitions/configurations and execution/provenance contracts in a WebPage experience adapter, then connect City place/entry declarations to that experience through an explicit host handoff. Preserve existing visitor behavior and tests until replacements are proven.
