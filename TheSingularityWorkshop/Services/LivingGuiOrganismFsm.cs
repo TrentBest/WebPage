@@ -1,6 +1,6 @@
 using System;
 using TheSingularityWorkshop.FSM_API;
-using fsm_API = FSM_API;
+using fsm_API = FsmApiCompat;
 
 namespace TheSingularityWorkshop.Services;
 
