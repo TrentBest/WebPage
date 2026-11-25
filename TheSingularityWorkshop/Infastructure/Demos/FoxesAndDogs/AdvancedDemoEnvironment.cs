@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System; // For Math.Abs
 
-using fsm_API = FsmApiCompat;
-
 namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
 {
     public class AdvancedDemoEnvironment : IStateContext
@@ -17,13 +15,13 @@ namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
 
         public AdvancedDemoEnvironment()
         {
-            if (!fsm_API.Interaction.Exists("AdvancedDemoEnvironmentFSM", "Environment"))
+            if (!FsmApiCompat.Interaction.Exists("AdvancedDemoEnvironmentFSM", "Environment"))
             {
-                fsm_API.Create.CreateFiniteStateMachine("AdvancedDemoEnvironmentFSM", -1, "Environment")
+                FsmApiCompat.Create.CreateFiniteStateMachine("AdvancedDemoEnvironmentFSM", -1, "Environment")
                     .State("Existing", null, OnUpdateExisting, null)
                     .BuildDefinition();
             }
-            fsm_API.Create.CreateInstance("AdvancedDemoEnvironmentFSM", this, "Environment");
+            FsmApiCompat.Create.CreateInstance("AdvancedDemoEnvironmentFSM", this, "Environment");
             Name = "AdvancedDemoEnvironment";
             IsValid = true;
         }
