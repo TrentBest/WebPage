@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-using fsm_API = FsmApiCompat;
-
 namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
 {
     public class AdvancedDogContext : IAdvancedAgent
@@ -28,9 +26,9 @@ namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
         public AdvancedDogContext(int id, Vector2 pos, AdvancedDemoEnvironment environment)
         {
             Position = pos;
-            if (!fsm_API.Interaction.Exists("AdvancedDogFSM", "Dogs"))
+            if (!FsmApiCompat.Interaction.Exists("AdvancedDogFSM", "Dogs"))
             {
-                fsm_API.Create.CreateFiniteStateMachine("AdvancedDogFSM", -1, "Dogs")
+                FsmApiCompat.Create.CreateFiniteStateMachine("AdvancedDogFSM", -1, "Dogs")
                     .State("Sleeping", null, null, null)
                     .State("Idle", OnEnterIdle, null, null)
                     .State("Chasing", OnEnterChasing, OnUpdateChasing, OnExitChasing)
@@ -42,7 +40,7 @@ namespace TheSingularityWorkshop.Infrastructure.Demos.FoxesAndDogs
                     .Transition("Idle", "Sleeping", ShouldSleep)
                     .BuildDefinition();
             }
-            Status = fsm_API.Create.CreateInstance("AdvancedDogFSM", this, "Dogs");
+            Status = FsmApiCompat.Create.CreateInstance("AdvancedDogFSM", this, "Dogs");
             Environment = environment;
             Name = $"Dog[{id}]";
             IsValid = true;
