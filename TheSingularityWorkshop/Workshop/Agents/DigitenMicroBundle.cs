@@ -37,8 +37,8 @@ public sealed class DigitenMicroBundle : IDisposable
         _processingGroup = $"Digiten_{id}";
         _fsmName = $"DigitenBehavior_{id}";
 
-        FSM_API.FSM_API.Create.CreateProcessingGroup(_processingGroup);
-        FSM_API.FSM_API.Create.CreateFiniteStateMachine(_fsmName, -1, _processingGroup)
+        FsmApiCompat.Create.CreateProcessingGroup(_processingGroup);
+        FsmApiCompat.Create.CreateFiniteStateMachine(_fsmName, -1, _processingGroup)
             .State("Existing", onEnter: EnterExisting, onUpdate: _ => { }, onExit: _ => { })
             .State("PursuingGoal", onEnter: EnterPursuingGoal, onUpdate: _ => { }, onExit: _ => { })
             .State("Navigating", onEnter: EnterNavigating, onUpdate: _ => { }, onExit: _ => { })
@@ -52,7 +52,7 @@ public sealed class DigitenMicroBundle : IDisposable
             .WithInitialState("Existing")
             .BuildDefinition();
 
-        _behavior = FSM_API.FSM_API.Create.CreateInstance(_fsmName, _context, _processingGroup);
+        _behavior = FsmApiCompat.Create.CreateInstance(_fsmName, _context, _processingGroup);
     }
 
     /// <summary>Stable persistent actor identity.</summary>
@@ -107,7 +107,7 @@ public sealed class DigitenMicroBundle : IDisposable
     public void Update()
     {
         if (_disposed) return;
-        FSM_API.FSM_API.Interaction.Update(_processingGroup);
+        FsmApiCompat.Interaction.Update(_processingGroup);
 
         if (!_behavior.HasEnteredCurrentState)
             _behavior.TransitionTo(_behavior.CurrentState);
@@ -116,7 +116,7 @@ public sealed class DigitenMicroBundle : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        FSM_API.FSM_API.Interaction.DestroyFiniteStateMachine(_fsmName, _processingGroup);
+        FsmApiCompat.Interaction.DestroyFiniteStateMachine(_fsmName, _processingGroup);
         _disposed = true;
     }
 
