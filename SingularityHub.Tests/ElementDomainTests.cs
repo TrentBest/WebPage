@@ -12,6 +12,8 @@ namespace SingularityHub.Tests;
 /// </summary>
 public sealed class ElementDomainTests : IDisposable
 {
+    private readonly List<MicroBundle> _elements = new();
+
     public ElementDomainTests() => Reset();
 
     [ArchitectureTest(2, 1, 1)]
@@ -149,8 +151,17 @@ public sealed class ElementDomainTests : IDisposable
 
     public void Dispose() => Reset();
 
-    private static MicroBundle CreateElement(int id)
-        => new(id, $"Element_{id}", new WebMicroBundleProvider());
+    private MicroBundle CreateElement(int id)
+    {
+        var element = new MicroBundle(id, $"Element_{id}", new WebMicroBundleProvider());
+        _elements.Add(element);
+        return element;
+    }
 
-    private static void Reset() => FSM_API.Internal.ResetAPI(true);
+    private void Reset()
+    {
+        foreach (var element in _elements)
+            element.Dispose();
+        _elements.Clear();
+    }
 }
