@@ -116,3 +116,20 @@ The first City and Laboratory vertical slices now have executable evidence on th
 These are contract and presentation proofs, not a live hosted lab, live instrument telemetry, trusted authorization, Physics coordinate mapping or runtime City-to-Laboratory handoff. City map coordinates remain presentation coordinates until a complete spatial-frame contract exists. WebPage's legacy spatial laboratory models remain host-side presentation/visitor prototypes; they are not promoted to canonical scientific or security models.
 
 Next slice: consume Laboratory-owned experiment definitions/configurations and execution/provenance contracts in a WebPage experience adapter, then connect City place/entry declarations to that experience through an explicit host handoff. Preserve existing visitor behavior and tests until replacements are proven.
+
+## Cross-repository contract checkpoint — 26 November 2026
+
+The WebPage/Laboratories integration has advanced from campus and experiment-template metadata to immutable experiment results:
+
+- **Laboratories owns the scientific record.** Its ExperimentRunRecord, ExperimentResultView, and persistence-side result catalog remain authoritative for run identity, exact experiment/model versions, timestamps, replay lineage, validation, assumptions, limitations, and result payloads.
+- **WebPage consumes result views.** LaboratoryExperimentResultGuiBuilder is a conditional repository-source adapter. It projects read-only result views into the GUI tree, rejects null entries and duplicate run identities, and does not claim execution admission, execution start, access grant, or persistence ownership.
+- **CI proof:** [WebPage .NET Tests run 45756753226](https://github.com/TrentBest/WebPage/actions/runs/45756753226) passed both jobs. The source-mode lane checked out the Laboratory development source, built WebPage, passed the focused result-view tests, regenerated and verified the Singularity Studios stage plan, and completed the live Renderer source smoke. The standard lane passed the browser-host journey and existing test suites.
+- **Coordination:** the result-view checkpoint and CI evidence are recorded on [WebPage issue #137](https://github.com/TrentBest/WebPage/issues/137) and [Laboratories issue #7](https://github.com/TrentBest/TheSingularityWorkshop.SingularityLaboratories/issues/7).
+
+The broader repository review confirms that the next campaign step should reuse Laboratories' already implemented version-bound scientific campaign definitions, baseline/scenario execution, per-scenario outcomes (including failed, cancelled, and not-run), FSM_Execution workflow handler, and atomic campaign-envelope persistence. WebPage should consume the resulting campaign evidence as a presentation adapter; it must not create a competing campaign engine or infer that skipped/not-run scenarios succeeded.
+
+Other existing capabilities remain deliberately separated: Physics owns physical models; FSM_Execution owns workflow lifecycle; FSM_COS composes MicroBundles; City owns places and civic/spatial identity; Experiences owns Experience definitions and publishable artifacts; WebApp is the intended browser host while WebPage is the current proving ground; ServerApp owns server-role hosting and fleet operations; SingularityBot owns game strategy and SC2 actions; CiAi observes exact-commit CI evidence; HeadlessAi owns bounded model turns; CommandAi owns generic command proposals. These are integration candidates with distinct ownership, not dependencies to add indiscriminately.
+
+The successful source-mode lane already exercises the development sources for FSM_API, MicroBundleDomain, Physics, Laboratories, FSM_COS, FSM_UserIO, GUI, ProtocolAi, GrammarAi, Economy, Renderer, and Visualize alongside WebPage. This is a compile/test integration graph, not proof that every capability is live in the browser.
+
+No live campaign dashboard, runtime City-to-Laboratory handoff, hosted lab telemetry, trusted authorization, or Physics spatial-frame mapping is claimed by this checkpoint. No NuGet publication, master modification, branch creation/deletion, or deployment-setting change was performed.
