@@ -75,7 +75,7 @@ public static class LaboratoryExperimentTemplateGuiBuilder
 
             foreach (var parameter in schema.Parameters)
             {
-                var field = parameters.Child("input", parameter.Id, input =>
+                parameters.Child("input", parameter.Id, input =>
                 {
                     input.Text(parameter.Name)
                         .Property("data-parameter-id", parameter.Id)
