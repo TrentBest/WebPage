@@ -49,7 +49,7 @@ public sealed class LaboratoryExperimentResultGuiBuilderTests
         Assert.Equal(run.ConfigurationPayload, result.Properties["data-configuration-payload"]);
         Assert.Equal(run.ResultPayload, result.Properties["data-result-payload"]);
         Assert.Equal(replaySourceId.ToString("D"), result.Properties["data-replayed-from-run-id"]);
-        Assert.Contains("homogeneous", result.Find("experiment-run-" + runId.ToString("N") + "-assumptions").TextContent);
+        Assert.Contains("homogeneous", result.Find("experiment-run-" + runId.ToString("N") + "-assumptions").Text);
         Assert.Contains("phase changes", result.Find("experiment-run-" + runId.ToString("N") + "-limitations").TextContent);
 
         Assert.DoesNotContain("data-execution-admitted", result.Properties.Keys);
