@@ -18,6 +18,11 @@
         </div>
     </header>
 
+    <div class="replay-live-entry">
+        <a href="/match-viewer">OPEN MATCH VIEWER <span>↗</span></a>
+        <small>Browser-compatible spectator media · no live ServerSC2 feed is attached yet</small>
+    </div>
+
     <section class="replay-disclaimer" aria-label="Prototype status">
         <strong>DEMO DATA — NOT YET CONNECTED TO PHYSICS WORLD REPLAY</strong>
         <p>This interactive scene is a local, deterministic presentation fixture. The Physics repository has tested model-level replay and fork-aware route coordination, but this browser scene does not consume a Physics checkpoint or reconstruct a physical world.</p>
@@ -222,6 +227,10 @@
 .replay-lede{max-width:66ch;color:#a6bec9;line-height:1.7}
 .replay-state{display:flex;align-items:center;gap:.6rem;border:1px solid rgba(255,177,92,.45);padding:.8rem 1rem;color:#ffcb88;font:700 .65rem Consolas,monospace;letter-spacing:.08em}
 .status-dot{width:.5rem;height:.5rem;border-radius:50%;background:#ffb15c;box-shadow:0 0 12px #ffb15c}
+.replay-live-entry{max-width:1180px;margin:0 auto 1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.replay-live-entry a{display:inline-flex;gap:.8rem;align-items:center;padding:.8rem 1rem;border:1px solid rgba(0,234,255,.42);background:rgba(0,234,255,.06);color:#00eaff;text-decoration:none;font:800 .66rem Consolas,monospace;letter-spacing:.1em}
+.replay-live-entry a:hover,.replay-live-entry a:focus-visible{border-color:#ff2cff;color:#fff}
+.replay-live-entry small{color:#8fa9b6;font-size:.72rem}
 .replay-disclaimer{max-width:1180px;margin:0 auto 1.5rem;padding:1rem 1.2rem;border-left:3px solid #ffb15c;background:rgba(255,177,92,.06)}.replay-disclaimer strong{color:#ffcb88;font:800 .72rem Consolas,monospace;letter-spacing:.06em}.replay-disclaimer p{margin:.5rem 0 0;color:#a8bbc5;font-size:.88rem;line-height:1.65;max-width:110ch}
 .replay-workbench{max-width:1180px;margin:auto;border:1px solid rgba(0,234,255,.2);background:rgba(4,13,27,.9);box-shadow:0 25px 90px rgba(0,0,0,.25)}
 .scene-topline{padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(0,234,255,.13)}.scene-label,.tick-readout span,.timeline-head,.timeline-labels,.ledger-heading,.event-tick,.event-action,.capability-index{font:700 .63rem Consolas,monospace;letter-spacing:.12em;color:#6e909f}.scene-topline h2{font-size:1.25rem;margin:.35rem 0 0}.tick-readout{text-align:right}.tick-readout strong{display:block;margin-top:.3rem;color:#00eaff;font:700 1.8rem Consolas,monospace}
