@@ -31,7 +31,8 @@
             {
                 @foreach (var item in Experience.Manifest?.Hub.Where(item =>
                     (string.Equals(item.Name, "Singularity Laboratory", StringComparison.OrdinalIgnoreCase)
-                    || string.Equals(item.Name, "Demonstrations", StringComparison.OrdinalIgnoreCase)))
+                    || string.Equals(item.Name, "Demonstrations", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(item.Name, "SingularityBot", StringComparison.OrdinalIgnoreCase)))
                     ?? Array.Empty<WebPageManifestHubItem>())
                 {
                     <NavLink class="nav-link" href="@(item.Route ?? HubTabHref(item.Name))" @onclick="() => SelectHubDestination(item.Name)">@item.Name</NavLink>
@@ -108,6 +109,7 @@
         {
             "welcome" => 1,
             "singularity-laboratory" or "demonstrations" => 2,
+            "singularitybot" or "singularity-bot" => 2,
             "singularity-architecture" or "architecture" => 3,
             "city-lab" or "singularity-city" => 4,
             "economy" or "digitens" => 5,
