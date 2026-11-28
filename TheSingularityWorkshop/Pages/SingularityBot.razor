@@ -1,0 +1,120 @@
+@page "/singularity-bot"
+
+<PageTitle>SingularityBot // The Singularity Workshop</PageTitle>
+
+<main class="bot-showcase">
+    <header class="bot-hero">
+        <a class="bot-back" href="/">✳ THE SINGULARITY WORKSHOP</a>
+        <p class="bot-kicker">A WORKSHOP CREATION / STARCRAFT II</p>
+        <h1>Meet <span>SingularityBot</span>.</h1>
+        <p class="bot-lede">Not a script that blindly follows a build order. A decision-and-action runtime that observes a changing world, coordinates intent, and turns validated decisions into StarCraft II actions.</p>
+        <div class="bot-hero-actions">
+            <a class="bot-action primary" href="https://github.com/TrentBest/TheSingularityWorkshop.SingularityBot">EXPLORE THE SOURCE ↗</a>
+            <a class="bot-action" href="https://github.com/TrentBest/TheSingularityWorkshop.SingularityBot/tree/development/docs/forge">ENTER FORGE ↗</a>
+            <a class="bot-action" href="/match-viewer">MATCH VIEWER / PREVIEW ↗</a>
+        </div>
+        <div class="bot-statusline"><span class="status-pulse"></span> SOURCE-LED SHOWCASE <span>·</span> NO FABRICATED MATCH TELEMETRY</div>
+    </header>
+
+    <section class="bot-stage" aria-label="SingularityBot decision pipeline">
+        <div class="stage-heading"><span>THE DECISION ENGINE</span><span>FOLLOW THE SIGNAL ↓</span></div>
+        <div class="decision-flow">
+            <article class="decision-node">
+                <span class="node-number">01</span><span class="node-icon">◉</span>
+                <h2>Observe</h2><p>Receive the SC2 observation and normalize visible units, resources, orders, map facts and game-loop state.</p>
+                <small>SC2 PROTOCOL / NORMALIZED OBSERVATION</small>
+            </article>
+            <div class="flow-link" aria-hidden="true"><span>›</span></div>
+            <article class="decision-node">
+                <span class="node-number">02</span><span class="node-icon">◎</span>
+                <h2>Understand</h2><p>Maintain match context, spatial intelligence, entity history and the current strategic picture.</p>
+                <small>WORLD MODEL / PERSISTENT CONTEXT</small>
+            </article>
+            <div class="flow-link" aria-hidden="true"><span>›</span></div>
+            <article class="decision-node">
+                <span class="node-number">03</span><span class="node-icon">⌘</span>
+                <h2>Coordinate</h2><p>Advisors and controllers propose strategic jobs and intents; the executive reviews and arbitrates competing work.</p>
+                <small>CHIEF / COMMANDERS / STRATEGIC REVIEW</small>
+            </article>
+            <div class="flow-link" aria-hidden="true"><span>›</span></div>
+            <article class="decision-node">
+                <span class="node-number">04</span><span class="node-icon">⌁</span>
+                <h2>Execute</h2><p>Unit behavior FSMs update, intents are validated against current facts, and the SC2 adapter submits legal actions.</p>
+                <small>FSM_API / VALIDATION / ACTION PIPELINE</small>
+            </article>
+        </div>
+        <p class="flow-footnote">This is a source-derived explanation of the implemented control path—not a live match feed or a simulation running in this page.</p>
+    </section>
+
+    <section class="bot-layers">
+        <div class="section-intro"><span>UNDER THE HOOD</span><h2>One bot. Several cooperating systems.</h2><p>Open a layer to see what it contributes and where the responsibility lives.</p></div>
+        <details open>
+            <summary><span>01</span><strong>FSM_API</strong><em>Persistent behavior</em></summary>
+            <p>Provides finite-state-machine execution and persistent entity contexts. Individual units can carry behavior over time instead of being treated as disposable rows in a script.</p>
+            <a href="https://github.com/TrentBest/FSM_API">Inspect FSM_API ↗</a>
+        </details>
+        <details>
+            <summary><span>02</span><strong>FSM_COS</strong><em>Capability composition</em></summary>
+            <p>Composes startup dependencies and runtime configuration. It is not a second game loop and does not take over the bot's live action lifecycle.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS">Inspect FSM_COS ↗</a>
+        </details>
+        <details>
+            <summary><span>03</span><strong>Physics</strong><em>Spatial reasoning</em></summary>
+            <p>Supplies spatial and path reasoning capabilities used by the bot's world model and movement decisions.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.Physics">Inspect Physics ↗</a>
+        </details>
+        <details>
+            <summary><span>04</span><strong>CommandAi</strong><em>Command vocabulary</em></summary>
+            <p>Provides the bot-owned command vocabulary and validation boundary. It does not bypass the bot's action arbitration or submit protocol actions itself.</p>
+            <a href="https://github.com/TrentBest/TheSingularityWorkshop.CommandAi">Inspect CommandAi ↗</a>
+        </details>
+    </section>
+
+    <section class="bot-capabilities">
+        <div class="section-intro"><span>WHAT EXISTS TODAY</span><h2>Show the real work.</h2><p>These are implementation boundaries, not marketing checkmarks.</p></div>
+        <div class="capability-grid">
+            <article><b>Terran Marine baseline</b><p>The default match configuration is Terran, preserving the established Marine-oriented baseline. Full opening success still requires live match and replay evidence.</p><span class="capability-state implemented">IMPLEMENTED / LIVE MATCH PROOF PENDING</span></article>
+            <article><b>Race-aware definitions</b><p>BotDefinition and race/mode selection provide a bounded authoring surface. A selectable opener is not the same as a complete, ladder-ready race composition.</p><span class="capability-state bounded">BOUNDED / EXPERIMENTAL</span></article>
+            <article><b>Bot Studio evidence</b><p>The runtime publishes read-only snapshots and a bounded event journal. The optional bridge is loopback-only and token-protected; it is not a public browser telemetry endpoint.</p><span class="capability-state local">LOCAL INSPECTION FOUNDATION</span></article>
+            <article><b>Forge editor</b><p>Author BotDefinition data, inspect JSON, run browser-side contract checks, and import or export portable definitions. Runtime validation remains authoritative.</p><span class="capability-state implemented">BROWSER AUTHORING AVAILABLE</span></article>
+        </div>
+    </section>
+
+    <section class="bot-journey">
+        <div><span class="section-eyebrow">THE VISITOR JOURNEY</span><h2>Understand it. Then play it. Then build your own.</h2><p>The intended experience grows in deliberate stages. We will not light up a Play button until a hosted match can actually be started, watched, stopped, adjudicated and cleaned up.</p></div>
+        <div class="journey-steps">
+            <article><span>01 / NOW</span><h3>Discover</h3><p>Explore the bot, its decision pipeline, source, and current evidence.</p><a href="https://github.com/TrentBest/TheSingularityWorkshop.SingularityBot/tree/development/docs">READ THE DOCUMENTATION ↗</a></article>
+            <article><span>02 / NEXT</span><h3>Play</h3><p>A hosted SC2 client fills the available stage. The browser receives its video and later sends session-authorized input. No console window in the visitor view.</p><small>WAITING FOR SERVERSC2 HOST + MEDIA + CONTROL PROOF</small></article>
+            <article><span>03 / GROWING</span><h3>Build</h3><p>Forge already authors portable bot definitions. The future editor-to-ladder workflow will submit immutable definitions and builds to a trusted host.</p><a href="https://github.com/TrentBest/TheSingularityWorkshop.SingularityBot/tree/development/docs/forge">OPEN FORGE SOURCE ↗</a></article>
+        </div>
+    </section>
+
+    <section class="bot-match-plan">
+        <div><span class="section-eyebrow">THE MATCH EXPERIENCE</span><h2>From Play to a story worth replaying.</h2><p>Our target is a complete session, not just an embedded video. The game view should occupy the available panel; after authoritative completion, the host supplies a report, replay and evidence. Then the visitor can play again or follow another experience.</p></div>
+        <ol>
+            <li><strong>Full-stage game view</strong><span>Host-rendered SC2 video, fitted to the available panel, with the host console kept out of the visitor UI.</span></li>
+            <li><strong>Authoritative match report</strong><span>Result, participants, bot build identities, map, duration, key events and evidence provenance.</span></li>
+            <li><strong>Replay and moment snapshots</strong><span>Replays plus selected, spoiler-conscious screenshots that help visitors and casters judge a match's potential.</span></li>
+            <li><strong>Play again or discover</strong><span>Return to the queue or move to the next Workshop experience by choice.</span></li>
+        </ol>
+        <p class="match-boundary">CURRENT LIMIT: ServerSC2's independent observer topology, browser media delivery, remote input, authoritative completion and replay capture are not yet proven end to end. The Play experience remains a planned integration, not an enabled service.</p>
+    </section>
+
+    <footer class="bot-footer"><a href="https://github.com/TrentBest/TheSingularityWorkshop.SingularityBot">SINGULARITYBOT SOURCE ↗</a><span>DECISIONS SHOULD BE INSPECTABLE. CLAIMS SHOULD BE PROVABLE.</span></footer>
+</main>
+
+<style>
+.bot-showcase{min-height:100%;padding:clamp(1rem,4vw,3.5rem);background:radial-gradient(ellipse at 50% 0,rgba(0,190,255,.12),transparent 42%),#020711;color:#e9f8ff;font-family:system-ui,sans-serif}
+.bot-hero,.bot-stage,.bot-layers,.bot-capabilities,.bot-journey,.bot-match-plan,.bot-footer{max-width:1240px;margin-left:auto;margin-right:auto}
+.bot-back,.bot-kicker,.stage-heading,.node-number,.decision-node small,.section-intro>span,.section-eyebrow,.capability-state,.journey-steps article>span,.journey-steps small,.match-boundary,.bot-footer{font:700 .65rem Consolas,monospace;letter-spacing:.14em}
+.bot-back{color:#82a8b8;text-decoration:none}.bot-kicker{margin-top:3rem;color:#00eaff}.bot-hero h1{font-size:clamp(3rem,9vw,7rem);line-height:.9;letter-spacing:-.065em;margin:.7rem 0 1.3rem}.bot-hero h1 span{color:#ff3bd4}.bot-lede{max-width:850px;color:#aac4d0;font-size:clamp(1rem,2vw,1.25rem);line-height:1.7}.bot-hero-actions{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.8rem 0}.bot-action{display:inline-flex;padding:.9rem 1.1rem;border:1px solid rgba(0,234,255,.3);color:#aeeeff;text-decoration:none;font:700 .68rem Consolas,monospace;letter-spacing:.08em}.bot-action:hover{border-color:#ff3bd4;color:#fff}.bot-action.primary{background:rgba(0,234,255,.1);border-color:#00eaff;color:#fff}.bot-statusline{color:#7796a5;font:700 .62rem Consolas,monospace;letter-spacing:.12em}.status-pulse{display:inline-block;width:.5rem;height:.5rem;border-radius:50%;background:#63e6aa;box-shadow:0 0 12px #63e6aa;margin-right:.5rem;animation:botPulse 1.8s infinite}.bot-statusline span{padding:0 .5rem;color:#ff3bd4}
+.bot-stage{margin-top:3.5rem;border:1px solid rgba(0,234,255,.2);background:linear-gradient(145deg,rgba(5,19,35,.96),rgba(3,9,20,.98));padding:clamp(1rem,3vw,2rem);box-shadow:0 25px 90px rgba(0,0,0,.25)}.stage-heading{display:flex;justify-content:space-between;color:#7ea5b5;padding-bottom:1rem;border-bottom:1px solid rgba(0,234,255,.15)}.stage-heading span:last-child{color:#ff70dc}.decision-flow{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;gap:.55rem;padding:2rem 0 1rem}.decision-node{position:relative;min-width:0;padding:1.1rem;background:rgba(0,234,255,.035);border:1px solid rgba(0,234,255,.16);animation:nodeGlow 5s ease-in-out infinite}.decision-node:nth-of-type(3){animation-delay:1s}.decision-node:nth-of-type(5){animation-delay:2s}.decision-node:nth-of-type(7){animation-delay:3s}.node-number{color:#ff70dc}.node-icon{display:block;font-size:2rem;color:#00eaff;margin:.8rem 0}.decision-node h2{font-size:1.25rem;margin:.3rem 0}.decision-node p{font-size:.84rem;color:#9db7c5;line-height:1.65;min-height:7.2em}.decision-node small{font-size:.53rem;color:#66b8cb;line-height:1.5}.flow-link{display:grid;place-items:center;color:#ff70dc;font-size:2rem}.flow-footnote{border-top:1px solid rgba(0,234,255,.12);padding-top:1rem;color:#6f909f;font-size:.75rem;line-height:1.6}
+.bot-layers,.bot-capabilities,.bot-journey,.bot-match-plan{margin-top:4rem}.section-intro{margin-bottom:1.2rem}.section-intro>span,.section-eyebrow{color:#00eaff}.section-intro h2,.bot-journey h2,.bot-match-plan h2{font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-.04em;margin:.5rem 0}.section-intro p,.bot-journey>div>p,.bot-match-plan>div>p{max-width:75ch;color:#9fb7c4;line-height:1.7}.bot-layers details{border-top:1px solid rgba(0,234,255,.17);padding:1rem .3rem}.bot-layers details:last-child{border-bottom:1px solid rgba(0,234,255,.17)}.bot-layers summary{display:grid;grid-template-columns:3rem minmax(8rem,1fr) minmax(10rem,auto);align-items:center;gap:1rem;cursor:pointer;list-style:none}.bot-layers summary::-webkit-details-marker{display:none}.bot-layers summary span{color:#ff70dc;font:700 .7rem Consolas,monospace}.bot-layers summary strong{font-size:1.1rem}.bot-layers summary em{font-style:normal;color:#83a4b3;font-size:.8rem}.bot-layers details p{max-width:78ch;color:#9fb7c4;line-height:1.7;margin:.9rem 0 .6rem 4rem}.bot-layers details a{margin-left:4rem;color:#65dfff;font-size:.8rem}
+.capability-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.capability-grid article{padding:1.3rem;background:#061323;border:1px solid rgba(0,234,255,.15)}.capability-grid b{font-size:1.05rem}.capability-grid p{color:#9fb7c4;line-height:1.65;font-size:.87rem;min-height:5.3em}.capability-state{font-size:.56rem;line-height:1.5}.implemented{color:#6fe3b0}.bounded{color:#ffc47b}.local{color:#85d7f5}
+.bot-journey{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.5fr);gap:2rem;padding:2rem;border:1px solid rgba(255,59,212,.2);background:linear-gradient(110deg,rgba(255,59,212,.055),rgba(0,234,255,.035))}.journey-steps{display:grid;gap:.8rem}.journey-steps article{padding:1rem;border-left:2px solid rgba(0,234,255,.45);background:rgba(0,0,0,.16)}.journey-steps article>span{color:#ff70dc}.journey-steps h3{font-size:1.15rem;margin:.45rem 0}.journey-steps p{color:#9fb7c4;line-height:1.6;font-size:.84rem}.journey-steps a{color:#65dfff;font:700 .6rem Consolas,monospace}.journey-steps small{color:#ffc47b;font-size:.56rem;line-height:1.6}
+.bot-match-plan{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:2rem}.bot-match-plan ol{margin:0;padding:0;list-style:none;counter-reset:match}.bot-match-plan li{counter-increment:match;display:grid;grid-template-columns:2rem 1fr;gap:.2rem .8rem;padding:.8rem 0;border-bottom:1px solid rgba(0,234,255,.13)}.bot-match-plan li:before{content:counter(match,decimal-leading-zero);grid-row:span 2;color:#ff70dc;font:700 .7rem Consolas,monospace}.bot-match-plan li strong{font-size:.92rem}.bot-match-plan li span{color:#9fb7c4;font-size:.8rem;line-height:1.55}.match-boundary{grid-column:1/-1;padding:1rem;border-left:3px solid #ffc47b;background:rgba(255,196,123,.06);color:#d5b98e;font-size:.58rem;line-height:1.7}
+.bot-footer{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:3rem;padding-top:1.2rem;border-top:1px solid rgba(0,234,255,.15);color:#6f8e9d;font-size:.56rem}.bot-footer a{color:#65dfff;text-decoration:none}
+@@keyframes botPulse{50%{opacity:.45;box-shadow:0 0 2px #63e6aa}}@@keyframes nodeGlow{0%,100%{border-color:rgba(0,234,255,.12);transform:translateY(0)}50%{border-color:rgba(0,234,255,.48);transform:translateY(-3px)}}
+@@media(max-width:980px){.decision-flow{grid-template-columns:1fr 1fr;gap:.8rem}.flow-link{display:none}.decision-node p{min-height:0}.bot-journey,.bot-match-plan{grid-template-columns:1fr}}
+@@media(max-width:620px){.decision-flow,.capability-grid{grid-template-columns:1fr}.bot-layers summary{grid-template-columns:2.2rem 1fr}.bot-layers summary em{grid-column:2}.bot-layers details p,.bot-layers details a{margin-left:2.2rem}.bot-footer{flex-direction:column}}
+</style>
