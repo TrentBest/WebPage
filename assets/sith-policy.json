@@ -11,7 +11,7 @@
   ],
   "branch_count": 2,
   "status": "COMPLIANT",
-  "evaluated_at": "2026-11-27T13:49:14Z",
-  "workflow_run": "https://github.com/TrentBest/WebPage/actions/runs/46010380184",
-  "triggering_commit": "676d8a882549faa51c4bf2c5f24556a8c29a718d"
+  "evaluated_at": "2026-11-28T12:57:26Z",
+  "workflow_run": "https://github.com/TrentBest/WebPage/actions/runs/46147172742",
+  "triggering_commit": "94d84fbdd6e069f1848b029e0fc89f87989900b7"
 }
