@@ -1,0 +1,122 @@
+@page "/match-viewer"
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Match Viewer // The Singularity Workshop</PageTitle>
+
+<main class="match-viewer">
+    <a class="viewer-back" href="/replay-lab">← REPLAY LAB</a>
+    <header class="viewer-header">
+        <p class="viewer-kicker">THE SINGULARITY WORKSHOP / SERVER SC2</p>
+        <h1>Match <span>Viewer</span></h1>
+        <p>Watch a browser-compatible spectator feed from a hosted match. Match hosting and media delivery are separate services; this page never pretends a local fixture is a live game.</p>
+    </header>
+
+    @if (StreamUri is not null)
+    {
+        <section class="viewer-stage" aria-label="Live match video">
+            <div class="stage-heading">
+                <span><i class="live-dot"></i> STREAM SOURCE CONFIGURED</span>
+                <span>@(string.IsNullOrWhiteSpace(MatchId) ? "UNASSIGNED MATCH" : $"MATCH {MatchId}")</span>
+            </div>
+            <video class="match-video" controls playsinline preload="metadata" src="@StreamUri.AbsoluteUri">
+                Your browser cannot play this stream format. Try a browser-compatible MP4, WebM, or HLS source.
+            </video>
+            <p class="stream-note">Playback is visitor-controlled. The stream URL is supplied in this page's <code>stream</code> query parameter; no stream is created or proxied by WebPage.</p>
+        </section>
+    }
+    else
+    {
+        <section class="viewer-stage viewer-empty" aria-label="No match stream configured">
+            <div class="signal-ring"><span></span></div>
+            <p class="empty-kicker">SPECTATOR CHANNEL / STANDBY</p>
+            <h2>No match feed attached</h2>
+            <p>When a trusted host publishes a browser-compatible stream, open this page with its HTTPS media URL in the <code>stream</code> query parameter.</p>
+            <p class="empty-example"><code>/match-viewer?matchId=demo-001&amp;stream=https%3A%2F%2Fmedia.example.com%2Fmatch%2Fdemo-001.mp4</code></p>
+            <span class="standby-label">WAITING FOR HOST MEDIA DELIVERY</span>
+        </section>
+    }
+
+    @if (HasRejectedStream)
+    {
+        <p class="viewer-warning" role="alert">The supplied stream URL was rejected. Only absolute HTTPS URLs without embedded credentials are accepted.</p>
+    }
+
+    <section class="viewer-boundary">
+        <div>
+            <span class="boundary-index">01 / PAGE CAPABILITY</span>
+            <h2>Browser playback</h2>
+            <p>This page can play a direct HTTPS media resource supported by the visitor's browser. MP4 and WebM are broadly supported; HLS support varies by browser. Playback is not a StarCraft II client running in the browser.</p>
+        </div>
+        <div>
+            <span class="boundary-index">02 / SERVERSC2 INTEGRATION</span>
+            <h2>Host and observer</h2>
+            <p>ServerSC2 currently provides match-session foundations, not a browser media-stream endpoint. Its independent observer, authoritative terminal evidence, replay capture, and live process topology still need proof before this page can claim a live ServerSC2 match.</p>
+        </div>
+        <div>
+            <span class="boundary-index">03 / NEXT CONTRACT</span>
+            <h2>Session-bound stream</h2>
+            <p>The eventual integration should bind a short-lived, read-only spectator URL to an immutable match/session ID, expose health and lifecycle state separately, and never expose player-control or observer-only game data to competitors.</p>
+        </div>
+    </section>
+    <footer class="viewer-footer">No automatic playback · No player actions · No match data is uploaded by this page</footer>
+</main>
+
+@code {
+    [SupplyParameterFromQuery(Name = "stream")]
+    public string? Stream { get; set; }
+
+    [SupplyParameterFromQuery(Name = "matchId")]
+    public string? MatchId { get; set; }
+
+    private Uri? StreamUri
+    {
+        get
+        {
+            if (!Uri.TryCreate(Stream, UriKind.Absolute, out var uri) ||
+                !string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) ||
+                !string.IsNullOrEmpty(uri.UserInfo))
+                return null;
+
+            return uri;
+        }
+    }
+
+    private bool HasRejectedStream =>
+        !string.IsNullOrWhiteSpace(Stream) && StreamUri is null;
+}
+
+<style>
+.match-viewer{min-height:100vh;box-sizing:border-box;padding:clamp(1rem,4vw,3.5rem);background:radial-gradient(ellipse at 72% 4%,rgba(0,168,255,.12),transparent 32%),#020711;color:#eafaff;font-family:system-ui,sans-serif}
+.viewer-back{display:inline-block;color:#7c9ca9;text-decoration:none;font:700 .68rem Consolas,monospace;letter-spacing:.12em}
+.viewer-back:hover,.viewer-back:focus-visible{color:#00eaff}
+.viewer-header,.viewer-stage,.viewer-boundary{max-width:1180px;margin-left:auto;margin-right:auto}
+.viewer-header{margin-top:2rem;margin-bottom:1.5rem}
+.viewer-kicker,.boundary-index,.empty-kicker,.standby-label{color:#00eaff;font:700 .66rem Consolas,monospace;letter-spacing:.16em}
+.viewer-header h1{font-size:clamp(3rem,8vw,6.5rem);line-height:.9;letter-spacing:-.06em;margin:.8rem 0}
+.viewer-header h1 span{color:#ff2cff}
+.viewer-header>p:last-child{max-width:72ch;color:#a6bec9;line-height:1.7}
+.viewer-stage{border:1px solid rgba(0,234,255,.24);background:rgba(4,13,27,.94);box-shadow:0 25px 90px rgba(0,0,0,.28)}
+.stage-heading{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:1rem 1.2rem;border-bottom:1px solid rgba(0,234,255,.14);color:#9bb7c2;font:700 .63rem Consolas,monospace;letter-spacing:.1em}
+.live-dot{display:inline-block;width:.5rem;height:.5rem;margin-right:.45rem;border-radius:50%;background:#5de5a5;box-shadow:0 0 12px #5de5a5}
+.match-video{display:block;width:100%;max-height:72vh;aspect-ratio:16/9;background:#000;object-fit:contain}
+.stream-note{margin:0;padding:.8rem 1.2rem;color:#8fa9b6;font-size:.76rem;line-height:1.55}
+.viewer-empty{min-height:390px;box-sizing:border-box;padding:clamp(2rem,6vw,5rem);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;position:relative}
+.viewer-empty:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(0,234,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(0,234,255,.045) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(transparent,#000 25%,#000 75%,transparent);pointer-events:none}
+.signal-ring{position:relative;width:74px;height:74px;border:1px solid rgba(0,234,255,.4);border-radius:50%;display:grid;place-items:center;box-shadow:0 0 35px rgba(0,234,255,.12);margin-bottom:1.5rem}
+.signal-ring:before,.signal-ring:after{content:"";position:absolute;inset:10px;border:1px solid rgba(255,44,255,.3);border-radius:50%}
+.signal-ring:after{inset:-9px;border-color:rgba(0,234,255,.14)}
+.signal-ring span{width:10px;height:10px;border-radius:50%;background:#00eaff;box-shadow:0 0 18px #00eaff}
+.empty-kicker{position:relative;color:#ffb15c}
+.viewer-empty h2{position:relative;font-size:clamp(1.6rem,4vw,2.5rem);margin:.65rem 0}
+.viewer-empty>p:not(.empty-kicker){position:relative;max-width:66ch;color:#9eb4bf;line-height:1.65}
+.empty-example{max-width:100%;overflow-wrap:anywhere;padding:.8rem 1rem;border:1px solid rgba(0,234,255,.18);background:rgba(0,234,255,.035)}
+.standby-label{position:relative;margin-top:1rem;color:#ffb15c;font-size:.58rem}
+.viewer-warning{max-width:1180px;margin:1rem auto;padding:.85rem 1rem;border-left:3px solid #ffb15c;background:rgba(255,177,92,.07);color:#ffd29a;font-size:.85rem}
+.viewer-boundary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:1.5rem;border:1px solid rgba(0,234,255,.16);background:rgba(0,234,255,.16)}
+.viewer-boundary>div{padding:1.2rem;background:#040d1b}
+.viewer-boundary h2{font-size:1.05rem;margin:.8rem 0 .5rem}
+.viewer-boundary p{margin:0;color:#9eb4bf;font-size:.82rem;line-height:1.65}
+.boundary-index{font-size:.57rem;color:#7e9eac}
+.viewer-footer{max-width:1180px;margin:1.5rem auto 0;color:#6f8c99;font:700 .6rem Consolas,monospace;letter-spacing:.1em;text-align:center}
+@media(max-width:760px){.viewer-boundary{grid-template-columns:1fr}.viewer-empty{min-height:330px;padding:2rem 1rem}.stage-heading{font-size:.55rem}}
+</style>
