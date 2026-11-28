@@ -66,6 +66,16 @@
       "microBundles": []
     },
     {
+      "name": "SingularityBot",
+      "kind": "ExperienceGallery",
+      "description": "Meet the StarCraft II decision engine, trace its real implementation layers, inspect the browser Forge authoring workbench, and follow the evidence toward hosted play. Live matches are not enabled yet.",
+      "deploymentUrl": null,
+      "aboutUrl": "/singularity-bot",
+      "bridgeEndpoint": null,
+      "route": "/singularity-bot",
+      "microBundles": []
+    },
+    {
       "name": "Singularity Studios",
       "kind": "ExperienceGallery",
       "description": "Explore the virtual-production vision, reusable soundstage data, SFX, and the boundary between reference audio and physical acoustics.",
